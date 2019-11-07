@@ -1,0 +1,20 @@
+path_in:  datasources/SEDS
+file_out: eia_heatrate_parsed.csv
+description: EIA Average Tested Heat Rates -- https://www.eia.gov/electricity/annual/html/epa_08_02.html
+
+file_in:
+    name: generator_heat_rates.csv
+
+# OUTPUT COLUMNS -- ORDERED list of output columns and value types.
+col_out:
+    - year:      int
+    - coal:      int
+    - petroleum: int
+    - nat_gas:   int
+    - nuclear:   int
+    - units:     string
+
+# SET -- Define a column 'col' and set all elements to the value 'val'.
+setting:
+    col:    units
+    val:    btu per kWh generated

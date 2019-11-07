@@ -1,0 +1,89 @@
+path_in:  datasources/SEDS/Emissions
+file_out: emissions_all.csv
+description: ""
+
+file_in:
+    # name:     coal_CO2_by_state_2013.xlsx
+    # nickname: coal
+    # sheet:    Sheet1
+    # range:    A3:AI55
+
+    - name:      commercial_CO2_by_state_2013.xlsx
+      nickname:  com
+      sheet:     Sheet1
+      range:     A3:AI55
+      
+    - name:      electric_CO2_by_state_2013.xlsx
+      nickname:  elec
+      sheet:     Sheet1
+      range:     A3:AI55
+
+    # - name:      industrial_CO2_by_state_2013.xlsx
+    #   nickname:  ind
+    #   sheet:     Sheet1
+    #   range:     A3:AI55
+      
+    # - name:      natural_gas_CO2_by_state_2013.xlsx
+    #   nickname:  natgas
+    #   sheet:     Sheet1
+    #   range:     A3:AI55
+      
+    # - name:      petroleum_CO2_by_state_2013.xlsx
+    #   nickname:  petrol
+    #   sheet:     Sheet1
+    #   range:     A3:AI55
+      
+    # - name:      residential_CO2_by_state_2013.xlsx
+    #   nickname:  res
+    #   sheet:     Sheet1
+    #   range:     A3:AI55
+      
+    # - name:      transportation_CO2_by_state_2013.xlsx
+    #   nickname:  trans
+    #   sheet:     Sheet1
+    #   range:     A3:AI55
+
+# OUTPUT COLUMNS -- ORDERED list of output columns and value types.
+col_out:
+    - source:    string
+    - region:    string
+    - year:      int
+    - emissions: float
+    - units:     string
+
+# RENAME -- Columns 'from' -> 'to'.
+renaming:
+    from:   State
+    to:     region
+
+# MELT -- Normalize the dataframe by 'melting' columns into rows.
+# This will lengthen the dataframe by duplicating values in the column 'on'
+# into new rows. This will define two new columns:
+#   (1) 'var' (of 'type') with header names from the original dataframe.
+#   (2) 'val' with column values from the original dataframe.
+melting:
+    on:     region
+    var:    year
+    val:    emissions
+    type:   int
+
+# SET -- Define a column 'col' and set all elements to the value 'val'.
+setting:
+    col:    units
+    val:    million metric tons of carbon dioxide
+
+# APPEND
+appending:
+    col:    source
+    val:    nickname
+
+# MAP -- Define an 'output' column containing values based on those in an
+# 'input' column. The mapping columns 'from' -> 'to' are contained in a
+# .csv 'file' in the core_maps directory. The columns 'input' and 'from'
+# should contain the same values, as should 'output' and 'to'.
+mapping:
+    file:     "regions"
+    from:     "from"
+    to:       "to"
+    input:    "region"
+    output:   "region"

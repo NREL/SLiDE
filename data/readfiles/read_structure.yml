@@ -1,0 +1,39 @@
+
+
+# Define the inputs and their types.
+file_in:
+    name:     string
+    nickname: string
+    sheet:    string
+    range:    string
+
+# This dictionary sets column values
+setting:
+    col:    symbol
+    val:    Any
+
+replacing:
+    col:    symbol
+    from:   Any
+    to:     Any
+
+renaming:
+    from:   symbol
+    to:     symbol
+
+mapping:
+    file:   string
+    from:   symbol
+    to:     symbol
+    input:  symbol
+    output: symbol
+
+melting:
+    on:     symbol
+    var:    symbol
+    val:    symbol
+    type:   string
+
+appending:
+    col:    symbol
+    val:    string
