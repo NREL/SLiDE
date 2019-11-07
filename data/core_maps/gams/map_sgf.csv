@@ -1,0 +1,50 @@
+from,to
+Total Revenue,TOTREV
+Total Revenue - General Revenue,GENREV
+Total Revenue - General Revenue - Intergovernmental Revenue,INTREV
+Total Revenue - General Revenue - Intergovernmental Revenue - From Federal,INTFED
+Total Revenue - General Revenue - Intergovernmental Revenue - From Local,INTLOC
+Total Revenue - General Revenue - Total Taxes,TAXREV
+Total Revenue - General Revenue - Total Taxes - General Sales and Gross Receipts Taxes,GSALES
+Total Revenue - General Revenue - Total Taxes - Selective Sales and Gross Receipts Taxes,SSALES
+Total Revenue - General Revenue - Total Taxes - License Taxes,LICTAX
+Total Revenue - General Revenue - Total Taxes - Individual Income Taxes,INDTAX
+Total Revenue - General Revenue - Total Taxes - Corporation Net Income Taxes,CORTAX
+Total Revenue - General Revenue - Total Taxes - All Other Taxes,OTHTAX
+Total Revenue - General Revenue - Current Charges,CURCHG
+Total Revenue - General Revenue - Miscellaneous General Revenue,MSCREV
+Total Revenue - Utility Revenue,UTLREV
+Total Revenue - Liquor Stores Revenue,LIQREV
+Total Revenue - Insurance Trust Revenue,INSREV
+Total Revenue - Insurance Trust Revenue - Unemployment Compensation Systems,UNEMPL
+Total Revenue - Insurance Trust Revenue - State-Administered Pension Systems,PENSON
+Total Revenue - Insurance Trust Revenue - Workers' Compensation Systems,WRKCMP
+Total Revenue - Insurance Trust Revenue - Other Insurance Trust Systems,OTHINS
+Total Expenditure,TOTEXP
+Total Expenditure - Intergovernmental Expenditure,INTEXP
+Total Expenditure - Direct Expenditure,DIREXP
+Total Expenditure - Direct Expenditure - Current Operations,CUROPR
+Total Expenditure - Direct Expenditure - Capital Outlay,CAPOUT
+Total Expenditure - Direct Expenditure - Insurance Benefits and Repayments,INSBEN
+Total Expenditure - Direct Expenditure - Assistance and Subsidies,SUBSID
+Total Expenditure - Direct Expenditure - Interest on Debt,INTRST
+Total Expenditure - Exhibit: Salaries and Wages,SALARY
+Total Expenditure - General Expenditure,GENEXP
+Total Expenditure - General Expenditure - Direct General Expenditure,DIRGEX
+"General Expenditure, by Function: - Education",EDUCAT
+"General Expenditure, by Function: - Public Welfare",PUBWEL
+"General Expenditure, by Function: - Hospitals",HOSPTL
+"General Expenditure, by Function: - Health",HEALTH
+"General Expenditure, by Function: - Highways",HGHWAY
+"General Expenditure, by Function: - Police Protection",POLICE
+"General Expenditure, by Function: - Correction",CORREC
+"General Expenditure, by Function: - Natural Resources",NATRES
+"General Expenditure, by Function: - Parks and Recreation",PARKRC
+"General Expenditure, by Function: - Governmental Administration",GOVADM
+"General Expenditure, by Function: - Interest on General Debt",INTGEN
+"General Expenditure, by Function: - Other and Unallocable",OTHUNA
+Utility Expenditure,UTLEXP
+Liquor Stores Expenditure,LIQEXP
+Insurance Trust Expenditure,INSEXP
+"Debt Outstanding, Long Term and Short Term",DEBTFY
+Cash and Security Holdings,CASHSH
