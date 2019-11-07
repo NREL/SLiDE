@@ -1,3 +1,5 @@
 .DS_Store
 .git/
+data/scratch.jl
 data/datasources/
+data/outputs/

@@ -151,9 +151,10 @@ end
 # ------------------------------------------------------------------------------
 yaml_structure = YAML.load(open("readfiles/read_structure.yml"))
 
+y = read_yaml("read_bea_supply");
 # y = read_yaml("read_bea_use");
 # y = read_yaml("read_crude_oil");
-y = read_yaml("read_emissions");
+# y = read_yaml("read_emissions");
 # y = read_yaml("read_heatrate");
 
 df = DataFrame()
