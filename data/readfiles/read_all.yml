@@ -1,0 +1,9 @@
+path_out: outputs
+file:
+    - read_bea_supply
+    - read_bea_supply_detailed
+    - read_bea_use
+    - read_bea_use_detailed
+    - read_crude_oil
+    - read_emissions
+    - read_heatrate

@@ -414,7 +414,7 @@ S00201,State and local government passenger transit,trn_sle,sle,goods
 S00202,State and local government electric utilities,ele_sle,sle,goods
 T007,Total Commodity Output,Output,Output,
 MCIF,Imports,imports,imports,
-TRADE ,Trade margins,Margins,Margins,
+TRADE,Trade margins,Margins,Margins,
 MADJ,CIF/FOB Adjustments on Imports,ciffob,ciffob,
 TRANS,Transportation costs,TrnCost,TrnCost,
 T013,Total product supply (basic prices),BasicSupply,BasicSupply,

@@ -1,13 +1,13 @@
 path_in:  datasources/BEA_2007_2012
-file_out: bea_use_io_detailed.csv
-description: BEA IO Use Table (Detailed) -- https://www.bea.gov/industry/input-output-accounts-data
+file_out: bea_supply_io_detailed.csv
+description: BEA IO Supply Table (Detailed) -- https://www.bea.gov/industry/input-output-accounts-data
 
 file_in:
-    name:     Use_SUT_Framework_2007_2012_DET.xlsx
+    name:     Supply_2007_2012_DET.xlsx
     sheet:
         - 2007
         - 2012
-    range:    B6:PL420
+    range:    B6:PC412
 
 # OUTPUT COLUMNS -- ORDERED list of output columns and value types.
 col_out:

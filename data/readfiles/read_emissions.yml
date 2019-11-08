@@ -3,10 +3,10 @@ file_out: emissions_all.csv
 description: ""
 
 file_in:
-    # name:     coal_CO2_by_state_2013.xlsx
-    # nickname: coal
-    # sheet:    Sheet1
-    # range:    A3:AI55
+    - name:     coal_CO2_by_state_2013.xlsx
+      nickname: coal
+      sheet:    Sheet1
+      range:    A3:AI55
 
     - name:      commercial_CO2_by_state_2013.xlsx
       nickname:  com
@@ -18,30 +18,30 @@ file_in:
       sheet:     Sheet1
       range:     A3:AI55
 
-    # - name:      industrial_CO2_by_state_2013.xlsx
-    #   nickname:  ind
-    #   sheet:     Sheet1
-    #   range:     A3:AI55
+    - name:      industrial_CO2_by_state_2013.xlsx
+      nickname:  ind
+      sheet:     Sheet1
+      range:     A3:AI55
       
-    # - name:      natural_gas_CO2_by_state_2013.xlsx
-    #   nickname:  natgas
-    #   sheet:     Sheet1
-    #   range:     A3:AI55
+    - name:      natural_gas_CO2_by_state_2013.xlsx
+      nickname:  natgas
+      sheet:     Sheet1
+      range:     A3:AI55
       
-    # - name:      petroleum_CO2_by_state_2013.xlsx
-    #   nickname:  petrol
-    #   sheet:     Sheet1
-    #   range:     A3:AI55
+    - name:      petroleum_CO2_by_state_2013.xlsx
+      nickname:  petrol
+      sheet:     Sheet1
+      range:     A3:AI55
       
-    # - name:      residential_CO2_by_state_2013.xlsx
-    #   nickname:  res
-    #   sheet:     Sheet1
-    #   range:     A3:AI55
+    - name:      residential_CO2_by_state_2013.xlsx
+      nickname:  res
+      sheet:     Sheet1
+      range:     A3:AI55
       
-    # - name:      transportation_CO2_by_state_2013.xlsx
-    #   nickname:  trans
-    #   sheet:     Sheet1
-    #   range:     A3:AI55
+    - name:      transportation_CO2_by_state_2013.xlsx
+      nickname:  trans
+      sheet:     Sheet1
+      range:     A3:AI55
 
 # OUTPUT COLUMNS -- ORDERED list of output columns and value types.
 col_out:

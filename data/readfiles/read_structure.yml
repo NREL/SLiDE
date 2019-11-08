@@ -34,6 +34,10 @@ melting:
     val:    symbol
     type:   string
 
+missing:
+    col:    symbol
+    to:     any
+
 appending:
     col:    symbol
     val:    string
