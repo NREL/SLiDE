@@ -1,5 +1,7 @@
 .DS_Store
 .git/
+parse.py
 data/scratch.jl
 data/datasources/
 data/outputs/
+docs/

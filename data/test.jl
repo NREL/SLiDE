@@ -19,8 +19,8 @@ using DataFrames
 
 # dataframe_mapping(df, y)
 
-# df_maps = Dict(k => CSV.read("core_maps/$k.csv", silencewarnings = true)
-#     for k in unique([v for d in y["mapping"] for v in [d["file"]]]))
+df_maps = Dict(k => CSV.read("core_maps/$k.csv", silencewarnings = true)
+    for k in unique([v for d in y["mapping"] for v in [d["file"]]]))
 
 for d in y["mapping"]
     global df[!, d["input"]]  .= string.(strip.(df[!, d["input"]]))

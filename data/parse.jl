@@ -204,6 +204,13 @@ end
 
 # ------------------------------------------------------------------------------
 function dataframe_appending(df::DataFrame, df_temp::DataFrame, y::Dict, f::Dict)
+    """
+    This function appends a dataframe 'df_temp' to a dataframe 'df' and returns
+    'df', first adding the necessary columns to 'df_temp' (for example, if the
+    slice of data is specific to a year, a column containing that year should be
+    added.)
+    """
+
     [df_temp[!, d["col"]] .= f[d["val"]] for d in y["appending"]]
     df = vcat(df, df_temp)
     return df
@@ -211,6 +218,9 @@ end
 
 # ------------------------------------------------------------------------------
 function dataframe_reordering(df::DataFrame, y::Dict)
+    """
+    This function reorders the dataframe columns and updates their types.
+    """
 
     # Reorder columns.
     cols = [Symbol(k) for c in y["col_out"] for k in keys(c)]
