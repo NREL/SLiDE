@@ -21,7 +21,7 @@ function convert_type(type::String, x::Any)
     type = lowercase(type)
 
     if     occursin("symbol", type);  x = Symbol.(x)
-    elseif occursin("string", type);  x = string.(x)
+    elseif occursin("string", type);  x = string.(strip.(string.(x)))
     elseif occursin("float",  type);  x = parse.(Float64, string.(x))
     elseif occursin("int",    type)
         x = (typeof(x[1]) == Date) ? map(k -> Dates.year(k), x) :
@@ -61,9 +61,13 @@ function read_dataframe_from_yaml(filepath::String, file::Dict)
     
     if occursin(".xlsx", input)
         xf = XLSX.readdata(input, file["sheet"], file["range"])
-        df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]))
+        df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique = true)
     elseif occursin(".csv", input)
-        df = CSV.read(input)
+
+        # CSV.read() called with 'silencewarnings' enabled to prevent warnings
+        # for empty cells. These will be read as 'missing'.
+        df = CSV.read(input, silencewarnings = true)
+        if "foot" in keys(file);  df = df[1:end-file["foot"],:];  end
     end
 
     return df
@@ -95,6 +99,7 @@ function map_with_dataframe(input, mapfile::String;
     # for empty cells. These will be read as 'missing'.
     df_map = CSV.read("core_maps/$mapfile.csv", silencewarnings = true)
     dict_map = Dict(k => v for (k, v) in zip(df_map[!, from], df_map[!, to]))
+    # dict_map[" "] = ""
 
     output = map(x -> dict_map[x], input);
     return output
@@ -109,9 +114,43 @@ function map_with_dataframe(input, mapfile::DataFrame;
 
     df_map = mapfile
     dict_map = Dict(k => v for (k, v) in zip(df_map[!, from], df_map[!, to]))
+    # dict_map[" "] = ""
 
     output = map(x -> dict_map[x], input);
+    
     return output
+end
+
+# ------------------------------------------------------------------------------
+function join_to_dataframe(df::DataFrame, mapfile::String;
+    input::Symbol, on::Symbol)
+
+    # CSV.read() called with 'silencewarnings' enabled to prevent warnings
+    # for empty cells. These will be read as 'missing'.
+    df_map = CSV.read("core_maps/$mapfile.csv", silencewarnings = true)
+
+    df_join = join(df_map, rename(df, input => on), on = on)
+    return unique!(df_join)
+
+end
+
+# ------------------------------------------------------------------------------
+#               DATAFRAME EDITING
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+function dataframe_joining(df, y)
+
+    for d in y["joining"]
+        
+        df[!, d["input"]][completecases(df, d["input"])] .= string.(strip.(
+            df[:, d["input"]][completecases(df, d["input"])]))
+
+        df = join_to_dataframe(df, d["file"]; input = d["input"], on = d["from"])
+        df = df[!, setdiff(names(df), [d["from"]])]
+        rename!(df, d["to"] => d["output"])
+    end
+    return df
 end
 
 # ------------------------------------------------------------------------------
@@ -119,7 +158,15 @@ function dataframe_renaming(df::DataFrame, y::Dict)
     """
     This function renames columns 'from' -> 'to'.
     """
-    rename!(df, [d["from"] => d["to"] for d in y["renaming"]])
+    
+    if "col" in keys(y["renaming"][1])
+        rename!(df, [d["from"] => d["to"] for d in y["renaming"]
+            if d["from"] in [names(df)[d["col"]]]])
+    else
+        rename!(df, [d["from"] => d["to"] for d in y["renaming"]
+            if d["from"] in names(df)])
+    end
+
     return df
 end
 
@@ -132,10 +179,18 @@ function dataframe_melting(df::DataFrame, y::Dict)
       (1) 'var' (of 'type') with header names from the original dataframe.
       (2) 'val' with column values from the original dataframe.
     """
-    for d in y["melting"]
-        df = melt(df, d["on"], variable_name = d["var"], value_name = d["val"])
-        df[!, d["var"]] = convert_type(d["type"], df[!, d["var"]])
+    d = copy(y["melting"][1])
+    # println(d)
+
+    if size(y["melting"])[1] > 1
+        d["on"] = intersect([c["on"] for c in y["melting"]], names(df))
     end
+
+    # println(d["on"])
+
+    df = melt(df, d["on"], variable_name = d["var"], value_name = d["val"])
+    df[!, d["var"]] = convert_type(d["type"], df[!, d["var"]])
+
     return df
 end
 
@@ -200,6 +255,30 @@ function dataframe_replacing(df::DataFrame, y::Dict)
 end
 
 # ------------------------------------------------------------------------------
+function dataframe_grouping(df::DataFrame, y::Dict)
+
+    for d in y["grouping"]
+
+        df[!,:start] = (1:size(df)[1]) .+ 1
+
+        # Make matrix with info on where to split.
+        df_split = join_to_dataframe(df, d["file"];
+            input = d["input"], on = d["from"])
+        
+        sort!(unique!(df_split), :start)
+        df_split[!, :stop] .= vcat(df_split[2:end, :start] .- 2, [size(df)[1]])
+
+        # Initialize output column.
+        df[!, d["output"]] .= ""
+
+        for row in eachrow(df_split)
+            df[row[:start]:row[:stop], d["output"]] .= row[d["to"]]
+        end
+    end
+    return df
+end
+
+# ------------------------------------------------------------------------------
 function dataframe_appending(df::DataFrame, df_temp::DataFrame, y::Dict, f::Dict)
     """
     This function appends a dataframe 'df_temp' to a dataframe 'df' and returns
@@ -237,8 +316,8 @@ function edit_dataframe_from_yaml(df::DataFrame, y::Dict)
     if "renaming" in keys(y);  df = dataframe_renaming(df, y);  end
     if "melting" in keys(y);   df = dataframe_melting(df, y);   end
     if "setting" in keys(y);   df = dataframe_setting(df, y);   end
-    if "mapping" in keys(y);   df = dataframe_mapping(df, y);   end
     if "replacing" in keys(y); df = dataframe_replacing(df, y); end
+    if "mapping" in keys(y);   df = dataframe_mapping(df, y);   end
 
     return df
 end
@@ -246,30 +325,27 @@ end
 # ------------------------------------------------------------------------------
 #               MAIN
 # ------------------------------------------------------------------------------
-yaml_structure = YAML.load(open("readfiles/read_structure.yml"))
-yaml_all = YAML.load(open("readfiles/read_all.yml"))
+yaml_structure = YAML.load(open("readfiles/read_structure.yml"));
+yaml_all = YAML.load(open("readfiles/read_all.yml"));
 
-yaml = yaml_all["file"][end]
-y = read_yaml(yaml);
+for yaml in yaml_all["file"]
 
-# for yaml in yaml_all["file"][1:end-1]
+    println("reading ", yaml)
 
-#     println("reading ", yaml)
+    y = read_yaml(yaml);
+    df = DataFrame()
 
-#     y = read_yaml(yaml);
-#     df = DataFrame()
+    for f in y["file_in"]
 
-#     for f in y["file_in"]
-
-#         df_temp = read_dataframe_from_yaml(y["path_in"], f);
-#         df_temp = edit_dataframe_from_yaml(df_temp, y);
+        df_temp = read_dataframe_from_yaml(y["path_in"], f);
+        df_temp = edit_dataframe_from_yaml(df_temp, y);
         
-#         if "appending" in keys(y); df = dataframe_appending(df, df_temp, y, f)
-#         else;                      df = df_temp
-#         end
+        if "appending" in keys(y); df = dataframe_appending(df, df_temp, y, f)
+        else;                      df = df_temp
+        end
 
-#     end
+    end
 
-#     df = dataframe_reordering(df, y)
-#     # CSV.write(string(yaml_all["path_out"], "/" ,y["file_out"]), df)
-# end
+    # df = dataframe_reordering(df, y)
+    # CSV.write(string(yaml_all["path_out"], "/" ,y["file_out"]), df)
+end
