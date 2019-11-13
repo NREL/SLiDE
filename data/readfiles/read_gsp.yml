@@ -1,0 +1,85 @@
+path_in:  datasources/BEA/GDP/State
+file_out: gsp_all.csv
+description: BEA Gross State Product (Annual) -- https://www.bea.gov/data/gdp/gdp-state
+
+file_in:
+    name:
+        - SAGDP2N__ALL_AREAS_1997_2017.csv
+        - SAGDP3N__ALL_AREAS_1997_2017.csv
+        - SAGDP4N__ALL_AREAS_1997_2017.csv
+        - SAGDP5N__ALL_AREAS_1997_2017.csv
+        - SAGDP6N__ALL_AREAS_1997_2017.csv
+        - SAGDP7N__ALL_AREAS_1997_2017.csv
+        - SAGDP8N__ALL_AREAS_1997_2017.csv
+        - SAGDP9N__ALL_AREAS_1997_2017.csv
+        - SAGDP11N__ALL_AREAS_1998_2017.csv
+    foot:   4
+
+# OUTPUT COLUMNS -- ORDERED list of output columns and value types.
+col_out:
+    - GeoFIPS:        string
+    - GeoName:        string
+    - Region:         string
+    - TableName:      string
+    - ComponentName:  string
+    - units:          string
+    - IndustryID:     string
+    - IndustryClassification: string
+    - Description:    string
+    - year:           int
+    - value:          float
+
+# # RENAME -- Columns 'from' -> 'to'.
+renaming:
+    - from:   Unit
+      to:     units
+    - from:   IndustryId
+      to:     IndustryID
+
+# MELT -- Normalize the dataframe by 'melting' columns into rows.
+# This will lengthen the dataframe by duplicating values in the column 'on'
+# into new rows. This will define two new columns.
+#   (1) 'var' (of 'type') with header names from the original dataframe.
+#   (2) 'val' with column values from the original dataframe.
+melting:
+    on:
+        - GeoFIPS
+        - GeoName
+        - Region
+        - TableName
+        - ComponentName
+        - units
+        - IndustryID
+        - IndustryClassification
+        - Description
+    var:    year
+    val:    value
+    type:   int
+
+# REPLACE -- Values 'from' in the column 'col' with values 'to'.
+replacing:
+    - col:    GeoName
+      from:   United States*
+      to:     United States
+    # - col:    value
+    #   from:   (NA)
+    #   to:     0
+    # - col:    IndustryClassification
+    #   from:   ...
+    #   to:     ""
+
+# MAP -- Define an 'output' column containing values based on those in an
+# 'input' column. The mapping columns 'from' -> 'to' are contained in a
+# .csv 'file' in the core_maps directory. The columns 'input' and 'from'
+# should contain the same values, as should 'output' and 'to'.
+mapping:
+    - file:     regions
+      from:     from
+      to:       to
+      input:    GeoName
+      output:   GeoName
+    - file:     units
+      from:     from
+      to:       to
+      input:    units
+      output:   units

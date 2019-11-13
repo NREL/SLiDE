@@ -6,6 +6,7 @@ file_in:
     nickname: string
     sheet:    string
     range:    string
+    foot:     int
 
 # This dictionary sets column values
 setting:
@@ -20,6 +21,7 @@ replacing:
 renaming:
     from:   symbol
     to:     symbol
+    col:    int
 
 mapping:
     file:   string
@@ -34,10 +36,20 @@ melting:
     val:    symbol
     type:   string
 
-missing:
-    col:    symbol
-    to:     any
+grouping:
+    file:   string
+    from:   symbol
+    to:     symbol
+    input:  symbol
+    output: symbol
 
 appending:
     col:    symbol
     val:    string
+
+joining:
+    file:   string
+    from:   symbol
+    to:     symbol
+    input:  symbol
+    output: symbol

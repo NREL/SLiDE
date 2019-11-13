@@ -6,4 +6,6 @@ file:
     - read_bea_use_detailed
     - read_crude_oil
     - read_emissions
+    - read_gsp
     - read_heatrate
+    - read_pce

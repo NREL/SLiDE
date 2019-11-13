@@ -1,0 +1,69 @@
+path_in:  datasources/PCE
+file_out: pce_all.csv
+description: BEA Personal Consumer Expenditures -- https://apps.bea.gov/itable/iTable.cfm?ReqID=70&step=1
+
+file_in:
+    name:
+        - 'SAEXP1_1997_2017_ALL_AREAS_.csv'
+        - 'SAEXP2_1997_2017_ALL_AREAS_.csv'
+    foot: 4
+
+# OUTPUT COLUMNS -- ORDERED list of output columns and value types.
+col_out:
+    - GeoFIPS:        string
+    - GeoName:        string
+    - Region:         string
+    - TableName:      string
+    - ComponentName:  string
+    - units:          string
+    - Line:           int
+    - Description:    string
+    - year:           int
+    - value:          float
+
+# # RENAME -- Columns 'from' -> 'to'.
+renaming:
+    - from:   Unit
+      to:     units
+
+# MELT -- Normalize the dataframe by 'melting' columns into rows.
+# This will lengthen the dataframe by duplicating values in the column 'on'
+# into new rows. This will define two new columns.
+#   (1) 'var' (of 'type') with header names from the original dataframe.
+#   (2) 'val' with column values from the original dataframe.
+melting:
+    on:
+        - GeoFIPS
+        - GeoName
+        - Region
+        - TableName
+        - ComponentName
+        - units
+        - Line
+        - IndustryClassification
+        - Description
+    var:    year
+    val:    value
+    type:   int
+
+# # REPLACE -- Values 'from' in the column 'col' with values 'to'.
+replacing:
+    - col:    GeoName
+      from:   "\""
+      to:     ""
+
+# MAP -- Define an 'output' column containing values based on those in an
+# 'input' column. The mapping columns 'from' -> 'to' are contained in a
+# .csv 'file' in the core_maps directory. The columns 'input' and 'from'
+# should contain the same values, as should 'output' and 'to'.
+mapping:
+    - file:     regions
+      from:     from
+      to:       to
+      input:    GeoName
+      output:   GeoName
+    - file:     units
+      from:     from
+      to:       to
+      input:    units
+      output:   units

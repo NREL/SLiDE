@@ -110,9 +110,6 @@ function map_with_dataframe(input, mapfile::DataFrame;
     df_map = mapfile
     dict_map = Dict(k => v for (k, v) in zip(df_map[!, from], df_map[!, to]))
 
-    # println(input)
-    # println("TRADE" in input)
-
     output = map(x -> dict_map[x], input);
     return output
 end
@@ -252,59 +249,27 @@ end
 yaml_structure = YAML.load(open("readfiles/read_structure.yml"))
 yaml_all = YAML.load(open("readfiles/read_all.yml"))
 
-for yaml in yaml_all["file"]
+yaml = yaml_all["file"][end]
+y = read_yaml(yaml);
 
-    println("reading ", yaml)
+# for yaml in yaml_all["file"][1:end-1]
 
-    y = read_yaml(yaml);
-    df = DataFrame()
+#     println("reading ", yaml)
 
-    for f in y["file_in"]
+#     y = read_yaml(yaml);
+#     df = DataFrame()
 
-        df_temp = read_dataframe_from_yaml(y["path_in"], f);
-        df_temp = edit_dataframe_from_yaml(df_temp, y);
+#     for f in y["file_in"]
+
+#         df_temp = read_dataframe_from_yaml(y["path_in"], f);
+#         df_temp = edit_dataframe_from_yaml(df_temp, y);
         
-        if "appending" in keys(y); df = dataframe_appending(df, df_temp, y, f)
-        else;                      df = df_temp
-        end
+#         if "appending" in keys(y); df = dataframe_appending(df, df_temp, y, f)
+#         else;                      df = df_temp
+#         end
 
-    end
-
-    df = dataframe_reordering(df, y)
-    CSV.write(string(yaml_all["path_out"], "/" ,y["file_out"]), df)
-
-end
-
-
-
-
-
-
-
-
-
-
-# # y = read_yaml("read_bea_supply");
-# # y = read_yaml("read_bea_use");
-# # y = read_yaml("read_bea_use_detailed");
-# # y = read_yaml("read_bea_supply_detailed");
-# # y = read_yaml("read_crude_oil");
-# # y = read_yaml("read_emissions");
-# # y = read_yaml("read_heatrate");
-
-# df = DataFrame()
-
-# for f in y["file_in"]
-
-#     df_temp = read_dataframe_from_yaml(y["path_in"], f);
-#     df_temp = first(df_temp, 3)
-
-#     df_temp = edit_dataframe_from_yaml(df_temp, y);
-    
-#     if "appending" in keys(y); global df = dataframe_appending(df, df_temp, y, f)
-#     else;                      global df = df_temp
 #     end
 
+#     df = dataframe_reordering(df, y)
+#     # CSV.write(string(yaml_all["path_out"], "/" ,y["file_out"]), df)
 # end
-
-# df = dataframe_reordering(df, y)
