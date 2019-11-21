@@ -1,5 +1,3 @@
-module Parse
-
 using CSV
 using DataFrames
 using Dates
@@ -9,7 +7,8 @@ using YAML
 import YAML
 
 """
-This function converts input values x to the type specified in the string type. This was
+    convert_type(type::String, x::Any)
+Converts input values x to the type specified in the string type. This was
 written as a work-around for the convert function, which cannot convert to strings or
 symbols. Making these conversions ensures the yaml file info is the correct DataType for
 DataFrame manipulation.
@@ -29,6 +28,7 @@ function convert_type(type::String, x::Any)
 end
 
 """
+    convert_yaml_structure(x, y)
 This function converts data in the YAML input dictionary y into the types specified in the
 yaml structure dictionary x. This will simplify future DataFrame manipulation.
 """
@@ -49,6 +49,7 @@ function convert_yaml_structure(x, y)
 end
 
 """
+    read_dataframe_from_yaml(filepath::String, file::Dict)
 This function imports a file into a DataFrame. The methodology differs depending on the file
 type (.csv, .xlsx), but the result will be the same.
 """
@@ -71,7 +72,8 @@ function read_dataframe_from_yaml(filepath::String, file::Dict)
 end
 
 """
-This function reads a YAML file and converts it 
+    read_yaml(filename::String)
+This function reads a YAML file and converts it to fit the structure in 
 """
 function read_yaml(filename::String)
     """
@@ -82,12 +84,10 @@ function read_yaml(filename::String)
     return y
 end
 
-"""
-DataFrame Manipulation
-======================
-"""
 
 """
+    map_with_dataframe(input, mapfile::DataFrame; from::Symbol = :from, to::Symbol = :to)
+    map_with_dataframe(input, mapfile::String; from::Symbol = :from, to::Symbol = :to)
 This function maps a dataframe column into a new column based on values read from a map
 stored in a .csv file.
 """
@@ -102,10 +102,6 @@ function map_with_dataframe(input, mapfile::String; from::Symbol = :from, to::Sy
     return output
 end
 
-"""
-This function maps a dataframe column into a new column based on values read from a map
-stored in a .csv file.
-"""
 function map_with_dataframe(input, mapfile::DataFrame; from::Symbol = :from, to::Symbol = :to)
 
     df_map = mapfile
@@ -116,7 +112,12 @@ function map_with_dataframe(input, mapfile::DataFrame; from::Symbol = :from, to:
     return output
 end
 
-
+"""
+    join_to_dataframe(df::DataFrame, mapfile::String; input::String, on::Symbol)
+This function joins the input DataFrame to one from the DataFrame in the indicated file.
+The "from" column in "df" will be joined on the "on" column in the dataframe from the
+indicated file.
+"""
 function join_to_dataframe(df::DataFrame, mapfile::String;
     input::Symbol, on::Symbol)
 
@@ -130,7 +131,9 @@ function join_to_dataframe(df::DataFrame, mapfile::String;
 end
 
 """
-This function joins a dataframe
+    dataframe_joining(df::DataFrame, y::Dict)
+Joins the input DataFrame df to another based on the key values in the dictionary
+y["joining"].
 """
 function dataframe_joining(df::DataFrame, y::Dict)
 
@@ -147,7 +150,9 @@ function dataframe_joining(df::DataFrame, y::Dict)
 end
 
 """
-This function renames columns 'from' -> 'to'.
+    dataframe_renaming(df::DataFrame, y::Dict)
+Renames columns 'from' -> 'to' in the DataFrame 'df' based on key values in the dictionary
+y["renaming"].
 """
 function dataframe_renaming(df::DataFrame, y::Dict)
     
@@ -163,6 +168,7 @@ function dataframe_renaming(df::DataFrame, y::Dict)
 end
 
 """
+    dataframe_melting(df::DataFrame, y::Dict)
 Normalize the dataframe by 'melting' columns into rows. This will lengthen the dataframe by
 duplicating values in the column 'on' into new rows. This will define two new columns.
     (1) 'var' (of 'type') with header names from the original dataframe.
@@ -186,6 +192,7 @@ function dataframe_melting(df::DataFrame, y::Dict)
 end
 
 """
+    dataframe_setting(df::DataFrame, y::Dict)
 Define a column 'col' and set all elements to the value 'val'.
 """
 function dataframe_setting(df::DataFrame, y::Dict)
@@ -195,6 +202,7 @@ function dataframe_setting(df::DataFrame, y::Dict)
 end
 
 """
+    dataframe_mapping(df::DataFrame, y::Dict)
 Define an 'output' column containing values based on those in an 'input' column. The mapping
 columns 'from' -> 'to' are contained in a .csv 'file' in the core_maps directory. The
 columns 'input' and 'from' should contain the same values, as should 'output' and 'to'.
@@ -226,6 +234,7 @@ function dataframe_mapping(df::DataFrame, y::Dict)
 end
 
 """
+    dataframe_replacing(df::DataFrame, y::Dict)
 Replace values 'from' in the column 'col' with values 'to'.
 """
 function dataframe_replacing(df::DataFrame, y::Dict)
@@ -244,7 +253,11 @@ function dataframe_replacing(df::DataFrame, y::Dict)
     return df
 end
 
-# ------------------------------------------------------------------------------
+"""
+    dataframe_grouping(df::DataFrame, y::Dict)
+Split a DataFrame into groups indicated by the value in a new column based on the key values
+in the dictionary y["grouping"].
+"""
 function dataframe_grouping(df::DataFrame, y::Dict)
 
     for d in y["grouping"]
@@ -269,6 +282,7 @@ function dataframe_grouping(df::DataFrame, y::Dict)
 end
 
 """
+    dataframe_appending(df::DataFrame, df_temp::DataFrame, y::Dict, f::Dict)
 This function appends a dataframe 'df_temp' to a dataframe 'df' and returns
 'df', first adding the necessary columns to 'df_temp' (for example, if the
 slice of data is specific to a year, a column containing that year should be
@@ -337,5 +351,3 @@ for yaml in yaml_all["file"]
     # df = dataframe_reordering(df, y)
     # CSV.write(string(yaml_all["path_out"], "/" ,y["file_out"]), df)
 end
-
-end # module

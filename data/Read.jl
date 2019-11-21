@@ -17,7 +17,7 @@ import YAML
     input(filepath::String)
     input(filepath::String, dict::Dict)
 This is a generic read function. If there is a dictionary input, the function will use key
-values.
+values, such as a sheet and range for an xlsx file.
 """
 function input(filepath::String)
     if occursin(".csv", filepath)

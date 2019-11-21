@@ -1,11 +1,13 @@
 push!(LOAD_PATH, "../data/")
+push!(LOAD_PATH, "../data/readfiles")
+push!(LOAD_PATH, "../data/core_maps")
 
 using DelimitedFiles
 using Documenter
 
 # Include SLiDE modules.
 using Read
-using Parse
+# using Parse
 
 # First, combine README and auto-documentation markdown files.
 # Add the contents at the top of the file.

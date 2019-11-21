@@ -1,8 +1,7 @@
 .DS_Store
 .git/
 parse.jl
-data/EditDataFrame.jl
-data/parse_*.jl
+data/Edit.jl
 data/scratch*.jl
 data/datasources/
 data/outputs/
