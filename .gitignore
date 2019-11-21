@@ -6,4 +6,4 @@ data/parse_*.jl
 data/scratch*.jl
 data/datasources/
 data/outputs/
-docs/
+data/old
