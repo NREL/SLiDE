@@ -38,10 +38,4 @@ function input(filepath::String, dict::Dict)
     return ans
 end
 
-"""
-    convert(string)
-Idk figure out how to update this?
-"""
-convert(to::DataType, x::String) where t == Symbol
-
 end # module

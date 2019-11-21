@@ -5,6 +5,7 @@ using Documenter
 
 # Include SLiDE modules.
 using Read
+using Parse
 
 # First, combine README and auto-documentation markdown files.
 # Add the contents at the top of the file.

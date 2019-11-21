@@ -1,3 +1,5 @@
+module Parse
+
 using CSV
 using DataFrames
 using Dates
@@ -5,11 +7,6 @@ using XLSX
 using YAML
 
 import YAML
-
-"""
-DataFrame and YAML reading
-==========================
-"""
 
 """
 This function converts input values x to the type specified in the string type. This was
@@ -340,3 +337,5 @@ for yaml in yaml_all["file"]
     # df = dataframe_reordering(df, y)
     # CSV.write(string(yaml_all["path_out"], "/" ,y["file_out"]), df)
 end
+
+end # module
