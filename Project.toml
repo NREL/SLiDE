@@ -1,0 +1,4 @@
+name = "SLiDE"
+uuid = "2354c00b-e6a2-41d9-bf87-8a790e1eb718"
+authors = ["Caroline Hughes <clhughes@berkeley.edu>"]
+version = "0.1.0"
