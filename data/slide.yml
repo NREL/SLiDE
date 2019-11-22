@@ -1,5 +1,0 @@
-name: slide
-dependencies:
-    - julia=1.2
-    - csv=0.5.13
-    - dataframes=0.19.4
