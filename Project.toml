@@ -2,3 +2,16 @@ name = "SLiDE"
 uuid = "2354c00b-e6a2-41d9-bf87-8a790e1eb718"
 authors = ["Caroline Hughes <clhughes@berkeley.edu>"]
 version = "0.1.0"
+
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
+PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
+XLSX = "fdbf4ff8-1666-58a4-91e7-1b58723a45e0"
+YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
