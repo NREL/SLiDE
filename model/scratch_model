@@ -1,0 +1,156 @@
+using Complementarity
+using CSV
+using DataFrames
+using JuMP
+'''
+# ------------------------------------------------------------------------------
+#    Data Input
+# ------------------------------------------------------------------------------
+
+#load in a simple SAM
+#data is from Rutherford MPSGE small example
+sam = DataFrame(CSV.read("/Users/mbrown1/Documents/GitHub/SLiDE/model/simple_sam.csv")) 
+
+for i in names(sam)[2:end]
+    #why do i get this?
+    #┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+    sam[ismissing.(sam[i]),i] = 0
+end
+
+# ------------------------------------------------------------------------------
+#    Parameter Creation
+# ------------------------------------------------------------------------------
+
+sam0 = copy(sam[:,2:end])
+
+function negzero(x)
+    x[x .< 0] .= 0
+end
+
+b = copy(sam0);
+negzero.(eachcol(b));
+
+c = copy(sam0)
+c = -1.0 .* c
+# here, if i say 'c = ...' it only returns the vectors
+# why?
+negzero.(eachcol(c))
+
+mktval_c = sum.(eachcol(b))
+
+for j in names(c)
+    i = Symbol.(j)
+    c[:,i] = c[:,i] / sum(c[:,i])
+end
+
+#s: sectors
+#m: markets
+s = ["X","Y","W"]
+m = sam[:,Symbol.("p")]
+'''
+
+cge = MCPModel();
+
+@variable(cge,X>=0.001)
+@variable(cge,Y>=0)
+@variable(cge,W>=0)
+@variable(cge,PX>=0)
+@variable(cge,PY>=0)
+@variable(cge,PW>=0)
+@variable(cge,PL>=0)
+@variable(cge,PK>=0)
+@variable(cge,CONS>=0)
+
+#parameters for counterfactuals
+TX = 0
+LENDOW = 1
+
+#need to be indexed by s
+@mapping(cge,PRF_X,100 * PL^0.25 * PK^0.75 * (1+TX) >= 100*PX)
+@mapping(cge,PRF_Y,100 * PL^0.75* PK^0.25 >= 100*PY)
+@mapping(cge,PRF_W,200 * PX^0.5 * PY^0.5 >= 200*PW)
+
+@mapping(cge,MKT_X, 100 * X >= 100 * W * PX^0.5 * PY^0.5 / PX)
+@mapping(cge,MKT_Y, 100 * Y >= 100 * W * PX^0.5 * PY^0.5 / PY)
+@mapping(cge,MKT_W, 200 * W == CONS / PW)
+@mapping(cge,MKT_L, 100 * LENDOW >= 25 * X * PL^0.25 * PK^0.75 / PL + 75 * Y * PL^0.75 * PK^0.25 / PL)
+@mapping(cge,MKT_K, 100 >= 75 * X * PL^0.25 * PK^0.75 / PK + 25 * Y * PL^0.75 * PK^0.25 / PK)
+
+@mapping(cge,I_CONS, CONS == 100*LENDOW*PL + TX * 100 * X * (PL^0.25) * (PK^0.75) )
+
+
+@complementarity(cge,PRF_X,X)
+@complementarity(cge,PRF_Y,Y)
+@complementarity(cge,PRF_W,W)
+@complementarity(cge,MKT_X,PX)
+@complementarity(cge,MKT_Y,PY)
+@complementarity(cge,MKT_L,PL)
+@complementarity(cge,MKT_K,PK)
+@complementarity(cge,MKT_W,PW)
+@complementarity(cge,I_CONS,CONS)
+
+PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
+status = solveMCP(cge)
+
+#retrieve the values of x
+result_value.(X)
+
+
+
+```
+ps = indexin(["P"*i for i in s],sam[:,Symbol.("p")])
+s = Symbol.(s)
+sam_s = sam[ps,s]
+
+
+
+
+
+
+quit()
+
+
+
+#benchmark output
+#don't care about the strings in the first column for now
+#!!! ask dheepak about this...
+
+
+
+t = copy(sam)
+
+s2 = Symbol.(s)
+n = names(sam)
+#grab location of indices s in n
+scol = indexin(s,n)
+srow = t[:,s]
+
+
+sam0 = sam[:,2:6]
+
+a = copy(sam0)
+
+#Use Matrix - i.e. positive values of a matrix
+
+#Household Demand Matrix - c
+c = -1 .* copy(sam0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+u = ["BRD","MLK","CAP","LAB","HOH"] #all sam entries - aka v
+i = ["BRD","MLK"] #goods - aka j
+h = ["CAP","LAB"] #factors - aka k
+
+X0 = sam[!,"HOH"]
+```
