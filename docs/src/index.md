@@ -1,6 +1,8 @@
 
-# Parse
+# SLiDE Documentation
 
-```@autodocs
-Modules = [Parse]
-```
+*Intro to SLiDE*
+
+## Getting Started: Installation and First Steps
+
+*How to install.*

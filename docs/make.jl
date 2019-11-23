@@ -17,17 +17,15 @@ using Documenter
 # using Read
 using Parse
 
-# First, combine README and auto-documentation markdown files.
-# Add the contents at the top of the file.
-# reading(x::String) = open(x) do f
-#     readlines(f)
-# end
-
-# writing(x::String, s::Array) = open("src/$x", "w") do f
-#     writedlm(f, s, "\n")
-# end
-
-# s = reading("../README.md")
-
 # Now, generate the documentation.
-makedocs(clean = true, sitename="SLiDE")
+makedocs(clean = true,
+    modules = [Parse],
+    format = Documenter.HTML(prettyurls = false),
+    sitename="SLiDE",
+    pages=[
+        "Home" => "index.md",
+        "Data" => "lib/data.md",
+        "Functions" => Any[
+            "Parse" => "lib/parse.md"
+        ]
+    ])
