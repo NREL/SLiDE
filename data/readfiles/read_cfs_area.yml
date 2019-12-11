@@ -1,0 +1,20 @@
+path_in:  datasources/CFS
+file_out: map_cfs_area.csv
+description: ""
+
+file_in:
+    name:     cfs_2012_pum_file_users_guide_App_A (Jun 2015).xlsx
+    sheet:    App A1
+    range:    C3:E136
+
+# OUTPUT COLUMNS -- ORDERED list of output columns and value types.
+col_out:
+    - cfs_code: string
+    - cfs_desc: string
+
+# RENAME -- Columns 'from' -> 'to'.
+renaming:
+    - from:   DEST_CFS_AREA
+      to:     cfs_code
+    - from:   missing
+      to:     cfs_desc

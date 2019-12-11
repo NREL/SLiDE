@@ -1,0 +1,20 @@
+path_in:  datasources/CFS
+file_out: map_cfs_naics.csv
+description: ""
+
+file_in:
+    name:     cfs_2012_pum_file_users_guide_App_A (Jun 2015).xlsx
+    sheet:    App A2
+    range:    A2:B47
+
+# OUTPUT COLUMNS -- ORDERED list of output columns and value types.
+col_out:
+    - naics_code: string
+    - naics_desc: string
+
+# RENAME -- Columns 'from' -> 'to'.
+renaming:
+    - from:   NAICS
+      to:     naics_code
+    - from:   Description
+      to:     naics_desc
