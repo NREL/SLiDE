@@ -60,12 +60,13 @@ function read_dataframe_from_yaml(filepath::String, file::Dict)
     if occursin(".xlsx", input)
         xf = XLSX.readdata(input, file["sheet"], file["range"])
         df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique = true)
-    elseif occursin(".csv", input)
+    else
 
         # CSV.read() called with 'silencewarnings' enabled to prevent warnings
         # for empty cells. These will be read as 'missing'.
         df = CSV.read(input, silencewarnings = true)
         if "foot" in keys(file);  df = df[1:end-file["foot"],:];  end
+
     end
 
     return df
@@ -330,24 +331,30 @@ end
 yaml_structure = YAML.load(open("readfiles/read_structure.yml"));
 yaml_all = YAML.load(open("readfiles/read_all.yml"));
 
-for yaml in yaml_all["file"]
+# for yaml in yaml_all["file"]
 
-    println("reading ", yaml)
+#     println("reading ", yaml)
 
-    y = read_yaml(yaml);
-    df = DataFrame()
+#     y = read_yaml(yaml);
+#     df = DataFrame()
 
-    for f in y["file_in"]
+#     for f in y["file_in"]
 
-        df_temp = read_dataframe_from_yaml(y["path_in"], f);
-        df_temp = edit_dataframe_from_yaml(df_temp, y);
+#         df_temp = read_dataframe_from_yaml(y["path_in"], f);
+#         df_temp = edit_dataframe_from_yaml(df_temp, y);
         
-        if "appending" in keys(y); df = dataframe_appending(df, df_temp, y, f)
-        else;                      df = df_temp
-        end
+#         if "appending" in keys(y); df = dataframe_appending(df, df_temp, y, f)
+#         else;                      df = df_temp
+#         end
 
-    end
+#     end
 
-    # df = dataframe_reordering(df, y)
-    # CSV.write(string(yaml_all["path_out"], "/" ,y["file_out"]), df)
-end
+#     # df = dataframe_reordering(df, y)
+#     # CSV.write(string(yaml_all["path_out"], "/" ,y["file_out"]), df)
+# end
+
+y = read_yaml("read_usatrade");
+f = y["file_in"][1];
+
+df_temp = read_dataframe_from_yaml(y["path_in"], f);
+df_temp = edit_dataframe_from_yaml(df_temp, y);

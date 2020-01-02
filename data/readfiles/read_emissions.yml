@@ -82,8 +82,8 @@ appending:
 # .csv 'file' in the core_maps directory. The columns 'input' and 'from'
 # should contain the same values, as should 'output' and 'to'.
 mapping:
-    file:     "regions"
-    from:     "from"
-    to:       "to"
-    input:    "region"
-    output:   "region"
+    file:     regions
+    from:     from
+    to:       to
+    input:    region
+    output:   region

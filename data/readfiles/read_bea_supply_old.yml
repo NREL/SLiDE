@@ -1,9 +1,9 @@
 path_in:  datasources/BEA/IO
-file_out: bea_use_io.csv
-description: BEA IO Use Table (71 Industry) -- https://www.bea.gov/industry/input-output-accounts-data
+file_out: bea_supply_io.csv
+description: BEA IO Supply Table (71 Industry) -- https://www.bea.gov/industry/input-output-accounts-data
 
 file_in:
-    name:     Use_SUT_Framework_1997-2017_SUM.xlsx
+    name:     Supply_1997-2017_SUM.xlsx
     sheet:    
         - 1997
         - 1998
@@ -25,22 +25,22 @@ file_in:
         - 2014
         - 2015
         - 2016
-    range:    B7:CP89
+    range:    B7:CG81
 
 # OUTPUT COLUMNS -- ORDERED list of output columns and value types.
 col_out:
-    - from_industry:      string
-    - from_industry_desc: string
-    - to_industry:        string
-    - to_industry_desc:   string
-    - year:               int
-    - value:              float
-    - units:              string
+    - input:        string
+    - input_code:   string
+    - output:       string
+    - output_code:  string
+    - year:         int
+    - value:        float
+    - units:        string
 
 # RENAME -- Columns 'from' -> 'to'.
 renaming:
     from:   Name
-    to:     from_industry_desc
+    to:     input
 
 # MELT -- Normalize the dataframe by 'melting' columns into rows.
 # This will lengthen the dataframe by duplicating values in the column 'on'
@@ -48,8 +48,8 @@ renaming:
 #   (1) 'var' (of 'type') with header names from the original dataframe.
 #   (2) 'val' with column values from the original dataframe.
 melting:
-    on:     from_industry_desc
-    var:    to_industry_desc
+    on:     input
+    var:    output
     val:    value
     type:   String
 
@@ -72,13 +72,13 @@ mapping:
     - file:   bea_all
       from:   description
       to:     from
-      input:  from_industry_desc
-      output: from_industry
+      input:  input
+      output: input_code
     - file:   bea_all
       from:   description
       to:     from
-      input:  to_industry_desc
-      output: to_industry
+      input:  output
+      output: output_code
 
 appending:
     col:    year

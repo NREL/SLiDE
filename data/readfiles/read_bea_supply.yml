@@ -40,7 +40,7 @@ col_out:
 # RENAME -- Columns 'from' -> 'to'.
 renaming:
     from:   Name
-    to:     input
+    to:     from_industry_desc
 
 # MELT -- Normalize the dataframe by 'melting' columns into rows.
 # This will lengthen the dataframe by duplicating values in the column 'on'
@@ -48,8 +48,8 @@ renaming:
 #   (1) 'var' (of 'type') with header names from the original dataframe.
 #   (2) 'val' with column values from the original dataframe.
 melting:
-    on:     input
-    var:    output
+    on:     from_industry_desc
+    var:    to_industry_desc
     val:    value
     type:   String
 
@@ -72,13 +72,13 @@ mapping:
     - file:   bea_all
       from:   description
       to:     from
-      input:  input
-      output: input_code
+      input:  from_industry_desc
+      output: from_industry
     - file:   bea_all
       from:   description
       to:     from
-      input:  output
-      output: output_code
+      input:  to_industry_desc
+      output: to_industry
 
 appending:
     col:    year

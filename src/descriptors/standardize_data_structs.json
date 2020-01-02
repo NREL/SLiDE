@@ -1,0 +1,85 @@
+[
+    {
+        "struct_name": "Add",
+        "docstring": "Add new column `col` filled with `val`",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "name of new column",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "val",
+                "comment": "value to add to new column",
+                "data_type": "Any"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Melt",
+        "docstring": "Normalize the dataframe by 'melting' columns into rows. This will lengthen the dataframe by duplicating values in the column 'on' into new rows. This will define two new columns: (1) 'var' (of 'type') with header names from the original dataframe; and (2) 'val' with column values from the original dataframe.",
+        "fields": [
+            {
+                "name": "on",
+                "comment": "",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "var",
+                "comment": "",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "val",
+                "comment": "",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "type",
+                "comment": "",
+                "data_type": "Any"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Rename",
+        "docstring": "Change column name `from` -> `to`.",
+        "fields": [
+            {
+                "name": "from",
+                "comment": "original column name",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "to",
+                "comment": "new column name",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Replace",
+        "docstring": "Replace values in `col` `from` -> `to`.",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "name of column containing values to be replaced",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "from",
+                "comment": "value to replace",
+                "data_type": "Any"
+            },
+            {
+                "name": "to",
+                "comment": "new value",
+                "data_type": "Any"
+            }
+        ],
+        "supertype": "Edit"
+    }
+]

@@ -1,0 +1,37 @@
+path_in:  datasources/CFS
+file_out: cfs.csv
+description: ""
+
+file_in:
+    name:     cfs_2012_pumf_csv.txt
+
+# # SET -- Define a column 'col' and set all elements to the value 'val'.
+# setting:
+#     - col:    ""
+#       val:    ""
+
+# # MAP -- Define an 'output' column containing values based on those in an
+# # 'input' column. The mapping columns 'from' -> 'to' are contained in a
+# # .csv 'file' in the core_maps directory. The columns 'input' and 'from'
+# # should contain the same values, as should 'output' and 'to'.
+mapping:
+#     - file:     hazmat
+#       from:     hazmat_code
+#       to:       hazmat_desc
+#       input:    HAZMAT
+#       output:   HAZMAT
+#     - file:     regions
+#       from:     from
+#       to:       to
+#       input:    EXPORT_CNTRY
+#       output:   EXPORT_CNTRY
+    - file:     regions
+      from:     from
+      to:       to
+      input:    ORIG_STATE
+      output:   ORIG_STATE
+#     - file:     regions
+#       from:     from
+#       to:       to
+#       input:    DEST_STATE
+#       output:   DEST_STATE
