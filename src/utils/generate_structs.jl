@@ -10,7 +10,7 @@ using YAML
 # # Create abstract type...
 # abstract type Edit end
 
-# # Generate macros? lol Idk.
+# # Generate macros?
 # descriptor_file = "parse_structs.json"
 # output_dir = "tmp"
 
