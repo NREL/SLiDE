@@ -17,8 +17,44 @@
         "supertype": "Edit"
     },
     {
+        "struct_name": "Map",
+        "docstring": "",
+        "fields": [
+            {
+                "name": "file",
+                "comment": "",
+                "data_type": "String"
+            },
+            {
+                "name": "from",
+                "comment": "",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "to",
+                "comment": "",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "input",
+                "comment": "",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "output",
+                "comment": "",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
         "struct_name": "Melt",
-        "docstring": "Normalize the dataframe by 'melting' columns into rows. This will lengthen the dataframe by duplicating values in the column 'on' into new rows. This will define two new columns: (1) 'var' (of 'type') with header names from the original dataframe; and (2) 'val' with column values from the original dataframe.",
+        "docstring": "Normalize the dataframe by 'melting' columns into rows, lengthening the
+        dataframe by duplicating values in the column `on` into new rows and defining 2 new columns:
+            1. `var` with header names from the original dataframe.
+            2. `val` with column values from the original dataframe.
+        This operation can only be performed once per dataframe.",
         "fields": [
             {
                 "name": "on",

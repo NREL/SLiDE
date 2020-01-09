@@ -1,4 +1,4 @@
-from,description,to,category
+code,desc,aggr,category
 111CA,Farms,agr,goods
 113FF,"Forestry, fishing, and related activities",fof,goods
 211,Oil and gas extraction,oil,goods

@@ -1,5 +1,6 @@
 # Data
 
+This is the SLiDE version of the blueNOTE data and build streams.
 The data necessary to execute the SLiDE datastream is stored in the following structure:
 
 ```
