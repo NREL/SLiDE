@@ -8,10 +8,10 @@ Otherwise, it will return false.
 See: (thread on discourse.julialang.org)[https://discourse.julialang.org/t/parse-string-to-datatype/7118/9]
 """
 function datatype(str::String)
-    type = :($(Symbol(titlecase(str))))
+    # type = :($(Symbol(titlecase(str))))
+    type = :($(Symbol(str)))
     return isdefined(SLiDE, type) ? eval(type) : nothing
 end
-
 
 ############################################################################################
 

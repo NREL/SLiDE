@@ -1,4 +1,4 @@
-from,description,to,aggr_sector,category
+code,desc,sect,aggr,category
 1111A0,Oilseed farming,oil_agr,agr,goods
 1111B0,Grain farming,grn_agr,agr,goods
 111200,Vegetable and melon farming,veg_agr,agr,goods

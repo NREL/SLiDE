@@ -1,3 +1,12 @@
+path = ["data"]
+
+csvreading = CSVInput(name = "test_datastream.csv", descriptor = "1997");
+
+xlsxreading = [XLSXInput(name = "test_datastream.xlsx", sheet = "1999", range = "B7:J15", descriptor = "1999"),
+               XLSXInput(name = "test_datastream.xlsx", sheet = "2000", range = "B7:J15", descriptor = "2000")];
+
+############################################################################################
+
 renaming = [
     Rename(from = :IOCode, to = :from_industry_code),
     Rename(from = :Name,   to = :from_industry_desc)];

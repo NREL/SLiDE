@@ -6,7 +6,9 @@ This example will most-likely eventually be incorporated into some build stream 
 Relevant functions can be found in the associated files:
     * load_from() - src/parse/load_structs.jl
     * edit_with() - src/parse/standardize_data.jl
+    * read_file() - src/parse/read_file.jl
 """
+# !!!! Is it better practice to name the files the same as the functions they contain?
 
 using CSV
 using DataFrames
@@ -18,11 +20,6 @@ using SLiDE  # see src/SLiDE.jl
 # Note that this is stored within the `test` dir and is separate from the `data` dir.
 DATA_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "tests", "data"))
 
-# Read in raw test data and isolate a subsection for clarity.
-df_raw = CSV.read(joinpath(DATA_DIR, "test_datastream.csv"))
-df_raw = df_raw[:,1:2]
-
-
 
 """
 APPROACH 1: Define edit structs in julia file and include it.
@@ -32,8 +29,10 @@ CON: The input julia file is not as clean as the YAML file, and
      I suspect this will become complicated when we begin importing multiple files.
 """
 
-df1 = copy(df_raw)
 include(joinpath(DATA_DIR, "test_datastream.jl"))
+
+df1 = SLiDE.read_file(DATA_DIR, csvreading);
+df1 = df1[:,1:2]
 
 # Edit DataFrame.
 df1 = SLiDE.edit_with(df1, renaming)
@@ -41,7 +40,6 @@ df1 = SLiDE.edit_with(df1, melting)
 df1 = SLiDE.edit_with(df1, mapping)
 df1 = SLiDE.edit_with(df1, replacing)
 df1 = SLiDE.edit_with(df1, adding)
-
 
 
 """
@@ -53,21 +51,16 @@ PRO: The YAML file is user friendly.
 CON: The dictionary requires some manipulation to import it into the correct structure.
 """
 
-df2 = copy(df_raw)
-y = YAML.load(open(joinpath(DATA_DIR, "test_datastream.yml")))
+# First, read YAML file containing DataFrame and editing information.
+# Then, read dataframe to edit.
+y = SLiDE.read_file(joinpath(DATA_DIR, "test_datastream.yml"));
+df2 = SLiDE.read_file(DATA_DIR, y["CSVInput"]);
 
 # Define a list of edits to make since these must be done in this specific order.
 # Find where these intersect with the keys in the input dictionary.
-EDITS = ["Rename", "Melt", "Map", "Replace", "Add", "Other"];
+EDITS = ["Rename", "Melt", "Map", "Replace", "Add"];
 KEYS = intersect(EDITS, [k for k in keys(y)]);
 
-# First, convert the dictionary values into DataFrames.
-[y[k] = convert_type(DataFrame, y[k]) for k in KEYS]
-
-# Next, load each key entry into lists of Edit structures.
-# This can generally be passed into the SLiDE.edit_with() function.
-[y[k] = SLiDE.load_from(datatype(k), y[k]) for k in KEYS];
-
 # Finally, update the DataFrame iteratively.
-# I'm not sure why `global` is necessary here, but it is.
+# !!!! I'm not sure why `global` is necessary here, but it is.
 [global df2 = SLiDE.edit_with(df2, y[k]) for k in KEYS];

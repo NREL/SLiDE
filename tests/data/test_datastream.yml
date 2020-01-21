@@ -1,33 +1,18 @@
-# include(joinpath(BASE_DIR, "src", "parse", "standardize_data.jl"))
-# y = YAML.load(open("test_standardize_data.yml"))
-# [make_editor(y[key]) for key in keys(y)]
+Path: ["data"]
 
-# file_in:
-#     name:     Use_SUT_Framework_1997-2017_SUM.xlsx
-#     sheet:    
-#         - 1997
-#         - 1998
-#         - 1999
-#         - 2000
-#         - 2001
-#         - 2002
-#         - 2003
-#         - 2004
-#         - 2005
-#         - 2006
-#         - 2007
-#         - 2008
-#         - 2009
-#         - 2010
-#         - 2011
-#         - 2012
-#         - 2013
-#         - 2014
-#         - 2015
-#         - 2016
-#     range:    B7:CP89
+CSVInput:
+    name: test_datastream.csv
+    descriptor: test
 
-# # 
+XLSXInput:
+    name:   test_datastream.csv
+    sheet:
+      - 1999
+      - 2000
+    range:  B7:J15
+    descriptor:
+      - 1999
+      - 2000
 
 Rename:
     - from: IOCode

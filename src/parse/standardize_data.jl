@@ -22,7 +22,9 @@ function edit_with(df::DataFrame, x::Map)
 
     # Read the map file from data/coremaps. Use the Rename method of the edit_with()
     # function to ensure that the target and map dataframe column names are consistent.
-    df_map = CSV.read(joinpath("..", "data", "coremaps", x.file), silencewarnings = true)
+    MAP_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")),
+        "..", "data", "coremaps"))
+    df_map = CSV.read(joinpath(MAP_DIR, x.file), silencewarnings = true)
     df_map = edit_with(df_map, [Rename(x.from, x.input), Rename(x.to, x.output)])
     
     # Remove excess blank space from the input column to ensure consistency when mapping.
