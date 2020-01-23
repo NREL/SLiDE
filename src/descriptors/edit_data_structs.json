@@ -61,7 +61,7 @@
         "fields": [
             {
                 "name": "on",
-                "comment": "name of column NOT included in melt !!!! what if we want to keep multiple columns on the left?",
+                "comment": "name of column NOT included in melt",
                 "data_type": "Symbol"
             },
             {
