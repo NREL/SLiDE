@@ -14,6 +14,12 @@ const IS = InfrastructureSystems
 SRC_DIR = abspath(dirname(Base.find_package("SLiDE")))
 
 descriptor_file = joinpath(SRC_DIR, "descriptors", "standardize_data_structs.json")
-output_dir = joinpath(SRC_DIR, "parse", "generated")
+output_dir = joinpath(SRC_DIR, "parse", "generated_edit")
+
+IS.generate_structs(descriptor_file, output_dir; print_results = true)
+
+
+descriptor_file = joinpath(SRC_DIR, "descriptors", "file_structs.json")
+output_dir = joinpath(SRC_DIR, "parse", "generated_file")
 
 IS.generate_structs(descriptor_file, output_dir; print_results = true)

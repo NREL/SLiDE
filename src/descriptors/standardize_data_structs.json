@@ -18,31 +18,34 @@
     },
     {
         "struct_name": "Map",
-        "docstring": "",
+        "docstring": "Define an `output` column containing values based on those in an
+        `input` column. The mapping columns `from` -> `to` are contained in a .csv `file` in
+        the coremaps directory. The columns `input' and 'from` should contain the same
+        values, as should `output` and `to`.",
         "fields": [
             {
                 "name": "file",
-                "comment": "",
+                "comment": "mapping .csv file name in the coremaps directory",
                 "data_type": "String"
             },
             {
                 "name": "from",
-                "comment": "",
+                "comment": "name of the mapping column containing input values",
                 "data_type": "Symbol"
             },
             {
                 "name": "to",
-                "comment": "",
+                "comment": "name of the mapping column containing output values",
                 "data_type": "Symbol"
             },
             {
                 "name": "input",
-                "comment": "",
+                "comment": "name of the input column to map",
                 "data_type": "Symbol"
             },
             {
                 "name": "output",
-                "comment": "",
+                "comment": "name of the output column created",
                 "data_type": "Symbol"
             }
         ],
@@ -58,22 +61,22 @@
         "fields": [
             {
                 "name": "on",
-                "comment": "",
+                "comment": "name of column NOT included in melt !!!! what if we want to keep multiple columns on the left?",
                 "data_type": "Symbol"
             },
             {
                 "name": "var",
-                "comment": "",
+                "comment": "name of column containing header NAMES from the original dataframe",
                 "data_type": "Symbol"
             },
             {
                 "name": "val",
-                "comment": "",
+                "comment": "name of column containing VALUES from the original dataframe",
                 "data_type": "Symbol"
             },
             {
                 "name": "type",
-                "comment": "",
+                "comment": "Data type for the values in the VAL column",
                 "data_type": "Any"
             }
         ],
