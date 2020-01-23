@@ -2,8 +2,8 @@ path = ["data"]
 
 csvreading = CSVInput(name = "test_datastream.csv", descriptor = "1997");
 
-xlsxreading = [XLSXInput(name = "test_datastream.xlsx", sheet = "1999", range = "B7:J15", descriptor = "1999"),
-               XLSXInput(name = "test_datastream.xlsx", sheet = "2000", range = "B7:J15", descriptor = "2000")];
+xlsxreading = [XLSXInput(name = "test_datastream.xlsx", sheet = "1999", range = "A7:J14", descriptor = "1999"),
+               XLSXInput(name = "test_datastream.xlsx", sheet = "2000", range = "A7:J14", descriptor = "2000")];
 
 ############################################################################################
 

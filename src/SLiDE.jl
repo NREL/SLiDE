@@ -59,11 +59,10 @@ include(joinpath("utils", "utils.jl"))
 
 # PARSING
 include(joinpath("parse", "generated_edit", "includes.jl"))
-include(joinpath("parse", "generated_file", "includes.jl"))
+include(joinpath("parse", "generated_load", "includes.jl"))
 
-include(joinpath("parse", "read_file.jl"))
-include(joinpath("parse", "load_structs.jl"))
-include(joinpath("parse", "standardize_data.jl"))
+include(joinpath("parse", "load_data.jl"))
+include(joinpath("parse", "edit_data.jl"))
 
 # MODEL
 # include(joinpath("..", "model", "generated", "includes.jl"))

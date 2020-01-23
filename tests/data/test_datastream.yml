@@ -5,11 +5,11 @@ CSVInput:
     descriptor: test
 
 XLSXInput:
-    name:   test_datastream.csv
+    name:   test_datastream.xlsx
     sheet:
       - 1999
       - 2000
-    range:  B7:J15
+    range:  A7:J14
     descriptor:
       - 1999
       - 2000
@@ -31,6 +31,12 @@ Map:
       to:     code
       input:  to_industry_desc
       output: to_industry_code
+
+Melt:
+    on:   from_industry_desc
+    var:  to_industry_desc
+    val:  value
+    type: Any
 
 Melt:
     on:   from_industry_desc
