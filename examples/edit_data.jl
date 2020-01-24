@@ -8,7 +8,6 @@ Relevant functions can be found in the associated files:
     * edit_with() - src/parse/standardize_data.jl
     * read_file() - src/parse/read_file.jl
 """
-# !!!! Is it better practice to name the files the same as the functions they contain?
 
 using CSV
 using DataFrames
@@ -32,7 +31,7 @@ CON: The input julia file is not as clean as the YAML file, and
 include(joinpath(DATA_DIR, "test_datastream.jl"))
 
 df1 = SLiDE.read_file(DATA_DIR, csvreading);
-df1 = df1[:,1:2]
+df1 = df1[1:4,[1:2;size(df1)[2]]]
 
 # Edit DataFrame.
 df1 = SLiDE.edit_with(df1, renaming)
@@ -40,6 +39,8 @@ df1 = SLiDE.edit_with(df1, melting)
 df1 = SLiDE.edit_with(df1, mapping)
 df1 = SLiDE.edit_with(df1, replacing)
 df1 = SLiDE.edit_with(df1, adding)
+
+# show(df2)
 
 
 """
@@ -54,7 +55,8 @@ CON: The dictionary requires some manipulation to import it into the correct str
 # First, read YAML file containing DataFrame and editing information.
 # Then, read dataframe to edit.
 y = SLiDE.read_file(joinpath(DATA_DIR, "test_datastream.yml"));
-df2 = SLiDE.read_file(DATA_DIR, y["CSVInput"]);
+df2 = SLiDE.read_file(DATA_DIR, y["XLSXInput"][1]);
+df2 = df2[1:4,[1:3;size(df2)[2]]];
 
 # Define a list of edits to make since these must be done in this specific order.
 # Find where these intersect with the keys in the input dictionary.
@@ -64,3 +66,4 @@ KEYS = intersect(EDITS, [k for k in keys(y)]);
 # Finally, update the DataFrame iteratively.
 # !!!! I'm not sure why `global` is necessary here, but it is.
 [global df2 = SLiDE.edit_with(df2, y[k]) for k in KEYS];
+show(df2)
