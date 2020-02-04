@@ -1,4 +1,3 @@
-
 """
 Module for constructing SLiDE objects.
 """
@@ -19,6 +18,7 @@ export CGEInput
 
 export convert_type
 export datatype
+export isarray
 
 #################################################################################
 # IMPORTS
@@ -28,6 +28,7 @@ import Dates
 import JSON
 import Logging
 import Test
+import XLSX
 import YAML
 
 import InteractiveUtils

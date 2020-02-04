@@ -62,7 +62,7 @@
             {
                 "name": "on",
                 "comment": "name of column NOT included in melt",
-                "data_type": "Symbol"
+                "data_type": "Array{Symbol,1}"
             },
             {
                 "name": "var",

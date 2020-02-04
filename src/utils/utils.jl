@@ -47,6 +47,15 @@ end
 
 convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
 
+convert_type(::Type{Array{T,1}}, x::Any) where T <: Any = convert_type.(T, x)
+
+############################################################################################
+
+isarray(::Type{Array{T,1}}) where T <: Any = true
+isarray(x::Array{T,1}) where T <: Any = true
+isarray(::Any) = false
+
+
 ############################################################################################
 # TESTS
 # x = Date(2020)

@@ -77,10 +77,17 @@ function load_from(::Type{T}, df::DataFrame) where T <: Any
     # and save the column names to include.
     [df[!, field] .= convert_type.(type, df[:, field])
         for (field,type) in it if field in names(df)]
-    cols = [field for (field, type) in it]
 
-    # Create a list of structures from each DataFrame row.
-    lst = [T(values(row)...) for row in eachrow(df[:,cols])]
+
+    if any(isarray.(T.types))
+        inps = [isarray(type) ? df[:,field] : df[1,field] for (field,type) in it]
+        lst = [T(inps...)]
+    
+    else
+        # Create a list of structures from each DataFrame row.
+        cols = [field for (field, type) in it]
+        lst = [T(values(row)...) for row in eachrow(df[:,cols])]
+    end
     
     # !!!! If there is one instance of the struct, this function returns only that struct.
     # Otherwise, it returns a full list. Would it be less confusing to return a single

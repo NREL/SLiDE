@@ -33,13 +33,9 @@ Map:
       output: to_industry_code
 
 Melt:
-    on:   from_industry_desc
-    var:  to_industry_desc
-    val:  value
-    type: Any
-
-Melt:
-    on:   from_industry_desc
+    on:
+      - from_industry_code
+      - from_industry_desc
     var:  to_industry_desc
     val:  value
     type: Any
