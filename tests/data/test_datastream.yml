@@ -14,35 +14,71 @@ XLSXInput:
       - 1999
       - 2000
 
+Append:
+    col:  year
+    val:  sheet
+
+# Cleanest way to write Order in yaml file, but would require significant changes to code.
+# Order:
+#     - from_code: String
+#     - from_desc: String
+#     - to_code:   String
+#     - to_desc:   String
+#     - value:              Int
+#     - units:              String
+
+Order:
+    - {col: from_code, type: String}
+    - {col: from_desc, type: String}
+    - {col: to_code,   type: String}
+    - {col: to_code,   type: String}
+    - {col: value,     type: Int}
+    - {col: units,     type: String}
+
 Rename:
     - from: IOCode
-      to:   from_industry_code
+      to:   from_code
     - from: Name
-      to:   from_industry_desc
+      to:   from_desc
 
 Map:
     - file:   bea_all.csv
       from:   desc
       to:     code
-      input:  from_industry_desc
-      output: from_industry_code
+      input:  from_desc
+      output: from_code
     - file:   bea_all.csv
       from:   desc
       to:     code
-      input:  to_industry_desc
-      output: to_industry_code
+      input:  to_desc
+      output: to_code
+    - file:   regions.csv
+      from:   from
+      to:     to
+      input:  region
+      output: region
+
+Join:
+    - file:   bea_all.csv
+      on:     from_desc
+      prefix: from
+    - file:   bea_all.csv
+      on:     to_desc
+      prefix: to
 
 Melt:
     on:
-      - from_industry_code
-      - from_industry_desc
-    var:  to_industry_desc
+      - from_code
+      - from_desc
+    var:  to_desc
     val:  value
     type: Any
 
 Add:
-    col:  units
-    val:  millions of us dollars (USD)
+    - col:  region
+      val:  Colorado
+    - col:  units
+      val:  millions of us dollars (USD)
 
 Replace:
     col:  value

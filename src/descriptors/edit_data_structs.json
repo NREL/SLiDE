@@ -17,6 +17,60 @@
         "supertype": "Edit"
     },
     {
+        "struct_name": "Group",
+        "docstring": "",
+        "fields": [
+            {
+                "name": "file",
+                "comment": "mapping .csv file name in the coremaps directory",
+                "data_type": "String"
+            },
+            {
+                "name": "from",
+                "comment": "name of the mapping column containing input values",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "to",
+                "comment": "name of the mapping column containing output values",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "input",
+                "comment": "name of the input column to map",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "output",
+                "comment": "name of the output column created",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Join",
+        "docstring": "",
+        "fields": [
+            {
+                "name": "file",
+                "comment": "",
+                "data_type": "String"
+            },
+            {
+                "name": "on",
+                "comment": "",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "prefix",
+                "comment": "",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
         "struct_name": "Map",
         "docstring": "Define an `output` column containing values based on those in an
         `input` column. The mapping columns `from` -> `to` are contained in a .csv `file` in
@@ -78,6 +132,24 @@
                 "name": "type",
                 "comment": "Data type for the values in the VAL column",
                 "data_type": "Any"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Order",
+        "docstring": "Rearranges columns in the order specified by `cols` and sets them to
+        the specified type.",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "Ordered list of DataFrame columns",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "type",
+                "comment": "Ordered column types.",
+                "data_type": "Array{DataType,1}"
             }
         ],
         "supertype": "Edit"

@@ -6,8 +6,11 @@ module SLiDE
 #################################################################################
 # EXPORTS
 export Add
+export Group
+export Join
 export Map
 export Melt
+export Order
 export Rename
 export Replace
 
@@ -15,6 +18,7 @@ export CSVInput
 export XLSXInput
 
 export CGEInput
+
 
 export convert_type
 export datatype
@@ -27,6 +31,7 @@ import DataFrames
 import Dates
 import JSON
 import Logging
+# import Revise
 import Test
 import XLSX
 import YAML
@@ -64,8 +69,5 @@ include(joinpath("parse", "generated_load", "includes.jl"))
 
 include(joinpath("parse", "load_data.jl"))
 include(joinpath("parse", "edit_data.jl"))
-
-# MODEL
-# include(joinpath("..", "model", "generated", "includes.jl"))
 
 end # module
