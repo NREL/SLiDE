@@ -1,0 +1,32 @@
+Path: ["data"]
+
+CSVInput:
+    name: test_datastream_97.csv
+    descriptor: 1997
+
+Rename:
+    - from: Column1
+      to:   label
+    - from: Amount
+      to:   value
+
+Group:
+    file:   regions.csv
+    from:   from
+    to:     to
+    input:  label
+    output: region
+
+Order:
+    - {col: label,  type: String}
+    - {col: region, type: String}
+    # - {col: year,   type: Int}
+    - {col: value,  type: Int}
+    # - {col: units,  type: String}
+
+Map:
+    file:     sgf.csv
+    from:     from
+    to:       to
+    input:    label
+    output:   label
