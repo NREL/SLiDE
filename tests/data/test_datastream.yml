@@ -2,36 +2,27 @@ Path: ["data"]
 
 CSVInput:
     name: test_datastream.csv
-    descriptor: test
+    descriptor: 1997
 
 XLSXInput:
     name:   test_datastream.xlsx
     sheet:
       - 1999
       - 2000
-    range:  A7:J14
+    range:  B7:J14
     descriptor:
       - 1999
       - 2000
 
-Append:
+Describe:
     col:  year
-    val:  sheet
-
-# Cleanest way to write Order in yaml file, but would require significant changes to code.
-# Order:
-#     - from_code: String
-#     - from_desc: String
-#     - to_code:   String
-#     - to_desc:   String
-#     - value:              Int
-#     - units:              String
 
 Order:
+    - {col: year,      type: Int}
     - {col: from_code, type: String}
     - {col: from_desc, type: String}
     - {col: to_code,   type: String}
-    - {col: to_code,   type: String}
+    - {col: to_desc,   type: String}
     - {col: value,     type: Int}
     - {col: units,     type: String}
 
@@ -41,22 +32,20 @@ Rename:
     - from: Name
       to:   from_desc
 
+Melt:
+    on:
+      - from_code
+      - from_desc
+    var:  to_desc
+    val:  value
+    type: Any
+
 Map:
-    - file:   bea_all.csv
-      from:   desc
-      to:     code
-      input:  from_desc
-      output: from_code
-    - file:   bea_all.csv
-      from:   desc
-      to:     code
-      input:  to_desc
-      output: to_code
-    - file:   regions.csv
-      from:   from
-      to:     to
-      input:  region
-      output: region
+    file:   regions.csv
+    from:   from
+    to:     to
+    input:  region
+    output: region
 
 Join:
     - file:   bea_all.csv
@@ -66,14 +55,6 @@ Join:
       on:     to_desc
       prefix: to
 
-Melt:
-    on:
-      - from_code
-      - from_desc
-    var:  to_desc
-    val:  value
-    type: Any
-
 Add:
     - col:  region
       val:  Colorado
@@ -81,6 +62,9 @@ Add:
       val:  millions of us dollars (USD)
 
 Replace:
-    col:  value
-    from: ...
-    to:   "0"
+    - col:  value
+      from: ...
+      to:   0
+    - col:  value
+      from: missing
+      to:   0

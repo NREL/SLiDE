@@ -4,9 +4,10 @@ EXAMPLE: Standardize data read from csv file into DataFrame and manipulated usin
 
 This example will most-likely eventually be incorporated into some build stream method.
 Relevant functions can be found in the associated files:
-    * load_from() - src/parse/load_structs.jl
-    * edit_with() - src/parse/standardize_data.jl
-    * read_file() - src/parse/read_file.jl
+
+- load_from() - src/parse/load_data.jl
+- edit_with() - src/parse/edit_data.jl
+- read_file() - src/parse/load_data.jl
 """
 
 using CSV
@@ -15,55 +16,39 @@ using YAML
 
 using SLiDE  # see src/SLiDE.jl
 
-# Save location of test input files (or `data`).
-# Note that this is stored within the `test` dir and is separate from the `data` dir.
 DATA_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "tests", "data"))
-
 
 """
 APPROACH 1: Define edit structs in julia file and include it.
-
-PRO: Including the julia file is the easiest way to get the data.
-CON: The input julia file is not as clean as the YAML file, and
-     I suspect this will become complicated when we begin importing multiple files.
 """
 
 include(joinpath(DATA_DIR, "test_datastream.jl"))
 
-df1 = SLiDE.read_file(DATA_DIR, csvreading);
-df1 = df1[1:4,[1:2;size(df1)[2]]]
+df1 = SLiDE.read_file(DATA_DIR, csvreading; shorten=true);
 
-# Edit DataFrame.
-df1 = SLiDE.edit_with(df1, renaming)
-df1 = SLiDE.edit_with(df1, melting)
-df1 = SLiDE.edit_with(df1, mapping)
-df1 = SLiDE.edit_with(df1, replacing)
-df1 = SLiDE.edit_with(df1, adding)
+df1 = SLiDE.edit_with(df1, renaming);
+df1 = SLiDE.edit_with(df1, melting);
+df1 = SLiDE.edit_with(df1, adding);
+df1 = SLiDE.edit_with(df1, mapping);
+df1 = SLiDE.edit_with(df1, joining);
+df1 = SLiDE.edit_with(df1, replacing);
 
-# show(df2)
-
+df1 = SLiDE.edit_with(df1, describing, csvreading);
+df1 = SLiDE.edit_with(df1, ordering);
 
 """
 APPROACH 2: Define edit structs in a YAML file and load it.
-The final three lines of code *could* be consolidated, but this is easier to read for now.
-
-PRO: The YAML file is user friendly.
-     Updating the DataFrame iteratively is clean.
-CON: The dictionary requires some manipulation to import it into the correct structure.
+Here are some tricky examples used for development.
 """
 
-# First, read YAML file containing DataFrame and editing information.
-# Then, read dataframe to edit.
 y = SLiDE.read_file(joinpath(DATA_DIR, "test_datastream.yml"));
-df2 = SLiDE.read_file(DATA_DIR, y["XLSXInput"][1]);
-df2 = df2[1:4,[1:3;size(df2)[2]]];
+y["Path"] = DATA_DIR
+df2 = SLiDE.edit_with(y; shorten=true)
 
-# Define a list of edits to make since these must be done in this specific order.
-# Find where these intersect with the keys in the input dictionary.
-EDITS = ["Rename", "Melt", "Map", "Replace", "Add"];
-KEYS = intersect(EDITS, [k for k in keys(y)]);
+y = SLiDE.read_file(joinpath(DATA_DIR, "test_datastream_97.yml"));
+y["Path"] = DATA_DIR
+df_sgf_97 = SLiDE.edit_with(y)
 
-# Finally, update the DataFrame iteratively.
-# !!!! I'm not sure why `global` is necessary here, but it is.
-[global df2 = SLiDE.edit_with(df2, y[k]) for k in KEYS];
-show(df2)
+y = SLiDE.read_file(joinpath(DATA_DIR, "test_datastream_98.yml"));
+y["Path"] = DATA_DIR
+df_sgf_98 = SLiDE.edit_with(y)

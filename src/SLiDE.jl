@@ -4,27 +4,6 @@ Module for constructing SLiDE objects.
 module SLiDE
 
 #################################################################################
-# EXPORTS
-export Add
-export Group
-export Join
-export Map
-export Melt
-export Order
-export Rename
-export Replace
-
-export CSVInput
-export XLSXInput
-
-export CGEInput
-
-
-export convert_type
-export datatype
-export isarray
-
-#################################################################################
 # IMPORTS
 import CSV
 import DataFrames
@@ -41,6 +20,32 @@ const IU = InteractiveUtils
 
 import InfrastructureSystems
 const IS = InfrastructureSystems
+
+#################################################################################
+
+# First, generate structs to ensure all exports are possible.
+include(joinpath("utils", "generate_structs.jl"))
+
+# EXPORTS
+export Add
+export Describe
+export Group
+export Join
+export Map
+export Melt
+export Order
+export Rename
+export Replace
+
+export CSVInput
+export XLSXInput
+
+export CGEInput
+
+export convert_type
+export datatype
+export isarray
+
 
 #################################################################################
 # INCLUDES

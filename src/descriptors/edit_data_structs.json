@@ -17,12 +17,25 @@
         "supertype": "Edit"
     },
     {
+        "struct_name": "Describe",
+        "docstring": "This DataType is required when multiple DataFrames will be appended into one output file (say, if multiple sheets from an XLSX file are included). Before the DataFrames are appended, a column `col` will be added and filled with the value in the file descriptor.
+!!!! Does it make sense to have a DataType with one field?",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "name of new column",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
         "struct_name": "Group",
-        "docstring": "",
+        "docstring": "Use to edit files containing data in successive dataframes with an identifying header cell or row.",
         "fields": [
             {
                 "name": "file",
-                "comment": "mapping .csv file name in the coremaps directory",
+                "comment": "mapping .csv file name in the coremaps directory. The mapping file should correlate with the header information identifying each data group. It will be used to separate the header rows from data.",
                 "data_type": "String"
             },
             {
@@ -37,7 +50,7 @@
             },
             {
                 "name": "input",
-                "comment": "name of the input column to map",
+                "comment": "name of the input column containing",
                 "data_type": "Symbol"
             },
             {
@@ -50,21 +63,26 @@
     },
     {
         "struct_name": "Join",
-        "docstring": "",
+        "docstring": "Contains the information to join a mapping DataFrame (denoted `df_map`) to another DataFrame (`df`), with a `prefix` prepended to the column names in `df_map`.
+The dataframes will be joined on the column `on` (see [DataFrames join documentation](https://juliadata.github.io/DataFrames.jl/stable/man/joins/)).
+
+!!! note
+
+    The column `on` must be in both `df` and `df_map` after the prefix has been added.",
         "fields": [
             {
                 "name": "file",
-                "comment": "",
+                "comment": "joining .csv file name in the coremaps directory.",
                 "data_type": "String"
             },
             {
                 "name": "on",
-                "comment": "",
+                "comment": "column on which to perform the join.",
                 "data_type": "Symbol"
             },
             {
                 "name": "prefix",
-                "comment": "",
+                "comment": "prefix identifier to add to `df_map`. This is necessary in case the same `df_map` is joined on multiple `df` columns.",
                 "data_type": "Symbol"
             }
         ],
@@ -72,10 +90,9 @@
     },
     {
         "struct_name": "Map",
-        "docstring": "Define an `output` column containing values based on those in an
-        `input` column. The mapping columns `from` -> `to` are contained in a .csv `file` in
-        the coremaps directory. The columns `input' and 'from` should contain the same
-        values, as should `output` and `to`.",
+        "docstring": "Define an `output` column containing values based on those in an `input` column.
+The mapping columns `from` -> `to` are contained in a .csv `file` in the coremaps directory.
+The columns `input` and `from` should contain the same values, as should `output` and `to`.",
         "fields": [
             {
                 "name": "file",
@@ -108,14 +125,16 @@
     {
         "struct_name": "Melt",
         "docstring": "Normalize the dataframe by 'melting' columns into rows, lengthening the
-        dataframe by duplicating values in the column `on` into new rows and defining 2 new columns:
-            1. `var` with header names from the original dataframe.
-            2. `val` with column values from the original dataframe.
-        This operation can only be performed once per dataframe.",
+dataframe by duplicating values in the column `on` into new rows and defining 2 new columns:
+
+1. `var` with header names from the original dataframe.
+2. `val` with column values from the original dataframe.
+
+This operation can only be performed once per dataframe.",
         "fields": [
             {
                 "name": "on",
-                "comment": "name of column NOT included in melt",
+                "comment": "name of column(s) NOT included in melt",
                 "data_type": "Array{Symbol,1}"
             },
             {
@@ -183,12 +202,12 @@
             {
                 "name": "from",
                 "comment": "value to replace",
-                "data_type": "Any"
+                "data_type": "String"
             },
             {
                 "name": "to",
                 "comment": "new value",
-                "data_type": "Any"
+                "data_type": "String"
             }
         ],
         "supertype": "Edit"

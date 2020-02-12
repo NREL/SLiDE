@@ -1,67 +1,82 @@
 """
-    read_file(path::Array{String,1}, file::CSVInput)
+    read_file(file::String)
+    read_file(path::Array{String,1}, file<:File; kwargs...)
+    read_file(path::Array{String,1}, file::XLSXInput)
+    read_file(path::String, x::T) where T<:File
+    read_from(editor::T) where T<:Edit
+
+This method to reads .csv mapping files required for editing. These files must be stored in
+the `data/coremaps` directory. It returns a .csv file.
+
+# Arguments
+
+- `path::Array{String,1}` or `path::String`: Path to file *location*;
+    does not include file name.
+- `file::String`: Full path to file, including file name.
+- `file<:File`: A SLiDE DataType used to store information about a file. Options include:
+    - [`SLiDE.CSVInput`](@ref)
+    - [`SLiDE.XLSXInput`](@ref)
+- `editor<:Edit`: A SLiDE DataType used to store information about an edit to make in a
+    DataFrame. Specifically, this function might be called for edit types that include the
+    field `file` in reference to 
+    - [`SLiDE.Group`](@ref)
+    - [`SLiDE.Join`](@ref)
+    - [`SLiDE.Map`](@ref)
+
+# Keywords
+
+- `shorten::Bool = false`: if true, a shortened form of the dataframe will be read.
+    This is meant to aid troubleshooting during development.
+
+# Returns
+
+- `df::DataFrame`: If the input is a csv or xlsx file, this method will return a DataFrame.
+- `yml::Dict{Any,Any}`: If the input file is a yaml file, this method will return a
+    dictionary. All keys that correspond with SLiDE DataStream DataTypes will be converted
+    to (lists of) those types.
 """
-function read_file(path::Array{String,1}, file::CSVInput)
+function read_file(path::Array{String,1}, file::CSVInput; shorten::Bool=false)
     filepath = joinpath(path..., file.name)
     df = CSV.read(filepath, silencewarnings = true)
+
+    df = shorten ? df[1:min(2,size(df)[1]),1:min(4,size(df)[2])] : df;  # dev utility
 
     # Delete empty rows from the DataFrame before returning by searching for an deleting
     # rows only when the first column is empty. This should avoid deleting instances when
     # null values are `missing`.
     df = dropmissing(df, 1);
-
     return df
 end
 
-"""
-    read_file(path::Array{String,1}, x::XLSXInput)
-"""
-function read_file(path::Array{String,1}, file::XLSXInput)
+function read_file(path::Array{String,1}, file::XLSXInput; shorten::Bool=false)
     filepath = joinpath(path..., file.name)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
     df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique = true)
 
+    df = shorten ? df[1:min(2,size(df)[1]),1:min(4,size(df)[2])] : df;  # dev utility
+    
     # Delete empty rows from the DataFrame before returning by searching for an deleting
     # rows only when the first column is empty. This should avoid deleting instances when
     # null values are `missing`.
     df = dropmissing(df, 1);
-
     return df
 end
 
-"""
-    read_file(path::String, x::T) where T<:File
-"""
-read_file(path::String, x::T) where T<:File = read_file([path], x)
+function read_file(path::String, file::T; shorten::Bool=false) where T <: File
+    return read_file([path], file; shorten = shorten)
+end
 
-"""
-    read_from(x::T) where T <: Edit
-This method to reads .csv mapping files required for editing. These files must be stored in
-the `data/coremaps` directory. It returns a .csv file.
-"""
 # !!!! Is this method too niche?
-function read_file(x::T) where T <: Edit
-    DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")),
-        "..", "data", "coremaps"))
-    df = read_file(joinpath(DIR, x.file))
+function read_file(editor::T) where T <: Edit
+    # !!!! Should we avoid including specific paths within functions?
+    # !!!! Need to throw error if this is called when "file" is not a field.
+    DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "coremaps"))
+    df = read_file(joinpath(DIR, editor.file))
     return df
 end
 
-"""
-    read_file(file::String)
-This method reads a file given a string to a location alone, with no information specific to
-any file type other than in the file extension. This means that the method cannot be used
-for xlsx documents since, for example, there is no information about the sheet.
-It IS, however, useful for:
- * yaml file: the method returns a dictionary from the YAML file.
-   If any of the keys in the dictionary are IDENTICAL to a datatype,
-   the dictionary value will be of this type or a list of this type.
- * csv file: the method returns a dataframe of the csv file.
-"""
 function read_file(file::String)
-    
     if occursin(".yml", file) | occursin(".yaml", file)
-
         y = YAML.load(open(file))
 
         # Here, we first list all sub-subtypes of DataStream (DataTypes that are used in
@@ -71,12 +86,7 @@ function read_file(file::String)
         # !!!! Not sure why only using subtypes without the module name gets UndefVarError.
         KEYS = intersect(TYPES, [k for k in keys(y)]);
 
-        # These are the values to convert into DataFrames
-        # (necessary before converting into DataStream types).
         [y[k] = convert_type(DataFrame, y[k]) for k in KEYS]
-
-        # Next, load each key entry into lists of Edit structures.
-        # This can generally be passed into the SLiDE.edit_with() function.
         [y[k] = load_from(datatype(k), y[k]) for k in KEYS];
         return y
 
@@ -84,26 +94,36 @@ function read_file(file::String)
         df = CSV.read(file, silencewarnings = true)
         return df
     end
-
 end
-
-############################################################################################
 
 """
     load_from(::Type{T}, df::DataFrame) where T <: Any
-This function loads a DataFrame `df` into a structure of type T.
-This requires that all structure fieldnames are also DataFrame column names.
+Load a DataFrame `df` into a structure of type T.
 
-# Example:
+!!! note
+
+    This requires that all structure fieldnames are also DataFrame column names.
+
+# Arguments
+
+- `::Type{T} where T <: Any`: Any DataType.
+- `df::DataFrame`: The DataFrame storing the information to store as a DataType.
+
+# Returns
+
+- `x<:Any`: The DataType specified as an argument.
+- `lst::Array{T} where T<:Any`: A list of elements of the DataType specified as an argument
+    given a multi-row DataFrame.
+
+# Example
+
 ```julia
 df = DataFrame(from = ["State"], to = ["region"])
 load_from(Rename, df)
 ```
 """
 function load_from(::Type{T}, df::DataFrame) where T <: Any
-
-    # Define an iterator that pairs field names and their associated types.
-    it = zip(fieldnames(T), T.types)
+    it = zip(fieldnames(T), T.types);
 
     # Convert the necessary DataFrame columns into the correct type,
     # and save the column names to include. This ensures the dataframe columns are imported
@@ -117,17 +137,13 @@ function load_from(::Type{T}, df::DataFrame) where T <: Any
         inps = [isarray(type) ? df[:,field] : df[1,field] for (field,type) in it]
         lst = [T(inps...)]
     
-    # If each row in the input df fills one and only one struct...
+    # If each row in the input df fills one and only one struct,
+    # create a list of structures from each DataFrame row.
     else
-        # Create a list of structures from each DataFrame row.
         cols = [field for (field, type) in it]
         lst = [T(values(row)...) for row in eachrow(df[:,cols])]
     end
     
-    # !!!! If there is one instance of the struct, this function returns only that struct.
-    # Otherwise, it returns a full list. Would it be less confusing to return a single
-    # element list in this case?
-    size(lst)[1] == 1 ? lst = lst[1] : nothing
+    size(lst)[1] == 1 ? lst = lst[1] : nothing  # Don't return a single-element list
     return lst
-
 end

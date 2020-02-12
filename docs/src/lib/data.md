@@ -1,16 +1,16 @@
-# Data
+# blueNOTE Data Set
 
 This is the SLiDE version of the blueNOTE data and build streams.
 The data necessary to execute the SLiDE datastream is stored in the following structure:
 
 ```
 data/
-├── core_maps/
+├── coremaps/
 └── datasources/
 └── readfiles/
 ```
 
-**`core_maps`** contains .csv files that standardize DataFrame values for consistency. For example, `regions.csv` maps `CO, Colo., Colorado, COLORADO, colorado -> co`. Many files are from the WiNDC Data Stream, but some have been edited for simplicity.
+**`coremaps`** contains .csv files that standardize DataFrame values for consistency. For example, `regions.csv` maps `CO, Colo., Colorado, COLORADO, colorado -> co`. Many files are from the WiNDC Data Stream, but some have been edited for simplicity.
 
 **`datasources`** stores the original input data.
 This must be downloaded from the WiNDC Data Stream [datasources.zip](https://windc.wisc.edu/datasources.zip) file. This includes:
