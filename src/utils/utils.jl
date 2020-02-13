@@ -43,6 +43,18 @@ convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
 convert_type(::Type{Array{T,1}}, x::Any) where T<:Any = convert_type.(T, x)
 convert_type(::Type{T}, x::Missing) where T<:Real = x;
 convert_type(::Type{Any}, x::Any) = x
+
+function convert_type(
+    ::Type{Dict{Any,Any}},
+    df::DataFrame,
+    value_col::Symbol;
+    remove_col::Array{Symbol,1}=[]
+)
+    key_col = setdiff(names(df), [[value_col]; remove_col]);
+    d = Dict(values(row[key_col]) => row[value_col] for row in eachrow(df));
+    return d
+end
+
 convert_type(::Type{T}, x::Any) where T = T(x)
 
 """
