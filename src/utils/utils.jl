@@ -7,6 +7,7 @@ This function evaluates an input string as a DataType if it is defined.
 Otherwise, it will return false.
 See: (thread on discourse.julialang.org)[https://discourse.julialang.org/t/parse-string-to-datatype/7118/9]
 """
+
 function datatype(str::String)
     # type = :($(Symbol(titlecase(str))))
     type = :($(Symbol(str)))
@@ -54,6 +55,12 @@ convert_type(::Type{Array{T,1}}, x::Any) where T <: Any = convert_type.(T, x)
 isarray(::Type{Array{T,1}}) where T <: Any = true
 isarray(x::Array{T,1}) where T <: Any = true
 isarray(::Any) = false
+
+
+function df_to_dict(df::DataFrame,remove_columns::Vector{Symbol},value_column::Symbol)
+        colnames = setdiff(names(df),[remove_columns; value_column])
+        return Dict(tuple(row[colnames]...)=>row[:Val] for row in eachrow(df))
+end
 
 
 ############################################################################################

@@ -32,34 +32,48 @@ function read_data_temp(file::String,year::Int64,dir::String,desc::String)
     return df
 end
 
+
+td = Dict()
+
+test2 = read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply")
+
+function df_to_dict(df::DataFrame)
+    for i in 1:length(df[!,names(df)[1]])
+end
+
+
+for i in 1:length(test2[!,:yr])
+    push!(td,[test2[i,:r],test2[i,:s],test2[i,:g]] => test2[i,:Val])
+end
+
 #blueNOTE contains a dictionary of the parameters needed to specify the model
 blueNOTE = Dict(
-    :ys0 => read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"),
-    :id0 => read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"),
-    :ld0 => read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"),
-    :kd0 => read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"),
-    :ty0 => read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"),
-    :m0 => read_data_temp("m0",mod_year,data_temp_dir,"Imports"),
-    :x0 => read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"),
-    :rx0 => read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"),
-    :md0 => read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"),
-    :nm0 => read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"),
-    :dm0 => read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"),
-    :s0 => read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"),
-    :a0 => read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"),
-    :ta0 => read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"),
-    :tm0 => read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"),
-    :cd0 => read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"),
-    :c0 => read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"),
-    :yh0 => read_data_temp("yh0",mod_year,data_temp_dir,"Household production"),
-    :bopdef0 => read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"),
-    :hhadj => read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"),
-    :g0 => read_data_temp("g0",mod_year,data_temp_dir,"Government demand"),
-    :i0 => read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"),
-    :xn0 => read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"),
-    :xd0 => read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"),
-    :dd0 => read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"),
-    :nd0 => read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market")
+    :ys0 => df_to_dict(read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"),[:yr],:Val),
+    :id0 => df_to_dict(read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"),[:yr],:Val),
+    :ld0 => df_to_dict(read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"),[:yr],:Val),
+    :kd0 => df_to_dict(read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"),[:yr],:Val),
+    :ty0 => df_to_dict(read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"),[:yr],:Val),
+    :m0 => df_to_dict(read_data_temp("m0",mod_year,data_temp_dir,"Imports"),[:yr],:Val),
+    :x0 => df_to_dict(read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"),[:yr],:Val),
+    :rx0 => df_to_dict(read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"),[:yr],:Val),
+    :md0 => df_to_dict(read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"),[:yr],:Val),
+    :nm0 => df_to_dict(read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"),[:yr],:Val),
+    :dm0 => df_to_dict(read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"),[:yr],:Val),
+    :s0 => df_to_dict(read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"),[:yr],:Val),
+    :a0 => df_to_dict(read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"),[:yr],:Val),
+    :ta0 => df_to_dict(read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"),[:yr],:Val),
+    :tm0 => df_to_dict(read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"),[:yr],:Val),
+    :cd0 => df_to_dict(read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"),[:yr],:Val),
+    :c0 => df_to_dict(read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"),[:yr],:Val),
+    :yh0 => df_to_dict(read_data_temp("yh0",mod_year,data_temp_dir,"Household production"),[:yr],:Val),
+    :bopdef0 => df_to_dict(read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"),[:yr],:Val),
+    :hhadj => df_to_dict(read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"),[:yr],:Val),
+    :g0 => df_to_dict(read_data_temp("g0",mod_year,data_temp_dir,"Government demand"),[:yr],:Val),
+    :i0 => df_to_dict(read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"),[:yr],:Val),
+    :xn0 => df_to_dict(read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"),[:yr],:Val),
+    :xd0 => df_to_dict(read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"),[:yr],:Val),
+    :dd0 => df_to_dict(read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"),[:yr],:Val),
+    :nd0 => df_to_dict(read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"),[:yr],:Val)
 )
 
 ##########
@@ -83,6 +97,11 @@ alpha_rs[!,:kd0] = blueNOTE[:kd0][!,:Val]
 alpha_rs[!,:Val] = alpha_rs[!,:ld0] ./ (alpha_rs[!,:ld0] + alpha_rs[!,:kd0])
 
 
+
+
+
+
+
 ##################################
 # CONDITIONAL SETS AND FUNCTIONS
 ##################################
@@ -99,7 +118,7 @@ function tupleize(z::DataFrames.DataFrame,sets::Vector)
 
     return v
 
-end #end functiobn
+end #end function
 
 
 # until we have structs, we'll need composite sets
@@ -108,8 +127,6 @@ y_rs = tupleize(unique(blueNOTE[:ys0][!,[:r,:s]]),[:r,:s])
 x_rg = tupleize(unique(blueNOTE[:s0][!,[:r,:g]]),[:r,:g]) #can be used as a substitute for pd0
 a_rg = tupleize(unique([blueNOTE[:a0];blueNOTE[:rx0]][!,[:r,:g]]),[:r,:g])
 pk_rs = tupleize(unique(blueNOTE[:kd0][!,[:r,:s]]),[:r,:s])
-
-
 
 # function to check if the [x[xx],y[yy]] exists 
 # in xy where xy is a vector of tuples
@@ -124,28 +141,45 @@ end
 
 cge = MCPModel();
 
-@variable(cge,Y[r=1:length(rr),s=1:length(ss); check_xy(rr,ss,r,s,y_rs)]>=0)
-@variable(cge,X[r=1:length(rr),g=1:length(gg); check_xy(rr,gg,r,g,x_rg)]>=0,start=1) # Disposition
-@variable(cge,A[r=1:length(rr),g=1:length(gg); check_xy(rr,gg,r,g,a_rg)]>=0,start=1) # Absorption
-@variable(cge,C[r=1:length(rr)]>=0,start=1) # Aggregate final demand
-@variable(cge,MS[r=1:length(rr),m=1:length(mm)]>=0,start=1) # Margin supply
+@variable(cge,Y[r in rr,s in ss]>=0)
+
+@constraint(cge,ycon[r in rr,s in ss],
+                Y[r,s] >= sum(values(td[[r,s,g]]) for g in gg if haskey(td,[r,s,g]))
+)
+
+
+
+
+
+@variable(cge,Y[r in rr,s in ss,g in gg]>=0)
+
+@constraint(cge,ycon[r in rr,s in ss,g in gg; haskey(td,[r,s,g])],
+                    Y[r,s,g] >= td[r,s,g])
+
+
+@constraint(cge,temp1[r,s],Y[r,s]>=0)
+
+
+@variable(cge,X[r,g]>=0,start=1) # Disposition
+@variable(cge,A[r,g]>=0,start=1) # Absorption
+@variable(cge,C[r]>=0,start=1) # Aggregate final demand
+@variable(cge,MS[r,m]>=0,start=1) # Margin supply
 
 #commodities:
-@variable(cge,PA[r=1:length(rr),g=1:length(gg)]>=0,start=1) # Regional market (input)
-@variable(cge,PY[r=1:length(rr),g=1:length(gg)]>=0,start=1) # Regional market (output)
-@variable(cge,PD[r=1:length(rr),g=1:length(gg)]>=0,start=1) # Local market price
-@variable(cge,PN[g=1:length(gg)]>=0,start=1) # National market
-@variable(cge,PL[r=1:length(rr)]>=0,start=1) # Wage rate
-@variable(cge,PK[r=1:length(rr),s=1:length(ss)]>=0,start=1) # Rental rate of capital
-@variable(cge,PM[r=1:length(rr),m=1:length(ss)]>=0,start=1) # Margin price
-@variable(cge,PC[r=1:length(rr)]>=0,start=1) # Consumer price index
+@variable(cge,PA[r,g]>=0,start=1) # Regional market (input)
+@variable(cge,PY[r,g]>=0,start=1) # Regional market (output)
+@variable(cge,PD[r,g]>=0,start=1) # Local market price
+@variable(cge,PN[g]>=0,start=1) # National market
+@variable(cge,PL[r]>=0,start=1) # Wage rate
+@variable(cge,PK[r,s]>=0,start=1) # Rental rate of capital
+@variable(cge,PM[r,m]>=0,start=1) # Margin price
+@variable(cge,PC[r]>=0,start=1) # Consumer price index
 @variable(cge,PFX>=0,start=1) # Foreign exchange
 
 #consumer:
-@variable(cge,RA[r=1:length(rr)]>=0,start=1) # Representative agent
+@variable(cge,RA[r]>=0,start=1) # Representative agent
 
 ##############
 # CONSTRAINTS
 ##############
-
 
