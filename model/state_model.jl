@@ -73,6 +73,19 @@ gg = unique(blueNOTE[:ys0],:g)[!,:g]
 rr = unique(blueNOTE[:ys0],:r)[!,:r]
 mm = unique(blueNOTE[:md0],:m)[!,:m]
 
+##############
+# PARAMETERS
+##############
+
+alpha_rs = blueNOTE[:ld0]
+alpha_rs[!,:ld0] = alpha_rs[!,:Val]
+alpha_rs[!,:kd0] = blueNOTE[:kd0][!,:Val]
+alpha_rs[!,:Val] = alpha_rs[!,:ld0] ./ (alpha_rs[!,:ld0] + alpha_rs[!,:kd0])
+
+
+##################################
+# CONDITIONAL SETS AND FUNCTIONS
+##################################
 
 function tupleize(z::DataFrames.DataFrame,sets::Vector)
 
@@ -88,12 +101,15 @@ function tupleize(z::DataFrames.DataFrame,sets::Vector)
 
 end #end functiobn
 
+
 # until we have structs, we'll need composite sets
 # to evaluate the variable creation conditions
 y_rs = tupleize(unique(blueNOTE[:ys0][!,[:r,:s]]),[:r,:s])
 x_rg = tupleize(unique(blueNOTE[:s0][!,[:r,:g]]),[:r,:g]) #can be used as a substitute for pd0
 a_rg = tupleize(unique([blueNOTE[:a0];blueNOTE[:rx0]][!,[:r,:g]]),[:r,:g])
 pk_rs = tupleize(unique(blueNOTE[:kd0][!,[:r,:s]]),[:r,:s])
+
+
 
 # function to check if the [x[xx],y[yy]] exists 
 # in xy where xy is a vector of tuples
@@ -108,8 +124,7 @@ end
 
 cge = MCPModel();
 
-
-@variable(cge, Y[r=1:length(rr),ss=1:length(ss); check_xy(rr,ss,r,s,y_rs)]>=0)
+@variable(cge,Y[r=1:length(rr),s=1:length(ss); check_xy(rr,ss,r,s,y_rs)]>=0)
 @variable(cge,X[r=1:length(rr),g=1:length(gg); check_xy(rr,gg,r,g,x_rg)]>=0,start=1) # Disposition
 @variable(cge,A[r=1:length(rr),g=1:length(gg); check_xy(rr,gg,r,g,a_rg)]>=0,start=1) # Absorption
 @variable(cge,C[r=1:length(rr)]>=0,start=1) # Aggregate final demand
@@ -132,8 +147,5 @@ cge = MCPModel();
 ##############
 # CONSTRAINTS
 ##############
-
-
-
 
 
