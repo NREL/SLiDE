@@ -5,7 +5,7 @@
 ################################################
 
 
-#include("../src/slide.jl")
+#include("SLiDE.jl")
 using SLiDE
 using CSV
 using JuMP
@@ -30,20 +30,6 @@ function read_data_temp(file::String,year::Int64,dir::String,desc::String)
     df = SLiDE.read_file(dir,CSVInput(name=string(file,".csv"),descriptor=desc))
     df = df[df[!,:yr].==year,:]
     return df
-end
-
-
-td = Dict()
-
-test2 = read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply")
-
-function df_to_dict(df::DataFrame)
-    for i in 1:length(df[!,names(df)[1]])
-end
-
-
-for i in 1:length(test2[!,:yr])
-    push!(td,[test2[i,:r],test2[i,:s],test2[i,:g]] => test2[i,:Val])
 end
 
 #blueNOTE contains a dictionary of the parameters needed to specify the model
@@ -80,24 +66,31 @@ blueNOTE = Dict(
 # SETS
 ##########
 
+function key_to_vec(d::Dict,index_num::Int64)
+    return [k[index_num] for k in keys(d)]
+end
+
+
 # extract model indices from blueNOTE dict
 # here are the exhaustive struct names
-ss = unique(blueNOTE[:ys0],:s)[!,:s]
-gg = unique(blueNOTE[:ys0],:g)[!,:g]
-rr = unique(blueNOTE[:ys0],:r)[!,:r]
-mm = unique(blueNOTE[:md0],:m)[!,:m]
+rr = unique(key_to_vec(blueNOTE[:ys0],1))
+ss = unique(key_to_vec(blueNOTE[:ys0],2))
+gg = unique(key_to_vec(blueNOTE[:ys0],3))
+mm = unique(key_to_vec(blueNOTE[:md0],2))
+
 
 ##############
 # PARAMETERS
 ##############
 
-alpha_rs = blueNOTE[:ld0]
-alpha_rs[!,:ld0] = alpha_rs[!,:Val]
-alpha_rs[!,:kd0] = blueNOTE[:kd0][!,:Val]
-alpha_rs[!,:Val] = alpha_rs[!,:ld0] ./ (alpha_rs[!,:ld0] + alpha_rs[!,:kd0])
+alpha_kl = Dict() #value share of labor in the K/L nest for regions and sectors
 
+#(push!(alpha_kl,k=>blueNOTE[:ld0][k] / (blueNOTE[:kd0][k] + blueNOTE[:ld0][k]))  for k in keys(blueNOTE[:ld0]))
 
-
+for k in keys(blueNOTE[:ld0])
+    val = blueNOTE[:ld0][k] / (blueNOTE[:kd0][k] + blueNOTE[:ld0][k])
+    push!(alpha_kl,k=>val)
+end
 
 
 
@@ -144,20 +137,9 @@ cge = MCPModel();
 @variable(cge,Y[r in rr,s in ss]>=0)
 
 @constraint(cge,ycon[r in rr,s in ss],
-                Y[r,s] >= sum(values(td[[r,s,g]]) for g in gg if haskey(td,[r,s,g]))
+#                Y[r,s] >= sum(values(td[[r,s,g]]) for g in gg if haskey(td,[r,s,g]))
+                Y[r,s] >= 0
 )
-
-
-
-
-
-@variable(cge,Y[r in rr,s in ss,g in gg]>=0)
-
-@constraint(cge,ycon[r in rr,s in ss,g in gg; haskey(td,[r,s,g])],
-                    Y[r,s,g] >= td[r,s,g])
-
-
-@constraint(cge,temp1[r,s],Y[r,s]>=0)
 
 
 @variable(cge,X[r,g]>=0,start=1) # Disposition
