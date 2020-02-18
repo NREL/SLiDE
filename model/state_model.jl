@@ -63,20 +63,56 @@ blueNOTE = Dict(
 )
 
 ##########
-# SETS
+# FUNCTIONS
 ##########
 
 function key_to_vec(d::Dict,index_num::Int64)
     return [k[index_num] for k in keys(d)]
 end
 
+function fill_zero(source::Dict,tofill::Dict)
+    for k in keys(source)
+        if !haskey(tofill,k)
+            push!(tofill,k=>0)
+        end
+    end
+end
+
+#ordering here matters in that nd0 should be filled
+#with m0 keys before dd0 filled with nd0
+#never add keys to:
+#ys0, s0, and a0
+fill_zero(blueNOTE[:m0],blueNOTE[:tm0])
+fill_zero(blueNOTE[:m0],blueNOTE[:nd0])
+fill_zero(blueNOTE[:s0],blueNOTE[:x0])
+fill_zero(blueNOTE[:x0],blueNOTE[:rx0])
+fill_zero(blueNOTE[:nd0],blueNOTE[:dd0])
+
+#need to create a dictionary with unique r/s keys in ys0
+y_set = Dict()
+y_vector = []
+for keys in blueNOTE[:ys0]
+    newkey = [keys[1][1],keys[1][2]]
+    push!(y_vector,newkey)
+end
+y_vector = unique(y_vector)
+
+for i in y_vector
+    print(i)
+    push!(y_set,(i[1],i[2])=>0)
+end
+
+
+###############
+# -- SETS --
+###############
 
 # extract model indices from blueNOTE dict
 # here are the exhaustive struct names
-rr = unique(key_to_vec(blueNOTE[:ys0],1))
-ss = unique(key_to_vec(blueNOTE[:ys0],2))
-gg = unique(key_to_vec(blueNOTE[:ys0],3))
-mm = unique(key_to_vec(blueNOTE[:md0],2))
+r = unique(key_to_vec(blueNOTE[:ys0],1))
+s = unique(key_to_vec(blueNOTE[:ys0],2))
+g = unique(key_to_vec(blueNOTE[:ys0],3))
+m = unique(key_to_vec(blueNOTE[:md0],2))
 
 
 ##############
@@ -84,49 +120,42 @@ mm = unique(key_to_vec(blueNOTE[:md0],2))
 ##############
 
 alpha_kl = Dict() #value share of labor in the K/L nest for regions and sectors
-
-#(push!(alpha_kl,k=>blueNOTE[:ld0][k] / (blueNOTE[:kd0][k] + blueNOTE[:ld0][k]))  for k in keys(blueNOTE[:ld0]))
+alpha_x  = Dict() #export value share
+alpha_d  = Dict() #local/domestic supply share
+alpha_n  = Dict() #national supply share
+theta_n  = Dict() #national share of domestic Absorption
+theta_m  = Dict() #domestic share of absorption
 
 for k in keys(blueNOTE[:ld0])
     val = blueNOTE[:ld0][k] / (blueNOTE[:kd0][k] + blueNOTE[:ld0][k])
     push!(alpha_kl,k=>val)
 end
 
-
-
-
-##################################
-# CONDITIONAL SETS AND FUNCTIONS
-##################################
-
-function tupleize(z::DataFrames.DataFrame,sets::Vector)
-
-    #create an empty vector
-    v = []
-
-    #loop over elements in the vector 
-    for i in 1:length(z[!,sets[1]])
-        push!(v,[z[i,sets[1]],z[i,sets[2]]])
-    end #end loop
-
-    return v
-
-end #end function
-
-
-# until we have structs, we'll need composite sets
-# to evaluate the variable creation conditions
-y_rs = tupleize(unique(blueNOTE[:ys0][!,[:r,:s]]),[:r,:s])
-x_rg = tupleize(unique(blueNOTE[:s0][!,[:r,:g]]),[:r,:g]) #can be used as a substitute for pd0
-a_rg = tupleize(unique([blueNOTE[:a0];blueNOTE[:rx0]][!,[:r,:g]]),[:r,:g])
-pk_rs = tupleize(unique(blueNOTE[:kd0][!,[:r,:s]]),[:r,:s])
-
-# function to check if the [x[xx],y[yy]] exists 
-# in xy where xy is a vector of tuples
-function check_xy(x,y,xx::Int64,yy::Int64,xy::Array)
-    tup = [x[xx],y[yy]]
-    return tup in xy
+for k in keys(blueNOTE[:x0])
+    val = (blueNOTE[:x0][k] - blueNOTE[:rx0][k]) / blueNOTE[:s0][k]   
+    push!(alpha_x,k=>val)
 end
+
+for k in keys(blueNOTE[:xd0])
+    val = blueNOTE[:xd0][k] / blueNOTE[:s0][k]
+    push!(alpha_d,k=>val)
+end
+
+for k in keys(blueNOTE[:xn0])
+    val = blueNOTE[:xn0][k] / blueNOTE[:s0][k]
+    push!(alpha_n,k=>val)
+end
+
+for k in keys(blueNOTE[:nd0])
+    val = blueNOTE[:nd0][k] / (blueNOTE[:nd0][k] + blueNOTE[:dd0][k])
+    push!(theta_n,k=>val)
+end
+
+for k in keys(blueNOTE[:m0])
+    val = (1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k] / (blueNOTE[:nd0][k]+blueNOTE[:dd0][k]+(1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k])
+    push!(theta_m,k=>val)
+end
+
 
 ################
 # VARIABLES
@@ -134,34 +163,70 @@ end
 
 cge = MCPModel();
 
-@variable(cge,Y[r in rr,s in ss]>=0)
+# some small value that acts 
+# as a lower limit to variable values
+eps = 1e-3
 
-@constraint(cge,ycon[r in rr,s in ss],
-#                Y[r,s] >= sum(values(td[[r,s,g]]) for g in gg if haskey(td,[r,s,g]))
-                Y[r,s] >= 0
-)
-
-
-@variable(cge,X[r,g]>=0,start=1) # Disposition
-@variable(cge,A[r,g]>=0,start=1) # Absorption
-@variable(cge,C[r]>=0,start=1) # Aggregate final demand
-@variable(cge,MS[r,m]>=0,start=1) # Margin supply
+@variable(cge,Y[r,s]>=eps)
+@variable(cge,X[r,g]>=eps,start=1) # Disposition
+@variable(cge,A[r,g]>=eps,start=1) # Absorption
+@variable(cge,C[r]>=eps,start=1) # Aggregate final demand
+@variable(cge,MS[r,m]>=eps,start=1) # Margin supply
 
 #commodities:
-@variable(cge,PA[r,g]>=0,start=1) # Regional market (input)
-@variable(cge,PY[r,g]>=0,start=1) # Regional market (output)
-@variable(cge,PD[r,g]>=0,start=1) # Local market price
-@variable(cge,PN[g]>=0,start=1) # National market
-@variable(cge,PL[r]>=0,start=1) # Wage rate
-@variable(cge,PK[r,s]>=0,start=1) # Rental rate of capital
-@variable(cge,PM[r,m]>=0,start=1) # Margin price
-@variable(cge,PC[r]>=0,start=1) # Consumer price index
-@variable(cge,PFX>=0,start=1) # Foreign exchange
+@variable(cge,PA[r,g]>=eps,start=1) # Regional market (input)
+@variable(cge,PY[r,g]>=eps,start=1) # Regional market (output)
+@variable(cge,PD[r,g]>=eps,start=1) # Local market price
+@variable(cge,PN[g]>=eps,start=1) # National market
+@variable(cge,PL[r]>=eps,start=1) # Wage rate
+@variable(cge,PK[r,s]>=eps,start=1) # Rental rate of capital
+@variable(cge,PM[r,m]>=eps,start=1) # Margin price
+@variable(cge,PC[r]>=eps,start=1) # Consumer price index
+@variable(cge,PFX>=eps,start=1) # Foreign exchange
 
 #consumer:
-@variable(cge,RA[r]>=0,start=1) # Representative agent
+@variable(cge,RA[r]>=eps,start=1) # Representative agent
 
 ##############
 # CONSTRAINTS
 ##############
+
+
+
+####XY -- designates that the macro named XY in the blueNOTE mcp was replaced
+#y_set here is equivalent to the $y_(r,s) in the blueNOTE model
+@mapping(cge,profit_y[r in rr,s in ss; haskey(y_set,(r,s)) ],
+                sum(PA[r,g] * blueNOTE[:id0][r,g,s] for g in gg if haskey(blueNOTE[:id0],(r,g,s)) )
+                + PL[r]   * (blueNOTE[:ld0][r,s] * (PL[r]^alpha_kl[r,s] * PK[r,s]^(1-alpha_kl[r,s]) ) / PL[r])  ####AL
+                + PK[r,s] * (blueNOTE[:kd0][r,s] * (PL[r]^alpha_kl[r,s] * PK[r,s]^(1-alpha_kl[r,s]) ) / PK[r,s])  ####AK
+                == 
+                sum(PY[r,g] * blueNOTE[:ys0][r,s,g] for g in gg if haskey(blueNOTE[:ys0],(r,s,g)) )
+);
+
+fill_zero(alpha_x,alpha_n)
+fill_zero(alpha_x,alpha_d)
+fill_zero(blueNOTE[:s0],blueNOTE[:xd0])
+fill_zero(blueNOTE[:s0],blueNOTE[:xn0])
+
+
+@mapping(cge,profit_x[r in rr,g in gg; haskey(blueNOTE[:s0],(r,g)) ],
+                PY[r,g] * blueNOTE[:s0][r,g] 
+                == 
+                PFX * ((blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g]) * PFX / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5) )^4 ####AX
+                + PN[g] * blueNOTE[:xn0][r,g] * (PN[g] / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5))^4 ####AN / ####RX
+                + PD[r,g] * blueNOTE[:xd0][r,g] * (PD[r,g] / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5))^4 ####AD / ####RX
+);
+
+
+@mapping(cge,profit_x[r in rr,g in gg; haskey(blueNOTE[:a0],(r,g)) ],
+                PY[r,g] * blueNOTE[:s0][r,g] 
+                == 
+                PFX * ((blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g]) * PFX / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5) )^4 ####AX
+                + PN[g] * blueNOTE[:xn0][r,g] * (PN[g] / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5))^4 ####AN / ####RX
+                + PD[r,g] * blueNOTE[:xd0][r,g] * (PD[r,g] / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5))^4 ####AD / ####RX
+);
+
+
+
+
 
