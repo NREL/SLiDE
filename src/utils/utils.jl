@@ -23,7 +23,17 @@ Base.strip(x::Number) = x
 
 """
     convert_type(::Type{T}, x::Any)
-Converts x into the specified `Type{T}`.
+    convert_type(::Dict{Any,Any}, df::DataFrame, value_col::Symbol; kwargs...)
+Converts `x` into the specified `Type{T}`.
+
+# Arguments
+
+- `::Type{T}`:
+- `x<:Any`
+
+# Returns
+Data in specified type
+
 """
 convert_type(::Type{T}, x::Any) where T<:AbstractString = string(x)
 convert_type(::Type{T}, x::Date) where T<:Integer = Dates.year(x)

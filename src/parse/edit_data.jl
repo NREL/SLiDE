@@ -85,10 +85,15 @@ function edit_with(df::DataFrame, x::Map)
     # This approach was taken as opposed to editing the mapping df to avoid errors in case
     # the input and output column names are the same. Such is the case if mapping is used to
     # edit column values for consistency without adding a new column to the DataFrame.
+    # A left join is used to prevent data loss in the case that a value in the input df is
+    # NOT in the input mapping column. If this is the case, this value will map to "missing".
     # Remove excess blank space from the input column to ensure consistency when joining.
     df = edit_with(df, Rename(x.input, x.from));
     df[!, x.from] .= strip.(df[:, x.from]);
-    df = join(df, df_map, on = x.from, makeunique = true);
+    df = join(df, df_map, on = x.from, kind = :left, makeunique = true);
+
+    df[ismissing.(df[:,x.to]), x.to] .=
+        convert_type.(String, df[ismissing.(df[:,x.to]), x.from])
 
     # Return the DataFrame with the columns saved at the top of the method.
     df = x.input == x.output ? edit_with(df, Rename(x.to, x.output)) :
@@ -155,7 +160,7 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten::Bool=false) where T<:File
     # Find which of these edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, [k for k in keys(y)]);
     [df = edit_with(df, y[k]) for k in KEYS];
-
+    
     # Add a descriptor to identify the data from the file that was just added.
     # Then, reorder the columns and set them to the correct types.
     # This ensures consistency when concattenating.

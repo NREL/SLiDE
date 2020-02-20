@@ -37,14 +37,15 @@ the `data/coremaps` directory. It returns a .csv file.
 """
 function read_file(path::Array{String,1}, file::CSVInput; shorten::Bool=false)
     filepath = joinpath(path..., file.name)
-    df = CSV.read(filepath, silencewarnings = true)
+    df = CSV.read(filepath, silencewarnings = true, ignoreemptylines=true)
 
     df = shorten ? df[1:min(2,size(df)[1]),1:min(4,size(df)[2])] : df;  # dev utility
-
-    # Delete empty rows from the DataFrame before returning by searching for an deleting
-    # rows only when the first column is empty. This should avoid deleting instances when
-    # null values are `missing`.
-    df = dropmissing(df, 1);
+    # 
+    # # Delete empty rows from the DataFrame before returning by searching for an deleting
+    # # rows only when the first column is empty. This should avoid deleting instances when
+    # # null values are `missing`.
+    # df = dropmissing(df, 1);
+    df = df[.![all(ismissing.(values(row))) for row in eachrow(df)],:]
     return df
 end
 
@@ -91,7 +92,7 @@ function read_file(file::String)
         return y
 
     elseif occursin(".csv", file)
-        df = CSV.read(file, silencewarnings = true)
+        df = CSV.read(file, silencewarnings = true, ignoreemptylines=true)
         return df
     end
 end
