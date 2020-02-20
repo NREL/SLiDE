@@ -18,14 +18,16 @@ Describe:
     col:  year
 
 Order:
-    - {col: year,      type: Int}
-    - {col: from_code, type: String}
-    - {col: from_desc, type: String}
-    - {col: to_code,   type: String}
-    - {col: to_desc,   type: String}
-    - {col: value,     type: Int}
-    - {col: units,     type: String}
-
+    - {col: year,       type: Int}
+    # - {col: from_code, type: String}
+    # - {col: from_desc, type: String}
+    - {col: from_aggr,  type: String}
+    # - {col: to_code,   type: String}
+    # - {col: to_desc,   type: String}
+    - {col: to_aggr,    type: String}
+    - {col: value,      type: Int}
+    - {col: units,      type: String}
+    
 Rename:
     - from: IOCode
       to:   from_code

@@ -12,7 +12,7 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 
 - `df::DataFrame`: The DataFrame on which to perform the edit.
 - `editor::T where T<:Edit`: DataType containing information about which edit to perform. The following edit options are available and detailed below:
-    - [`SLiDE.Add`](@ref)
+    - [`SLiDE.Add`](@ref): 
     - [`SLiDE.Group`](@ref)
     - [`SLiDE.Join`](@ref)
     - [`SLiDE.Map`](@ref)
@@ -20,6 +20,7 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
     - [`SLiDE.Melt`](@ref)
     - [`SLiDE.Rename`](@ref)
     - [`SLiDE.Replace`](@ref)
+    - [`SLiDE.Split`](@ref)
 - `file::T where T <: File`: Data file containing information to read.
 - `files::Array{T} where T <: File`: List of data files.
 - `y::Dict{Any,Any}`: Dictionary containing all editing structures among other values read
@@ -138,6 +139,19 @@ function edit_with(df::DataFrame, x::Replace)
         df[!,x.col] .= convert_type.(String, df[:,x.col]) : nothing
 
     x.col in names(df) ? df[!, x.col][df[:, x.col] .== x.from] .= x.to : nothing
+    return df
+end
+
+function edit_with(df::DataFrame, x::Split)
+    df = edit_with(df, Add.(x.output, fill("",size(x.output))))
+    lst = split.(df[:, x.input], Regex(x.on));
+
+    [df[!, x.output[ii]] .= strip.([length(m) >= ii ? m[ii] : "" for m in lst])
+        for ii in 1:length(x.output)]
+
+    x.remove ? df[!,x.input] .= [strip(string(string.(strip.(el)," ")...))
+        for el in lst] : nothing
+
     return df
 end
 

@@ -67,6 +67,8 @@ end
 
 convert_type(::Type{T}, x::Any) where T = T(x)
 
+convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : false
+
 """
 Returns true/false if the the DataType or object is an array.
 """

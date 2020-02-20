@@ -32,3 +32,9 @@ Map:
   to:     to
   input:  state
   output: state
+
+Split:
+  on:     CFS Area
+  input:  desc
+  output: [ma_desc, state_desc]
+  remove: true

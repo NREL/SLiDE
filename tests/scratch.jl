@@ -15,24 +15,4 @@ df = SLiDE.read_file(y["Path"], y["XLSXInput"])
 
 df = SLiDE.edit_with(df, y["Rename"]);
 df = SLiDE.edit_with(df, y["Map"]);
-
-############################################################################################
-col = :desc
-on = "CFS Area"
-before = :ma_desc
-after = :none
-remove = true
-
-lst = split.(df[:,col], Regex(on));
-
-df[!, before] .= strip.([m[1] for m in lst]);
-df[!, after] .= strip.([length(m) > 1 ? m[2] : "" for m in lst]);
-
-remove ? df[!, col] .= strip.(string.(df[:,before], " ", df[:,after])) : nothing
-
-############################################################################################
-df = SLiDE.edit_with(df, y["Order"]);
-first(df,3)
-
-# m1 = match.(r"(?<aggr>.*)\[CFS Area](?<sect>.*)", df[:,col])
-# [m[1] for m in lst];
+df = SLiDE.edit_with(df, y["Split"]);

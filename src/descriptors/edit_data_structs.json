@@ -211,5 +211,32 @@ This operation can only be performed once per dataframe.",
             }
         ],
         "supertype": "Edit"
+    },
+    {
+        "struct_name": "Split",
+        "docstring": "",
+        "fields": [
+            {
+                "name": "on",
+                "comment": "string indicating where to split",
+                "data_type": "String"
+            },
+            {
+                "name": "input",
+                "comment": "column to split",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "output",
+                "comment": "column names to label text surrounding the split",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "remove",
+                "comment": "should the term indicating whether to split be removed from the dataframe?",
+                "data_type": "Bool"
+            }
+        ],
+        "supertype": "Edit"
     }
 ]

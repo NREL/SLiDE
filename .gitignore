@@ -1,6 +1,6 @@
 .DS_Store
 .git/
-.vs_code/
+.vscode/
 
 data/Edit.jl
 data/scratch*.jl
@@ -17,4 +17,4 @@ src/parse/generated/
 src/parse/scratch/
 src/parse/utils/generate_structs.jl
 
-tests/scratch*.jl
+# tests/scratch*.jl
