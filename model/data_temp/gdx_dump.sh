@@ -3,6 +3,12 @@
 #
 # these operations will be replaced when datastream 
 # and calibration are fully replicated in SLiDE
+# exports sets
+
+gdxdump WiNDCdatabase.gdx format=csv symb=s > set_s.csv
+gdxdump WiNDCdatabase.gdx format=csv symb=r > set_r.csv
+gdxdump WiNDCdatabase.gdx format=csv symb=m > set_m.csv
+gdxdump WiNDCdatabase.gdx format=csv symb=gm > set_gm.csv
 
 gdxdump WiNDCdatabase.gdx format=csv symb=ys0_ > ys0.csv
 gdxdump WiNDCdatabase.gdx format=csv symb=id0_ > id0.csv

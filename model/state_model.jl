@@ -77,7 +77,6 @@ function key_to_vec(d::Dict,index_num::Int64)
     return [k[index_num] for k in keys(d)]
 end
 
-
 function fill_zero(source::Dict,tofill::Dict)
     for k in keys(source)
         if !haskey(tofill,k)
@@ -96,6 +95,7 @@ regions = unique(key_to_vec(blueNOTE[:ys0],1))
 sectors = unique(key_to_vec(blueNOTE[:ys0],2))
 goods = unique(key_to_vec(blueNOTE[:ys0],3))
 margins = unique(key_to_vec(blueNOTE[:md0],2))
+gm = unique(key_to_vec(blueNOTE[:nm0],3))
 
 #need to create a dictionary with unique r/s keys in ys0
 #but requires us to remove the third 'g' key in the r/s/g 
@@ -120,17 +120,21 @@ fill_zero(blueNOTE[:a0],temp_a2)
 a_set = temp_a2
 
 
+fill_zero(y_set,blueNOTE[:yh0])
 
-# set up subsets simiar to 
-#ordering here matters in that nd0 should be filled
-#with m0 keys before dd0 filled with nd0
-#never add keys to:
-#ys0, s0, and a0
-fill_zero(blueNOTE[:m0],blueNOTE[:tm0])
-fill_zero(blueNOTE[:m0],blueNOTE[:nd0])
-fill_zero(blueNOTE[:s0],blueNOTE[:x0])
-fill_zero(blueNOTE[:x0],blueNOTE[:rx0])
-fill_zero(blueNOTE[:nd0],blueNOTE[:dd0])
+fill_zero(x_set,blueNOTE[:x0])
+fill_zero(x_set,blueNOTE[:rx0])
+fill_zero(x_set,blueNOTE[:xd0])
+fill_zero(x_set,blueNOTE[:xn0])
+
+fill_zero(a_set,blueNOTE[:nd0])
+fill_zero(a_set,blueNOTE[:dd0])
+fill_zero(a_set,blueNOTE[:tm0])
+fill_zero(a_set,blueNOTE[:m0])
+fill_zero(a_set,blueNOTE[:cd0])
+fill_zero(a_set,blueNOTE[:g0])
+fill_zero(a_set,blueNOTE[:i0])
+fill_zero(a_set,blueNOTE[:a0])
 
 
 ##############
@@ -144,15 +148,10 @@ alpha_n  = Dict() #national supply share
 theta_n  = Dict() #national share of domestic Absorption
 theta_m  = Dict() #domestic share of absorption
 
-for k in keys(blueNOTE[:ld0])
+for k in keys(y_set)
     val = blueNOTE[:ld0][k] / (blueNOTE[:kd0][k] + blueNOTE[:ld0][k])
     push!(alpha_kl,k=>val)
 end
-
-fill_zero(x_set,blueNOTE[:x0])
-fill_zero(x_set,blueNOTE[:rx0])
-fill_zero(x_set,blueNOTE[:xd0])
-fill_zero(x_set,blueNOTE[:xn0])
 
 for k in keys(x_set)
     val = (blueNOTE[:x0][k] - blueNOTE[:rx0][k]) / blueNOTE[:s0][k]   
@@ -168,11 +167,6 @@ for k in keys(x_set)
     val = blueNOTE[:xn0][k] / blueNOTE[:s0][k]
     push!(alpha_n,k=>val)
 end
-
-fill_zero(a_set,blueNOTE[:nd0])
-fill_zero(a_set,blueNOTE[:dd0])
-fill_zero(a_set,blueNOTE[:tm0])
-fill_zero(a_set,blueNOTE[:m0])
 
 for k in keys(a_set)
     val = blueNOTE[:nd0][k] / (blueNOTE[:nd0][k] + blueNOTE[:dd0][k])
@@ -221,66 +215,57 @@ eps = 1e-3
 # -- PLACEHOLDER VARIABLES --
 ###############################
 
-fill_zero(y_set,alpha_kl)
-fill_zero(y_set,blueNOTE[:ld0])
-fill_zero(y_set,blueNOTE[:kd0])
-
-fill_zero(x_set,alpha_x)
-fill_zero(x_set,alpha_n)
-fill_zero(x_set,alpha_d)
-fill_zero(x_set,blueNOTE[:rx0])
-
-
 @NLexpression(cge,CVA[r in regions,s in sectors; haskey(y_set,(r,s))],
-  PL[r]^alpha_kl[r,s] * PK[r,s] ^(1-alpha_kl[r,s]) )
+  PL[r]^alpha_kl[r,s] * PK[r,s] ^(1-alpha_kl[r,s]) );
 
 @NLexpression(cge,AL[r in regions,s in sectors; haskey(y_set,(r,s))],
-  blueNOTE[:ld0][r,s] * CVA[r,s] / PL[r] )
+  blueNOTE[:ld0][r,s] * CVA[r,s] / PL[r] );
 
 @NLexpression(cge,AK[r in regions,s in sectors; haskey(y_set,(r,s))],
-  blueNOTE[:kd0][r,s] * CVA[r,s] / PK[r,s] )
+  blueNOTE[:kd0][r,s] * CVA[r,s] / PK[r,s] );
 
   ###
 
 @NLexpression(cge,RX[r in regions,g in goods; haskey(x_set,(r,g))],
-  (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5) )
+  (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5) );
 
 @NLexpression(cge,AX[r in regions,g in goods; haskey(x_set,(r,g))],
-  (blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g])*(PFX/RX[r,g])^4 )
+  (blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g])*(PFX/RX[r,g])^4 );
 
 @NLexpression(cge,AN[r in regions,g in goods; haskey(x_set,(r,g))],
-  blueNOTE[:xn0][r,g]*(PN[g]/RX[r,g])^4 )
+  blueNOTE[:xn0][r,g]*(PN[g]/RX[r,g])^4 );
 
 @NLexpression(cge,AD[r in regions,g in goods; haskey(x_set,(r,g))],
-  blueNOTE[:xd0][r,g]*(PD[r,g]/RX[r,g])^4 )
+  blueNOTE[:xd0][r,g]*(PD[r,g]/RX[r,g])^4 );
 
   ###
 
 @NLexpression(cge,CDN[r in regions,g in goods; haskey(a_set,(r,g))],
-  (theta_n[r,g]*PN[g]^(1-2)+(1-theta_n[r,g])*PD[r,g]^(1-2))^(1/(1-2)) )
+  (theta_n[r,g]*PN[g]^(1-2)+(1-theta_n[r,g])*PD[r,g]^(1-2))^(1/(1-2)) );
 
 #!!!! here replaced first :tm with :tm0
-@NLexpression(cge,CDM[r in regions,g in goods; haskey(blueNOTE[:nd0],(r,g))],
-  ((1-theta_m[r,g])*CDN[r,g]^(1-4)+theta_m[r,g]*(PFX*(1+blueNOTE[:tm0][r,g])/(1+blueNOTE[:tm0][r,g]))^(1-4))^(1/(1-4)) )
+@NLexpression(cge,CDM[r in regions,g in goods; haskey(a_set,(r,g))],
+  ((1-theta_m[r,g])*CDN[r,g]^(1-4)+theta_m[r,g]*
+  (PFX*(1+blueNOTE[:tm0][r,g])/(1+blueNOTE[:tm0][r,g]))^(1-4))^(1/(1-4)) 
+  );
 
   ###
 
-@NLexpression(cge,DN[r in regions,g in goods; haskey(blueNOTE[:m0],(r,g))],
-  blueNOTE[:nd0][r,g]*(CDN[r,g]/PN[g])^2*(CDM[r,g]/CDN[r,g])^4 )
+@NLexpression(cge,DN[r in regions,g in goods; haskey(a_set,(r,g))],
+  blueNOTE[:nd0][r,g]*(CDN[r,g]/PN[g])^2*(CDM[r,g]/CDN[r,g])^4 );
 
-@NLexpression(cge,DD[r in regions,g in goods; haskey(blueNOTE[:dd0],(r,g))],
-  blueNOTE[:dd0][r,g]*(CDN[r,g]/PD[r,g])^2*(CDM[r,g]/CDN[r,g])^4 )
+@NLexpression(cge,DD[r in regions,g in goods; haskey(a_set,(r,g))],
+  blueNOTE[:dd0][r,g]*(CDN[r,g]/PD[r,g])^2*(CDM[r,g]/CDN[r,g])^4 );
 
-@NLexpression(cge,MD[r in regions,g in goods; haskey(blueNOTE[:x0],(r,g))],
-  blueNOTE[:m0][r,g]*(CDM[r,g]*(1+blueNOTE[:tm0][r,g])/(PFX*(1+blueNOTE[:tm][r,g])))^4 )
+@NLexpression(cge,MD[r in regions,g in goods; haskey(a_set,(r,g))],
+  blueNOTE[:m0][r,g]*(CDM[r,g]*(1+blueNOTE[:tm0][r,g])/(PFX*(1+blueNOTE[:tm0][r,g])))^4 );
 
-@NLexpression(cge,CD[r in regions,g in goods; haskey(blueNOTE[:x0],(r,g))],
-  blueNOTE[:cd0][r,g]*PC[r] / PA[r,g] )
+@NLexpression(cge,CD[r in regions,g in goods; haskey(a_set,(r,g))],
+  blueNOTE[:cd0][r,g]*PC[r] / PA[r,g] );
 
-
-##############
-# CONSTRAINTS
-##############
+###############################
+# -- Zero Profit Conditions --
+###############################
 
 #y_set here is equivalent to the $y_(r,s) in the blueNOTE model
 @mapping(cge,profit_y[r in regions,s in sectors; haskey(y_set,(r,s)) ],
@@ -299,12 +284,47 @@ fill_zero(x_set,blueNOTE[:rx0])
                 + PD[r,g] * AD[r,g]
 );
 
-@mapping(cge,profit_a[r in regions,g in goods; haskey(blueNOTE[:0],(r,g)) ],
+@mapping(cge,profit_a[r in regions,g in goods; haskey(a_set,(r,g)) ],
                   PY[r,g] * blueNOTE[:s0][r,g] 
                   == 
                   PFX * AX[r,g]
                 + PN[g] * AN[r,g]
                 + PD[r,g] * AD[r,g]
+);
+
+@mapping(cge,profit_C[r in regions],
+                  sum(PA[r,g] * CD[r,g] for g in goods if haskey(a_set,(r,g)))
+                  ==
+                  PC[r] * blueNOTE[:c0][(r,)]
+);
+
+@mapping(cge,profit_ms[r in regions, m in margins],
+    sum(PN[gma]   * blueNOTE[:nm0][r,m,gma] for gma in gm if haskey(blueNOTE[:nm0],(r,m,gma)) )
+  + sum(PD[r,gma] * blueNOTE[:dm0][r,m,gma] for gma in gm if haskey(blueNOTE[:dm0],(r,m,gma)) )
+  == 
+  PM[r,m] * sum(blueNOTE[:md0][r,m,gma] for gma in gm if haskey(blueNOTE[:md0],(r,m,gma)) )
+);
+
+
+###################################
+# -- Market Clearing Conditions -- 
+###################################
+
+@mapping(cge,market_pa[r in regions, g in goods; haskey(a_set,(r,g))],
+        A[r,g] * blueNOTE[:a0][r,g] 
+        == 
+        blueNOTE[:g0][r,g] 
+      + blueNOTE[:i0][r,g]
+      + C[r] * CD[r,g]
+      + sum(Y[r,s] * blueNOTE[:id0][r,g,s] for s in sectors if haskey(blueNOTE[:id0],(r,g,s)))
+);
+
+
+@mapping(cge,profit_py[r in regions, g in goods; haskey(y_set,(r,g))],
+        sum(Y[r,s] * blueNOTE[:ys0][r,s,g] for s in sectors if haskey(blueNOTE[:ys0],(r,s,g)))
+      + blueNOTE[:yh0][r,g]
+        ==
+        X[r,g] * blueNOTE[:s0][r,g]
 );
 
 
