@@ -72,9 +72,11 @@ blueNOTE = Dict(
 # FUNCTIONS
 ##########
 
+#replace here with "collect"
 function key_to_vec(d::Dict,index_num::Int64)
     return [k[index_num] for k in keys(d)]
 end
+
 
 function fill_zero(source::Dict,tofill::Dict)
     for k in keys(source)
@@ -83,34 +85,6 @@ function fill_zero(source::Dict,tofill::Dict)
         end
     end
 end
-
-#ordering here matters in that nd0 should be filled
-#with m0 keys before dd0 filled with nd0
-#never add keys to:
-#ys0, s0, and a0
-fill_zero(blueNOTE[:m0],blueNOTE[:tm0])
-fill_zero(blueNOTE[:m0],blueNOTE[:nd0])
-fill_zero(blueNOTE[:s0],blueNOTE[:x0])
-fill_zero(blueNOTE[:x0],blueNOTE[:rx0])
-fill_zero(blueNOTE[:nd0],blueNOTE[:dd0])
-
-#need to create a dictionary with unique r/s keys in ys0
-y_set = Dict()
-y_vector = []
-for keys in blueNOTE[:ys0]
-    newkey = [keys[1][1],keys[1][2]]
-    push!(y_vector,newkey)
-end
-y_vector = unique(y_vector)
-
-for i in y_vector
-    print(i)
-    push!(y_set,(i[1],i[2])=>0)
-end
-
-
-
-
 
 ###############
 # -- SETS --
@@ -122,6 +96,41 @@ regions = unique(key_to_vec(blueNOTE[:ys0],1))
 sectors = unique(key_to_vec(blueNOTE[:ys0],2))
 goods = unique(key_to_vec(blueNOTE[:ys0],3))
 margins = unique(key_to_vec(blueNOTE[:md0],2))
+
+#need to create a dictionary with unique r/s keys in ys0
+#but requires us to remove the third 'g' key in the r/s/g 
+#dict keys in the ys0 parameter
+y_set = Dict()
+y_vector = []
+for keys in blueNOTE[:ys0]
+    newkey = [keys[1][1],keys[1][2]]
+    push!(y_vector,newkey)
+end
+y_vector = unique(y_vector)
+
+for i in y_vector
+    push!(y_set,(i[1],i[2])=>0)
+end
+
+x_set = blueNOTE[:s0]
+
+#here creating a placeholder set to make sure we don't modify blueNOTE[:rx0]
+temp_a2 = blueNOTE[:rx0]
+fill_zero(blueNOTE[:a0],temp_a2)
+a_set = temp_a2
+
+
+
+# set up subsets simiar to 
+#ordering here matters in that nd0 should be filled
+#with m0 keys before dd0 filled with nd0
+#never add keys to:
+#ys0, s0, and a0
+fill_zero(blueNOTE[:m0],blueNOTE[:tm0])
+fill_zero(blueNOTE[:m0],blueNOTE[:nd0])
+fill_zero(blueNOTE[:s0],blueNOTE[:x0])
+fill_zero(blueNOTE[:x0],blueNOTE[:rx0])
+fill_zero(blueNOTE[:nd0],blueNOTE[:dd0])
 
 
 ##############
@@ -140,27 +149,38 @@ for k in keys(blueNOTE[:ld0])
     push!(alpha_kl,k=>val)
 end
 
-for k in keys(blueNOTE[:x0])
+fill_zero(x_set,blueNOTE[:x0])
+fill_zero(x_set,blueNOTE[:rx0])
+fill_zero(x_set,blueNOTE[:xd0])
+fill_zero(x_set,blueNOTE[:xn0])
+
+for k in keys(x_set)
     val = (blueNOTE[:x0][k] - blueNOTE[:rx0][k]) / blueNOTE[:s0][k]   
     push!(alpha_x,k=>val)
 end
 
-for k in keys(blueNOTE[:xd0])
+for k in keys(x_set)
     val = blueNOTE[:xd0][k] / blueNOTE[:s0][k]
     push!(alpha_d,k=>val)
 end
 
-for k in keys(blueNOTE[:xn0])
+for k in keys(x_set)
     val = blueNOTE[:xn0][k] / blueNOTE[:s0][k]
     push!(alpha_n,k=>val)
 end
 
-for k in keys(blueNOTE[:nd0])
+fill_zero(a_set,blueNOTE[:nd0])
+fill_zero(a_set,blueNOTE[:dd0])
+fill_zero(a_set,blueNOTE[:tm0])
+fill_zero(a_set,blueNOTE[:m0])
+
+for k in keys(a_set)
     val = blueNOTE[:nd0][k] / (blueNOTE[:nd0][k] + blueNOTE[:dd0][k])
     push!(theta_n,k=>val)
 end
 
-for k in keys(blueNOTE[:m0])
+#!!!! not sure on a_set here
+for k in keys(a_set)
     val = (1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k] / (blueNOTE[:nd0][k]+blueNOTE[:dd0][k]+(1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k])
     push!(theta_m,k=>val)
 end
@@ -176,7 +196,7 @@ cge = MCPModel();
 # as a lower limit to variable values
 eps = 1e-3
 
-@variable(cge,Y[regions,sectors]>=eps)
+@variable(cge,Y[regions,sectors]>=eps,start=1)
 @variable(cge,X[regions,goods]>=eps,start=1) # Disposition
 @variable(cge,A[regions,goods]>=eps,start=1) # Absorption
 @variable(cge,C[regions]>=eps,start=1) # Aggregate final demand
@@ -201,29 +221,49 @@ eps = 1e-3
 # -- PLACEHOLDER VARIABLES --
 ###############################
 
-fill_zero(alpha_x,alpha_n)
-fill_zero(alpha_x,alpha_d)
-fill_zero(blueNOTE[:s0],blueNOTE[:xd0])
-fill_zero(blueNOTE[:s0],blueNOTE[:xn0])
+fill_zero(y_set,alpha_kl)
+fill_zero(y_set,blueNOTE[:ld0])
+fill_zero(y_set,blueNOTE[:kd0])
 
-@NLexpression(cge,RX[r in regions,g in goods; haskey(blueNOTE[:x0],(r,g))],
+fill_zero(x_set,alpha_x)
+fill_zero(x_set,alpha_n)
+fill_zero(x_set,alpha_d)
+fill_zero(x_set,blueNOTE[:rx0])
+
+
+@NLexpression(cge,CVA[r in regions,s in sectors; haskey(y_set,(r,s))],
+  PL[r]^alpha_kl[r,s] * PK[r,s] ^(1-alpha_kl[r,s]) )
+
+@NLexpression(cge,AL[r in regions,s in sectors; haskey(y_set,(r,s))],
+  blueNOTE[:ld0][r,s] * CVA[r,s] / PL[r] )
+
+@NLexpression(cge,AK[r in regions,s in sectors; haskey(y_set,(r,s))],
+  blueNOTE[:kd0][r,s] * CVA[r,s] / PK[r,s] )
+
+  ###
+
+@NLexpression(cge,RX[r in regions,g in goods; haskey(x_set,(r,g))],
   (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5) )
 
-@NLexpression(cge,AX[r in regions,g in goods; haskey(blueNOTE[:x0],(r,g))],
+@NLexpression(cge,AX[r in regions,g in goods; haskey(x_set,(r,g))],
   (blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g])*(PFX/RX[r,g])^4 )
 
-@NLexpression(cge,AN[r in regions,g in goods; haskey(blueNOTE[:x0],(r,g))],
+@NLexpression(cge,AN[r in regions,g in goods; haskey(x_set,(r,g))],
   blueNOTE[:xn0][r,g]*(PN[g]/RX[r,g])^4 )
 
-@NLexpression(cge,AD[r in regions,g in goods; haskey(blueNOTE[:x0],(r,g))],
+@NLexpression(cge,AD[r in regions,g in goods; haskey(x_set,(r,g))],
   blueNOTE[:xd0][r,g]*(PD[r,g]/RX[r,g])^4 )
 
-@NLexpression(cge,CDN[r in regions,g in goods; haskey(blueNOTE[:nd0],(r,g))],
+  ###
+
+@NLexpression(cge,CDN[r in regions,g in goods; haskey(a_set,(r,g))],
   (theta_n[r,g]*PN[g]^(1-2)+(1-theta_n[r,g])*PD[r,g]^(1-2))^(1/(1-2)) )
 
 #!!!! here replaced first :tm with :tm0
 @NLexpression(cge,CDM[r in regions,g in goods; haskey(blueNOTE[:nd0],(r,g))],
   ((1-theta_m[r,g])*CDN[r,g]^(1-4)+theta_m[r,g]*(PFX*(1+blueNOTE[:tm0][r,g])/(1+blueNOTE[:tm0][r,g]))^(1-4))^(1/(1-4)) )
+
+  ###
 
 @NLexpression(cge,DN[r in regions,g in goods; haskey(blueNOTE[:m0],(r,g))],
   blueNOTE[:nd0][r,g]*(CDN[r,g]/PN[g])^2*(CDM[r,g]/CDN[r,g])^4 )
@@ -235,44 +275,36 @@ fill_zero(blueNOTE[:s0],blueNOTE[:xn0])
   blueNOTE[:m0][r,g]*(CDM[r,g]*(1+blueNOTE[:tm0][r,g])/(PFX*(1+blueNOTE[:tm][r,g])))^4 )
 
 @NLexpression(cge,CD[r in regions,g in goods; haskey(blueNOTE[:x0],(r,g))],
-  blueNOTE[:cd0][r,g]*PC[r]/PA[r,g] )
+  blueNOTE[:cd0][r,g]*PC[r] / PA[r,g] )
 
 
 ##############
 # CONSTRAINTS
 ##############
 
-
-####XY -- designates that the macro named XY in the blueNOTE mcp was replaced
 #y_set here is equivalent to the $y_(r,s) in the blueNOTE model
 @mapping(cge,profit_y[r in regions,s in sectors; haskey(y_set,(r,s)) ],
                 sum(PA[r,g] * blueNOTE[:id0][r,g,s] for g in goods if haskey(blueNOTE[:id0],(r,g,s)) )
-                + PL[r]   * (blueNOTE[:ld0][r,s] * (PL[r]^alpha_kl[r,s] * PK[r,s]^(1-alpha_kl[r,s]) ) / PL[r])  ####AL
-                + PK[r,s] * (blueNOTE[:kd0][r,s] * (PL[r]^alpha_kl[r,s] * PK[r,s]^(1-alpha_kl[r,s]) ) / PK[r,s])  ####AK
+                + PL[r] * AL[r,s]
+                + PK[r,s] * AK[r,s]
                 == 
                 sum(PY[r,g] * blueNOTE[:ys0][r,s,g] for g in goods if haskey(blueNOTE[:ys0],(r,s,g)) )
 );
 
-
-@NLexpression(cge,RX[r in regions,g in goods; haskey(blueNOTE[:s0],(r,g))],
-    (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5)
-)
-
-@mapping(cge,profit_x[r in rr,g in gg; haskey(blueNOTE[:s0],(r,g)) ],
-                PY[r,g] * blueNOTE[:s0][r,g] 
-                == 
-                PFX * ((blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g]) * PFX / RX(r,g) )^4 ####AX
-                + PN[g] * blueNOTE[:xn0][r,g] * (PN[g] / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5))^4 ####AN / ####RX
-                + PD[r,g] * blueNOTE[:xd0][r,g] * (PD[r,g] / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5))^4 ####AD / ####RX
+@mapping(cge,profit_x[r in regions,g in goods; haskey(blueNOTE[:x0],(r,g)) ],
+                  PY[r,g] * blueNOTE[:s0][r,g] 
+                  == 
+                  PFX * AX[r,g]
+                + PN[g] * AN[r,g]
+                + PD[r,g] * AD[r,g]
 );
 
-
-@mapping(cge,profit_x[r in rr,g in gg; haskey(blueNOTE[:a0],(r,g)) ],
-                PY[r,g] * blueNOTE[:s0][r,g] 
-                == 
-                PFX * ((blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g]) * PFX / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5) )^4 ####AX
-                + PN[g] * blueNOTE[:xn0][r,g] * (PN[g] / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5))^4 ####AN / ####RX
-                + PD[r,g] * blueNOTE[:xd0][r,g] * (PD[r,g] / (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5))^4 ####AD / ####RX
+@mapping(cge,profit_a[r in regions,g in goods; haskey(blueNOTE[:0],(r,g)) ],
+                  PY[r,g] * blueNOTE[:s0][r,g] 
+                  == 
+                  PFX * AX[r,g]
+                + PN[g] * AN[r,g]
+                + PD[r,g] * AD[r,g]
 );
 
 
