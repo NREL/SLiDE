@@ -89,13 +89,13 @@ end
 # -- SETS --
 ###############
 
-# extract model indices from blueNOTE dict
-# here are the exhaustive struct names
-regions = unique(key_to_vec(blueNOTE[:ys0],1))
-sectors = unique(key_to_vec(blueNOTE[:ys0],2))
-goods = unique(key_to_vec(blueNOTE[:ys0],3))
-margins = unique(key_to_vec(blueNOTE[:md0],2))
-gm = unique(key_to_vec(blueNOTE[:nm0],3))
+# read sets from their dumped CSVs
+regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
+sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
+goods = sectors;
+margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
+goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
+
 
 #need to create a dictionary with unique r/s keys in ys0
 #but requires us to remove the third 'g' key in the r/s/g 
@@ -119,7 +119,6 @@ temp_a2 = blueNOTE[:rx0]
 fill_zero(blueNOTE[:a0],temp_a2)
 a_set = temp_a2
 
-
 fill_zero(y_set,blueNOTE[:yh0])
 
 fill_zero(x_set,blueNOTE[:x0])
@@ -135,6 +134,7 @@ fill_zero(a_set,blueNOTE[:cd0])
 fill_zero(a_set,blueNOTE[:g0])
 fill_zero(a_set,blueNOTE[:i0])
 fill_zero(a_set,blueNOTE[:a0])
+fill_zero(a_set,blueNOTE[:ta0])
 
 
 ##############
@@ -299,10 +299,10 @@ eps = 1e-3
 );
 
 @mapping(cge,profit_ms[r in regions, m in margins],
-    sum(PN[gma]   * blueNOTE[:nm0][r,m,gma] for gma in gm if haskey(blueNOTE[:nm0],(r,m,gma)) )
-  + sum(PD[r,gma] * blueNOTE[:dm0][r,m,gma] for gma in gm if haskey(blueNOTE[:dm0],(r,m,gma)) )
+    sum(PN[gm]   * blueNOTE[:nm0][r,m,gm] for gm in goods_margins if haskey(blueNOTE[:nm0],(r,m,gm)) )
+  + sum(PD[r,gm] * blueNOTE[:dm0][r,m,gm] for gm in goods_margins if haskey(blueNOTE[:dm0],(r,m,gm)) )
   == 
-  PM[r,m] * sum(blueNOTE[:md0][r,m,gma] for gma in gm if haskey(blueNOTE[:md0],(r,m,gma)) )
+  PM[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins if haskey(blueNOTE[:md0],(r,m,gm)) )
 );
 
 
@@ -320,14 +320,75 @@ eps = 1e-3
 );
 
 
-@mapping(cge,profit_py[r in regions, g in goods; haskey(y_set,(r,g))],
+@mapping(cge,market_py[r in regions, g in goods; haskey(y_set,(r,g))],
         sum(Y[r,s] * blueNOTE[:ys0][r,s,g] for s in sectors if haskey(blueNOTE[:ys0],(r,s,g)))
       + blueNOTE[:yh0][r,g]
         ==
         X[r,g] * blueNOTE[:s0][r,g]
 );
 
+@mapping(cge,market_pd[r in regions, g in goods; haskey(x_set,(r,g))],
+        X[r,g] * AD[r,g] 
+        == 
+        A[r,g] * DD[r,g]
+      + sum(MS[r,m] * blueNOTE[:dm0][r,m,g] for m in margins if (g in goods_margins && haskey(blueNOTE[:dm0],(r,m,g))) )  
+);
+
+@mapping(cge,market_pn[g in goods],
+        sum(X[r,g] * AN[r,g] for r in regions if haskey(x_set,(r,g)))
+        == 
+        sum(A[r,g] * DN[r,g] for r in regions if haskey(a_set,(r,g)))
+        + sum(MS[r,m] * blueNOTE[:nm0][r,m,g] for r in regions for m in margins if (g in goods_margins && haskey(blueNOTE[:nm0],(r,m,g))) )
+);
+
+@mapping(cge,market_pl[r in regions],
+        sum(blueNOTE[:ld0][r,s] for s in sectors if haskey(blueNOTE[:ld0],(r,s)))
+        == 
+        sum(Y[r,s] * AL[r,s] for s in sectors if haskey(y_set,(r,s)))
+);
+
+@mapping(cge,market_pk[r in regions, s in sectors; haskey(blueNOTE[:kd0],(r,s))],
+        blueNOTE[:kd0][r,s]
+        == 
+        Y[r,s] * AK[r,s]
+);
+
+@mapping(cge,market_pm[r in regions, m in margins],
+        MS[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins if haskey(blueNOTE[:md0],(r,m,gm)))
+        ==
+        sum(A[r,g] * blueNOTE[:md0][r,m,g] for g in goods if haskey(blueNOTE[:md0],(r,m,g)))
+);
+
+@mapping(cge,market_pc[r in regions],
+        C[r] * blueNOTE[:c0][r] == RA[r] / PC[r]
+);
+
+@mapping(cge,market_pfx,
+#will fix the reference here...
+        sum(blueNOTE[:bopdef0][(r,)] for r in regions)
+#!!!! not sure if haskey needed here...        
+#        + sum(X[r,g] * AX[r,g] for r in regions for g in goods if haskey(x_set,(r,g)))
+        + sum(X[r,g] * AX[r,g] for r in regions for g in goods)
+        + sum(A[r,g] * blueNOTE[:x0][r,g] for r in regions for g in goods if haskey(a_set,(r,g)))
+        ==
+        sum(A[r,g] * MD[r,g] for r in regions for g in goods)
+        );
+
+@mapping(cge,income_ra[r in regions],
+        RA[r] == 
+        sum(PY[r,g]*blueNOTE[:yh0][r,g] for g in goods if haskey(blueNOTE[:yh0],(r,g)))
+#will fix reference here...        
+        + PFX * (blueNOTE[:bopdef0][(r,)] + blueNOTE[:hhadj][(r,)])
+        - sum(PA[r,g] * (blueNOTE[:g0][r,g] + blueNOTE[:i0][r,g]) for g in goods)
+        + PL[r] * sum(blueNOTE[:ld0][r,s] for s in sectors if haskey(blueNOTE[:ld0],(r,s)) )
+        + sum(PK[r,s] * blueNOTE[:kd0][r,s] for s in sectors if haskey(blueNOTE[:kd0],(r,s)) )
+#changed tm to tm0 here...        
+        + sum(A[r,g] * MD[r,g]* PFX * blueNOTE[:tm0][r,g] for g in goods if haskey(a_set,(r,g)) )
+#change ta to ta0 here
+        + sum(A[r,g] * blueNOTE[:a0][r,g]*PA[r,g]*blueNOTE[:ta0][r,g] for g in goods if haskey(a_set,(r,g)) )
+);
 
 
 
+@complementarity(cge,profit_y[regions,sectors],Y[regions,sectors]; haskey(y_set,(regions,sectors)))
 
