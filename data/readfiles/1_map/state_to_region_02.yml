@@ -1,0 +1,22 @@
+Path:  ["..", "data", "coremaps"]
+PathOut: ["..", "data", "coremaps", "temp_us_regions.csv"]
+
+CSVInput:
+  name:  state_to_region.csv
+  descriptor: region
+  header: 1
+
+Order:
+  - {col: from, type: Int}
+  - {col: to,   type: String}
+
+Rename:
+  - from:   state
+    to:     to
+  - from:   region
+    to:     from
+
+Drop:
+  col: fips
+  val: 57000
+  operation: "<"

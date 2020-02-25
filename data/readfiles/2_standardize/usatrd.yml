@@ -1,0 +1,53 @@
+Path:  ["..", "data", "datasources", "USATradeOnline"]
+
+CSVInput:
+  - name:  "State Imports by NAICS Commodities.csv"
+    header: 3
+    descriptor: import
+  - name:  "State Exports by NAICS Commodities.csv"
+    header: 4
+    descriptor: export
+
+Order:
+  - {col: year,    type: Int}
+  - {col: flow,    type: String}
+  - {col: state,   type: String}
+  - {col: country, type: String}
+  - {col: naics_code,  type: String}
+  - {col: units,   type: String}
+  - {col: value,   type: Float64}
+
+Rename:
+  - from: upper
+    to:   lower
+  - from: time
+    to:   year
+  - from: "customs value (gen) ($us)"
+    to:   value
+  - from: total exports value ($us)
+    to:   value
+
+Describe:
+  col: flow
+
+Map:
+  file:   regions.csv
+  from:   from
+  to:     to
+  input:  [state, country]
+  output: [state, country]
+
+Drop:
+  col: year
+  val: 2017 through November
+  operation: "=="
+
+Add:
+  col: units
+  val: us dollars (USD)
+
+Split:
+  on: " "
+  input: commodity
+  output: naics_code
+  remove: false

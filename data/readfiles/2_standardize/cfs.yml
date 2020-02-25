@@ -1,7 +1,8 @@
-Path:  ["..","data","datasources", "CFS"]
+Path:  ["data", "datasources", "CFS"]
 
 CSVInput:
   name:  cfs_2012_pumf_csv.txt
+  header: 1
   descriptor: cfs
 
 Order:
@@ -67,44 +68,3 @@ Add:
     val: great circle distance in miles
   - col: shipmt_dist_routed_units
     val: routed distance in miles
-
-# Path:  ["..","data","datasources", "CFS"]
-
-# XLSXInput:
-#   name:  cfs_2012_pum_file_users_guide_App_A (Jun 2015).xlsx
-#   sheet: App A1
-#   range: A3:E136
-#   descriptor: area
-
-# Order:
-#   - {col: state,   type: String}
-#   - {col: ma_code, type: String}
-#   - {col: ma_desc, type: String}
-#   - {col: code,    type: String}
-#   - {col: desc,    type: String}
-#   - {col: type,    type: String}
-
-# Rename:
-#   - from:   DEST_MA
-#     to:     ma_code
-#   - from:   DEST_STATE
-#     to:     state_code
-#   - from:   DEST_CFS_AREA
-#     to:     code
-#   - from:   missing
-#     to:     desc
-#   - from:   Type
-#     to:     type
-
-# Map:
-#   file:   regions.csv
-#   from:   from
-#   to:     to
-#   input:  state
-#   output: state
-
-# Split:
-#   on:     CFS Area
-#   input:  desc
-#   output: [ma_desc, state_desc]
-#   remove: true

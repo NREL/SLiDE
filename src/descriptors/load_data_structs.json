@@ -9,6 +9,11 @@
                 "data_type": "String"
             },
             {
+                "name": "header",
+                "comment": "first row to read and use as header",
+                "data_type": "Int"
+            },
+            {
                 "name": "descriptor",
                 "comment": "file descriptor",
                 "data_type": "String"

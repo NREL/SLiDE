@@ -16,10 +16,22 @@ end
 """
     Base.strip(x::Missing)
     Base.strip(x::Number)
-Extends "strip" to ignore missing fields and numbers.
+Extends `strip` to ignore missing fields and numbers.
 """
 Base.strip(x::Missing) = x
 Base.strip(x::Number) = x
+
+"""
+    Base.lowercase(x::Symbol)
+Extends `lowercase` to handle symbols.
+"""
+Base.lowercase(x::Symbol) = Symbol(lowercase(string(x)))
+
+"""
+    Base.uppercase(x::Symbol)
+Extends `uppercase` to handle symbols.
+"""
+Base.uppercase(x::Symbol) = Symbol(uppercase(string(x)))
 
 """
     convert_type(::Type{T}, x::Any)
@@ -42,11 +54,16 @@ function convert_type(::Type{T}, x::AbstractString) where T<:Integer
     return convert_type(T, convert_type(Float64, x))
 end
 
-convert_type(::Type{T}, x::AbstractString) where T<:Real = parse(T, replace(x, "," => ""))
+# convert_type(::Type{T}, x::AbstractString) where T<:Real = parse(T, replace(x, "," => ""))
+function convert_type(::Type{T}, x::AbstractString) where T<:Real
+    return parse(T, reduce(replace, ["," => "", "\"" => ""], init = x))
+end
+
 convert_type(::Type{T}, x::Symbol) where T<:Real = convert_type(T, convert_type(String, x))
 
 function convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1})
-    return DataFrame(Dict(key => [x[key] for x in lst] for key in keys(lst[1])))
+    return vcat(DataFrame.(lst)...)
+    # return DataFrame(Dict(key => [x[key] for x in lst] for key in keys(lst[1])))
 end
 
 convert_type(::Type{DataType}, x::AbstractString) = datatype(x)

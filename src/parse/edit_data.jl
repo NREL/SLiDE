@@ -12,14 +12,30 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 
 - `df::DataFrame`: The DataFrame on which to perform the edit.
 - `editor::T where T<:Edit`: DataType containing information about which edit to perform. The following edit options are available and detailed below:
-    - [`SLiDE.Add`](@ref): 
-    - [`SLiDE.Group`](@ref)
-    - [`SLiDE.Join`](@ref)
-    - [`SLiDE.Map`](@ref)
-    - [`SLiDE.Order`](@ref)
-    - [`SLiDE.Melt`](@ref)
-    - [`SLiDE.Rename`](@ref)
-    - [`SLiDE.Replace`](@ref)
+    - [`SLiDE.Add`](@ref): Add new column `col` filled with `val`.
+    - [`SLiDE.Describe`](@ref): This DataType is required when multiple DataFrames will be
+        appended into one output file (say, if multiple sheets from an XLSX file are
+        included). Before the DataFrames are appended, a column `col` will be added and
+        filled with the value in the file descriptor.
+    - [`SLiDE.Group`](@ref): Use to edit files containing data in successive dataframes with
+        an identifying header cell or row.
+    - [`SLiDE.Join`](@ref): Contains the information to join a mapping DataFrame to another
+        DataFrame (`df`), with a `prefix` prepended to the column names in `df_map`.
+        The dataframes will be joined on the column `on`
+        (see [DataFrames join documentation](https://juliadata.github.io/DataFrames.jl/stable/man/joins/))
+    - [`SLiDE.Map`](@ref): Define an `output` column containing values based on those in an
+        `input` column. The mapping columns `from` -> `to` are contained in a .csv `file` in
+        the coremaps directory. The columns `input` and `from` should contain the same
+        values, as should `output` and `to`.
+    - [`SLiDE.Melt`](@ref): Normalize the dataframe by 'melting' columns into rows, 
+        lengthening the dataframe by duplicating values in the column `on` into new rows and
+        defining 2 new columns:
+        1. `var` with header names from the original dataframe.
+        2. `val` with column values from the original dataframe.
+    - [`SLiDE.Order`](@ref): Rearranges columns in the order specified by `cols` and sets
+        them to the specified type.
+    - [`SLiDE.Rename`](@ref): Change column name `from` -> `to`.
+    - [`SLiDE.Replace`](@ref): Replace values in `col` `from` -> `to`.
     - [`SLiDE.Split`](@ref)
 - `file::T where T <: File`: Data file containing information to read.
 - `files::Array{T} where T <: File`: List of data files.
@@ -38,6 +54,16 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 """
 function edit_with(df::DataFrame, x::Add)
     df[!, x.col] .= x.val
+    return df
+end
+
+function edit_with(df::DataFrame, x::Drop)
+    if typeof(x.val) == String
+        occursin(lowercase(x.val), "missing") ? dropmissing!(df, x.col) :
+            occursin(lowercase(x.val), "unique") ? unique!(df, x.col) : nothing
+    end
+    # !!!! Add error if broadcast not possible.
+    df = df[.!broadcast(datatype(x.operation), df[:,x.col], x.val), :]
     return df
 end
 
@@ -89,7 +115,14 @@ function edit_with(df::DataFrame, x::Map)
     # A left join is used to prevent data loss in the case that a value in the input df is
     # NOT in the input mapping column. If this is the case, this value will map to "missing".
     # Remove excess blank space from the input column to ensure consistency when joining.
-    df = edit_with(df, Rename(x.input, x.from));
+
+    # !!!! Warning when renaming doesn't happen?
+    x.input == x.from ? nothing : df = edit_with(df, Rename(x.input, x.from));
+    # show(first(df,3))
+
+    all(typeof.(df_map[:,x.from]) .== String) ?
+        df[!,x.from] .= convert_type.(String, df[:,x.from]) : nothing
+
     df[!, x.from] .= strip.(df[:, x.from]);
     df = join(df, df_map, on = x.from, kind = :left, makeunique = true);
 
@@ -99,6 +132,7 @@ function edit_with(df::DataFrame, x::Map)
     # Return the DataFrame with the columns saved at the top of the method.
     df = x.input == x.output ? edit_with(df, Rename(x.to, x.output)) :
                                edit_with(df, Rename.([x.from, x.to], [x.input, x.output]))
+
     return df[:, cols]
     # !!!! ALTERNATE APPROACH: In the current approach, any row in df that is NOT in df_map
     # will be removed. This is beneficial when using edit_with(df, x::Group).
@@ -130,7 +164,15 @@ function edit_with(df::DataFrame, x::Order)
 end
 
 function edit_with(df::DataFrame, x::Rename)
-    x.from in names(df) ? rename!(df, x.from => x.to) : nothing
+    # Explicitly rename the specified column if it exists in the dataframe.
+    x.from in names(df) ? rename!(df, x.from => x.to) :
+
+        # If we are, instead, changing the CASE of all column names...
+        lowercase(x.to) == :lower ?
+            df = edit_with(df, Rename.(names(df), lowercase.(names(df)))) :
+            lowercase(x.to) == :upper ?
+                df = edit_with(df, Rename.(names(df), uppercase.(names(df)))) :
+                nothing
     return df
 end
 
@@ -143,6 +185,7 @@ function edit_with(df::DataFrame, x::Replace)
 end
 
 function edit_with(df::DataFrame, x::Split)
+    
     df = edit_with(df, Add.(x.output, fill("",size(x.output))))
     lst = split.(df[:, x.input], Regex(x.on));
 
@@ -169,7 +212,7 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten::Bool=false) where T<:File
     df = read_file(y["Path"], file; shorten=shorten);
 
     # Specify the order in which edits must occur.
-    EDITS = ["Rename", "Group", "Melt", "Add", "Map", "Join", "Replace"];
+    EDITS = ["Rename", "Group", "Melt", "Add", "Map", "Join", "Split", "Replace", "Drop"];
 
     # Find which of these edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, [k for k in keys(y)]);

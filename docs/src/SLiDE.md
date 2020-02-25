@@ -17,6 +17,7 @@ SLiDE
 
 ```@docs
 SLiDE.Add
+SLiDE.Describe
 SLiDE.Group
 SLiDE.Join
 SLiDE.Map
@@ -24,6 +25,7 @@ SLiDE.Melt
 SLiDE.Order
 SLiDE.Rename
 SLiDE.Replace
+SLiDE.Split
 ```
 
 ```@docs

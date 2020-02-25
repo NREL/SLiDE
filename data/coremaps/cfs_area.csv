@@ -1,0 +1,134 @@
+state,ma_code,ma_desc,code,desc,type
+ga,122,"Atlanta-Athens-Clarke County-Sandy Springs, GA",13-122,"Atlanta-Athens-Clarke County-Sandy Springs, GA",C
+al,142,"Birmingham-Hoover-Talladega, AL",01-142,"Birmingham-Hoover-Talladega, AL",C
+ma,148,"Boston-Worcester-Providence, MA-RI-NH-CT",25-148,"Boston-Worcester-Providence, MA-RI-NH-CT (MA Part)",C
+nh,148,"Boston-Worcester-Providence, MA-RI-NH-CT",33-148,"Boston-Worcester-Providence, MA-RI-NH-CT (NH Part)",C
+ri,148,"Boston-Worcester-Providence, MA-RI-NH-CT",44-148,"Boston-Worcester-Providence, MA-RI-NH-CT (RI Part)",C
+ny,160,"Buffalo-Cheektowaga, NY",36-160,"Buffalo-Cheektowaga, NY",C
+nc,172,"Charlotte-Concord, NC-SC",37-172,"Charlotte-Concord, NC-SC (NC Part)",C
+il,176,"Chicago-Naperville, IL-IN-WI",17-176,"Chicago-Naperville, IL-IN-WI (IL Part)",C
+in,176,"Chicago-Naperville, IL-IN-WI",18-176,"Chicago-Naperville, IL-IN-WI (IN Part)",C
+ky,178,"Cincinnati-Wilmington-Maysville, OH-KY-IN",21-178,"Cincinnati-Wilmington-Maysville, OH-KY-IN (KY Part)",C
+oh,178,"Cincinnati-Wilmington-Maysville, OH-KY-IN",39-178,"Cincinnati-Wilmington-Maysville, OH-KY-IN (OH Part)",C
+oh,184,"Cleveland-Akron-Canton, OH",39-184,"Cleveland-Akron-Canton, OH",C
+oh,198,"Columbus-Marion-Zanesville, OH",39-198,"Columbus-Marion-Zanesville, OH",C
+tx,204,"Corpus Christi-Kingsville-Alice, TX",48-204,"Corpus Christi-Kingsville-Alice, TX",C
+tx,206,"Dallas-Fort Worth, TX-OK",48-206,"Dallas-Fort Worth, TX-OK (TX Part)",C
+oh,212,"Dayton-Springfield-Sidney, OH",39-212,"Dayton-Springfield-Sidney, OH",C
+co,216,"Denver-Aurora, CO",08-216,"Denver-Aurora, CO",C
+mi,220,"Detroit-Warren-Ann Arbor, MI",26-220,"Detroit-Warren-Ann Arbor, MI",C
+tx,238,"El Paso-Las Cruces, TX-NM",48-238,"El Paso-Las Cruces, TX-NM (TX Part)",C
+in,258,"Fort Wayne-Huntington-Auburn, IN",18-258,"Fort Wayne-Huntington-Auburn, IN",C
+ca,260,"Fresno-Madera, CA",06-260,"Fresno-Madera, CA",C
+mi,266,"Grand Rapids-Wyoming-Muskegon, MI",26-266,"Grand Rapids-Wyoming-Muskegon, MI",C
+nc,268,"Greensboro--Winston-Salem--High Point, NC",37-268,"Greensboro--Winston-Salem--High Point, NC",C
+sc,273,"Greenville-Spartanburg-Anderson, SC",45-273,"Greenville-Spartanburg-Anderson, SC",C
+tx,288,"Houston-The Woodlands, TX",48-288,"Houston-The Woodlands, TX",C
+in,294,"Indianapolis-Carmel-Muncie, IN",18-294,"Indianapolis-Carmel-Muncie, IN",C
+fl,300,"Jacksonville-St. Marys-Palatka, FL-GA",12-300,"Jacksonville-St. Marys-Palatka, FL-GA (FL Part)",C
+ks,312,"Kansas City-Overland Park-Kansas City, MO-KS",20-312,"Kansas City-Overland Park-Kansas City, MO-KS (KS Part)",C
+mo,312,"Kansas City-Overland Park-Kansas City, MO-KS",29-312,"Kansas City-Overland Park-Kansas City, MO-KS (MO Part)",C
+tn,314,"Knoxville-Morristown-Sevierville, TN",47-314,"Knoxville-Morristown-Sevierville, TN",C
+nv,332,"Las Vegas-Henderson, NV-AZ",32-332,"Las Vegas-Henderson, NV-AZ (NV Part)",C
+ca,348,"Los Angeles-Long Beach, CA",06-348,"Los Angeles-Long Beach, CA",C
+ky,350,"Louisville/Jefferson County-Elizabethtown-Madison, KY-IN",21-350,"Louisville/Jefferson County-Elizabethtown-Madison, KY-IN (KY Part)",C
+tn,368,"Memphis, TN-MS-AR",47-368,"Memphis, TN-MS-AR (TN Part)",C
+fl,370,"Miami-Fort Lauderdale-Port St. Lucie, FL",12-370,"Miami-Fort Lauderdale-Port St. Lucie, FL",C
+wi,376,"Milwaukee-Racine-Waukesha, WI",55-376,"Milwaukee-Racine-Waukesha, WI",C
+mn,378,"Minneapolis-St. Paul, MN-WI",27-378,"Minneapolis-St. Paul, MN-WI (MN Part)",C
+al,380,"Mobile-Daphne-Fairhope, AL",01-380,"Mobile-Daphne-Fairhope, AL",C
+tn,400,"Nashville-Davidson--Murfreesboro, TN",47-400,"Nashville-Davidson--Murfreesboro, TN",C
+la,406,"New Orleans-Metairie-Hammond, LA-MS",22-406,"New Orleans-Metairie-Hammond, LA-MS (LA Part)",C
+ct,408,"New York-Newark, NY-NJ-CT-PA",09-408,"New York-Newark, NY-NJ-CT-PA (CT Part)",C
+nj,408,"New York-Newark, NY-NJ-CT-PA",34-408,"New York-Newark, NY-NJ-CT-PA (NJ Part)",C
+ny,408,"New York-Newark, NY-NJ-CT-PA",36-408,"New York-Newark, NY-NJ-CT-PA (NY Part)",C
+pa,408,"New York-Newark, NY-NJ-CT-PA",42-408,"New York-Newark, NY-NJ-CT-PA (PA Part)",C
+ok,416,"Oklahoma City-Shawnee, OK",40-416,"Oklahoma City-Shawnee, OK",C
+ne,420,"Omaha-Council Bluffs-Fremont, NE-IA",31-420,"Omaha-Council Bluffs-Fremont, NE-IA (NE Part)",C
+fl,422,"Orlando-Deltona-Daytona Beach, FL",12-422,"Orlando-Deltona-Daytona Beach, FL",C
+de,428,"Philadelphia-Reading-Camden, PA-NJ-DE-MD",10-428,"Philadelphia-Reading-Camden, PA-NJ-DE-MD (DE Part)",C
+nj,428,"Philadelphia-Reading-Camden, PA-NJ-DE-MD",34-428,"Philadelphia-Reading-Camden, PA-NJ-DE-MD (NJ Part)",C
+pa,428,"Philadelphia-Reading-Camden, PA-NJ-DE-MD",42-428,"Philadelphia-Reading-Camden, PA-NJ-DE-MD (PA Part)",C
+pa,430,"Pittsburgh-New Castle-Weirton, PA-OH-WV",42-430,"Pittsburgh-New Castle-Weirton, PA-OH-WV (PA Part)",C
+or,440,"Portland-Vancouver-Salem, OR-WA",41-440,"Portland-Vancouver-Salem, OR-WA (OR Part)",C
+wa,440,"Portland-Vancouver-Salem, OR-WA",53-440,"Portland-Vancouver-Salem, OR-WA (WA Part)",C
+nc,450,"Raleigh-Durham-Chapel Hill, NC",37-450,"Raleigh-Durham-Chapel Hill, NC",C
+ny,464,"Rochester-Batavia-Seneca Falls, NY",36-464,"Rochester-Batavia-Seneca Falls, NY",C
+ca,472,"Sacramento-Roseville, CA",06-472,"Sacramento-Roseville, CA",C
+il,476,"St. Louis-St. Charles-Farmington, MO-IL",17-476,"St. Louis-St. Charles-Farmington, MO-IL (IL Part)",C
+mo,476,"St. Louis-St. Charles-Farmington, MO-IL",29-476,"St. Louis-St. Charles-Farmington, MO-IL (MO Part)",C
+ut,482,"Salt Lake City-Provo-Orem, UT",49-482,"Salt Lake City-Provo-Orem, UT",C
+ca,488,"San Jose-San Francisco-Oakland, CA",06-488,"San Jose-San Francisco-Oakland, CA",C
+ga,496,"Savannah-Hinesville-Statesboro, GA",13-496,"Savannah-Hinesville-Statesboro, GA",C
+wa,500,"Seattle-Tacoma, WA",53-500,"Seattle-Tacoma, WA",C
+az,536,"Tucson-Nogales, AZ",04-536,"Tucson-Nogales, AZ",C
+ok,538,"Tulsa-Muskogee-Bartlesville, OK",40-538,"Tulsa-Muskogee-Bartlesville, OK",C
+va,545,"Virginia Beach-Norfolk, VA-NC",51-545,"Virginia Beach-Norfolk, VA-NC (VA Part)",C
+ks,556,"Wichita-Arkansas City-Winfield, KS",20-556,"Wichita-Arkansas City-Winfield, KS",C
+tx,12420,"Austin-Round Rock, TX",48-12420,"Austin-Round Rock, TX",M
+md,12580,"Baltimore-Columbia-Towson, MD",24-12580,"Baltimore-Columbia-Towson, MD",M
+la,12940,"Baton Rouge, LA",22-12940,"Baton Rouge, LA",M
+tx,13140,"Beaumont-Port Arthur, TX",48-13140,"Beaumont-Port Arthur, TX",M
+sc,16700,"Charleston-North Charleston-Summerville, SC",45-16700,"Charleston-North Charleston-Summerville, SC",M
+ct,25540,"Hartford-West Hartford-East Hartford, CT",09-25540,"Hartford-West Hartford-East Hartford, CT",M
+la,29340,"Lake Charles, LA",22-29340,"Lake Charles, LA",M
+tx,29700,"Laredo, TX",48-29700,"Laredo, TX",M
+az,38060,"Phoenix-Mesa-Glendale, AZ",04-38060,"Phoenix-Mesa-Glendale, AZ",M
+va,40060,"Richmond, VA",51-40060,"Richmond, VA",M
+tx,41700,"San Antonio-New Braunfels, TX",48-41700,"San Antonio-New Braunfels, TX",M
+ca,41740,"San Diego-Carlsbad-San Marcos, CA",06-41740,"San Diego-Carlsbad-San Marcos, CA",M
+fl,45300,"Tampa-St. Petersburg-Clearwater, FL",12-45300,"Tampa-St. Petersburg-Clearwater, FL",M
+hi,46520,"Urban Honolulu, HI",15-46520,"Urban Honolulu, HI",M
+dc,47900,"Washington-Arlington-Alexandria, DC-VA-MD-WV",11-47900,"Washington-Arlington-Alexandria, DC-VA-MD-WV (DC Part)",M
+md,47900,"Washington-Arlington-Alexandria, DC-VA-MD-WV",24-47900,"Washington-Arlington-Alexandria, DC-VA-MD-WV (MD Part)",M
+va,47900,"Washington-Arlington-Alexandria, DC-VA-MD-WV",51-47900,"Washington-Arlington-Alexandria, DC-VA-MD-WV (VA Part)",M
+al,99999,Remainder of Alabama,01-99999,Remainder of Alabama,R
+az,99999,Remainder of Arizona,04-99999,Remainder of Arizona,R
+ca,99999,Remainder of California,06-99999,Remainder of California,R
+co,99999,Remainder of Colorado,08-99999,Remainder of Colorado,R
+ct,99999,Remainder of Connecticut,09-99999,Remainder of Connecticut,R
+de,99999,Remainder of Delaware,10-99999,Remainder of Delaware,R
+fl,99999,Remainder of Florida,12-99999,Remainder of Florida,R
+ga,99999,Remainder of Georgia,13-99999,Remainder of Georgia,R
+hi,99999,Remainder of Hawaii,15-99999,Remainder of Hawaii,R
+il,99999,Remainder of Illinois,17-99999,Remainder of Illinois,R
+in,99999,Remainder of Indiana,18-99999,Remainder of Indiana,R
+ks,99999,Remainder of Kansas,20-99999,Remainder of Kansas,R
+ky,99999,Remainder of Kentucky,21-99999,Remainder of Kentucky,R
+la,99999,Remainder of Louisiana,22-99999,Remainder of Louisiana,R
+md,99999,Remainder of Maryland,24-99999,Remainder of Maryland,R
+ma,99999,Remainder of Massachusetts,25-99999,Remainder of Massachusetts,R
+mi,99999,Remainder of Michigan,26-99999,Remainder of Michigan,R
+mn,99999,Remainder of Minnesota,27-99999,Remainder of Minnesota,R
+mo,99999,Remainder of Missouri,29-99999,Remainder of Missouri,R
+ne,99999,Remainder of Nebraska,31-99999,Remainder of Nebraska,R
+nv,99999,Remainder of Nevada,32-99999,Remainder of Nevada,R
+nh,99999,Remainder of New Hampshire,33-99999,Remainder of New Hampshire,R
+ny,99999,Remainder of New York,36-99999,Remainder of New York,R
+nc,99999,Remainder of North Carolina,37-99999,Remainder of North Carolina,R
+oh,99999,Remainder of Ohio,39-99999,Remainder of Ohio,R
+ok,99999,Remainder of Oklahoma,40-99999,Remainder of Oklahoma,R
+or,99999,Remainder of Oregon,41-99999,Remainder of Oregon,R
+pa,99999,Remainder of Pennsylvania,42-99999,Remainder of Pennsylvania,R
+sc,99999,Remainder of South Carolina,45-99999,Remainder of South Carolina,R
+tn,99999,Remainder of Tennessee,47-99999,Remainder of Tennessee,R
+tx,99999,Remainder of Texas,48-99999,Remainder of Texas,R
+ut,99999,Remainder of Utah,49-99999,Remainder of Utah,R
+va,99999,Remainder of Virginia,51-99999,Remainder of Virginia,R
+wa,99999,Remainder of Washington,53-99999,Remainder of Washington,R
+wi,99999,Remainder of Wisconsin,55-99999,Remainder of Wisconsin,R
+ak,99999,Remainder of Alaska,02-99999,Remainder of Alaska,S
+ar,99999,Remainder of Arkansas,05-99999,Remainder of Arkansas,S
+id,99999,Remainder of Idaho,16-99999,Remainder of Idaho,S
+ia,99999,Remainder of Iowa,19-99999,Remainder of Iowa,S
+me,99999,Remainder of Maine,23-99999,Remainder of Maine,S
+ms,99999,Remainder of Mississippi,28-99999,Remainder of Mississippi,S
+mt,99999,Remainder of Montana,30-99999,Remainder of Montana,S
+nm,99999,Remainder of New Mexico,35-99999,Remainder of New Mexico,S
+nd,99999,Remainder of North Dakota,38-99999,Remainder of North Dakota,S
+sd,99999,Remainder of South Dakota,46-99999,Remainder of South Dakota,S
+vt,99999,Remainder of Vermont,50-99999,Remainder of Vermont,S
+wv,99999,Remainder of West Virginia,54-99999,Remainder of West Virginia,S
+wy,99999,Remainder of Wyoming,56-99999,Remainder of Wyoming,S
+NN,00000,"Metro area suppressed, state (NN) still shown",NN-00000,"Metro area suppressed, state (NN) still shown",missing
+us,00000,Shipment origin suppressed completely,00-00000,Shipment origin suppressed completely,missing

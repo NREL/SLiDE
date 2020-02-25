@@ -17,6 +17,28 @@
         "supertype": "Edit"
     },
     {
+        "struct_name": "Drop",
+        "docstring": "Remove information from the dataframe",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "name of column containing data to remove",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "val",
+                "comment": "value to drop",
+                "data_type": "Any"
+            },
+            {
+                "name": "operation",
+                "comment": "how to determine what to drop",
+                "data_type": "String"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
         "struct_name": "Describe",
         "docstring": "This DataType is required when multiple DataFrames will be appended into one output file (say, if multiple sheets from an XLSX file are included). Before the DataFrames are appended, a column `col` will be added and filled with the value in the file descriptor.
 !!!! Does it make sense to have a DataType with one field?",

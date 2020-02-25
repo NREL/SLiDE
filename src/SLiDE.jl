@@ -29,6 +29,7 @@ include(joinpath("utils", "generate_structs.jl"))
 # EXPORTS
 export Add
 export Describe
+export Drop
 export Group
 export Join
 export Map

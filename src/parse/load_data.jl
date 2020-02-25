@@ -37,7 +37,7 @@ the `data/coremaps` directory. It returns a .csv file.
 """
 function read_file(path::Array{String,1}, file::CSVInput; shorten::Bool=false)
     filepath = joinpath(path..., file.name)
-    df = CSV.read(filepath, silencewarnings = true, ignoreemptylines=true)
+    df = CSV.read(filepath, silencewarnings = true, ignoreemptylines=true; header = file.header);
 
     df = shorten ? df[1:min(2,size(df)[1]),1:min(4,size(df)[2])] : df;  # dev utility
     # 
@@ -85,7 +85,7 @@ function read_file(file::String)
         # dictionary read from the YAML file.
         TYPES = string.([IU.subtypes.(IU.subtypes(DataStream))...;])
         # !!!! Not sure why only using subtypes without the module name gets UndefVarError.
-        KEYS = intersect(TYPES, [k for k in keys(y)]);
+        KEYS = intersect(TYPES, collect(keys(y)));
 
         [y[k] = convert_type(DataFrame, y[k]) for k in KEYS]
         [y[k] = load_from(datatype(k), y[k]) for k in KEYS];
