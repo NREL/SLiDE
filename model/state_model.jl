@@ -4,8 +4,6 @@
 #
 ################################################
 
-
-#include("SLiDE.jl")
 using SLiDE
 using CSV
 using JuMP
@@ -113,6 +111,7 @@ for i in y_vector
 end
 
 x_set = blueNOTE[:s0]
+pd_set = blueNOTE[:xd0]
 
 #here creating a placeholder set to make sure we don't modify blueNOTE[:rx0]
 temp_a2 = blueNOTE[:rx0]
@@ -208,7 +207,8 @@ eps = 1e-3
 @variable(cge,PFX>=eps,start=1) # Foreign exchange
 
 #consumer:
-@variable(cge,RA[regions]>=eps,start=1) # Representative agent
+@variable(cge,RA[r in regions]>=eps,start=blueNOTE[:c0][(r,)]) # Representative agent
+
 
 
 ###############################
@@ -276,7 +276,7 @@ eps = 1e-3
                 sum(PY[r,g] * blueNOTE[:ys0][r,s,g] for g in goods if haskey(blueNOTE[:ys0],(r,s,g)) )
 );
 
-@mapping(cge,profit_x[r in regions,g in goods; haskey(blueNOTE[:x0],(r,g)) ],
+@mapping(cge,profit_x[r in regions,g in goods; haskey(x_set,(r,g)) ],
                   PY[r,g] * blueNOTE[:s0][r,g] 
                   == 
                   PFX * AX[r,g]
@@ -292,7 +292,7 @@ eps = 1e-3
                 + PD[r,g] * AD[r,g]
 );
 
-@mapping(cge,profit_C[r in regions],
+@mapping(cge,profit_c[r in regions],
                   sum(PA[r,g] * CD[r,g] for g in goods if haskey(a_set,(r,g)))
                   ==
                   PC[r] * blueNOTE[:c0][(r,)]
@@ -327,7 +327,7 @@ eps = 1e-3
         X[r,g] * blueNOTE[:s0][r,g]
 );
 
-@mapping(cge,market_pd[r in regions, g in goods; haskey(x_set,(r,g))],
+@mapping(cge,market_pd[r in regions, g in goods; haskey(pd_set,(r,g))],
         X[r,g] * AD[r,g] 
         == 
         A[r,g] * DD[r,g]
@@ -360,7 +360,7 @@ eps = 1e-3
 );
 
 @mapping(cge,market_pc[r in regions],
-        C[r] * blueNOTE[:c0][r] == RA[r] / PC[r]
+        C[r] * blueNOTE[:c0][(r,)] == RA[r] / PC[r]
 );
 
 @mapping(cge,market_pfx,
@@ -389,6 +389,34 @@ eps = 1e-3
 );
 
 
+####################################
+# -- Complementarity Conditions --
+####################################
 
-@complementarity(cge,profit_y[regions,sectors],Y[regions,sectors]; haskey(y_set,(regions,sectors)))
+# equations with conditions cannot be paired 
+# see workaround here: https://github.com/chkwon/Complementarity.jl/issues/37
 
+[@complementarity(cge,profit_y[r,s],Y[r,s]) for r in regions for s in sectors if haskey(y_set,(r,s)) ];
+[@complementarity(cge,profit_x[r,g],X[r,g]) for r in regions for g in goods if haskey(x_set,(r,g)) ];
+[@complementarity(cge,profit_a[r,g],A[r,g]) for r in regions for g in goods if haskey(a_set,(r,g)) ];
+@complementarity(cge,profit_c,C);
+@complementarity(cge,profit_ms,MS);
+[@complementarity(cge,market_pa[r,g],PA[r,g]) for r in regions for g in goods if haskey(a_set,(r,g)) ];
+[@complementarity(cge,market_py[r,g],PY[r,g]) for r in regions for g in goods if haskey(y_set,(r,g)) ];
+[@complementarity(cge,market_pd[r,g],PD[r,g]) for r in regions for g in goods if haskey(pd_set,(r,g)) ];
+@complementarity(cge,market_pn,PN);
+@complementarity(cge,market_pl,PL);
+[@complementarity(cge,market_pk[r,s],PK[r,s]) for r in regions for s in sectors if haskey(blueNOTE[:kd0],(r,s)) ];
+@complementarity(cge,market_pm,PM);
+@complementarity(cge,market_pc,PC);
+@complementarity(cge,market_pfx,PFX);
+@complementarity(cge,income_ra,RA);
+
+[fix(PK[r,s],1,force=true) for r in regions for s in sectors if !(haskey(blueNOTE[:kd0],(r,s)))];
+[fix(PA[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:a0],(r,g)))];
+[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:s0],(r,g)))];
+[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:xd0],(r,g)))];
+
+
+PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
+status = solveMCP(cge)
