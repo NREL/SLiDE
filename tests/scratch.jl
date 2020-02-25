@@ -12,12 +12,15 @@ using SLiDE  # see src/SLiDE.jl
 # READ YAML FILE.
 READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "readfiles", "2_standardize"));
 # DATA_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "datasources", "USATradeOnline"));
-y = SLiDE.read_file(joinpath(READ_DIR, "usatrd.yml"));
+y = SLiDE.read_file(joinpath(READ_DIR, "pce.yml"));
+df = SLiDE.edit_with(y)
+# df = SLiDE.read_file(y["Path"], y["CSVInput"][1]);
 
-# df = CSV.read(joinpath(DATA_DIR, "State Exports by NAICS Commodities.csv"); header = 4)
-# y["Path"] = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", y["Path"]...))
-
-
+# df = SLiDE.edit_with(df, y["Rename"])
+# df = SLiDE.edit_with(df, y["Melt"])
+# df = SLiDE.edit_with(df, y["Drop"])
+# df = SLiDE.edit_with(df, y["Map"])
+# df = SLiDE.edit_with(df, y["Order"])
 
 
 # v = df[1,:commodity]

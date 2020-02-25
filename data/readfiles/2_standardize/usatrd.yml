@@ -9,13 +9,13 @@ CSVInput:
     descriptor: export
 
 Order:
-  - {col: year,    type: Int}
-  - {col: flow,    type: String}
-  - {col: state,   type: String}
-  - {col: country, type: String}
-  - {col: naics_code,  type: String}
-  - {col: units,   type: String}
-  - {col: value,   type: Float64}
+  - {col: year,       type: Int}
+  - {col: flow,       type: String}
+  - {col: state,      type: String}
+  - {col: country,    type: String}
+  - {col: naics_code, type: String}
+  - {col: units,      type: String}
+  - {col: value,      type: Float64}
 
 Rename:
   - from: upper
