@@ -367,8 +367,8 @@ eps = 1e-3
 #will fix the reference here...
         sum(blueNOTE[:bopdef0][(r,)] for r in regions)
 #!!!! not sure if haskey needed here...        
-#        + sum(X[r,g] * AX[r,g] for r in regions for g in goods if haskey(x_set,(r,g)))
-        + sum(X[r,g] * AX[r,g] for r in regions for g in goods)
+        + sum(X[r,g] * AX[r,g] for r in regions for g in goods if haskey(x_set,(r,g)))
+#        + sum(X[r,g] * AX[r,g] for r in regions for g in goods)
         + sum(A[r,g] * blueNOTE[:x0][r,g] for r in regions for g in goods if haskey(a_set,(r,g)))
         ==
         sum(A[r,g] * MD[r,g] for r in regions for g in goods)
