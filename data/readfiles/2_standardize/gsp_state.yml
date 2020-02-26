@@ -1,0 +1,77 @@
+Path:  ["..", "data", "datasources", "BEA", "GDP", "State"]
+
+CSVInput:
+  name:
+    - SAGDP2N__ALL_AREAS_1997_2017.csv
+    # - SAGDP3N__ALL_AREAS_1997_2017.csv
+    # - SAGDP4N__ALL_AREAS_1997_2017.csv
+    # - SAGDP5N__ALL_AREAS_1997_2017.csv
+    # - SAGDP6N__ALL_AREAS_1997_2017.csv
+    # - SAGDP7N__ALL_AREAS_1997_2017.csv
+    # - SAGDP8N__ALL_AREAS_1997_2017.csv
+    # - SAGDP9N__ALL_AREAS_1997_2017.csv
+    # - SAGDP11N__ALL_AREAS_1998_2017.csv
+  descriptor:
+    - SAGDP2N
+    # - SAGDP3N
+    # - SAGDP4N
+    # - SAGDP5N
+    # - SAGDP6N
+    # - SAGDP7N
+    # - SAGDP8N
+    # - SAGDP9N
+    # - SAGDP11N
+
+# Order:
+#   - {col: year,          type: Int}
+#   - {col: region,        type: String}
+#   - {col: componentname, type: String}
+#   # - {col: industryid,    type: String}
+#   - {col: label,         type: String}
+#   - {col: units,         type: String}
+#   - {col: value,         type: Float64}
+
+Rename:
+  - from: GeoName
+    to:   region
+  - from: TableName
+    to:   table
+  - from: Unit
+    to:   units
+  - from: Description
+    to:   label
+  - from: ComponentName
+    to:   componentname
+  - from: IndustryClassification
+    to:   industryid
+
+Melt:
+  on: [GeoFIPS, region, Region, table, componentname, units, Line, industryid, label]
+  var: year
+  val: value
+  type: Any
+
+# Map:
+#   - file:   regions.csv
+#     from:   from
+#     to:     to
+#     input:  region
+#     output: region
+#   - file:   windc/gams/map_pce.csv
+#     from:   from
+#     to:     to
+#     input:  label
+#     output: label
+#   - file:   units.csv
+#     from:   from
+#     to:     to
+#     input:  units
+#     output: units
+
+# Drop:
+#   - col: value
+#     val: missing
+#     operation: "=="
+#   # - col: componentname
+#   #   val: Per capita personal consumption expenditures (PCE) by state
+#   #   operation: "=="

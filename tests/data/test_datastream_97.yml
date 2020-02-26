@@ -5,7 +5,7 @@ CSVInput:
     descriptor: 1997
 
 Rename:
-    - from: Column1
+    - from: missing
       to:   label
     - from: Amount
       to:   value

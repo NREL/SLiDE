@@ -4,7 +4,6 @@ PathOut: ["..", "data", "coremaps", "state_to_region.csv"]
 CSVInput:
   name:  SAEXP1_1997_2017_ALL_AREAS_.csv
   descriptor: region
-  header: 1
 
 Order:
   - {col: fips,   type: Int}

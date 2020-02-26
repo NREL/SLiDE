@@ -1,8 +1,7 @@
-Path:  ["data", "datasources", "CFS"]
+Path:  ["..", "data", "datasources", "CFS"]
 
 CSVInput:
   name:  cfs_2012_pumf_csv.txt
-  header: 1
   descriptor: cfs
 
 Order:

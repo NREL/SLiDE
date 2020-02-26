@@ -1,11 +1,9 @@
 Path:  ["..", "data", "datasources", "USATradeOnline"]
 
 CSVInput:
-  - name:  "State Imports by NAICS Commodities.csv"
-    header: 3
+  - name: "State Imports by NAICS Commodities.csv"
     descriptor: import
   - name:  "State Exports by NAICS Commodities.csv"
-    header: 4
     descriptor: export
 
 Order:

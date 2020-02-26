@@ -4,7 +4,6 @@ PathOut: ["..", "data", "coremaps", "state_to_region.csv"]
 CSVInput:
   name:  state_to_region.csv
   descriptor: region
-  header: 1
 
 Order:
   - {col: state,  type: String}

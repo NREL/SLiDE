@@ -8,6 +8,7 @@ module SLiDE
 import CSV
 import DataFrames
 import Dates
+import DelimitedFiles
 import JSON
 import Logging
 # import Revise

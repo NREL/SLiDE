@@ -37,15 +37,35 @@ the `data/coremaps` directory. It returns a .csv file.
 """
 function read_file(path::Array{String,1}, file::CSVInput; shorten::Bool=false)
     filepath = joinpath(path..., file.name)
-    df = CSV.read(filepath, silencewarnings = true, ignoreemptylines=true; header = file.header);
 
-    df = shorten ? df[1:min(2,size(df)[1]),1:min(4,size(df)[2])] : df;  # dev utility
+    # Using readdlm instead removes need to define header.
+    @time df = CSV.read(filepath, silencewarnings = true, ignoreemptylines = true; header = 1);
+
+    @time xf = DelimitedFiles.readdlm(filepath, ',', Any, '\n')
+
+    # Remove totally empty rows and columns. Commented for now to save time.
+    # xf = xf[:, .!all.(collect(eachcol(length.(xf) .== 0)))]
+    # xf = xf[.!all.(collect(eachrow(length.(xf) .== 0))), :]
+
+    # METHOD 1 TO FIND THE HEADER. Check rows sequentially and stop when found.
+    HEAD = 1;
+    @time while sum(Int.(length.(xf[HEAD,:]) .> 0)) <= 1; HEAD+=1; end
+
+    # METHOD 2 TO FIND THE HEADER. Check all possible rows.
+    @time HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf[1:10,:]) .!= 0)))) .> 1)[2]
+
+    # Begin matrix at header row and make empty values consistent with XLSX handling.
+    @time xf = xf[HEAD:end,:]
+    @time xf[1,:] = replace(xf[1,:], "" => missing)
+    @time df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique = true)
+
+    df = shorten ? df[1:min(2,size(df)[1]),:] : df;  # dev utility
     # 
     # # Delete empty rows from the DataFrame before returning by searching for an deleting
     # # rows only when the first column is empty. This should avoid deleting instances when
     # # null values are `missing`.
-    # df = dropmissing(df, 1);
-    df = df[.![all(ismissing.(values(row))) for row in eachrow(df)],:]
+    @time df = dropmissing(df, 1);
+    # df = df[.![all(ismissing.(values(row))) for row in eachrow(df)],:]
     return df
 end
 

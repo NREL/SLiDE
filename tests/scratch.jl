@@ -11,9 +11,59 @@ using SLiDE  # see src/SLiDE.jl
 
 # READ YAML FILE.
 READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "readfiles", "2_standardize"));
-# DATA_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "datasources", "USATradeOnline"));
-y = SLiDE.read_file(joinpath(READ_DIR, "pce.yml"));
-df = SLiDE.edit_with(y)
+# # DATA_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "datasources", "USATradeOnline"));
+y = SLiDE.read_file(joinpath(READ_DIR, "usatrd.yml"));
+filepath = joinpath(y["Path"]..., y["CSVInput"][1].name)
+
+
+# @time df0 = SLiDE.read_file(y["Path"], y["CSVInput"]);
+
+@time df = CSV.read(filepath);
+
+sum(Int.(occursin.("Column", string.(names(df))))) > 2
+
+@time xf = DelimitedFiles.readdlm(filepath, ',', Any, '\n')
+
+HEAD = 1;
+@time while sum(Int.(length.(xf[HEAD,:]) .> 0)) <= 1; global HEAD+=1; end
+
+# xf = xf[:, .!all.(collect(eachcol(length.(xf) .== 0)))]
+# xf = xf[.!all.(collect(eachrow(length.(xf) .== 0))), :]
+
+# # for row in eachrow(xf)
+# #     print(sum(Int.(length.(row) .> 0)) .> 1)
+# # end
+
+
+# # sum(Int.(length.(row) .> 0)) .> 1 for eachrow()
+HEAD = 1;
+while sum(Int.(length.(xf[HEAD,:]) .> 0)) <= 1; global HEAD+=1; end
+
+
+@time HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf[1:12,:]) .!= 0)))) .> 1)[2]
+# xf = xf[HEAD:end,:]
+# xf[1,:] = replace(xf[1,:], "" => missing)
+
+# df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique = true)
+
+
+
+
+
+
+
+
+# xf = xf[:, .!all.(collect(eachcol(length.(xf) .== 0)))]
+# xf = xf[.!any.(collect(eachrow(length.(xf) .== 0))), :]
+
+# DataFrame(mat[2:end,:], Symbol.(mat[1,:]), makeunique = true)
+
+
+
+# mat = mat[.!(sum(length.(collect(eachrow(mat))[1]) .== 0) == size(mat)[2]-1),:]
+
+# df = SLiDE.edit_with(y)
+
 # df = SLiDE.read_file(y["Path"], y["CSVInput"][1]);
 
 # df = SLiDE.edit_with(df, y["Rename"])
