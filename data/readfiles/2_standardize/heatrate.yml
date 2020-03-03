@@ -1,0 +1,28 @@
+Path: ["..", "data", "datasources", "SEDS"]
+
+CSVInput:
+  name: generator_heat_rates.csv
+  descriptor: heatrate
+
+Order:
+  - {col: year,   type: Int}
+  - {col: source, type: String}
+  - {col: value,  type: Float64}
+  - {col: units,  type: String}
+
+Melt:
+  on:  year
+  var: source
+  val: value
+  type: Int
+
+Map:
+  file:   emissions.csv
+  from:   from
+  to:     to
+  input:  source
+  output: source
+
+Add:
+  col: units
+  val: btu per kWh generated

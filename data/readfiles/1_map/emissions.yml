@@ -1,0 +1,8 @@
+Path:  ["..", "data", "coremaps", "windc", "gams"]
+PathOut: ["..", "data", "coremaps", "emissions.csv"]
+
+CSVInput:
+  - name: map_emissions.csv
+    descriptor: 1
+  - name: map_seds_energy_tech.csv
+    descriptor: 2

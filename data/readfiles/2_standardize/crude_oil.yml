@@ -1,0 +1,26 @@
+Path:  ["..", "data", "datasources", "SEDS", "CrudeOil"]
+# file_out: eia_crude_oil_price.csv
+# description: EIA Annual Crude Oil Prices -- https://www.eia.gov/dnav/pet/pet_pri_rac2_dcu_nus_a.htm
+
+XLSXInput:
+  name:  R0000____3a.xlsx
+  sheet: Data 1
+  range: A3:B54
+  descriptor: crude_oil
+
+Order:
+  - {col: year,  type: Int}
+  - {col: units, type: String}
+  - {col: value, type: Float64}
+
+Rename:
+  - from: Date
+    to:   year
+  - from: U.S. Crude Oil Composite Acquisition Cost by Refiners (Dollars per Barrel)
+    to:   value
+
+Add:
+  - col: units
+    val: us dollars (USD) per barrel
+  - col: notes
+    val: crude oil composite acquisition cost by refiners

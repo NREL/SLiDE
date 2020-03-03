@@ -76,7 +76,7 @@ function edit_with(df::DataFrame, x::Group)
     # Editing with a map will remove all rows that do not contain relevant information.
     # Add a column indicating where each data set STOPS, assuming all completely blank rows
     # were removed by read_file().
-    df_split = edit_with(copy(df), Map(x.file, x.from, x.to, x.input, x.output));
+    df_split = edit_with(copy(df), Map(x.file, x.from, x.to, x.input, x.output); kind = :inner);
     sort!(unique!(df_split), :start)
     df_split[!, :stop] .= vcat(df_split[2:end, :start] .- 2, [size(df)[1]])
 
@@ -102,7 +102,7 @@ function edit_with(df::DataFrame, x::Join)
     return df
 end
 
-function edit_with(df::DataFrame, x::Map)
+function edit_with(df::DataFrame, x::Map; kind = :left)
     # Save the column names in the input dataframe and add the output column. This will
     # avoid including unnecessary output columns from the map file in the result.
     cols = unique(push!(names(df), x.output))
@@ -124,10 +124,10 @@ function edit_with(df::DataFrame, x::Map)
         df[!,x.from] .= convert_type.(String, df[:,x.from]) : nothing
 
     df[!, x.from] .= strip.(df[:, x.from]);
-    df = join(df, df_map, on = x.from, kind = :left, makeunique = true);
+    df = join(df, df_map, on = x.from, kind = kind, makeunique = true);
 
-    df[ismissing.(df[:,x.to]), x.to] .=
-        convert_type.(String, df[ismissing.(df[:,x.to]), x.from])
+    # df[ismissing.(df[:,x.to]), x.to] .=
+    #     convert_type.(String, df[ismissing.(df[:,x.to]), x.from])
 
     # Return the DataFrame with the columns saved at the top of the method.
     df = x.input == x.output ? edit_with(df, Rename(x.to, x.output)) :
@@ -140,6 +140,14 @@ function edit_with(df::DataFrame, x::Map)
     # when using edit_with(df, x::Map), where Map is defined in the input yaml file.
     # dict_map = Dict(k => v for (k, v) in zip(df_map[!, xfrom], df_map[!, xto]))
     # df[!, x.output] = map(x -> dict_map[x], df[!, x.input])
+end
+
+function edit_with(df::DataFrame, x::Match)
+    df = edit_with(df, Add.(x.output, fill(missing,size(x.output))))
+    m = match.(x.on, df[:, x.input]);
+    [df[!,out] .= [row != nothing ? row[out] : nothing for row in m]
+        for out in x.output]
+    return df
 end
 
 function edit_with(df::DataFrame, x::Melt)
@@ -180,7 +188,7 @@ function edit_with(df::DataFrame, x::Replace)
     any(typeof.(df[:,x.col]) .== Missing) ?
         df[!,x.col] .= convert_type.(String, df[:,x.col]) : nothing
 
-    x.col in names(df) ? df[!, x.col][df[:, x.col] .== x.from] .= x.to : nothing
+    x.col in names(df) ? df[!, x.col][strip.(df[:, x.col]) .== x.from] .= x.to : nothing
     return df
 end
 
@@ -212,7 +220,7 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten::Bool=false) where T<:File
     df = read_file(y["Path"], file; shorten=shorten);
 
     # Specify the order in which edits must occur.
-    EDITS = ["Rename", "Group", "Melt", "Add", "Map", "Join", "Split", "Replace", "Drop"];
+    EDITS = ["Rename", "Group", "Match", "Melt", "Add", "Map", "Join", "Split", "Replace", "Drop"];
 
     # Find which of these edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, [k for k in keys(y)]);

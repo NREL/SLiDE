@@ -1,0 +1,56 @@
+Path: ["..", "data", "datasources", "SGF"]
+
+XLSXInput:
+  - name: 99statess.xlsx
+    sheet: [1, 2]
+    range: ["A3:BX64", "A3:CA64"]
+    descriptor: 1999
+  - name:  00statess.xlsx
+    sheet: TabStateGovFinSS (US-WY)
+    range: A3:EX64
+    descriptor: 2000
+  - name:  01statess.xlsx
+    sheet: 01stus-wy
+    range: A3:EX64
+    descriptor: 2001
+  # - name:  02statess.xlsx
+  #   sheet: 0200usst
+  #   range: A3:CY64
+  #   descriptor: 2002
+
+Describe:
+  col: year
+
+Order:
+  - {col: year,  type: Int}
+  - {col: state, type: String}
+  - {col: label, type: String}
+  - {col: units, type: String}
+  - {col: value, type: Float64}
+
+Rename:
+  from: Item
+  to:   label
+
+Melt:
+  on:  label
+  var: state
+  val: value
+  type: Int
+  
+Map:
+  - file:   sgf.csv
+    from:   sgf
+    to:     [units, desc, code]
+    input:  label
+    output: [units, desc, label]
+  - file:   regions.csv
+    from:   from
+    to:     to
+    input:  state
+    output: state
+
+Drop:
+  col: [label, state]
+  val: missing
+  operation: "=="

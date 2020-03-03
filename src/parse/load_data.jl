@@ -37,36 +37,33 @@ the `data/coremaps` directory. It returns a .csv file.
 """
 function read_file(path::Array{String,1}, file::CSVInput; shorten::Bool=false)
     filepath = joinpath(path..., file.name)
+    df = CSV.read(filepath; silencewarnings = true, ignoreemptylines = true)
 
-    # Using readdlm instead removes need to define header.
-    @time df = CSV.read(filepath, silencewarnings = true, ignoreemptylines = true; header = 1);
+    NUMTEST = 10;
 
-    @time xf = DelimitedFiles.readdlm(filepath, ',', Any, '\n')
+    # A column name containing the word "Column" indicates that the input csv file was
+    # missing a column header. Multiple (more than 2?) columns with missing header suggests
+    # that the first row in the .csv was not the header, but rather, the file began with
+    # comments. Here, we find the header and reread .csv into a DataFrame.
+    # CSV.read() was used rather than converting the 2-D Array read using  dlmread()
+    # because this was faster, and includes the option to ignore missing rows.
+    if sum(Int.(occursin.("Column", string.(names(df))))) > 2 || size(df)[2] == 1
+        xf = DelimitedFiles.readdlm(filepath, ',', Any, '\n')
+        xf = xf[1:NUMTEST,:]
 
-    # Remove totally empty rows and columns. Commented for now to save time.
-    # xf = xf[:, .!all.(collect(eachcol(length.(xf) .== 0)))]
-    # xf = xf[.!all.(collect(eachrow(length.(xf) .== 0))), :]
+        HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf) .!= 0)))) .> 1)[2]
+        df = CSV.read(filepath, silencewarnings = true, ignoreemptylines = true; 
+            header = HEAD);
+    end
 
-    # METHOD 1 TO FIND THE HEADER. Check rows sequentially and stop when found.
-    HEAD = 1;
-    @time while sum(Int.(length.(xf[HEAD,:]) .> 0)) <= 1; HEAD+=1; end
-
-    # METHOD 2 TO FIND THE HEADER. Check all possible rows.
-    @time HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf[1:10,:]) .!= 0)))) .> 1)[2]
-
-    # Begin matrix at header row and make empty values consistent with XLSX handling.
-    @time xf = xf[HEAD:end,:]
-    @time xf[1,:] = replace(xf[1,:], "" => missing)
-    @time df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique = true)
+    if all(ismissing.(values(df[end,2:end])))
+        x = sum.([Int.(ismissing.(values(row))) for row in eachrow(df[end-NUMTEST:end,:])]);
+        FOOT = size(df)[1] - (length(x) - (findmax(x)[2]-1))
+        df = df[1:FOOT,:]
+    end
 
     df = shorten ? df[1:min(2,size(df)[1]),:] : df;  # dev utility
-    # 
-    # # Delete empty rows from the DataFrame before returning by searching for an deleting
-    # # rows only when the first column is empty. This should avoid deleting instances when
-    # # null values are `missing`.
-    @time df = dropmissing(df, 1);
-    # df = df[.![all(ismissing.(values(row))) for row in eachrow(df)],:]
-    return df
+    return unique(df)
 end
 
 function read_file(path::Array{String,1}, file::XLSXInput; shorten::Bool=false)
@@ -80,7 +77,7 @@ function read_file(path::Array{String,1}, file::XLSXInput; shorten::Bool=false)
     # rows only when the first column is empty. This should avoid deleting instances when
     # null values are `missing`.
     df = dropmissing(df, 1);
-    return df
+    return unique(df)
 end
 
 function read_file(path::String, file::T; shorten::Bool=false) where T <: File

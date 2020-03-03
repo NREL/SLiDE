@@ -1,0 +1,39 @@
+Path: ["..", "data", "datasources", "NASS"]
+
+CSVInput:
+  name: agcensus_2012_sales_redownload.csv
+  descriptor: 2012
+
+Order:
+  - {col: year,   type: Int}
+  - {col: state, type: String}
+  - {col: naics_code, type: String}
+  - {col: units,  type: String}
+  - {col: value,  type: Int}
+
+Rename:
+  - from: upper
+    to:   lower
+  - from: domain category
+    to:   naics_code_temp
+
+Match:
+  on: "\\((?<naics_code>.*)\\)"
+  input: naics_code_temp
+  output: naics_code
+
+Add:
+  col: units
+  val: us dollars (USD)
+
+Replace:
+  col: value
+  from: ["(D)", "(H)", "(L)"]
+  to:   0
+
+Map:
+  file:   regions.csv
+  from:   from
+  to:     to
+  input:  state
+  output: state

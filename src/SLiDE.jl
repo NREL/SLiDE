@@ -37,6 +37,7 @@ export Map
 export Melt
 export Order
 export Split
+export Match
 export Rename
 export Replace
 

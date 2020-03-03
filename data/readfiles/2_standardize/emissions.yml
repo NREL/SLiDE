@@ -1,0 +1,54 @@
+Path: ["..", "data", "datasources", "SEDS", "Emissions"]
+
+XLSXInput:
+  sheet: Sheet1
+  range: A3:AI55
+  name:
+    - coal_CO2_by_state_2013.xlsx
+    - commercial_CO2_by_state_2013.xlsx
+    - electric_CO2_by_state_2013.xlsx
+    - industrial_CO2_by_state_2013.xlsx
+    - natural_gas_CO2_by_state_2013.xlsx
+    - petroleum_CO2_by_state_2013.xlsx
+    - residential_CO2_by_state_2013.xlsx
+    - transportation_CO2_by_state_2013.xlsx
+  descriptor:
+    - col
+    - com
+    - ele
+    - ind
+    - gas
+    - oil
+    - res
+    - trn
+
+Order:
+  - {col: year,   type: Int}
+  - {col: state,  type: String}
+  - {col: source, type: String}
+  - {col: value,  type: Float64}
+  - {col: units,  type: String}
+
+Describe:
+  col: source
+
+Rename:
+  from: State
+  to:   state
+
+Melt:
+  on:  state
+  var: year
+  val: value
+  type: Int
+
+Add:
+  col: units
+  val: million metric tons of carbon dioxide
+
+Map:
+  file:   regions.csv
+  from:   from
+  to:     to
+  input:  state
+  output: state

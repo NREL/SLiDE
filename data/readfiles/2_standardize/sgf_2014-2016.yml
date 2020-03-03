@@ -1,0 +1,60 @@
+Path: ["..", "data", "datasources", "SGF"]
+
+CSVInput:
+  - name: SGF_2014_00A1.csv
+    descriptor: 2014
+  - name: SGF_2015_00A1.csv
+    descriptor: 2015
+  - name: SGF_2016_00A1.csv
+    descriptor: 2016
+
+Describe:
+  col: year
+
+Order:
+  - {col: year,  type: Int}
+  - {col: state, type: String}
+  # - {col: fintype_code, type: Any}
+  # - {col: fintype_desc, type: Any}
+  - {col: label, type: String}
+  # - {col: label_desc, type: String}
+  - {col: units, type: String}
+  - {col: value, type: Float64}
+
+Rename:
+  - from: GEO.display-label
+    to:   state
+  - from: YEAR.id
+    to:   year
+  - from: FINSRC.id
+    to:   label
+  - from: FINSRC.display-label
+    to:   label_desc
+  - from: AMOUNT
+    to:   value
+  - from: FINTYPE.id
+    to:   fintype_code
+  - from: FINTYPE.display-label
+    to:   fintype_desc
+
+Map:
+  - file:   sgf.csv
+    from:   sgf
+    to:     [units, desc, code]
+    input:  label
+    output: [units, desc, label]
+  - file:   regions.csv
+    from:   from
+    to:     to
+    input:  state
+    output: state
+# 
+# Replace:
+#   col:  value
+#   from: ["-", "(X)"]
+#   to:   0
+# 
+# Drop:
+#   - col: [label, state]
+#     val: missing
+#     operation: "=="

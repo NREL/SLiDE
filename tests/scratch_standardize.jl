@@ -11,50 +11,93 @@ using SLiDE  # see src/SLiDE.jl
 
 # READ YAML FILE.
 READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "readfiles", "2_standardize"));
-# # DATA_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "datasources", "USATradeOnline"));
+
+
+############################################################################################
+# NASS - WORKING
+# y = SLiDE.read_file(joinpath(READ_DIR, "nass.yml"));
+
+
+############################################################################################
+# NASS - WORKING
+# y = SLiDE.read_file(joinpath(READ_DIR, "nass.yml"));
+# df = SLiDE.read_file(y["Path"], y["CSVInput"]);
+# df = SLiDE.edit_with(df, y["Rename"])
+# df = SLiDE.edit_with(df, y["Add"])
+# df = SLiDE.edit_with(df, y["Match"])
+# df = SLiDE.edit_with(df, y["Map"])
+# df = SLiDE.edit_with(df, y["Replace"])
+# df = SLiDE.edit_with(df, y["Order"])
+# df = SLiDE.edit_with(y)
+
+############################################################################################
+# SGF - WORKING
+# y = SLiDE.read_file(joinpath(READ_DIR, "sgf_1997.yml"));
+# df = unique(SLiDE.edit_with(y))
+
+# y = SLiDE.read_file(joinpath(READ_DIR, "sgf_1998.yml"));
+# df = unique(SLiDE.edit_with(y))
+
+# y = SLiDE.read_file(joinpath(READ_DIR, "sgf_1999-2011.yml"));
+# df = SLiDE.read_file(y["Path"], y["XLSXInput"][1]);
+# df = unique(SLiDE.edit_with(y));
+
+# y = SLiDE.read_file(joinpath(READ_DIR, "sgf_2012-2013.yml"));
+# df = SLiDE.read_file(y["Path"], y["CSVInput"]);
+# df = SLiDE.edit_with(df, y["Rename"])
+# df = SLiDE.edit_with(df, y["Melt"])
+# df = SLiDE.edit_with(df, y["Map"])
+# df = SLiDE.edit_with(df, y["Drop"])
+# df = SLiDE.edit_with(df, y["Replace"])
+# df = unique(SLiDE.edit_with(y))
+
+# y = SLiDE.read_file(joinpath(READ_DIR, "sgf_2014-2016.yml"));
+# df = SLiDE.read_file(y["Path"], y["CSVInput"][1]);
+# df = SLiDE.edit_with(df, y["Rename"])
+# df = SLiDE.edit_with(df, y["Map"])
+# df = SLiDE.edit_with(df, y["Order"])
+# df = unique(SLiDE.edit_with(y))
+
+############################################################################################
+# USA TRADE - WORKING
 y = SLiDE.read_file(joinpath(READ_DIR, "usatrd.yml"));
-filepath = joinpath(y["Path"]..., y["CSVInput"][1].name)
-
-
-# @time df0 = SLiDE.read_file(y["Path"], y["CSVInput"]);
-
-@time df = CSV.read(filepath);
-
-sum(Int.(occursin.("Column", string.(names(df))))) > 2
-
-@time xf = DelimitedFiles.readdlm(filepath, ',', Any, '\n')
-
-HEAD = 1;
-@time while sum(Int.(length.(xf[HEAD,:]) .> 0)) <= 1; global HEAD+=1; end
-
-# xf = xf[:, .!all.(collect(eachcol(length.(xf) .== 0)))]
-# xf = xf[.!all.(collect(eachrow(length.(xf) .== 0))), :]
-
-# # for row in eachrow(xf)
-# #     print(sum(Int.(length.(row) .> 0)) .> 1)
-# # end
-
-
-# # sum(Int.(length.(row) .> 0)) .> 1 for eachrow()
-HEAD = 1;
-while sum(Int.(length.(xf[HEAD,:]) .> 0)) <= 1; global HEAD+=1; end
-
-
-@time HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf[1:12,:]) .!= 0)))) .> 1)[2]
-# xf = xf[HEAD:end,:]
-# xf[1,:] = replace(xf[1,:], "" => missing)
-
-# df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique = true)
+# df = SLiDE.read_file(y["Path"], y["CSVInput"][1]);
+# df = SLiDE.edit_with(df, y["Rename"])
+# df = SLiDE.edit_with(df, y["Map"])
+# df = SLiDE.edit_with(df, y["Match"])
+df = unique(SLiDE.edit_with(y))
 
 
 
+# to_drop = ["Population",
+#         "General Expenditure, by Function:",
+#         "Personal income",
+#         "Total Expenditure - General Expenditure - Intergovernmental General Expenditure",
+#         "Insurance Trust Expenditure - Unemployment Compensation Systems",
+#         "Insurance Trust Expenditure - Workers' Compensation Systems",
+#         "Insurance Trust Expenditure - State-Administered Pension Systems",
+#         "Insurance Trust Expenditure - Other Insurance Trust Systems"]
+
+# df_map = SLiDE.read_file(y["Map"][1]);
 
 
+# y = SLiDE.read_file(joinpath(READ_DIR, "gsp_state.yml"));
+# df = SLiDE.read_file(y["Path"], y["CSVInput"]);
+# df = SLiDE.edit_with(df, y["Rename"])
+# df = SLiDE.edit_with(df, y["Melt"])
+# df = SLiDE.edit_with(df, y["Map"])
+# df = SLiDE.edit_with(df, y["Replace"])
+# df = SLiDE.edit_with(df, y["Drop"])
+
+# df = SLiDE.edit_with(df, y["Order"])
 
 
+# filepath = joinpath(y["Path"]..., y["CSVInput"][2].name)
 
-# xf = xf[:, .!all.(collect(eachcol(length.(xf) .== 0)))]
-# xf = xf[.!any.(collect(eachrow(length.(xf) .== 0))), :]
+# # HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf) .!= 0)))) .> 1)[2]
+# xf = Array{Any,2}(df)
+
+# ismissing.(values.(collect(eachrow(df))))
 
 # DataFrame(mat[2:end,:], Symbol.(mat[1,:]), makeunique = true)
 

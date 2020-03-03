@@ -1,8 +1,6 @@
 Path:  ["..", "data", "datasources", "CFS"]
 PathOut: ["..", "data", "coremaps", "cfs_area.csv"]
 
-Unique: true
-
 XLSXInput:
   name:  cfs_2012_pum_file_users_guide_App_A (Jun 2015).xlsx
   sheet: App A1

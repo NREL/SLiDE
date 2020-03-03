@@ -22,14 +22,15 @@ CSVInput:
     # - SAGDP9N
     # - SAGDP11N
 
-# Order:
-#   - {col: year,          type: Int}
-#   - {col: region,        type: String}
-#   - {col: componentname, type: String}
-#   # - {col: industryid,    type: String}
-#   - {col: label,         type: String}
-#   - {col: units,         type: String}
-#   - {col: value,         type: Float64}
+Order:
+  - {col: year,          type: Int}
+  - {col: region,        type: String}
+  - {col: componentname, type: String}
+  - {col: industryid,    type: String}
+  - {col: industryclass, type: String}
+  - {col: label,         type: String}
+  - {col: units,         type: String}
+  - {col: value,         type: Float64}
 
 Rename:
   - from: GeoName
@@ -43,35 +44,42 @@ Rename:
   - from: ComponentName
     to:   componentname
   - from: IndustryClassification
+    to:   industryclass
+  - from: IndustryId
     to:   industryid
 
 Melt:
-  on: [GeoFIPS, region, Region, table, componentname, units, Line, industryid, label]
+  on: [GeoFIPS, region, Region, table, componentname, units, industryid, industryclass, label]
   var: year
   val: value
   type: Any
 
-# Map:
-#   - file:   regions.csv
-#     from:   from
-#     to:     to
-#     input:  region
-#     output: region
-#   - file:   windc/gams/map_pce.csv
-#     from:   from
-#     to:     to
-#     input:  label
-#     output: label
-#   - file:   units.csv
-#     from:   from
-#     to:     to
-#     input:  units
-#     output: units
+Map:
+  - file:   regions.csv
+    from:   from
+    to:     to
+    input:  region
+    output: region
+  # - file:   windc/gams/map_pce.csv
+  #   from:   from
+  #   to:     to
+  #   input:  label
+  #   output: label
+  - file:   units.csv
+    from:   from
+    to:     to
+    input:  units
+    output: units
 
-# Drop:
-#   - col: value
-#     val: missing
-#     operation: "=="
-#   # - col: componentname
-#   #   val: Per capita personal consumption expenditures (PCE) by state
-#   #   operation: "=="
+Drop:
+  - col: value
+    val: [missing, "(NA)", "(L)", "(D)", "(H)"]
+    operation: "=="
+  - col: componentname
+    val: Contributions to percent change in real GDP
+    operation: "=="
+
+Replace:
+  col:  region
+  from: "United States*"
+  to:    us
