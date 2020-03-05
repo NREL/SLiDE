@@ -145,6 +145,40 @@ The columns `input` and `from` should contain the same values, as should `output
         "supertype": "Edit"
     },
     {
+        "struct_name": "Map2",
+        "docstring": "Define an `output` column containing values based on those in an `input` column.
+The mapping columns `from` -> `to` are contained in a .csv `file` in the coremaps directory.
+The columns `input` and `from` should contain the same values, as should `output` and `to`.",
+        "fields": [
+            {
+                "name": "file",
+                "comment": "mapping .csv file name in the coremaps directory",
+                "data_type": "String"
+            },
+            {
+                "name": "from",
+                "comment": "name of the mapping column containing input values",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "to",
+                "comment": "name of the mapping column containing output values",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "input",
+                "comment": "name of the input column to map",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "output",
+                "comment": "name of the output column created",
+                "data_type": "Array{Symbol,1}"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
         "struct_name": "Melt",
         "docstring": "Normalize the dataframe by 'melting' columns into rows, lengthening the
 dataframe by duplicating values in the column `on` into new rows and defining 2 new columns:

@@ -1,0 +1,874 @@
+state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_desc,necta_desc,nectadiv_desc,place_desc,nmemi,nectapci
+25,011,51265,715,70450,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Athol, MA",,Orange,2,false
+25,027,02480,715,70450,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Athol, MA",,Athol,2,true
+25,027,53120,715,70450,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Athol, MA",,Petersham,2,false
+23,011,02100,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Augusta,2,true
+23,011,04020,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Belgrade,2,false
+23,011,12350,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Chelsea,2,false
+23,011,12735,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,China,2,false
+23,011,24670,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Farmingdale,2,false
+23,011,27085,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Gardiner,2,false
+23,011,30550,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Hallowell,2,false
+23,011,43080,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Manchester,2,false
+23,011,47770,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Mount Vernon,2,false
+23,011,59110,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Pittston,2,false
+23,011,61700,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Randolph,2,false
+23,011,62190,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Readfield,2,false
+23,011,63835,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Rome,2,false
+23,011,68385,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Sidney,2,false
+23,011,78745,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Vassalboro,2,false
+23,011,80880,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Wayne,2,false
+23,011,82945,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,West Gardiner,2,false
+23,011,86165,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Windsor,2,false
+23,011,86970,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Winthrop,2,false
+23,015,69645,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Somerville,2,false
+23,015,85010,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Whitefield,2,false
+23,027,56450,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Palermo,2,false
+23,009,01185,,70750,,,"Bangor, ME",,Amherst,1,false
+23,009,02165,,70750,,,"Bangor, ME",,Aurora,1,false
+23,009,16935,,70750,,,"Bangor, ME",,Dedham,1,false
+23,009,55855,,70750,,,"Bangor, ME",,Osborn,1,false
+23,009,55890,,70750,,,"Bangor, ME",,Otis,1,false
+23,019,01115,,70750,,,"Bangor, ME",,Alton,1,false
+23,019,01500,,70750,,,"Bangor, ME",,Argyle unorganized territory,1,false
+23,019,02795,,70750,,,"Bangor, ME",,Bangor,1,true
+23,019,06575,,70750,,,"Bangor, ME",,Bradford,1,false
+23,019,06680,,70750,,,"Bangor, ME",,Bradley,1,false
+23,019,06925,,70750,,,"Bangor, ME",,Brewer,1,false
+23,019,09200,,70750,,,"Bangor, ME",,Burlington,1,false
+23,019,10670,,70750,,,"Bangor, ME",,Carmel,1,false
+23,019,12105,,70750,,,"Bangor, ME",,Charleston,1,false
+23,019,13365,,70750,,,"Bangor, ME",,Clifton,1,false
+23,019,14380,,70750,,,"Bangor, ME",,Corinth,1,false
+23,019,17950,,70750,,,"Bangor, ME",,Dixmont,1,false
+23,019,19868,,70750,,,"Bangor, ME",,East Central Penobscot unorganized territory,1,false
+23,019,22535,,70750,,,"Bangor, ME",,Eddington,1,false
+23,019,22710,,70750,,,"Bangor, ME",,Edinburg,1,false
+23,019,23620,,70750,,,"Bangor, ME",,Enfield,1,false
+23,019,23865,,70750,,,"Bangor, ME",,Etna,1,false
+23,019,24110,,70750,,,"Bangor, ME",,Exeter,1,false
+23,019,27190,,70750,,,"Bangor, ME",,Garland,1,false
+23,019,27645,,70750,,,"Bangor, ME",,Glenburn,1,false
+23,019,29185,,70750,,,"Bangor, ME",,Greenbush,1,false
+23,019,30795,,70750,,,"Bangor, ME",,Hampden,1,false
+23,019,32510,,70750,,,"Bangor, ME",,Hermon,1,false
+23,019,33490,,70750,,,"Bangor, ME",,Holden,1,false
+23,019,34190,,70750,,,"Bangor, ME",,Howland,1,false
+23,019,34365,,70750,,,"Bangor, ME",,Hudson,1,false
+23,019,36325,,70750,,,"Bangor, ME",,Kenduskeag,1,false
+23,019,37760,,70750,,,"Bangor, ME",,Lagrange,1,false
+23,019,38705,,70750,,,"Bangor, ME",,Levant,1,false
+23,019,45670,,70750,,,"Bangor, ME",,Milford,1,false
+23,019,48505,,70750,,,"Bangor, ME",,Newburgh,1,false
+23,019,49065,,70750,,,"Bangor, ME",,Newport,1,false
+23,019,55225,,70750,,,"Bangor, ME",,Old Town,1,false
+23,019,55565,,70750,,,"Bangor, ME",,Orono,1,false
+23,019,55680,,70750,,,"Bangor, ME",,Orrington,1,false
+23,019,57045,,70750,,,"Bangor, ME",,Passadumkeag,1,false
+23,019,57937,,70750,,,"Bangor, ME",,Penobscot Indian Island Reservation,1,false
+23,019,74055,,70750,,,"Bangor, ME",,Stetson,1,false
+23,019,78780,,70750,,,"Bangor, ME",,Veazie,1,false
+23,021,70655,,70750,,,"Bangor, ME",,Southeast Piscataquis unorganized territory,1,false
+23,027,86760,,70750,,,"Bangor, ME",,Winterport,1,false
+25,001,03690,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Barnstable Town,1,true
+25,001,07175,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Bourne,1,false
+25,001,07980,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Brewster,1,false
+25,001,12995,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Chatham,1,false
+25,001,16775,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Dennis,1,false
+25,001,19295,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Eastham,1,false
+25,001,23105,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Falmouth,1,false
+25,001,29020,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Harwich,1,false
+25,001,39100,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Mashpee,1,false
+25,001,51440,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Orleans,1,false
+25,001,59735,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Sandwich,1,false
+25,001,74385,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Wellfleet,1,false
+25,001,82525,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Yarmouth,1,false
+25,023,38540,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Marion,1,false
+25,023,72985,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Wareham,1,false
+50,017,53425,,71050,,,"Barre, VT",,Orange,2,false
+50,017,76750,,71050,,,"Barre, VT",,Washington,2,false
+50,017,84175,,71050,,,"Barre, VT",,Williamstown,2,false
+50,023,03175,,71050,,,"Barre, VT",,Barre,2,true
+50,023,03250,,71050,,,"Barre, VT",,Barre,2,true
+50,023,05650,,71050,,,"Barre, VT",,Berlin,2,false
+50,023,11350,,71050,,,"Barre, VT",,Calais,2,false
+50,023,21925,,71050,,,"Barre, VT",,East Montpelier,2,false
+50,023,43600,,71050,,,"Barre, VT",,Marshfield,2,false
+50,023,44500,,71050,,,"Barre, VT",,Middlesex,2,false
+50,023,46000,,71050,,,"Barre, VT",,Montpelier,2,false
+50,023,55825,,71050,,,"Barre, VT",,Plainfield,2,false
+50,023,85525,,71050,,,"Barre, VT",,Woodbury,2,false
+50,023,86125,,71050,,,"Barre, VT",,Worcester,2,false
+50,003,04825,,71350,,,"Bennington, VT",,Bennington,2,true
+50,003,27962,,71350,,,"Bennington, VT",,Glastenbury,2,false
+50,003,57025,,71350,,,"Bennington, VT",,Pownal,2,false
+50,003,63550,,71350,,,"Bennington, VT",,Shaftsbury,2,false
+50,003,85675,,71350,,,"Bennington, VT",,Woodford,2,false
+33,007,05140,,71500,,,"Berlin, NH",,Berlin,2,true
+33,007,19300,,71500,,,"Berlin, NH",,Dummer,2,false
+33,007,30260,,71500,,,"Berlin, NH",,Gorham,2,false
+33,007,47860,,71500,,,"Berlin, NH",,Milan,2,false
+33,007,63860,,71500,,,"Berlin, NH",,Randolph,2,false
+33,007,68980,,71500,,,"Berlin, NH",,Shelburne,2,false
+33,007,73060,,71500,,,"Berlin, NH",,Stark,2,false
+25,005,38225,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Mansfield,1,false
+25,009,01465,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Andover,1,false
+25,009,07420,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Boxford,1,false
+25,009,21850,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Essex,1,false
+25,009,26150,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Gloucester,1,false
+25,009,27900,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Hamilton,1,false
+25,009,32310,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Ipswich,1,false
+25,009,37560,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Lynnfield,1,false
+25,009,37995,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Manchester-by-the-Sea,1,false
+25,009,41095,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Middleton,1,false
+25,009,45175,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Newbury,1,false
+25,009,57880,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Rockport,1,false
+25,009,58405,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Rowley,1,false
+25,009,70150,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Topsfield,1,false
+25,009,74595,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Wenham,1,false
+25,017,00380,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Acton,1,false
+25,017,01605,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Arlington,1,false
+25,017,04615,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Bedford,1,false
+25,017,05070,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Belmont,1,false
+25,017,07350,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Boxborough,1,false
+25,017,09840,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Burlington,1,false
+25,017,11000,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Cambridge,1,true
+25,017,11525,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Carlisle,1,false
+25,017,15060,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Concord,1,false
+25,017,21990,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Everett,1,false
+25,017,35215,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Lexington,1,false
+25,017,35425,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Lincoln,1,false
+25,017,37875,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Malden,1,false
+25,017,39625,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Maynard,1,false
+25,017,39835,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Medford,1,false
+25,017,40115,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Melrose,1,false
+25,017,45560,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Newton,1,true
+25,017,48955,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",North Reading,1,false
+25,017,56130,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Reading,1,false
+25,017,61380,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Sherborn,1,false
+25,017,62535,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Somerville,1,false
+25,017,67665,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Stoneham,1,false
+25,017,68050,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Stow,1,false
+25,017,72215,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Wakefield,1,false
+25,017,72600,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Waltham,1,true
+25,017,73440,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Watertown Town,1,false
+25,017,73790,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Wayland,1,false
+25,017,77255,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Weston,1,false
+25,017,80230,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Wilmington,1,false
+25,017,80510,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Winchester,1,false
+25,017,81035,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Woburn,1,false
+25,021,07740,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Braintree Town,1,false
+25,021,09175,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Brookline,1,false
+25,021,11315,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Canton,1,false
+25,021,14640,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Cohasset,1,false
+25,021,16495,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Dedham,1,false
+25,021,17405,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Dover,1,false
+25,021,24820,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Foxborough,1,false
+25,021,25172,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Franklin Town,1,false
+25,021,30455,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Holbrook,1,false
+25,021,39765,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Medfield,1,false
+25,021,39975,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Medway,1,false
+25,021,41515,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Millis,1,false
+25,021,41690,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Milton,1,false
+25,021,44105,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Needham,1,false
+25,021,46050,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Norfolk,1,false
+25,021,50250,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Norwood,1,false
+25,021,55745,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Quincy,1,false
+25,021,55955,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Randolph,1,false
+25,021,60785,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Sharon,1,false
+25,021,67945,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Stoughton,1,false
+25,021,72495,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Walpole,1,false
+25,021,74175,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Wellesley,1,false
+25,021,78690,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Westwood,1,false
+25,021,78972,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Weymouth Town,1,false
+25,021,82315,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Wrentham,1,false
+25,023,00170,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Abington,1,false
+25,023,11665,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Carver,1,false
+25,023,17895,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Duxbury,1,false
+25,023,27795,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Halifax,1,false
+25,023,28285,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Hanover,1,false
+25,023,30210,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Hingham,1,false
+25,023,31645,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Hull,1,false
+25,023,33220,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Kingston,1,false
+25,023,38855,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Marshfield,1,false
+25,023,50145,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Norwell,1,false
+25,023,52630,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Pembroke,1,false
+25,023,54310,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Plymouth,1,false
+25,023,54415,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Plympton,1,false
+25,023,57775,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Rockland,1,false
+25,023,60330,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Scituate,1,false
+25,025,07000,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Boston,1,true
+25,025,13205,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Chelsea,1,false
+25,025,56585,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Revere,1,false
+25,025,81005,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Winthrop Town,1,false
+25,027,05490,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Berlin,1,false
+25,027,06365,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Bolton,1,false
+25,005,20100,715,71650,72104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Brockton-Bridgewater-Easton, MA",Easton,1,false
+25,021,02935,715,71650,72104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Brockton-Bridgewater-Easton, MA",Avon,1,false
+25,023,08085,715,71650,72104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Brockton-Bridgewater-Easton, MA",Bridgewater,1,false
+25,023,09000,715,71650,72104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Brockton-Bridgewater-Easton, MA",Brockton,1,false
+25,023,18455,715,71650,72104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Brockton-Bridgewater-Easton, MA",East Bridgewater,1,false
+25,023,28495,715,71650,72104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Brockton-Bridgewater-Easton, MA",Hanson,1,false
+25,023,75260,715,71650,72104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Brockton-Bridgewater-Easton, MA",West Bridgewater,1,false
+25,023,79530,715,71650,72104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Brockton-Bridgewater-Easton, MA",Whitman,1,false
+25,017,02130,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Ashland,1,false
+25,017,24925,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Framingham,1,true
+25,017,30700,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Holliston,1,false
+25,017,31085,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Hopkinton,1,false
+25,017,31540,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Hudson,1,false
+25,017,38715,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Marlborough,1,false
+25,017,43895,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Natick,1,false
+25,017,68260,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Sudbury,1,false
+25,027,30945,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Hopedale,1,false
+25,027,40255,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Mendon,1,false
+25,027,41165,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Milford,1,false
+25,027,63165,715,71650,73104,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Framingham, MA",Southborough,1,false
+25,009,01260,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Amesbury Town,1,false
+25,009,25625,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Georgetown,1,false
+25,009,27620,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Groveland,1,false
+25,009,29405,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Haverhill,1,false
+25,009,40430,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Merrimac,1,false
+25,009,45245,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Newburyport,1,false
+25,009,59245,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Salisbury,1,false
+25,009,77150,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",West Newbury,1,false
+33,015,02340,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Atkinson,1,false
+33,015,17140,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Danville,1,false
+33,015,21380,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",East Kingston,1,false
+33,015,27940,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Fremont,1,false
+33,015,32900,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Hampstead,1,false
+33,015,33460,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Hampton Falls,1,false
+33,015,39780,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Kensington,1,false
+33,015,40100,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Kingston,1,false
+33,015,52900,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Newton,1,false
+33,015,62500,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Plaistow,1,false
+33,015,67620,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Sandown,1,false
+33,015,68260,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Seabrook,1,false
+33,015,71140,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",South Hampton,1,false
+25,009,34550,715,71650,74204,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lawrence-Methuen Town-Salem, MA-NH",Lawrence,1,false
+25,009,40710,715,71650,74204,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lawrence-Methuen Town-Salem, MA-NH",Methuen Town,1,false
+25,009,46365,715,71650,74204,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lawrence-Methuen Town-Salem, MA-NH",North Andover,1,false
+33,015,66660,715,71650,74204,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lawrence-Methuen Town-Salem, MA-NH",Salem,1,false
+25,017,01955,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Ashby,1,false
+25,017,03005,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Ayer,1,false
+25,017,05805,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Billerica,1,false
+25,017,13135,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Chelmsford,1,false
+25,017,17475,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Dracut,1,false
+25,017,27480,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Groton,1,false
+25,017,35950,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Littleton,1,false
+25,017,37000,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Lowell,1,false
+25,017,61590,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Shirley,1,false
+25,017,69415,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Tewksbury,1,false
+25,017,70360,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Townsend,1,false
+25,017,71025,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Tyngsborough,1,false
+25,017,76135,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Westford,1,false
+25,027,28950,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Harvard,1,false
+33,011,59940,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Pelham,1,false
+25,009,37490,715,71650,74854,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lynn-Saugus-Marblehead, MA",Lynn,1,false
+25,009,38400,715,71650,74854,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lynn-Saugus-Marblehead, MA",Marblehead,1,false
+25,009,43580,715,71650,74854,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lynn-Saugus-Marblehead, MA",Nahant,1,false
+25,009,60015,715,71650,74854,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lynn-Saugus-Marblehead, MA",Saugus,1,false
+25,009,68645,715,71650,74854,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lynn-Saugus-Marblehead, MA",Swampscott,1,false
+25,017,17825,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Dunstable,1,false
+25,017,52805,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Pepperell,1,false
+33,011,01300,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Amherst,1,false
+33,011,08100,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Brookline,1,false
+33,011,31540,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Greenfield,1,false
+33,011,31940,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Greenville,1,false
+33,011,37140,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Hollis,1,false
+33,011,37940,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Hudson,1,false
+33,011,42260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Litchfield,1,false
+33,011,44580,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Lyndeborough,1,false
+33,011,46260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Mason,1,false
+33,011,47540,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Merrimack,1,false
+33,011,48020,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Milford,1,false
+33,011,49140,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Mont Vernon,1,false
+33,011,50260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Nashua,1,true
+33,011,76260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Temple,1,false
+33,011,85220,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Wilton,1,false
+33,015,12100,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Chester,1,false
+33,015,17940,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Derry,1,false
+33,015,43220,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Londonderry,1,false
+33,015,85780,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Windham,1,false
+25,009,05595,715,71650,76524,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Peabody-Salem-Beverly, MA",Beverly,1,false
+25,009,16250,715,71650,76524,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Peabody-Salem-Beverly, MA",Danvers,1,false
+25,009,52490,715,71650,76524,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Peabody-Salem-Beverly, MA",Peabody,1,false
+25,009,59105,715,71650,76524,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Peabody-Salem-Beverly, MA",Salem,1,false
+25,005,05280,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Berkley,1,false
+25,005,16950,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Dighton,1,false
+25,005,25240,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Freetown,1,false
+25,005,49970,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Norton,1,false
+25,005,56060,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Raynham,1,false
+25,005,69170,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Taunton,1,false
+25,023,33920,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Lakeville,1,false
+25,023,40850,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Middleborough,1,false
+25,023,57600,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Rochester,1,false
+9,001,08070,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Bridgeport,1,true
+9,001,18850,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Darien,1,false
+9,001,23890,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Easton,1,false
+9,001,26620,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Fairfield,1,false
+9,001,33620,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Greenwich,1,false
+9,001,48620,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Monroe,1,false
+9,001,50580,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,New Canaan,1,false
+9,001,56060,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Norwalk,1,true
+9,001,63480,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Redding,1,false
+9,001,63970,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Ridgefield,1,false
+9,001,68170,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Shelton,1,false
+9,001,73070,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Stamford,1,true
+9,001,74190,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Stratford,1,true
+9,001,77200,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Trumbull,1,false
+9,001,83430,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Weston,1,false
+9,001,83500,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Westport,1,false
+9,001,86370,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Wilton,1,false
+9,009,01220,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Ansonia,1,false
+9,009,19550,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Derby,1,false
+9,009,47535,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Milford,1,true
+9,009,58300,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Oxford,1,false
+9,009,67610,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Seymour,1,false
+9,009,69640,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Southbury,1,false
+9,009,87700,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Woodbridge,1,false
+23,005,08430,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Brunswick,2,true
+23,005,31390,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Harpswell,2,false
+23,015,18475,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Dresden,2,false
+23,015,84140,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Westport Island,2,false
+23,015,87075,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Wiscasset,2,false
+23,023,01570,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Arrowsic,2,false
+23,023,03355,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Bath,2,false
+23,023,06260,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Bowdoin,2,false
+23,023,06365,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Bowdoinham,2,false
+23,023,27295,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Georgetown,2,false
+23,023,58515,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Phippsburg,2,false
+23,023,76960,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Topsham,2,false
+23,023,81930,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,West Bath,2,false
+23,023,87460,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Woolwich,2,false
+50,001,26300,,72400,,,"Burlington-South Burlington, VT",,Ferrisburgh,1,false
+50,001,40075,,72400,,,"Burlington-South Burlington, VT",,Lincoln,1,false
+50,001,45550,,72400,,,"Burlington-South Burlington, VT",,Monkton,1,false
+50,001,70075,,72400,,,"Burlington-South Burlington, VT",,Starksboro,1,false
+50,001,74650,,72400,,,"Burlington-South Burlington, VT",,Vergennes,1,false
+50,007,06550,,72400,,,"Burlington-South Burlington, VT",,Bolton,1,false
+50,007,10675,,72400,,,"Burlington-South Burlington, VT",,Burlington,1,true
+50,007,13300,,72400,,,"Burlington-South Burlington, VT",,Charlotte,1,false
+50,007,14875,,72400,,,"Burlington-South Burlington, VT",,Colchester,1,false
+50,007,24175,,72400,,,"Burlington-South Burlington, VT",,Essex,1,false
+50,007,33475,,72400,,,"Burlington-South Burlington, VT",,Hinesburg,1,false
+50,007,34600,,72400,,,"Burlington-South Burlington, VT",,Huntington,1,false
+50,007,36700,,72400,,,"Burlington-South Burlington, VT",,Jericho,1,false
+50,007,45250,,72400,,,"Burlington-South Burlington, VT",,Milton,1,false
+50,007,59275,,72400,,,"Burlington-South Burlington, VT",,Richmond,1,false
+50,007,62050,,72400,,,"Burlington-South Burlington, VT",,St. George,1,false
+50,007,64300,,72400,,,"Burlington-South Burlington, VT",,Shelburne,1,false
+50,007,66175,,72400,,,"Burlington-South Burlington, VT",,South Burlington,1,true
+50,007,73975,,72400,,,"Burlington-South Burlington, VT",,Underhill,1,false
+50,007,80350,,72400,,,"Burlington-South Burlington, VT",,Westford,1,false
+50,007,84475,,72400,,,"Burlington-South Burlington, VT",,Williston,1,false
+50,007,85150,,72400,,,"Burlington-South Burlington, VT",,Winooski,1,false
+50,011,24925,,72400,,,"Burlington-South Burlington, VT",,Fairfax,1,false
+50,011,26500,,72400,,,"Burlington-South Burlington, VT",,Fletcher,1,false
+50,011,27700,,72400,,,"Burlington-South Burlington, VT",,Georgia,1,false
+50,011,61675,,72400,,,"Burlington-South Burlington, VT",,St. Albans,1,false
+50,011,61750,,72400,,,"Burlington-South Burlington, VT",,St. Albans,1,false
+50,011,71725,,72400,,,"Burlington-South Burlington, VT",,Swanton,1,false
+50,013,29275,,72400,,,"Burlington-South Burlington, VT",,Grand Isle,1,false
+50,013,50650,,72400,,,"Burlington-South Burlington, VT",,North Hero,1,false
+50,013,67000,,72400,,,"Burlington-South Burlington, VT",,South Hero,1,false
+50,015,11500,,72400,,,"Burlington-South Burlington, VT",,Cambridge,1,false
+50,023,18550,,72400,,,"Burlington-South Burlington, VT",,Duxbury,1,false
+33,013,06260,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Boscawen,2,false
+33,013,06500,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Bow,2,false
+33,013,09860,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Canterbury,2,false
+33,013,12420,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Chichester,2,false
+33,013,14200,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Concord,2,true
+33,013,24900,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Epsom,2,false
+33,013,37540,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Hopkinton,2,false
+33,013,43380,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Loudon,2,false
+33,013,61940,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Pittsfield,2,false
+33,013,66980,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Salisbury,2,false
+33,013,78580,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Warner,2,false
+33,013,80020,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Webster,2,false
+9,001,04720,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Bethel,1,false
+9,001,08980,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Brookfield,1,false
+9,001,18500,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Danbury,1,true
+9,001,50860,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,New Fairfield,1,false
+9,001,52980,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Newtown,1,false
+9,001,68310,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Sherman,1,false
+9,005,08210,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Bridgewater,1,false
+9,005,52630,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,New Milford,1,false
+23,031,04720,,73050,,,"Dover-Durham, NH-ME",,Berwick,1,false
+23,031,38425,,73050,,,"Dover-Durham, NH-ME",,Lebanon,1,false
+23,031,70030,,73050,,,"Dover-Durham, NH-ME",,South Berwick,1,false
+33,017,03460,,73050,,,"Dover-Durham, NH-ME",,Barrington,1,false
+33,017,18820,,73050,,,"Dover-Durham, NH-ME",,Dover,1,true
+33,017,19700,,73050,,,"Dover-Durham, NH-ME",,Durham,1,true
+33,017,26020,,73050,,,"Dover-Durham, NH-ME",,Farmington,1,false
+33,017,41460,,73050,,,"Dover-Durham, NH-ME",,Lee,1,false
+33,017,44820,,73050,,,"Dover-Durham, NH-ME",,Madbury,1,false
+33,017,47700,,73050,,,"Dover-Durham, NH-ME",,Middleton,1,false
+33,017,48660,,73050,,,"Dover-Durham, NH-ME",,Milton,1,false
+33,017,51220,,73050,,,"Dover-Durham, NH-ME",,New Durham,1,false
+33,017,65140,,73050,,,"Dover-Durham, NH-ME",,Rochester,1,false
+33,017,65540,,73050,,,"Dover-Durham, NH-ME",,Rollinsford,1,false
+33,017,69940,,73050,,,"Dover-Durham, NH-ME",,Somersworth,1,false
+33,017,73860,,73050,,,"Dover-Durham, NH-ME",,Strafford,1,false
+25,011,05560,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Bernardston,2,false
+25,011,14885,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Colrain,2,false
+25,011,21780,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Erving,2,false
+25,011,25730,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Gill,2,false
+25,011,27100,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Greenfield Town,2,true
+25,011,29650,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Heath,2,false
+25,011,35285,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Leyden,2,false
+25,011,42285,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Montague,2,false
+25,011,47835,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Northfield,2,false
+9,003,02060,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Avon,1,false
+9,003,04300,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Berlin,1,false
+9,003,05910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Bloomfield,1,false
+9,003,08490,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Bristol,1,false
+9,003,10100,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Burlington,1,false
+9,003,12270,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Canton,1,false
+9,003,22070,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Granby,1,false
+9,003,22630,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Hartford,1,true
+9,003,27600,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Farmington,1,false
+9,003,31240,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Glastonbury,1,false
+9,003,32640,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Granby,1,false
+9,003,37070,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Hartford,1,true
+9,003,37140,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Hartland,1,false
+9,003,44700,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Manchester,1,false
+9,003,45820,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Marlborough,1,false
+9,003,50440,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,New Britain,1,false
+9,003,52140,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Newington,1,false
+9,003,60120,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Plainville,1,false
+9,003,65370,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Rocky Hill,1,false
+9,003,68940,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Simsbury,1,false
+9,003,70550,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Southington,1,false
+9,003,71390,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,South Windsor,1,false
+9,003,82590,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,West Hartford,1,true
+9,003,84900,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Wethersfield,1,false
+9,003,87000,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Windsor,1,false
+9,005,02760,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Barkhamsted,1,false
+9,005,37280,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Harwinton,1,false
+9,005,51350,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,New Hartford,1,false
+9,005,60750,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Plymouth,1,false
+9,005,75730,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Thomaston,1,false
+9,007,18080,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Cromwell,1,false
+9,007,22280,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Haddam,1,false
+9,007,22490,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Hampton,1,false
+9,007,35230,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Haddam,1,false
+9,007,47360,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Middletown,1,true
+9,007,61800,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Portland,1,false
+9,011,15910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Colchester,1,false
+9,011,42390,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Lebanon,1,false
+9,013,01080,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Andover,1,false
+9,013,06260,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Bolton,1,false
+9,013,16400,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Columbia,1,false
+9,013,17800,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Coventry,1,false
+9,013,25360,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Ellington,1,false
+9,013,37910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Hebron,1,false
+9,013,44910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Mansfield,1,false
+9,013,72090,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Stafford,1,false
+9,013,76290,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Tolland,1,false
+9,013,77830,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Union,1,false
+9,013,78250,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Vernon,1,false
+9,013,85950,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Willington,1,false
+9,015,01430,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Ashford,1,false
+9,015,13810,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Chaplin,1,false
+9,015,67400,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Scotland,1,false
+9,015,86790,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Windham,1,false
+33,005,12260,,73750,,,"Keene, NH",,Chesterfield,2,false
+33,005,29220,,73750,,,"Keene, NH",,Gilsum,2,false
+33,005,34420,,73750,,,"Keene, NH",,Harrisville,2,false
+33,005,39300,,73750,,,"Keene, NH",,Keene,2,true
+33,005,45460,,73750,,,"Keene, NH",,Marlborough,2,false
+33,005,45700,,73750,,,"Keene, NH",,Marlow,2,false
+33,005,50580,,73750,,,"Keene, NH",,Nelson,2,false
+33,005,64420,,73750,,,"Keene, NH",,Richmond,2,false
+33,005,65700,,73750,,,"Keene, NH",,Roxbury,2,false
+33,005,74900,,73750,,,"Keene, NH",,Sullivan,2,false
+33,005,75300,,73750,,,"Keene, NH",,Surry,2,false
+33,005,75700,,73750,,,"Keene, NH",,Swanzey,2,false
+33,005,77380,,73750,,,"Keene, NH",,Troy,2,false
+33,005,82660,,73750,,,"Keene, NH",,Westmoreland,2,false
+33,005,85540,,73750,,,"Keene, NH",,Winchester,2,false
+33,001,28740,,73900,,,"Laconia, NH",,Gilford,2,false
+33,001,40180,,73900,,,"Laconia, NH",,Laconia,2,true
+33,009,08980,,74350,,,"Lebanon, NH-VT",,Canaan,2,false
+33,009,18740,,74350,,,"Lebanon, NH-VT",,Dorchester,2,false
+33,009,24340,,74350,,,"Lebanon, NH-VT",,Enfield,2,false
+33,009,30820,,74350,,,"Lebanon, NH-VT",,Grafton,2,false
+33,009,33860,,74350,,,"Lebanon, NH-VT",,Hanover,2,false
+33,009,41300,,74350,,,"Lebanon, NH-VT",,Lebanon,2,true
+33,009,44260,,74350,,,"Lebanon, NH-VT",,Lyme,2,false
+33,009,58340,,74350,,,"Lebanon, NH-VT",,Orange,2,false
+33,009,58500,,74350,,,"Lebanon, NH-VT",,Orford,2,false
+33,009,61060,,74350,,,"Lebanon, NH-VT",,Piermont,2,false
+33,019,15060,,74350,,,"Lebanon, NH-VT",,Cornish,2,false
+33,019,16340,,74350,,,"Lebanon, NH-VT",,Croydon,2,false
+33,019,31220,,74350,,,"Lebanon, NH-VT",,Grantham,2,false
+33,019,62340,,74350,,,"Lebanon, NH-VT",,Plainfield,2,false
+50,017,07375,,74350,,,"Lebanon, NH-VT",,Bradford,2,false
+50,017,15700,,74350,,,"Lebanon, NH-VT",,Corinth,2,false
+50,017,25675,,74350,,,"Lebanon, NH-VT",,Fairlee,2,false
+50,017,70675,,74350,,,"Lebanon, NH-VT",,Strafford,2,false
+50,017,72400,,74350,,,"Lebanon, NH-VT",,Thetford,2,false
+50,017,73675,,74350,,,"Lebanon, NH-VT",,Tunbridge,2,false
+50,017,74950,,74350,,,"Lebanon, NH-VT",,Vershire,2,false
+50,017,79975,,74350,,,"Lebanon, NH-VT",,West Fairlee,2,false
+50,027,32275,,74350,,,"Lebanon, NH-VT",,Hartford,2,false
+50,027,32425,,74350,,,"Lebanon, NH-VT",,Hartland,2,false
+50,027,52900,,74350,,,"Lebanon, NH-VT",,Norwich,2,false
+50,027,60850,,74350,,,"Lebanon, NH-VT",,Royalton,2,false
+50,027,63775,,74350,,,"Lebanon, NH-VT",,Sharon,2,false
+50,027,83050,,74350,,,"Lebanon, NH-VT",,West Windsor,2,false
+50,027,84925,,74350,,,"Lebanon, NH-VT",,Windsor,2,false
+25,027,01885,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Ashburnham,1,false
+25,027,23875,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Fitchburg,1,false
+25,027,25485,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Gardner,1,true
+25,027,35075,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Leominster,1,true
+25,027,37420,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Lunenburg,1,false
+25,027,53225,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Phillipston,1,false
+25,027,58580,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Royalston,1,false
+25,027,69275,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Templeton,1,false
+25,027,77010,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Westminster,1,false
+25,027,80405,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Winchendon,1,false
+23,001,02060,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Auburn,1,true
+23,001,29255,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Greene,1,false
+23,001,38565,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Leeds,1,false
+23,001,38740,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Lewiston,1,true
+23,001,40035,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Lisbon,1,false
+23,001,44585,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Mechanic Falls,1,false
+23,001,46160,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Minot,1,false
+23,001,60020,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Poland,1,false
+23,001,64570,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Sabattus,1,false
+23,001,77800,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Turner,1,false
+23,001,79585,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Wales,1,false
+23,011,46405,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Monmouth,1,false
+23,017,08710,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Buckfield,1,false
+23,017,10005,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Canton,1,false
+23,017,31670,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Hartford,1,false
+23,017,32370,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Hebron,1,false
+33,011,04500,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Bedford,1,false
+33,011,29860,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Goffstown,1,false
+33,011,45140,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Manchester,1,true
+33,011,50740,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,New Boston,1,false
+33,011,79780,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Weare,1,false
+33,013,00660,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Allenstown,1,false
+33,013,19460,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Dunbarton,1,false
+33,013,37300,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Hooksett,1,false
+33,013,60020,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Pembroke,1,false
+33,015,02820,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Auburn,1,false
+33,015,09300,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Candia,1,false
+25,005,00520,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Acushnet,1,false
+25,005,16425,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Dartmouth,1,false
+25,005,22130,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Fairhaven,1,false
+25,005,45000,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,New Bedford,1,true
+25,023,39450,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Mattapoisett,1,false
+9,007,14300,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Chester,1,false
+9,007,15350,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Clinton,1,false
+9,007,19130,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Deep River,1,false
+9,007,20810,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Durham,1,false
+9,007,26270,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Essex,1,false
+9,007,40710,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Killingworth,1,false
+9,007,47080,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Middlefield,1,false
+9,007,57320,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Old Saybrook,1,false
+9,007,81680,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Westbrook,1,false
+9,009,04580,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Bethany,1,false
+9,009,07310,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Branford,1,false
+9,009,14160,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Cheshire,1,false
+9,009,22910,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,East Haven,1,false
+9,009,34950,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Guilford,1,false
+9,009,35650,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Hamden,1,false
+9,009,44560,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Madison,1,false
+9,009,46520,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Meriden,1,false
+9,009,52070,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,New Haven,1,true
+9,009,53890,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,North Branford,1,false
+9,009,54870,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,North Haven,1,false
+9,009,57600,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Orange,1,false
+9,009,78740,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Wallingford,1,false
+9,009,82870,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,West Haven,1,false
+25,003,14010,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,Clarksburg,2,false
+25,003,24120,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,Florida,2,false
+25,003,46225,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,North Adams,2,true
+25,003,79985,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,Williamstown,2,false
+50,003,69775,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,Stamford,2,false
+9,011,06820,,76450,,,"Norwich-New London-Westerly, CT-RI",,Bozrah,1,false
+9,011,23400,,76450,,,"Norwich-New London-Westerly, CT-RI",,East Lyme,1,false
+9,011,29910,,76450,,,"Norwich-New London-Westerly, CT-RI",,Franklin,1,false
+9,011,33900,,76450,,,"Norwich-New London-Westerly, CT-RI",,Griswold,1,false
+9,011,34250,,76450,,,"Norwich-New London-Westerly, CT-RI",,Groton,1,false
+9,011,42600,,76450,,,"Norwich-New London-Westerly, CT-RI",,Ledyard,1,false
+9,011,43230,,76450,,,"Norwich-New London-Westerly, CT-RI",,Lisbon,1,false
+9,011,44210,,76450,,,"Norwich-New London-Westerly, CT-RI",,Lyme,1,false
+9,011,48900,,76450,,,"Norwich-New London-Westerly, CT-RI",,Montville,1,false
+9,011,52350,,76450,,,"Norwich-New London-Westerly, CT-RI",,New London,1,true
+9,011,55500,,76450,,,"Norwich-New London-Westerly, CT-RI",,North Stonington,1,false
+9,011,56270,,76450,,,"Norwich-New London-Westerly, CT-RI",,Norwich,1,true
+9,011,57040,,76450,,,"Norwich-New London-Westerly, CT-RI",,Old Lyme,1,false
+9,011,62150,,76450,,,"Norwich-New London-Westerly, CT-RI",,Preston,1,false
+9,011,66210,,76450,,,"Norwich-New London-Westerly, CT-RI",,Salem,1,false
+9,011,71670,,76450,,,"Norwich-New London-Westerly, CT-RI",,Sprague,1,false
+9,011,73770,,76450,,,"Norwich-New London-Westerly, CT-RI",,Stonington,1,false
+9,011,78600,,76450,,,"Norwich-New London-Westerly, CT-RI",,Voluntown,1,false
+9,011,80280,,76450,,,"Norwich-New London-Westerly, CT-RI",,Waterford,1,false
+9,015,12130,,76450,,,"Norwich-New London-Westerly, CT-RI",,Canterbury,1,false
+44,009,35380,,76450,,,"Norwich-New London-Westerly, CT-RI",,Hopkinton,1,false
+44,009,77000,,76450,,,"Norwich-New London-Westerly, CT-RI",,Westerly,1,true
+25,003,00555,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Adams,1,false
+25,003,04545,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Becket,1,false
+25,003,13345,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Cheshire,1,false
+25,003,16180,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Dalton,1,false
+25,003,30315,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Hinsdale,1,false
+25,003,34340,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Lanesborough,1,false
+25,003,34655,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Lee,1,false
+25,003,34970,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Lenox,1,false
+25,003,44385,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,New Ashford,1,false
+25,003,53050,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Peru,1,false
+25,003,53960,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Pittsfield,1,true
+25,003,56795,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Richmond,1,false
+25,003,60225,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Savoy,1,false
+25,003,73335,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Washington,1,false
+25,003,80685,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Windsor,1,false
+25,015,40990,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Middlefield,1,false
+23,001,19105,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Durham,1,false
+23,005,02655,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Baldwin,1,false
+23,005,10180,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Cape Elizabeth,1,false
+23,005,11125,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Casco,1,false
+23,005,12300,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Chebeague Island,1,false
+23,005,15430,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Cumberland,1,false
+23,005,24495,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Falmouth,1,false
+23,005,26525,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Freeport,1,false
+23,005,27025,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Frye Island,1,false
+23,005,28240,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Gorham,1,false
+23,005,28870,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Gray,1,false
+23,005,41067,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Long Island,1,false
+23,005,48085,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Naples,1,false
+23,005,48820,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,New Gloucester,1,false
+23,005,53860,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,North Yarmouth,1,false
+23,005,60545,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Portland,1,true
+23,005,60685,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Pownal,1,false
+23,005,61945,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Raymond,1,false
+23,005,66145,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Scarborough,1,false
+23,005,66775,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Sebago,1,false
+23,005,71990,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,South Portland,1,true
+23,005,73670,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Standish,1,false
+23,005,82105,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Westbrook,1,false
+23,005,86025,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Windham,1,false
+23,005,87845,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Yarmouth,1,false
+23,031,01605,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Arundel,1,false
+23,031,04860,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Biddeford,1,false
+23,031,09410,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Buxton,1,false
+23,031,14485,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Cornish,1,false
+23,031,16725,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Dayton,1,false
+23,031,33665,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Hollis,1,false
+23,031,36535,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Kennebunk,1,false
+23,031,36745,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Kennebunkport,1,false
+23,031,39195,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Limerick,1,false
+23,031,39405,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Limington,1,false
+23,031,41750,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Lyman,1,false
+23,031,55085,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Old Orchard Beach,1,false
+23,031,64675,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Saco,1,false
+23,031,80530,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Waterboro,1,false
+23,031,22955,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Eliot,1,false
+23,031,37270,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Kittery,1,false
+23,031,87985,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,York,1,false
+33,015,07220,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Brentwood,1,false
+33,015,24660,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Epping,1,false
+33,015,25380,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Exeter,1,false
+33,015,31700,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Greenland,1,false
+33,015,33060,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Hampton,1,false
+33,015,50980,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,New Castle,1,false
+33,015,51380,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Newfields,1,false
+33,015,51620,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Newington,1,false
+33,015,52340,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Newmarket,1,false
+33,015,54580,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,North Hampton,1,false
+33,015,62900,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Portsmouth,1,true
+33,015,66180,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Rye,1,false
+33,015,74340,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Stratham,1,false
+25,005,02690,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Attleboro,1,false
+25,005,23000,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Fall River,1,false
+25,005,46575,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Attleborough,1,false
+25,005,56375,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Rehoboth,1,false
+25,005,60645,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Seekonk,1,false
+25,005,62430,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Somerset,1,false
+25,005,68750,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Swansea,1,false
+25,005,77570,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Westport,1,false
+25,021,04930,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Bellingham,1,false
+25,021,54100,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Plainville,1,false
+25,027,06015,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Blackstone,1,false
+25,027,41585,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Millville,1,false
+44,001,05140,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Barrington,1,false
+44,001,09280,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Bristol,1,false
+44,001,73760,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Warren,1,false
+44,003,18640,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Coventry,1,false
+44,003,22240,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,East Greenwich,1,false
+44,003,74300,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Warwick,1,true
+44,003,77720,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,West Greenwich,1,false
+44,003,78440,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,West Warwick,1,false
+44,005,36820,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Jamestown,1,false
+44,005,42400,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Little Compton,1,false
+44,005,45460,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Middletown,1,false
+44,005,49960,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Newport,1,false
+44,005,57880,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Portsmouth,1,false
+44,005,70880,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Tiverton,1,false
+44,007,11800,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Burrillville,1,false
+44,007,14140,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Central Falls,1,false
+44,007,19180,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Cranston,1,false
+44,007,20080,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Cumberland,1,false
+44,007,22960,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,East Providence,1,false
+44,007,27460,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Foster,1,false
+44,007,30340,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Glocester,1,false
+44,007,37720,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Johnston,1,false
+44,007,41500,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Lincoln,1,false
+44,007,51760,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Providence,1,false
+44,007,52480,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Smithfield,1,false
+44,007,54640,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Pawtucket,1,false
+44,007,59000,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Providence,1,true
+44,007,64220,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Scituate,1,false
+44,007,66200,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Smithfield,1,false
+44,007,80780,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Woonsocket,1,false
+44,009,14500,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Charlestown,1,false
+44,009,25300,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Exeter,1,false
+44,009,48340,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Narragansett,1,false
+44,009,51580,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Kingstown,1,false
+44,009,61160,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Richmond,1,false
+44,009,67460,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,South Kingstown,1,false
+50,021,11950,,77650,,,"Rutland, VT",,Castleton,2,false
+50,021,14350,,77650,,,"Rutland, VT",,Chittenden,2,false
+50,021,14500,,77650,,,"Rutland, VT",,Clarendon,2,false
+50,021,34450,,77650,,,"Rutland, VT",,Hubbardton,2,false
+50,021,35425,,77650,,,"Rutland, VT",,Ira,2,false
+50,021,44125,,77650,,,"Rutland, VT",,Mendon,2,false
+50,021,44800,,77650,,,"Rutland, VT",,Middletown Springs,2,false
+50,021,55600,,77650,,,"Rutland, VT",,Pittsford,2,false
+50,021,57250,,77650,,,"Rutland, VT",,Proctor,2,false
+50,021,61225,,77650,,,"Rutland, VT",,Rutland,2,true
+50,021,61300,,77650,,,"Rutland, VT",,Rutland,2,true
+50,021,65275,,77650,,,"Rutland, VT",,Shrewsbury,2,false
+50,021,75925,,77650,,,"Rutland, VT",,Wallingford,2,false
+50,021,82300,,77650,,,"Rutland, VT",,West Rutland,2,false
+23,031,65760,775,77950,,"Portland-Lewiston-South Portland, ME","Sanford, ME",,Sanford,2,true
+23,031,67475,775,77950,,"Portland-Lewiston-South Portland, ME","Sanford, ME",,Shapleigh,2,false
+9,003,24800,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,East Windsor,1,false
+9,003,25990,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Enfield,1,false
+9,003,74540,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Suffield,1,false
+9,003,87070,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Windsor Locks,1,false
+9,013,69220,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Somers,1,false
+25,011,02095,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Ashfield,1,false
+25,011,15200,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Conway,1,false
+25,011,16670,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Deerfield,1,false
+25,011,35180,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Leverett,1,false
+25,011,61905,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Shutesbury,1,false
+25,011,68400,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Sunderland,1,false
+25,011,74525,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Wendell,1,false
+25,011,79110,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Whately,1,false
+25,013,00840,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Agawam Town,1,false
+25,013,06085,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Blandford,1,false
+25,013,13485,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Chester,1,false
+25,013,13660,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Chicopee,1,false
+25,013,19645,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,East Longmeadow,1,false
+25,013,26675,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Granville,1,false
+25,013,28075,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Hampden,1,false
+25,013,30840,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Holyoke,1,false
+25,013,36300,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Longmeadow,1,false
+25,013,37175,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Ludlow,1,false
+25,013,42145,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Monson,1,false
+25,013,42530,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Montgomery,1,false
+25,013,52144,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Palmer Town,1,false
+25,013,58650,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Russell,1,false
+25,013,65825,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Southwick,1,false
+25,013,67000,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Springfield,1,true
+25,013,70045,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Tolland,1,false
+25,013,72390,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Wales,1,false
+25,013,76030,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Westfield,1,false
+25,013,77890,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,West Springfield Town,1,false
+25,013,79740,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Wilbraham,1,false
+25,015,01325,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Amherst,1,false
+25,015,04825,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Belchertown,1,false
+25,015,13590,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Chesterfield,1,false
+25,015,16040,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Cummington,1,false
+25,015,19370,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Easthampton Town,1,false
+25,015,26290,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Goshen,1,false
+25,015,26535,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Granby,1,false
+25,015,27690,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Hadley,1,false
+25,015,29265,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Hatfield,1,false
+25,015,31785,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Huntington,1,false
+25,015,46330,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Northampton,1,false
+25,015,52560,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Pelham,1,false
+25,015,62745,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Southampton,1,false
+25,015,64145,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,South Hadley,1,false
+25,015,72880,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Ware,1,false
+25,015,76380,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Westhampton,1,false
+25,015,79915,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Williamsburg,1,false
+25,015,82175,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Worthington,1,false
+9,005,16050,790,78400,,"Springfield-Hartford-West Hartford, MA-CT","Torrington, CT",,Colebrook,2,false
+9,005,76570,790,78400,,"Springfield-Hartford-West Hartford, MA-CT","Torrington, CT",,Torrington,2,true
+9,005,86440,790,78400,,"Springfield-Hartford-West Hartford, MA-CT","Torrington, CT",,Winchester,2,false
+25,007,01585,,78500,,,"Vineyard Haven, MA",,Aquinnah,2,false
+25,007,13800,,78500,,,"Vineyard Haven, MA",,Chilmark,2,false
+25,007,21150,,78500,,,"Vineyard Haven, MA",,Edgartown,2,false
+25,007,50390,,78500,,,"Vineyard Haven, MA",,Oak Bluffs,2,false
+25,007,69940,,78500,,,"Vineyard Haven, MA",,Tisbury,2,false
+25,007,78235,,78500,,,"Vineyard Haven, MA",,West Tisbury,2,false
+9,005,04930,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Bethlehem,1,false
+9,005,80490,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Watertown,1,false
+9,005,87910,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Woodbury,1,false
+9,009,03250,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Beacon Falls,1,false
+9,009,46940,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Middlebury,1,false
+9,009,49950,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Naugatuck borough and,1,false
+9,009,62290,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Prospect,1,false
+9,009,80070,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Waterbury,1,true
+9,009,87560,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Wolcott,1,false
+23,011,00590,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Albion,2,false
+23,011,04475,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Benton,2,false
+23,011,13470,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Clinton,2,false
+23,011,54560,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Oakland,2,false
+23,011,78190,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Unity unorganized territory,2,false
+23,011,80740,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Waterville,2,true
+23,011,86515,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Winslow,2,false
+23,025,24320,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Fairfield,2,false
+23,027,09270,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Burnham,2,false
+9,015,09190,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Brooklyn,1,false
+9,015,40500,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Killingly,1,false
+9,015,59980,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Plainfield,1,false
+9,015,61030,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Pomfret,1,false
+9,015,62710,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Putnam,1,false
+9,015,73420,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sterling,1,false
+9,015,75870,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Thompson,1,false
+9,015,88190,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Woodstock,1,false
+25,013,08470,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Brimfield,1,false
+25,013,30665,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Holland,1,false
+25,027,02760,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Auburn,1,false
+25,027,03740,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Barre,1,false
+25,027,07525,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Boylston,1,false
+25,027,09105,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Brookfield,1,false
+25,027,12715,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Charlton,1,false
+25,027,14395,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Clinton,1,false
+25,027,17300,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Douglas,1,false
+25,027,17685,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Dudley,1,false
+25,027,18560,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,East Brookfield,1,false
+25,027,26430,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Grafton,1,false
+25,027,30560,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Holden,1,false
+25,027,31435,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Hubbardston,1,false
+25,027,34165,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Lancaster,1,false
+25,027,34795,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Leicester,1,false
+25,027,41340,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Millbury,1,false
+25,027,45105,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,New Braintree,1,false
+25,027,46820,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Northborough,1,false
+25,027,46925,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Northbridge,1,false
+25,027,47135,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,North Brookfield,1,false
+25,027,50670,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Oakham,1,false
+25,027,51825,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Oxford,1,false
+25,027,52420,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Paxton,1,false
+25,027,55395,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Princeton,1,false
+25,027,58825,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Rutland,1,false
+25,027,61800,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Shrewsbury,1,false
+25,027,63345,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Southbridge Town,1,false
+25,027,66105,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Spencer,1,false
+25,027,67385,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sterling,1,false
+25,027,68155,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sturbridge,1,false
+25,027,68610,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sutton,1,false
+25,027,71480,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Upton,1,false
+25,027,71620,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Uxbridge,1,false
+25,027,73090,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Warren,1,false
+25,027,73895,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Webster,1,false
+25,027,75015,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Westborough,1,false
+25,027,75155,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,West Boylston,1,false
+25,027,75400,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,West Brookfield,1,false
+25,027,82000,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Worcester,1,true

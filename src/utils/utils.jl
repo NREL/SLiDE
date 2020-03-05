@@ -33,6 +33,15 @@ Extends `uppercase` to handle symbols.
 """
 Base.uppercase(x::Symbol) = Symbol(uppercase(string(x)))
 
+
+"""
+    Base.occursin(x::Symbol, y::Symbol)
+    Base.occursin(x::String, y::Symbol)
+Extends `occursin` to work for symbols. Potentially helpful for DataFrame columns.
+"""
+Base.occursin(x::Symbol, y::Symbol) = occursin(string(x), y)
+Base.occursin(x::String, y::Symbol) = occursin(x, string(y))
+
 """
     convert_type(::Type{T}, x::Any)
     convert_type(::Dict{Any,Any}, df::DataFrame, value_col::Symbol; kwargs...)
@@ -68,6 +77,9 @@ end
 
 convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
 convert_type(::Type{Array{T,1}}, x::Any) where T<:Any = convert_type.(T, x)
+# convert_type(::Type{Array{T,1}}, x::Array{Any,1}) where T<:Any = convert_type.(T, x)
+# convert_type(::Type{Array{T,1}}, x::String) where T<:Any = [convert_type(T, x)]
+
 convert_type(::Type{T}, x::Missing) where T<:Real = x;
 convert_type(::Type{Any}, x::Any) = x
 
@@ -92,3 +104,9 @@ Returns true/false if the the DataType or object is an array.
 isarray(::Type{Array{T,1}}) where T <: Any = true
 isarray(x::Array{T,1}) where T <: Any = true
 isarray(::Any) = false
+
+"""
+Returns an array.
+"""
+ensurearray(x::Array{T,1}) where T <: Any = x
+ensurearray(x::Any) = [x]

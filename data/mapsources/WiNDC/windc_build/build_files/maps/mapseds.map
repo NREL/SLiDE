@@ -1,0 +1,13 @@
+oil.ref		"Petroleum refineries",
+cru.ind		"Crude oil extraction",
+gas.ind		"Natural gas extraction",
+cng.ind		"Crude oil and natural gas extraction",
+col.ind		"Coal mining",
+ele.ele		"Electric power generation, transmission, and distribution",
+trn.trn		"Transportation",
+pmt.ind		"Primary metals",
+con.ind		"Construction",
+eint.ind	"Energy/Emission intensive sectors (embodied carbon > .5 kg per $)",
+omnf.ind	"Other manufacturing sectors",
+osrv.com	"Other services",
+roe.com		"Rest of the economy"

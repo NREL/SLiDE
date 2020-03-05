@@ -1,0 +1,26 @@
+# GOOD.
+Path: ["..", "data", "datasources", "BEA", "GDP", "Metro"]
+
+CSVInput:
+  name:  MAGDP2_2001_2017_ALL_AREAS.csv
+  descriptor: 2
+
+Order:
+  - {col: cbsa_code, type: Any}
+  - {col: desc,      type: Any}
+
+Rename:
+  - from: GeoFIPS
+    to:   cbsa_code
+  - from: GeoName
+    to:   desc
+
+# df_metro = df_map[.!ismissing.(df_map[:,:metro_code]),:]
+
+# Drop:
+#   - col: fips
+#     val: unique
+#     operation: "=="
+#   - col: msa
+#     val: missing
+#     operation: "=="

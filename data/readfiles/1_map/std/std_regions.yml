@@ -1,0 +1,6 @@
+Path:  ["..", "data", "mapsources", "WiNDC", "windc_datastream", "core_maps"]
+PathOut: ["..", "data", "coremaps", "std", "regions.csv"]
+
+CSVInput:
+  name: regions.csv
+  descriptor: 1

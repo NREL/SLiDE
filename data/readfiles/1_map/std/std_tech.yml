@@ -1,0 +1,8 @@
+Path:  ["..", "data", "mapsources", "WiNDC", "windc_datastream", "core_maps", "gams"]
+PathOut: ["..", "data", "coremaps", "std", "tech.csv"]
+
+CSVInput:
+  - name: map_emissions.csv
+    descriptor: 1
+  - name: map_seds_energy_tech.csv
+    descriptor: 2

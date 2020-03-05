@@ -102,10 +102,10 @@ function read_file(file::String)
         # dictionary read from the YAML file.
         TYPES = string.([IU.subtypes.(IU.subtypes(DataStream))...;])
         # !!!! Not sure why only using subtypes without the module name gets UndefVarError.
-        KEYS = intersect(TYPES, collect(keys(y)));
-
-        [y[k] = convert_type(DataFrame, y[k]) for k in KEYS]
-        [y[k] = load_from(datatype(k), y[k]) for k in KEYS];
+        KEYS = intersect(TYPES, collect(keys(y)))
+        
+        # [y[k] = convert_type(DataFrame, y[k]) for k in KEYS]
+        [y[k] = load_from(datatype(k), y[k]) for k in KEYS]
         return y
 
     elseif occursin(".csv", file)
@@ -140,8 +140,27 @@ df = DataFrame(from = ["State"], to = ["region"])
 load_from(Rename, df)
 ```
 """
+function load_from(::Type{T}, d::Array{Dict{Any,Any},1}) where T <: Any
+    lst = all(isarray.(T.types)) ? ensurearray(load_from(T, convert_type(DataFrame, d))) :
+        vcat(ensurearray(load_from.(T, d))...)
+    return size(lst)[1] == 1 ? lst[1] : lst
+end
+
+function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
+    it = zip(string.(fieldnames(T)), T.types)
+
+    if any(isarray.(T.types)) & !all(isarray.(T.types))
+        inps = [isarray(type) ? ensurearray(convert_type.(type, d[field])) :
+            convert_type.(type, d[field]) for (field,type) in it]
+        lst = [T(inps...)]
+    else
+        lst = ensurearray(load_from(T, convert_type(DataFrame, d)))
+    end
+    return size(lst)[1] == 1 ? lst[1] : lst
+end
+
 function load_from(::Type{T}, df::DataFrame) where T <: Any
-    it = zip(fieldnames(T), T.types);
+    it = zip(fieldnames(T), T.types)
 
     # Convert the necessary DataFrame columns into the correct type,
     # and save the column names to include. This ensures the dataframe columns are imported
@@ -152,16 +171,15 @@ function load_from(::Type{T}, df::DataFrame) where T <: Any
     # If one of the struct fields is an ARRAY, we here assume that it is the length of the
     # entire DataFrame, and all other fields are duplicates.
     if any(isarray.(T.types))
+    # if all(isarray.(T.types))
+        # inps = [df[:,field] for (field,type) in it]
         inps = [isarray(type) ? df[:,field] : df[1,field] for (field,type) in it]
         lst = [T(inps...)]
-    
     # If each row in the input df fills one and only one struct,
     # create a list of structures from each DataFrame row.
     else
         cols = [field for (field, type) in it]
         lst = [T(values(row)...) for row in eachrow(df[:,cols])]
     end
-    
-    size(lst)[1] == 1 ? lst = lst[1] : nothing  # Don't return a single-element list
-    return lst
+    return size(lst)[1] == 1 ? lst[1] : lst
 end

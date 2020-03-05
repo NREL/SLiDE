@@ -34,6 +34,7 @@ export Drop
 export Group
 export Join
 export Map
+export Map2
 export Melt
 export Order
 export Split
@@ -45,11 +46,18 @@ export CSVInput
 export XLSXInput
 
 export CGEInput
+export DataStream
+export File
+export Edit
 
 export convert_type
 export datatype
 export isarray
+export ensurearray
 
+export edit_with
+export read_file
+export load_from
 
 #################################################################################
 # INCLUDES
