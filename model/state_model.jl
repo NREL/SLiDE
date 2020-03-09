@@ -83,57 +83,57 @@ function fill_zero(source::Dict,tofill::Dict)
     end
 end
 
+function fill_zero(source::Tuple, tofill::Dict)
+ 
+  # Assume all possible permutations of keys should be present
+  # and determine which are missing.
+  allkeys = vcat(collect(Base.Iterators.product(source...))...)
+  missingkeys = setdiff(allkeys, collect(keys(tofill)))
+
+  # Add
+  [push!(tofill, fill=>0) for fill in missingkeys]
+  return tofill
+end
+
+
 ###############
 # -- SETS --
 ###############
 
 # read sets from their dumped CSVs
-regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
-sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
-goods = sectors;
-margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
-goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
+r = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
+s = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
+g = sectors;
+m = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
+gm = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
 
+fill_zero(tuple(r,s,g),blueNOTE[:ys0])
+fill_zero(tuple(r,g,s),blueNOTE[:id0])
+fill_zero(tuple(r,s),blueNOTE[:ld0])
+fill_zero(tuple(r,s),blueNOTE[:kd0])
+fill_zero(tuple(r,s),blueNOTE[:ty0])
+fill_zero(tuple(r,g),blueNOTE[:m0])
+fill_zero(tuple(r,g),blueNOTE[:x0])
+fill_zero(tuple(r,g),blueNOTE[:rx0])
+fill_zero(tuple(r,m,g),blueNOTE[:md0])
+fill_zero(tuple(r,g,m),blueNOTE[:nm0])
+fill_zero(tuple(r,g,m),blueNOTE[:dm0])
+fill_zero(tuple(r,g),blueNOTE[:s0])
+fill_zero(tuple(r,g),blueNOTE[:a0])
+fill_zero(tuple(r,g),blueNOTE[:ta0])
+fill_zero(tuple(r,g),blueNOTE[:tm0])
+fill_zero(tuple(r,g),blueNOTE[:cd0])
+fill_zero(tuple(r),blueNOTE[:c0])
+fill_zero(tuple(r,g),blueNOTE[:yh0])
+fill_zero(tuple(r),blueNOTE[:bopdef0])
+fill_zero(tuple(r),blueNOTE[:hhadj])
+fill_zero(tuple(r,g),blueNOTE[:g0])
+fill_zero(tuple(r,g),blueNOTE[:i0])
+fill_zero(tuple(r,g),blueNOTE[:xn0])
+fill_zero(tuple(r,g),blueNOTE[:xd0])
+fill_zero(tuple(r,g),blueNOTE[:dd0])
+fill_zero(tuple(r,g),blueNOTE[:nd0])
 
-#need to create a dictionary with unique r/s keys in ys0
-#but requires us to remove the third 'g' key in the r/s/g 
-#dict keys in the ys0 parameter
-y_set = Dict()
-y_vector = []
-for keys in blueNOTE[:ys0]
-    newkey = [keys[1][1],keys[1][2]]
-    push!(y_vector,newkey)
-end
-y_vector = unique(y_vector)
-
-for i in y_vector
-    push!(y_set,(i[1],i[2])=>0)
-end
-
-x_set = blueNOTE[:s0]
-pd_set = blueNOTE[:xd0]
-
-#here creating a placeholder set to make sure we don't modify blueNOTE[:rx0]
-temp_a2 = blueNOTE[:rx0]
-fill_zero(blueNOTE[:a0],temp_a2)
-a_set = temp_a2
-
-fill_zero(y_set,blueNOTE[:yh0])
-
-fill_zero(x_set,blueNOTE[:x0])
-fill_zero(x_set,blueNOTE[:rx0])
-fill_zero(x_set,blueNOTE[:xd0])
-fill_zero(x_set,blueNOTE[:xn0])
-
-fill_zero(a_set,blueNOTE[:nd0])
-fill_zero(a_set,blueNOTE[:dd0])
-fill_zero(a_set,blueNOTE[:tm0])
-fill_zero(a_set,blueNOTE[:m0])
-fill_zero(a_set,blueNOTE[:cd0])
-fill_zero(a_set,blueNOTE[:g0])
-fill_zero(a_set,blueNOTE[:i0])
-fill_zero(a_set,blueNOTE[:a0])
-fill_zero(a_set,blueNOTE[:ta0])
 
 
 ##############
@@ -147,33 +147,32 @@ alpha_n  = Dict() #national supply share
 theta_n  = Dict() #national share of domestic Absorption
 theta_m  = Dict() #domestic share of absorption
 
-for k in keys(y_set)
+for k in keys(blueNOTE[:ld0])
     val = blueNOTE[:ld0][k] / (blueNOTE[:kd0][k] + blueNOTE[:ld0][k])
     push!(alpha_kl,k=>val)
 end
 
-for k in keys(x_set)
+for k in keys(blueNOTE[:x0])
     val = (blueNOTE[:x0][k] - blueNOTE[:rx0][k]) / blueNOTE[:s0][k]   
     push!(alpha_x,k=>val)
 end
 
-for k in keys(x_set)
+for k in keys(blueNOTE[:xd0])
     val = blueNOTE[:xd0][k] / blueNOTE[:s0][k]
     push!(alpha_d,k=>val)
 end
 
-for k in keys(x_set)
+for k in keys(blueNOTE[:xn0])
     val = blueNOTE[:xn0][k] / blueNOTE[:s0][k]
     push!(alpha_n,k=>val)
 end
 
-for k in keys(a_set)
+for k in keys(blueNOTE[:nd0])
     val = blueNOTE[:nd0][k] / (blueNOTE[:nd0][k] + blueNOTE[:dd0][k])
     push!(theta_n,k=>val)
 end
 
-#!!!! not sure on a_set here
-for k in keys(a_set)
+for k in keys(blueNOTE[:tm0])
     val = (1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k] / (blueNOTE[:nd0][k]+blueNOTE[:dd0][k]+(1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k])
     push!(theta_m,k=>val)
 end
@@ -189,18 +188,24 @@ cge = MCPModel();
 # as a lower limit to variable values
 eps = 1e-3
 
+#@variable(cge,Y[r in regions,s in sectors; haskey(y_set,(r,s))]>=eps,start=1)
 @variable(cge,Y[regions,sectors]>=eps,start=1)
 @variable(cge,X[regions,goods]>=eps,start=1) # Disposition
 @variable(cge,A[regions,goods]>=eps,start=1) # Absorption
 @variable(cge,C[regions]>=eps,start=1) # Aggregate final demand
 @variable(cge,MS[regions,margins]>=eps,start=1) # Margin supply
 
+
 #commodities:
+#@variable(cge,PA[r in regions,g in goods; haskey(x_set,(r,g))]>=eps,start=1) # Regional market (input)
 @variable(cge,PA[regions,goods]>=eps,start=1) # Regional market (input)
+#@variable(cge,PY[r in regions,g in goods; haskey(blueNOTE[:s0],(r,g))]>=eps,start=1) # Regional market (output)
 @variable(cge,PY[regions,goods]>=eps,start=1) # Regional market (output)
+#@variable(cge,PD[r in regions,g in goods; haskey(pd_set,(r,g))]>=eps,start=1) # Local market price
 @variable(cge,PD[regions,goods]>=eps,start=1) # Local market price
 @variable(cge,PN[goods]>=eps,start=1) # National market
 @variable(cge,PL[regions]>=eps,start=1) # Wage rate
+#@variable(cge,PK[r in regions,s in sectors; haskey(blueNOTE[:kd0],(r,s))]>=eps,start=1) # Rental rate of capital
 @variable(cge,PK[regions,sectors]>=eps,start=1) # Rental rate of capital
 @variable(cge,PM[regions,margins]>=eps,start=1) # Margin price
 @variable(cge,PC[regions]>=eps,start=1) # Consumer price index
@@ -269,7 +274,7 @@ eps = 1e-3
 
 #y_set here is equivalent to the $y_(r,s) in the blueNOTE model
 @mapping(cge,profit_y[r in regions,s in sectors; haskey(y_set,(r,s)) ],
-                sum(PA[r,g] * blueNOTE[:id0][r,g,s] for g in goods if haskey(blueNOTE[:id0],(r,g,s)) )
+                sum(PA[r,g] * blueNOTE[:id0][r,g,s] for g in goods if haskey(blueNOTE[:id0],(r,g,s)) ) 
                 + PL[r] * AL[r,s]
                 + PK[r,s] * AK[r,s]
                 == 
@@ -395,6 +400,12 @@ eps = 1e-3
 
 # equations with conditions cannot be paired 
 # see workaround here: https://github.com/chkwon/Complementarity.jl/issues/37
+[fix(PK[r,s],1,force=true) for r in regions for s in sectors if !(haskey(blueNOTE[:kd0],(r,s)))];
+[fix(PA[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:a0],(r,g)))];
+[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:s0],(r,g)))];
+[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:xd0],(r,g)))];
+
+#@complementarity(cge,profit_y,Y)
 
 [@complementarity(cge,profit_y[r,s],Y[r,s]) for r in regions for s in sectors if haskey(y_set,(r,s)) ];
 [@complementarity(cge,profit_x[r,g],X[r,g]) for r in regions for g in goods if haskey(x_set,(r,g)) ];
@@ -412,11 +423,60 @@ eps = 1e-3
 @complementarity(cge,market_pfx,PFX);
 @complementarity(cge,income_ra,RA);
 
-[fix(PK[r,s],1,force=true) for r in regions for s in sectors if !(haskey(blueNOTE[:kd0],(r,s)))];
-[fix(PA[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:a0],(r,g)))];
-[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:s0],(r,g)))];
-[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:xd0],(r,g)))];
-
 
 PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
 status = solveMCP(cge)
+
+mcp_data = cge.ext[:MCP]
+        #reset raw indices
+
+#for i in 1:10000
+for i in 10000:15000
+  println("i: ",i,"  variable: ",mcp_data[i].var,"  raw_index:",mcp_data[i].raw_idx)
+end
+
+
+
+temp_list = []
+for i in 1:length(mcp_data)
+    push!(temp_list,mcp_data[i].raw_idx)
+end
+        
+
+n = maximum(temp_list)
+lb = zeros(n)
+ub = ones(n)
+
+raw_index(v::JuMP.VariableRef) = JuMP.index(v).value
+
+
+for i in 1:length(mcp_data)
+  println("i: ",i,"   raw_index: ",raw_index(mcp_data[i].var))
+  lb[raw_index(mcp_data[i].var)] = mcp_data[i].lb
+  ub[raw_index(mcp_data[i].var)] = mcp_data[i].ub
+end
+
+
+
+```
+
+temp =[]
+for i in 1:length(kk)
+  push!(temp,kk[i].raw_idx)
+end
+
+for i in 1:length(kk)
+  kk[i].raw_idx = i
+end
+
+raw_index(v::JuMP.VariableRef) = JuMP.index(v).value
+
+for i in 1:26180
+  println(i,raw_index(kk[i].var))
+end
+
+loop_list = []
+for i in mcp_data
+    push!(loop_list,raw_index(mcp_data[i]))
+end
+```
