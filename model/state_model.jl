@@ -216,16 +216,22 @@ cge = MCPModel();
 
 # some small value that acts 
 # as a lower limit to variable values
-sv = 1e-3
+sv = 0
 
-#need to create starting values for primal variables...
+#need to create starting values for primal variables
+y_start = Dict()
+x_start = Dict()
+ms_start = Dict()
+[y_start[r,s] = sum(blueNOTE[:ys0][r,s,g] for g in goods) for r in regions for s in sectors]
+[x_start[r,g] = blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g] for r in regions for g in goods]
+[ms_start[r,m] = sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins) for r in regions for m in margins]
 
 #sectors
-@variable(cge,Y[r in regions,s in sectors]>=sv,start=1)
-@variable(cge,X[r in regions,g in goods]>=sv,start=1) # Disposition
+@variable(cge,Y[r in regions,s in sectors]>=sv,start=y_start[r,s])
+@variable(cge,X[r in regions,g in goods]>=sv,start=x_start[r,g]) # Disposition
 @variable(cge,A[r in regions,g in goods]>=sv,start=blueNOTE[:a0][r,g]) # Absorption
-@variable(cge,C[r in regions]>=sv,start=1) # Aggregate final demand
-@variable(cge,MS[r in regions,m in margins]>=sv,start=1) # Margin supply
+@variable(cge,C[r in regions]>=sv,start=blueNOTE[:c0][(r,)]) # Aggregate final demand
+@variable(cge,MS[r in regions,m in margins]>=sv,start=ms_start[r,m]) # Margin supply
 
 #commodities:
 @variable(cge,PA[r in regions,g in goods]>=sv,start=1) # Regional market (input)
@@ -239,14 +245,7 @@ sv = 1e-3
 @variable(cge,PFX>=sv,start=1) # Foreign exchange
 
 #consumer:
-@variable(cge,RA[r in regions]>=sv,start=1) # Representative agent
-
-# here explicitly declaring the starting value
-# doesn't work within the variable macro when not looping 
-for r in regions
-  set_start_value(RA[r],blueNOTE[:c0][(r,)])
-end
-
+@variable(cge,RA[r in regions]>=sv,start=blueNOTE[:c0][(r,)]) # Representative agent
 
 ###############################
 # -- PLACEHOLDER VARIABLES --
@@ -459,59 +458,6 @@ end
 
 
 PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
+ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
 status = solveMCP(cge)
 
-
-
-```
-mcp_data = cge.ext[:MCP]
-        #reset raw indices
-
-#for i in 1:10000
-for i in 10000:15000
-  println("i: ",i,"  variable: ",mcp_data[i].var,"  raw_index:",mcp_data[i].raw_idx)
-end
-
-
-
-temp_list = []
-for i in 1:length(mcp_data)
-    push!(temp_list,mcp_data[i].raw_idx)
-end
-        
-
-n = maximum(temp_list)
-lb = zeros(n)
-ub = ones(n)
-
-raw_index(v::JuMP.VariableRef) = JuMP.index(v).value
-
-
-for i in 1:length(mcp_data)
-  println("i: ",i,"   raw_index: ",raw_index(mcp_data[i].var))
-  lb[raw_index(mcp_data[i].var)] = mcp_data[i].lb
-  ub[raw_index(mcp_data[i].var)] = mcp_data[i].ub
-end
-
-
-
-temp =[]
-for i in 1:length(kk)
-  push!(temp,kk[i].raw_idx)
-end
-
-for i in 1:length(kk)
-  kk[i].raw_idx = i
-end
-
-raw_index(v::JuMP.VariableRef) = JuMP.index(v).value
-
-for i in 1:26180
-  println(i,raw_index(kk[i].var))
-end
-
-loop_list = []
-for i in mcp_data
-    push!(loop_list,raw_index(mcp_data[i]))
-end
-```
