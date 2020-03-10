@@ -3,6 +3,8 @@ Module for constructing SLiDE objects.
 """
 module SLiDE
 
+# setenv("PATH_LICENSE_STRING", "2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0")
+
 #################################################################################
 # IMPORTS
 import CSV
@@ -86,5 +88,13 @@ include(joinpath("parse", "generated_load", "includes.jl"))
 
 include(joinpath("parse", "load_data.jl"))
 include(joinpath("parse", "edit_data.jl"))
+
+function __init__()
+    # See: http://pages.cs.wisc.edu/~ferris/path/LICENSE
+    # https://docs.julialang.org/en/v1/base/base/#Base.ENV
+    # https://docs.julialang.org/en/v1/manual/modules/index.html -> init
+    Base.ENV["PATH_LICENSE_STRING"] =
+        "2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
+end
 
 end # module

@@ -22,7 +22,6 @@ function dataframe_stats(df::DataFrame)
         unique = fill(0, COL),
         miss = fill(0,COL)
     )
-
     for ii in 1:COL
         col = names(df)[ii]
         df_stats[ii,:col] = col

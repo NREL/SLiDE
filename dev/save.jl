@@ -1,9 +1,4 @@
 
-
-# match(r"(?<aggr>.*)\&(?<sect>.*)", v)
-
-# m=match(r"(?<hour>\d+):(?<minute>\d+)","12:45")
-
 # Define tuple of inputs:
 regions = ["co","md","nd","wi"]
 sectors = ["agr","fof"]
@@ -28,6 +23,10 @@ function fill_zero(source::Tuple, tofill::Dict)
 end
 
 fill_zero(inp, d)
+
+d = Dict(k => v > 0.0 for (k,v) in d)
+
+[k => v > 0.0 for (k,v) in d]
 
 # GSP FULL_CODE -> STATE_CODE, COUNTY_CODE
 str = "01001"
