@@ -218,10 +218,12 @@ cge = MCPModel();
 # as a lower limit to variable values
 sv = 1e-3
 
+#need to create starting values for primal variables...
+
 #sectors
 @variable(cge,Y[r in regions,s in sectors]>=sv,start=1)
 @variable(cge,X[r in regions,g in goods]>=sv,start=1) # Disposition
-@variable(cge,A[r in regions,g in goods]>=sv,start=1) # Absorption
+@variable(cge,A[r in regions,g in goods]>=sv,start=blueNOTE[:a0][r,g]) # Absorption
 @variable(cge,C[r in regions]>=sv,start=1) # Aggregate final demand
 @variable(cge,MS[r in regions,m in margins]>=sv,start=1) # Margin supply
 
@@ -432,10 +434,10 @@ end
 
 # equations with conditions cannot be paired 
 # see workaround here: https://github.com/chkwon/Complementarity.jl/issues/37
-[fix(PK[r,s],1,force=true) for r in regions for s in sectors if !(haskey(blueNOTE[:kd0],(r,s)))];
-[fix(PA[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:a0],(r,g)))];
-[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:s0],(r,g)))];
-[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(haskey(blueNOTE[:xd0],(r,g)))];
+[fix(PK[r,s],1,force=true) for r in regions for s in sectors if !(blueNOTE[:kd0][r,s] > 0)];
+[fix(PA[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:a0][r,g]>0)];
+[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:s0][r,g]>0)];
+[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:xd0][r,g] > 0)];
 
 #@complementarity(cge,profit_y,Y)
 
