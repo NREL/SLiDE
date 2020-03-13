@@ -1,5 +1,5 @@
 Path: ["..", "data", "mapsources", "NAICS"]
-PathOut: ["..", "data", "coremaps", "scale", "naics_codes.csv"]
+PathOut: ["..", "data", "coremaps", "std", "naics.csv"]
 
 XLSXInput:
   name:  "2-6 digit_2017_Codes.xlsx"
@@ -12,6 +12,16 @@ Rename:
   - {from: 2017 NAICS US Title,  to: naics_desc}
 
 Match:
-  on:     "(?<level>\\d*)"
+  on:     "(?<naics_level>\\d*)"
   input:  naics_code
-  output: level
+  output: naics_level
+
+Replace:
+  col: naics_level
+  from: [2,3,4,5,6]
+  to:
+    - sector
+    - subsector
+    - industry_group
+    - naics_industry
+    - national_industry

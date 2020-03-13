@@ -32,7 +32,7 @@ Replace:
   to:   0
 
 Map:
-  file:   regions.csv
+  file:   std/regions.csv
   from:   from
   to:     to
   input:  state

@@ -1,0 +1,6 @@
+Path:  ["..", "data", "mapsources", "WiNDC", "windc_datastream", "core_maps"]
+PathOut: ["..", "data", "coremaps", "std", "bea.csv"]
+
+CSVInput:
+  name: bea_all.csv
+  descriptor: 1

@@ -58,12 +58,22 @@ function edit_with(df::DataFrame, x::Add)
 end
 
 function edit_with(df::DataFrame, x::Drop)
-    if typeof(x.val) == String
-        occursin(lowercase(x.val), "missing") ? dropmissing!(df, x.col) :
-            occursin(lowercase(x.val), "unique") ? unique!(df, x.col) : nothing
+    
+    if x.col in names(df)
+        if occursin(lowercase(x.val), "all")
+            df = df[:, setdiff(names(df), [x.col])]
+
+        else
+
+            if typeof(x.val) == String
+                occursin(lowercase(x.val), "all") ? df = df[:, setdiff(names(df), [x.col])] :
+                    occursin(lowercase(x.val), "missing") ? dropmissing!(df, x.col) :
+                        occursin(lowercase(x.val), "unique") ? unique!(df, x.col) : nothing
+            end
+            # !!!! Add error if broadcast not possible.
+            df = df[.!broadcast(datatype(x.operation), df[:,x.col], x.val), :]
+        end
     end
-    # !!!! Add error if broadcast not possible.
-    df = df[.!broadcast(datatype(x.operation), df[:,x.col], x.val), :]
     return df
 end
 
@@ -114,6 +124,8 @@ function edit_with(df::DataFrame, x::Map2)
     return df
 end
 
+
+
 function edit_with(df::DataFrame, x::Map; kind = :left)
     # Save the column names in the input dataframe and add the output column. This will
     # avoid including unnecessary output columns from the map file in the result.
@@ -155,6 +167,9 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
 end
 
 function edit_with(df::DataFrame, x::Match)
+    !all(typeof(df[:,x.input]).==String) ?
+        df[!,x.input] .= convert_type.(String, df[:,x.input]) : nothing
+
     cols = setdiff(x.output, names(df))
     df = edit_with(df, Add.(cols, fill("", size(cols))))
     m = match.(x.on, df[:, x.input])
@@ -233,10 +248,12 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten::Bool=false) where T<:File
     df = read_file(y["Path"], file; shorten=shorten);
 
     # Specify the order in which edits must occur.
-    EDITS = ["Rename", "Group", "Match", "Melt", "Add", "Map", "Map2", "Join", "Split", "Replace", "Drop"];
+    EDITS = ["Drop", "Rename", "Group", "Match", "Melt", "Add", "Map", "Map2", "Join", "Replace", "Drop"];
 
     # Find which of these edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, [k for k in keys(y)]);
+    "Drop" in KEYS ? push!(KEYS, "Drop") : nothing
+
     [df = edit_with(df, y[k]) for k in KEYS];
     
     # Add a descriptor to identify the data from the file that was just added.

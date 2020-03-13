@@ -1,8 +1,9 @@
 Path:  ["..", "data", "datasources", "BEA", "GDP", "State"]
 
 CSVInput:
-  name:
-    - SAGDP2N__ALL_AREAS_1997_2017.csv
+  - {name: SAGDP2N__ALL_AREAS_1997_2017.csv, descriptor: SAGDP2N}
+  # name:
+  #   - SAGDP2N__ALL_AREAS_1997_2017.csv
     # - SAGDP3N__ALL_AREAS_1997_2017.csv
     # - SAGDP4N__ALL_AREAS_1997_2017.csv
     # - SAGDP5N__ALL_AREAS_1997_2017.csv
@@ -11,8 +12,8 @@ CSVInput:
     # - SAGDP8N__ALL_AREAS_1997_2017.csv
     # - SAGDP9N__ALL_AREAS_1997_2017.csv
     # - SAGDP11N__ALL_AREAS_1998_2017.csv
-  descriptor:
-    - SAGDP2N
+  # descriptor:
+  #   - SAGDP2N
     # - SAGDP3N
     # - SAGDP4N
     # - SAGDP5N
@@ -24,62 +25,64 @@ CSVInput:
 
 Order:
   - {col: year,          type: Int}
-  - {col: region,        type: String}
-  - {col: componentname, type: String}
-  - {col: industryid,    type: String}
-  - {col: industryclass, type: String}
-  - {col: label,         type: String}
+  - {col: region_code,   type: String}
+  - {col: region_desc,   type: String}
+  - {col: component,     type: String}
+  - {col: industry_id,   type: String}
+  - {col: industry_code, type: String}
+  - {col: industry_desc, type: String}
   - {col: units,         type: String}
   - {col: value,         type: Float64}
 
 Rename:
-  - from: GeoName
-    to:   region
-  - from: TableName
-    to:   table
-  - from: Unit
-    to:   units
-  - from: Description
-    to:   label
-  - from: ComponentName
-    to:   componentname
-  - from: IndustryClassification
-    to:   industryclass
-  - from: IndustryId
-    to:   industryid
+  - {from: GeoFIPS, to: region_code}
+  - {from: GeoName, to: region_desc}
+  - {from: Unit, to: units}
+  - {from: Description, to: industry_desc}
+  - {from: ComponentName, to: component}
+  - {from: IndustryClassification, to: industry_code}
+  - {from: IndustryId, to: industry_id}
 
 Melt:
-  on: [GeoFIPS, region, Region, table, componentname, units, industryid, industryclass, label]
+  on: [region_code, region_desc, component, units, industry_id, industry_code, industry_desc]
   var: year
   val: value
   type: Any
 
 Map:
-  - file:   regions.csv
-    from:   from
-    to:     to
-    input:  region
-    output: region
-  # - file:   windc/gams/map_pce.csv
+  # - file:   std/regions.csv
   #   from:   from
   #   to:     to
-  #   input:  label
-  #   output: label
-  - file:   units.csv
+  #   input:  region
+  #   output: region
+  - file:   std/gsp.csv
     from:   from
     to:     to
-    input:  units
-    output: units
+    input:  component
+    output: component
+  # - file:   units.csv
+  #   from:   from
+  #   to:     to
+  #   input:  units
+  #   output: units
 
 Drop:
-  - col: value
-    val: [missing, "(NA)", "(L)", "(D)", "(H)"]
+  - col: [Region, TableName]
+    val: all
     operation: "=="
-  - col: componentname
-    val: Contributions to percent change in real GDP
+  - col: value
+    val: [missing, "(NA)", "(L)", "(D)", "(H)", "(T)"]
+    operation: "=="
+  - col: component
+    val: missing
     operation: "=="
 
-Replace:
-  col:  region
-  from: "United States*"
-  to:    us
+Match:
+  on: "(?<region_desc>.*)\\*"
+  input: region_desc
+  output: region_desc
+
+# Replace:
+#   col:  region
+#   from: "United States*"
+#   to:    us

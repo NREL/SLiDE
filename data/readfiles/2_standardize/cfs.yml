@@ -13,39 +13,39 @@ Order:
   - {col: dest_ma,                  type: Int}
 #  - {col: dest_cfs,                 type: String}
   - {col: quarter,                  type: Int}
-  - {col: naics,                    type: Int}
+  - {col: naics,                    type: String}
   - {col: sctg,                     type: String}
   - {col: mode,                     type: Int}
-  - {col: shipmt_value,             type: Int}
-  - {col: shipmt_wght,              type: Int}
-  - {col: shipmt_dist_gc,           type: Int}
-  - {col: shipmt_dist_routed,       type: Int}
-  - {col: temp_cntl_yn,             type: Bool}
-  - {col: export_yn,                type: Bool}
-  - {col: export_cntry,             type: String}
-  - {col: hazmat,                   type: String}
-  - {col: wgt_factor,               type: Float64}
-  - {col: shipmt_value_units,       type: String}
-  - {col: shipmt_wght_units,        type: String}
-  - {col: shipmt_dist_gc_units,     type: String}
-  - {col: shipmt_dist_routed_units, type: String}
+  # - {col: shipmt_value,             type: Int}
+  # - {col: shipmt_wght,              type: Int}
+  # - {col: shipmt_dist_gc,           type: Int}
+  # - {col: shipmt_dist_routed,       type: Int}
+  # - {col: temp_cntl_yn,             type: Bool}
+  # - {col: export_yn,                type: Bool}
+  # - {col: export_cntry,             type: String}
+  # - {col: hazmat,                   type: String}
+  # - {col: wgt_factor,               type: Float64}
+  # - {col: shipmt_value_units,       type: String}
+  # - {col: shipmt_wght_units,        type: String}
+  # - {col: shipmt_dist_gc_units,     type: String}
+  # - {col: shipmt_dist_routed_units, type: String}
 
 Rename:
   from: upper
   to:   lower
 
-Map:
-  file:   regions.csv
-  from:   from
-  to:     to
-  input:
-    - export_cntry
-    - orig_state
-    - dest_state
-  output:
-    - export_cntry
-    - orig_state
-    - dest_state
+# Map:
+#   file:   std/regions.csv
+#   from:   from
+#   to:     to
+#   input:
+#     - export_cntry
+#     - orig_state
+#     - dest_state
+#   output:
+#     - export_cntry
+#     - orig_state
+#     - dest_state
 
 Replace:
   - col:  temp_cntl_yn

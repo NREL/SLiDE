@@ -30,11 +30,23 @@ Describe:
   col: flow
 
 Map:
-  file:   regions.csv
+  file:   "std/regions.csv"
   from:   from
   to:     to
   input:  [state, country]
   output: [state, country]
+
+# Map2:
+#   - file:   "std/regions.csv"
+#     from:   from
+#     to:     to
+#     input:  state
+#     output: state
+#   - file:   "std/regions.csv"
+#     from:   from
+#     to:     to
+#     input:  state
+#     output: state
 
 Drop:
   col: year

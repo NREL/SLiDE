@@ -34,8 +34,8 @@ Map:
   input:  state
   output: state
 
-Split:
-  on:     CFS Area
-  input:  desc
-  output: ma_desc
-  remove: true
+# Split:
+#   on:     CFS Area
+#   input:  desc
+#   output: ma_desc
+#   remove: true

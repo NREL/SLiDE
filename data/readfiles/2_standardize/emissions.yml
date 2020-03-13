@@ -47,7 +47,7 @@ Add:
   val: million metric tons of carbon dioxide
 
 Map:
-  file:   regions.csv
+  file:   std/regions.csv
   from:   from
   to:     to
   input:  state

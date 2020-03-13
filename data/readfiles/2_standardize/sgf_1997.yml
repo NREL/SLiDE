@@ -23,18 +23,25 @@ Rename:
     to:   value
 
 Group:
-    file:   regions.csv
+    file:   std/regions.csv
     from:   from
     to:     to
     input:  label
     output: state
 
-Map:
-  file:   sgf.csv
-  from:   sgf
-  to:     [units, desc, code]
-  input:  label
-  output: [units, desc, label]
+# Map:
+#   file:   std/sgf.csv
+#   from:   from_sgf
+#   to:     [units, to_sgf, code]
+#   input:  label
+#   output: [units, desc, label]
+
+# Map2:
+#   file: std/sgf.csv
+#   from: sgf_from
+#   to:   [to_sgf, sgf_windc, units]
+#   input: label
+#   output: [sgf_windc, units]
 
 Drop:
   col: label

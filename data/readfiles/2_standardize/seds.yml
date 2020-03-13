@@ -1,0 +1,41 @@
+Path:  ["..", "data", "datasources", "SEDS"]
+# file_out: eia_crude_oil_price.csv
+# description: EIA Annual Crude Oil Prices -- https://www.eia.gov/dnav/pet/pet_pri_rac2_dcu_nus_a.htm
+
+Order:
+  - {col: year, type: Int}
+  - {col: state_code, type: String}
+  - {col: msn, type: String}
+  - {col: source_code, type: String}
+  - {col: sector_code, type: String}
+  - {col: units, type: String}
+  - {col: value, type: Float64}
+
+CSVInput:
+  name:  Complete_SEDS_update.csv
+  descriptor: seds
+
+Rename:
+  - {from: upper, to: lower}
+  - {from: statecode, to: state_code}
+  - {from: data, to: value}
+
+Match:
+  on:     "(?<source_code>.{2})(?<sector_code>.{2})(?<units>.)"
+  input:  msn
+  output: ["source_code", "sector_code", "units"]
+
+Map:
+  file: "std/regions.csv"
+  from: from
+  to:   to
+  input: state_code
+  output: state_code
+
+Drop:
+  - col: "Data_Status"
+    val: all
+    operation: "=="
+  - col: value
+    val: missing
+    operation: "=="

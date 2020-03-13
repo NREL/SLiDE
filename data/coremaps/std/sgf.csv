@@ -1,4 +1,4 @@
-from_sgf,to_sgf,sgf_windc,units
+from,sgf_desc,sgf_windc,units
 Population (thousands),Population,,thousands
 Total Revenue,Total Revenue,TOTREV,thousands of us dollars (USD)
 General revenue,Total Revenue - General Revenue,GENREV,thousands of us dollars (USD)

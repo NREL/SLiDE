@@ -26,7 +26,7 @@ julia> df = DataFrame(
 │ 6   │ B         │ 4     │
 
 julia> editor = SLiDE.Group(
-           file = "regions.csv",
+           file = "std/regions.csv",
            from = :from,
            to = :to,
            input = :sector,
