@@ -19,10 +19,6 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
         filled with the value in the file descriptor.
     - [`SLiDE.Group`](@ref): Use to edit files containing data in successive dataframes with
         an identifying header cell or row.
-    - [`SLiDE.Join`](@ref): Contains the information to join a mapping DataFrame to another
-        DataFrame (`df`), with a `prefix` prepended to the column names in `df_map`.
-        The dataframes will be joined on the column `on`
-        (see [DataFrames join documentation](https://juliadata.github.io/DataFrames.jl/stable/man/joins/))
     - [`SLiDE.Map`](@ref): Define an `output` column containing values based on those in an
         `input` column. The mapping columns `from` -> `to` are contained in a .csv `file` in
         the coremaps directory. The columns `input` and `from` should contain the same
@@ -36,7 +32,6 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
         them to the specified type.
     - [`SLiDE.Rename`](@ref): Change column name `from` -> `to`.
     - [`SLiDE.Replace`](@ref): Replace values in `col` `from` -> `to`.
-    - [`SLiDE.Split`](@ref)
 - `file::T where T <: File`: Data file containing information to read.
 - `files::Array{T} where T <: File`: List of data files.
 - `y::Dict{Any,Any}`: Dictionary containing all editing structures among other values read
@@ -86,7 +81,7 @@ function edit_with(df::DataFrame, x::Group)
     # Editing with a map will remove all rows that do not contain relevant information.
     # Add a column indicating where each data set STOPS, assuming all completely blank rows
     # were removed by read_file().
-    df_split = edit_with(copy(df), Map(x.file, x.from, x.to, x.input, x.output); kind = :inner);
+    df_split = edit_with(copy(df), Map2(x.file, [x.from], [x.to], [x.input], [x.output]); kind = :inner);
     sort!(unique!(df_split), :start)
     df_split[!, :stop] .= vcat(df_split[2:end, :start] .- 2, [size(df)[1]])
 
@@ -101,30 +96,24 @@ function edit_with(df::DataFrame, x::Group)
     return df[:, cols]
 end
 
-function edit_with(df::DataFrame, x::Join)
-    # Prepend the column names of the mapping DataFrame with the Join prefix.
-    df_map = read_file(x)
-    df_map = edit_with(df_map, Rename.(names(df_map), Symbol.(x.prefix, "_", names(df_map))))
-
-    # Remove excess blank space from the input column to ensure consistency when joining.
-    df[!, x.on] .= strip.(df[:, x.on])
-    df = join(df, df_map, on = x.on, makeunique = true)
-    return df
-end
-
-function edit_with(df::DataFrame, x::Map2)
+function edit_with(df::DataFrame, x::Map2; kind = :left)
     df_map = read_file(x)
     df_map = dropmissing(unique(df_map[:,unique([x.from; x.to])]))
 
+    temp_to = Symbol.(string.("to_", 1:length(x.to)))
+    temp_from = Symbol.(string.("from_", 1:length(x.from)))
+    df_map = edit_with(df_map, Rename.([x.to; x.from], [temp_to; temp_from]))
+
     [df[!,col] .= convert_type.(unique(typeof.(df_map[:,col_map])), df[:,col])
-        for (col_map, col) in zip(x.from, x.input)]
-            
-    df = join(df, df_map, on = collect(zip(x.input, x.from));
-        kind = :left, makeunique = true)
+        for (col_map, col) in zip(temp_from, x.input)]
+
+    df = join(df, df_map, on = Pair.(x.input, temp_from);
+        kind = kind, makeunique = true)
+
+    df = df[:, setdiff(names(df), x.output)]
+    df = edit_with(df, Rename.(temp_to, x.output))
     return df
 end
-
-
 
 function edit_with(df::DataFrame, x::Map; kind = :left)
     # Save the column names in the input dataframe and add the output column. This will
@@ -143,7 +132,7 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
     # !!!! Warning when renaming doesn't happen?
     x.input == x.from ? nothing : df = edit_with(df, Rename(x.input, x.from));
     # show(first(df,3))
-
+    
     all(typeof.(df_map[:,x.from]) .== String) ?
         df[!,x.from] .= convert_type.(String, df[:,x.from]) : nothing
 
@@ -213,24 +202,11 @@ function edit_with(df::DataFrame, x::Rename)
 end
 
 function edit_with(df::DataFrame, x::Replace)
-    any(typeof.(df[:,x.col]) .== Missing) ?
+    any(ismissing.(df[:,x.col])) ?
         df[!,x.col] .= convert_type.(String, df[:,x.col]) : nothing
 
-    x.col in names(df) ? df[!, x.col][strip.(df[:, x.col]) .== x.from] .= x.to : nothing
-    return df
-end
-
-function edit_with(df::DataFrame, x::Split)
-    
-    df = edit_with(df, Add.(x.output, fill("",size(x.output))))
-    lst = split.(df[:, x.input], Regex(x.on));
-
-    [df[!, x.output[ii]] .= strip.([length(m) >= ii ? m[ii] : "" for m in lst])
-        for ii in 1:length(x.output)]
-
-    x.remove ? df[!,x.input] .= [strip(string(string.(strip.(el)," ")...))
-        for el in lst] : nothing
-
+        (x.col in names(df)) & (x.from in strip.(df[:,x.col])) ?
+            df[!, x.col][strip.(df[:, x.col]) .== x.from] .= x.to : nothing
     return df
 end
 
@@ -248,7 +224,7 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten::Bool=false) where T<:File
     df = read_file(y["Path"], file; shorten=shorten);
 
     # Specify the order in which edits must occur.
-    EDITS = ["Drop", "Rename", "Group", "Match", "Melt", "Add", "Map", "Map2", "Join", "Replace", "Drop"];
+    EDITS = ["Drop", "Rename", "Group", "Match", "Melt", "Add", "Map", "Map2", "Replace"]
 
     # Find which of these edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, [k for k in keys(y)]);

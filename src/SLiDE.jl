@@ -34,12 +34,12 @@ export Add
 export Describe
 export Drop
 export Group
-export Join
+# export Join
 export Map
 export Map2
 export Melt
 export Order
-export Split
+# export Split
 export Match
 export Rename
 export Replace

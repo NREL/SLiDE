@@ -13,12 +13,18 @@ using SLiDE  # see src/SLiDE.jl
 READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "readfiles", "1_map", "std"))
 # MAP_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "coremaps"))
 
+y_map = read_file(joinpath(READ_DIR, "std_bea_sum.yml"))
+df_map = unique(SLiDE.edit_with(y_map))
+CSV.write(joinpath(y_map["PathOut"]...), df_map)
+
+y_map = read_file(joinpath(READ_DIR, "std_bea_det.yml"))
+df_map = unique(SLiDE.edit_with(y_map))
+CSV.write(joinpath(y_map["PathOut"]...), df_map)
 
 ############################################################################################
 # BEA
-# y_map = read_file(joinpath(READ_DIR, "std_bea.yml"));
+# y_map = read_file(joinpath(READ_DIR, "std_bea.yml"))
 # df_map = unique(SLiDE.edit_with(y_map))
-# sort!(df_map, reverse(names(df_map)))
 # CSV.write(joinpath(y_map["PathOut"]...), df_map)
 
 ############################################################################################
@@ -52,46 +58,43 @@ READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "
 # CSV.write(joinpath(y_map["PathOut"]...), df_map)
 
 ############################################################################################
-# SGF
-y_map = read_file(joinpath(READ_DIR, "std_sgf.yml"));
-# df_map = unique(SLiDE.edit_with(y_map));
-df_map = read_file(y_map["Path"], y_map["CSVInput"])
+# # SGF
+# y_map = read_file(joinpath(READ_DIR, "std_sgf.yml"));
+# # df_map = unique(SLiDE.edit_with(y_map));
+# df_map = read_file(y_map["Path"], y_map["CSVInput"])
 
-# Make horizontally-concatennated DataFrames one, normalized database.
-# None of the Edit DataTypes are quite equiped to handle this.
-df_map = df_map[:, names(df_map)[.!occursin.("line_num", names(df_map))]]
+# # Make horizontally-concatennated DataFrames one, normalized database.
+# # None of the Edit DataTypes are quite equiped to handle this.
+# df_map = df_map[:, names(df_map)[.!occursin.("line_num", names(df_map))]]
 
-df = DataFrame();
-cols = [:from, :sgf_desc, :units]
+# df = DataFrame();
+# cols = [:from, :sgf_desc, :units]
 
-for yy in string.(1997:2016)
-    df_temp = copy(df_map[:, occursin.(yy, names(df_map))]);
-    df_temp = edit_with(df_temp, Rename.(names(df_temp), cols))
-    global df = vcat(df, df_temp);
-end
-
-
-function SLiDE.edit_with(df::DataFrame, x::Map2)
-    df_map = read_file(x)
-    df_map = dropmissing(unique(df_map[:,unique([x.from; x.to])]))
-    [df[!,col] .= convert_type.(unique(typeof.(df_map[:,col_map])), df[:,col])
-        for (col_map, col) in zip(x.from, x.input)]
-    df = join(df, df_map, on = collect(zip(x.input, x.from));
-        kind = :left, makeunique = true)
-
-    return df
-end
+# for yy in string.(1997:2016)
+#     df_temp = copy(df_map[:, occursin.(yy, names(df_map))]);
+#     df_temp = edit_with(df_temp, Rename.(names(df_temp), cols))
+#     global df = vcat(df, df_temp);
+# end
 
 
+# function SLiDE.edit_with(df::DataFrame, x::Map2)
+#     df_map = read_file(x)
+#     df_map = dropmissing(unique(df_map[:,unique([x.from; x.to])]))
+#     [df[!,col] .= convert_type.(unique(typeof.(df_map[:,col_map])), df[:,col])
+#         for (col_map, col) in zip(x.from, x.input)]
+#     df = join(df, df_map, on = collect(zip(x.input, x.from));
+#         kind = :left, makeunique = true)
 
+#     return df
+# end
 
-# Other edits...
-df = unique(edit_with(df, y_map["Drop"]))
-df = unique(edit_with(df, y_map["Map2"]))
-df = edit_with(df, Rename(:to, :sgf_windc))
+# # Other edits...
+# df = unique(edit_with(df, y_map["Drop"]))
+# df = unique(edit_with(df, y_map["Map2"]))
+# df = edit_with(df, Rename(:to, :sgf_windc))
 
-df = unique(edit_with(df, y_map["Order"]))
-CSV.write(joinpath(y_map["PathOut"]...), df)
+# df = unique(edit_with(df, y_map["Order"]))
+# CSV.write(joinpath(y_map["PathOut"]...), df)
 
 
 

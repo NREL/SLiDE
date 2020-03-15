@@ -58,6 +58,7 @@ Data in specified type
 """
 convert_type(::Type{T}, x::Any) where T<:AbstractString = string(x)
 convert_type(::Type{T}, x::Date) where T<:Integer = Dates.year(x)
+convert_type(::Type{T}, x::AbstractString) where T<:AbstractString = string(strip(x))
 
 function convert_type(::Type{T}, x::AbstractString) where T<:Integer
     return convert_type(T, convert_type(Float64, x))
@@ -77,8 +78,6 @@ end
 
 convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
 convert_type(::Type{Array{T,1}}, x::Any) where T<:Any = convert_type.(T, x)
-# convert_type(::Type{Array{T,1}}, x::Array{Any,1}) where T<:Any = convert_type.(T, x)
-# convert_type(::Type{Array{T,1}}, x::String) where T<:Any = [convert_type(T, x)]
 
 convert_type(::Type{T}, x::Missing) where T<:Real = x;
 convert_type(::Type{Any}, x::Any) = x

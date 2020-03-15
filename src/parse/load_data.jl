@@ -69,15 +69,14 @@ end
 function read_file(path::Array{String,1}, file::XLSXInput; shorten::Bool=false)
     filepath = joinpath(path..., file.name)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
+    
+    # Delete rows containing only missing values.
+    xf = xf[[!all(row) for row in eachrow(ismissing.(xf))],:]
     df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique = true)
 
     df = shorten ? df[1:min(2,size(df)[1]),1:min(4,size(df)[2])] : df;  # dev utility
     
-    # Delete empty rows from the DataFrame before returning by searching for an deleting
-    # rows only when the first column is empty. This should avoid deleting instances when
-    # null values are `missing`.
-    df = dropmissing(df, 1);
-    return unique(df)
+    return df
 end
 
 function read_file(path::String, file::T; shorten::Bool=false) where T <: File
@@ -147,6 +146,12 @@ function load_from(::Type{T}, d::Array{Dict{Any,Any},1}) where T <: Any
 end
 
 function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
+    FILES = [".csv", ".xlsx", ".txt"]
+    [(typeof(lst) .== Array{String,1}) &&
+            (any(occursin.(FILES, lst[end]))) &&
+            (!all([any(occursin.(FILES, v)) for v in lst[1:end-1]])) ?
+        d[k] = joinpath(lst...) : nothing for (k,lst) in d]
+
     it = zip(string.(fieldnames(T)), T.types)
 
     if any(isarray.(T.types)) & !all(isarray.(T.types))

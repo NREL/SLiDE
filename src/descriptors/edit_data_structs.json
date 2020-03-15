@@ -84,33 +84,6 @@
         "supertype": "Edit"
     },
     {
-        "struct_name": "Join",
-        "docstring": "Contains the information to join a mapping DataFrame (denoted `df_map`) to another DataFrame (`df`), with a `prefix` prepended to the column names in `df_map`.
-The dataframes will be joined on the column `on` (see [DataFrames join documentation](https://juliadata.github.io/DataFrames.jl/stable/man/joins/)).
-
-!!! note
-
-    The column `on` must be in both `df` and `df_map` after the prefix has been added.",
-        "fields": [
-            {
-                "name": "file",
-                "comment": "joining .csv file name in the coremaps directory.",
-                "data_type": "String"
-            },
-            {
-                "name": "on",
-                "comment": "column on which to perform the join.",
-                "data_type": "Symbol"
-            },
-            {
-                "name": "prefix",
-                "comment": "prefix identifier to add to `df_map`. This is necessary in case the same `df_map` is joined on multiple `df` columns.",
-                "data_type": "Symbol"
-            }
-        ],
-        "supertype": "Edit"
-    },
-    {
         "struct_name": "Map",
         "docstring": "Define an `output` column containing values based on those in an `input` column.
 The mapping columns `from` -> `to` are contained in a .csv `file` in the coremaps directory.
@@ -202,11 +175,6 @@ This operation can only be performed once per dataframe.",
                 "name": "val",
                 "comment": "name of column containing VALUES from the original dataframe",
                 "data_type": "Symbol"
-            },
-            {
-                "name": "type",
-                "comment": "Data type for the values in the VAL column",
-                "data_type": "Any"
             }
         ],
         "supertype": "Edit"
@@ -264,33 +232,6 @@ This operation can only be performed once per dataframe.",
                 "name": "to",
                 "comment": "new value",
                 "data_type": "String"
-            }
-        ],
-        "supertype": "Edit"
-    },
-    {
-        "struct_name": "Split",
-        "docstring": "",
-        "fields": [
-            {
-                "name": "on",
-                "comment": "string indicating where to split",
-                "data_type": "String"
-            },
-            {
-                "name": "input",
-                "comment": "column to split",
-                "data_type": "Symbol"
-            },
-            {
-                "name": "output",
-                "comment": "column names to label text surrounding the split",
-                "data_type": "Array{Symbol,1}"
-            },
-            {
-                "name": "remove",
-                "comment": "should the term indicating whether to split be removed from the dataframe?",
-                "data_type": "Bool"
             }
         ],
         "supertype": "Edit"
