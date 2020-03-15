@@ -92,7 +92,12 @@ function read_file(editor::T) where T <: Edit
     return df
 end
 
-function read_file(file::String)
+function read_file(file::String; colnames = false)
+
+    if occursin(".map", file) | occursin(".set", file)
+        return convert_type(DataFrame, readlines(filename); colnames = colnames)
+    end
+
     if occursin(".yml", file) | occursin(".yaml", file)
         y = YAML.load(open(file))
 
