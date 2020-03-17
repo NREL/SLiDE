@@ -17,7 +17,7 @@ df_all = read_file(READ_DIR, x)
 
 
 
-function write_yaml(path, file)
+function write_yaml(path::String, file::XLSXInput)
     
     KEYS = string.(string.([subtypes.(subtypes(SLiDE.DataStream))...; ["Path", "PathOut"]]), ":")
     df_all = read_file(path, file)
@@ -37,6 +37,9 @@ function write_yaml(path, file)
         end
     end
 end
+
+
+
 
 write_yaml(READ_DIR, x)
 

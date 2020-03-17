@@ -34,17 +34,16 @@ export Add
 export Describe
 export Drop
 export Group
-# export Join
 export Map
 export Map2
 export Melt
 export Order
-# export Split
 export Match
 export Rename
 export Replace
 
 export CSVInput
+export GAMSInput
 export XLSXInput
 
 export CGEInput
@@ -60,6 +59,9 @@ export ensurearray
 export edit_with
 export read_file
 export load_from
+
+export write_yaml
+export run_yaml
 
 #################################################################################
 # INCLUDES

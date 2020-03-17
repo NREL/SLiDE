@@ -3,6 +3,13 @@ using DataFrames
 using DelimitedFiles
 using SLiDE
 
+path_in = "../data/mapsources/WiNDC/windc_build/build_files/maps"
+files_in = readdir(path_in)
+
+path_out = "../data/coremaps/parse"
+files_out = [reduce(replace, [".map" => ".csv", "map" => "temp_"], init = x) for x in files_in]
+# files_out = string.("temp_bea.csv")
+
 ############################################################################################
 # EXPERIMENT: How do the sector and good sets compare?
 # Answer: They are the same.
@@ -36,11 +43,10 @@ using SLiDE
 # df_pce = sort(CSV.read(joinpath(path, "map_gsp.csv"))[:,[:from,:to]], :to)
 
 ############################################################################################
-path = "../data/mapsources/WiNDC/windc_build/build_files/"
+
 
 # xf = readdlm(joinpath(path, "maps/mapcfs.map"), '\t', Any, ',')
 # df = DataFrame(xf)
-
 
 # function gams_to_dataframe(filename::String, colnames = false)
 #     return gams_to_dataframe(readlines(filename); colnames = colnames)

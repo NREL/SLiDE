@@ -1,0 +1,59 @@
+state_code,necta_code,place_code,necta_desc,place_desc,nmemi,nectapci
+25,70450,02515,"Athol, MA",Athol,2,true
+23,70600,02100,"Augusta, ME",Augusta,2,true
+23,70750,02795,"Bangor, ME",Bangor,1,true
+25,70900,03690,"Barnstable Town, MA",Barnstable Town,1,true
+50,71050,03175,"Barre, VT",Barre,2,true
+50,71350,04750,"Bennington, VT",Bennington,2,true
+33,71500,05140,"Berlin, NH",Berlin,2,true
+25,71650,07000,"Boston-Cambridge-Nashua, MA-NH",Boston,1,true
+25,71650,11000,"Boston-Cambridge-Nashua, MA-NH",Cambridge,1,true
+25,71650,24960,"Boston-Cambridge-Nashua, MA-NH",Framingham,1,true
+25,71650,45560,"Boston-Cambridge-Nashua, MA-NH",Newton,1,true
+25,71650,72600,"Boston-Cambridge-Nashua, MA-NH",Waltham,1,true
+33,71650,50260,"Boston-Cambridge-Nashua, MA-NH",Nashua,1,true
+09,71950,08000,"Bridgeport-Stamford-Norwalk, CT",Bridgeport,1,true
+09,71950,47515,"Bridgeport-Stamford-Norwalk, CT",Milford,1,true
+09,71950,55990,"Bridgeport-Stamford-Norwalk, CT",Norwalk,1,true
+09,71950,73000,"Bridgeport-Stamford-Norwalk, CT",Stamford,1,true
+09,71950,74260,"Bridgeport-Stamford-Norwalk, CT",Stratford,1,true
+23,72250,08395,"Brunswick, ME",Brunswick,2,true
+50,72400,10675,"Burlington-South Burlington, VT",Burlington,1,true
+50,72400,66175,"Burlington-South Burlington, VT",South Burlington,1,true
+33,72700,14200,"Concord, NH",Concord,2,true
+09,72850,18430,"Danbury, CT",Danbury,1,true
+33,73050,18820,"Dover-Durham, NH-ME",Dover,1,true
+33,73050,19620,"Dover-Durham, NH-ME",Durham,1,true
+25,73300,27100,"Greenfield Town, MA",Greenfield Town,2,true
+09,73450,22700,"Hartford-West Hartford-East Hartford, CT",East Hartford,1,true
+09,73450,37000,"Hartford-West Hartford-East Hartford, CT",Hartford,1,true
+09,73450,47290,"Hartford-West Hartford-East Hartford, CT",Middletown,1,true
+09,73450,82660,"Hartford-West Hartford-East Hartford, CT",West Hartford,1,true
+33,73750,39300,"Keene, NH",Keene,2,true
+33,73900,40180,"Laconia, NH",Laconia,2,true
+33,74350,41300,"Lebanon, NH-VT",Lebanon,2,true
+25,74500,25485,"Leominster-Gardner, MA",Gardner,1,true
+25,74500,35075,"Leominster-Gardner, MA",Leominster,1,true
+23,74650,02060,"Lewiston-Auburn, ME",Auburn,1,true
+23,74650,38740,"Lewiston-Auburn, ME",Lewiston,1,true
+33,74950,45140,"Manchester, NH",Manchester,1,true
+25,75550,45000,"New Bedford, MA",New Bedford,1,true
+09,75700,52000,"New Haven, CT",New Haven,1,true
+25,76150,46225,"North Adams, MA-VT",North Adams,2,true
+09,76450,52280,"Norwich-New London-Westerly, CT-RI",New London,1,true
+09,76450,56200,"Norwich-New London-Westerly, CT-RI",Norwich,1,true
+44,76450,76820,"Norwich-New London-Westerly, CT-RI",Westerly,1,true
+25,76600,53960,"Pittsfield, MA",Pittsfield,1,true
+23,76750,60545,"Portland-South Portland, ME",Portland,1,true
+23,76750,71990,"Portland-South Portland, ME",South Portland,1,true
+33,76900,62900,"Portsmouth, NH-ME",Portsmouth,1,true
+44,77200,59000,"Providence-Warwick, RI-MA",Providence,1,true
+44,77200,74300,"Providence-Warwick, RI-MA",Warwick,1,true
+50,77650,61225,"Rutland, VT",Rutland,2,true
+23,77950,65725,"Sanford, ME",Sanford,2,true
+25,78100,67000,"Springfield, MA-CT",Springfield,1,true
+09,78400,76500,"Torrington, CT",Torrington,2,true
+25,78500,71970,"Vineyard Haven, MA",Vineyard Haven,2,true
+09,78700,80000,"Waterbury, CT",Waterbury,1,true
+23,78850,80740,"Waterville, ME",Waterville,2,true
+25,79600,82000,"Worcester, MA-CT",Worcester,1,true
