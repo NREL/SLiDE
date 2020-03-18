@@ -231,6 +231,7 @@ function run_yaml(filename::String)
     if haskey(y, "Complete") && y["Complete"]
         println(string("Standardizing ", filename))
         df = unique(edit_with(y))
+
         CSV.write(joinpath(y["PathOut"]...), df)
         return nothing
     else

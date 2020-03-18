@@ -251,5 +251,7 @@ function edit_with(y::Dict{Any,Any}; shorten::Bool = false)
         if isarray(v) ? any(broadcast(<:, typeof.(v), File)) : typeof(v)<:File]
     file = length(file) == 1 ? file[1] : vcat(file...)
     df = edit_with(file, y; shorten=shorten)
+    
+    length(intersect(names(df), [:from,:to])) == 2 ? sort!(df, [:to, :from]) : nothing
     return df
 end

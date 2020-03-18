@@ -1,0 +1,117 @@
+bea_code,bea_desc,bea_windc,category
+111CA,Farms,agr,goods
+113FF,"Forestry, fishing, and related activities",fof,goods
+211,Oil and gas extraction,oil,goods
+212,"Mining, except oil and gas",min,goods
+213,Support activities for mining,smn,goods
+22,Utilities,uti,goods
+23,Construction,con,goods
+321,Wood products,wpd,goods
+327,Nonmetallic mineral products,nmp,goods
+331,Primary metals,pmt,goods
+332,Fabricated metal products,fmt,goods
+333,Machinery,mch,goods
+334,Computer and electronic products,cep,goods
+335,"Electrical equipment, appliances, and components",eec,goods
+3361MV,"Motor vehicles, bodies and trailers, and parts",mot,goods
+3364OT,Other transportation equipment,ote,goods
+337,Furniture and related products,fpd,goods
+339,Miscellaneous manufacturing,mmf,goods
+311FT,Food and beverage and tobacco products,fbp,goods
+313TT,Textile mills and textile product mills,tex,goods
+315AL,Apparel and leather and allied products,alt,goods
+322,Paper products,ppd,goods
+323,Printing and related support activities,pri,goods
+324,Petroleum and coal products,pet,goods
+325,Chemical products,che,goods
+326,Plastics and rubber products,pla,goods
+42,Wholesale trade,wht,goods
+441,Motor vehicle and parts dealers,mvt,goods
+445,Food and beverage stores,fbt,goods
+452,General merchandise stores,gmt,goods
+4A0,Other retail,ott,goods
+481,Air transportation,air,goods
+482,Rail transportation,trn,goods
+483,Water transportation,wtt,goods
+484,Truck transportation,trk,goods
+485,Transit and ground passenger transportation,grd,goods
+486,Pipeline transportation,pip,goods
+487OS,Other transportation and support activities,otr,goods
+493,Warehousing and storage,wrh,goods
+511,"Publishing industries, except internet (includes software)",pub,goods
+512,Motion picture and sound recording industries,mov,goods
+513,Broadcasting and telecommunications,brd,goods
+514,"Data processing, internet publishing, and other information services",dat,goods
+521CI,"Federal Reserve banks, credit intermediation, and related activities",bnk,goods
+523,"Securities, commodity contracts, and investments",sec,goods
+524,Insurance carriers and related activities,ins,goods
+525,"Funds, trusts, and other financial vehicles",fin,goods
+HS,Housing,hou,goods
+ORE,Other real estate,ore,goods
+532RL,Rental and leasing services and lessors of intangible assets,rnt,goods
+5411,Legal services,leg,goods
+5415,Computer systems design and related services,com,goods
+5412OP,"Miscellaneous professional, scientific, and technical services",tsv,goods
+55,Management of companies and enterprises,man,goods
+561,Administrative and support services,adm,goods
+562,Waste management and remediation services,wst,goods
+61,Educational services,edu,goods
+621,Ambulatory health care services,amb,goods
+622,Hospitals,hos,goods
+623,Nursing and residential care facilities,nrs,goods
+624,Social assistance,soc,goods
+711AS,"Performing arts, spectator sports, museums, and related activities",art,goods
+713,"Amusements, gambling, and recreation industries",rec,goods
+721,Accommodation,amd,goods
+722,Food services and drinking places,res,goods
+81,"Other services, except government",osv,goods
+GFGD,Federal general government (defense),fdd,goods
+GFGN,Federal general government (nondefense),fnd,goods
+GFE,Federal government enterprises,fen,goods
+GSLG,State and local general government,slg,goods
+GSLE,State and local government enterprises,sle,goods
+Other,Noncomparable imports and rest-of-the-world adjustment,oth,goods
+Used,"Scrap, used and secondhand goods",use,goods
+T005,Total Intermediate,interm,
+V001,Compensation of employees,compen,valueadded
+V003,Gross operating surplus,surplus,valueadded
+T00OTOP,Other taxes on production,othtax,valueadded
+VABAS,Value Added (basic prices),basicvalueadded,
+T018,Total industry output (basic prices),industryoutput,
+T00TOP,Taxes on products and imports,taxes,taxessubsidies
+T00SUB,Less: Subsidies,subsidies,taxessubsidies
+VAPRO,Value Added (producer prices),valueadded,
+T001,Total Intermediate,totint,
+F010,Personal consumption expenditures,pce,finaldemand
+F02E,Nonresidential private fixed investment in equipment,equipment,finaldemand
+F02N,Nonresidential private fixed investment in intellectual property products,intelprop,finaldemand
+F02R,Residential private fixed investment,residential,finaldemand
+F02S,Nonresidential private fixed investment in structures,structures,finaldemand
+F030,Change in private inventories,changinv,finaldemand
+F040,Exports of goods and services,exports,
+F06C,National defense: Consumption expenditures,defense,finaldemand
+F06E,Federal national defense: Gross investment in equipment,def_equipment,finaldemand
+F06N,Federal national defense: Gross investment in intellectual property products,def_intelprop,finaldemand
+F06S,Federal national defense: Gross investment in structures,def_structures,finaldemand
+F07C,Nondefense: Consumption expenditures,nondefense,finaldemand
+F07E,Federal nondefense: Gross investment in equipment,fed_equipment,finaldemand
+F07N,Federal nondefense: Gross investment in intellectual property products,fed_intelprop,finaldemand
+F07S,Federal nondefense: Gross investment in structures,fed_structures,finaldemand
+F10C,State and local government consumption expenditures,state_consume,finaldemand
+F10E,State and local: Gross investment in equipment,state_equipment,finaldemand
+F10N,State and local: Gross investment in intellectual property products,state_intelprop,finaldemand
+F10S,State and local: Gross investment in structures,state_invest,finaldemand
+T019,Total use of products,totaluse,
+T017,Total industry supply,TotalBasic,
+T007,Total Commodity Output,Output,
+MCIF,Imports,imports,
+MADJ,CIF/FOB Adjustments on Imports,ciffob,
+T013,Total product supply (basic prices),BasicSupply,
+Trade,Trade margins,Margins,
+Trans,Transport margins,TrnCost,
+T014,Total trade and transportation margins,TrdTrn,
+MDTY,Import duties,Duties,
+TOP,Tax on products,Tax,
+SUB,Subsidies,Subsidies,
+T015,Total tax less subsidies on products,TaxLesSubsidies,
+T016,Total product supply (purchaser prices),Supply,

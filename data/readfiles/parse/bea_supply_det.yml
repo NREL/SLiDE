@@ -2,9 +2,9 @@
 # !!!! missing AND 0 values. Should we drop missing or make 0?
 Complete: true
 
-Path: ["..", data, datasources, BEA_2007_2012]
+Path: [.., data, datasources, BEA_2007_2012]
 
-PathOut: ["..", "data", "output", "bea_supply_det.csv"]
+PathOut: [.., data, output, bea_supply_det.csv]
 
 XLSXInput:
   name:  Supply_2007_2012_DET.xlsx
@@ -33,13 +33,17 @@ Melt:
   var: output_bea_code
   val: value
 
+Add:
+  col: units
+  val: millions of us dollars (USD)
+
 Map2:
-  - file:   [parse, bea.csv]
+  - file:   [parse, bea_detail.csv]
     from:   bea_code
     to:     [bea_desc, bea_windc]
     input:  output_bea_code
     output: [output_bea_desc, output_bea_windc]
-  - file:   [parse, bea.csv]
+  - file:   [parse, bea_detail.csv]
     from:   [bea_code, bea_desc]
     to:     bea_windc
     input:  [input_bea_code, input_bea_desc]

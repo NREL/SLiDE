@@ -2,9 +2,9 @@
 # TODO: industry_code, units
 Complete: true
 
-Path:  ["..", "data", "datasources", "BEA", "GDP", "State"]
+Path:  [.., data, datasources, BEA, GDP, State]
 
-PathOut: ["..", "data", "output", "gsp_state.csv"]
+PathOut: [.., data, output, gsp_state.csv]
 
 CSVInput:
   - {name: SAGDP2N__ALL_AREAS_1997_2017.csv,  descriptor: SAGDP2N}
@@ -61,6 +61,11 @@ Map2:
     to:     to
     input:  region_desc
     output: region_desc
+  - file:   [parse, units.csv]
+    from:   from
+    to:     to
+    input:  units
+    output: units
 
 Replace:
   - col:  value

@@ -76,18 +76,6 @@ CSV.write(joinpath(y_map["PathOut"]...), df_map)
 #     global df = vcat(df, df_temp);
 # end
 
-
-# function SLiDE.edit_with(df::DataFrame, x::Map2)
-#     df_map = read_file(x)
-#     df_map = dropmissing(unique(df_map[:,unique([x.from; x.to])]))
-#     [df[!,col] .= convert_type.(unique(typeof.(df_map[:,col_map])), df[:,col])
-#         for (col_map, col) in zip(x.from, x.input)]
-#     df = join(df, df_map, on = collect(zip(x.input, x.from));
-#         kind = :left, makeunique = true)
-
-#     return df
-# end
-
 # # Other edits...
 # df = unique(edit_with(df, y_map["Drop"]))
 # df = unique(edit_with(df, y_map["Map2"]))
