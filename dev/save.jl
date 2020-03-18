@@ -1,4 +1,7 @@
+# Here are little snippets of code that aren't necessarily used anywhere,
+# but are worth saving :)
 
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 # Define tuple of inputs:
 regions = ["co","md","nd","wi"]
 sectors = ["agr","fof"]
@@ -24,10 +27,13 @@ end
 
 fill_zero(inp, d)
 
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+# Get dictionary values with some condition.
 d = Dict(k => v > 0.0 for (k,v) in d)
-
 [k => v > 0.0 for (k,v) in d]
 
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+# Regular expressions
 # GSP FULL_CODE -> STATE_CODE, COUNTY_CODE
 str = "01001"
 match(r"(?<state_code>\d{2})(?<county_code>\d*)", str)

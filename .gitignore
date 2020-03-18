@@ -5,13 +5,15 @@
 data/Edit.jl
 data/scratch*.jl
 data/datasources/
+data/output/
 data/outputs/
 data/old/
 data/old/readfiles/
 data/coremaps/temp/
 data/coremaps/windc/
+data/readfiles/~$*
 data/outputs_csv/
-data/windc_output
+data/windc_output/
 
 docs/build/
 
