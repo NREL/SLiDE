@@ -97,24 +97,6 @@ convert_type(::Type{T}, x::Any) where T = T(x)
 
 convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : false
 
-function convert_type(::Type{DataFrame}, xf::Array{String,1}; colnames = false)
-    xf = [string.(split(reduce(replace, ["." => "|", "\t\"" => "|", "\"," => "", "\"" => ""],
-        init = row), "|")) for row in xf]
-    xf = permutedims(hcat(xf...))
-    ROWS, COLS = size(xf)
-    
-    m = [match.(r"\((.*)\)", row) for row in xf]
-
-    df = vcat([DataFrame(Dict(jj => m[ii,jj] != nothing ? string.(split(m[ii,jj][1], ",")) : xf[ii,jj]
-        for jj in 1:COLS)) for ii in 1:ROWS]...)
-
-    df = edit_with(df, Rename.(names(df), colnames != false ? colnames :
-        [:missing; Symbol.(:missing_, 1:COLS-1)]))
-
-    return COLS > 1 ? sort(df, reverse(names(df)[1:2])) : sort(df)
-end
-
-
 """
 Returns true/false if the the DataType or object is an array.
 """

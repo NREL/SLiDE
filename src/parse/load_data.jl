@@ -35,6 +35,13 @@ the `data/coremaps` directory. It returns a .csv file.
     dictionary. All keys that correspond with SLiDE DataStream DataTypes will be converted
     to (lists of) those types.
 """
+function read_file(path::Array{String,1}, file::GAMSInput)
+    filepath = joinpath(path..., file.name)
+    xf = readlines(filepath)
+    df = gams_to_dataframe(xf; colnames = file.col)
+    return df
+end
+
 function read_file(path::Array{String,1}, file::CSVInput; shorten::Bool=false)
     filepath = joinpath(path..., file.name)
     df = CSV.read(filepath; silencewarnings = true, ignoreemptylines = true)
@@ -95,7 +102,7 @@ end
 function read_file(file::String; colnames = false)
 
     if occursin(".map", file) | occursin(".set", file)
-        return convert_type(DataFrame, readlines(filename); colnames = colnames)
+        return gams_to_dataframe(readlines(file); colnames = colnames)
     end
 
     if occursin(".yml", file) | occursin(".yaml", file)
@@ -246,4 +253,22 @@ function run_yaml(filenames::Array{String,1})
         string.("\n  ", filenames)...,
         "\nAdd \"Complete = true\" to yaml file to run automatically.")) : nothing
     return filenames
+end
+
+"""
+"""
+function gams_to_dataframe(xf::Array{String,1}; colnames = false)
+    df = DataFrame(missing = xf)
+    df = edit_with(df, Match(Regex("^(?<missing>\\S+)\\.(?<missing_1>[\\S^,]*)\\s*\"*(?<missing_2>[^\"]*),?"),
+        :missing, [:missing, :missing_1, :missing_2]))
+    
+    df_set = match.(r"^\((.*)\)", df)
+    df_isset = df_set .!== nothing
+    
+    ROWS, COLS = size(df)
+    df = [[DataFrame(Dict(k => df_isset[ii,k] ? string.(split(df_set[ii,k][1], ",")) : df[ii,k]
+        for k in names(df))) for ii in 1:size(df,1)]...;]
+            
+    df = colnames != false ? edit_with(df, Rename.(names(df), colnames)) : df
+    return COLS > 1 ? sort(df, reverse(names(df)[1:2])) : sort(df)
 end

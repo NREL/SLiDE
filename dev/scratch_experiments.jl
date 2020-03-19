@@ -3,13 +3,6 @@ using DataFrames
 using DelimitedFiles
 using SLiDE
 
-path_in = "../data/mapsources/WiNDC/windc_build/build_files/maps"
-files_in = readdir(path_in)
-
-path_out = "../data/coremaps/parse"
-files_out = [reduce(replace, [".map" => ".csv", "map" => "temp_"], init = x) for x in files_in]
-# files_out = string.("temp_bea.csv")
-
 ############################################################################################
 # EXPERIMENT: How do the sector and good sets compare?
 # Answer: They are the same.

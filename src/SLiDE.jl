@@ -59,6 +59,7 @@ export ensurearray
 export edit_with
 export read_file
 export load_from
+export gams_to_dataframe
 
 export write_yaml
 export run_yaml
