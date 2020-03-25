@@ -54,7 +54,7 @@ Match:
     input:  place_desc
     output: place_desc
 
-Map2:
+Map:
   file:   [scale, census_necta_cities.csv]
   from:   [state_code, necta_code, place_desc]
   to:     [nectapci]

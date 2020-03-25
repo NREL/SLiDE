@@ -19,7 +19,7 @@ Order:
 Rename:
   - {from: to, to: sgf_code}
 
-Map2:
+Map:
   - file:   [.., mapsources, WiNDC, windc_datastream, core_maps, gams, map_sgf.csv]
     from:   from
     to:     to

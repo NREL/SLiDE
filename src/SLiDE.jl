@@ -35,7 +35,6 @@ export Describe
 export Drop
 export Group
 export Map
-export Map2
 export Melt
 export Order
 export Match

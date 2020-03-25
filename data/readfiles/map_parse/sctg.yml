@@ -22,7 +22,7 @@ Rename:
   - {from: Description, to: sctg_desc}
   - {from: SCTG Group,  to: sctg_group}
 
-Map2:
+Map:
 # file:   [.., mapsources, WiNDC, windc_build, build_files, maps, mapcfs.map]
   file:   ../mapsources/WiNDC/windc_build/build_files/maps/mapcfs.map
   from:   missing

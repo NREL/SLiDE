@@ -81,7 +81,7 @@ function edit_with(df::DataFrame, x::Group)
     # Editing with a map will remove all rows that do not contain relevant information.
     # Add a column indicating where each data set STOPS, assuming all completely blank rows
     # were removed by read_file().
-    df_split = edit_with(copy(df), Map2(x.file, [x.from], [x.to], [x.input], [x.output]); kind = :inner);
+    df_split = edit_with(copy(df), Map(x.file, [x.from], [x.to], [x.input], [x.output]); kind = :inner);
     sort!(unique!(df_split), :start)
     df_split[!, :stop] .= vcat(df_split[2:end, :start] .- 2, [size(df)[1]])
 
@@ -96,7 +96,9 @@ function edit_with(df::DataFrame, x::Group)
     return df[:, cols]
 end
 
-function edit_with(df::DataFrame, x::Map2; kind = :left)
+function edit_with(df::DataFrame, x::Map; kind = :left)
+    cols = unique([names(df); x.output])
+
     df_map = read_file(x)
     df_map = dropmissing(unique(df_map[:,unique([x.from; x.to])]))
 
@@ -112,47 +114,8 @@ function edit_with(df::DataFrame, x::Map2; kind = :left)
 
     df = df[:, setdiff(names(df), x.output)]
     df = edit_with(df, Rename.(temp_to, x.output))
-    return df
-end
-
-function edit_with(df::DataFrame, x::Map; kind = :left)
-    # Save the column names in the input dataframe and add the output column. This will
-    # avoid including unnecessary output columns from the map file in the result.
-    cols = unique(push!(names(df), x.output))
-    df_map = read_file(x);
-
-    # Rename the input column in the DataFrame to edit to match that in the mapping df.
-    # This approach was taken as opposed to editing the mapping df to avoid errors in case
-    # the input and output column names are the same. Such is the case if mapping is used to
-    # edit column values for consistency without adding a new column to the DataFrame.
-    # A left join is used to prevent data loss in the case that a value in the input df is
-    # NOT in the input mapping column. If this is the case, this value will map to "missing".
-    # Remove excess blank space from the input column to ensure consistency when joining.
-
-    # !!!! Warning when renaming doesn't happen?
-    x.input == x.from ? nothing : df = edit_with(df, Rename(x.input, x.from));
-    # show(first(df,3))
-    
-    all(typeof.(df_map[:,x.from]) .== String) ?
-        df[!,x.from] .= convert_type.(String, df[:,x.from]) : nothing
-
-    df[!, x.from] .= strip.(df[:, x.from]);
-    df = join(df, df_map, on = x.from, kind = kind, makeunique = true);
-
-    # df[ismissing.(df[:,x.to]), x.to] .=
-    #     convert_type.(String, df[ismissing.(df[:,x.to]), x.from])
-
-    # Return the DataFrame with the columns saved at the top of the method.
-    df = x.input == x.output ? edit_with(df, Rename(x.to, x.output)) :
-                               edit_with(df, Rename.([x.from, x.to], [x.input, x.output]))
-
+    # return df
     return df[:, cols]
-    # !!!! ALTERNATE APPROACH: In the current approach, any row in df that is NOT in df_map
-    # will be removed. This is beneficial when using edit_with(df, x::Group).
-    # In the commented approached, this will return an error. This could prevent data loss
-    # when using edit_with(df, x::Map), where Map is defined in the input yaml file.
-    # dict_map = Dict(k => v for (k, v) in zip(df_map[!, xfrom], df_map[!, xto]))
-    # df[!, x.output] = map(x -> dict_map[x], df[!, x.input])
 end
 
 function edit_with(df::DataFrame, x::Match)

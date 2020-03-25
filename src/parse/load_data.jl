@@ -158,7 +158,7 @@ function load_from(::Type{T}, d::Array{Dict{Any,Any},1}) where T <: Any
 end
 
 function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
-    FILES = [".csv", ".xlsx", ".txt"]
+    FILES = [".csv", ".xlsx", ".txt", ".map", ".set"]
     [(typeof(lst) .== Array{String,1}) &&
             (any(occursin.(FILES, lst[end]))) &&
             (!all([any(occursin.(FILES, v)) for v in lst[1:end-1]])) ?
