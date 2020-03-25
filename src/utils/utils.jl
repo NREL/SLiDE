@@ -80,6 +80,7 @@ convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
 convert_type(::Type{Array{T,1}}, x::Any) where T<:Any = convert_type.(T, x)
 
 convert_type(::Type{T}, x::Missing) where T<:Real = x;
+convert_type(::Type{T}, x::Missing) where T<:AbstractString = x;
 convert_type(::Type{Any}, x::Any) = x
 
 function convert_type(

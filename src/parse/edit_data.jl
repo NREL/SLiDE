@@ -202,11 +202,12 @@ function edit_with(df::DataFrame, x::Rename)
 end
 
 function edit_with(df::DataFrame, x::Replace)
-    any(ismissing.(df[:,x.col])) ?
-        df[!,x.col] .= convert_type.(String, df[:,x.col]) : nothing
-
-        (x.col in names(df)) & (x.from in strip.(df[:,x.col])) ?
-            df[!, x.col][strip.(df[:, x.col]) .== x.from] .= x.to : nothing
+    if x.col in names(df)
+        df[!, x.col] .= convert_type.(String, df[:, x.col])
+        x.from == "missing" ?
+            df[ismissing.(df[:,x.col]), x.col] .= x.to :
+            df[!, x.col][strip.(string.(df[:,x.col])) .== x.from] .= x.to
+    end
     return df
 end
 

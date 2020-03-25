@@ -235,10 +235,9 @@ write_yaml(path, files::Array{XLSXInput,1}) = vcat([write_yaml(path, f) for f in
 """
 function run_yaml(filename::String)    
     y = read_file(filename)
-    if haskey(y, "Complete") && y["Complete"]
+    if haskey(y, "Editable") && y["Editable"]
         println(string("Standardizing ", filename))
         df = unique(edit_with(y))
-
         CSV.write(joinpath(y["PathOut"]...), df)
         return nothing
     else
@@ -251,7 +250,7 @@ function run_yaml(filenames::Array{String,1})
     filenames = filenames[filenames .!== nothing]
     length(filenames) > 0 ? @warn(string("run_yaml() generated no output for:",
         string.("\n  ", filenames)...,
-        "\nAdd \"Complete = true\" to yaml file to run automatically.")) : nothing
+        "\nAdd \"Editable: true\" to yaml file to run automatically.")) : nothing
     return filenames
 end
 

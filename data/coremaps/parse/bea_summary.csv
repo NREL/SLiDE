@@ -72,23 +72,23 @@ GSLG,State and local general government,slg,gds
 GSLE,State and local government enterprises,sle,gds
 Other,Noncomparable imports and rest-of-the-world adjustment,oth,gds
 Used,"Scrap, used and secondhand goods",use,gds
-T005,Total Intermediate,interm,missing
+T005,Total Intermediate,interm,
 V001,Compensation of employees,compen,valueadded
 V003,Gross operating surplus,surplus,valueadded
 T00OTOP,Other taxes on production,othtax,valueadded
-VABAS,Value Added (basic prices),basicvalueadded,missing
-T018,Total industry output (basic prices),industryoutput,missing
+VABAS,Value Added (basic prices),basicvalueadded,
+T018,Total industry output (basic prices),industryoutput,
 T00TOP,Taxes on products and imports,taxes,taxessubsidies
 T00SUB,Less: Subsidies,subsidies,taxessubsidies
-VAPRO,Value Added (producer prices),valueadded,missing
-T001,Total Intermediate,totint,missing
+VAPRO,Value Added (producer prices),valueadded,
+T001,Total Intermediate,totint,
 F010,Personal consumption expenditures,pce,finaldemand
 F02E,Nonresidential private fixed investment in equipment,equipment,finaldemand
 F02N,Nonresidential private fixed investment in intellectual property products,intelprop,finaldemand
 F02R,Residential private fixed investment,residential,finaldemand
 F02S,Nonresidential private fixed investment in structures,structures,finaldemand
 F030,Change in private inventories,changinv,finaldemand
-F040,Exports of goods and services,exports,missing
+F040,Exports of goods and services,exports,
 F06C,National defense: Consumption expenditures,defense,finaldemand
 F06E,Federal national defense: Gross investment in equipment,def_equipment,finaldemand
 F06N,Federal national defense: Gross investment in intellectual property products,def_intelprop,finaldemand
@@ -101,17 +101,17 @@ F10C,State and local government consumption expenditures,state_consume,finaldema
 F10E,State and local: Gross investment in equipment,state_equipment,finaldemand
 F10N,State and local: Gross investment in intellectual property products,state_intelprop,finaldemand
 F10S,State and local: Gross investment in structures,state_invest,finaldemand
-T019,Total use of products,totaluse,missing
-T017,Total industry supply,TotalBasic,missing
-T007,Total Commodity Output,Output,missing
-MCIF,Imports,imports,missing
-MADJ,CIF/FOB Adjustments on Imports,ciffob,missing
-T013,Total product supply (basic prices),BasicSupply,missing
-Trade,Trade margins,Margins,missing
-Trans,Transport margins,TrnCost,missing
-T014,Total trade and transportation margins,TrdTrn,missing
-MDTY,Import duties,Duties,missing
-TOP,Tax on products,Tax,missing
-SUB,Subsidies,Subsidies,missing
-T015,Total tax less subsidies on products,TaxLesSubsidies,missing
-T016,Total product supply (purchaser prices),Supply,missing
+T019,Total use of products,totaluse,
+T017,Total industry supply,TotalBasic,
+T007,Total Commodity Output,Output,
+MCIF,Imports,imports,
+MADJ,CIF/FOB Adjustments on Imports,ciffob,
+T013,Total product supply (basic prices),BasicSupply,
+Trade,Trade margins,Margins,
+Trans,Transport margins,TrnCost,
+T014,Total trade and transportation margins,TrdTrn,
+MDTY,Import duties,Duties,
+TOP,Tax on products,Tax,
+SUB,Subsidies,Subsidies,
+T015,Total tax less subsidies on products,TaxLesSubsidies,
+T016,Total product supply (purchaser prices),Supply,

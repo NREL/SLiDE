@@ -59,7 +59,7 @@ if length(filename) > 0
     println(string("Standardizing ", filename[1]))
     y = read_file(filename[1])
     df = read_file(y["Path"], y["CSVInput"])
-
+    
     col = :naics_level
     input = [:naics_code, :naics_desc]
     vals = ["sector", "subsector", "industry_group", "naics_industry", "national_industry"]

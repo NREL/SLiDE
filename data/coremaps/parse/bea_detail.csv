@@ -404,40 +404,40 @@ S00401,Scrap,srp_use,gds
 S00402,Used and secondhand goods,sec_use,gds
 S00300,Noncomparable imports,imp_oth,gds
 S00900,Rest of the world adjustment,rwa_oth,gds
-T017,Total industry supply,TotalBasic,missing
+T017,Total industry supply,TotalBasic,
 331314,Secondary smelting and alloying of aluminum,sme_pmt,gds
-MDTY,Import duties,Duties,missing
-TOP,Tax on products,Tax,missing
-SUB,Subsidies,Subsidies,missing
+MDTY,Import duties,Duties,
+TOP,Tax on products,Tax,
+SUB,Subsidies,Subsidies,
 S00101,Federal electric utilities,ele_fen,gds
 S00201,State and local government passenger transit,trn_sle,gds
 S00202,State and local government electric utilities,ele_sle,gds
-T007,Total Commodity Output,Output,missing
-MCIF,Imports,imports,missing
-TRADE,Trade margins,Margins,missing
-MADJ,CIF/FOB Adjustments on Imports,ciffob,missing
-TRANS,Transportation costs,TrnCost,missing
-T013,Total product supply (basic prices),BasicSupply,missing
-T014,Total trade and transportation margins,TrdTrn,missing
-T015,Total tax less subsidies on products,TaxLesSubsidies,missing
-T016,Total product supply (purchaser prices),Supply,missing
-T005,Total intermediate inputs,interm,missing
+T007,Total Commodity Output,Output,
+MCIF,Imports,imports,
+TRADE,Trade margins,Margins,
+MADJ,CIF/FOB Adjustments on Imports,ciffob,
+TRANS,Transportation costs,TrnCost,
+T013,Total product supply (basic prices),BasicSupply,
+T014,Total trade and transportation margins,TrdTrn,
+T015,Total tax less subsidies on products,TaxLesSubsidies,
+T016,Total product supply (purchaser prices),Supply,
+T005,Total intermediate inputs,interm,
 V00100,Compensation of employees,compen,valueadded
 T00OTOP,Other taxes on production,othtax,valueadded
 V00300,Gross operating surplus,surplus,valueadded
-VABAS,Value added (basic value),basicvalueadded,missing
-T018,Total industry output (basic value),industryoutput,missing
-T00TOP,Plus: Taxes on products and imports,taxes,missing
-T00SUB,Less: Subsidies,subsidies,missing
-VAPRO,Value added (producer value),valueadded,missing
-T001,Total Intermediate,totint,missing
+VABAS,Value added (basic value),basicvalueadded,
+T018,Total industry output (basic value),industryoutput,
+T00TOP,Plus: Taxes on products and imports,taxes,
+T00SUB,Less: Subsidies,subsidies,
+VAPRO,Value added (producer value),valueadded,
+T001,Total Intermediate,totint,
 F01000,Personal consumption expenditures,pce,finaldemand
 F02E00,Nonresidential private fixed investment in equipment,equipment,finaldemand
 F02N00,Nonresidential private fixed investment in intellectual property products,intelprop,finaldemand
 F02R00,Residential private fixed investment,residential,finaldemand
 F02S00,Nonresidential private fixed investment in structures,structures,finaldemand
 F03000,Change in private inventories,changinv,finaldemand
-F04000,Exports of goods and services,exports,missing
+F04000,Exports of goods and services,exports,
 F06C00,Federal Government defense: Consumption expenditures,defense,finaldemand
 F06E00,Federal national defense: Gross investment in equipment,def_equipment,finaldemand
 F07C00,Federal Government nondefense: Consumption expenditures,nondefense,finaldemand
@@ -450,4 +450,4 @@ F10C00,State and local government consumption expenditures,state_consume,finalde
 F10E00,State and local: Gross investment in equipment,state_equipment,finaldemand
 F10N00,State and local: Gross investment in intellectual property products,state_intelprop,finaldemand
 F10S00,State and local: Gross investment in structures,state_invest,finaldemand
-T019,Total use of products,totaluse,missing
+T019,Total use of products,totaluse,
