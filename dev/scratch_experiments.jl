@@ -4,6 +4,19 @@ using DelimitedFiles
 using SLiDE
 
 ############################################################################################
+# EXPERIMENT: Units?
+# Answer: 
+path = "../data/output"
+files = readdir(path)
+files = files[occursin.(".csv", files)]
+
+files = ["bea_supply.csv", "cfs.csv", "crude_oil.csv", "emissions.csv", "gsp_state.csv",
+ "heatrate.csv", "nass.csv", "pce.csv", "seds.csv", "sgf_1997.csv", "utd.csv"]
+ 
+
+# for f in files
+
+############################################################################################
 # EXPERIMENT: How do the sector and good sets compare?
 # Answer: They are the same.
 # path = "../data/windc_output/3_build"

@@ -9,12 +9,12 @@ using SLiDE
 #     end
 # end
 
-function SLiDE.read_file(path::Array{String,1}, file::GAMSInput; shorten = false)
-    filepath = joinpath(path..., file.name)
-    xf = readlines(filepath)
-    df = gams_to_dataframe(xf; colnames = file.col)
-    return df
-end
+# function SLiDE.read_file(path::Array{String,1}, file::GAMSInput; shorten = false)
+#     filepath = joinpath(path..., file.name)
+#     xf = readlines(filepath)
+#     df = gams_to_dataframe(xf; colnames = file.col)
+#     return df
+# end
 
 path_in_1 = "../data/mapsources/WiNDC/windc_build/build_files/user_defined_schemes/"
 files_in_1 = ["bluenote.set"]

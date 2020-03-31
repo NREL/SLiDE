@@ -7,19 +7,10 @@ using YAML
 
 using SLiDE  # see src/SLiDE.jl
 
-# function SLiDE.run_yaml(filenames::Array{String,1})
-#     filenames = [run_yaml(f) for f in filenames]
-#     filenames = filenames[filenames .!== nothing]
-#     length(filenames) > 0 ? @warn(string("run_yaml() generated no output for:",
-#         string.("\n  ", filenames)...,
-#         "\nAdd \"Complete = true\" to yaml file to run automatically.")) : nothing
-#     return filenames
-# end
-
 READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "readfiles"))
 
-files_map = [XLSXInput("generate_yaml.xlsx", "map_parse", "B1:Z150", "map_parse"),
-             XLSXInput("generate_yaml.xlsx", "map_scale", "B1:Z150", "map_scale")]
+files_map = [XLSXInput("generate_yaml.xlsx", "map_parse", "B1:Z150", "map_parse")]
+            #  XLSXInput("generate_yaml.xlsx", "map_scale", "B1:Z150", "map_scale")]
 
 files_map = write_yaml(READ_DIR, files_map)
 files_map = run_yaml(files_map)

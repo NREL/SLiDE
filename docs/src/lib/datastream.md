@@ -6,14 +6,26 @@
 
 [`SLiDE.Rename`](@ref)
 
-[`SLiDE.Group`](@ref)
-
-```jldoctest DataStreamGroup
+```jldoctest DataStreamRename
 julia> using SLiDE, DataFrames
 
 julia> df = DataFrame(
-           sector = ["Colorado", "A", "B", "Wisconsin", "A", "B"],
+           Item = ["Colorado", "A", "B", "Wisconsin", "A", "B"],
            value = ["", 1, 2, "", 3, 4])
+6×2 DataFrames.DataFrame
+│ Row │ Item      │ value │
+│     │ String    │ Any   │
+├─────┼───────────┼───────┤
+│ 1   │ Colorado  │       │
+│ 2   │ A         │ 1     │
+│ 3   │ B         │ 2     │
+│ 4   │ Wisconsin │       │
+│ 5   │ A         │ 3     │
+│ 6   │ B         │ 4     │
+
+julia> editor = SLiDE.Rename(from = :Item, to = :sector);
+
+julia> df = SLiDE.edit_with(df, editor)
 6×2 DataFrames.DataFrame
 │ Row │ sector    │ value │
 │     │ String    │ Any   │
@@ -24,9 +36,19 @@ julia> df = DataFrame(
 │ 4   │ Wisconsin │       │
 │ 5   │ A         │ 3     │
 │ 6   │ B         │ 4     │
+```
+
+[`SLiDE.Group`](@ref)
+
+```jldoctest DataStreamGroup
+julia> using SLiDE, DataFrames
+
+julia> df = DataFrame(
+           sector = ["Colorado", "A", "B", "Wisconsin", "A", "B"],
+           value = ["", 1, 2, "", 3, 4]);
 
 julia> editor = SLiDE.Group(
-           file = "std/regions.csv",
+           file = joinpath("parse","regions.csv"),
            from = :from,
            to = :to,
            input = :sector,
@@ -48,8 +70,6 @@ julia> df = SLiDE.edit_with(df, editor)
 [`SLiDE.Add`](@ref)
 
 [`SLiDE.Map`](@ref)
-
-[`SLiDE.Join`](@ref)
 
 [`SLiDE.Replace`](@ref)
 

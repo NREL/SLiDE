@@ -25,8 +25,7 @@ Map:
     to:     to
     input:  sgf_desc
     output: sgf_code
-# - file:   [.., mapsources, WiNDC, windc_build, build_files, maps, mapsgf.map]
-  - file:   ../mapsources/WiNDC/windc_build/build_files/maps/mapsgf.map
+  - file:   [.., mapsources, WiNDC, windc_build, build_files, maps, mapsgf.map]
     from:   missing_1
     to:     missing
     input:  sgf_code

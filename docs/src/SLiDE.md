@@ -19,13 +19,11 @@ SLiDE
 SLiDE.Add
 SLiDE.Describe
 SLiDE.Group
-SLiDE.Join
 SLiDE.Map
 SLiDE.Melt
 SLiDE.Order
 SLiDE.Rename
 SLiDE.Replace
-SLiDE.Split
 ```
 
 ```@docs
@@ -39,4 +37,6 @@ SLiDE.XLSXInput
 SLiDE.edit_with
 SLiDE.load_from
 SLiDE.read_file
+SLiDE.write_yaml
+SLiDE.run_yaml
 ```

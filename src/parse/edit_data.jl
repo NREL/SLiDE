@@ -52,20 +52,40 @@ function edit_with(df::DataFrame, x::Add)
     return df
 end
 
+# function edit_with(df::DataFrame, x::Drop)
+#     if x.col in names(df)
+#         # Drop an entire column. It is helpful to remove dead weight with the first edit.
+#         if occursin(lowercase(x.val), "all")
+#             df = df[:, setdiff(names(df), [x.col])]
+#         else
+#             # Look for a specific indicator: 
+#             if typeof(x.val) == String
+#                 occursin(lowercase(x.val), "all") ? df = df[:, setdiff(names(df), [x.col])] :
+#                     occursin(lowercase(x.val), "missing") ? dropmissing!(df, x.col) :
+#                         occursin(lowercase(x.val), "unique") ? unique!(df, x.col) : nothing
+#             end
+#             # !!!! Add error if broadcast not possible.
+#             df = df[.!broadcast(datatype(x.operation), df[:,x.col], x.val), :]
+#         end
+#     end
+#     return df
+# end
+
 function edit_with(df::DataFrame, x::Drop)
-    
     if x.col in names(df)
-        if occursin(lowercase(x.val), "all")
+        # Drop an entire column. It is helpful to remove dead weight with the first edit.
+        if (typeof(x.val) == String) && occursin(lowercase(x.val), "all")
             df = df[:, setdiff(names(df), [x.col])]
 
+        # Drop rows based on value.
         else
-
             if typeof(x.val) == String
-                occursin(lowercase(x.val), "all") ? df = df[:, setdiff(names(df), [x.col])] :
-                    occursin(lowercase(x.val), "missing") ? dropmissing!(df, x.col) :
-                        occursin(lowercase(x.val), "unique") ? unique!(df, x.col) : nothing
+                occursin(lowercase(x.val), "missing") ? dropmissing!(df, x.col) :
+                    occursin(lowercase(x.val), "unique") ? unique!(df, x.col) : nothing
             end
+            # Perform generalized drops specified by the operation field.
             # !!!! Add error if broadcast not possible.
+            df[!,x.col] .= convert_type.(typeof(x.val), df[:,x.col])
             df = df[.!broadcast(datatype(x.operation), df[:,x.col], x.val), :]
         end
     end
@@ -97,33 +117,46 @@ function edit_with(df::DataFrame, x::Group)
 end
 
 function edit_with(df::DataFrame, x::Map; kind = :left)
+    # Save all input column names, read the map file, and isolate relevant columns.
+    # This prevents duplicate columns in the final DataFrame.
     cols = unique([names(df); x.output])
-
     df_map = read_file(x)
     df_map = dropmissing(unique(df_map[:,unique([x.from; x.to])]))
 
+    # Rename columns in the mapping DataFrame to temporary values in case any of these
+    # columns were already present in the input DataFrame.
     temp_to = Symbol.(string.("to_", 1:length(x.to)))
     temp_from = Symbol.(string.("from_", 1:length(x.from)))
     df_map = edit_with(df_map, Rename.([x.to; x.from], [temp_to; temp_from]))
 
+    # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
+    # DataFrame are used since (!!!! assuming all missing values were dropped), all values
+    # in the mapping DataFrame should be the same.
     [df[!,col] .= convert_type.(unique(typeof.(df_map[:,col_map])), df[:,col])
         for (col_map, col) in zip(temp_from, x.input)]
 
     df = join(df, df_map, on = Pair.(x.input, temp_from);
         kind = kind, makeunique = true)
-
+    
+    # Remove all output column names that might already be in the DataFrame. These will be
+    # overwritten by the columns from the mapping DataFrame. Finally, remane mapping "to"
+    # columns from their temporary to output values.
     df = df[:, setdiff(names(df), x.output)]
     df = edit_with(df, Rename.(temp_to, x.output))
-    # return df
+
     return df[:, cols]
 end
 
 function edit_with(df::DataFrame, x::Match)
-    !all(typeof(df[:,x.input]).==String) ?
+    # First, ensure that all row values are strings that can be matched with a Regex.
+    !all(typeof(df[:,x.input]) .== String) ?
         df[!,x.input] .= convert_type.(String, df[:,x.input]) : nothing
-
+    
+    # Add empty columns for all output columns not already in the DataFrame.
     cols = setdiff(x.output, names(df))
     df = edit_with(df, Add.(cols, fill("", size(cols))))
+
+    # Find all matches! Where there is a match, fill in the empty cells.
     m = match.(x.on, df[:, x.input])
     [m[ii] != nothing ? [df[ii,out] = m[ii][out] for out in x.output] : nothing
         for ii in 1:length(m)]
@@ -131,7 +164,7 @@ function edit_with(df::DataFrame, x::Match)
 end
 
 function edit_with(df::DataFrame, x::Melt)
-    on = intersect(x.on, names(df))  # Melt on present.
+    on = intersect(x.on, names(df))
     df = melt(df, on, variable_name = x.var, value_name = x.val)
     df[!, x.var] .= convert_type.(String, df[:, x.var])
     return df
@@ -180,15 +213,15 @@ function edit_with(df::DataFrame, lst::Array{T}) where T<:Edit
 end
 
 function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
-    df = edit_with(df, Add(x.col, file.descriptor))
-    return df
+    return edit_with(df, Add(x.col, file.descriptor))
 end
 
 function edit_with(file::T, y::Dict{Any,Any}; shorten::Bool=false) where T<:File
     df = read_file(y["Path"], file; shorten=shorten);
-
-    # Specify the order in which edits must occur.
-    EDITS = ["Drop", "Rename", "Group", "Match", "Melt", "Add", "Map", "Map2", "Replace"]
+    
+    # Specify the order in which edits must occur. "Drop" is included twice, once at the
+    # beginning and once at the end. First, drop entire columns. Last, drop specific values.
+    EDITS = ["Drop", "Rename", "Group", "Match", "Melt", "Add", "Map", "Replace"]
 
     # Find which of these edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, [k for k in keys(y)]);
