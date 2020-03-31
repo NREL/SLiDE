@@ -40,8 +40,9 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 
 # Keywords
 
-- `shorten::Bool = false`: if true, a shortened form of the dataframe will be read.
-    This is meant to aid troubleshooting during development.
+- `shorten::Bool = false` or `shorten::Int`: if an integer length is specified, the
+    DataFrame will be shortened to the input value. This is meant to aid troubleshooting
+    during development.
 
 # Returns
 
@@ -216,8 +217,8 @@ function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
     return edit_with(df, Add(x.col, file.descriptor))
 end
 
-function edit_with(file::T, y::Dict{Any,Any}; shorten::Bool=false) where T<:File
-    df = read_file(y["Path"], file; shorten=shorten);
+function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
+    df = read_file(y["Path"], file; shorten = shorten);
     
     # Specify the order in which edits must occur. "Drop" is included twice, once at the
     # beginning and once at the end. First, drop entire columns. Last, drop specific values.
@@ -237,17 +238,17 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten::Bool=false) where T<:File
     return df
 end
 
-function edit_with(files::Array{T}, y::Dict{Any,Any}; shorten::Bool=false) where T<:File
+function edit_with(files::Array{T}, y::Dict{Any,Any}; shorten = false) where T<:File
     df = DataFrame();
-    [df = vcat(df, edit_with(file, y; shorten=shorten)) for file in files]
+    [df = vcat(df, edit_with(file, y; shorten = shorten)) for file in files]
     return df
 end
 
-function edit_with(y::Dict{Any,Any}; shorten::Bool = false)
+function edit_with(y::Dict{Any,Any}; shorten = false)
     file = [v for (k,v) in y
         if isarray(v) ? any(broadcast(<:, typeof.(v), File)) : typeof(v)<:File]
     file = length(file) == 1 ? file[1] : vcat(file...)
-    df = edit_with(file, y; shorten=shorten)
+    df = edit_with(file, y; shorten = shorten)
     
     length(intersect(names(df), [:from,:to])) == 2 ? sort!(df, [:to, :from]) : nothing
     return df

@@ -24,8 +24,9 @@ the `data/coremaps` directory. It returns a .csv file.
 
 # Keywords
 
-- `shorten::Bool = false`: if true, a shortened form of the dataframe will be read.
-    This is meant to aid troubleshooting during development.
+- `shorten::Bool = false` or `shorten::Int`: if an integer length is specified, the
+    DataFrame will be shortened to the input value. This is meant to aid troubleshooting
+    during development.
 
 # Returns
 
@@ -41,7 +42,7 @@ function read_file(path::Array{String,1}, file::GAMSInput)
     return df
 end
 
-function read_file(path::Array{String,1}, file::CSVInput; shorten::Bool=false)
+function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
     filepath = joinpath(path..., file.name)
     df = CSV.read(filepath; silencewarnings = true, ignoreemptylines = true)
 
@@ -68,11 +69,12 @@ function read_file(path::Array{String,1}, file::CSVInput; shorten::Bool=false)
         df = df[1:FOOT,:]
     end
 
-    df = shorten ? df[1:min(2,size(df)[1]),:] : df;  # dev utility
+    shorten != false ? df = df[1:shorten,:] : nothing
+    # df = shorten ? df[1:min(2,size(df)[1]),:] : df;  # dev utility
     return unique(df)
 end
 
-function read_file(path::Array{String,1}, file::XLSXInput; shorten::Bool=false)
+function read_file(path::Array{String,1}, file::XLSXInput; shorten = false)
     filepath = joinpath(path..., file.name)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
     
@@ -80,12 +82,11 @@ function read_file(path::Array{String,1}, file::XLSXInput; shorten::Bool=false)
     xf = xf[[!all(row) for row in eachrow(ismissing.(xf))],:]
     df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique = true)
 
-    df = shorten ? df[1:min(2,size(df)[1]),1:min(4,size(df)[2])] : df;  # dev utility
-    
+    shorten != false ? df = df[1:shorten,:] : nothing
     return df
 end
 
-function read_file(path::String, file::T; shorten::Bool=false) where T <: File
+function read_file(path::String, file::T; shorten = false) where T <: File
     return read_file([path], file; shorten = shorten)
 end
 
@@ -293,19 +294,44 @@ function run_yaml(filenames::Array{String,1})
 end
 
 """
+    gams_to_dataframe(xf::Array{String,1}; colnames = false)
+
+This function converts a GAMS map or set to a DataFrame, expanding sets into multiple rows.
+
+# Arguments
+
+- `xf::Array{String,1}`: A list of rows of text from a .map or a .set input file.
+
+# Keywords
+
+- `colnames = false`: A user has the option to specify the column names of the output
+    DataFrame. If none are specified, a default of `[missing, missing_1, ...]` will be used,
+    consistent with the default column headers for `CSV.read()` if column names are missing.
+
+# Returns
+
+- `df::DataFrame`: A dataframe representation of the GAMS map or set.
+
 """
 function gams_to_dataframe(xf::Array{String,1}; colnames = false)
+    # Convert the input array into a DataFrame and use SLiDE editing capabilities to split
+    # each rows into columns, based on the syntax.
     df = DataFrame(missing = xf)
     df = edit_with(df, Match(Regex("^(?<missing>\\S+)\\.(?<missing_1>[\\S^,]*)\\s*\"*(?<missing_2>[^\"]*),?"),
         :missing, [:missing, :missing_1, :missing_2]))
-    
+    ROWS, COLS = size(df)
+
+    # Does the DataFrame row contain a set (indicated by parentheses)?
     df_set = match.(r"^\((.*)\)", df)
     df_isset = df_set .!== nothing
-    
-    ROWS, COLS = size(df)
+
+    # If so, expand into multiple rows by converting the row into a dictionary -- with
+    # column names as keys and the set divided into a list -- and back into a DataFrame.
     df = [[DataFrame(Dict(k => df_isset[ii,k] ? string.(split(df_set[ii,k][1], ",")) : df[ii,k]
-        for k in names(df))) for ii in 1:size(df,1)]...;]
-            
+        for k in names(df))) for ii in 1:ROWS]...;]
+    
+    # If the user specified column names, apply those here and
+    # return a DataFrame sorted based on the mapping values.
     df = colnames != false ? edit_with(df, Rename.(names(df), colnames)) : df
     return COLS > 1 ? sort(df, reverse(names(df)[1:2])) : sort(df)
 end

@@ -39,4 +39,5 @@ SLiDE.load_from
 SLiDE.read_file
 SLiDE.write_yaml
 SLiDE.run_yaml
+SLiDE.gams_to_dataframe
 ```

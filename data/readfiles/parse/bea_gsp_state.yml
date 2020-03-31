@@ -79,6 +79,3 @@ Drop:
   - col: component
     val: missing
     operation: "=="
-  - col: value
-    val: 10.0
-    operation: "<"
