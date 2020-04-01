@@ -46,31 +46,12 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 
 # Returns
 
-- `df::DataFrame`: Including edit(s).
+- `df::DataFrame`: including edit(s)
 """
 function edit_with(df::DataFrame, x::Add)
     df[!, x.col] .= x.val
     return df
 end
-
-# function edit_with(df::DataFrame, x::Drop)
-#     if x.col in names(df)
-#         # Drop an entire column. It is helpful to remove dead weight with the first edit.
-#         if occursin(lowercase(x.val), "all")
-#             df = df[:, setdiff(names(df), [x.col])]
-#         else
-#             # Look for a specific indicator: 
-#             if typeof(x.val) == String
-#                 occursin(lowercase(x.val), "all") ? df = df[:, setdiff(names(df), [x.col])] :
-#                     occursin(lowercase(x.val), "missing") ? dropmissing!(df, x.col) :
-#                         occursin(lowercase(x.val), "unique") ? unique!(df, x.col) : nothing
-#             end
-#             # !!!! Add error if broadcast not possible.
-#             df = df[.!broadcast(datatype(x.operation), df[:,x.col], x.val), :]
-#         end
-#     end
-#     return df
-# end
 
 function edit_with(df::DataFrame, x::Drop)
     if x.col in names(df)

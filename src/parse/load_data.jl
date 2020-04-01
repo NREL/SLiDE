@@ -63,6 +63,8 @@ function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
             header = HEAD);
     end
 
+    # Remove footer rows. These are identified by rows at the bottom of the sheet that are
+    # empty with the exception of the first column.
     if all(ismissing.(values(df[end,2:end])))
         x = sum.([Int.(ismissing.(values(row))) for row in eachrow(df[end-NUMTEST:end,:])]);
         FOOT = size(df)[1] - (length(x) - (findmax(x)[2]-1))
@@ -70,7 +72,6 @@ function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
     end
 
     shorten != false ? df = df[1:shorten,:] : nothing
-    # df = shorten ? df[1:min(2,size(df)[1]),:] : df;  # dev utility
     return unique(df)
 end
 

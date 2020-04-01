@@ -1,72 +1,63 @@
-Path: ["data"]
+Path: [data]
 
 CSVInput:
     name: test_datastream.csv
-    descriptor: 1997
+    descriptor: 2020
 
-XLSXInput:
-    name:   test_datastream.xlsx
-    sheet:
-      - 1999
-      - 2000
-    range:  B7:J14
-    descriptor:
-      - 1999
-      - 2000
-
-Describe:
-    col:  year
-
-Order:
-    - {col: year,       type: Int}
-    # - {col: from_code, type: String}
-    # - {col: from_desc, type: String}
-    - {col: from_aggr,  type: String}
-    # - {col: to_code,   type: String}
-    # - {col: to_desc,   type: String}
-    - {col: to_aggr,    type: String}
-    - {col: value,      type: Int}
-    - {col: units,      type: String}
+# Order:
+#     - {col: year,       type: Int}
+#     # - {col: from_code, type: String}
+#     # - {col: from_desc, type: String}
+#     - {col: from_aggr,  type: String}
+#     # - {col: to_code,   type: String}
+#     # - {col: to_desc,   type: String}
+#     - {col: to_aggr,    type: String}
+#     - {col: value,      type: Int}
+#     - {col: units,      type: String}
     
 Rename:
-    - from: IOCode
-      to:   from_code
-    - from: Name
-      to:   from_desc
+  - from: IOCode
+    to:   input_code
+  - from: Name
+    to:   input_desc
+
+Group:
+  file:   [parse, regions.csv]
+  from:   from
+  to:     to
+  input:  input_code
+  output: region
+
+Match:
+  on:     \((?<input_code>.*)\)
+  input:  input_code
+  output: input_code
 
 Melt:
-    on:
-      - from_code
-      - from_desc
-    var:  to_desc
-    val:  value
-    type: Any
+  on:  [input_code, region]
+  var: year
+  val: value
 
 Map:
-    file:   regions.csv
-    from:   from
-    to:     to
-    input:  region
-    output: region
-
-Join:
-    - file:   bea_all.csv
-      on:     from_desc
-      prefix: from
-    - file:   bea_all.csv
-      on:     to_desc
-      prefix: to
+    file:   [parse, bea.csv]
+    from:   bea_code
+    to:     [bea_desc, bea_windc]
+    input:  input_code
+    output: [input_desc, input_windc]
 
 Add:
-    - col:  region
-      val:  Colorado
-    - col:  units
-      val:  millions of us dollars (USD)
+  col:  units
+  val:  USD
 
 Replace:
-    - col:  value
-      from: ...
-      to:   0
-    - col:  value
-      from: missing
-      to:   0
+  col:  value
+  from: missing
+  to:   0
+
+Drop:
+  - col: linenum
+    val: all
+    operation: "=="
+  - col: value
+    val: 0
+    operation: "<"
