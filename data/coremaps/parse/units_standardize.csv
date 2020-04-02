@@ -1,0 +1,4 @@
+from,factor,to
+millions of us dollars (USD),1.0,millions of us dollars (USD)
+thousands of us dollars (USD),0.001,millions of us dollars (USD)
+us dollars (USD),1.0e-6,millions of us dollars (USD)

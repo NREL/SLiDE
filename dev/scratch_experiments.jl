@@ -12,133 +12,47 @@ files = files[occursin.(".csv", files)]
 
 files = ["bea_supply.csv", "cfs.csv", "crude_oil.csv", "emissions.csv", "gsp_state.csv",
     "heatrate.csv", "nass.csv", "pce.csv", "seds.csv", "sgf_1997.csv", "utd.csv"];
-files = joinpath.(path, files)
-files = files[[9]]
 
-df = read_file(files[1])
+df_units = DataFrame()
 
-# units = DataFrame()
+for f in files
+    df = read_file(joinpath(path,f))
+    df = unique(df[:, occursin.(:units, names(df))])
+    d = Dict(:file => f, :units => [[col for col in eachcol(df)]...;])
+    global df_units = [df_units; DataFrame(d)]
+end
 
-# for f in files
-#     df = read_file(joinpath(path,f))
-#     df = unique(df[:, occursin.(:units, names(df))])
+# fseds = "../data/mapsources/WiNDC/windc_datastream/core_maps/seds.csv"
+# funits = "../data/mapsources/WiNDC/windc_datastream/core_maps/units.csv"
+fseds = "../data/output/seds.csv"
+funits = "../data/coremaps/parse/units.csv"
 
-#     d = Dict(:file => f, :units => [[col for col in eachcol(df)]...;])
-#     global units = [units; DataFrame(d)]
-# end
-
-fseds = "../data/mapsources/WiNDC/windc_datastream/core_maps/seds.csv"
-funits = "../data/mapsources/WiNDC/windc_datastream/core_maps/units.csv"
-
-# dfs = read_file(fseds)
+df_seds = read_file(fseds)
 # dfs = edit_with(unique(dfs[:,[:units_abbv,:units]]), Rename.([:units_abbv,:units], [:from,:to]))
 
-# df_units = read_file(funits)
 
-# df_mult = unique(df_units[:, [:to]])
+df_units_map = read_file(funits);
+df_mult = unique(df_units_map[:, [:to]]);
+
+unused_units = setdiff(df_units_map[:,:to], df_units[:,:units])
+unlisted_units = setdiff(df_units[:,:units], df_units_map[:,:to])
+listed_units = intersect(df_units[:,:units], df_units_map[:,:to])
+
+df_unused = filter(row -> row[:to] in unused_units, df_units_map)
+df_unlisted = filter(row -> row[:units] in unlisted_units, df_units)
+df_listed = sort(filter(row -> row[:units] in listed_units, df_units), :units)
+
+
+
+df_convert = unique(df_units_map[:,[:to]]);
+df_convert = edit_with(df_convert, Rename(:to, :cleaned))
+df_convert = edit_with(df_convert, Add.([:factor, :to], [1E0, ""]))
+
+
+# df_convert[!,:factor] .= 1E0;
+
+
 # df_mult = edit_with(df_mult, Add(:factor, 1))
-
-
-["Drop", "Rename", "Group", "Match", "Melt", "Add", "Map", "Replace"]
-
-
-# df = DataFrame(IOCode = ["22", "23"], Name = ["Utilities", "Construction"]);
-# editor = [Rename(from = :IOCode, to = :input_code),
-#           Rename(from = :Name,   to = :input_desc)]
-
-
-# df = DataFrame(
-#     input_code = ["Colorado", "22", "23", "Wisconsin", "22", "23"],
-#     value = ["",1,2,"",3,4]);
-# editor = Group(
-#     file   = joinpath("parse", "regions.csv"),
-#     from   = :from,
-#     to     = :to,
-#     input  = :input_code,
-#     output = :region);
-# edit_with(df, editor)
-
-
-
-
-# df = DataFrame(IOCode = ["Colorado", "111CA", "113FF", "Colorado", "111CA", "113FF"],
-#     Name = ["", "Farms", "Forestry, fishing, and related activities", "", "Farms", "Forestry, fishing, and related activities"])
-
-y = read_file(joinpath(["..", "tests", "data", "test_datastream.yml"]...))
-df = read_file(joinpath(["..", "tests", "data", "test_datastream.csv"]...))
-df = edit_with(df, y["Rename"])
-
-
-df2 = DataFrame(input_code = ["Colorado", "Fishing", "Logging", "Wisconsin", "Fishing", "Logging"],
-    value = [missing,1,2,missing,3,4]);
-
-# editor = Drop(col = :linenum, val = "all", operation = "==")
-# df = edit_with(df, editor)
-
-
-# y = read_file(joinpath(["..", "tests", "data", "test_datastream.yml"]...))
-# df = read_file(y["Path"], y["CSVInput"])
-# df = edit_with(df, [[y[k] for k in ["Drop"]]...;])
-
-# editor = Rename(from = :IOCode, to = :input_code)
-# df = edit_with(df, editor)
-
-# editor = Group(file = joinpath("parse", "regions.csv"),
-#     from = :from,
-#     to = :to,
-#     input = :input_code,
-#     output = :region)
-# df = edit_with(df, editor)
-
-# editor = Match(on = r"\((?<input_code>.*)\)",
-#     input = :input_code,
-#     output = [:input_code])
-# df = edit_with(df, editor)
-
-
-# editor = Melt(on = [:input_code, :region],
-#     var = :output_desc,
-#     val = :value)
-# df = edit_with(df, editor)
-
-
-# df = DataFrame(output_desc = [fill("Utilities", (4,1)); fill("Construction", (4,1))],
-#     value = [1:6; missing; 8],
-#     input_code = string.([22,23,22,23,22,23,22,23]),
-#     region = ["co", "co", "wi", "wi", "co", "co", "wi", "wi"])
-
-# editor = Map(file = joinpath("parse", "bea.csv",
-#     ))
-
-
-
-# df = DataFrame(linenum = 1:2, input_code = ["A", "B"], value = [1, 2])
-# editor = Drop(col = :linenum, val = "all", operation = "==")
-# df = edit_with(df, editor)
-
-# df = DataFrame(IOCode = ["A", "B"], value = [1, 2])
-# editor = Rename(from = :IOCode, to = :input_code)
-# df = edit_with(df, editor)
-
-# df = DataFrame(linenum = 1:6,
-#     input_code = ["Colorado", "NAICS: A", "NAICS: B", "Wisconsin", "A", "B"],
-#     value = ["", 1, 2, "", 3, 4])
-# editor = Group(file = joinpath("parse", "regions.csv"),
-#     from = :from,
-#     to = :to,
-#     input = :input_code,
-#     output = :region)
-# df = edit_with(df, editor)
-
-
-
-
-# dfn = read_file("../data/coremaps/parse/naics.csv")
-# dfn1 = unique(dfn[.!occursin.(" ", dfn[:,:naics_desc]),:], :naics_desc)
-
-# dfb = read_file("../data/coremaps/parse/bea.csv")
-# dfb1 = unique(dfb[.!occursin.(" ", dfb[:,:bea_desc]),:], :bea_desc)
-
 
 # df_convert = DataFrame(from = ["millions of us dollars (USD)", "thousands of us dollars (USD)", "us dollars (USD)"],
 #     factor = [1E0, 1E-3, 1E-6],

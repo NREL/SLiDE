@@ -5,7 +5,7 @@
 ## Example 1: Operations
 
 
-### [`SLiDE.Rename`](@ref)
+#### [`SLiDE.Rename`](@ref)
 
 ```@setup ex1_datastream_rename
 using SLiDE, DataFrames
@@ -19,7 +19,7 @@ editor = [Rename(from = :IOCode, to = :input_code),
 edit_with(df, editor)
 ```
 
-### [`SLiDE.Group`](@ref)
+#### [`SLiDE.Group`](@ref)
 
 ```@setup ex1_datastream_group
 using SLiDE, DataFrames
@@ -38,7 +38,7 @@ editor = Group(
 edit_with(df, editor)
 ```
 
-### [`SLiDE.Drop`](@ref)
+#### [`SLiDE.Drop`](@ref)
 
 ```@setup ex1_datastream_drop
 using SLiDE, DataFrames
@@ -68,7 +68,7 @@ df = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.csv"]...))
 df
 ```
 
-[`SLiDE.Drop`](@ref)
+#### [`SLiDE.Drop`](@ref)
 
 ```@setup ex2_datastream_drop_1
 using SLiDE, DataFrames
@@ -85,7 +85,7 @@ editor = Drop(
 df = edit_with(df, editor)
 ```
 
-[`SLiDE.Rename`](@ref)
+#### [`SLiDE.Rename`](@ref)
 
 ```@setup ex2_datastream_rename
 using SLiDE, DataFrames
@@ -102,7 +102,7 @@ editor = Rename(
 df = edit_with(df, editor)
 ```
 
-[`SLiDE.Group`](@ref)
+#### [`SLiDE.Group`](@ref)
 
 ```@setup ex2_datastream_group
 using SLiDE, DataFrames
@@ -122,7 +122,7 @@ editor = Group(
 df = edit_with(df, editor)
 ```
 
-[`SLiDE.Match`](@ref)
+#### [`SLiDE.Match`](@ref)
 
 ```@setup ex2_datastream_match
 using SLiDE, DataFrames
@@ -140,7 +140,7 @@ editor = Match(
 df = edit_with(df, editor)
 ```
 
-[`SLiDE.Melt`](@ref)
+#### [`SLiDE.Melt`](@ref)
 
 ```@setup ex2_datastream_melt
 using SLiDE, DataFrames
@@ -158,7 +158,7 @@ editor = Melt(
 df = edit_with(df, editor)
 ```
 
-[`SLiDE.Map`](@ref)
+#### [`SLiDE.Map`](@ref)
 
 ```@setup ex2_datastream_map
 using SLiDE, DataFrames
@@ -178,7 +178,7 @@ editor = Map(
 df = edit_with(df, editor)
 ```
 
-[`SLiDE.Add`](@ref)
+#### [`SLiDE.Add`](@ref)
 
 ```@setup ex2_datastream_add
 using SLiDE, DataFrames
@@ -195,7 +195,7 @@ editor = Add(
 df = edit_with(df, editor)
 ```
 
-[`SLiDE.Replace`](@ref)
+#### [`SLiDE.Replace`](@ref)
 
 ```@setup ex2_datastream_replace
 using SLiDE, DataFrames

@@ -8,5 +8,5 @@ PathOut: [.., data, coremaps, parse, gsp.csv]
 CSVInput:
   - name: [WiNDC, windc_datastream, core_maps, gams, map_gsp.csv]
     descriptor: state
-  - name: [Manual, append_gsp_metro.csv]
+  - name: [Manual, gsp_metro_append.csv]
     descriptor: metro
