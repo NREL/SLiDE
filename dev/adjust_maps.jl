@@ -47,7 +47,7 @@ if length(filename) > 0
             Rename.(names(df_map)[occursin.(yy, names(df_map))], cols))
         for yy in string.(1997:2016)]...)
 
-    df = edit_with(df, vcat([vcat(y[k]) for k in ["Drop", "Map2", "Order"]]...))
+    df = edit_with(df, vcat([vcat(y[k]) for k in ["Drop", "Map", "Order"]]...))
     CSV.write(joinpath(y["PathOut"]...), df)
 end
 

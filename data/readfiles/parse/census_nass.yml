@@ -14,10 +14,11 @@ Order:
   - {col: state,      type: String}
   - {col: naics_code, type: String}
 # - {col: naics_level,type: Any}
-  - {col: units_clean,type: String}
-  - {col: value,      type: Int}
-  - {col: factor,     type: Float64}
   - {col: units,      type: Any}
+  - {col: value,      type: Any}
+# - {col: units_0,    type: String}
+# - {col: value_0,    type: Any}
+# - {col: factor,     type: Any}
 
 Rename:
   - {from: upper,           to: lower}
@@ -29,7 +30,7 @@ Match:
   output: naics_code
 
 Add:
-  col: units_clean
+  col: units
   val: us dollars (USD)
 
 Map:
@@ -43,13 +44,25 @@ Map:
     to:     to
     input:  state
     output: state
-  - file:   [parse, units_standardize.csv]
+  - file:   [parse, units.csv]
     from:   from
-    to:     [factor, to]
-    input:  units_clean
-    output: [factor, units]
+    to:     [to, factor, units_factor]
+    input:  units
+    output: [units, factor, units_factor]
 
 Replace:
   col:  value
-  from: ["(D)", "(H)", "(L)"]
+  from: [(D), (H), (L)]
   to:   0
+
+Drop:
+  col: [Program, Period, Week Ending, Geo Level, Ag District, Ag District Code, County, County ANSI, Zip Code, Region, Watershed, watershed_code, Commodity, Data Item, Domain, CV (%)]
+  val: all
+  operation: "=="
+
+Operate:
+  operation: "*"
+  from:   units
+  to:     units_factor
+  input:  [value, factor]
+  output: value

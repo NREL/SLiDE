@@ -30,6 +30,11 @@ Map:
     to:     missing
     input:  sgf_code
     output: windc_code
+  - file:   [parse, units.csv]
+    from:   from
+    to:     to
+    input:  units
+    output: units
 
 Drop:
   - col: [line_num_1997, line_num_1998, line_num_1999, line_num_2000, line_num_2001, line_num_2002, line_num_2003, line_num_2004, line_num_2005, line_num_2006, line_num_2007, line_num_2008, line_num_2009, line_num_2010, line_num_2011]

@@ -146,6 +146,38 @@ This operation can only be performed once per dataframe.",
         "supertype": "Edit"
     },
     {
+        "struct_name": "Operate",
+        "docstring": "Perform an operation (+, -, *, /) across multiple DataFrame columns.",
+        "fields": [
+            {
+                "name": "operation",
+                "comment": "operation to perform (+, -, *, /)",
+                "data_type": "String"
+            },
+            {
+                "name": "from",
+                "comment": "name of original comment column (ex. units)",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "to",
+                "comment": "name of new comment column (ex. units)",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "input",
+                "comment": "names of columns on which to operate",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "output",
+                "comment": "name of result column",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
         "struct_name": "Order",
         "docstring": "Rearranges columns in the order specified by `cols` and sets them to
         the specified type.",

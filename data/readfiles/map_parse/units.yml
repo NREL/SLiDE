@@ -16,14 +16,17 @@ Map:
     from:   from
     to:     [factor, to]
     input:  to
-    output: [factor, factor_to]
+    output: [factor, units_factor]
 
 Replace:
-  col:  to
-  from: us dollars per million btu
-  to:   us dollars (USD) per million btu
+  - col:  to
+    from: us dollars per million btu
+    to:   us dollars (USD) per million btu
+  - col:  factor
+    from: missing
+    to:   1.0
 
 Drop:
   col: from
-  val: unique
+  val: [missing, unique]
   operation: "=="

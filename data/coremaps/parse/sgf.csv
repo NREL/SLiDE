@@ -1,5 +1,5 @@
 from,sgf_desc,sgf_code,windc_code,units
-Population (thousands),Population,,,thousands
+Population (thousands),Population,,,thousand
 Total Revenue,Total Revenue,TOTREV,,thousands of us dollars (USD)
 General revenue,Total Revenue - General Revenue,GENREV,,thousands of us dollars (USD)
 Intergovernmental revenue,Total Revenue - General Revenue - Intergovernmental Revenue,INTREV,,thousands of us dollars (USD)
@@ -121,7 +121,7 @@ Cash and Security Holdings,Cash and Security Holdings,CASHSH,,thousands of us do
 Individual income tax,Total Revenue - General Revenue - Total Taxes - Individual Income Taxes,INDTAX,,thousands of us dollars (USD)
 Corporate income tax,Total Revenue - General Revenue - Total Taxes - Corporation Net Income Taxes,CORTAX,,thousands of us dollars (USD)
 Cash and security holdings,Cash and Security Holdings,CASHSH,,thousands of us dollars (USD)
-"Population (thousands, July 1, 1999)",Population,,,thousands
+"Population (thousands, July 1, 1999)",Population,,,thousand
 "Personal income (millions, calendar year 1998)",Personal income,,,millions of us dollars (USD)
 Liquor store revenue,Total Revenue - Liquor Stores Revenue,LIQREV,,thousands of us dollars (USD)
 "General expenditures, by function","General Expenditure, by Function:",,,thousands of us dollars (USD)
@@ -146,14 +146,14 @@ Government administration,"General Expenditure, by Function: - Governmental Admi
 Liquor store expenditure,Liquor Stores Expenditure,LIQEXP,fbp,thousands of us dollars (USD)
 Liquor store expenditure,Liquor Stores Expenditure,LIQEXP,fbt,thousands of us dollars (USD)
 Liquor store expenditure,Liquor Stores Expenditure,LIQEXP,res,thousands of us dollars (USD)
-"Population (thousands, April 1, 2000)",Population,,,thousands
+"Population (thousands, April 1, 2000)",Population,,,thousand
 "Personal income (millions, calendar year 1999)",Personal income,,,millions of us dollars (USD)
-"Population (thousands, July 1, 2001)",Population,,,thousands
+"Population (thousands, July 1, 2001)",Population,,,thousand
 "Personal income (millions, calendar year 2000)",Personal income,,,millions of us dollars (USD)
 Total revenue,Total Revenue,TOTREV,,thousands of us dollars (USD)
-"Population (thousands, July, 2002)",Population,,,thousands
+"Population (thousands, July, 2002)",Population,,,thousand
 "General expenditures, by function:","General Expenditure, by Function:",,,thousands of us dollars (USD)
-"Population (thousands, 2003)",Population,,,thousands
+"Population (thousands, 2003)",Population,,,thousand
 Insurance trust revenue (1),Total Revenue - Insurance Trust Revenue,INSREV,,thousands of us dollars (USD)
 SGF001,Total Revenue,TOTREV,,thousands of us dollars (USD)
 SGF002,Total Revenue - General Revenue,GENREV,,thousands of us dollars (USD)

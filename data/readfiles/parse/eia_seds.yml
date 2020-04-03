@@ -12,11 +12,14 @@ CSVInput:
 Order:
   - {col: year,        type: Int}
   - {col: state,       type: String}
-# - {col: msn,         type: String}
+  - {col: msn_code,    type: String}
   - {col: source_code, type: String}
   - {col: sector_code, type: String}
   - {col: units,       type: String}
   - {col: value,       type: Float64}
+  - {col: units_0,    type: String}
+  - {col: value_0,    type: Any}
+  - {col: factor,     type: Any}
 
 Rename:
   - {from: upper,     to: lower}
@@ -42,14 +45,14 @@ Map:
     output: state
   - file:   [parse, units.csv]
     from:   from
-    to:     to
+    to:     [to, factor, units_factor]
     input:  units
-    output: units
+    output: [units, factor, units_factor]
 
 Replace:
-  col:  value
-  from: missing
-  to:   0.0
+  - col:  value
+    from: missing
+    to:   0.0
 
 Drop:
   - col: "Data_Status"
@@ -58,3 +61,10 @@ Drop:
 # - col: value
 #   val: missing
 #   operation: "=="
+
+Operate:
+  operation: "*"
+  from:   units
+  to:     units_factor
+  input:  [value, factor]
+  output: value

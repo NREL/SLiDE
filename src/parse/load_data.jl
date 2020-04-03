@@ -35,7 +35,7 @@ the `data/coremaps` directory. It returns a .csv file.
     dictionary. All keys that correspond with SLiDE DataStream DataTypes will be converted
     to (lists of) those types.
 """
-function read_file(path::Array{String,1}, file::GAMSInput)
+function read_file(path::Array{String,1}, file::GAMSInput; shorten = false)
     filepath = joinpath(path..., file.name)
     xf = readlines(filepath)
     df = gams_to_dataframe(xf; colnames = file.col)

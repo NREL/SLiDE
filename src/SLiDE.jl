@@ -36,6 +36,7 @@ export Drop
 export Group
 export Map
 export Melt
+export Operate
 export Order
 export Match
 export Rename

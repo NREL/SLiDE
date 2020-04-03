@@ -103,7 +103,7 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
     # This prevents duplicate columns in the final DataFrame.
     cols = unique([names(df); x.output])
     df_map = read_file(x)
-    df_map = dropmissing(unique(df_map[:,unique([x.from; x.to])]))
+    df_map = unique(df_map[:,unique([x.from; x.to])])
 
     # Rename columns in the mapping DataFrame to temporary values in case any of these
     # columns were already present in the input DataFrame.
@@ -152,6 +152,30 @@ function edit_with(df::DataFrame, x::Melt)
     return df
 end
 
+function edit_with(df::DataFrame, x::Operate)
+    # Perform operation on columns. Isolate columns to be operated on.
+    # Append original columns that might be replaced "_0" to preserve information.
+    df_val = convert_type.(Float64, copy(df[:,x.input]))
+    x.output in x.input ? df = edit_with(df, Rename(x.output, Symbol(x.output, :_0))) :
+        nothing
+    df[!,x.output] .= broadcast(datatype(x.operation), [col for col in eachcol(df_val)]...)
+
+    # Adjust labeling columns.
+    for (from, to) in zip(x.from, x.to)
+        if from in names(df) && to in names(df) && from !== to
+            df_comment = dropmissing(unique(df[:, [from; to]]))
+            df[!, Symbol(from, :_0)] .= df[:,from]
+            df = edit_with(df, Replace.(from, df_comment[:,from], df_comment[:,to]))
+        end
+    end
+    
+    # Reorder DataFrame columns to show all columns involved in the operation last.
+    # This could aid in troubleshooting.
+    cols = intersect([setdiff(x.input, [x.output]); Symbol(x.output, :_0); x.output;
+        reverse(sort([Symbol.(x.from, :_0); x.from])); reverse(sort(x.to))], names(df));
+    return df[:,[setdiff(names(df), cols); cols]]
+end
+
 function edit_with(df::DataFrame, x::Order)
     # If not all columns are present, return the DataFrame as is. Such is the case when a
     # descriptor column must be added when appending multiple data sets in one DataFrame.
@@ -183,7 +207,9 @@ function edit_with(df::DataFrame, x::Replace)
     if x.col in names(df)
         df[!, x.col] .= convert_type.(String, df[:, x.col])
         x.from == "missing" ?
-            df[ismissing.(df[:,x.col]), x.col] .= x.to :
+            all(typeof.(df[:,x.col]) .== Missing) ?
+                df = edit_with(df, Add(x.col, x.to)) :
+                df[ismissing.(df[:,x.col]), x.col] .= x.to :
             df[!, x.col][strip.(string.(df[:,x.col])) .== x.from] .= x.to
     end
     return df
@@ -203,11 +229,11 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
     
     # Specify the order in which edits must occur. "Drop" is included twice, once at the
     # beginning and once at the end. First, drop entire columns. Last, drop specific values.
-    EDITS = ["Drop", "Rename", "Group", "Match", "Melt", "Add", "Map", "Replace"]
+    EDITS = ["Rename", "Group", "Match", "Melt", "Add", "Map", "Replace", "Drop", "Operate"]
 
     # Find which of these edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, [k for k in keys(y)]);
-    "Drop" in KEYS ? push!(KEYS, "Drop") : nothing
+    "Drop" in KEYS ? KEYS = ["Drop"; KEYS] : nothing
 
     [df = edit_with(df, y[k]) for k in KEYS];
     

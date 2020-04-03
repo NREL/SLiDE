@@ -1,0 +1,50 @@
+sctg_code,windc_code,windc_desc
+01,agr,Farms
+01,fof,"Forestry, fishing, and related activities"
+02,agr,Farms
+03,agr,Farms
+04,agr,Farms
+04,fbp,Food and beverage and tobacco products
+05,agr,Farms
+05,fbp,Food and beverage and tobacco products
+06,fbp,Food and beverage and tobacco products
+07,fbp,Food and beverage and tobacco products
+08,fbp,Food and beverage and tobacco products
+09,fbp,Food and beverage and tobacco products
+10,min,"Mining, except oil and gas"
+11,min,"Mining, except oil and gas"
+12,min,"Mining, except oil and gas"
+13,min,"Mining, except oil and gas"
+14,min,"Mining, except oil and gas"
+15,,
+16,,
+17,oil,Oil and gas extraction
+18,oil,Oil and gas extraction
+19,pet,Petroleum and coal products
+20,che,Chemical products
+21,che,Chemical products
+22,che,Chemical products
+23,che,Chemical products
+24,pla,Plastics and rubber products
+25,fof,"Forestry, fishing, and related activities"
+26,wpd,Wood products
+27,ppd,Paper products
+28,ppd,Paper products
+29,pri,Printing and related support activities
+30,alt,Apparel and leather and allied products
+30,tex,Textile mills and textile product mills
+31,nmp,Nonmetallic mineral products
+32,pmt,Primary metals
+33,fmt,Fabricated metal products
+34,mch,Machinery
+35,cep,Computer and electronic products
+35,eec,"Electrical equipment, appliances, and components"
+36,mot,"Motor vehicles, bodies and trailers, and parts manufacturing"
+37,ote,Other transportation equipment
+38,mmf,Miscellaneous manufacturing
+39,fpd,Furniture and related products
+40,mmf,Miscellaneous manufacturing
+41,use,"Scrap, used and secondhand goods"
+43,,
+99,,
+00,,
