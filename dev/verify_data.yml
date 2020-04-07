@@ -1,0 +1,11 @@
+
+FileInput:
+  - colnames: [year, input_bea_windc, output_bea_windc, units, value]
+    f1: [bea_use.csv, bea_supply.csv, bea_use_det.csv, bea_supply_det.csv]
+    f2: [use_units.csv, supply_units.csv, use_det_units.csv, supply_det_units.csv]
+  - colnames:  [region_desc, year, component, industry_id, units, value]
+    f1: [gsp_state.csv]
+    f2: [gsp_units.csv]
+  - colnames:  [year, region_desc, windc_code, units, value]
+    f1: pce.csv
+    f2: pce_units.csv

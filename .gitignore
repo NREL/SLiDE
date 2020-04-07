@@ -19,6 +19,7 @@ docs/build/
 
 src/datastream/
 
+src/parse/generated_check/
 src/parse/generated_edit/
 src/parse/generated_load/
 src/parse/scratch/

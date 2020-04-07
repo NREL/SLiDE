@@ -169,12 +169,32 @@ function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
         d[k] = joinpath(lst...) : nothing for (k,lst) in d]
 
     # Fill the datatype with the values in the dictionary keys, ensuring correct type.
-    it = zip(string.(fieldnames(T)), T.types)
+    (fields, types) = (string.(fieldnames(T)), T.types)
 
-    if any(isarray.(T.types)) & !all(isarray.(T.types))
+    # Fill the datatype with the input.
+    # if any(isarray.(T.types)) & !all(isarray.(T.types))
+    #     inps = [isarray(type) ? ensurearray(convert_type.(type, d[field])) :
+    #         convert_type.(type, d[field]) for (field,type) in it]
+    #     lst = [T(inps...)]~
+    if .&(any(isarray.(types)), !all(isarray.(types)))
+        # Restructure data into a list of inputs in the order and type required when
+        # creating the datatype. Ensure that all array entries should, in fact, be arrays.
         inps = [isarray(type) ? ensurearray(convert_type.(type, d[field])) :
-            convert_type.(type, d[field]) for (field,type) in it]
-        lst = [T(inps...)]
+            convert_type.(type, d[field]) for (field,type) in zip(fields, types)]
+        inpscorrect = isarray.(inps) .== isarray.(types)
+
+        # If all inputs are of the correct structure, fill the data type.
+        if all(inpscorrect)
+            lst = [T(inps...)]
+        # If some inputs are arrays when they shouldn't be, expand these into a new list of
+        # dictionaries to create a list of datatypes, including all array values.
+        else
+            LEN = length(inps[findmax(.!inpscorrect)[2]])
+            splitarray = Dict(fields[ii] => !inpscorrect[ii] for ii in 1:length(inps))
+            lst = [Dict{Any,Any}(k => splitarray[k] ? d[k][ii] : d[k] for k in keys(d))
+                for ii in 1:LEN]
+            lst = ensurearray(load_from(T, lst))
+        end
     else
         lst = ensurearray(load_from(T, convert_type(DataFrame, d)))
     end

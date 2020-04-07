@@ -18,7 +18,7 @@ Order:
   - {col: region_desc,   type: String}
 # - {col: component,     type: String}
   - {col: windc_code,    type: String}
-  - {col: industry_desc, type: String}
+# - {col: industry_desc, type: String}
   - {col: units,         type: String}
   - {col: value,         type: Float64}
 

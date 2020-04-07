@@ -59,25 +59,25 @@ function compare_sets(df1::DataFrame, df2::DataFrame, ind::Array{Symbol,1}; valu
     df_dict = Dict(k => df for (df, k) in zip([df1,df2], ind))
     cols = setdiff(intersect(names(df1), names(df2)), [value])
 
-    d = Dict(k1 => Dict(k2 =>
+    inp = Dict(k1 => Dict(k2 =>
             unique(setdiff(df[:,k2], df_dict[setdiff(ind,[k1])[1]][:,k2]))
         for k2 in cols) for (k1,df) in df_dict)
 
-    # df = [[edit_with(DataFrame(Dict(col => length(v) == 0 ? "" : v for (col,v) in d)),
-    #         Add.([k; setdiff(ind,[k])], [true,false])) for (k,d) in d_all]...;]
+    # df = [[edit_with(DataFrame(Dict(col => length(v) == 0 ? "" : v for (col,v) in inp)),
+    #         Add.([k; setdiff(ind,[k])], [true,false])) for (k,inp) in d_all]...;]
     # df = df[.!all.(eachrow(df[:,cols] .== "")), :];
 
-    all([[length.(collect(values(d1))) for (k1,d1) in d]...;] .== 0) ?
+    all([[length.(collect(values(d1))) for (k1,d1) in inp]...;] .== 0) ?
         println("All sets are consistent.") :
         println("Summary of set differences:")
 
-    for (k1,d1) in d
+    for (k1,d1) in inp
         any(length.(collect(values(d1))) .!== 0) ? println("  ", k1, " only") : continue
         for (k2,v2) in d1
             length(v2) !== 0 ? println("    ", k2, ":  ", string.(v2," ")...,) : continue
         end
     end
-    return d
+    return inp
 end
 
 # ******************************************************************************************s
@@ -85,40 +85,31 @@ end
 path_slide = joinpath("..","data","output")
 path_bluenote = joinpath("..","data","windc_output","2_stream")
 
-df_slide = DataFrame()
-df_bluenote = DataFrame()
+dfs = DataFrame()
+dfb = DataFrame()
 
+y = read_file("verify_data.yml");
+lst = y["FileInput"];
 
+for inp in lst
+    println("\n",inp.f1);
+    dfs = read_file(joinpath(path_slide, inp.f1));
+    global dfs = make_uniform(dfs, inp.colnames);
 
-# mutable struct Compare <: Edit
-#     col::Array{Symbol,1}
-#     f1::String
-#     f2::String
-# end
+    dfb = read_file(joinpath(path_bluenote, inp.f2));
+    global dfb = make_uniform(dfb, inp.colnames);
 
+    d = compare_sets(dfs, dfb, [:slide, :bluenote]);
 
+    # Resolve MINOR discrepancies to compare values.
+    x = [Replace(:output_bea_windc, "subsidies", "Subsidies"),  # bea
+         Replace(:component,        "Tax", "tax")]              # gsp
+    dfb = edit_with(dfb, x);
+
+    df = compare_values(dfs, dfb, [:slide, :bluenote]);
+end
 
 # ******************************************************************************************
-# cols = [:year, :input_bea_windc, :output_bea_windc, :units, :value]
-
-# f_slide = ["bea_use.csv", "bea_supply.csv", "bea_use_det.csv", "bea_supply_det.csv"];
-# f_bluenote = ["use_units.csv", "supply_units.csv", "use_det_units.csv", "supply_det_units.csv"];
-
-# for (fs, fb) in zip(f_slide, f_bluenote)
-#     println("\n",fs);
-
-#     df_slide = read_file(joinpath(path_slide, fs));
-#     global df_slide = make_uniform(df_slide, cols);
-
-#     df_bluenote = read_file(joinpath(path_bluenote, fb));
-#     global df_bluenote = make_uniform(df_bluenote, cols);
-
-#     d = compare_sets(df_slide, df_bluenote, [:slide, :bluenote]);
-
-#     df_bluenote = edit_with(df_bluenote, Replace(:output_bea_windc, "subsidies", "Subsidies"))
-
-#     df = compare_values(df_slide, df_bluenote, [:slide, :bluenote]);
-# end
 
 # ******************************************************************************************
 # cols = [:region_desc, :year, :component, :industry_id, :units, :value]
@@ -131,41 +122,45 @@ df_bluenote = DataFrame()
 
 #     # println(fs);
 
-# df_slide = read_file(joinpath(path_slide, fs));
-# df_slide = make_uniform(df_slide, cols);
-# # display(first(df_slide,4))
+# dfs = read_file(joinpath(path_slide, fs));
+# dfs = make_uniform(dfs, cols);
+# # display(first(dfs,4))
 
-# df_bluenote = read_file(joinpath(path_bluenote, fb));
-# df_bluenote = make_uniform(df_bluenote, cols);
-# # display(first(df_bluenote,4))
+# dfb = read_file(joinpath(path_bluenote, fb));
+# dfb = make_uniform(dfb, cols);
+# # display(first(dfb,4))
 
-# d = compare_sets(df_slide, df_bluenote, [:slide, :bluenote]);
-# df = compare_values(df_slide, df_bluenote, [:slide, :bluenote]);
+# inp = compare_sets(dfs, dfb, [:slide, :bluenote]);
+# df = compare_values(dfs, dfb, [:slide, :bluenote]);
 # end
 
 println("")
 
 # ******************************************************************************************
-cols = [:year, :region_desc, :windc_code, :units, :value]
+# cols = [:year, :region_desc, :windc_code, :units, :value]
 
-fs = "pce.csv"
-fb = "pce_units.csv"
+# fs = "pce.csv"
+# fb = "pce_units.csv"
 
-println("")
-# for (fs, fb) in zip(f_slide, f_bluenote)
+# println("")
+# # for (fs, fb) in zip(f_slide, f_bluenote)
 
-    # println(fs);
+#     # println(fs);
 
-df_slide = read_file(joinpath(path_slide, fs));
-df_slide = make_uniform(df_slide, cols);
-display(first(df_slide,4))
+# dfs = read_file(joinpath(path_slide, fs));
+# dfs = make_uniform(dfs, cols);
+# display(first(dfs,4))
 
-df_bluenote = read_file(joinpath(path_bluenote, fb));
-df_bluenote = make_uniform(df_bluenote, cols);
-display(first(df_bluenote,4))
+# dfb = read_file(joinpath(path_bluenote, fb));
+# dfb = make_uniform(dfb, cols);
+# display(first(dfb,4))
 
-d = compare_sets(df_slide, df_bluenote, [:slide, :bluenote]);
-df = compare_values(df_slide, df_bluenote, [:slide, :bluenote]);
-# end
+# inp = compare_sets(dfs, dfb, [:slide, :bluenote]);
+# df = compare_values(dfs, dfb, [:slide, :bluenote]);
+# # end
 
-println("")
+# println("")
+
+# ******************************************************************************************
+# fs = "pce.csv"
+# fb = "pce_units.csv"

@@ -46,10 +46,13 @@ export CSVInput
 export GAMSInput
 export XLSXInput
 
+export FileInput
+
 export CGEInput
 export DataStream
-export File
+export Check
 export Edit
+export File
 
 export convert_type
 export datatype
@@ -78,6 +81,7 @@ provide a constructor that allows existing values to be deserialized.
 abstract type DataStream end
 abstract type Edit <: DataStream end
 abstract type File <: DataStream end
+abstract type Check <: DataStream end
 
 # abstract type CGEModel <: EconomicSystemsType end
 # abstract type CGEModel end
@@ -86,6 +90,7 @@ abstract type File <: DataStream end
 include(joinpath("utils", "utils.jl"))
 
 # PARSING
+include(joinpath("parse", "generated_check", "includes.jl"))
 include(joinpath("parse", "generated_edit", "includes.jl"))
 include(joinpath("parse", "generated_load", "includes.jl"))
 
