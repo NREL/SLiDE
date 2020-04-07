@@ -160,6 +160,9 @@ function edit_with(df::DataFrame, x::Operate)
         nothing
     df[!,x.output] .= broadcast(datatype(x.operation), [col for col in eachcol(df_val)]...)
 
+    # !!!! SOS how do we deal with floating point arithmetic? (ex: 1.1 + 0.1 = 1.2000000000000002)
+    df[!,x.output] .= round.(df[:,x.output], digits=8)
+
     # Adjust labeling columns.
     for (from, to) in zip(x.from, x.to)
         if from in names(df) && to in names(df) && from !== to

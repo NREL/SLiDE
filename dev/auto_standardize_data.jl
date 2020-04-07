@@ -7,39 +7,92 @@ using YAML
 
 using SLiDE  # see src/SLiDE.jl
 
+# function SLiDE.edit_with(df::DataFrame, x::Operate)
+#     # Perform operation on columns. Isolate columns to be operated on.
+#     # Append original columns that might be replaced "_0" to preserve information.
+#     df_val = convert_type.(Float64, copy(df[:,x.input]))
+#     x.output in x.input ? df = edit_with(df, Rename(x.output, Symbol(x.output, :_0))) :
+#         nothing
+#     df[!,x.output] .= broadcast(datatype(x.operation), [col for col in eachcol(df_val)]...)
+
+#     # !!!! SOS how do we deal with floating point arithmetic? (ex: 1.1 + 0.1 = 1.2000000000000002)
+#     df[!,x.output] .= round.(df[:,x.output], digits=8)
+
+#     # Adjust labeling columns.
+#     for (from, to) in zip(x.from, x.to)
+#         if from in names(df) && to in names(df) && from !== to
+#             df_comment = dropmissing(unique(df[:, [from; to]]))
+#             df[!, Symbol(from, :_0)] .= df[:,from]
+#             df = edit_with(df, Replace.(from, df_comment[:,from], df_comment[:,to]))
+#         end
+#     end
+    
+#     # Reorder DataFrame columns to show all columns involved in the operation last.
+#     # This could aid in troubleshooting.
+#     cols = intersect([setdiff(x.input, [x.output]); Symbol(x.output, :_0); x.output;
+#         reverse(sort([Symbol.(x.from, :_0); x.from])); reverse(sort(x.to))], names(df));
+#     return df[:,[setdiff(names(df), cols); cols]]
+# end
+
+
 
 READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "readfiles"))
 
-files_parse = XLSXInput("generate_yaml.xlsx", "parse", "V1:V180", "parse")
+files_parse = XLSXInput("generate_yaml.xlsx", "parse", "I1:I180", "parse")
 files_parse = write_yaml(READ_DIR, files_parse)
 y = read_file(joinpath(READ_DIR, files_parse[1]))
 
 files_parse = run_yaml(files_parse)
 df = read_file(joinpath(y["PathOut"]...))
 
+
 # df = read_file("../data/output/nass.csv")
 # df = unique(edit_with(df, Drop(:value, 0.0, "==")), :units_0)
 
+# for ii in 1:length(y["CSVInput"])
+#     df = read_file(y["Path"], y["CSVInput"][ii])
 
-# df = read_file(y["Path"], y["CSVInput"][1])
+#     df = edit_with(df, y["Drop"])
+#     df = edit_with(df, y["Rename"])
+#     # # df = edit_with(df, y["Group"])
+#     # df = edit_with(df, y["Match"])
+#     df = edit_with(df, y["Melt"])
+#     # # # # df = edit_with(df, y["Add"])
+#     df = edit_with(df, y["Map"])
+
+#     println(ii, " ", unique(df[:,:component]))
+# end
+
+
 # df = read_file(y["Path"], y["XLSXInput"])
+# df = read_file(y["Path"], y["CSVInput"][3])
 
 # # # # # # # # # # df = edit_with(y)
 
 # # x = Map("parse/units.csv",
 # #     [:from], [:to, :factor, :units_factor], [:units], [:units,:factor,:units_factor])
 
+# setrounding(Float64,RoundDown) do
+#     x / y
+# end
+
 
 # df = edit_with(df, y["Drop"])
 # df = edit_with(df, y["Rename"])
-# # df = edit_with(df, y["Group"])
-# # # # df = edit_with(df, y["Match"])
+# # # # df = edit_with(df, y["Group"])
+# df = edit_with(df, y["Match"])
 # df = edit_with(df, y["Melt"])
-# # # # df = edit_with(df, y["Add"])
+# # # # # # df = edit_with(df, y["Add"])
 # df = edit_with(df, y["Map"])
 # df = edit_with(df, y["Replace"])
 # df = edit_with(df, y["Drop"])
-# df = edit_with(df, y["Operate"])
+# # df = edit_with(df, y["Operate"])
+# # # df = edit_with(df, y["Order"])
+
+
+# any(occursin.())
+
+
 
 # x = y["Map"]
 # # kind = :left
