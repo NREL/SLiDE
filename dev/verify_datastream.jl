@@ -1,10 +1,12 @@
 using CSV
 using DataFrames
 using DelimitedFiles
+using Printf
+
 using SLiDE
 
 function make_uniform(df::DataFrame, cols::Array{Symbol,1})
-    size(names(df)) == size(cols) ?
+    .&(size(names(df)) == size(cols), length(setdiff(cols, names(df))) > 0) ?
         df = edit_with(df, Rename.(names(df), cols))[:,cols] : nothing
     df = df[:,cols]
         
@@ -12,75 +14,75 @@ function make_uniform(df::DataFrame, cols::Array{Symbol,1})
     return unique(sort(df, names(df)[1:end-1]));
 end
 
-function compare_summary(df1::DataFrame, df2::DataFrame, ind::Array{Symbol,1}; value = :value)
-    
-    df1 = copy(df1)
-    df2 = copy(df2)
+function compare_summary(df_lst::Array{DataFrame,1}, ind::Array{Symbol,1}; value = :value)
+    df_lst = copy(df_lst)
+
+    # Sort inputs in order of longest to shortest DataFrame.
+    # This is important when preserving missing values to indicate inconsistencies.
+    ii_sort = reverse(sortperm(size.(df_lst,1)))
+    df_lst = df_lst[ii_sort]
+    ind = ind[ii_sort]
 
     vals = Symbol.(value, :_, ind)
-    [df = edit_with(df, [Add(col, true); Rename.(:value, Symbol(value, :_, col))])
-        for (df, col) in zip([df1,df2], ind)]
-    cols = intersect(names(df1), names(df2))
+    [df = edit_with(df, [Add(col, true); Rename.(value, Symbol(value, :_, col))])
+        for (df, col) in zip(df_lst, ind)]
+    cols = intersect(intersect(names.(df_lst)...))
 
-    df = size(df2,1) > size(df1,1) ?
-        join(df1, df2, on = cols, kind = :right) :
-        join(df1, df2, on = cols, kind = :left)
+    df = df_lst[1]
+    [df = join(df, df_lst[ii], on = cols, kind = :left) for ii in 2:length(ind)]
+    [df[!,col] .= .!ismissing.(df[:,col]) for col in ind]
 
-    for col in ind
-        df[ismissing.(df[:,col]),col] .= false
-        df[!,col] *= true
-    end
+    # Are all keys equal/present in the DataFrame?
+    df[!,:equal_keys] .= prod.(eachrow(df[:,ind]))
+    
+    # Are there discrepancies between PRESENT values?
+    # df[!,:equal_values] .= df[:,vals[1]] .== df[:,vals[2]]
+    ii_compare = sum.(eachrow(.!ismissing.(df[:,vals]))) .!= 1;
+    df[!,:equal_values] .= [x ? x : missing for x in ii_compare];
+    # df[ii_compare,:equal_values] .= length.(unique.(eachrow(df[ii_compare,vals]))) .== 1
+    df[ii_compare,:equal_values] .= length.(unique.(skipmissing.(eachrow(df[ii_compare,vals])))) .== 1
 
-    df[!,:equal_set] .= prod.(eachrow(df[:,ind]))
-    df[!,:equal_value] .= df[:,vals[1]] .== df[:,vals[2]]
-
-    return df[:,[cols; vals; ind; [:equal_set, :equal_value]]]
+    return sort(df[:,[cols; sort(vals); sort(ind); [:equal_keys, :equal_values]]], cols)
 end
 
-function compare_values(df1::DataFrame, df2::DataFrame, ind::Array{Symbol,1}; value = :value)
+function compare_values(df_lst::Array{DataFrame,1}, ind::Array{Symbol,1}; value = :value)
+    df_lst = copy(df_lst)
 
-    cols = intersect(names(df1),names(df2))
-    
-    df1 = copy(df1[:,cols]);
-    df2 = copy(df2[:,cols]);
-
-    df = dropmissing(compare_summary(df1, df2, ind;), :equal_value);
-    df = df[.!df[:,:equal_value],:];
-
-    size(df,1) == 0 ?
-        println("All values are consistent.") :
-        println("Values inconsistent:")
-
+    df = dropmissing(compare_summary(copy.(df_lst), ind;), :equal_values);
+    df = df[.!df[:,:equal_values],:];
+    size(df,1) == 0 ? println("All values are consistent.") : @warn("Values inconsistent.")
     return df
 end
 
-function compare_sets(df1::DataFrame, df2::DataFrame, ind::Array{Symbol,1}; value = :value)
+function compare_keys(df_lst::Array{DataFrame,1}, ind::Array{Symbol,1}; value = :value)
+    df_lst = copy(df_lst)
 
-    df_dict = Dict(k => df for (df, k) in zip([df1,df2], ind))
-    cols = setdiff(intersect(names(df1), names(df2)), [value])
+    N = length(ind);
+    cols = setdiff(intersect(names.(df_lst)...), [value])
+    ii_other = setdiff.(fill(1:N,N), 1:N)
 
-    inp = Dict(k1 => Dict(k2 =>
-            unique(setdiff(df[:,k2], df_dict[setdiff(ind,[k1])[1]][:,k2]))
-        for k2 in cols) for (k1,df) in df_dict)
+    d_temp = Dict(col => Dict(ind[ii] =>
+            setdiff(unique(df_lst[ii][:,col]), unique([df_lst[ii_other[ii]]...;][:,col]))
+        for ii in 1:N) for col in cols)
 
-    # df = [[edit_with(DataFrame(Dict(col => length(v) == 0 ? "" : v for (col,v) in inp)),
-    #         Add.([k; setdiff(ind,[k])], [true,false])) for (k,inp) in d_all]...;]
-    # df = df[.!all.(eachrow(df[:,cols] .== "")), :];
-
-    all([[length.(collect(values(d1))) for (k1,d1) in inp]...;] .== 0) ?
-        println("All sets are consistent.") :
-        println("Summary of set differences:")
-
-    for (k1,d1) in inp
-        any(length.(collect(values(d1))) .!== 0) ? println("  ", k1, " only") : continue
-        for (k2,v2) in d1
-            length(v2) !== 0 ? println("    ", k2, ":  ", string.(v2," ")...,) : continue
-        end
+    # [all(length.(values(d1)).==0) ? pop!(d_temp,k1) :
+    #     [pop!(d_temp[k1],k2) for (k2,d2) in d1 if length(d2)==0] for (k1,d1) in d_temp]
+    
+    d = Dict(k1 => Dict(k2 => sort(d2) for (k2,d2) in d1 if length(d2) != 0)
+        for (k1,d1) in d_temp if any(length.(values(d1)).!==0))
+    
+    # Print summary.
+    isempty(d) ? println("All sets are consistent.") : println("Set differences:")
+    for (k1,d1) in d
+        @printf("  %s\n", k1)
+        [@printf("    %-10s[%s]\n", k2,
+                string((length(d2) > 1 ? string.(d2[1:end-1], ", ") : "")..., d2[end]))
+            for (k2,d2) in d1]
     end
-    return inp
+    return d_temp
 end
 
-# ******************************************************************************************s
+# ******************************************************************************************
 
 path_slide = joinpath("..","data","output")
 path_bluenote = joinpath("..","data","windc_output","2_stream")
@@ -91,76 +93,73 @@ dfb = DataFrame()
 y = read_file("verify_data.yml");
 lst = y["FileInput"];
 
-for inp in lst
-    println("\n",inp.f1);
+df_attn = Dict()
+
+for inp in lst[[end]]
+    println("\n",uppercase(inp.f1));
+
     dfs = read_file(joinpath(path_slide, inp.f1));
     global dfs = make_uniform(dfs, inp.colnames);
 
     dfb = read_file(joinpath(path_bluenote, inp.f2));
     global dfb = make_uniform(dfb, inp.colnames);
 
-    d = compare_sets(dfs, dfb, [:slide, :bluenote]);
+    if occursin("seds", inp.f1)
+        x = [Rename.([:units_0, :value_0], [:units, :value]);
+             Replace.([:source_code, :sector_code], "lower", "upper");
+             Map("parse/units.csv", [:from], [:to], [:units], [:units])];
+        global dfs = edit_with(dfs, x)
+        global dfb = edit_with(dfb, x)
+    end
+
+    d = compare_keys(copy.([dfs, dfb]), [:slide, :bluenote]);
 
     # Resolve MINOR discrepancies to compare values.
     x = [Replace(:output_bea_windc, "subsidies", "Subsidies"),  # bea
-         Replace(:component,        "Tax", "tax")]              # gsp
-    dfb = edit_with(dfb, x);
+         Replace(:component,        "Tax",       "tax"),        # gsp
+         Replace(:sgf_code,         "othtax",    "OTHTAX"),     # sgf
+         Replace(:units, "btu per kWh generated", "btu per kilowatthour") # heatrate
+    ]
 
-    df = compare_values(dfs, dfb, [:slide, :bluenote]);
+    global dfs = edit_with(dfs, x);
+    global dfb = edit_with(dfb, x);
+
+    global df = compare_values(copy.([dfs, dfb]), [:slide, :bluenote]);
+    size(df,1) > 0 ? df_attn[inp.f1[1:end-4]] = df : nothing
 end
 
 # ******************************************************************************************
+# cols = [:year, :state, :sgf_code, :units, :value];
+# dfs = read_file(joinpath(path_slide, "sgf.csv"));
+# dfs[!,:windc_code] .= ismissing.(dfs[:,:windc_code])
+# dfs = unique(sort(dropmissing(dfs, :sgf_code), cols));
+# display(first(dfs,4));
+
+# dfb = read_file(joinpath(path_bluenote, "sgf_units.csv"));
+# dfb = make_uniform(edit_with(dfb, Replace(:sgf_code, "othtax", "OTHTAX")), cols);
+# display(first(dfb,4));
 
 # ******************************************************************************************
-# cols = [:region_desc, :year, :component, :industry_id, :units, :value]
+# cols = [:state, :naics_code, :year, :flow, :units, :value];
+# dfs = read_file(joinpath(path_slide, "utd.csv"));
+# dfs = sort(dfs, cols[1:end-1]);
+# display(first(dfs,4));
 
-# fs = "gsp_state.csv"
-# fb = "gsp_units.csv"
-
-# println("")
-# # for (fs, fb) in zip(f_slide, f_bluenote)
-
-#     # println(fs);
-
-# dfs = read_file(joinpath(path_slide, fs));
-# dfs = make_uniform(dfs, cols);
-# # display(first(dfs,4))
-
-# dfb = read_file(joinpath(path_bluenote, fb));
-# dfb = make_uniform(dfb, cols);
-# # display(first(dfb,4))
-
-# inp = compare_sets(dfs, dfb, [:slide, :bluenote]);
-# df = compare_values(dfs, dfb, [:slide, :bluenote]);
-# end
-
-println("")
+# dfb = read_file(joinpath(path_bluenote, "usatrd_units.csv"));
+# # dfb = make_uniform(dfb, cols);
+# dfb = edit_with(dfb, Rename.(names(dfb),cols))
+# dfb = sort(dfb, cols[1:end-1]);
+# display(first(dfb,4));
 
 # ******************************************************************************************
-# cols = [:year, :region_desc, :windc_code, :units, :value]
+# TESTING
+df = compare_summary(copy.([dfs,dfb]), [:slide,:bluenote]);
 
-# fs = "pce.csv"
-# fb = "pce_units.csv"
-
-# println("")
-# # for (fs, fb) in zip(f_slide, f_bluenote)
-
-#     # println(fs);
-
-# dfs = read_file(joinpath(path_slide, fs));
-# dfs = make_uniform(dfs, cols);
-# display(first(dfs,4))
-
-# dfb = read_file(joinpath(path_bluenote, fb));
-# dfb = make_uniform(dfb, cols);
-# display(first(dfb,4))
-
-# inp = compare_sets(dfs, dfb, [:slide, :bluenote]);
-# df = compare_values(dfs, dfb, [:slide, :bluenote]);
-# # end
-
-# println("")
+dfa = dfs[.&(dfs[:,:year] .> 2014),:];
+dfb = edit_with(dfa, Drop.(:source,["oil"],"=="));
+dfc = copy(dfb);
+dfc[.&(dfc[:,:source] .== "gas"), :value] *= 10;
+dfc[4,:value] *= 10;
+dfa = dfa[1:end-1,:]
 
 # ******************************************************************************************
-# fs = "pce.csv"
-# fb = "pce_units.csv"

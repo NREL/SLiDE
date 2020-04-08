@@ -58,6 +58,9 @@ Drop:
   - col: "Data_Status"
     val: all
     operation: "=="
+  - col: year
+    val: 1997
+    operation: "<"
 # - col: value
 #   val: missing
 #   operation: "=="

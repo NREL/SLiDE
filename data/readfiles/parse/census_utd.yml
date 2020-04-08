@@ -6,8 +6,8 @@ Path:  [.., data, datasources, USATradeOnline]
 PathOut: [.., data, output, utd.csv]
 
 CSVInput:
-  - {name: "State Imports by NAICS Commodities.csv", descriptor: import}
-  - {name: "State Exports by NAICS Commodities.csv", descriptor: export}
+  - {name: "State Imports by NAICS Commodities.csv", descriptor: imports}
+  - {name: "State Exports by NAICS Commodities.csv", descriptor: exports}
 
 Describe:
   col: flow
@@ -62,9 +62,12 @@ Map:
     output: [units, factor, units_factor]
 
 Drop:
-  col: year
-  val: 2017 through November
-  operation: "=="
+  - col: year
+    val: 2017 through November
+    operation: "=="
+  - col: country
+    val: world total
+    operation: "!="
 
 Operate:
   operation: "*"

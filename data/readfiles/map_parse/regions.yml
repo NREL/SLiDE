@@ -10,3 +10,12 @@ CSVInput:
     descriptor: windc
   - name: [Manual, regions_append.csv]
     descriptor: cfs_export_country
+
+Order:
+  - {col: from, type: String}
+  - {col: to,   type: String}
+
+Replace:
+  col:  to
+  from: federa offshore, pacific
+  to:   federal offshore, pacific

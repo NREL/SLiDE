@@ -194,13 +194,15 @@ function edit_with(df::DataFrame, x::Order)
 end
 
 function edit_with(df::DataFrame, x::Rename)
+    (from_temp, to_temp) = lowercase.((x.from, x.to))
+    
     # Explicitly rename the specified column if it exists in the dataframe.
     x.from in names(df) ? rename!(df, x.from => x.to) :
 
         # If we are, instead, changing the CASE of all column names...
-        lowercase(x.to) == :lower ?
+        .&(occursin(:upper, from_temp), occursin(:lower, to_temp)) ?
             df = edit_with(df, Rename.(names(df), lowercase.(names(df)))) :
-            lowercase(x.to) == :upper ?
+            .&(occursin(:lower, from_temp), occursin(:upper, to_temp)) ?
                 df = edit_with(df, Rename.(names(df), uppercase.(names(df)))) :
                 nothing
     return df
@@ -209,7 +211,15 @@ end
 function edit_with(df::DataFrame, x::Replace)
     if x.col in names(df)
         df[!, x.col] .= convert_type.(String, df[:, x.col])
-        x.from == "missing" ?
+        (from_temp, to_temp) = lowercase.((x.from, x.to))
+
+        .&(occursin("upper", from_temp), occursin("lower", to_temp)) ?
+            df[!, x.col] .= lowercase.(df[:, x.col]) :
+            .&(occursin("lower", from_temp), occursin("upper", to_temp)) ?
+                df[!, x.col] .= uppercase.(df[:, x.col]) :
+                nothing
+
+        from_temp == "missing" ?
             all(typeof.(df[:,x.col]) .== Missing) ?
                 df = edit_with(df, Add(x.col, x.to)) :
                 df[ismissing.(df[:,x.col]), x.col] .= x.to :

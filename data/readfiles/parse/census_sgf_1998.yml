@@ -22,9 +22,9 @@ Order:
   - {col: windc_code,type: String}
   - {col: units,     type: String}
   - {col: value,     type: Float64}
-  - {col: units_0,    type: String}
-  - {col: value_0,    type: Any}
-  - {col: factor,     type: Any}
+# - {col: units_0,    type: String}
+# - {col: value_0,    type: Any}
+# - {col: factor,     type: Any}
 
 Rename:
   - {from: missing, to: sgf_desc}

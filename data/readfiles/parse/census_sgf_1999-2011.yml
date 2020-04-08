@@ -31,9 +31,9 @@ Order:
   - {col: windc_code,type: String}
   - {col: units,     type: String}
   - {col: value,     type: Float64}
-  - {col: units_0,    type: String}
-  - {col: value_0,    type: Any}
-  - {col: factor,     type: Any}
+# - {col: units_0,    type: String}
+# - {col: value_0,    type: Any}
+# - {col: factor,     type: Any}
 
 Rename:
   - {from: Item, to: sgf_desc}
@@ -69,6 +69,9 @@ Drop:
   col: [Item, state]
   val: missing
   operation: "=="
+# - col: sgf_code
+#   val: missing
+#   operation: "=="
 
 Operate:
   operation: "*"

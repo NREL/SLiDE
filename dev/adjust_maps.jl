@@ -30,8 +30,8 @@ if length(filename) > 0
     CSV.write(joinpath(y["PathOut"]...), unique(df))
 end
 
-# # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-# # SGF
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+# SGF
 filename = files_map[occursin.(joinpath("parse","sgf"), files_map)]
 if length(filename) > 0
     println(string("Standardizing ", filename[1]))
