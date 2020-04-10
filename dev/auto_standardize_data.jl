@@ -9,11 +9,10 @@ using SLiDE  # see src/SLiDE.jl
 
 READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "readfiles"))
 
-check_one = true;
-file_check = "use_det"; # index of parsed files to check.
+check_one = false;
+file_check = "cfs"; # index of parsed files to check.
 
-
-files_parse = XLSXInput("generate_yaml.xlsx", "parse", "A1:Z180", "parse")
+files_parse = XLSXInput("generate_yaml.xlsx", "parse", "J1:L180", "parse")
 files_parse = write_yaml(READ_DIR, files_parse)
 
 .&(check_one, any(occursin.(file_check, files_parse))) ?
@@ -21,9 +20,7 @@ files_parse = write_yaml(READ_DIR, files_parse)
 length(files_parse) == 1 ? check_one = true : nothing
 check_one ? y = read_file(joinpath(READ_DIR, files_parse[1])) : nothing
 
-
 files_parse = run_yaml(files_parse);
-
 check_one ? df = read_file(joinpath(y["PathOut"]...)) : nothing
 
 # ******************************************************************************************
@@ -44,3 +41,5 @@ check_one ? df = read_file(joinpath(y["PathOut"]...)) : nothing
 # df = "Operate" in keys(y) ? edit_with(df, y["Operate"])          : df
 # df = "Describe"  in keys(y) ? edit_with(df, y["Describe"], file) : df
 # df = "Order"   in keys(y) ? edit_with(df, y["Order"])            : df
+
+# x = Drop(:sctg, "-", "occursin")

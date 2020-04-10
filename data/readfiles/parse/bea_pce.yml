@@ -60,9 +60,9 @@ Drop:
   - col: [Region, TableName, Line, IndustryClassification]
     val: all
     operation: "=="
-# - col: value
-#   val: missing
-#   operation: "=="
   - col: component
     val: Per capita personal consumption expenditures (PCE) by state
     operation: "=="
+# - col: value
+#   val: missing
+#   operation: "=="

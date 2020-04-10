@@ -27,6 +27,9 @@ Replace:
     to:   1.0
 
 Drop:
-  col: from
-  val: [missing, unique]
-  operation: "=="
+  - col: comment
+    val: all
+    operation: "=="
+  - col: from
+    val: [missing, unique]
+    operation: "=="

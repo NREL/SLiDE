@@ -75,6 +75,7 @@ Drop:
 
 Operate:
   operation: "*"
+  axis:   col
   from:   units
   to:     units_factor
   input:  [value, factor]

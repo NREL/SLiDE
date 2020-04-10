@@ -16,6 +16,9 @@ FileInput:
   - colnames: [year, region_desc, windc_code, units, value]
     f1: pce.csv
     f2: pce_units.csv
+  # - colnames: [orig_metro, dest_metro, naics, sctg, units, value]
+  #   f1: cfs_metro.csv
+  #   f2: cfsdata_ma_units.csv
   - colnames: [state, naics_code, units, value]
     f1: nass.csv
     f2: nass_units.csv

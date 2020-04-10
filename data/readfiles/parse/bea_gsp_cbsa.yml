@@ -4,7 +4,7 @@ Editable: true
 
 Path:  [.., data, datasources, BEA, GDP, Metro]
 
-PathOut: [.., data, output, gsp_metro.csv]
+PathOut: [.., data, output, gsp_cbsa.csv]
 
 CSVInput:
   - {name: MAGDP2_2001_2017_ALL_AREAS.csv,  descriptor: gdp}
@@ -46,11 +46,11 @@ Map:
     to:     to
     input:  component
     output: component
-# - file:   [scale, census_cbsa.csv]
-#   from:   cbsa_code
-#   to:     cbsa_desc
-#   input:  region_code
-#   output: region_desc
+  - file:   [scale, census_cbsa.csv]
+    from:   cbsa_code
+    to:     cbsa_desc
+    input:  region_code
+    output: region_desc
   - file:   [parse, units.csv]
     from:   from
     to:     to
@@ -65,6 +65,9 @@ Replace:
 Drop:
   - col: [Region, TableName]
     val: all
+    operation: "=="
+  - col: region_desc
+    val: missing
     operation: "=="
   - col: component
     val: missing

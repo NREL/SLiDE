@@ -67,7 +67,7 @@ function compare_keys(df_lst::Array{DataFrame,1}, ind::Array{Symbol,1}; value = 
 
     # [all(length.(values(d1)).==0) ? pop!(d_temp,k1) :
     #     [pop!(d_temp[k1],k2) for (k2,d2) in d1 if length(d2)==0] for (k1,d1) in d_temp]
-    
+
     d = Dict(k1 => Dict(k2 => sort(d2) for (k2,d2) in d1 if length(d2) != 0)
         for (k1,d1) in d_temp if any(length.(values(d1)).!==0))
     
@@ -95,38 +95,38 @@ lst = y["FileInput"];
 
 df_attn = Dict()
 
-for inp in lst[[end]]
-    println("\n",uppercase(inp.f1));
+# for inp in lst
+#     println("\n",uppercase(inp.f1));
 
-    dfs = read_file(joinpath(path_slide, inp.f1));
-    global dfs = make_uniform(dfs, inp.colnames);
+#     dfs = read_file(joinpath(path_slide, inp.f1));
+#     global dfs = make_uniform(dfs, inp.colnames);
 
-    dfb = read_file(joinpath(path_bluenote, inp.f2));
-    global dfb = make_uniform(dfb, inp.colnames);
+#     dfb = read_file(joinpath(path_bluenote, inp.f2));
+#     global dfb = make_uniform(dfb, inp.colnames);
 
-    if occursin("seds", inp.f1)
-        x = [Rename.([:units_0, :value_0], [:units, :value]);
-             Replace.([:source_code, :sector_code], "lower", "upper");
-             Map("parse/units.csv", [:from], [:to], [:units], [:units])];
-        global dfs = edit_with(dfs, x)
-        global dfb = edit_with(dfb, x)
-    end
+#     if occursin("seds", inp.f1)
+#         x = [Rename.([:units_0, :value_0], [:units, :value]);
+#              Replace.([:source_code, :sector_code], "lower", "upper");
+#              Map("parse/units.csv", [:from], [:to], [:units], [:units])];
+#         global dfs = edit_with(dfs, x)
+#         global dfb = edit_with(dfb, x)
+#     end
 
-    d = compare_keys(copy.([dfs, dfb]), [:slide, :bluenote]);
+#     d = compare_keys(copy.([dfs, dfb]), [:slide, :bluenote]);
 
-    # Resolve MINOR discrepancies to compare values.
-    x = [Replace(:output_bea_windc, "subsidies", "Subsidies"),  # bea
-         Replace(:component,        "Tax",       "tax"),        # gsp
-         Replace(:sgf_code,         "othtax",    "OTHTAX"),     # sgf
-         Replace(:units, "btu per kWh generated", "btu per kilowatthour") # heatrate
-    ]
+#     # Resolve MINOR discrepancies to compare values.
+#     x = [Replace(:output_bea_windc, "subsidies", "Subsidies"),  # bea
+#          Replace(:component,        "Tax",       "tax"),        # gsp
+#          Replace(:sgf_code,         "othtax",    "OTHTAX"),     # sgf
+#          Replace(:units, "btu per kWh generated", "btu per kilowatthour") # heatrate
+#     ]
 
-    global dfs = edit_with(dfs, x);
-    global dfb = edit_with(dfb, x);
+#     global dfs = edit_with(dfs, x);
+#     global dfb = edit_with(dfb, x);
 
-    global df = compare_values(copy.([dfs, dfb]), [:slide, :bluenote]);
-    size(df,1) > 0 ? df_attn[inp.f1[1:end-4]] = df : nothing
-end
+#     global df = compare_values(copy.([dfs, dfb]), [:slide, :bluenote]);
+#     size(df,1) > 0 ? df_attn[inp.f1[1:end-4]] = df : nothing
+# end
 
 # ******************************************************************************************
 # cols = [:year, :state, :sgf_code, :units, :value];
@@ -140,26 +140,34 @@ end
 # display(first(dfb,4));
 
 # ******************************************************************************************
-# cols = [:state, :naics_code, :year, :flow, :units, :value];
-# dfs = read_file(joinpath(path_slide, "utd.csv"));
-# dfs = sort(dfs, cols[1:end-1]);
+# cols = [:orig_state, :dest_state, :naics, :sctg, :units, :value];
+# dfs = read_file(joinpath(path_slide, "cfs_state.csv"));
+# dfs = make_uniform(dfs, cols);
 # display(first(dfs,4));
 
-# dfb = read_file(joinpath(path_bluenote, "usatrd_units.csv"));
-# # dfb = make_uniform(dfb, cols);
-# dfb = edit_with(dfb, Rename.(names(dfb),cols))
-# dfb = sort(dfb, cols[1:end-1]);
+# dfb = read_file(joinpath(path_bluenote, "cfsdata_st_units.csv"));
+# dfb = make_uniform(dfb, cols);
+# # dfb = edit_with(dfb, Rename.(names(dfb),cols))
 # display(first(dfb,4));
+
+# d = compare_keys(copy.([dfs,dfb]), [:slide,:bluenote])
+# df = compare_summary(copy.([dfs,dfb]), [:slide,:bluenote]);
+
+
+
+# ******************************************************************************************
+# dfs = read_file(joinpath(path_slide, "cfs.csv"));
+
 
 # ******************************************************************************************
 # TESTING
-df = compare_summary(copy.([dfs,dfb]), [:slide,:bluenote]);
+# df = compare_summary(copy.([dfs,dfb]), [:slide,:bluenote]);
 
-dfa = dfs[.&(dfs[:,:year] .> 2014),:];
-dfb = edit_with(dfa, Drop.(:source,["oil"],"=="));
-dfc = copy(dfb);
-dfc[.&(dfc[:,:source] .== "gas"), :value] *= 10;
-dfc[4,:value] *= 10;
-dfa = dfa[1:end-1,:]
+# dfa = dfs[.&(dfs[:,:year] .> 2014),:];
+# dfb = edit_with(dfa, Drop.(:source,["oil"],"=="));
+# dfc = copy(dfb);
+# dfc[.&(dfc[:,:source] .== "gas"), :value] *= 10;
+# dfc[4,:value] *= 10;
+# dfa = dfa[1:end-1,:]
 
 # ******************************************************************************************

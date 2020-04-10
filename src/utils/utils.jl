@@ -25,6 +25,7 @@ Base.strip(x::Number) = x
     Base.lowercase(x::Symbol)
 Extends `lowercase` to handle symbols.
 """
+Base.lowercase(x::Int) = x
 Base.lowercase(x::Symbol) = Symbol(lowercase(string(x)))
 Base.lowercase(x::Missing) = missing
 
@@ -32,6 +33,7 @@ Base.lowercase(x::Missing) = missing
     Base.uppercase(x::Symbol)
 Extends `uppercase` to handle symbols.
 """
+Base.uppercase(x::Int) = x
 Base.uppercase(x::Symbol) = Symbol(uppercase(string(x)))
 Base.uppercase(x::Missing) = missing
 

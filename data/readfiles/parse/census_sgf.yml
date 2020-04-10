@@ -15,6 +15,6 @@ CSVInput:
 Order:
   - {col: year,      type: Int}
   - {col: state,     type: String}
-  - {col: sgf_windc, type: String}
+# - {col: sgf_windc, type: String}
   - {col: units,     type: String}
   - {col: value,     type: Float64}

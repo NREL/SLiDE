@@ -68,7 +68,9 @@ function edit_with(df::DataFrame, x::Drop)
             # Perform generalized drops specified by the operation field.
             # !!!! Add error if broadcast not possible.
             df[!,x.col] .= convert_type.(typeof(x.val), df[:,x.col])
-            df = df[.!broadcast(datatype(x.operation), df[:,x.col], x.val), :]
+            df = x.operation == "occursin" ?
+                df[.!broadcast(datatype(x.operation), x.val, df[:,x.col]), :] :
+                df[.!broadcast(datatype(x.operation), df[:,x.col], x.val), :]
         end
     end
     return df
@@ -152,31 +154,61 @@ function edit_with(df::DataFrame, x::Melt)
     return df
 end
 
+# function edit_with(df::DataFrame, x::Operate)
+#     # Perform operation on columns. Isolate columns to be operated on.
+#     # Append original columns that might be replaced "_0" to preserve information.
+#     df_val = convert_type.(Float64, copy(df[:,x.input]))
+#     x.output in x.input ? df = edit_with(df, Rename(x.output, Symbol(x.output, :_0))) :
+#         nothing
+#     df[!,x.output] .= broadcast(datatype(x.operation), [col for col in eachcol(df_val)]...)
+
+#     # !!!! SOS how do we deal with floating point arithmetic? (ex: 1.1 + 0.1 = 1.2000000000000002)
+#     df[!,x.output] .= round.(df[:,x.output], digits=8)
+
+#     # Adjust labeling columns.
+#     for (from, to) in zip(x.from, x.to)
+#         if from in names(df) && to in names(df) && from !== to
+#             df_comment = dropmissing(unique(df[:, [from; to]]))
+#             df[!, Symbol(from, :_0)] .= df[:,from]
+#             df = edit_with(df, Replace.(from, df_comment[:,from], df_comment[:,to]))
+#         end
+#     end
+    
+#     # Reorder DataFrame columns to show all columns involved in the operation last.
+#     # This could aid in troubleshooting.
+#     cols = intersect([setdiff(x.input, [x.output]); Symbol(x.output, :_0); x.output;
+#         reverse(sort([Symbol.(x.from, :_0); x.from])); reverse(sort(x.to))], names(df));
+#     return df[:,[setdiff(names(df), cols); cols]]
+# end
+
 function edit_with(df::DataFrame, x::Operate)
-    # Perform operation on columns. Isolate columns to be operated on.
-    # Append original columns that might be replaced "_0" to preserve information.
-    df_val = convert_type.(Float64, copy(df[:,x.input]))
-    x.output in x.input ? df = edit_with(df, Rename(x.output, Symbol(x.output, :_0))) :
-        nothing
-    df[!,x.output] .= broadcast(datatype(x.operation), [col for col in eachcol(df_val)]...)
+    # If it is a ROW-WISE operation,
+    if Symbol(1) == x.axis || occursin(:row, lowercase(x.axis))
+        df = by(df, x.input, x.output => datatype(x.operation));
+        df = edit_with(df, Rename.(setdiff(names(df),x.input), [x.output]));
+    end
 
-    # !!!! SOS how do we deal with floating point arithmetic? (ex: 1.1 + 0.1 = 1.2000000000000002)
-    df[!,x.output] .= round.(df[:,x.output], digits=8)
+    # If it is a COLUMN-WISE operation, 
+    if Symbol(2) == x.axis || occursin(:col, lowercase(x.axis))
+        # Isolate columns to be operated on.
+        # Append original columns that might be replaced "_0" to preserve information.
+        df_val = convert_type.(Float64, copy(df[:,x.input]))
+        x.output in x.input ? df = edit_with(df, Rename(x.output, Symbol(x.output, :_0))) :
+            nothing
+        df[!,x.output] .= broadcast(datatype(x.operation), [col for col in eachcol(df_val)]...)
 
-    # Adjust labeling columns.
-    for (from, to) in zip(x.from, x.to)
-        if from in names(df) && to in names(df) && from !== to
-            df_comment = dropmissing(unique(df[:, [from; to]]))
-            df[!, Symbol(from, :_0)] .= df[:,from]
-            df = edit_with(df, Replace.(from, df_comment[:,from], df_comment[:,to]))
+        # Adjust labeling columns.
+        for (from, to) in zip(x.from, x.to)
+            if from in names(df) && to in names(df) && from !== to
+                df_comment = dropmissing(unique(df[:, [from; to]]))
+                df[!, Symbol(from, :_0)] .= df[:,from]
+                df = edit_with(df, Replace.(from, df_comment[:,from], df_comment[:,to]))
+            end
         end
     end
-    
-    # Reorder DataFrame columns to show all columns involved in the operation last.
-    # This could aid in troubleshooting.
-    cols = intersect([setdiff(x.input, [x.output]); Symbol(x.output, :_0); x.output;
-        reverse(sort([Symbol.(x.from, :_0); x.from])); reverse(sort(x.to))], names(df));
-    return df[:,[setdiff(names(df), cols); cols]]
+    # !!!! SOS how do we deal with floating point arithmetic? (ex: 1.1 + 0.1 = 1.2000000000000002)
+    df[!,x.output] .= round.(df[:,x.output], digits=8)
+    return df
 end
 
 function edit_with(df::DataFrame, x::Order)
