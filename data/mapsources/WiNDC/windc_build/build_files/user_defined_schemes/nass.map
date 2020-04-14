@@ -1,0 +1,121 @@
+* create regions in target dataset
+ALIAS(r,rr);
+
+* map target regions to source regions
+SET rmap(rr,r);
+rmap(r,r) = yes;
+
+SET ss "Sectors in the target dataset" /
+		oila	"Oilseed farming (1111A0)",
+		grna	"Grain farming (1111B0)",
+		vega	"Vegetable and melon farming (111200)",
+		nuta	"Fruit and tree nut farming (111300)",
+		floa	"Greenhouse, nursery, and floriculture production (111400)",
+		otha	"Other crop farming (111900)",
+		befa	"Beef cattle ranching and farming, including feedlots and dual-purpose ranching and farming (1121A0)",
+		drya	"Dairy cattle and milk production (112120)",
+		otaa	"Animal production, except cattle and poultry and eggs (112A00)",
+		egga	"Poultry and egg production (112300)",
+		fdp		"Food processing",
+		trn		"Transportation",
+		con		"Construction",
+		mnf		"Manufacturing sectors",
+		srv		"Services",
+		roe		"Rest of the economy" /;
+
+SET mm "Margins in the target dataset" /
+		trn	"Transport margin"
+		trd	"Retail margin" /;
+
+SET smap(ss,s) "Mapping of target sectors ss and source sectors s" /
+		oila.oil_agr	"Oilseed farming (1111A0)",
+		grna.grn_agr	"Grain farming (1111B0)",
+		vega.veg_agr	"Vegetable and melon farming (111200)",
+		nuta.nut_agr	"Fruit and tree nut farming (111300)",
+		floa.flo_agr	"Greenhouse, nursery, and floriculture production (111400)",
+		otha.oth_agr	"Other crop farming (111900)",
+		befa.bef_agr	"Beef cattle ranching and farming, including feedlots and dual-purpose ranching and farming (1121A0)",
+		drya.dry_agr	"Dairy cattle and milk production (112120)",
+		otaa.ota_agr	"Animal production, except cattle and poultry and eggs (112A00)",
+		egga.egg_agr	"Poultry and egg production (112300)",
+		fdp.fbp				"Food and beverage and tobacco products",
+		con.con				"Construction",
+
+		trn.air				"Air transportation",
+		trn.trn				"Rail transportation",
+		trn.wtt				"Water transportation",
+		trn.trk				"Truck transportation",
+		trn.grd				"Transit and ground passenger transportation",
+		trn.pip				"Pipeline transportation",
+		trn.otr				"Other transportation and support activities",
+
+		mnf.oil				"Oil and natural gas extraction",
+		mnf.pmt				"Primary metals",
+		mnf.che				"Chemical products",
+		mnf.ppd				"Paper products",
+		mnf.nmp				"Nonmetallic mineral products",
+		mnf.pla				"Plastics and rubber products",
+		mnf.min				"Mining",
+		mnf.mot				"Motor vehicles, bodies and trailers, and parts manufacturing",
+		mnf.fmt				"Fabricated metal products",
+		mnf.eec				"Electrical equipment, appliances, and components",
+		mnf.pri				"Printing and related support activities",
+		mnf.tex				"Textile mills and textile product mills",
+		mnf.mch				"Machinery",
+		mnf.wpd				"Wood products",
+		mnf.fpd				"Furniture and related products"
+		mnf.ote				"Other transportation equipment",
+		mnf.mmf				"Miscellaneous manufacturing",
+		mnf.pet				"Other petroleum based manufacturing",
+		mnf.smn				"Support activities for mining",
+		mnf.alt				"Apparel and leather and allied products",
+		mnf.fof				"Forestry, fishing, and related activities",
+		mnf.cep				"Computer and electronic products",
+
+		srv.uti				"Other utilities",
+		srv.ore				"Other real estate",
+		srv.dat				"Data processing, internet publishing, and other information",
+		srv.wst				"Waste management and remediation services",
+		srv.brd				"Broadcasting and telecommunications",
+		srv.res				"Food services and drinking places",
+		srv.wrh				"Warehousing and storage",
+		srv.fin				"Funds, trusts, and other financial vehicles",
+		srv.rec				"Amusements, gambling, and recreation industries",
+		srv.edu				"Educational services",
+		srv.tsv				"Miscellaneous professional, scientific, and technical services",
+		srv.amd				"Accommodation",
+		srv.osv				"Other services, except government",
+		srv.pub				"Publishing industries, except internet (includes software)",
+		srv.hos				"Hospitals",
+		srv.adm				"Administrative and support services",
+		srv.nrs				"Nursing and residential care facilities",
+		srv.rnt				"Rental and leasing services and lessors of intangible assets",
+		srv.soc				"Social assistance",
+		srv.art				"Performing arts, spectator sports, museums, and related activit",
+		srv.man				"Management of companies and enterprises",
+		srv.amb				"Ambulatory health care services",
+		srv.com				"Computer systems design and related services",
+		srv.bnk				"Federal Reserve banks, credit intermediation, and related activ",
+		srv.sec				"Securities, commodity contracts, and investments",
+		srv.mov				"Motion picture and sound recording industries",
+		srv.leg				"Legal services",
+		srv.ins				"Insurance carriers and related activities",
+		srv.hou				"Housing",
+
+		roe.wht       "Wholesale trade",
+		roe.mvt       "Motor vehicle and parts dealers",
+		roe.fbt       "Food and beverage stores",
+		roe.gmt       "General merchandise stores",
+		roe.ott       "Other retail",
+		roe.fdd       "Federal general government (defense)",
+		roe.fnd       "Federal general government (nondefense)",
+		roe.fen       "Federal government enterprises",
+		roe.slg       "State and local general government",
+		roe.sle       "State and local government enterprises",
+		roe.use       "Scrap, used and secondhand goods",
+		roe.oth       "Noncomparable imports and rest-of-the-world adjustment" /;
+
+SET	mmap(mm,m)	Mapping of target margins mm and source margins m /
+		trn.trn		"Transport margin"
+		trd.trd		"Retail margin"
+		/;

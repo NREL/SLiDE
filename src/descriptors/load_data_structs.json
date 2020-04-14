@@ -17,8 +17,25 @@
         "supertype": "File"
     },
     {
+        "struct_name": "GAMSInput",
+        "docstring": "Read .map or .set file",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "input file name",
+                "data_type": "String"
+            },
+            {
+                "name": "col",
+                "comment": "column names",
+                "data_type": "Array{Symbol,1}"
+            }
+        ],
+        "supertype": "File"
+    },
+    {
         "struct_name": "XLSXInput",
-        "docstring": "Read .xlsx file",
+        "docstring": "Read .xlsx file.",
         "fields": [
             {
                 "name": "name",

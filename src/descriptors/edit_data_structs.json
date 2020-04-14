@@ -17,15 +17,47 @@
         "supertype": "Edit"
     },
     {
-        "struct_name": "Map",
-        "docstring": "Define an `output` column containing values based on those in an
-        `input` column. The mapping columns `from` -> `to` are contained in a .csv `file` in
-        the coremaps directory. The columns `input' and 'from` should contain the same
-        values, as should `output` and `to`.",
+        "struct_name": "Drop",
+        "docstring": "Remove information from the dataframe",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "name of column containing data to remove",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "val",
+                "comment": "value to drop",
+                "data_type": "Any"
+            },
+            {
+                "name": "operation",
+                "comment": "how to determine what to drop",
+                "data_type": "String"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Describe",
+        "docstring": "This DataType is required when multiple DataFrames will be appended into one output file (say, if multiple sheets from an XLSX file are included). Before the DataFrames are appended, a column `col` will be added and filled with the value in the file descriptor.
+!!!! Does it make sense to have a DataType with one field?",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "name of new column",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Group",
+        "docstring": "Use to edit files containing data in successive dataframes with an identifying header cell or row.",
         "fields": [
             {
                 "name": "file",
-                "comment": "mapping .csv file name in the coremaps directory",
+                "comment": "mapping .csv file name in the coremaps directory. The mapping file should correlate with the header information identifying each data group. It will be used to separate the header rows from data.",
                 "data_type": "String"
             },
             {
@@ -40,7 +72,7 @@
             },
             {
                 "name": "input",
-                "comment": "name of the input column to map",
+                "comment": "name of the input column containing",
                 "data_type": "Symbol"
             },
             {
@@ -52,16 +84,52 @@
         "supertype": "Edit"
     },
     {
+        "struct_name": "Map",
+        "docstring": "Define an `output` column containing values based on those in an `input` column.
+The mapping columns `from` -> `to` are contained in a .csv `file` in the coremaps directory.
+The columns `input` and `from` should contain the same values, as should `output` and `to`.",
+        "fields": [
+            {
+                "name": "file",
+                "comment": "mapping .csv file name in the coremaps directory",
+                "data_type": "String"
+            },
+            {
+                "name": "from",
+                "comment": "name of the mapping column containing input values",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "to",
+                "comment": "name of the mapping column containing output values",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "input",
+                "comment": "name of the input column to map",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "output",
+                "comment": "name of the output column created",
+                "data_type": "Array{Symbol,1}"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
         "struct_name": "Melt",
         "docstring": "Normalize the dataframe by 'melting' columns into rows, lengthening the
-        dataframe by duplicating values in the column `on` into new rows and defining 2 new columns:
-            1. `var` with header names from the original dataframe.
-            2. `val` with column values from the original dataframe.
-        This operation can only be performed once per dataframe.",
+dataframe by duplicating values in the column `on` into new rows and defining 2 new columns:
+
+1. `var` with header names from the original dataframe.
+2. `val` with column values from the original dataframe.
+
+This operation can only be performed once per dataframe.",
         "fields": [
             {
                 "name": "on",
-                "comment": "name of column NOT included in melt",
+                "comment": "name of column(s) NOT included in melt",
                 "data_type": "Array{Symbol,1}"
             },
             {
@@ -73,11 +141,61 @@
                 "name": "val",
                 "comment": "name of column containing VALUES from the original dataframe",
                 "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Operate",
+        "docstring": "Perform an operation (+, -, *, /) across multiple DataFrame columns.",
+        "fields": [
+            {
+                "name": "axis",
+                "comment": "Axis across which to perform operation",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "operation",
+                "comment": "operation to perform (+, -, *, /)",
+                "data_type": "String"
+            },
+            {
+                "name": "from",
+                "comment": "name of original comment column (ex. units)",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "to",
+                "comment": "name of new comment column (ex. units)",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "input",
+                "comment": "names of columns on which to operate",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "output",
+                "comment": "name of result column",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Order",
+        "docstring": "Rearranges columns in the order specified by `cols` and sets them to
+        the specified type.",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "Ordered list of DataFrame columns",
+                "data_type": "Array{Symbol,1}"
             },
             {
                 "name": "type",
-                "comment": "Data type for the values in the VAL column",
-                "data_type": "Any"
+                "comment": "Ordered column types.",
+                "data_type": "Array{DataType,1}"
             }
         ],
         "supertype": "Edit"
@@ -111,12 +229,34 @@
             {
                 "name": "from",
                 "comment": "value to replace",
-                "data_type": "Any"
+                "data_type": "String"
             },
             {
                 "name": "to",
                 "comment": "new value",
-                "data_type": "Any"
+                "data_type": "String"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Match",
+        "docstring": "",
+        "fields": [
+            {
+                "name": "on",
+                "comment": "string indicating where to split",
+                "data_type": "Regex"
+            },
+            {
+                "name": "input",
+                "comment": "column to split",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "output",
+                "comment": "column names to label text surrounding the split",
+                "data_type": "Array{Symbol,1}"
             }
         ],
         "supertype": "Edit"

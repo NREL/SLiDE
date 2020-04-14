@@ -1,0 +1,43 @@
+from,to,factor,units_factor
+billion btu,billion btu,1.0,
+btu per kilowatthour,btu per kilowatthour,1.0,
+great circle distance in miles,great circle distance in miles,1.0,
+million btu,million btu,1.0,
+million btu per barrel,million btu per barrel,1.0,
+million btu per short ton,million btu per short ton,1.0,
+million cubic feet,million cubic feet,1.0,
+million kilowatthours,million kilowatthours,1.0,
+million metric tons of carbon dioxide,million metric tons of carbon dioxide,1.0,
+Millions of chained 2009 dollars,millions of chained 2009 us dollars (USD),1.0,
+million chained (2009) dollars,millions of chained 2009 us dollars (USD),1.0,
+millions of chained 2009 us dollars (USD),millions of chained 2009 us dollars (USD),1.0,
+Millions of chained 2012 dollars,millions of chained 2012 us dollars (USD),1.0,
+millions of chained 2012 us dollars (USD),millions of chained 2012 us dollars (USD),1.0,
+Millions of current dollars,millions of us dollars (USD),1.0,millions of us dollars (USD)
+million dollars,millions of us dollars (USD),1.0,millions of us dollars (USD)
+millions of us dollars (USD),millions of us dollars (USD),1.0,millions of us dollars (USD)
+percent,percent,1.0,
+Percent change,percent change,1.0,
+Percentage points,percentage points,1.0,
+Quantity index,quantity index,1.0,
+routed distance in miles,routed distance in miles,1.0,
+thousand,thousand,1.0,
+thousands,thousand,1.0,
+thousand barrels,thousand barrels,1.0,
+thousand btu per chained (2009) dollar,thousand btu per chained 2009 us dollars (USD),1.0,
+thousand btu per chained 2009 us dollars (USD),thousand btu per chained 2009 us dollars (USD),1.0,
+thousand btu per cubic feet,thousand btu per cubic foot,1.0,
+thousand btu per cubic foot,thousand btu per cubic foot,1.0,
+thousand btu per kilowatthour,thousand btu per kilowatthour,1.0,
+thousand cords,thousand cords,1.0,
+thousand short tons,thousand short tons,1.0,
+Thousands of dollars,thousands of us dollars (USD),0.001,millions of us dollars (USD)
+thousands of us dollars (USD),thousands of us dollars (USD),0.001,millions of us dollars (USD)
+Dollars,us dollars (USD),1.0e-6,millions of us dollars (USD)
+dollars,us dollars (USD),1.0e-6,millions of us dollars (USD)
+us dollars (USD),us dollars (USD),1.0e-6,millions of us dollars (USD)
+usd,us dollars (USD),1.0e-6,millions of us dollars (USD)
+us dollars (USD) per barrel,us dollars (USD) per barrel,1.0,
+dollars per million btu,us dollars (USD) per million btu,1.0,
+us dollars (USD) per million btu,us dollars (USD) per million btu,1.0,
+weight of shipment in pounds,weight of shipment in pounds,1.0,

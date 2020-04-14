@@ -1,0 +1,2197 @@
+naics_code,naics_desc,naics_level
+11,"Agriculture, Forestry, Fishing and Hunting",sector
+111,Crop Production,subsector
+1111,Oilseed and Grain Farming,industry_group
+11111,Soybean Farming,naics_industry
+111110,Soybean Farming,national_industry
+11112,Oilseed (except Soybean) Farming,naics_industry
+111120,Oilseed (except Soybean) Farming,national_industry
+11113,Dry Pea and Bean Farming,naics_industry
+111130,Dry Pea and Bean Farming,national_industry
+11114,Wheat Farming,naics_industry
+111140,Wheat Farming,national_industry
+11115,Corn Farming,naics_industry
+111150,Corn Farming,national_industry
+11116,Rice Farming,naics_industry
+111160,Rice Farming,national_industry
+11119,Other Grain Farming,naics_industry
+111191,Oilseed and Grain Combination Farming,national_industry
+111199,All Other Grain Farming,national_industry
+1112,Vegetable and Melon Farming,industry_group
+11121,Vegetable and Melon Farming,naics_industry
+111211,Potato Farming,national_industry
+111219,Other Vegetable (except Potato) and Melon Farming,national_industry
+1113,Fruit and Tree Nut Farming,industry_group
+11131,Orange Groves,naics_industry
+111310,Orange Groves,national_industry
+11132,Citrus (except Orange) Groves,naics_industry
+111320,Citrus (except Orange) Groves,national_industry
+11133,Noncitrus Fruit and Tree Nut Farming,naics_industry
+111331,Apple Orchards,national_industry
+111332,Grape Vineyards,national_industry
+111333,Strawberry Farming,national_industry
+111334,Berry (except Strawberry) Farming,national_industry
+111335,Tree Nut Farming,national_industry
+111336,Fruit and Tree Nut Combination Farming,national_industry
+111339,Other Noncitrus Fruit Farming,national_industry
+1114,"Greenhouse, Nursery, and Floriculture Production",industry_group
+11141,Food Crops Grown Under Cover,naics_industry
+111411,Mushroom Production,national_industry
+111419,Other Food Crops Grown Under Cover,national_industry
+11142,Nursery and Floriculture Production,naics_industry
+111421,Nursery and Tree Production,national_industry
+111422,Floriculture Production,national_industry
+1119,Other Crop Farming,industry_group
+11191,Tobacco Farming,naics_industry
+111910,Tobacco Farming,national_industry
+11192,Cotton Farming,naics_industry
+111920,Cotton Farming,national_industry
+11193,Sugarcane Farming,naics_industry
+111930,Sugarcane Farming,national_industry
+11194,Hay Farming,naics_industry
+111940,Hay Farming,national_industry
+11199,All Other Crop Farming,naics_industry
+111991,Sugar Beet Farming,national_industry
+111992,Peanut Farming,national_industry
+111998,All Other Miscellaneous Crop Farming,national_industry
+112,Animal Production and Aquaculture,subsector
+1121,Cattle Ranching and Farming,industry_group
+11211,"Beef Cattle Ranching and Farming, including Feedlots",naics_industry
+112111,Beef Cattle Ranching and Farming,national_industry
+112112,Cattle Feedlots,national_industry
+11212,Dairy Cattle and Milk Production,naics_industry
+112120,Dairy Cattle and Milk Production,national_industry
+11213,Dual-Purpose Cattle Ranching and Farming,naics_industry
+112130,Dual-Purpose Cattle Ranching and Farming,national_industry
+1122,Hog and Pig Farming,industry_group
+11221,Hog and Pig Farming,naics_industry
+112210,Hog and Pig Farming,national_industry
+1123,Poultry and Egg Production,industry_group
+11231,Chicken Egg Production,naics_industry
+112310,Chicken Egg Production,national_industry
+11232,Broilers and Other Meat Type Chicken Production,naics_industry
+112320,Broilers and Other Meat Type Chicken Production,national_industry
+11233,Turkey Production,naics_industry
+112330,Turkey Production,national_industry
+11234,Poultry Hatcheries,naics_industry
+112340,Poultry Hatcheries,national_industry
+11239,Other Poultry Production,naics_industry
+112390,Other Poultry Production,national_industry
+1124,Sheep and Goat Farming,industry_group
+11241,Sheep Farming,naics_industry
+112410,Sheep Farming,national_industry
+11242,Goat Farming,naics_industry
+112420,Goat Farming,national_industry
+1125,Aquaculture,industry_group
+11251,Aquaculture,naics_industry
+112511,Finfish Farming and Fish Hatcheries,national_industry
+112512,Shellfish Farming,national_industry
+112519,Other Aquaculture,national_industry
+1129,Other Animal Production,industry_group
+11291,Apiculture,naics_industry
+112910,Apiculture,national_industry
+11292,Horses and Other Equine Production,naics_industry
+112920,Horses and Other Equine Production,national_industry
+11293,Fur-Bearing Animal and Rabbit Production,naics_industry
+112930,Fur-Bearing Animal and Rabbit Production,national_industry
+11299,All Other Animal Production,naics_industry
+112990,All Other Animal Production,national_industry
+113,Forestry and Logging,subsector
+1131,Timber Tract Operations,industry_group
+11311,Timber Tract Operations,naics_industry
+113110,Timber Tract Operations,national_industry
+1132,Forest Nurseries and Gathering of Forest Products,industry_group
+11321,Forest Nurseries and Gathering of Forest Products,naics_industry
+113210,Forest Nurseries and Gathering of Forest Products,national_industry
+1133,Logging,industry_group
+11331,Logging,naics_industry
+113310,Logging,national_industry
+114,"Fishing, Hunting and Trapping",subsector
+1141,Fishing,industry_group
+11411,Fishing,naics_industry
+114111,Finfish Fishing,national_industry
+114112,Shellfish Fishing,national_industry
+114119,Other Marine Fishing,national_industry
+1142,Hunting and Trapping,industry_group
+11421,Hunting and Trapping,naics_industry
+114210,Hunting and Trapping,national_industry
+115,Support Activities for Agriculture and Forestry,subsector
+1151,Support Activities for Crop Production,industry_group
+11511,Support Activities for Crop Production,naics_industry
+115111,Cotton Ginning,national_industry
+115112,"Soil Preparation, Planting, and Cultivating",national_industry
+115113,"Crop Harvesting, Primarily by Machine",national_industry
+115114,Postharvest Crop Activities (except Cotton Ginning),national_industry
+115115,Farm Labor Contractors and Crew Leaders,national_industry
+115116,Farm Management Services,national_industry
+1152,Support Activities for Animal Production,industry_group
+11521,Support Activities for Animal Production,naics_industry
+115210,Support Activities for Animal Production,national_industry
+1153,Support Activities for Forestry,industry_group
+11531,Support Activities for Forestry,naics_industry
+115310,Support Activities for Forestry,national_industry
+21,"Mining, Quarrying, and Oil and Gas Extraction",sector
+211,Oil and Gas Extraction,subsector
+2111,Oil and Gas Extraction,industry_group
+21112,Crude Petroleum Extraction,naics_industry
+211120,Crude Petroleum Extraction,national_industry
+21113,Natural Gas Extraction,naics_industry
+211130,Natural Gas Extraction,national_industry
+212,Mining (except Oil and Gas),subsector
+2121,Coal Mining,industry_group
+21211,Coal Mining,naics_industry
+212111,Bituminous Coal and Lignite Surface Mining,national_industry
+212112,Bituminous Coal Underground Mining,national_industry
+212113,Anthracite Mining,national_industry
+2122,Metal Ore Mining,industry_group
+21221,Iron Ore Mining,naics_industry
+212210,Iron Ore Mining,national_industry
+21222,Gold Ore and Silver Ore Mining,naics_industry
+212221,Gold Ore Mining,national_industry
+212222,Silver Ore Mining,national_industry
+21223,"Copper, Nickel, Lead, and Zinc Mining",naics_industry
+212230,"Copper, Nickel, Lead, and Zinc Mining",national_industry
+21229,Other Metal Ore Mining,naics_industry
+212291,Uranium-Radium-Vanadium Ore Mining,national_industry
+212299,All Other Metal Ore Mining,national_industry
+2123,Nonmetallic Mineral Mining and Quarrying,industry_group
+21231,Stone Mining and Quarrying,naics_industry
+212311,Dimension Stone Mining and Quarrying,national_industry
+212312,Crushed and Broken Limestone Mining and Quarrying,national_industry
+212313,Crushed and Broken Granite Mining and Quarrying,national_industry
+212319,Other Crushed and Broken Stone Mining and Quarrying,national_industry
+21232,"Sand, Gravel, Clay, and Ceramic and Refractory Minerals Mining and Quarrying",naics_industry
+212321,Construction Sand and Gravel Mining,national_industry
+212322,Industrial Sand Mining,national_industry
+212324,Kaolin and Ball Clay Mining,national_industry
+212325,Clay and Ceramic and Refractory Minerals Mining,national_industry
+21239,Other Nonmetallic Mineral Mining and Quarrying,naics_industry
+212391,"Potash, Soda, and Borate Mineral Mining",national_industry
+212392,Phosphate Rock Mining,national_industry
+212393,Other Chemical and Fertilizer Mineral Mining,national_industry
+212399,All Other Nonmetallic Mineral Mining,national_industry
+213,Support Activities for Mining,subsector
+2131,Support Activities for Mining,industry_group
+21311,Support Activities for Mining,naics_industry
+213111,Drilling Oil and Gas Wells,national_industry
+213112,Support Activities for Oil and Gas Operations,national_industry
+213113,Support Activities for Coal Mining,national_industry
+213114,Support Activities for Metal Mining,national_industry
+213115,Support Activities for Nonmetallic Minerals (except Fuels) Mining,national_industry
+22,Utilities,sector
+221,Utilities,subsector
+2211,"Electric Power Generation, Transmission and Distribution",industry_group
+22111,Electric Power Generation,naics_industry
+221111,Hydroelectric Power Generation,national_industry
+221112,Fossil Fuel Electric Power Generation,national_industry
+221113,Nuclear Electric Power Generation,national_industry
+221114,Solar Electric Power Generation,national_industry
+221115,Wind Electric Power Generation,national_industry
+221116,Geothermal Electric Power Generation,national_industry
+221117,Biomass Electric Power Generation,national_industry
+221118,Other Electric Power Generation,national_industry
+22112,"Electric Power Transmission, Control, and Distribution",naics_industry
+221121,Electric Bulk Power Transmission and Control,national_industry
+221122,Electric Power Distribution,national_industry
+2212,Natural Gas Distribution,industry_group
+22121,Natural Gas Distribution,naics_industry
+221210,Natural Gas Distribution,national_industry
+2213,"Water, Sewage and Other Systems",industry_group
+22131,Water Supply and Irrigation Systems,naics_industry
+221310,Water Supply and Irrigation Systems,national_industry
+22132,Sewage Treatment Facilities,naics_industry
+221320,Sewage Treatment Facilities,national_industry
+22133,Steam and Air-Conditioning Supply,naics_industry
+221330,Steam and Air-Conditioning Supply,national_industry
+23,Construction,sector
+236,Construction of Buildings,subsector
+2361,Residential Building Construction,industry_group
+23611,Residential Building Construction,naics_industry
+236115,New Single-Family Housing Construction (except For-Sale Builders),national_industry
+236116,New Multifamily Housing Construction (except For-Sale Builders),national_industry
+236117,New Housing For-Sale Builders,national_industry
+236118,Residential Remodelers,national_industry
+2362,Nonresidential Building Construction,industry_group
+23621,Industrial Building Construction,naics_industry
+236210,Industrial Building Construction,national_industry
+23622,Commercial and Institutional Building Construction,naics_industry
+236220,Commercial and Institutional Building Construction,national_industry
+237,Heavy and Civil Engineering Construction,subsector
+2371,Utility System Construction,industry_group
+23711,Water and Sewer Line and Related Structures Construction,naics_industry
+237110,Water and Sewer Line and Related Structures Construction,national_industry
+23712,Oil and Gas Pipeline and Related Structures Construction,naics_industry
+237120,Oil and Gas Pipeline and Related Structures Construction,national_industry
+23713,Power and Communication Line and Related Structures Construction,naics_industry
+237130,Power and Communication Line and Related Structures Construction,national_industry
+2372,Land Subdivision,industry_group
+23721,Land Subdivision,naics_industry
+237210,Land Subdivision,national_industry
+2373,"Highway, Street, and Bridge Construction",industry_group
+23731,"Highway, Street, and Bridge Construction",naics_industry
+237310,"Highway, Street, and Bridge Construction",national_industry
+2379,Other Heavy and Civil Engineering Construction,industry_group
+23799,Other Heavy and Civil Engineering Construction,naics_industry
+237990,Other Heavy and Civil Engineering Construction,national_industry
+238,Specialty Trade Contractors,subsector
+2381,"Foundation, Structure, and Building Exterior Contractors",industry_group
+23811,Poured Concrete Foundation and Structure Contractors,naics_industry
+238110,Poured Concrete Foundation and Structure Contractors,national_industry
+23812,Structural Steel and Precast Concrete Contractors,naics_industry
+238120,Structural Steel and Precast Concrete Contractors,national_industry
+23813,Framing Contractors,naics_industry
+238130,Framing Contractors,national_industry
+23814,Masonry Contractors,naics_industry
+238140,Masonry Contractors,national_industry
+23815,Glass and Glazing Contractors,naics_industry
+238150,Glass and Glazing Contractors,national_industry
+23816,Roofing Contractors,naics_industry
+238160,Roofing Contractors,national_industry
+23817,Siding Contractors,naics_industry
+238170,Siding Contractors,national_industry
+23819,"Other Foundation, Structure, and Building Exterior Contractors",naics_industry
+238190,"Other Foundation, Structure, and Building Exterior Contractors",national_industry
+2382,Building Equipment Contractors,industry_group
+23821,Electrical Contractors and Other Wiring Installation Contractors,naics_industry
+238210,Electrical Contractors and Other Wiring Installation Contractors,national_industry
+23822,"Plumbing, Heating, and Air-Conditioning Contractors",naics_industry
+238220,"Plumbing, Heating, and Air-Conditioning Contractors",national_industry
+23829,Other Building Equipment Contractors,naics_industry
+238290,Other Building Equipment Contractors,national_industry
+2383,Building Finishing Contractors,industry_group
+23831,Drywall and Insulation Contractors,naics_industry
+238310,Drywall and Insulation Contractors,national_industry
+23832,Painting and Wall Covering Contractors,naics_industry
+238320,Painting and Wall Covering Contractors,national_industry
+23833,Flooring Contractors,naics_industry
+238330,Flooring Contractors,national_industry
+23834,Tile and Terrazzo Contractors,naics_industry
+238340,Tile and Terrazzo Contractors,national_industry
+23835,Finish Carpentry Contractors,naics_industry
+238350,Finish Carpentry Contractors,national_industry
+23839,Other Building Finishing Contractors,naics_industry
+238390,Other Building Finishing Contractors,national_industry
+2389,Other Specialty Trade Contractors,industry_group
+23891,Site Preparation Contractors,naics_industry
+238910,Site Preparation Contractors,national_industry
+23899,All Other Specialty Trade Contractors,naics_industry
+238990,All Other Specialty Trade Contractors,national_industry
+31-33,Manufacturing,sector
+311,Food Manufacturing,subsector
+3111,Animal Food Manufacturing,industry_group
+31111,Animal Food Manufacturing,naics_industry
+311111,Dog and Cat Food Manufacturing,national_industry
+311119,Other Animal Food Manufacturing,national_industry
+3112,Grain and Oilseed Milling,industry_group
+31121,Flour Milling and Malt Manufacturing,naics_industry
+311211,Flour Milling,national_industry
+311212,Rice Milling,national_industry
+311213,Malt Manufacturing,national_industry
+31122,Starch and Vegetable Fats and Oils Manufacturing,naics_industry
+311221,Wet Corn Milling,national_industry
+311224,Soybean and Other Oilseed Processing,national_industry
+311225,Fats and Oils Refining and Blending,national_industry
+31123,Breakfast Cereal Manufacturing,naics_industry
+311230,Breakfast Cereal Manufacturing,national_industry
+3113,Sugar and Confectionery Product Manufacturing,industry_group
+31131,Sugar Manufacturing,naics_industry
+311313,Beet Sugar Manufacturing,national_industry
+311314,Cane Sugar Manufacturing,national_industry
+31134,Nonchocolate Confectionery Manufacturing,naics_industry
+311340,Nonchocolate Confectionery Manufacturing,national_industry
+31135,Chocolate and Confectionery Manufacturing,naics_industry
+311351,Chocolate and Confectionery Manufacturing from Cacao Beans,national_industry
+311352,Confectionery Manufacturing from Purchased Chocolate,national_industry
+3114,Fruit and Vegetable Preserving and Specialty Food Manufacturing,industry_group
+31141,Frozen Food Manufacturing,naics_industry
+311411,"Frozen Fruit, Juice, and Vegetable Manufacturing",national_industry
+311412,Frozen Specialty Food Manufacturing,national_industry
+31142,"Fruit and Vegetable Canning, Pickling, and Drying",naics_industry
+311421,Fruit and Vegetable Canning,national_industry
+311422,Specialty Canning,national_industry
+311423,Dried and Dehydrated Food Manufacturing,national_industry
+3115,Dairy Product Manufacturing,industry_group
+31151,Dairy Product (except Frozen) Manufacturing,naics_industry
+311511,Fluid Milk Manufacturing,national_industry
+311512,Creamery Butter Manufacturing,national_industry
+311513,Cheese Manufacturing,national_industry
+311514,"Dry, Condensed, and Evaporated Dairy Product Manufacturing",national_industry
+31152,Ice Cream and Frozen Dessert Manufacturing,naics_industry
+311520,Ice Cream and Frozen Dessert Manufacturing,national_industry
+3116,Animal Slaughtering and Processing,industry_group
+31161,Animal Slaughtering and Processing,naics_industry
+311611,Animal (except Poultry) Slaughtering,national_industry
+311612,Meat Processed from Carcasses,national_industry
+311613,Rendering and Meat Byproduct Processing,national_industry
+311615,Poultry Processing,national_industry
+3117,Seafood Product Preparation and Packaging,industry_group
+31171,Seafood Product Preparation and Packaging,naics_industry
+311710,Seafood Product Preparation and Packaging,national_industry
+3118,Bakeries and Tortilla Manufacturing,industry_group
+31181,Bread and Bakery Product Manufacturing,naics_industry
+311811,Retail Bakeries,national_industry
+311812,Commercial Bakeries,national_industry
+311813,"Frozen Cakes, Pies, and Other Pastries Manufacturing",national_industry
+31182,"Cookie, Cracker, and Pasta Manufacturing",naics_industry
+311821,Cookie and Cracker Manufacturing,national_industry
+311824,"Dry Pasta, Dough, and Flour Mixes Manufacturing from Purchased Flour",national_industry
+31183,Tortilla Manufacturing,naics_industry
+311830,Tortilla Manufacturing,national_industry
+3119,Other Food Manufacturing,industry_group
+31191,Snack Food Manufacturing,naics_industry
+311911,Roasted Nuts and Peanut Butter Manufacturing,national_industry
+311919,Other Snack Food Manufacturing,national_industry
+31192,Coffee and Tea Manufacturing,naics_industry
+311920,Coffee and Tea Manufacturing,national_industry
+31193,Flavoring Syrup and Concentrate Manufacturing,naics_industry
+311930,Flavoring Syrup and Concentrate Manufacturing,national_industry
+31194,Seasoning and Dressing Manufacturing,naics_industry
+311941,"Mayonnaise, Dressing, and Other Prepared Sauce Manufacturing",national_industry
+311942,Spice and Extract Manufacturing,national_industry
+31199,All Other Food Manufacturing,naics_industry
+311991,Perishable Prepared Food Manufacturing,national_industry
+311999,All Other Miscellaneous Food Manufacturing,national_industry
+312,Beverage and Tobacco Product Manufacturing,subsector
+3121,Beverage Manufacturing,industry_group
+31211,Soft Drink and Ice Manufacturing,naics_industry
+312111,Soft Drink Manufacturing,national_industry
+312112,Bottled Water Manufacturing,national_industry
+312113,Ice Manufacturing,national_industry
+31212,Breweries,naics_industry
+312120,Breweries,national_industry
+31213,Wineries,naics_industry
+312130,Wineries,national_industry
+31214,Distilleries,naics_industry
+312140,Distilleries,national_industry
+3122,Tobacco Manufacturing,industry_group
+31223,Tobacco Manufacturing,naics_industry
+312230,Tobacco Manufacturing,national_industry
+313,Textile Mills,subsector
+3131,"Fiber, Yarn, and Thread Mills",industry_group
+31311,"Fiber, Yarn, and Thread Mills",naics_industry
+313110,"Fiber, Yarn, and Thread Mills",national_industry
+3132,Fabric Mills,industry_group
+31321,Broadwoven Fabric Mills,naics_industry
+313210,Broadwoven Fabric Mills,national_industry
+31322,Narrow Fabric Mills and Schiffli Machine Embroidery,naics_industry
+313220,Narrow Fabric Mills and Schiffli Machine Embroidery,national_industry
+31323,Nonwoven Fabric Mills,naics_industry
+313230,Nonwoven Fabric Mills,national_industry
+31324,Knit Fabric Mills,naics_industry
+313240,Knit Fabric Mills,national_industry
+3133,Textile and Fabric Finishing and Fabric Coating Mills,industry_group
+31331,Textile and Fabric Finishing Mills,naics_industry
+313310,Textile and Fabric Finishing Mills,national_industry
+31332,Fabric Coating Mills,naics_industry
+313320,Fabric Coating Mills,national_industry
+314,Textile Product Mills,subsector
+3141,Textile Furnishings Mills,industry_group
+31411,Carpet and Rug Mills,naics_industry
+314110,Carpet and Rug Mills,national_industry
+31412,Curtain and Linen Mills,naics_industry
+314120,Curtain and Linen Mills,national_industry
+3149,Other Textile Product Mills,industry_group
+31491,Textile Bag and Canvas Mills,naics_industry
+314910,Textile Bag and Canvas Mills,national_industry
+31499,All Other Textile Product Mills,naics_industry
+314994,"Rope, Cordage, Twine, Tire Cord, and Tire Fabric Mills",national_industry
+314999,All Other Miscellaneous Textile Product Mills,national_industry
+315,Apparel Manufacturing,subsector
+3151,Apparel Knitting Mills,industry_group
+31511,Hosiery and Sock Mills,naics_industry
+315110,Hosiery and Sock Mills,national_industry
+31519,Other Apparel Knitting Mills,naics_industry
+315190,Other Apparel Knitting Mills,national_industry
+3152,Cut and Sew Apparel Manufacturing,industry_group
+31521,Cut and Sew Apparel Contractors,naics_industry
+315210,Cut and Sew Apparel Contractors,national_industry
+31522,Men’s and Boys’ Cut and Sew Apparel Manufacturing,naics_industry
+315220,Men’s and Boys’ Cut and Sew Apparel Manufacturing,national_industry
+31524,"Women’s, Girls’, and Infants’ Cut and Sew Apparel Manufacturing",naics_industry
+315240,"Women’s, Girls’, and Infants’ Cut and Sew Apparel Manufacturing",national_industry
+31528,Other Cut and Sew Apparel Manufacturing,naics_industry
+315280,Other Cut and Sew Apparel Manufacturing,national_industry
+3159,Apparel Accessories and Other Apparel Manufacturing,industry_group
+31599,Apparel Accessories and Other Apparel Manufacturing,naics_industry
+315990,Apparel Accessories and Other Apparel Manufacturing,national_industry
+316,Leather and Allied Product Manufacturing,subsector
+3161,Leather and Hide Tanning and Finishing,industry_group
+31611,Leather and Hide Tanning and Finishing,naics_industry
+316110,Leather and Hide Tanning and Finishing,national_industry
+3162,Footwear Manufacturing,industry_group
+31621,Footwear Manufacturing,naics_industry
+316210,Footwear Manufacturing,national_industry
+3169,Other Leather and Allied Product Manufacturing,industry_group
+31699,Other Leather and Allied Product Manufacturing,naics_industry
+316992,Women's Handbag and Purse Manufacturing,national_industry
+316998,All Other Leather Good and Allied Product Manufacturing,national_industry
+321,Wood Product Manufacturing,subsector
+3211,Sawmills and Wood Preservation,industry_group
+32111,Sawmills and Wood Preservation,naics_industry
+321113,Sawmills,national_industry
+321114,Wood Preservation,national_industry
+3212,"Veneer, Plywood, and Engineered Wood Product Manufacturing",industry_group
+32121,"Veneer, Plywood, and Engineered Wood Product Manufacturing",naics_industry
+321211,Hardwood Veneer and Plywood Manufacturing,national_industry
+321212,Softwood Veneer and Plywood Manufacturing,national_industry
+321213,Engineered Wood Member (except Truss) Manufacturing,national_industry
+321214,Truss Manufacturing,national_industry
+321219,Reconstituted Wood Product Manufacturing,national_industry
+3219,Other Wood Product Manufacturing,industry_group
+32191,Millwork,naics_industry
+321911,Wood Window and Door Manufacturing,national_industry
+321912,"Cut Stock, Resawing Lumber, and Planing",national_industry
+321918,Other Millwork (including Flooring),national_industry
+32192,Wood Container and Pallet Manufacturing,naics_industry
+321920,Wood Container and Pallet Manufacturing,national_industry
+32199,All Other Wood Product Manufacturing,naics_industry
+321991,Manufactured Home (Mobile Home) Manufacturing,national_industry
+321992,Prefabricated Wood Building Manufacturing,national_industry
+321999,All Other Miscellaneous Wood Product Manufacturing,national_industry
+322,Paper Manufacturing,subsector
+3221,"Pulp, Paper, and Paperboard Mills",industry_group
+32211,Pulp Mills,naics_industry
+322110,Pulp Mills,national_industry
+32212,Paper Mills,naics_industry
+322121,Paper (except Newsprint) Mills,national_industry
+322122,Newsprint Mills,national_industry
+32213,Paperboard Mills,naics_industry
+322130,Paperboard Mills,national_industry
+3222,Converted Paper Product Manufacturing,industry_group
+32221,Paperboard Container Manufacturing,naics_industry
+322211,Corrugated and Solid Fiber Box Manufacturing,national_industry
+322212,Folding Paperboard Box Manufacturing,national_industry
+322219,Other Paperboard Container Manufacturing,national_industry
+32222,Paper Bag and Coated and Treated Paper Manufacturing,naics_industry
+322220,Paper Bag and Coated and Treated Paper Manufacturing,national_industry
+32223,Stationery Product Manufacturing,naics_industry
+322230,Stationery Product Manufacturing,national_industry
+32229,Other Converted Paper Product Manufacturing,naics_industry
+322291,Sanitary Paper Product Manufacturing,national_industry
+322299,All Other Converted Paper Product Manufacturing,national_industry
+323,Printing and Related Support Activities,subsector
+3231,Printing and Related Support Activities,industry_group
+32311,Printing,naics_industry
+323111,Commercial Printing (except Screen and Books),national_industry
+323113,Commercial Screen Printing,national_industry
+323117,Books Printing,national_industry
+32312,Support Activities for Printing,naics_industry
+323120,Support Activities for Printing,national_industry
+324,Petroleum and Coal Products Manufacturing,subsector
+3241,Petroleum and Coal Products Manufacturing,industry_group
+32411,Petroleum Refineries,naics_industry
+324110,Petroleum Refineries,national_industry
+32412,"Asphalt Paving, Roofing, and Saturated Materials Manufacturing",naics_industry
+324121,Asphalt Paving Mixture and Block Manufacturing,national_industry
+324122,Asphalt Shingle and Coating Materials Manufacturing,national_industry
+32419,Other Petroleum and Coal Products Manufacturing,naics_industry
+324191,Petroleum Lubricating Oil and Grease Manufacturing,national_industry
+324199,All Other Petroleum and Coal Products Manufacturing,national_industry
+325,Chemical Manufacturing,subsector
+3251,Basic Chemical Manufacturing,industry_group
+32511,Petrochemical Manufacturing,naics_industry
+325110,Petrochemical Manufacturing,national_industry
+32512,Industrial Gas Manufacturing,naics_industry
+325120,Industrial Gas Manufacturing,national_industry
+32513,Synthetic Dye and Pigment Manufacturing,naics_industry
+325130,Synthetic Dye and Pigment Manufacturing,national_industry
+32518,Other Basic Inorganic Chemical Manufacturing,naics_industry
+325180,Other Basic Inorganic Chemical Manufacturing,national_industry
+32519,Other Basic Organic Chemical Manufacturing,naics_industry
+325193,Ethyl Alcohol Manufacturing,national_industry
+325194,"Cyclic Crude, Intermediate, and Gum and Wood Chemical Manufacturing",national_industry
+325199,All Other Basic Organic Chemical Manufacturing,national_industry
+3252,"Resin, Synthetic Rubber, and Artificial and Synthetic Fibers and Filaments Manufacturing",industry_group
+32521,Resin and Synthetic Rubber Manufacturing,naics_industry
+325211,Plastics Material and Resin Manufacturing,national_industry
+325212,Synthetic Rubber Manufacturing,national_industry
+32522,Artificial and Synthetic Fibers and Filaments Manufacturing,naics_industry
+325220,Artificial and Synthetic Fibers and Filaments Manufacturing,national_industry
+3253,"Pesticide, Fertilizer, and Other Agricultural Chemical Manufacturing",industry_group
+32531,Fertilizer Manufacturing,naics_industry
+325311,Nitrogenous Fertilizer Manufacturing,national_industry
+325312,Phosphatic Fertilizer Manufacturing,national_industry
+325314,Fertilizer (Mixing Only) Manufacturing,national_industry
+32532,Pesticide and Other Agricultural Chemical Manufacturing,naics_industry
+325320,Pesticide and Other Agricultural Chemical Manufacturing,national_industry
+3254,Pharmaceutical and Medicine Manufacturing,industry_group
+32541,Pharmaceutical and Medicine Manufacturing,naics_industry
+325411,Medicinal and Botanical Manufacturing,national_industry
+325412,Pharmaceutical Preparation Manufacturing,national_industry
+325413,In-Vitro Diagnostic Substance Manufacturing,national_industry
+325414,Biological Product (except Diagnostic) Manufacturing,national_industry
+3255,"Paint, Coating, and Adhesive Manufacturing",industry_group
+32551,Paint and Coating Manufacturing,naics_industry
+325510,Paint and Coating Manufacturing,national_industry
+32552,Adhesive Manufacturing,naics_industry
+325520,Adhesive Manufacturing,national_industry
+3256,"Soap, Cleaning Compound, and Toilet Preparation Manufacturing",industry_group
+32561,Soap and Cleaning Compound Manufacturing,naics_industry
+325611,Soap and Other Detergent Manufacturing,national_industry
+325612,Polish and Other Sanitation Good Manufacturing,national_industry
+325613,Surface Active Agent Manufacturing,national_industry
+32562,Toilet Preparation Manufacturing,naics_industry
+325620,Toilet Preparation Manufacturing,national_industry
+3259,Other Chemical Product and Preparation Manufacturing,industry_group
+32591,Printing Ink Manufacturing,naics_industry
+325910,Printing Ink Manufacturing,national_industry
+32592,Explosives Manufacturing,naics_industry
+325920,Explosives Manufacturing,national_industry
+32599,All Other Chemical Product and Preparation Manufacturing,naics_industry
+325991,Custom Compounding of Purchased Resins,national_industry
+325992,"Photographic Film, Paper, Plate, and Chemical Manufacturing",national_industry
+325998,All Other Miscellaneous Chemical Product and Preparation Manufacturing,national_industry
+326,Plastics and Rubber Products Manufacturing,subsector
+3261,Plastics Product Manufacturing,industry_group
+32611,Plastics Packaging Materials and Unlaminated Film and Sheet Manufacturing,naics_industry
+326111,Plastics Bag and Pouch Manufacturing,national_industry
+326112,Plastics Packaging Film and Sheet (including Laminated) Manufacturing,national_industry
+326113,Unlaminated Plastics Film and Sheet (except Packaging) Manufacturing,national_industry
+32612,"Plastics Pipe, Pipe Fitting, and Unlaminated Profile Shape Manufacturing",naics_industry
+326121,Unlaminated Plastics Profile Shape Manufacturing,national_industry
+326122,Plastics Pipe and Pipe Fitting Manufacturing,national_industry
+32613,"Laminated Plastics Plate, Sheet (except Packaging), and Shape Manufacturing",naics_industry
+326130,"Laminated Plastics Plate, Sheet (except Packaging), and Shape Manufacturing",national_industry
+32614,Polystyrene Foam Product Manufacturing,naics_industry
+326140,Polystyrene Foam Product Manufacturing,national_industry
+32615,Urethane and Other Foam Product (except Polystyrene) Manufacturing,naics_industry
+326150,Urethane and Other Foam Product (except Polystyrene) Manufacturing,national_industry
+32616,Plastics Bottle Manufacturing,naics_industry
+326160,Plastics Bottle Manufacturing,national_industry
+32619,Other Plastics Product Manufacturing,naics_industry
+326191,Plastics Plumbing Fixture Manufacturing,national_industry
+326199,All Other Plastics Product Manufacturing,national_industry
+3262,Rubber Product Manufacturing,industry_group
+32621,Tire Manufacturing,naics_industry
+326211,Tire Manufacturing (except Retreading),national_industry
+326212,Tire Retreading,national_industry
+32622,Rubber and Plastics Hoses and Belting Manufacturing,naics_industry
+326220,Rubber and Plastics Hoses and Belting Manufacturing,national_industry
+32629,Other Rubber Product Manufacturing,naics_industry
+326291,Rubber Product Manufacturing for Mechanical Use,national_industry
+326299,All Other Rubber Product Manufacturing,national_industry
+327,Nonmetallic Mineral Product Manufacturing,subsector
+3271,Clay Product and Refractory Manufacturing,industry_group
+32711,"Pottery, Ceramics, and Plumbing Fixture Manufacturing",naics_industry
+327110,"Pottery, Ceramics, and Plumbing Fixture Manufacturing",national_industry
+32712,Clay Building Material and Refractories Manufacturing,naics_industry
+327120,Clay Building Material and Refractories Manufacturing,national_industry
+3272,Glass and Glass Product Manufacturing,industry_group
+32721,Glass and Glass Product Manufacturing,naics_industry
+327211,Flat Glass Manufacturing,national_industry
+327212,Other Pressed and Blown Glass and Glassware Manufacturing,national_industry
+327213,Glass Container Manufacturing,national_industry
+327215,Glass Product Manufacturing Made of Purchased Glass,national_industry
+3273,Cement and Concrete Product Manufacturing,industry_group
+32731,Cement Manufacturing,naics_industry
+327310,Cement Manufacturing,national_industry
+32732,Ready-Mix Concrete Manufacturing,naics_industry
+327320,Ready-Mix Concrete Manufacturing,national_industry
+32733,"Concrete Pipe, Brick, and Block Manufacturing",naics_industry
+327331,Concrete Block and Brick Manufacturing,national_industry
+327332,Concrete Pipe Manufacturing,national_industry
+32739,Other Concrete Product Manufacturing,naics_industry
+327390,Other Concrete Product Manufacturing,national_industry
+3274,Lime and Gypsum Product Manufacturing,industry_group
+32741,Lime Manufacturing,naics_industry
+327410,Lime Manufacturing,national_industry
+32742,Gypsum Product Manufacturing,naics_industry
+327420,Gypsum Product Manufacturing,national_industry
+3279,Other Nonmetallic Mineral Product Manufacturing,industry_group
+32791,Abrasive Product Manufacturing,naics_industry
+327910,Abrasive Product Manufacturing,national_industry
+32799,All Other Nonmetallic Mineral Product Manufacturing,naics_industry
+327991,Cut Stone and Stone Product Manufacturing,national_industry
+327992,Ground or Treated Mineral and Earth Manufacturing,national_industry
+327993,Mineral Wool Manufacturing,national_industry
+327999,All Other Miscellaneous Nonmetallic Mineral Product Manufacturing,national_industry
+331,Primary Metal Manufacturing,subsector
+3311,Iron and Steel Mills and Ferroalloy Manufacturing,industry_group
+33111,Iron and Steel Mills and Ferroalloy Manufacturing,naics_industry
+331110,Iron and Steel Mills and Ferroalloy Manufacturing,national_industry
+3312,Steel Product Manufacturing from Purchased Steel,industry_group
+33121,Iron and Steel Pipe and Tube Manufacturing from Purchased Steel,naics_industry
+331210,Iron and Steel Pipe and Tube Manufacturing from Purchased Steel,national_industry
+33122,Rolling and Drawing of Purchased Steel,naics_industry
+331221,Rolled Steel Shape Manufacturing,national_industry
+331222,Steel Wire Drawing,national_industry
+3313,Alumina and Aluminum Production and Processing,industry_group
+33131,Alumina and Aluminum Production and Processing,naics_industry
+331313,Alumina Refining and Primary Aluminum Production,national_industry
+331314,Secondary Smelting and Alloying of Aluminum,national_industry
+331315,"Aluminum Sheet, Plate, and Foil Manufacturing",national_industry
+331318,"Other Aluminum Rolling, Drawing, and Extruding",national_industry
+3314,Nonferrous Metal (except Aluminum) Production and Processing,industry_group
+33141,Nonferrous Metal (except Aluminum) Smelting and Refining,naics_industry
+331410,Nonferrous Metal (except Aluminum) Smelting and Refining,national_industry
+33142,"Copper Rolling, Drawing, Extruding, and Alloying",naics_industry
+331420,"Copper Rolling, Drawing, Extruding, and Alloying",national_industry
+33149,"Nonferrous Metal (except Copper and Aluminum) Rolling, Drawing, Extruding, and Alloying",naics_industry
+331491,"Nonferrous Metal (except Copper and Aluminum) Rolling, Drawing, and Extruding",national_industry
+331492,"Secondary Smelting, Refining, and Alloying of Nonferrous Metal (except Copper and Aluminum)",national_industry
+3315,Foundries,industry_group
+33151,Ferrous Metal Foundries,naics_industry
+331511,Iron Foundries,national_industry
+331512,Steel Investment Foundries,national_industry
+331513,Steel Foundries (except Investment),national_industry
+33152,Nonferrous Metal Foundries,naics_industry
+331523,Nonferrous Metal Die-Casting Foundries,national_industry
+331524,Aluminum Foundries (except Die-Casting),national_industry
+331529,Other Nonferrous Metal Foundries (except Die-Casting),national_industry
+332,Fabricated Metal Product Manufacturing,subsector
+3321,Forging and Stamping,industry_group
+33211,Forging and Stamping,naics_industry
+332111,Iron and Steel Forging,national_industry
+332112,Nonferrous Forging,national_industry
+332114,Custom Roll Forming,national_industry
+332117,Powder Metallurgy Part Manufacturing,national_industry
+332119,"Metal Crown, Closure, and Other Metal Stamping (except Automotive)",national_industry
+3322,Cutlery and Handtool Manufacturing,industry_group
+33221,Cutlery and Handtool Manufacturing,naics_industry
+332215,"Metal Kitchen Cookware, Utensil, Cutlery, and Flatware (except Precious) Manufacturing",national_industry
+332216,Saw Blade and Handtool Manufacturing,national_industry
+3323,Architectural and Structural Metals Manufacturing,industry_group
+33231,Plate Work and Fabricated Structural Product Manufacturing,naics_industry
+332311,Prefabricated Metal Building and Component Manufacturing,national_industry
+332312,Fabricated Structural Metal Manufacturing,national_industry
+332313,Plate Work Manufacturing,national_industry
+33232,Ornamental and Architectural Metal Products Manufacturing,naics_industry
+332321,Metal Window and Door Manufacturing,national_industry
+332322,Sheet Metal Work Manufacturing,national_industry
+332323,Ornamental and Architectural Metal Work Manufacturing,national_industry
+3324,"Boiler, Tank, and Shipping Container Manufacturing",industry_group
+33241,Power Boiler and Heat Exchanger Manufacturing,naics_industry
+332410,Power Boiler and Heat Exchanger Manufacturing,national_industry
+33242,Metal Tank (Heavy Gauge) Manufacturing,naics_industry
+332420,Metal Tank (Heavy Gauge) Manufacturing,national_industry
+33243,"Metal Can, Box, and Other Metal Container (Light Gauge) Manufacturing",naics_industry
+332431,Metal Can Manufacturing,national_industry
+332439,Other Metal Container Manufacturing,national_industry
+3325,Hardware Manufacturing,industry_group
+33251,Hardware Manufacturing,naics_industry
+332510,Hardware Manufacturing,national_industry
+3326,Spring and Wire Product Manufacturing,industry_group
+33261,Spring and Wire Product Manufacturing,naics_industry
+332613,Spring Manufacturing,national_industry
+332618,Other Fabricated Wire Product Manufacturing,national_industry
+3327,"Machine Shops; Turned Product; and Screw, Nut, and Bolt Manufacturing",industry_group
+33271,Machine Shops,naics_industry
+332710,Machine Shops,national_industry
+33272,"Turned Product and Screw, Nut, and Bolt Manufacturing",naics_industry
+332721,Precision Turned Product Manufacturing,national_industry
+332722,"Bolt, Nut, Screw, Rivet, and Washer Manufacturing",national_industry
+3328,"Coating, Engraving, Heat Treating, and Allied Activities",industry_group
+33281,"Coating, Engraving, Heat Treating, and Allied Activities",naics_industry
+332811,Metal Heat Treating,national_industry
+332812,"Metal Coating, Engraving (except Jewelry and Silverware), and Allied Services to Manufacturers",national_industry
+332813,"Electroplating, Plating, Polishing, Anodizing, and Coloring",national_industry
+3329,Other Fabricated Metal Product Manufacturing,industry_group
+33291,Metal Valve Manufacturing,naics_industry
+332911,Industrial Valve Manufacturing,national_industry
+332912,Fluid Power Valve and Hose Fitting Manufacturing,national_industry
+332913,Plumbing Fixture Fitting and Trim Manufacturing,national_industry
+332919,Other Metal Valve and Pipe Fitting Manufacturing,national_industry
+33299,All Other Fabricated Metal Product Manufacturing,naics_industry
+332991,Ball and Roller Bearing Manufacturing,national_industry
+332992,Small Arms Ammunition Manufacturing,national_industry
+332993,Ammunition (except Small Arms) Manufacturing,national_industry
+332994,"Small Arms, Ordnance, and Ordnance Accessories Manufacturing",national_industry
+332996,Fabricated Pipe and Pipe Fitting Manufacturing,national_industry
+332999,All Other Miscellaneous Fabricated Metal Product Manufacturing,national_industry
+333,Machinery Manufacturing,subsector
+3331,"Agriculture, Construction, and Mining Machinery Manufacturing",industry_group
+33311,Agricultural Implement Manufacturing,naics_industry
+333111,Farm Machinery and Equipment Manufacturing,national_industry
+333112,Lawn and Garden Tractor and Home Lawn and Garden Equipment Manufacturing,national_industry
+33312,Construction Machinery Manufacturing,naics_industry
+333120,Construction Machinery Manufacturing,national_industry
+33313,Mining and Oil and Gas Field Machinery Manufacturing,naics_industry
+333131,Mining Machinery and Equipment Manufacturing,national_industry
+333132,Oil and Gas Field Machinery and Equipment Manufacturing,national_industry
+3332,Industrial Machinery Manufacturing,industry_group
+33324,Industrial Machinery Manufacturing,naics_industry
+333241,Food Product Machinery Manufacturing,national_industry
+333242,Semiconductor Machinery Manufacturing,national_industry
+333243,"Sawmill, Woodworking, and Paper Machinery Manufacturing",national_industry
+333244,Printing Machinery and Equipment Manufacturing,national_industry
+333249,Other Industrial Machinery Manufacturing,national_industry
+3333,Commercial and Service Industry Machinery Manufacturing,industry_group
+33331,Commercial and Service Industry Machinery Manufacturing,naics_industry
+333314,Optical Instrument and Lens Manufacturing,national_industry
+333316,Photographic and Photocopying Equipment Manufacturing,national_industry
+333318,Other Commercial and Service Industry Machinery Manufacturing,national_industry
+3334,"Ventilation, Heating, Air-Conditioning, and Commercial Refrigeration Equipment Manufacturing",industry_group
+33341,"Ventilation, Heating, Air-Conditioning, and Commercial Refrigeration Equipment Manufacturing",naics_industry
+333413,Industrial and Commercial Fan and Blower and Air Purification Equipment Manufacturing,national_industry
+333414,Heating Equipment (except Warm Air Furnaces) Manufacturing,national_industry
+333415,Air-Conditioning and Warm Air Heating Equipment and Commercial and Industrial Refrigeration Equipment Manufacturing,national_industry
+3335,Metalworking Machinery Manufacturing,industry_group
+33351,Metalworking Machinery Manufacturing,naics_industry
+333511,Industrial Mold Manufacturing,national_industry
+333514,"Special Die and Tool, Die Set, Jig, and Fixture Manufacturing",national_industry
+333515,Cutting Tool and Machine Tool Accessory Manufacturing,national_industry
+333517,Machine Tool Manufacturing,national_industry
+333519,Rolling Mill and Other Metalworking Machinery Manufacturing,national_industry
+3336,"Engine, Turbine, and Power Transmission Equipment Manufacturing",industry_group
+33361,"Engine, Turbine, and Power Transmission Equipment Manufacturing",naics_industry
+333611,Turbine and Turbine Generator Set Units Manufacturing,national_industry
+333612,"Speed Changer, Industrial High-Speed Drive, and Gear Manufacturing",national_industry
+333613,Mechanical Power Transmission Equipment Manufacturing,national_industry
+333618,Other Engine Equipment Manufacturing,national_industry
+3339,Other General Purpose Machinery Manufacturing,industry_group
+33391,Pump and Compressor Manufacturing,naics_industry
+333912,Air and Gas Compressor Manufacturing,national_industry
+333914,"Measuring, Dispensing, and Other Pumping Equipment Manufacturing",national_industry
+33392,Material Handling Equipment Manufacturing,naics_industry
+333921,Elevator and Moving Stairway Manufacturing,national_industry
+333922,Conveyor and Conveying Equipment Manufacturing,national_industry
+333923,"Overhead Traveling Crane, Hoist, and Monorail System Manufacturing",national_industry
+333924,"Industrial Truck, Tractor, Trailer, and Stacker Machinery Manufacturing",national_industry
+33399,All Other General Purpose Machinery Manufacturing,naics_industry
+333991,Power-Driven Handtool Manufacturing,national_industry
+333992,Welding and Soldering Equipment Manufacturing,national_industry
+333993,Packaging Machinery Manufacturing,national_industry
+333994,Industrial Process Furnace and Oven Manufacturing,national_industry
+333995,Fluid Power Cylinder and Actuator Manufacturing,national_industry
+333996,Fluid Power Pump and Motor Manufacturing,national_industry
+333997,Scale and Balance Manufacturing,national_industry
+333999,All Other Miscellaneous General Purpose Machinery Manufacturing,national_industry
+334,Computer and Electronic Product Manufacturing,subsector
+3341,Computer and Peripheral Equipment Manufacturing,industry_group
+33411,Computer and Peripheral Equipment Manufacturing,naics_industry
+334111,Electronic Computer Manufacturing,national_industry
+334112,Computer Storage Device Manufacturing,national_industry
+334118,Computer Terminal and Other Computer Peripheral Equipment Manufacturing,national_industry
+3342,Communications Equipment Manufacturing,industry_group
+33421,Telephone Apparatus Manufacturing,naics_industry
+334210,Telephone Apparatus Manufacturing,national_industry
+33422,Radio and Television Broadcasting and Wireless Communications Equipment Manufacturing,naics_industry
+334220,Radio and Television Broadcasting and Wireless Communications Equipment Manufacturing,national_industry
+33429,Other Communications Equipment Manufacturing,naics_industry
+334290,Other Communications Equipment Manufacturing,national_industry
+3343,Audio and Video Equipment Manufacturing,industry_group
+33431,Audio and Video Equipment Manufacturing,naics_industry
+334310,Audio and Video Equipment Manufacturing,national_industry
+3344,Semiconductor and Other Electronic Component Manufacturing,industry_group
+33441,Semiconductor and Other Electronic Component Manufacturing,naics_industry
+334412,Bare Printed Circuit Board Manufacturing,national_industry
+334413,Semiconductor and Related Device Manufacturing,national_industry
+334416,"Capacitor, Resistor, Coil, Transformer, and Other Inductor Manufacturing",national_industry
+334417,Electronic Connector Manufacturing,national_industry
+334418,Printed Circuit Assembly (Electronic Assembly) Manufacturing,national_industry
+334419,Other Electronic Component Manufacturing,national_industry
+3345,"Navigational, Measuring, Electromedical, and Control Instruments Manufacturing",industry_group
+33451,"Navigational, Measuring, Electromedical, and Control Instruments Manufacturing",naics_industry
+334510,Electromedical and Electrotherapeutic Apparatus Manufacturing,national_industry
+334511,"Search, Detection, Navigation, Guidance, Aeronautical, and Nautical System and Instrument Manufacturing",national_industry
+334512,"Automatic Environmental Control Manufacturing for Residential, Commercial, and Appliance Use",national_industry
+334513,"Instruments and Related Products Manufacturing for Measuring, Displaying, and Controlling Industrial Process Variables",national_industry
+334514,Totalizing Fluid Meter and Counting Device Manufacturing,national_industry
+334515,Instrument Manufacturing for Measuring and Testing Electricity and Electrical Signals,national_industry
+334516,Analytical Laboratory Instrument Manufacturing,national_industry
+334517,Irradiation Apparatus Manufacturing,national_industry
+334519,Other Measuring and Controlling Device Manufacturing,national_industry
+3346,Manufacturing and Reproducing Magnetic and Optical Media,industry_group
+33461,Manufacturing and Reproducing Magnetic and Optical Media,naics_industry
+334613,Blank Magnetic and Optical Recording Media Manufacturing,national_industry
+334614,"Software and Other Prerecorded Compact Disc, Tape, and Record Reproducing",national_industry
+335,"Electrical Equipment, Appliance, and Component Manufacturing",subsector
+3351,Electric Lighting Equipment Manufacturing,industry_group
+33511,Electric Lamp Bulb and Part Manufacturing,naics_industry
+335110,Electric Lamp Bulb and Part Manufacturing,national_industry
+33512,Lighting Fixture Manufacturing,naics_industry
+335121,Residential Electric Lighting Fixture Manufacturing,national_industry
+335122,"Commercial, Industrial, and Institutional Electric Lighting Fixture Manufacturing",national_industry
+335129,Other Lighting Equipment Manufacturing,national_industry
+3352,Household Appliance Manufacturing,industry_group
+33521,Small Electrical Appliance Manufacturing,naics_industry
+335210,Small Electrical Appliance Manufacturing,national_industry
+33522,Major Household Appliance Manufacturing,naics_industry
+335220,Major Household Appliance Manufacturing,national_industry
+3353,Electrical Equipment Manufacturing,industry_group
+33531,Electrical Equipment Manufacturing,naics_industry
+335311,"Power, Distribution, and Specialty Transformer Manufacturing",national_industry
+335312,Motor and Generator Manufacturing,national_industry
+335313,Switchgear and Switchboard Apparatus Manufacturing,national_industry
+335314,Relay and Industrial Control Manufacturing,national_industry
+3359,Other Electrical Equipment and Component Manufacturing,industry_group
+33591,Battery Manufacturing,naics_industry
+335911,Storage Battery Manufacturing,national_industry
+335912,Primary Battery Manufacturing,national_industry
+33592,Communication and Energy Wire and Cable Manufacturing,naics_industry
+335921,Fiber Optic Cable Manufacturing,national_industry
+335929,Other Communication and Energy Wire Manufacturing,national_industry
+33593,Wiring Device Manufacturing,naics_industry
+335931,Current-Carrying Wiring Device Manufacturing,national_industry
+335932,Noncurrent-Carrying Wiring Device Manufacturing,national_industry
+33599,All Other Electrical Equipment and Component Manufacturing,naics_industry
+335991,Carbon and Graphite Product Manufacturing,national_industry
+335999,All Other Miscellaneous Electrical Equipment and Component Manufacturing,national_industry
+336,Transportation Equipment Manufacturing,subsector
+3361,Motor Vehicle Manufacturing,industry_group
+33611,Automobile and Light Duty Motor Vehicle Manufacturing,naics_industry
+336111,Automobile Manufacturing,national_industry
+336112,Light Truck and Utility Vehicle Manufacturing,national_industry
+33612,Heavy Duty Truck Manufacturing,naics_industry
+336120,Heavy Duty Truck Manufacturing,national_industry
+3362,Motor Vehicle Body and Trailer Manufacturing,industry_group
+33621,Motor Vehicle Body and Trailer Manufacturing,naics_industry
+336211,Motor Vehicle Body Manufacturing,national_industry
+336212,Truck Trailer Manufacturing,national_industry
+336213,Motor Home Manufacturing,national_industry
+336214,Travel Trailer and Camper Manufacturing,national_industry
+3363,Motor Vehicle Parts Manufacturing,industry_group
+33631,Motor Vehicle Gasoline Engine and Engine Parts Manufacturing,naics_industry
+336310,Motor Vehicle Gasoline Engine and Engine Parts Manufacturing,national_industry
+33632,Motor Vehicle Electrical and Electronic Equipment Manufacturing,naics_industry
+336320,Motor Vehicle Electrical and Electronic Equipment Manufacturing,national_industry
+33633,Motor Vehicle Steering and Suspension Components (except Spring) Manufacturing,naics_industry
+336330,Motor Vehicle Steering and Suspension Components (except Spring) Manufacturing,national_industry
+33634,Motor Vehicle Brake System Manufacturing,naics_industry
+336340,Motor Vehicle Brake System Manufacturing,national_industry
+33635,Motor Vehicle Transmission and Power Train Parts Manufacturing,naics_industry
+336350,Motor Vehicle Transmission and Power Train Parts Manufacturing,national_industry
+33636,Motor Vehicle Seating and Interior Trim Manufacturing,naics_industry
+336360,Motor Vehicle Seating and Interior Trim Manufacturing,national_industry
+33637,Motor Vehicle Metal Stamping,naics_industry
+336370,Motor Vehicle Metal Stamping,national_industry
+33639,Other Motor Vehicle Parts Manufacturing,naics_industry
+336390,Other Motor Vehicle Parts Manufacturing,national_industry
+3364,Aerospace Product and Parts Manufacturing,industry_group
+33641,Aerospace Product and Parts Manufacturing,naics_industry
+336411,Aircraft Manufacturing,national_industry
+336412,Aircraft Engine and Engine Parts Manufacturing,national_industry
+336413,Other Aircraft Parts and Auxiliary Equipment Manufacturing,national_industry
+336414,Guided Missile and Space Vehicle Manufacturing,national_industry
+336415,Guided Missile and Space Vehicle Propulsion Unit and Propulsion Unit Parts Manufacturing,national_industry
+336419,Other Guided Missile and Space Vehicle Parts and Auxiliary Equipment Manufacturing,national_industry
+3365,Railroad Rolling Stock Manufacturing,industry_group
+33651,Railroad Rolling Stock Manufacturing,naics_industry
+336510,Railroad Rolling Stock Manufacturing,national_industry
+3366,Ship and Boat Building,industry_group
+33661,Ship and Boat Building,naics_industry
+336611,Ship Building and Repairing,national_industry
+336612,Boat Building,national_industry
+3369,Other Transportation Equipment Manufacturing,industry_group
+33699,Other Transportation Equipment Manufacturing,naics_industry
+336991,"Motorcycle, Bicycle, and Parts Manufacturing",national_industry
+336992,"Military Armored Vehicle, Tank, and Tank Component Manufacturing",national_industry
+336999,All Other Transportation Equipment Manufacturing,national_industry
+337,Furniture and Related Product Manufacturing,subsector
+3371,Household and Institutional Furniture and Kitchen Cabinet Manufacturing,industry_group
+33711,Wood Kitchen Cabinet and Countertop Manufacturing,naics_industry
+337110,Wood Kitchen Cabinet and Countertop Manufacturing,national_industry
+33712,Household and Institutional Furniture Manufacturing,naics_industry
+337121,Upholstered Household Furniture Manufacturing,national_industry
+337122,Nonupholstered Wood Household Furniture Manufacturing,national_industry
+337124,Metal Household Furniture Manufacturing,national_industry
+337125,Household Furniture (except Wood and Metal) Manufacturing,national_industry
+337127,Institutional Furniture Manufacturing,national_industry
+3372,Office Furniture (including Fixtures) Manufacturing,industry_group
+33721,Office Furniture (including Fixtures) Manufacturing,naics_industry
+337211,Wood Office Furniture Manufacturing,national_industry
+337212,Custom Architectural Woodwork and Millwork Manufacturing,national_industry
+337214,Office Furniture (except Wood) Manufacturing,national_industry
+337215,"Showcase, Partition, Shelving, and Locker Manufacturing",national_industry
+3379,Other Furniture Related Product Manufacturing,industry_group
+33791,Mattress Manufacturing,naics_industry
+337910,Mattress Manufacturing,national_industry
+33792,Blind and Shade Manufacturing,naics_industry
+337920,Blind and Shade Manufacturing,national_industry
+339,Miscellaneous Manufacturing,subsector
+3391,Medical Equipment and Supplies Manufacturing,industry_group
+33911,Medical Equipment and Supplies Manufacturing,naics_industry
+339112,Surgical and Medical Instrument Manufacturing,national_industry
+339113,Surgical Appliance and Supplies Manufacturing,national_industry
+339114,Dental Equipment and Supplies Manufacturing,national_industry
+339115,Ophthalmic Goods Manufacturing,national_industry
+339116,Dental Laboratories,national_industry
+3399,Other Miscellaneous Manufacturing,industry_group
+33991,Jewelry and Silverware Manufacturing,naics_industry
+339910,Jewelry and Silverware Manufacturing,national_industry
+33992,Sporting and Athletic Goods Manufacturing,naics_industry
+339920,Sporting and Athletic Goods Manufacturing,national_industry
+33993,"Doll, Toy, and Game Manufacturing",naics_industry
+339930,"Doll, Toy, and Game Manufacturing",national_industry
+33994,Office Supplies (except Paper) Manufacturing,naics_industry
+339940,Office Supplies (except Paper) Manufacturing,national_industry
+33995,Sign Manufacturing,naics_industry
+339950,Sign Manufacturing,national_industry
+33999,All Other Miscellaneous Manufacturing,naics_industry
+339991,"Gasket, Packing, and Sealing Device Manufacturing",national_industry
+339992,Musical Instrument Manufacturing,national_industry
+339993,"Fastener, Button, Needle, and Pin Manufacturing",national_industry
+339994,"Broom, Brush, and Mop Manufacturing",national_industry
+339995,Burial Casket Manufacturing,national_industry
+339999,All Other Miscellaneous Manufacturing,national_industry
+42,Wholesale Trade,sector
+423,"Merchant Wholesalers, Durable Goods",subsector
+4231,Motor Vehicle and Motor Vehicle Parts and Supplies Merchant Wholesalers,industry_group
+42311,Automobile and Other Motor Vehicle Merchant Wholesalers,naics_industry
+423110,Automobile and Other Motor Vehicle Merchant Wholesalers,national_industry
+42312,Motor Vehicle Supplies and New Parts Merchant Wholesalers,naics_industry
+423120,Motor Vehicle Supplies and New Parts Merchant Wholesalers,national_industry
+42313,Tire and Tube Merchant Wholesalers,naics_industry
+423130,Tire and Tube Merchant Wholesalers,national_industry
+42314,Motor Vehicle Parts (Used) Merchant Wholesalers,naics_industry
+423140,Motor Vehicle Parts (Used) Merchant Wholesalers,national_industry
+4232,Furniture and Home Furnishing Merchant Wholesalers,industry_group
+42321,Furniture Merchant Wholesalers,naics_industry
+423210,Furniture Merchant Wholesalers,national_industry
+42322,Home Furnishing Merchant Wholesalers,naics_industry
+423220,Home Furnishing Merchant Wholesalers,national_industry
+4233,Lumber and Other Construction Materials Merchant Wholesalers,industry_group
+42331,"Lumber, Plywood, Millwork, and Wood Panel Merchant Wholesalers",naics_industry
+423310,"Lumber, Plywood, Millwork, and Wood Panel Merchant Wholesalers",national_industry
+42332,"Brick, Stone, and Related Construction Material Merchant Wholesalers",naics_industry
+423320,"Brick, Stone, and Related Construction Material Merchant Wholesalers",national_industry
+42333,"Roofing, Siding, and Insulation Material Merchant Wholesalers",naics_industry
+423330,"Roofing, Siding, and Insulation Material Merchant Wholesalers",national_industry
+42339,Other Construction Material Merchant Wholesalers,naics_industry
+423390,Other Construction Material Merchant Wholesalers,national_industry
+4234,Professional and Commercial Equipment and Supplies Merchant Wholesalers,industry_group
+42341,Photographic Equipment and Supplies Merchant Wholesalers,naics_industry
+423410,Photographic Equipment and Supplies Merchant Wholesalers,national_industry
+42342,Office Equipment Merchant Wholesalers,naics_industry
+423420,Office Equipment Merchant Wholesalers,national_industry
+42343,Computer and Computer Peripheral Equipment and Software Merchant Wholesalers,naics_industry
+423430,Computer and Computer Peripheral Equipment and Software Merchant Wholesalers,national_industry
+42344,Other Commercial Equipment Merchant Wholesalers,naics_industry
+423440,Other Commercial Equipment Merchant Wholesalers,national_industry
+42345,"Medical, Dental, and Hospital Equipment and Supplies Merchant Wholesalers",naics_industry
+423450,"Medical, Dental, and Hospital Equipment and Supplies Merchant Wholesalers",national_industry
+42346,Ophthalmic Goods Merchant Wholesalers,naics_industry
+423460,Ophthalmic Goods Merchant Wholesalers,national_industry
+42349,Other Professional Equipment and Supplies Merchant Wholesalers,naics_industry
+423490,Other Professional Equipment and Supplies Merchant Wholesalers,national_industry
+4235,Metal and Mineral (except Petroleum) Merchant Wholesalers,industry_group
+42351,Metal Service Centers and Other Metal Merchant Wholesalers,naics_industry
+423510,Metal Service Centers and Other Metal Merchant Wholesalers,national_industry
+42352,Coal and Other Mineral and Ore Merchant Wholesalers,naics_industry
+423520,Coal and Other Mineral and Ore Merchant Wholesalers,national_industry
+4236,Household Appliances and Electrical and Electronic Goods Merchant Wholesalers,industry_group
+42361,"Electrical Apparatus and Equipment, Wiring Supplies, and Related Equipment Merchant Wholesalers",naics_industry
+423610,"Electrical Apparatus and Equipment, Wiring Supplies, and Related Equipment Merchant Wholesalers",national_industry
+42362,"Household Appliances, Electric Housewares, and Consumer Electronics Merchant Wholesalers",naics_industry
+423620,"Household Appliances, Electric Housewares, and Consumer Electronics Merchant Wholesalers",national_industry
+42369,Other Electronic Parts and Equipment Merchant Wholesalers,naics_industry
+423690,Other Electronic Parts and Equipment Merchant Wholesalers,national_industry
+4237,"Hardware, and Plumbing and Heating Equipment and Supplies Merchant Wholesalers",industry_group
+42371,Hardware Merchant Wholesalers,naics_industry
+423710,Hardware Merchant Wholesalers,national_industry
+42372,Plumbing and Heating Equipment and Supplies (Hydronics) Merchant Wholesalers,naics_industry
+423720,Plumbing and Heating Equipment and Supplies (Hydronics) Merchant Wholesalers,national_industry
+42373,Warm Air Heating and Air-Conditioning Equipment and Supplies Merchant Wholesalers,naics_industry
+423730,Warm Air Heating and Air-Conditioning Equipment and Supplies Merchant Wholesalers,national_industry
+42374,Refrigeration Equipment and Supplies Merchant Wholesalers,naics_industry
+423740,Refrigeration Equipment and Supplies Merchant Wholesalers,national_industry
+4238,"Machinery, Equipment, and Supplies Merchant Wholesalers",industry_group
+42381,Construction and Mining (except Oil Well) Machinery and Equipment Merchant Wholesalers,naics_industry
+423810,Construction and Mining (except Oil Well) Machinery and Equipment Merchant Wholesalers,national_industry
+42382,Farm and Garden Machinery and Equipment Merchant Wholesalers,naics_industry
+423820,Farm and Garden Machinery and Equipment Merchant Wholesalers,national_industry
+42383,Industrial Machinery and Equipment Merchant Wholesalers,naics_industry
+423830,Industrial Machinery and Equipment Merchant Wholesalers,national_industry
+42384,Industrial Supplies Merchant Wholesalers,naics_industry
+423840,Industrial Supplies Merchant Wholesalers,national_industry
+42385,Service Establishment Equipment and Supplies Merchant Wholesalers,naics_industry
+423850,Service Establishment Equipment and Supplies Merchant Wholesalers,national_industry
+42386,Transportation Equipment and Supplies (except Motor Vehicle) Merchant Wholesalers,naics_industry
+423860,Transportation Equipment and Supplies (except Motor Vehicle) Merchant Wholesalers,national_industry
+4239,Miscellaneous Durable Goods Merchant Wholesalers,industry_group
+42391,Sporting and Recreational Goods and Supplies Merchant Wholesalers,naics_industry
+423910,Sporting and Recreational Goods and Supplies Merchant Wholesalers,national_industry
+42392,Toy and Hobby Goods and Supplies Merchant Wholesalers,naics_industry
+423920,Toy and Hobby Goods and Supplies Merchant Wholesalers,national_industry
+42393,Recyclable Material Merchant Wholesalers,naics_industry
+423930,Recyclable Material Merchant Wholesalers,national_industry
+42394,"Jewelry, Watch, Precious Stone, and Precious Metal Merchant Wholesalers",naics_industry
+423940,"Jewelry, Watch, Precious Stone, and Precious Metal Merchant Wholesalers",national_industry
+42399,Other Miscellaneous Durable Goods Merchant Wholesalers,naics_industry
+423990,Other Miscellaneous Durable Goods Merchant Wholesalers,national_industry
+424,"Merchant Wholesalers, Nondurable Goods",subsector
+4241,Paper and Paper Product Merchant Wholesalers,industry_group
+42411,Printing and Writing Paper Merchant Wholesalers,naics_industry
+424110,Printing and Writing Paper Merchant Wholesalers,national_industry
+42412,Stationery and Office Supplies Merchant Wholesalers,naics_industry
+424120,Stationery and Office Supplies Merchant Wholesalers,national_industry
+42413,Industrial and Personal Service Paper Merchant Wholesalers,naics_industry
+424130,Industrial and Personal Service Paper Merchant Wholesalers,national_industry
+4242,Drugs and Druggists' Sundries Merchant Wholesalers,industry_group
+42421,Drugs and Druggists' Sundries Merchant Wholesalers,naics_industry
+424210,Drugs and Druggists' Sundries Merchant Wholesalers,national_industry
+4243,"Apparel, Piece Goods, and Notions Merchant Wholesalers",industry_group
+42431,"Piece Goods, Notions, and Other Dry Goods Merchant Wholesalers",naics_industry
+424310,"Piece Goods, Notions, and Other Dry Goods Merchant Wholesalers",national_industry
+42432,Men's and Boys' Clothing and Furnishings Merchant Wholesalers,naics_industry
+424320,Men's and Boys' Clothing and Furnishings Merchant Wholesalers,national_industry
+42433,"Women's, Children's, and Infants' Clothing and Accessories Merchant Wholesalers",naics_industry
+424330,"Women's, Children's, and Infants' Clothing and Accessories Merchant Wholesalers",national_industry
+42434,Footwear Merchant Wholesalers,naics_industry
+424340,Footwear Merchant Wholesalers,national_industry
+4244,Grocery and Related Product Merchant Wholesalers,industry_group
+42441,General Line Grocery Merchant Wholesalers,naics_industry
+424410,General Line Grocery Merchant Wholesalers,national_industry
+42442,Packaged Frozen Food Merchant Wholesalers,naics_industry
+424420,Packaged Frozen Food Merchant Wholesalers,national_industry
+42443,Dairy Product (except Dried or Canned) Merchant Wholesalers,naics_industry
+424430,Dairy Product (except Dried or Canned) Merchant Wholesalers,national_industry
+42444,Poultry and Poultry Product Merchant Wholesalers,naics_industry
+424440,Poultry and Poultry Product Merchant Wholesalers,national_industry
+42445,Confectionery Merchant Wholesalers,naics_industry
+424450,Confectionery Merchant Wholesalers,national_industry
+42446,Fish and Seafood Merchant Wholesalers,naics_industry
+424460,Fish and Seafood Merchant Wholesalers,national_industry
+42447,Meat and Meat Product Merchant Wholesalers,naics_industry
+424470,Meat and Meat Product Merchant Wholesalers,national_industry
+42448,Fresh Fruit and Vegetable Merchant Wholesalers,naics_industry
+424480,Fresh Fruit and Vegetable Merchant Wholesalers,national_industry
+42449,Other Grocery and Related Products Merchant Wholesalers,naics_industry
+424490,Other Grocery and Related Products Merchant Wholesalers,national_industry
+4245,Farm Product Raw Material Merchant Wholesalers,industry_group
+42451,Grain and Field Bean Merchant Wholesalers,naics_industry
+424510,Grain and Field Bean Merchant Wholesalers,national_industry
+42452,Livestock Merchant Wholesalers,naics_industry
+424520,Livestock Merchant Wholesalers,national_industry
+42459,Other Farm Product Raw Material Merchant Wholesalers,naics_industry
+424590,Other Farm Product Raw Material Merchant Wholesalers,national_industry
+4246,Chemical and Allied Products Merchant Wholesalers,industry_group
+42461,Plastics Materials and Basic Forms and Shapes Merchant Wholesalers,naics_industry
+424610,Plastics Materials and Basic Forms and Shapes Merchant Wholesalers,national_industry
+42469,Other Chemical and Allied Products Merchant Wholesalers,naics_industry
+424690,Other Chemical and Allied Products Merchant Wholesalers,national_industry
+4247,Petroleum and Petroleum Products Merchant Wholesalers,industry_group
+42471,Petroleum Bulk Stations and Terminals,naics_industry
+424710,Petroleum Bulk Stations and Terminals,national_industry
+42472,Petroleum and Petroleum Products Merchant Wholesalers (except Bulk Stations and Terminals),naics_industry
+424720,Petroleum and Petroleum Products Merchant Wholesalers (except Bulk Stations and Terminals),national_industry
+4248,"Beer, Wine, and Distilled Alcoholic Beverage Merchant Wholesalers",industry_group
+42481,Beer and Ale Merchant Wholesalers,naics_industry
+424810,Beer and Ale Merchant Wholesalers,national_industry
+42482,Wine and Distilled Alcoholic Beverage Merchant Wholesalers,naics_industry
+424820,Wine and Distilled Alcoholic Beverage Merchant Wholesalers,national_industry
+4249,Miscellaneous Nondurable Goods Merchant Wholesalers,industry_group
+42491,Farm Supplies Merchant Wholesalers,naics_industry
+424910,Farm Supplies Merchant Wholesalers,national_industry
+42492,"Book, Periodical, and Newspaper Merchant Wholesalers",naics_industry
+424920,"Book, Periodical, and Newspaper Merchant Wholesalers",national_industry
+42493,"Flower, Nursery Stock, and Florists' Supplies Merchant Wholesalers",naics_industry
+424930,"Flower, Nursery Stock, and Florists' Supplies Merchant Wholesalers",national_industry
+42494,Tobacco and Tobacco Product Merchant Wholesalers,naics_industry
+424940,Tobacco and Tobacco Product Merchant Wholesalers,national_industry
+42495,"Paint, Varnish, and Supplies Merchant Wholesalers",naics_industry
+424950,"Paint, Varnish, and Supplies Merchant Wholesalers",national_industry
+42499,Other Miscellaneous Nondurable Goods Merchant Wholesalers,naics_industry
+424990,Other Miscellaneous Nondurable Goods Merchant Wholesalers,national_industry
+425,Wholesale Electronic Markets and Agents and Brokers,subsector
+4251,Wholesale Electronic Markets and Agents and Brokers,industry_group
+42511,Business to Business Electronic Markets,naics_industry
+425110,Business to Business Electronic Markets,national_industry
+42512,Wholesale Trade Agents and Brokers,naics_industry
+425120,Wholesale Trade Agents and Brokers,national_industry
+44-45,Retail Trade,sector
+441,Motor Vehicle and Parts Dealers,subsector
+4411,Automobile Dealers,industry_group
+44111,New Car Dealers,naics_industry
+441110,New Car Dealers,national_industry
+44112,Used Car Dealers,naics_industry
+441120,Used Car Dealers,national_industry
+4412,Other Motor Vehicle Dealers,industry_group
+44121,Recreational Vehicle Dealers,naics_industry
+441210,Recreational Vehicle Dealers,national_industry
+44122,"Motorcycle, Boat, and Other Motor Vehicle Dealers",naics_industry
+441222,Boat Dealers,national_industry
+441228,"Motorcycle, ATV, and All Other Motor Vehicle Dealers",national_industry
+4413,"Automotive Parts, Accessories, and Tire Stores",industry_group
+44131,Automotive Parts and Accessories Stores,naics_industry
+441310,Automotive Parts and Accessories Stores,national_industry
+44132,Tire Dealers,naics_industry
+441320,Tire Dealers,national_industry
+442,Furniture and Home Furnishings Stores,subsector
+4421,Furniture Stores,industry_group
+44211,Furniture Stores,naics_industry
+442110,Furniture Stores,national_industry
+4422,Home Furnishings Stores,industry_group
+44221,Floor Covering Stores,naics_industry
+442210,Floor Covering Stores,national_industry
+44229,Other Home Furnishings Stores,naics_industry
+442291,Window Treatment Stores,national_industry
+442299,All Other Home Furnishings Stores,national_industry
+443,Electronics and Appliance Stores,subsector
+4431,Electronics and Appliance Stores,industry_group
+44314,Electronics and Appliance Stores,naics_industry
+443141,Household Appliance Stores,national_industry
+443142,Electronics Stores,national_industry
+444,Building Material and Garden Equipment and Supplies Dealers,subsector
+4441,Building Material and Supplies Dealers,industry_group
+44411,Home Centers,naics_industry
+444110,Home Centers,national_industry
+44412,Paint and Wallpaper Stores,naics_industry
+444120,Paint and Wallpaper Stores,national_industry
+44413,Hardware Stores,naics_industry
+444130,Hardware Stores,national_industry
+44419,Other Building Material Dealers,naics_industry
+444190,Other Building Material Dealers,national_industry
+4442,Lawn and Garden Equipment and Supplies Stores,industry_group
+44421,Outdoor Power Equipment Stores,naics_industry
+444210,Outdoor Power Equipment Stores,national_industry
+44422,"Nursery, Garden Center, and Farm Supply Stores",naics_industry
+444220,"Nursery, Garden Center, and Farm Supply Stores",national_industry
+445,Food and Beverage Stores,subsector
+4451,Grocery Stores,industry_group
+44511,Supermarkets and Other Grocery (except Convenience) Stores,naics_industry
+445110,Supermarkets and Other Grocery (except Convenience) Stores,national_industry
+44512,Convenience Stores,naics_industry
+445120,Convenience Stores,national_industry
+4452,Specialty Food Stores,industry_group
+44521,Meat Markets,naics_industry
+445210,Meat Markets,national_industry
+44522,Fish and Seafood Markets,naics_industry
+445220,Fish and Seafood Markets,national_industry
+44523,Fruit and Vegetable Markets,naics_industry
+445230,Fruit and Vegetable Markets,national_industry
+44529,Other Specialty Food Stores,naics_industry
+445291,Baked Goods Stores,national_industry
+445292,Confectionery and Nut Stores,national_industry
+445299,All Other Specialty Food Stores,national_industry
+4453,"Beer, Wine, and Liquor Stores",industry_group
+44531,"Beer, Wine, and Liquor Stores",naics_industry
+445310,"Beer, Wine, and Liquor Stores",national_industry
+446,Health and Personal Care Stores,subsector
+4461,Health and Personal Care Stores,industry_group
+44611,Pharmacies and Drug Stores,naics_industry
+446110,Pharmacies and Drug Stores,national_industry
+44612,"Cosmetics, Beauty Supplies, and Perfume Stores",naics_industry
+446120,"Cosmetics, Beauty Supplies, and Perfume Stores",national_industry
+44613,Optical Goods Stores,naics_industry
+446130,Optical Goods Stores,national_industry
+44619,Other Health and Personal Care Stores,naics_industry
+446191,Food (Health) Supplement Stores,national_industry
+446199,All Other Health and Personal Care Stores,national_industry
+447,Gasoline Stations,subsector
+4471,Gasoline Stations,industry_group
+44711,Gasoline Stations with Convenience Stores,naics_industry
+447110,Gasoline Stations with Convenience Stores,national_industry
+44719,Other Gasoline Stations,naics_industry
+447190,Other Gasoline Stations,national_industry
+448,Clothing and Clothing Accessories Stores,subsector
+4481,Clothing Stores,industry_group
+44811,Men's Clothing Stores,naics_industry
+448110,Men's Clothing Stores,national_industry
+44812,Women's Clothing Stores,naics_industry
+448120,Women's Clothing Stores,national_industry
+44813,Children's and Infants' Clothing Stores,naics_industry
+448130,Children's and Infants' Clothing Stores,national_industry
+44814,Family Clothing Stores,naics_industry
+448140,Family Clothing Stores,national_industry
+44815,Clothing Accessories Stores,naics_industry
+448150,Clothing Accessories Stores,national_industry
+44819,Other Clothing Stores,naics_industry
+448190,Other Clothing Stores,national_industry
+4482,Shoe Stores,industry_group
+44821,Shoe Stores,naics_industry
+448210,Shoe Stores,national_industry
+4483,"Jewelry, Luggage, and Leather Goods Stores",industry_group
+44831,Jewelry Stores,naics_industry
+448310,Jewelry Stores,national_industry
+44832,Luggage and Leather Goods Stores,naics_industry
+448320,Luggage and Leather Goods Stores,national_industry
+451,"Sporting Goods, Hobby, Musical Instrument, and Book Stores",subsector
+4511,"Sporting Goods, Hobby, and Musical Instrument Stores",industry_group
+45111,Sporting Goods Stores,naics_industry
+451110,Sporting Goods Stores,national_industry
+45112,"Hobby, Toy, and Game Stores",naics_industry
+451120,"Hobby, Toy, and Game Stores",national_industry
+45113,"Sewing, Needlework, and Piece Goods Stores",naics_industry
+451130,"Sewing, Needlework, and Piece Goods Stores",national_industry
+45114,Musical Instrument and Supplies Stores,naics_industry
+451140,Musical Instrument and Supplies Stores,national_industry
+4512,Book Stores and News Dealers,industry_group
+45121,Book Stores and News Dealers,naics_industry
+451211,Book Stores,national_industry
+451212,News Dealers and Newsstands,national_industry
+452,General Merchandise Stores,subsector
+4522,Department Stores,industry_group
+45221,Department Stores,naics_industry
+452210,Department Stores,national_industry
+4523,"General Merchandise Stores, including Warehouse Clubs and Supercenters",industry_group
+45231,"General Merchandise Stores, including Warehouse Clubs and Supercenters",naics_industry
+452311,Warehouse Clubs and Supercenters,national_industry
+452319,All Other General Merchandise Stores,national_industry
+453,Miscellaneous Store Retailers,subsector
+4531,Florists,industry_group
+45311,Florists,naics_industry
+453110,Florists,national_industry
+4532,"Office Supplies, Stationery, and Gift Stores",industry_group
+45321,Office Supplies and Stationery Stores,naics_industry
+453210,Office Supplies and Stationery Stores,national_industry
+45322,"Gift, Novelty, and Souvenir Stores",naics_industry
+453220,"Gift, Novelty, and Souvenir Stores",national_industry
+4533,Used Merchandise Stores,industry_group
+45331,Used Merchandise Stores,naics_industry
+453310,Used Merchandise Stores,national_industry
+4539,Other Miscellaneous Store Retailers,industry_group
+45391,Pet and Pet Supplies Stores,naics_industry
+453910,Pet and Pet Supplies Stores,national_industry
+45392,Art Dealers,naics_industry
+453920,Art Dealers,national_industry
+45393,Manufactured (Mobile) Home Dealers,naics_industry
+453930,Manufactured (Mobile) Home Dealers,national_industry
+45399,All Other Miscellaneous Store Retailers,naics_industry
+453991,Tobacco Stores,national_industry
+453998,All Other Miscellaneous Store Retailers (except Tobacco Stores),national_industry
+454,Nonstore Retailers,subsector
+4541,Electronic Shopping and Mail-Order Houses,industry_group
+45411,Electronic Shopping and Mail-Order Houses,naics_industry
+454110,Electronic Shopping and Mail-Order Houses,national_industry
+4542,Vending Machine Operators,industry_group
+45421,Vending Machine Operators,naics_industry
+454210,Vending Machine Operators,national_industry
+4543,Direct Selling Establishments,industry_group
+45431,Fuel Dealers,naics_industry
+454310,Fuel Dealers,national_industry
+45439,Other Direct Selling Establishments,naics_industry
+454390,Other Direct Selling Establishments,national_industry
+48-49,Transportation and Warehousing,sector
+481,Air Transportation,subsector
+4811,Scheduled Air Transportation,industry_group
+48111,Scheduled Air Transportation,naics_industry
+481111,Scheduled Passenger Air Transportation,national_industry
+481112,Scheduled Freight Air Transportation,national_industry
+4812,Nonscheduled Air Transportation,industry_group
+48121,Nonscheduled Air Transportation,naics_industry
+481211,Nonscheduled Chartered Passenger Air Transportation,national_industry
+481212,Nonscheduled Chartered Freight Air Transportation,national_industry
+481219,Other Nonscheduled Air Transportation,national_industry
+482,Rail Transportation,subsector
+4821,Rail Transportation,industry_group
+48211,Rail Transportation,naics_industry
+482111,Line-Haul Railroads,national_industry
+482112,Short Line Railroads,national_industry
+483,Water Transportation,subsector
+4831,"Deep Sea, Coastal, and Great Lakes Water Transportation",industry_group
+48311,"Deep Sea, Coastal, and Great Lakes Water Transportation",naics_industry
+483111,Deep Sea Freight Transportation,national_industry
+483112,Deep Sea Passenger Transportation,national_industry
+483113,Coastal and Great Lakes Freight Transportation,national_industry
+483114,Coastal and Great Lakes Passenger Transportation,national_industry
+4832,Inland Water Transportation,industry_group
+48321,Inland Water Transportation,naics_industry
+483211,Inland Water Freight Transportation,national_industry
+483212,Inland Water Passenger Transportation,national_industry
+484,Truck Transportation,subsector
+4841,General Freight Trucking,industry_group
+48411,"General Freight Trucking, Local",naics_industry
+484110,"General Freight Trucking, Local",national_industry
+48412,"General Freight Trucking, Long-Distance",naics_industry
+484121,"General Freight Trucking, Long-Distance, Truckload",national_industry
+484122,"General Freight Trucking, Long-Distance, Less Than Truckload",national_industry
+4842,Specialized Freight Trucking,industry_group
+48421,Used Household and Office Goods Moving,naics_industry
+484210,Used Household and Office Goods Moving,national_industry
+48422,"Specialized Freight (except Used Goods) Trucking, Local",naics_industry
+484220,"Specialized Freight (except Used Goods) Trucking, Local",national_industry
+48423,"Specialized Freight (except Used Goods) Trucking, Long-Distance",naics_industry
+484230,"Specialized Freight (except Used Goods) Trucking, Long-Distance",national_industry
+485,Transit and Ground Passenger Transportation,subsector
+4851,Urban Transit Systems,industry_group
+48511,Urban Transit Systems,naics_industry
+485111,Mixed Mode Transit Systems,national_industry
+485112,Commuter Rail Systems,national_industry
+485113,Bus and Other Motor Vehicle Transit Systems,national_industry
+485119,Other Urban Transit Systems,national_industry
+4852,Interurban and Rural Bus Transportation,industry_group
+48521,Interurban and Rural Bus Transportation,naics_industry
+485210,Interurban and Rural Bus Transportation,national_industry
+4853,Taxi and Limousine Service,industry_group
+48531,Taxi Service,naics_industry
+485310,Taxi Service,national_industry
+48532,Limousine Service,naics_industry
+485320,Limousine Service,national_industry
+4854,School and Employee Bus Transportation,industry_group
+48541,School and Employee Bus Transportation,naics_industry
+485410,School and Employee Bus Transportation,national_industry
+4855,Charter Bus Industry,industry_group
+48551,Charter Bus Industry,naics_industry
+485510,Charter Bus Industry,national_industry
+4859,Other Transit and Ground Passenger Transportation,industry_group
+48599,Other Transit and Ground Passenger Transportation,naics_industry
+485991,Special Needs Transportation,national_industry
+485999,All Other Transit and Ground Passenger Transportation,national_industry
+486,Pipeline Transportation,subsector
+4861,Pipeline Transportation of Crude Oil,industry_group
+48611,Pipeline Transportation of Crude Oil,naics_industry
+486110,Pipeline Transportation of Crude Oil,national_industry
+4862,Pipeline Transportation of Natural Gas,industry_group
+48621,Pipeline Transportation of Natural Gas,naics_industry
+486210,Pipeline Transportation of Natural Gas,national_industry
+4869,Other Pipeline Transportation,industry_group
+48691,Pipeline Transportation of Refined Petroleum Products,naics_industry
+486910,Pipeline Transportation of Refined Petroleum Products,national_industry
+48699,All Other Pipeline Transportation,naics_industry
+486990,All Other Pipeline Transportation,national_industry
+487,Scenic and Sightseeing Transportation,subsector
+4871,"Scenic and Sightseeing Transportation, Land",industry_group
+48711,"Scenic and Sightseeing Transportation, Land",naics_industry
+487110,"Scenic and Sightseeing Transportation, Land",national_industry
+4872,"Scenic and Sightseeing Transportation, Water",industry_group
+48721,"Scenic and Sightseeing Transportation, Water",naics_industry
+487210,"Scenic and Sightseeing Transportation, Water",national_industry
+4879,"Scenic and Sightseeing Transportation, Other",industry_group
+48799,"Scenic and Sightseeing Transportation, Other",naics_industry
+487990,"Scenic and Sightseeing Transportation, Other",national_industry
+488,Support Activities for Transportation,subsector
+4881,Support Activities for Air Transportation,industry_group
+48811,Airport Operations,naics_industry
+488111,Air Traffic Control,national_industry
+488119,Other Airport Operations,national_industry
+48819,Other Support Activities for Air Transportation,naics_industry
+488190,Other Support Activities for Air Transportation,national_industry
+4882,Support Activities for Rail Transportation,industry_group
+48821,Support Activities for Rail Transportation,naics_industry
+488210,Support Activities for Rail Transportation,national_industry
+4883,Support Activities for Water Transportation,industry_group
+48831,Port and Harbor Operations,naics_industry
+488310,Port and Harbor Operations,national_industry
+48832,Marine Cargo Handling,naics_industry
+488320,Marine Cargo Handling,national_industry
+48833,Navigational Services to Shipping,naics_industry
+488330,Navigational Services to Shipping,national_industry
+48839,Other Support Activities for Water Transportation,naics_industry
+488390,Other Support Activities for Water Transportation,national_industry
+4884,Support Activities for Road Transportation,industry_group
+48841,Motor Vehicle Towing,naics_industry
+488410,Motor Vehicle Towing,national_industry
+48849,Other Support Activities for Road Transportation,naics_industry
+488490,Other Support Activities for Road Transportation,national_industry
+4885,Freight Transportation Arrangement,industry_group
+48851,Freight Transportation Arrangement,naics_industry
+488510,Freight Transportation Arrangement,national_industry
+4889,Other Support Activities for Transportation,industry_group
+48899,Other Support Activities for Transportation,naics_industry
+488991,Packing and Crating,national_industry
+488999,All Other Support Activities for Transportation,national_industry
+491,Postal Service,subsector
+4911,Postal Service,industry_group
+49111,Postal Service,naics_industry
+491110,Postal Service,national_industry
+492,Couriers and Messengers,subsector
+4921,Couriers and Express Delivery Services,industry_group
+49211,Couriers and Express Delivery Services,naics_industry
+492110,Couriers and Express Delivery Services,national_industry
+4922,Local Messengers and Local Delivery,industry_group
+49221,Local Messengers and Local Delivery,naics_industry
+492210,Local Messengers and Local Delivery,national_industry
+493,Warehousing and Storage,subsector
+4931,Warehousing and Storage,industry_group
+49311,General Warehousing and Storage,naics_industry
+493110,General Warehousing and Storage,national_industry
+49312,Refrigerated Warehousing and Storage,naics_industry
+493120,Refrigerated Warehousing and Storage,national_industry
+49313,Farm Product Warehousing and Storage,naics_industry
+493130,Farm Product Warehousing and Storage,national_industry
+49319,Other Warehousing and Storage,naics_industry
+493190,Other Warehousing and Storage,national_industry
+51,Information,sector
+511,Publishing Industries (except Internet),subsector
+5111,"Newspaper, Periodical, Book, and Directory Publishers",industry_group
+51111,Newspaper Publishers,naics_industry
+511110,Newspaper Publishers,national_industry
+51112,Periodical Publishers,naics_industry
+511120,Periodical Publishers,national_industry
+51113,Book Publishers,naics_industry
+511130,Book Publishers,national_industry
+51114,Directory and Mailing List Publishers,naics_industry
+511140,Directory and Mailing List Publishers,national_industry
+51119,Other Publishers,naics_industry
+511191,Greeting Card Publishers,national_industry
+511199,All Other Publishers,national_industry
+5112,Software Publishers,industry_group
+51121,Software Publishers,naics_industry
+511210,Software Publishers,national_industry
+512,Motion Picture and Sound Recording Industries,subsector
+5121,Motion Picture and Video Industries,industry_group
+51211,Motion Picture and Video Production,naics_industry
+512110,Motion Picture and Video Production,national_industry
+51212,Motion Picture and Video Distribution,naics_industry
+512120,Motion Picture and Video Distribution,national_industry
+51213,Motion Picture and Video Exhibition,naics_industry
+512131,Motion Picture Theaters (except Drive-Ins),national_industry
+512132,Drive-In Motion Picture Theaters,national_industry
+51219,Postproduction Services and Other Motion Picture and Video Industries,naics_industry
+512191,Teleproduction and Other Postproduction Services,national_industry
+512199,Other Motion Picture and Video Industries,national_industry
+5122,Sound Recording Industries,industry_group
+51223,Music Publishers,naics_industry
+512230,Music Publishers,national_industry
+51224,Sound Recording Studios,naics_industry
+512240,Sound Recording Studios,national_industry
+51225,Record Production and Distribution,naics_industry
+512250,Record Production and Distribution,national_industry
+51229,Other Sound Recording Industries,naics_industry
+512290,Other Sound Recording Industries,national_industry
+515,Broadcasting (except Internet),subsector
+5151,Radio and Television Broadcasting,industry_group
+51511,Radio Broadcasting,naics_industry
+515111,Radio Networks,national_industry
+515112,Radio Stations,national_industry
+51512,Television Broadcasting,naics_industry
+515120,Television Broadcasting,national_industry
+5152,Cable and Other Subscription Programming,industry_group
+51521,Cable and Other Subscription Programming,naics_industry
+515210,Cable and Other Subscription Programming,national_industry
+517,Telecommunications,subsector
+5173,Wired and Wireless Telecommunications Carriers,industry_group
+51731,Wired and Wireless Telecommunications Carriers,naics_industry
+517311,Wired Telecommunications Carriers,national_industry
+517312,Wireless Telecommunications Carriers (except Satellite),national_industry
+5174,Satellite Telecommunications,industry_group
+51741,Satellite Telecommunications,naics_industry
+517410,Satellite Telecommunications,national_industry
+5179,Other Telecommunications,industry_group
+51791,Other Telecommunications,naics_industry
+517911,Telecommunications Resellers,national_industry
+517919,All Other Telecommunications,national_industry
+518,"Data Processing, Hosting, and Related Services",subsector
+5182,"Data Processing, Hosting, and Related Services",industry_group
+51821,"Data Processing, Hosting, and Related Services",naics_industry
+518210,"Data Processing, Hosting, and Related Services",national_industry
+519,Other Information Services,subsector
+5191,Other Information Services,industry_group
+51911,News Syndicates,naics_industry
+519110,News Syndicates,national_industry
+51912,Libraries and Archives,naics_industry
+519120,Libraries and Archives,national_industry
+51913,Internet Publishing and Broadcasting and Web Search Portals,naics_industry
+519130,Internet Publishing and Broadcasting and Web Search Portals,national_industry
+51919,All Other Information Services,naics_industry
+519190,All Other Information Services,national_industry
+52,Finance and Insurance,sector
+521,Monetary Authorities-Central Bank,subsector
+5211,Monetary Authorities-Central Bank,industry_group
+52111,Monetary Authorities-Central Bank,naics_industry
+521110,Monetary Authorities-Central Bank,national_industry
+522,Credit Intermediation and Related Activities,subsector
+5221,Depository Credit Intermediation,industry_group
+52211,Commercial Banking,naics_industry
+522110,Commercial Banking,national_industry
+52212,Savings Institutions,naics_industry
+522120,Savings Institutions,national_industry
+52213,Credit Unions,naics_industry
+522130,Credit Unions,national_industry
+52219,Other Depository Credit Intermediation,naics_industry
+522190,Other Depository Credit Intermediation,national_industry
+5222,Nondepository Credit Intermediation,industry_group
+52221,Credit Card Issuing,naics_industry
+522210,Credit Card Issuing,national_industry
+52222,Sales Financing,naics_industry
+522220,Sales Financing,national_industry
+52229,Other Nondepository Credit Intermediation,naics_industry
+522291,Consumer Lending,national_industry
+522292,Real Estate Credit,national_industry
+522293,International Trade Financing,national_industry
+522294,Secondary Market Financing,national_industry
+522298,All Other Nondepository Credit Intermediation,national_industry
+5223,Activities Related to Credit Intermediation,industry_group
+52231,Mortgage and Nonmortgage Loan Brokers,naics_industry
+522310,Mortgage and Nonmortgage Loan Brokers,national_industry
+52232,"Financial Transactions Processing, Reserve, and Clearinghouse Activities",naics_industry
+522320,"Financial Transactions Processing, Reserve, and Clearinghouse Activities",national_industry
+52239,Other Activities Related to Credit Intermediation,naics_industry
+522390,Other Activities Related to Credit Intermediation,national_industry
+523,"Securities, Commodity Contracts, and Other Financial Investments and Related Activities",subsector
+5231,Securities and Commodity Contracts Intermediation and Brokerage,industry_group
+52311,Investment Banking and Securities Dealing,naics_industry
+523110,Investment Banking and Securities Dealing,national_industry
+52312,Securities Brokerage,naics_industry
+523120,Securities Brokerage,national_industry
+52313,Commodity Contracts Dealing,naics_industry
+523130,Commodity Contracts Dealing,national_industry
+52314,Commodity Contracts Brokerage,naics_industry
+523140,Commodity Contracts Brokerage,national_industry
+5232,Securities and Commodity Exchanges,industry_group
+52321,Securities and Commodity Exchanges,naics_industry
+523210,Securities and Commodity Exchanges,national_industry
+5239,Other Financial Investment Activities,industry_group
+52391,Miscellaneous Intermediation,naics_industry
+523910,Miscellaneous Intermediation,national_industry
+52392,Portfolio Management,naics_industry
+523920,Portfolio Management,national_industry
+52393,Investment Advice,naics_industry
+523930,Investment Advice,national_industry
+52399,All Other Financial Investment Activities,naics_industry
+523991,"Trust, Fiduciary, and Custody Activities",national_industry
+523999,Miscellaneous Financial Investment Activities,national_industry
+524,Insurance Carriers and Related Activities,subsector
+5241,Insurance Carriers,industry_group
+52411,"Direct Life, Health, and Medical Insurance Carriers",naics_industry
+524113,Direct Life Insurance Carriers,national_industry
+524114,Direct Health and Medical Insurance Carriers,national_industry
+52412,"Direct Insurance (except Life, Health, and Medical) Carriers",naics_industry
+524126,Direct Property and Casualty Insurance Carriers,national_industry
+524127,Direct Title Insurance Carriers,national_industry
+524128,"Other Direct Insurance (except Life, Health, and Medical) Carriers",national_industry
+52413,Reinsurance Carriers,naics_industry
+524130,Reinsurance Carriers,national_industry
+5242,"Agencies, Brokerages, and Other Insurance Related Activities",industry_group
+52421,Insurance Agencies and Brokerages,naics_industry
+524210,Insurance Agencies and Brokerages,national_industry
+52429,Other Insurance Related Activities,naics_industry
+524291,Claims Adjusting,national_industry
+524292,Third Party Administration of Insurance and Pension Funds,national_industry
+524298,All Other Insurance Related Activities,national_industry
+525,"Funds, Trusts, and Other Financial Vehicles",subsector
+5251,Insurance and Employee Benefit Funds,industry_group
+52511,Pension Funds,naics_industry
+525110,Pension Funds,national_industry
+52512,Health and Welfare Funds,naics_industry
+525120,Health and Welfare Funds,national_industry
+52519,Other Insurance Funds,naics_industry
+525190,Other Insurance Funds,national_industry
+5259,Other Investment Pools and Funds,industry_group
+52591,Open-End Investment Funds,naics_industry
+525910,Open-End Investment Funds,national_industry
+52592,"Trusts, Estates, and Agency Accounts",naics_industry
+525920,"Trusts, Estates, and Agency Accounts",national_industry
+52599,Other Financial Vehicles,naics_industry
+525990,Other Financial Vehicles,national_industry
+53,Real Estate and Rental and Leasing,sector
+531,Real Estate,subsector
+5311,Lessors of Real Estate,industry_group
+53111,Lessors of Residential Buildings and Dwellings,naics_industry
+531110,Lessors of Residential Buildings and Dwellings,national_industry
+53112,Lessors of Nonresidential Buildings (except Miniwarehouses),naics_industry
+531120,Lessors of Nonresidential Buildings (except Miniwarehouses),national_industry
+53113,Lessors of Miniwarehouses and Self-Storage Units,naics_industry
+531130,Lessors of Miniwarehouses and Self-Storage Units,national_industry
+53119,Lessors of Other Real Estate Property,naics_industry
+531190,Lessors of Other Real Estate Property,national_industry
+5312,Offices of Real Estate Agents and Brokers,industry_group
+53121,Offices of Real Estate Agents and Brokers,naics_industry
+531210,Offices of Real Estate Agents and Brokers,national_industry
+5313,Activities Related to Real Estate,industry_group
+53131,Real Estate Property Managers,naics_industry
+531311,Residential Property Managers,national_industry
+531312,Nonresidential Property Managers,national_industry
+53132,Offices of Real Estate Appraisers,naics_industry
+531320,Offices of Real Estate Appraisers,national_industry
+53139,Other Activities Related to Real Estate,naics_industry
+531390,Other Activities Related to Real Estate,national_industry
+532,Rental and Leasing Services,subsector
+5321,Automotive Equipment Rental and Leasing,industry_group
+53211,Passenger Car Rental and Leasing,naics_industry
+532111,Passenger Car Rental,national_industry
+532112,Passenger Car Leasing,national_industry
+53212,"Truck, Utility Trailer, and RV (Recreational Vehicle) Rental and Leasing",naics_industry
+532120,"Truck, Utility Trailer, and RV (Recreational Vehicle) Rental and Leasing",national_industry
+5322,Consumer Goods Rental,industry_group
+53221,Consumer Electronics and Appliances Rental,naics_industry
+532210,Consumer Electronics and Appliances Rental,national_industry
+53228,Other Consumer Goods Rental,naics_industry
+532281,Formal Wear and Costume Rental,national_industry
+532282,Video Tape and Disc Rental,national_industry
+532283,Home Health Equipment Rental,national_industry
+532284,Recreational Goods Rental,national_industry
+532289,All Other Consumer Goods Rental,national_industry
+5323,General Rental Centers,industry_group
+53231,General Rental Centers,naics_industry
+532310,General Rental Centers,national_industry
+5324,Commercial and Industrial Machinery and Equipment Rental and Leasing,industry_group
+53241,"Construction, Transportation, Mining, and Forestry Machinery and Equipment Rental and Leasing",naics_industry
+532411,"Commercial Air, Rail, and Water Transportation Equipment Rental and Leasing",national_industry
+532412,"Construction, Mining, and Forestry Machinery and Equipment Rental and Leasing",national_industry
+53242,Office Machinery and Equipment Rental and Leasing,naics_industry
+532420,Office Machinery and Equipment Rental and Leasing,national_industry
+53249,Other Commercial and Industrial Machinery and Equipment Rental and Leasing,naics_industry
+532490,Other Commercial and Industrial Machinery and Equipment Rental and Leasing,national_industry
+533,Lessors of Nonfinancial Intangible Assets (except Copyrighted Works),subsector
+5331,Lessors of Nonfinancial Intangible Assets (except Copyrighted Works),industry_group
+53311,Lessors of Nonfinancial Intangible Assets (except Copyrighted Works),naics_industry
+533110,Lessors of Nonfinancial Intangible Assets (except Copyrighted Works),national_industry
+54,"Professional, Scientific, and Technical Services",sector
+541,"Professional, Scientific, and Technical Services",subsector
+5411,Legal Services,industry_group
+54111,Offices of Lawyers,naics_industry
+541110,Offices of Lawyers,national_industry
+54112,Offices of Notaries,naics_industry
+541120,Offices of Notaries,national_industry
+54119,Other Legal Services,naics_industry
+541191,Title Abstract and Settlement Offices,national_industry
+541199,All Other Legal Services,national_industry
+5412,"Accounting, Tax Preparation, Bookkeeping, and Payroll Services",industry_group
+54121,"Accounting, Tax Preparation, Bookkeeping, and Payroll Services",naics_industry
+541211,Offices of Certified Public Accountants,national_industry
+541213,Tax Preparation Services,national_industry
+541214,Payroll Services,national_industry
+541219,Other Accounting Services,national_industry
+5413,"Architectural, Engineering, and Related Services",industry_group
+54131,Architectural Services,naics_industry
+541310,Architectural Services,national_industry
+54132,Landscape Architectural Services,naics_industry
+541320,Landscape Architectural Services,national_industry
+54133,Engineering Services,naics_industry
+541330,Engineering Services,national_industry
+54134,Drafting Services,naics_industry
+541340,Drafting Services,national_industry
+54135,Building Inspection Services,naics_industry
+541350,Building Inspection Services,national_industry
+54136,Geophysical Surveying and Mapping Services,naics_industry
+541360,Geophysical Surveying and Mapping Services,national_industry
+54137,Surveying and Mapping (except Geophysical) Services,naics_industry
+541370,Surveying and Mapping (except Geophysical) Services,national_industry
+54138,Testing Laboratories,naics_industry
+541380,Testing Laboratories,national_industry
+5414,Specialized Design Services,industry_group
+54141,Interior Design Services,naics_industry
+541410,Interior Design Services,national_industry
+54142,Industrial Design Services,naics_industry
+541420,Industrial Design Services,national_industry
+54143,Graphic Design Services,naics_industry
+541430,Graphic Design Services,national_industry
+54149,Other Specialized Design Services,naics_industry
+541490,Other Specialized Design Services,national_industry
+5415,Computer Systems Design and Related Services,industry_group
+54151,Computer Systems Design and Related Services,naics_industry
+541511,Custom Computer Programming Services,national_industry
+541512,Computer Systems Design Services,national_industry
+541513,Computer Facilities Management Services,national_industry
+541519,Other Computer Related Services,national_industry
+5416,"Management, Scientific, and Technical Consulting Services",industry_group
+54161,Management Consulting Services,naics_industry
+541611,Administrative Management and General Management Consulting Services,national_industry
+541612,Human Resources Consulting Services,national_industry
+541613,Marketing Consulting Services,national_industry
+541614,"Process, Physical Distribution, and Logistics Consulting Services",national_industry
+541618,Other Management Consulting Services,national_industry
+54162,Environmental Consulting Services,naics_industry
+541620,Environmental Consulting Services,national_industry
+54169,Other Scientific and Technical Consulting Services,naics_industry
+541690,Other Scientific and Technical Consulting Services,national_industry
+5417,Scientific Research and Development Services,industry_group
+54171,"Research and Development in the Physical, Engineering, and Life Sciences",naics_industry
+541713,Research and Development in Nanotechnology,national_industry
+541714,Research and Development in Biotechnology (except Nanobiotechnology),national_industry
+541715,"Research and Development in the Physical, Engineering, and Life Sciences (except Nanotechnology and Biotechnology)",national_industry
+54172,Research and Development in the Social Sciences and Humanities,naics_industry
+541720,Research and Development in the Social Sciences and Humanities,national_industry
+5418,"Advertising, Public Relations, and Related Services",industry_group
+54181,Advertising Agencies,naics_industry
+541810,Advertising Agencies,national_industry
+54182,Public Relations Agencies,naics_industry
+541820,Public Relations Agencies,national_industry
+54183,Media Buying Agencies,naics_industry
+541830,Media Buying Agencies,national_industry
+54184,Media Representatives,naics_industry
+541840,Media Representatives,national_industry
+54185,Outdoor Advertising,naics_industry
+541850,Outdoor Advertising,national_industry
+54186,Direct Mail Advertising,naics_industry
+541860,Direct Mail Advertising,national_industry
+54187,Advertising Material Distribution Services,naics_industry
+541870,Advertising Material Distribution Services,national_industry
+54189,Other Services Related to Advertising,naics_industry
+541890,Other Services Related to Advertising,national_industry
+5419,"Other Professional, Scientific, and Technical Services",industry_group
+54191,Marketing Research and Public Opinion Polling,naics_industry
+541910,Marketing Research and Public Opinion Polling,national_industry
+54192,Photographic Services,naics_industry
+541921,"Photography Studios, Portrait",national_industry
+541922,Commercial Photography,national_industry
+54193,Translation and Interpretation Services,naics_industry
+541930,Translation and Interpretation Services,national_industry
+54194,Veterinary Services,naics_industry
+541940,Veterinary Services,national_industry
+54199,"All Other Professional, Scientific, and Technical Services",naics_industry
+541990,"All Other Professional, Scientific, and Technical Services",national_industry
+55,Management of Companies and Enterprises,sector
+551,Management of Companies and Enterprises,subsector
+5511,Management of Companies and Enterprises,industry_group
+55111,Management of Companies and Enterprises,naics_industry
+551111,Offices of Bank Holding Companies,national_industry
+551112,Offices of Other Holding Companies,national_industry
+551114,"Corporate, Subsidiary, and Regional Managing Offices",national_industry
+56,Administrative and Support and Waste Management and Remediation Services,sector
+561,Administrative and Support Services,subsector
+5611,Office Administrative Services,industry_group
+56111,Office Administrative Services,naics_industry
+561110,Office Administrative Services,national_industry
+5612,Facilities Support Services,industry_group
+56121,Facilities Support Services,naics_industry
+561210,Facilities Support Services,national_industry
+5613,Employment Services,industry_group
+56131,Employment Placement Agencies and Executive Search Services,naics_industry
+561311,Employment Placement Agencies,national_industry
+561312,Executive Search Services,national_industry
+56132,Temporary Help Services,naics_industry
+561320,Temporary Help Services,national_industry
+56133,Professional Employer Organizations,naics_industry
+561330,Professional Employer Organizations,national_industry
+5614,Business Support Services,industry_group
+56141,Document Preparation Services,naics_industry
+561410,Document Preparation Services,national_industry
+56142,Telephone Call Centers,naics_industry
+561421,Telephone Answering Services,national_industry
+561422,Telemarketing Bureaus and Other Contact Centers,national_industry
+56143,Business Service Centers,naics_industry
+561431,Private Mail Centers,national_industry
+561439,Other Business Service Centers (including Copy Shops),national_industry
+56144,Collection Agencies,naics_industry
+561440,Collection Agencies,national_industry
+56145,Credit Bureaus,naics_industry
+561450,Credit Bureaus,national_industry
+56149,Other Business Support Services,naics_industry
+561491,Repossession Services,national_industry
+561492,Court Reporting and Stenotype Services,national_industry
+561499,All Other Business Support Services,national_industry
+5615,Travel Arrangement and Reservation Services,industry_group
+56151,Travel Agencies,naics_industry
+561510,Travel Agencies,national_industry
+56152,Tour Operators,naics_industry
+561520,Tour Operators,national_industry
+56159,Other Travel Arrangement and Reservation Services,naics_industry
+561591,Convention and Visitors Bureaus,national_industry
+561599,All Other Travel Arrangement and Reservation Services,national_industry
+5616,Investigation and Security Services,industry_group
+56161,"Investigation, Guard, and Armored Car Services",naics_industry
+561611,Investigation Services,national_industry
+561612,Security Guards and Patrol Services,national_industry
+561613,Armored Car Services,national_industry
+56162,Security Systems Services,naics_industry
+561621,Security Systems Services (except Locksmiths),national_industry
+561622,Locksmiths,national_industry
+5617,Services to Buildings and Dwellings,industry_group
+56171,Exterminating and Pest Control Services,naics_industry
+561710,Exterminating and Pest Control Services,national_industry
+56172,Janitorial Services,naics_industry
+561720,Janitorial Services,national_industry
+56173,Landscaping Services,naics_industry
+561730,Landscaping Services,national_industry
+56174,Carpet and Upholstery Cleaning Services,naics_industry
+561740,Carpet and Upholstery Cleaning Services,national_industry
+56179,Other Services to Buildings and Dwellings,naics_industry
+561790,Other Services to Buildings and Dwellings,national_industry
+5619,Other Support Services,industry_group
+56191,Packaging and Labeling Services,naics_industry
+561910,Packaging and Labeling Services,national_industry
+56192,Convention and Trade Show Organizers,naics_industry
+561920,Convention and Trade Show Organizers,national_industry
+56199,All Other Support Services,naics_industry
+561990,All Other Support Services,national_industry
+562,Waste Management and Remediation Services,subsector
+5621,Waste Collection,industry_group
+56211,Waste Collection,naics_industry
+562111,Solid Waste Collection,national_industry
+562112,Hazardous Waste Collection,national_industry
+562119,Other Waste Collection,national_industry
+5622,Waste Treatment and Disposal,industry_group
+56221,Waste Treatment and Disposal,naics_industry
+562211,Hazardous Waste Treatment and Disposal,national_industry
+562212,Solid Waste Landfill,national_industry
+562213,Solid Waste Combustors and Incinerators,national_industry
+562219,Other Nonhazardous Waste Treatment and Disposal,national_industry
+5629,Remediation and Other Waste Management Services,industry_group
+56291,Remediation Services,naics_industry
+562910,Remediation Services,national_industry
+56292,Materials Recovery Facilities,naics_industry
+562920,Materials Recovery Facilities,national_industry
+56299,All Other Waste Management Services,naics_industry
+562991,Septic Tank and Related Services,national_industry
+562998,All Other Miscellaneous Waste Management Services,national_industry
+61,Educational Services,sector
+611,Educational Services,subsector
+6111,Elementary and Secondary Schools,industry_group
+61111,Elementary and Secondary Schools,naics_industry
+611110,Elementary and Secondary Schools,national_industry
+6112,Junior Colleges,industry_group
+61121,Junior Colleges,naics_industry
+611210,Junior Colleges,national_industry
+6113,"Colleges, Universities, and Professional Schools",industry_group
+61131,"Colleges, Universities, and Professional Schools",naics_industry
+611310,"Colleges, Universities, and Professional Schools",national_industry
+6114,Business Schools and Computer and Management Training,industry_group
+61141,Business and Secretarial Schools,naics_industry
+611410,Business and Secretarial Schools,national_industry
+61142,Computer Training,naics_industry
+611420,Computer Training,national_industry
+61143,Professional and Management Development Training,naics_industry
+611430,Professional and Management Development Training,national_industry
+6115,Technical and Trade Schools,industry_group
+61151,Technical and Trade Schools,naics_industry
+611511,Cosmetology and Barber Schools,national_industry
+611512,Flight Training,national_industry
+611513,Apprenticeship Training,national_industry
+611519,Other Technical and Trade Schools,national_industry
+6116,Other Schools and Instruction,industry_group
+61161,Fine Arts Schools,naics_industry
+611610,Fine Arts Schools,national_industry
+61162,Sports and Recreation Instruction,naics_industry
+611620,Sports and Recreation Instruction,national_industry
+61163,Language Schools,naics_industry
+611630,Language Schools,national_industry
+61169,All Other Schools and Instruction,naics_industry
+611691,Exam Preparation and Tutoring,national_industry
+611692,Automobile Driving Schools,national_industry
+611699,All Other Miscellaneous Schools and Instruction,national_industry
+6117,Educational Support Services,industry_group
+61171,Educational Support Services,naics_industry
+611710,Educational Support Services,national_industry
+62,Health Care and Social Assistance,sector
+621,Ambulatory Health Care Services,subsector
+6211,Offices of Physicians,industry_group
+62111,Offices of Physicians,naics_industry
+621111,Offices of Physicians (except Mental Health Specialists),national_industry
+621112,"Offices of Physicians, Mental Health Specialists",national_industry
+6212,Offices of Dentists,industry_group
+62121,Offices of Dentists,naics_industry
+621210,Offices of Dentists,national_industry
+6213,Offices of Other Health Practitioners,industry_group
+62131,Offices of Chiropractors,naics_industry
+621310,Offices of Chiropractors,national_industry
+62132,Offices of Optometrists,naics_industry
+621320,Offices of Optometrists,national_industry
+62133,Offices of Mental Health Practitioners (except Physicians),naics_industry
+621330,Offices of Mental Health Practitioners (except Physicians),national_industry
+62134,"Offices of Physical, Occupational and Speech Therapists, and Audiologists",naics_industry
+621340,"Offices of Physical, Occupational and Speech Therapists, and Audiologists",national_industry
+62139,Offices of All Other Health Practitioners,naics_industry
+621391,Offices of Podiatrists,national_industry
+621399,Offices of All Other Miscellaneous Health Practitioners,national_industry
+6214,Outpatient Care Centers,industry_group
+62141,Family Planning Centers,naics_industry
+621410,Family Planning Centers,national_industry
+62142,Outpatient Mental Health and Substance Abuse Centers,naics_industry
+621420,Outpatient Mental Health and Substance Abuse Centers,national_industry
+62149,Other Outpatient Care Centers,naics_industry
+621491,HMO Medical Centers,national_industry
+621492,Kidney Dialysis Centers,national_industry
+621493,Freestanding Ambulatory Surgical and Emergency Centers,national_industry
+621498,All Other Outpatient Care Centers,national_industry
+6215,Medical and Diagnostic Laboratories,industry_group
+62151,Medical and Diagnostic Laboratories,naics_industry
+621511,Medical Laboratories,national_industry
+621512,Diagnostic Imaging Centers,national_industry
+6216,Home Health Care Services,industry_group
+62161,Home Health Care Services,naics_industry
+621610,Home Health Care Services,national_industry
+6219,Other Ambulatory Health Care Services,industry_group
+62191,Ambulance Services,naics_industry
+621910,Ambulance Services,national_industry
+62199,All Other Ambulatory Health Care Services,naics_industry
+621991,Blood and Organ Banks,national_industry
+621999,All Other Miscellaneous Ambulatory Health Care Services,national_industry
+622,Hospitals,subsector
+6221,General Medical and Surgical Hospitals,industry_group
+62211,General Medical and Surgical Hospitals,naics_industry
+622110,General Medical and Surgical Hospitals,national_industry
+6222,Psychiatric and Substance Abuse Hospitals,industry_group
+62221,Psychiatric and Substance Abuse Hospitals,naics_industry
+622210,Psychiatric and Substance Abuse Hospitals,national_industry
+6223,Specialty (except Psychiatric and Substance Abuse) Hospitals,industry_group
+62231,Specialty (except Psychiatric and Substance Abuse) Hospitals,naics_industry
+622310,Specialty (except Psychiatric and Substance Abuse) Hospitals,national_industry
+623,Nursing and Residential Care Facilities,subsector
+6231,Nursing Care Facilities (Skilled Nursing Facilities),industry_group
+62311,Nursing Care Facilities (Skilled Nursing Facilities),naics_industry
+623110,Nursing Care Facilities (Skilled Nursing Facilities),national_industry
+6232,"Residential Intellectual and Developmental Disability, Mental Health, and Substance Abuse Facilities",industry_group
+62321,Residential Intellectual and Developmental Disability Facilities,naics_industry
+623210,Residential Intellectual and Developmental Disability Facilities,national_industry
+62322,Residential Mental Health and Substance Abuse Facilities,naics_industry
+623220,Residential Mental Health and Substance Abuse Facilities,national_industry
+6233,Continuing Care Retirement Communities and Assisted Living Facilities for the Elderly,industry_group
+62331,Continuing Care Retirement Communities and Assisted Living Facilities for the Elderly,naics_industry
+623311,Continuing Care Retirement Communities,national_industry
+623312,Assisted Living Facilities for the Elderly,national_industry
+6239,Other Residential Care Facilities,industry_group
+62399,Other Residential Care Facilities,naics_industry
+623990,Other Residential Care Facilities,national_industry
+624,Social Assistance,subsector
+6241,Individual and Family Services,industry_group
+62411,Child and Youth Services,naics_industry
+624110,Child and Youth Services,national_industry
+62412,Services for the Elderly and Persons with Disabilities,naics_industry
+624120,Services for the Elderly and Persons with Disabilities,national_industry
+62419,Other Individual and Family Services,naics_industry
+624190,Other Individual and Family Services,national_industry
+6242,"Community Food and Housing, and Emergency and Other Relief Services",industry_group
+62421,Community Food Services,naics_industry
+624210,Community Food Services,national_industry
+62422,Community Housing Services,naics_industry
+624221,Temporary Shelters,national_industry
+624229,Other Community Housing Services,national_industry
+62423,Emergency and Other Relief Services,naics_industry
+624230,Emergency and Other Relief Services,national_industry
+6243,Vocational Rehabilitation Services,industry_group
+62431,Vocational Rehabilitation Services,naics_industry
+624310,Vocational Rehabilitation Services,national_industry
+6244,Child Day Care Services,industry_group
+62441,Child Day Care Services,naics_industry
+624410,Child Day Care Services,national_industry
+71,"Arts, Entertainment, and Recreation",sector
+711,"Performing Arts, Spectator Sports, and Related Industries",subsector
+7111,Performing Arts Companies,industry_group
+71111,Theater Companies and Dinner Theaters,naics_industry
+711110,Theater Companies and Dinner Theaters,national_industry
+71112,Dance Companies,naics_industry
+711120,Dance Companies,national_industry
+71113,Musical Groups and Artists,naics_industry
+711130,Musical Groups and Artists,national_industry
+71119,Other Performing Arts Companies,naics_industry
+711190,Other Performing Arts Companies,national_industry
+7112,Spectator Sports,industry_group
+71121,Spectator Sports,naics_industry
+711211,Sports Teams and Clubs,national_industry
+711212,Racetracks,national_industry
+711219,Other Spectator Sports,national_industry
+7113,"Promoters of Performing Arts, Sports, and Similar Events",industry_group
+71131,"Promoters of Performing Arts, Sports, and Similar Events with Facilities",naics_industry
+711310,"Promoters of Performing Arts, Sports, and Similar Events with Facilities",national_industry
+71132,"Promoters of Performing Arts, Sports, and Similar Events without Facilities",naics_industry
+711320,"Promoters of Performing Arts, Sports, and Similar Events without Facilities",national_industry
+7114,"Agents and Managers for Artists, Athletes, Entertainers, and Other Public Figures",industry_group
+71141,"Agents and Managers for Artists, Athletes, Entertainers, and Other Public Figures",naics_industry
+711410,"Agents and Managers for Artists, Athletes, Entertainers, and Other Public Figures",national_industry
+7115,"Independent Artists, Writers, and Performers",industry_group
+71151,"Independent Artists, Writers, and Performers",naics_industry
+711510,"Independent Artists, Writers, and Performers",national_industry
+712,"Museums, Historical Sites, and Similar Institutions",subsector
+7121,"Museums, Historical Sites, and Similar Institutions",industry_group
+71211,Museums,naics_industry
+712110,Museums,national_industry
+71212,Historical Sites,naics_industry
+712120,Historical Sites,national_industry
+71213,Zoos and Botanical Gardens,naics_industry
+712130,Zoos and Botanical Gardens,national_industry
+71219,Nature Parks and Other Similar Institutions,naics_industry
+712190,Nature Parks and Other Similar Institutions,national_industry
+713,"Amusement, Gambling, and Recreation Industries",subsector
+7131,Amusement Parks and Arcades,industry_group
+71311,Amusement and Theme Parks,naics_industry
+713110,Amusement and Theme Parks,national_industry
+71312,Amusement Arcades,naics_industry
+713120,Amusement Arcades,national_industry
+7132,Gambling Industries,industry_group
+71321,Casinos (except Casino Hotels),naics_industry
+713210,Casinos (except Casino Hotels),national_industry
+71329,Other Gambling Industries,naics_industry
+713290,Other Gambling Industries,national_industry
+7139,Other Amusement and Recreation Industries,industry_group
+71391,Golf Courses and Country Clubs,naics_industry
+713910,Golf Courses and Country Clubs,national_industry
+71392,Skiing Facilities,naics_industry
+713920,Skiing Facilities,national_industry
+71393,Marinas,naics_industry
+713930,Marinas,national_industry
+71394,Fitness and Recreational Sports Centers,naics_industry
+713940,Fitness and Recreational Sports Centers,national_industry
+71395,Bowling Centers,naics_industry
+713950,Bowling Centers,national_industry
+71399,All Other Amusement and Recreation Industries,naics_industry
+713990,All Other Amusement and Recreation Industries,national_industry
+72,Accommodation and Food Services,sector
+721,Accommodation,subsector
+7211,Traveler Accommodation,industry_group
+72111,Hotels (except Casino Hotels) and Motels,naics_industry
+721110,Hotels (except Casino Hotels) and Motels,national_industry
+72112,Casino Hotels,naics_industry
+721120,Casino Hotels,national_industry
+72119,Other Traveler Accommodation,naics_industry
+721191,Bed-and-Breakfast Inns,national_industry
+721199,All Other Traveler Accommodation,national_industry
+7212,RV (Recreational Vehicle) Parks and Recreational Camps,industry_group
+72121,RV (Recreational Vehicle) Parks and Recreational Camps,naics_industry
+721211,RV (Recreational Vehicle) Parks and Campgrounds,national_industry
+721214,Recreational and Vacation Camps (except Campgrounds),national_industry
+7213,"Rooming and Boarding Houses, Dormitories, and Workers' Camps",industry_group
+72131,"Rooming and Boarding Houses, Dormitories, and Workers' Camps",naics_industry
+721310,"Rooming and Boarding Houses, Dormitories, and Workers' Camps",national_industry
+722,Food Services and Drinking Places,subsector
+7223,Special Food Services,industry_group
+72231,Food Service Contractors,naics_industry
+722310,Food Service Contractors,national_industry
+72232,Caterers,naics_industry
+722320,Caterers,national_industry
+72233,Mobile Food Services,naics_industry
+722330,Mobile Food Services,national_industry
+7224,Drinking Places (Alcoholic Beverages),industry_group
+72241,Drinking Places (Alcoholic Beverages),naics_industry
+722410,Drinking Places (Alcoholic Beverages),national_industry
+7225,Restaurants and Other Eating Places,industry_group
+72251,Restaurants and Other Eating Places,naics_industry
+722511,Full-Service Restaurants,national_industry
+722513,Limited-Service Restaurants,national_industry
+722514,"Cafeterias, Grill Buffets, and Buffets",national_industry
+722515,Snack and Nonalcoholic Beverage Bars,national_industry
+81,Other Services (except Public Administration),sector
+811,Repair and Maintenance,subsector
+8111,Automotive Repair and Maintenance,industry_group
+81111,Automotive Mechanical and Electrical Repair and Maintenance,naics_industry
+811111,General Automotive Repair,national_industry
+811112,Automotive Exhaust System Repair,national_industry
+811113,Automotive Transmission Repair,national_industry
+811118,Other Automotive Mechanical and Electrical Repair and Maintenance,national_industry
+81112,"Automotive Body, Paint, Interior, and Glass Repair",naics_industry
+811121,"Automotive Body, Paint, and Interior Repair and Maintenance",national_industry
+811122,Automotive Glass Replacement Shops,national_industry
+81119,Other Automotive Repair and Maintenance,naics_industry
+811191,Automotive Oil Change and Lubrication Shops,national_industry
+811192,Car Washes,national_industry
+811198,All Other Automotive Repair and Maintenance,national_industry
+8112,Electronic and Precision Equipment Repair and Maintenance,industry_group
+81121,Electronic and Precision Equipment Repair and Maintenance,naics_industry
+811211,Consumer Electronics Repair and Maintenance,national_industry
+811212,Computer and Office Machine Repair and Maintenance,national_industry
+811213,Communication Equipment Repair and Maintenance,national_industry
+811219,Other Electronic and Precision Equipment Repair and Maintenance,national_industry
+8113,Commercial and Industrial Machinery and Equipment (except Automotive and Electronic) Repair and Maintenance,industry_group
+81131,Commercial and Industrial Machinery and Equipment (except Automotive and Electronic) Repair and Maintenance,naics_industry
+811310,Commercial and Industrial Machinery and Equipment (except Automotive and Electronic) Repair and Maintenance,national_industry
+8114,Personal and Household Goods Repair and Maintenance,industry_group
+81141,Home and Garden Equipment and Appliance Repair and Maintenance,naics_industry
+811411,Home and Garden Equipment Repair and Maintenance,national_industry
+811412,Appliance Repair and Maintenance,national_industry
+81142,Reupholstery and Furniture Repair,naics_industry
+811420,Reupholstery and Furniture Repair,national_industry
+81143,Footwear and Leather Goods Repair,naics_industry
+811430,Footwear and Leather Goods Repair,national_industry
+81149,Other Personal and Household Goods Repair and Maintenance,naics_industry
+811490,Other Personal and Household Goods Repair and Maintenance,national_industry
+812,Personal and Laundry Services,subsector
+8121,Personal Care Services,industry_group
+81211,"Hair, Nail, and Skin Care Services",naics_industry
+812111,Barber Shops,national_industry
+812112,Beauty Salons,national_industry
+812113,Nail Salons,national_industry
+81219,Other Personal Care Services,naics_industry
+812191,Diet and Weight Reducing Centers,national_industry
+812199,Other Personal Care Services,national_industry
+8122,Death Care Services,industry_group
+81221,Funeral Homes and Funeral Services,naics_industry
+812210,Funeral Homes and Funeral Services,national_industry
+81222,Cemeteries and Crematories,naics_industry
+812220,Cemeteries and Crematories,national_industry
+8123,Drycleaning and Laundry Services,industry_group
+81231,Coin-Operated Laundries and Drycleaners,naics_industry
+812310,Coin-Operated Laundries and Drycleaners,national_industry
+81232,Drycleaning and Laundry Services (except Coin-Operated),naics_industry
+812320,Drycleaning and Laundry Services (except Coin-Operated),national_industry
+81233,Linen and Uniform Supply,naics_industry
+812331,Linen Supply,national_industry
+812332,Industrial Launderers,national_industry
+8129,Other Personal Services,industry_group
+81291,Pet Care (except Veterinary) Services,naics_industry
+812910,Pet Care (except Veterinary) Services,national_industry
+81292,Photofinishing,naics_industry
+812921,Photofinishing Laboratories (except One-Hour),national_industry
+812922,One-Hour Photofinishing,national_industry
+81293,Parking Lots and Garages,naics_industry
+812930,Parking Lots and Garages,national_industry
+81299,All Other Personal Services,naics_industry
+812990,All Other Personal Services,national_industry
+813,"Religious, Grantmaking, Civic, Professional, and Similar Organizations",subsector
+8131,Religious Organizations,industry_group
+81311,Religious Organizations,naics_industry
+813110,Religious Organizations,national_industry
+8132,Grantmaking and Giving Services,industry_group
+81321,Grantmaking and Giving Services,naics_industry
+813211,Grantmaking Foundations,national_industry
+813212,Voluntary Health Organizations,national_industry
+813219,Other Grantmaking and Giving Services,national_industry
+8133,Social Advocacy Organizations,industry_group
+81331,Social Advocacy Organizations,naics_industry
+813311,Human Rights Organizations,national_industry
+813312,"Environment, Conservation and Wildlife Organizations",national_industry
+813319,Other Social Advocacy Organizations,national_industry
+8134,Civic and Social Organizations,industry_group
+81341,Civic and Social Organizations,naics_industry
+813410,Civic and Social Organizations,national_industry
+8139,"Business, Professional, Labor, Political, and Similar Organizations",industry_group
+81391,Business Associations,naics_industry
+813910,Business Associations,national_industry
+81392,Professional Organizations,naics_industry
+813920,Professional Organizations,national_industry
+81393,Labor Unions and Similar Labor Organizations,naics_industry
+813930,Labor Unions and Similar Labor Organizations,national_industry
+81394,Political Organizations,naics_industry
+813940,Political Organizations,national_industry
+81399,"Other Similar Organizations (except Business, Professional, Labor, and Political Organizations)",naics_industry
+813990,"Other Similar Organizations (except Business, Professional, Labor, and Political Organizations)",national_industry
+814,Private Households,subsector
+8141,Private Households,industry_group
+81411,Private Households,naics_industry
+814110,Private Households,national_industry
+92,Public Administration,sector
+921,"Executive, Legislative, and Other General Government Support",subsector
+9211,"Executive, Legislative, and Other General Government Support",industry_group
+92111,Executive Offices,naics_industry
+921110,Executive Offices,national_industry
+92112,Legislative Bodies,naics_industry
+921120,Legislative Bodies,national_industry
+92113,Public Finance Activities,naics_industry
+921130,Public Finance Activities,national_industry
+92114,"Executive and Legislative Offices, Combined",naics_industry
+921140,"Executive and Legislative Offices, Combined",national_industry
+92115,American Indian and Alaska Native Tribal Governments,naics_industry
+921150,American Indian and Alaska Native Tribal Governments,national_industry
+92119,Other General Government Support,naics_industry
+921190,Other General Government Support,national_industry
+922,"Justice, Public Order, and Safety Activities",subsector
+9221,"Justice, Public Order, and Safety Activities",industry_group
+92211,Courts,naics_industry
+922110,Courts,national_industry
+92212,Police Protection,naics_industry
+922120,Police Protection,national_industry
+92213,Legal Counsel and Prosecution,naics_industry
+922130,Legal Counsel and Prosecution,national_industry
+92214,Correctional Institutions,naics_industry
+922140,Correctional Institutions,national_industry
+92215,Parole Offices and Probation Offices,naics_industry
+922150,Parole Offices and Probation Offices,national_industry
+92216,Fire Protection,naics_industry
+922160,Fire Protection,national_industry
+92219,"Other Justice, Public Order, and Safety Activities",naics_industry
+922190,"Other Justice, Public Order, and Safety Activities",national_industry
+923,Administration of Human Resource Programs,subsector
+9231,Administration of Human Resource Programs,industry_group
+92311,Administration of Education Programs,naics_industry
+923110,Administration of Education Programs,national_industry
+92312,Administration of Public Health Programs,naics_industry
+923120,Administration of Public Health Programs,national_industry
+92313,"Administration of Human Resource Programs (except Education, Public Health, and Veterans' Affairs Programs)",naics_industry
+923130,"Administration of Human Resource Programs (except Education, Public Health, and Veterans' Affairs Programs)",national_industry
+92314,Administration of Veterans' Affairs,naics_industry
+923140,Administration of Veterans' Affairs,national_industry
+924,Administration of Environmental Quality Programs,subsector
+9241,Administration of Environmental Quality Programs,industry_group
+92411,Administration of Air and Water Resource and Solid Waste Management Programs,naics_industry
+924110,Administration of Air and Water Resource and Solid Waste Management Programs,national_industry
+92412,Administration of Conservation Programs,naics_industry
+924120,Administration of Conservation Programs,national_industry
+925,"Administration of Housing Programs, Urban Planning, and Community Development",subsector
+9251,"Administration of Housing Programs, Urban Planning, and Community Development",industry_group
+92511,Administration of Housing Programs,naics_industry
+925110,Administration of Housing Programs,national_industry
+92512,Administration of Urban Planning and Community and Rural Development,naics_industry
+925120,Administration of Urban Planning and Community and Rural Development,national_industry
+926,Administration of Economic Programs,subsector
+9261,Administration of Economic Programs,industry_group
+92611,Administration of General Economic Programs,naics_industry
+926110,Administration of General Economic Programs,national_industry
+92612,Regulation and Administration of Transportation Programs,naics_industry
+926120,Regulation and Administration of Transportation Programs,national_industry
+92613,"Regulation and Administration of Communications, Electric, Gas, and Other Utilities",naics_industry
+926130,"Regulation and Administration of Communications, Electric, Gas, and Other Utilities",national_industry
+92614,Regulation of Agricultural Marketing and Commodities,naics_industry
+926140,Regulation of Agricultural Marketing and Commodities,national_industry
+92615,"Regulation, Licensing, and Inspection of Miscellaneous Commercial Sectors",naics_industry
+926150,"Regulation, Licensing, and Inspection of Miscellaneous Commercial Sectors",national_industry
+927,Space Research and Technology,subsector
+9271,Space Research and Technology,industry_group
+92711,Space Research and Technology,naics_industry
+927110,Space Research and Technology,national_industry
+928,National Security and International Affairs,subsector
+9281,National Security and International Affairs,industry_group
+92811,National Security,naics_industry
+928110,National Security,national_industry
+92812,International Affairs,naics_industry
+928120,International Affairs,national_industry

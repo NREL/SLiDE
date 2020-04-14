@@ -1,0 +1,32 @@
+Path:  ["..", "data", "datasources", "BEA", "IO"]
+PathOut: ["..", "data", "coremaps", "temp", "naics_b.csv"]
+
+XLSXInput:
+  name:  Margins_Before_Redefinitions_2007_2012_SUM.xlsx
+  sheet: NAICS Codes
+  range: "B5:G1025"
+  descriptor: b
+
+Order:
+  - {col: a_code, type: String}
+  - {col: b_code, type: String}
+  - {col: b_desc, type: String}
+  # - {col: b_aggr, type: String}
+
+Rename:
+  - from: Summary
+    to:   b_code
+  - from: U.Summary
+    to:   b_desc
+
+Group:
+  file:   "temp/naics_a.csv"
+  from:   a_desc
+  to:     a_code
+  input:  b_code
+  output: a_code
+
+# Join:
+#   file:   bea_all.csv
+#   on:     b_code
+#   prefix: b

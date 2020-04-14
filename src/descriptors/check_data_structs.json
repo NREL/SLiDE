@@ -1,0 +1,24 @@
+[
+    {
+        "struct_name": "FileInput",
+        "docstring": "Information for files to compare.",
+        "fields": [
+            {
+                "name": "f1",
+                "comment": "First file to compare",
+                "data_type": "String"
+            },
+            {
+                "name": "f2",
+                "comment": "Second file to compare",
+                "data_type": "String"
+            },
+            {
+                "name": "colnames",
+                "comment": "column names shared by the two files",
+                "data_type": "Array{Symbol,1}"
+            }
+        ],
+        "supertype": "Check"
+    }
+]

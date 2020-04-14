@@ -1,0 +1,17 @@
+Path: ["..", "data", "mapsources", "NAICS"]
+PathOut: ["..", "data", "coremaps", "scale", "naics_codes.csv"]
+
+XLSXInput:
+  - name:  "2-6 digit_2017_Codes.xlsx"
+  sheet: tbl_2017_title_description_coun
+  range: B1:C2198
+  descriptor: 2017
+
+Rename:
+  - {from: 2017 NAICS US   Code, to: naics_code}
+  - {from: 2017 NAICS US Title,  to: naics_desc}
+
+Match:
+  on:     "(?<level>\\d*)"
+  input:  naics_code
+  output: level

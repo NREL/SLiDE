@@ -1,20 +1,28 @@
 .DS_Store
 .git/
-.vs_code/
+.vscode/
 
 data/Edit.jl
 data/scratch*.jl
 data/datasources/
+data/output/
 data/outputs/
 data/old/
-data/old/readfiles
+data/old/readfiles/
+data/coremaps/temp/
+data/coremaps/windc/
+data/readfiles/~$*
+data/outputs_csv/
+data/windc_output/
 
 docs/build/
 
 src/datastream/
 
-src/parse/generated/
+src/parse/generated_check/
+src/parse/generated_edit/
+src/parse/generated_load/
 src/parse/scratch/
 src/parse/utils/generate_structs.jl
 
-tests/scratch*.jl
+# tests/scratch*.jl

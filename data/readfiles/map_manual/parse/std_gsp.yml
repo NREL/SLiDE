@@ -1,0 +1,6 @@
+Path:  ["..", "data", "mapsources", "WiNDC", "windc_datastream", "core_maps", "gams"]
+PathOut: ["..", "data", "coremaps", "std", "gsp.csv"]
+
+CSVInput:
+  name: map_gsp.csv
+  descriptor: 1

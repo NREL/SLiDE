@@ -1,0 +1,27 @@
+Path:  ["..", "data", "mapsources", "WiNDC", "windc_datastream", "core_maps"]
+PathOut: ["..", "data", "coremaps", "std", "sgf.csv"]
+
+CSVInput:
+  name: sgf.csv
+  descriptor: 1
+
+Order:
+  - {col: from, type: Any}
+  - {col: sgf_desc, type: String}
+  - {col: sgf_windc, type: Any}
+  - {col: units, type: String}
+
+Drop:
+  - col: from
+    val: missing
+    operation: "=="
+  - col: from
+    val: unique
+    operation: "=="
+
+Map2:
+  file: ../mapsources/WiNDC/windc_datastream/core_maps/gams/map_sgf.csv
+  from: from
+  to:   to
+  input: sgf_desc
+  output: sgf_windc

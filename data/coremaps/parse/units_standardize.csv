@@ -1,0 +1,4 @@
+from,factor,to,ref
+millions of us dollars (USD),1.0,millions of us dollars (USD),all_gamsify.py
+thousands of us dollars (USD),0.001,millions of us dollars (USD),all_gamsify.py
+us dollars (USD),1.0e-6,millions of us dollars (USD),all_gamsify.py

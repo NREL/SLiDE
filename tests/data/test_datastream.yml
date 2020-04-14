@@ -1,50 +1,63 @@
-Path: ["data"]
+Path: [data]
 
 CSVInput:
     name: test_datastream.csv
-    descriptor: test
+    descriptor: 2020
 
-XLSXInput:
-    name:   test_datastream.xlsx
-    sheet:
-      - 1999
-      - 2000
-    range:  A7:J14
-    descriptor:
-      - 1999
-      - 2000
-
+# Order:
+#     - {col: year,       type: Int}
+#     # - {col: from_code, type: String}
+#     # - {col: from_desc, type: String}
+#     - {col: from_aggr,  type: String}
+#     # - {col: to_code,   type: String}
+#     # - {col: to_desc,   type: String}
+#     - {col: to_aggr,    type: String}
+#     - {col: value,      type: Int}
+#     - {col: units,      type: String}
+    
 Rename:
-    - from: IOCode
-      to:   from_industry_code
-    - from: Name
-      to:   from_industry_desc
+  - from: IOCode
+    to:   input_code
+  - from: Name
+    to:   input_desc
 
-Map:
-    - file:   bea_all.csv
-      from:   desc
-      to:     code
-      input:  from_industry_desc
-      output: from_industry_code
-    - file:   bea_all.csv
-      from:   desc
-      to:     code
-      input:  to_industry_desc
-      output: to_industry_code
+Group:
+  file:   [parse, regions.csv]
+  from:   from
+  to:     to
+  input:  input_code
+  output: region
+
+Match:
+  on:     \((?<input_code>.*)\)
+  input:  input_code
+  output: input_code
 
 Melt:
-    on:
-      - from_industry_code
-      - from_industry_desc
-    var:  to_industry_desc
-    val:  value
-    type: Any
+  on:  [input_code, region]
+  var: year
+  val: value
+
+Map:
+    file:   [parse, bea.csv]
+    from:   bea_code
+    to:     [bea_desc, bea_windc]
+    input:  input_code
+    output: [input_desc, input_windc]
 
 Add:
-    col:  units
-    val:  millions of us dollars (USD)
+  col:  units
+  val:  USD
 
 Replace:
-    col:  value
-    from: ...
-    to:   "0"
+  col:  value
+  from: missing
+  to:   0
+
+Drop:
+  - col: linenum
+    val: all
+    operation: "=="
+  - col: value
+    val: 0
+    operation: "<"

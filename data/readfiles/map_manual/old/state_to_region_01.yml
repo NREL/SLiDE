@@ -1,0 +1,39 @@
+Path:  ["..", "data", "datasources", "PCE"]
+PathOut: ["..", "data", "coremaps", "state_to_region.csv"]
+
+CSVInput:
+  name:  SAEXP1_1997_2017_ALL_AREAS_.csv
+  descriptor: region
+
+Order:
+  - {col: fips,   type: Int}
+  - {col: state,  type: String}
+  - {col: region, type: Int}
+
+Rename:
+  - from:   GeoFIPS
+    to:     fips
+  - from:   GeoName
+    to:     state
+  - from:   Region
+    to:     region
+
+Map:
+  file:   regions.csv
+  from:   from
+  to:     to
+  input:  state
+  output: state
+
+Drop:
+  - col: region
+    val: missing
+    operation: "=="
+  - col: state
+    val: unique
+    operation: "=="
+
+Replace:
+  col: region
+  from: " "
+  to:   0

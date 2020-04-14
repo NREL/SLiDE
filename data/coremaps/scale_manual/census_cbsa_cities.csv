@@ -1,0 +1,1269 @@
+state_code,cbsa_code,place_code,cbsa_desc,place_desc,memi,cbsapci
+46,10100,00100,"Aberdeen, SD",Aberdeen,2,true
+53,10140,00100,"Aberdeen, WA",Aberdeen,2,true
+48,10180,01000,"Abilene, TX",Abilene,1,true
+40,10220,00200,"Ada, OK",Ada,2,true
+26,10300,00440,"Adrian, MI",Adrian,2,true
+72,10380,00745,"Aguadilla-Isabela, PR",Aguadilla,1,true
+72,10380,36478,"Aguadilla-Isabela, PR",Isabela,1,true
+39,10420,01000,"Akron, OH",Akron,1,true
+35,10460,01780,"Alamogordo, NM",Alamogordo,2,true
+13,10500,01052,"Albany, GA",Albany,1,true
+41,10540,01000,"Albany-Lebanon, OR",Albany,1,true
+41,10540,41650,"Albany-Lebanon, OR",Lebanon,1,true
+36,10580,01000,"Albany-Schenectady-Troy, NY",Albany,1,true
+36,10580,65508,"Albany-Schenectady-Troy, NY",Schenectady,1,true
+36,10580,75484,"Albany-Schenectady-Troy, NY",Troy,1,true
+37,10620,00680,"Albemarle, NC",Albemarle,2,true
+27,10660,00694,"Albert Lea, MN",Albert Lea,2,true
+01,10700,00988,"Albertville, AL",Albertville,2,true
+35,10740,02000,"Albuquerque, NM",Albuquerque,1,true
+01,10760,01132,"Alexander City, AL",Alexander City,2,true
+22,10780,00975,"Alexandria, LA",Alexandria,1,true
+27,10820,00928,"Alexandria, MN",Alexandria,2,true
+48,10860,01852,"Alice, TX",Alice,2,true
+42,10900,02000,"Allentown-Bethlehem-Easton, PA-NJ",Allentown,1,true
+42,10900,06088,"Allentown-Bethlehem-Easton, PA-NJ",Bethlehem,1,true
+26,10940,01540,"Alma, MI",Alma,2,true
+26,10980,01740,"Alpena, MI",Alpena,2,true
+42,11020,02184,"Altoona, PA",Altoona,1,true
+40,11060,01700,"Altus, OK",Altus,2,true
+48,11100,03000,"Amarillo, TX",Amarillo,1,true
+13,11140,02116,"Americus, GA",Americus,2,true
+19,11180,01855,"Ames, IA",Ames,1,true
+36,11220,02066,"Amsterdam, NY",Amsterdam,2,true
+02,11260,03000,"Anchorage, AK",Anchorage,1,true
+48,11380,03216,"Andrews, TX",Andrews,2,true
+18,11420,01666,"Angola, IN",Angola,2,true
+26,11460,03000,"Ann Arbor, MI",Ann Arbor,1,true
+01,11500,01852,"Anniston-Oxford, AL",Anniston,1,true
+01,11500,57576,"Anniston-Oxford, AL",Oxford,1,true
+55,11540,02375,"Appleton, WI",Appleton,1,true
+12,11580,01750,"Arcadia, FL",Arcadia,2,true
+40,11620,02600,"Ardmore, OK",Ardmore,2,true
+72,11640,03368,"Arecibo, PR",Arecibo,1,true
+05,11660,01870,"Arkadelphia, AR",Arkadelphia,2,true
+37,11700,02140,"Asheville, NC",Asheville,1,true
+39,11740,02568,"Ashland, OH",Ashland,2,true
+39,11780,02638,"Ashtabula, OH",Ashtabula,2,true
+41,11820,03150,"Astoria, OR",Astoria,2,true
+20,11860,02900,"Atchison, KS",Atchison,2,true
+39,11900,02736,"Athens, OH",Athens,2,true
+47,11940,02320,"Athens, TN",Athens,2,true
+48,11980,04504,"Athens, TX",Athens,2,true
+13,12020,03440,"Athens-Clarke County, GA",Athens-Clarke County unified government (balance),1,true
+13,12060,01696,"Atlanta-Sandy Springs-Alpharetta, GA",Alpharetta,1,true
+13,12060,04000,"Atlanta-Sandy Springs-Alpharetta, GA",Atlanta,1,true
+13,12060,49756,"Atlanta-Sandy Springs-Alpharetta, GA",Marietta,1,true
+13,12060,68516,"Atlanta-Sandy Springs-Alpharetta, GA",Sandy Springs,1,true
+34,12100,02080,"Atlantic City-Hammonton, NJ",Atlantic City,1,true
+34,12100,29430,"Atlantic City-Hammonton, NJ",Hammonton,1,true
+01,12120,03004,"Atmore, AL",Atmore,2,true
+18,12140,02674,"Auburn, IN",Auburn,2,true
+36,12180,03078,"Auburn, NY",Auburn,2,true
+01,12220,03076,"Auburn-Opelika, AL",Auburn,1,true
+01,12220,57048,"Auburn-Opelika, AL",Opelika,1,true
+13,12260,04204,"Augusta-Richmond County, GA-SC",Augusta-Richmond County consolidated government (balance),1,true
+23,12300,02100,"Augusta-Waterville, ME",Augusta,2,true
+23,12300,80740,"Augusta-Waterville, ME",Waterville,2,true
+27,12380,02908,"Austin, MN",Austin,2,true
+48,12420,05000,"Austin-Round Rock-Georgetown, TX",Austin,1,true
+48,12420,29336,"Austin-Round Rock-Georgetown, TX",Georgetown,1,true
+48,12420,63500,"Austin-Round Rock-Georgetown, TX",Round Rock,1,true
+48,12420,65600,"Austin-Round Rock-Georgetown, TX",San Marcos,1,true
+13,12460,04896,"Bainbridge, GA",Bainbridge,2,true
+06,12540,03526,"Bakersfield, CA",Bakersfield,1,true
+24,12580,04000,"Baltimore-Columbia-Towson, MD",Baltimore,1,true
+24,12580,19125,"Baltimore-Columbia-Towson, MD",Columbia,1,true
+24,12580,78425,"Baltimore-Columbia-Towson, MD",Towson,1,true
+23,12620,02795,"Bangor, ME",Bangor,1,true
+55,12660,04625,"Baraboo, WI",Baraboo,2,true
+21,12680,03628,"Bardstown, KY",Bardstown,2,true
+25,12700,03690,"Barnstable Town, MA",Barnstable Town,1,true
+50,12740,03175,"Barre, VT",Barre,2,true
+40,12780,04450,"Bartlesville, OK",Bartlesville,2,true
+36,12860,04715,"Batavia, NY",Batavia,2,true
+05,12900,04030,"Batesville, AR",Batesville,2,true
+22,12940,05000,"Baton Rouge, LA",Baton Rouge,1,true
+26,12980,05920,"Battle Creek, MI",Battle Creek,1,true
+26,13020,06020,"Bay City, MI",Bay City,1,true
+48,13060,05984,"Bay City, TX",Bay City,2,true
+31,13100,03390,"Beatrice, NE",Beatrice,2,true
+48,13140,07000,"Beaumont-Port Arthur, TX",Beaumont,1,true
+48,13140,58820,"Beaumont-Port Arthur, TX",Port Arthur,1,true
+55,13180,05900,"Beaver Dam, WI",Beaver Dam,2,true
+54,13220,05332,"Beckley, WV",Beckley,1,true
+18,13260,04114,"Bedford, IN",Bedford,2,true
+48,13300,07192,"Beeville, TX",Beeville,2,true
+39,13340,05130,"Bellefontaine, OH",Bellefontaine,2,true
+53,13380,05280,"Bellingham, WA",Bellingham,1,true
+27,13420,05068,"Bemidji, MN",Bemidji,2,true
+41,13460,05800,"Bend, OR",Bend,1,true
+45,13500,05680,"Bennettsville, SC",Bennettsville,2,true
+50,13540,04750,"Bennington, VT",Bennington,2,true
+33,13620,05140,"Berlin, NH",Berlin,2,true
+26,13660,08300,"Big Rapids, MI",Big Rapids,2,true
+48,13700,08236,"Big Spring, TX",Big Spring,2,true
+51,13720,07480,"Big Stone Gap, VA",Big Stone Gap,2,true
+30,13740,06550,"Billings, MT",Billings,1,true
+36,13780,06607,"Binghamton, NY",Binghamton,1,true
+01,13820,07000,"Birmingham-Hoover, AL",Birmingham,1,true
+01,13820,35896,"Birmingham-Hoover, AL",Hoover,1,true
+38,13900,07200,"Bismarck, ND",Bismarck,1,true
+16,13940,07840,"Blackfoot, ID",Blackfoot,2,true
+51,13980,07784,"Blacksburg-Christiansburg, VA",Blacksburg,1,true
+51,13980,16608,"Blacksburg-Christiansburg, VA",Christiansburg,1,true
+17,14010,06613,"Bloomington, IL",Bloomington,1,true
+18,14020,05860,"Bloomington, IN",Bloomington,1,true
+42,14100,05888,"Bloomsburg-Berwick, PA",Berwick,1,true
+42,14100,07128,"Bloomsburg-Berwick, PA",Bloomsburg,1,true
+54,14140,08524,"Bluefield, WV-VA",Bluefield,2,true
+05,14180,07330,"Blytheville, AR",Blytheville,2,true
+22,14220,08150,"Bogalusa, LA",Bogalusa,2,true
+16,14260,08830,"Boise City, ID",Boise City,1,true
+48,14300,09328,"Bonham, TX",Bonham,2,true
+37,14380,07080,"Boone, NC",Boone,2,true
+48,14420,09556,"Borger, TX",Borger,2,true
+25,14460,07000,"Boston-Cambridge-Newton, MA-NH",Boston,1,true
+25,14460,11000,"Boston-Cambridge-Newton, MA-NH",Cambridge,1,true
+25,14460,24960,"Boston-Cambridge-Newton, MA-NH",Framingham,1,true
+25,14460,45560,"Boston-Cambridge-Newton, MA-NH",Newton,1,true
+25,14460,72600,"Boston-Cambridge-Newton, MA-NH",Waltham,1,true
+08,14500,07850,"Boulder, CO",Boulder,1,true
+21,14540,08902,"Bowling Green, KY",Bowling Green,1,true
+30,14580,08950,"Bozeman, MT",Bozeman,2,true
+42,14620,08040,"Bradford, PA",Bradford,2,true
+27,14660,07300,"Brainerd, MN",Brainerd,2,true
+29,14700,07966,"Branson, MO",Branson,2,true
+08,14720,08400,"Breckenridge, CO",Breckenridge,2,true
+53,14740,07695,"Bremerton-Silverdale-Port Orchard, WA",Bremerton,1,true
+53,14740,55785,"Bremerton-Silverdale-Port Orchard, WA",Port Orchard,1,true
+53,14740,64365,"Bremerton-Silverdale-Port Orchard, WA",Silverdale,1,true
+48,14780,10156,"Brenham, TX",Brenham,2,true
+37,14820,07720,"Brevard, NC",Brevard,2,true
+09,14860,08000,"Bridgeport-Stamford-Norwalk, CT",Bridgeport,1,true
+09,14860,18430,"Bridgeport-Stamford-Norwalk, CT",Danbury,1,true
+09,14860,55990,"Bridgeport-Stamford-Norwalk, CT",Norwalk,1,true
+09,14860,73000,"Bridgeport-Stamford-Norwalk, CT",Stamford,1,true
+09,14860,74260,"Bridgeport-Stamford-Norwalk, CT",Stratford,1,true
+28,15020,08820,"Brookhaven, MS",Brookhaven,2,true
+41,15060,08650,"Brookings, OR",Brookings,2,true
+46,15100,07580,"Brookings, SD",Brookings,2,true
+47,15140,08920,"Brownsville, TN",Brownsville,2,true
+48,15180,10768,"Brownsville-Harlingen, TX",Brownsville,1,true
+48,15180,32372,"Brownsville-Harlingen, TX",Harlingen,1,true
+48,15220,10780,"Brownwood, TX",Brownwood,2,true
+13,15260,11560,"Brunswick, GA",Brunswick,1,true
+39,15340,10030,"Bucyrus-Galion, OH",Bucyrus,2,true
+39,15340,29162,"Bucyrus-Galion, OH",Galion,2,true
+36,15380,11000,"Buffalo-Cheektowaga, NY",Buffalo,1,true
+36,15380,15000,"Buffalo-Cheektowaga, NY",Cheektowaga,1,true
+16,15420,11260,"Burley, ID",Burley,2,true
+19,15460,09550,"Burlington, IA-IL",Burlington,2,true
+37,15500,09060,"Burlington, NC",Burlington,1,true
+50,15540,10675,"Burlington-South Burlington, VT",Burlington,1,true
+50,15540,66175,"Burlington-South Burlington, VT",South Burlington,1,true
+30,15580,11397,"Butte-Silver Bow, MT",Butte-Silver Bow (balance),2,true
+26,15620,12320,"Cadillac, MI",Cadillac,2,true
+13,15660,12456,"Calhoun, GA",Calhoun,2,true
+24,15680,12150,"California-Lexington Park, MD",California,1,true
+24,15680,46725,"California-Lexington Park, MD",Lexington Park,1,true
+24,15700,12400,"Cambridge, MD",Cambridge,2,true
+39,15740,10996,"Cambridge, OH",Cambridge,2,true
+05,15780,10720,"Camden, AR",Camden,2,true
+21,15820,12160,"Campbellsville, KY",Campbellsville,2,true
+08,15860,11810,"Cañon City, CO",Cañon City,2,true
+39,15940,12000,"Canton-Massillon, OH",Canton,1,true
+39,15940,48244,"Canton-Massillon, OH",Massillon,1,true
+12,15980,10275,"Cape Coral-Fort Myers, FL",Cape Coral,1,true
+12,15980,24125,"Cape Coral-Fort Myers, FL",Fort Myers,1,true
+29,16020,11242,"Cape Girardeau, MO-IL",Cape Girardeau,1,true
+17,16060,11163,"Carbondale-Marion, IL",Carbondale,1,true
+17,16060,46916,"Carbondale-Marion, IL",Marion,1,true
+35,16100,05220,"Carlsbad-Artesia, NM",Artesia,2,true
+35,16100,12150,"Carlsbad-Artesia, NM",Carlsbad,2,true
+19,16140,11080,"Carroll, IA",Carroll,2,true
+32,16180,09700,"Carson City, NV",Carson City,1,true
+56,16220,13150,"Casper, WY",Casper,1,true
+49,16260,11320,"Cedar City, UT",Cedar City,2,true
+19,16300,12000,"Cedar Rapids, IA",Cedar Rapids,1,true
+13,16340,14500,"Cedartown, GA",Cedartown,2,true
+39,16380,12868,"Celina, OH",Celina,2,true
+21,16420,13978,"Central City, KY",Central City,2,true
+17,16460,12164,"Centralia, IL",Centralia,2,true
+53,16500,11160,"Centralia, WA",Centralia,2,true
+42,16540,12536,"Chambersburg-Waynesboro, PA",Chambersburg,1,true
+42,16540,81824,"Chambersburg-Waynesboro, PA",Waynesboro,1,true
+17,16580,12385,"Champaign-Urbana, IL",Champaign,1,true
+17,16580,77005,"Champaign-Urbana, IL",Urbana,1,true
+54,16620,14600,"Charleston, WV",Charleston,1,true
+17,16660,12567,"Charleston-Mattoon, IL",Charleston,2,true
+17,16660,47553,"Charleston-Mattoon, IL",Mattoon,2,true
+45,16700,13330,"Charleston-North Charleston, SC",Charleston,1,true
+45,16700,50875,"Charleston-North Charleston, SC",North Charleston,1,true
+37,16740,12000,"Charlotte-Concord-Gastonia, NC-SC",Charlotte,1,true
+37,16740,14100,"Charlotte-Concord-Gastonia, NC-SC",Concord,1,true
+37,16740,25580,"Charlotte-Concord-Gastonia, NC-SC",Gastonia,1,true
+45,16740,61405,"Charlotte-Concord-Gastonia, NC-SC",Rock Hill,1,true
+51,16820,14968,"Charlottesville, VA",Charlottesville,1,true
+47,16860,14000,"Chattanooga, TN-GA",Chattanooga,1,true
+56,16940,13900,"Cheyenne, WY",Cheyenne,1,true
+17,16980,07133,"Chicago-Naperville-Elgin, IL-IN-WI",Bolingbrook,1,true
+17,16980,14000,"Chicago-Naperville-Elgin, IL-IN-WI",Chicago,1,true
+17,16980,19642,"Chicago-Naperville-Elgin, IL-IN-WI",Des Plaines,1,true
+17,16980,23074,"Chicago-Naperville-Elgin, IL-IN-WI",Elgin,1,true
+17,16980,24582,"Chicago-Naperville-Elgin, IL-IN-WI",Evanston,1,true
+17,16980,35411,"Chicago-Naperville-Elgin, IL-IN-WI",Hoffman Estates,1,true
+17,16980,51622,"Chicago-Naperville-Elgin, IL-IN-WI",Naperville,1,true
+17,16980,68003,"Chicago-Naperville-Elgin, IL-IN-WI",Schaumburg,1,true
+17,16980,70122,"Chicago-Naperville-Elgin, IL-IN-WI",Skokie,1,true
+18,16980,27000,"Chicago-Naperville-Elgin, IL-IN-WI",Gary,1,true
+06,17020,13014,"Chico, CA",Chico,1,true
+39,17060,14184,"Chillicothe, OH",Chillicothe,2,true
+39,17140,15000,"Cincinnati, OH-KY-IN",Cincinnati,1,true
+54,17220,15628,"Clarksburg, WV",Clarksburg,2,true
+28,17260,13820,"Clarksdale, MS",Clarksdale,2,true
+47,17300,15160,"Clarksville, TN-KY",Clarksville,1,true
+06,17340,13945,"Clearlake, CA",Clearlake,2,true
+28,17380,14260,"Cleveland, MS",Cleveland,2,true
+47,17420,15400,"Cleveland, TN",Cleveland,1,true
+39,17460,16000,"Cleveland-Elyria, OH",Cleveland,1,true
+39,17460,25256,"Cleveland-Elyria, OH",Elyria,1,true
+12,17500,13000,"Clewiston, FL",Clewiston,2,true
+19,17540,14430,"Clinton, IA",Clinton,2,true
+35,17580,16420,"Clovis, NM",Clovis,2,true
+72,17620,18719,"Coamo, PR",Coamo,2,true
+72,17640,18891,"Coco, PR",Coco,2,true
+16,17660,16750,"Coeur d'Alene, ID",Coeur d'Alene,1,true
+20,17700,14600,"Coffeyville, KS",Coffeyville,2,true
+26,17740,17020,"Coldwater, MI",Coldwater,2,true
+48,17780,10912,"College Station-Bryan, TX",Bryan,1,true
+48,17780,15976,"College Station-Bryan, TX",College Station,1,true
+08,17820,16000,"Colorado Springs, CO",Colorado Springs,1,true
+29,17860,15670,"Columbia, MO",Columbia,1,true
+45,17900,16000,"Columbia, SC",Columbia,1,true
+13,17980,19000,"Columbus, GA-AL",Columbus,1,true
+18,18020,14734,"Columbus, IN",Columbus,1,true
+28,18060,15380,"Columbus, MS",Columbus,2,true
+31,18100,10110,"Columbus, NE",Columbus,2,true
+39,18140,18000,"Columbus, OH",Columbus,1,true
+33,18180,14200,"Concord, NH",Concord,2,true
+18,18220,14932,"Connersville, IN",Connersville,2,true
+47,18260,16920,"Cookeville, TN",Cookeville,2,true
+41,18300,15250,"Coos Bay, OR",Coos Bay,2,true
+13,18380,19616,"Cordele, GA",Cordele,2,true
+28,18420,15700,"Corinth, MS",Corinth,2,true
+13,18460,19728,"Cornelia, GA",Cornelia,2,true
+36,18500,18256,"Corning, NY",Corning,2,true
+48,18580,17000,"Corpus Christi, TX",Corpus Christi,1,true
+48,18620,17060,"Corsicana, TX",Corsicana,2,true
+36,18660,18388,"Cortland, NY",Cortland,2,true
+41,18700,15800,"Corvallis, OR",Corvallis,1,true
+39,18740,18868,"Coshocton, OH",Coshocton,2,true
+08,18780,17760,"Craig, CO",Craig,2,true
+18,18820,15742,"Crawfordsville, IN",Crawfordsville,2,true
+06,18860,17022,"Crescent City, CA",Crescent City,2,true
+12,18880,15475,"Crestview-Fort Walton Beach-Destin, FL",Crestview,1,true
+12,18880,17325,"Crestview-Fort Walton Beach-Destin, FL",Destin,1,true
+12,18880,24475,"Crestview-Fort Walton Beach-Destin, FL",Fort Walton Beach,1,true
+47,18900,18540,"Crossville, TN",Crossville,2,true
+01,18980,18976,"Cullman, AL",Cullman,2,true
+37,19000,15880,"Cullowhee, NC",Cullowhee,2,true
+24,19060,21325,"Cumberland, MD-WV",Cumberland,1,true
+48,19100,04000,"Dallas-Fort Worth-Arlington, TX",Arlington,1,true
+48,19100,19000,"Dallas-Fort Worth-Arlington, TX",Dallas,1,true
+48,19100,19972,"Dallas-Fort Worth-Arlington, TX",Denton,1,true
+48,19100,27000,"Dallas-Fort Worth-Arlington, TX",Fort Worth,1,true
+48,19100,30644,"Dallas-Fort Worth-Arlington, TX",Grapevine,1,true
+48,19100,37000,"Dallas-Fort Worth-Arlington, TX",Irving,1,true
+48,19100,58016,"Dallas-Fort Worth-Arlington, TX",Plano,1,true
+48,19100,61796,"Dallas-Fort Worth-Arlington, TX",Richardson,1,true
+13,19140,21380,"Dalton, GA",Dalton,1,true
+17,19180,18563,"Danville, IL",Danville,1,true
+21,19220,19882,"Danville, KY",Danville,2,true
+51,19260,21344,"Danville, VA",Danville,2,true
+01,19300,19648,"Daphne-Fairhope-Foley, AL",Daphne,1,true
+01,19300,25240,"Daphne-Fairhope-Foley, AL",Fairhope,1,true
+01,19300,26992,"Daphne-Fairhope-Foley, AL",Foley,1,true
+01,19300,32272,"Daphne-Fairhope-Foley, AL",Gulf Shores,1,true
+17,19340,49867,"Davenport-Moline-Rock Island, IA-IL",Moline,1,true
+17,19340,65078,"Davenport-Moline-Rock Island, IA-IL",Rock Island,1,true
+19,19340,19000,"Davenport-Moline-Rock Island, IA-IL",Davenport,1,true
+47,19420,19700,"Dayton, TN",Dayton,2,true
+39,19430,21000,"Dayton-Kettering, OH",Dayton,1,true
+39,19430,40040,"Dayton-Kettering, OH",Kettering,1,true
+01,19460,20104,"Decatur, AL",Decatur,1,true
+17,19500,18823,"Decatur, IL",Decatur,1,true
+18,19540,17074,"Decatur, IN",Decatur,2,true
+39,19580,21308,"Defiance, OH",Defiance,2,true
+48,19620,19792,"Del Rio, TX",Del Rio,2,true
+12,19660,16525,"Deltona-Daytona Beach-Ormond Beach, FL",Daytona Beach,1,true
+12,19660,16875,"Deltona-Daytona Beach-Ormond Beach, FL",DeLand,1,true
+12,19660,17200,"Deltona-Daytona Beach-Ormond Beach, FL",Deltona,1,true
+12,19660,53150,"Deltona-Daytona Beach-Ormond Beach, FL",Ormond Beach,1,true
+35,19700,20270,"Deming, NM",Deming,2,true
+08,19740,04000,"Denver-Aurora-Lakewood, CO",Aurora,1,true
+08,19740,09280,"Denver-Aurora-Lakewood, CO",Broomfield,1,true
+08,19740,12815,"Denver-Aurora-Lakewood, CO",Centennial,1,true
+08,19740,16495,"Denver-Aurora-Lakewood, CO",Commerce City,1,true
+08,19740,20000,"Denver-Aurora-Lakewood, CO",Denver,1,true
+08,19740,43000,"Denver-Aurora-Lakewood, CO",Lakewood,1,true
+22,19760,20610,"DeRidder, LA",DeRidder,2,true
+19,19780,21000,"Des Moines-West Des Moines, IA",Des Moines,1,true
+19,19780,83910,"Des Moines-West Des Moines, IA",West Des Moines,1,true
+26,19820,21000,"Detroit-Warren-Dearborn, MI",Dearborn,1,true
+26,19820,22000,"Detroit-Warren-Dearborn, MI",Detroit,1,true
+26,19820,27440,"Detroit-Warren-Dearborn, MI",Farmington Hills,1,true
+26,19820,49000,"Detroit-Warren-Dearborn, MI",Livonia,1,true
+26,19820,59440,"Detroit-Warren-Dearborn, MI",Novi,1,true
+26,19820,65440,"Detroit-Warren-Dearborn, MI",Pontiac,1,true
+26,19820,74900,"Detroit-Warren-Dearborn, MI",Southfield,1,true
+26,19820,79000,"Detroit-Warren-Dearborn, MI",Taylor,1,true
+26,19820,80700,"Detroit-Warren-Dearborn, MI",Troy,1,true
+26,19820,84000,"Detroit-Warren-Dearborn, MI",Warren,1,true
+38,19860,19620,"Dickinson, ND",Dickinson,2,true
+17,19940,20162,"Dixon, IL",Dixon,2,true
+20,19980,18250,"Dodge City, KS",Dodge City,2,true
+01,20020,21184,"Dothan, AL",Dothan,1,true
+13,20060,23872,"Douglas, GA",Douglas,2,true
+10,20100,21200,"Dover, DE",Dover,1,true
+13,20140,24376,"Dublin, GA",Dublin,2,true
+42,20180,20136,"DuBois, PA",DuBois,2,true
+19,20220,22395,"Dubuque, IA",Dubuque,1,true
+27,20260,17000,"Duluth, MN-WI",Duluth,1,true
+48,20300,21556,"Dumas, TX",Dumas,2,true
+40,20340,21900,"Duncan, OK",Duncan,2,true
+08,20420,22035,"Durango, CO",Durango,2,true
+40,20460,22050,"Durant, OK",Durant,2,true
+37,20500,11800,"Durham-Chapel Hill, NC",Chapel Hill,1,true
+37,20500,19000,"Durham-Chapel Hill, NC",Durham,1,true
+47,20540,22200,"Dyersburg, TN",Dyersburg,2,true
+48,20580,21892,"Eagle Pass, TX",Eagle Pass,2,true
+24,20660,24475,"Easton, MD",Easton,2,true
+42,20700,21872,"East Stroudsburg, PA",East Stroudsburg,1,true
+55,20740,22300,"Eau Claire, WI",Eau Claire,1,true
+08,20780,23300,"Edwards, CO",Edwards,2,true
+17,20820,22736,"Effingham, IL",Effingham,2,true
+48,20900,22864,"El Campo, TX",El Campo,2,true
+06,20940,21782,"El Centro, CA",El Centro,1,true
+05,20980,21070,"El Dorado, AR",El Dorado,2,true
+37,21020,20580,"Elizabeth City, NC",Elizabeth City,2,true
+21,21060,24274,"Elizabethtown-Fort Knox, KY",Elizabethtown,1,true
+21,21060,28540,"Elizabethtown-Fort Knox, KY",Fort Knox,1,true
+40,21120,23500,"Elk City, OK",Elk City,2,true
+18,21140,20728,"Elkhart-Goshen, IN",Elkhart,1,true
+18,21140,28386,"Elkhart-Goshen, IN",Goshen,1,true
+54,21180,24580,"Elkins, WV",Elkins,2,true
+32,21220,22500,"Elko, NV",Elko,2,true
+53,21260,21240,"Ellensburg, WA",Ellensburg,2,true
+36,21300,24229,"Elmira, NY",Elmira,1,true
+48,21340,24000,"El Paso, TX",El Paso,1,true
+20,21380,21275,"Emporia, KS",Emporia,2,true
+40,21420,23950,"Enid, OK",Enid,1,true
+01,21460,24184,"Enterprise, AL",Enterprise,2,true
+42,21500,24000,"Erie, PA",Erie,1,true
+26,21540,26360,"Escanaba, MI",Escanaba,2,true
+35,21580,25170,"Española, NM",Española,2,true
+01,21640,24568,"Eufaula, AL-GA",Eufaula,2,true
+41,21660,23850,"Eugene-Springfield, OR",Eugene,1,true
+41,21660,69600,"Eugene-Springfield, OR",Springfield,1,true
+06,21700,02476,"Eureka-Arcata, CA",Arcata,2,true
+06,21700,23042,"Eureka-Arcata, CA",Eureka,2,true
+56,21740,25620,"Evanston, WY",Evanston,2,true
+18,21780,22000,"Evansville, IN-KY",Evansville,1,true
+02,21820,24230,"Fairbanks, AK",Fairbanks,1,true
+19,21840,26445,"Fairfield, IA",Fairfield,2,true
+27,21860,20330,"Fairmont, MN",Fairmont,2,true
+54,21900,26452,"Fairmont, WV",Fairmont,2,true
+32,21980,24100,"Fallon, NV",Fallon,2,true
+38,22020,25700,"Fargo, ND-MN",Fargo,1,true
+27,22060,20546,"Faribault-Northfield, MN",Faribault,2,true
+27,22060,46924,"Faribault-Northfield, MN",Northfield,2,true
+29,22100,23752,"Farmington, MO",Farmington,2,true
+35,22140,25800,"Farmington, NM",Farmington,1,true
+37,22180,22920,"Fayetteville, NC",Fayetteville,1,true
+05,22220,05320,"Fayetteville-Springdale-Rogers, AR",Bentonville,1,true
+05,22220,23290,"Fayetteville-Springdale-Rogers, AR",Fayetteville,1,true
+05,22220,60410,"Fayetteville-Springdale-Rogers, AR",Rogers,1,true
+05,22220,66080,"Fayetteville-Springdale-Rogers, AR",Springdale,1,true
+27,22260,20906,"Fergus Falls, MN",Fergus Falls,2,true
+32,22280,24900,"Fernley, NV",Fernley,2,true
+39,22300,27048,"Findlay, OH",Findlay,2,true
+13,22340,29528,"Fitzgerald, GA",Fitzgerald,2,true
+04,22380,23620,"Flagstaff, AZ",Flagstaff,1,true
+26,22420,29000,"Flint, MI",Flint,1,true
+45,22500,25810,"Florence, SC",Florence,1,true
+01,22520,26896,"Florence-Muscle Shoals, AL",Florence,1,true
+01,22520,53016,"Florence-Muscle Shoals, AL",Muscle Shoals,1,true
+55,22540,26275,"Fond du Lac, WI",Fond du Lac,1,true
+37,22580,24080,"Forest City, NC",Forest City,2,true
+05,22620,24430,"Forrest City, AR",Forrest City,2,true
+08,22660,27425,"Fort Collins, CO",Fort Collins,1,true
+19,22700,28515,"Fort Dodge, IA",Fort Dodge,2,true
+29,22780,25264,"Fort Leonard Wood, MO",Fort Leonard Wood,2,true
+19,22800,28605,"Fort Madison-Keokuk, IA-IL-MO",Fort Madison,2,true
+19,22800,40845,"Fort Madison-Keokuk, IA-IL-MO",Keokuk,2,true
+08,22820,27810,"Fort Morgan, CO",Fort Morgan,2,true
+01,22840,27616,"Fort Payne, AL",Fort Payne,2,true
+22,22860,26757,"Fort Polk South, LA",Fort Polk South,2,true
+05,22900,24550,"Fort Smith, AR-OK",Fort Smith,1,true
+18,23060,25000,"Fort Wayne, IN",Fort Wayne,1,true
+18,23140,25324,"Frankfort, IN",Frankfort,2,true
+21,23180,28900,"Frankfort, KY",Frankfort,2,true
+48,23240,27348,"Fredericksburg, TX",Fredericksburg,2,true
+17,23300,27884,"Freeport, IL",Freeport,2,true
+31,23340,17670,"Fremont, NE",Fremont,2,true
+39,23380,28826,"Fremont, OH",Fremont,2,true
+06,23420,27000,"Fresno, CA",Fresno,1,true
+01,23460,28696,"Gadsden, AL",Gadsden,1,true
+45,23500,28060,"Gaffney, SC",Gaffney,2,true
+12,23540,25175,"Gainesville, FL",Gainesville,1,true
+13,23580,31908,"Gainesville, GA",Gainesville,1,true
+48,23620,27984,"Gainesville, TX",Gainesville,2,true
+17,23660,28326,"Galesburg, IL",Galesburg,2,true
+35,23700,28460,"Gallup, NM",Gallup,2,true
+20,23780,25325,"Garden City, KS",Garden City,2,true
+32,23820,26500,"Gardnerville Ranchos, NV",Gardnerville Ranchos,2,true
+45,23860,28870,"Georgetown, SC",Georgetown,2,true
+42,23900,28960,"Gettysburg, PA",Gettysburg,1,true
+56,23940,31855,"Gillette, WY",Gillette,2,true
+21,23980,31114,"Glasgow, KY",Glasgow,2,true
+36,24020,29333,"Glens Falls, NY",Glens Falls,1,true
+08,24060,30780,"Glenwood Springs, CO",Glenwood Springs,2,true
+36,24100,29443,"Gloversville, NY",Gloversville,2,true
+37,24140,26880,"Goldsboro, NC",Goldsboro,1,true
+48,24180,30416,"Granbury, TX",Granbury,2,true
+38,24220,32060,"Grand Forks, ND-MN",Grand Forks,1,true
+31,24260,19595,"Grand Island, NE",Grand Island,1,true
+08,24300,31660,"Grand Junction, CO",Grand Junction,1,true
+27,24330,25118,"Grand Rapids, MN",Grand Rapids,2,true
+26,24340,34000,"Grand Rapids-Kentwood, MI",Grand Rapids,1,true
+26,24340,42820,"Grand Rapids-Kentwood, MI",Kentwood,1,true
+35,24380,30490,"Grants, NM",Grants,2,true
+41,24420,30550,"Grants Pass, OR",Grants Pass,1,true
+20,24460,28300,"Great Bend, KS",Great Bend,2,true
+30,24500,32800,"Great Falls, MT",Great Falls,1,true
+08,24540,32155,"Greeley, CO",Greeley,1,true
+55,24580,31000,"Green Bay, WI",Green Bay,1,true
+47,24620,30980,"Greeneville, TN",Greeneville,2,true
+37,24660,28000,"Greensboro-High Point, NC",Greensboro,1,true
+37,24660,31400,"Greensboro-High Point, NC",High Point,1,true
+18,24700,29718,"Greensburg, IN",Greensburg,2,true
+28,24740,29180,"Greenville, MS",Greenville,2,true
+37,24780,28080,"Greenville, NC",Greenville,1,true
+39,24820,32340,"Greenville, OH",Greenville,2,true
+45,24860,01360,"Greenville-Anderson, SC",Anderson,1,true
+45,24860,30850,"Greenville-Anderson, SC",Greenville,1,true
+28,24900,29340,"Greenwood, MS",Greenwood,2,true
+45,24940,30895,"Greenwood, SC",Greenwood,2,true
+28,24980,29460,"Grenada, MS",Grenada,2,true
+72,25020,32221,"Guayama, PR",Guayama,1,true
+28,25060,06220,"Gulfport-Biloxi, MS",Biloxi,1,true
+28,25060,29700,"Gulfport-Biloxi, MS",Gulfport,1,true
+40,25100,31750,"Guymon, OK",Guymon,2,true
+24,25180,36075,"Hagerstown-Martinsburg, MD-WV",Hagerstown,1,true
+54,25180,52060,"Hagerstown-Martinsburg, MD-WV",Martinsburg,1,true
+16,25200,34390,"Hailey, ID",Hailey,2,true
+22,25220,32755,"Hammond, LA",Hammond,1,true
+06,25260,16224,"Hanford-Corcoran, CA",Corcoran,1,true
+06,25260,31960,"Hanford-Corcoran, CA",Hanford,1,true
+29,25300,30214,"Hannibal, MO",Hannibal,2,true
+42,25420,11272,"Harrisburg-Carlisle, PA",Carlisle,1,true
+42,25420,32800,"Harrisburg-Carlisle, PA",Harrisburg,1,true
+05,25460,30460,"Harrison, AR",Harrison,2,true
+51,25500,35624,"Harrisonburg, VA",Harrisonburg,1,true
+09,25540,22700,"Hartford-East Hartford-Middletown, CT",East Hartford,1,true
+09,25540,37000,"Hartford-East Hartford-Middletown, CT",Hartford,1,true
+09,25540,47290,"Hartford-East Hartford-Middletown, CT",Middletown,1,true
+31,25580,21415,"Hastings, NE",Hastings,2,true
+28,25620,31020,"Hattiesburg, MS",Hattiesburg,1,true
+20,25700,31100,"Hays, KS",Hays,2,true
+49,25720,34200,"Heber, UT",Heber,2,true
+30,25740,35600,"Helena, MT",Helena,2,true
+05,25760,31190,"Helena-West Helena, AR",Helena-West Helena,2,true
+37,25780,30660,"Henderson, NC",Henderson,2,true
+48,25820,33320,"Hereford, TX",Hereford,2,true
+41,25840,33700,"Hermiston-Pendleton, OR",Hermiston,2,true
+41,25840,57150,"Hermiston-Pendleton, OR",Pendleton,2,true
+37,25860,31060,"Hickory-Lenoir-Morganton, NC",Hickory,1,true
+37,25860,37760,"Hickory-Lenoir-Morganton, NC",Lenoir,1,true
+37,25860,44400,"Hickory-Lenoir-Morganton, NC",Morganton,1,true
+26,25880,38460,"Hillsdale, MI",Hillsdale,2,true
+15,25900,14650,"Hilo, HI",Hilo,2,true
+45,25940,07210,"Hilton Head Island-Bluffton, SC",Bluffton,1,true
+45,25940,34045,"Hilton Head Island-Bluffton, SC",Hilton Head Island,1,true
+13,25980,38964,"Hinesville, GA",Hinesville,1,true
+35,26020,32520,"Hobbs, NM",Hobbs,2,true
+26,26090,38640,"Holland, MI",Holland,2,true
+12,26140,32400,"Homosassa Springs, FL",Homosassa Springs,1,true
+41,26220,34900,"Hood River, OR",Hood River,2,true
+05,26260,33190,"Hope, AR",Hope,2,true
+05,26300,33400,"Hot Springs, AR",Hot Springs,1,true
+26,26340,39360,"Houghton, MI",Houghton,2,true
+22,26380,36255,"Houma-Thibodaux, LA",Houma,1,true
+22,26380,75425,"Houma-Thibodaux, LA",Thibodaux,1,true
+48,26420,06128,"Houston-The Woodlands-Sugar Land, TX",Baytown,1,true
+48,26420,16432,"Houston-The Woodlands-Sugar Land, TX",Conroe,1,true
+48,26420,28068,"Houston-The Woodlands-Sugar Land, TX",Galveston,1,true
+48,26420,35000,"Houston-The Woodlands-Sugar Land, TX",Houston,1,true
+48,26420,70808,"Houston-The Woodlands-Sugar Land, TX",Sugar Land,1,true
+48,26420,72656,"Houston-The Woodlands-Sugar Land, TX",The Woodlands,1,true
+36,26460,35969,"Hudson, NY",Hudson,2,true
+42,26500,36368,"Huntingdon, PA",Huntingdon,2,true
+18,26540,35302,"Huntington, IN",Huntington,2,true
+21,26580,02368,"Huntington-Ashland, WV-KY-OH",Ashland,1,true
+54,26580,39460,"Huntington-Ashland, WV-KY-OH",Huntington,1,true
+01,26620,37000,"Huntsville, AL",Huntsville,1,true
+48,26660,35528,"Huntsville, TX",Huntsville,2,true
+46,26700,31060,"Huron, SD",Huron,2,true
+20,26740,33625,"Hutchinson, KS",Hutchinson,2,true
+27,26780,30644,"Hutchinson, MN",Hutchinson,2,true
+16,26820,39700,"Idaho Falls, ID",Idaho Falls,1,true
+42,26860,36816,"Indiana, PA",Indiana,2,true
+18,26900,01468,"Indianapolis-Carmel-Anderson, IN",Anderson,1,true
+18,26900,10342,"Indianapolis-Carmel-Anderson, IN",Carmel,1,true
+18,26900,36003,"Indianapolis-Carmel-Anderson, IN",Indianapolis city (balance),1,true
+28,26940,34740,"Indianola, MS",Indianola,2,true
+19,26980,38595,"Iowa City, IA",Iowa City,1,true
+26,27020,40960,"Iron Mountain, MI-WI",Iron Mountain,2,true
+36,27060,38077,"Ithaca, NY",Ithaca,1,true
+26,27100,41420,"Jackson, MI",Jackson,1,true
+28,27140,36000,"Jackson, MS",Jackson,1,true
+39,27160,37842,"Jackson, OH",Jackson,2,true
+47,27180,37640,"Jackson, TN",Jackson,1,true
+56,27220,40120,"Jackson, WY-ID",Jackson,2,true
+12,27260,35000,"Jacksonville, FL",Jacksonville,1,true
+17,27300,38115,"Jacksonville, IL",Jacksonville,2,true
+37,27340,34200,"Jacksonville, NC",Jacksonville,1,true
+48,27380,37216,"Jacksonville, TX",Jacksonville,2,true
+38,27420,40580,"Jamestown, ND",Jamestown,2,true
+36,27460,21105,"Jamestown-Dunkirk-Fredonia, NY",Dunkirk,2,true
+36,27460,27419,"Jamestown-Dunkirk-Fredonia, NY",Fredonia,2,true
+36,27460,38264,"Jamestown-Dunkirk-Fredonia, NY",Jamestown,2,true
+55,27500,06500,"Janesville-Beloit, WI",Beloit,1,true
+55,27500,37825,"Janesville-Beloit, WI",Janesville,1,true
+01,27530,38416,"Jasper, AL",Jasper,2,true
+18,27540,37782,"Jasper, IN",Jasper,2,true
+72,27580,38370,"Jayuya, PR",Jayuya,2,true
+13,27600,41988,"Jefferson, GA",Jefferson,2,true
+29,27620,37000,"Jefferson City, MO",Jefferson City,1,true
+22,27660,38355,"Jennings, LA",Jennings,2,true
+13,27700,42268,"Jesup, GA",Jesup,2,true
+47,27740,38320,"Johnson City, TN",Johnson City,1,true
+42,27780,38288,"Johnstown, PA",Johnstown,1,true
+05,27860,35710,"Jonesboro, AR",Jonesboro,1,true
+29,27900,37592,"Joplin, MO",Joplin,1,true
+02,27940,36400,"Juneau, AK",Juneau,2,true
+15,27980,22700,"Kahului-Wailuku-Lahaina, HI",Kahului,1,true
+15,27980,42950,"Kahului-Wailuku-Lahaina, HI",Lahaina,1,true
+15,27980,77450,"Kahului-Wailuku-Lahaina, HI",Wailuku,1,true
+26,28020,42160,"Kalamazoo-Portage, MI",Kalamazoo,1,true
+26,28020,65560,"Kalamazoo-Portage, MI",Portage,1,true
+30,28060,40075,"Kalispell, MT",Kalispell,2,true
+17,28100,38934,"Kankakee, IL",Kankakee,1,true
+20,28140,36000,"Kansas City, MO-KS",Kansas City,1,true
+20,28140,39350,"Kansas City, MO-KS",Lenexa,1,true
+20,28140,53775,"Kansas City, MO-KS",Overland Park,1,true
+29,28140,38000,"Kansas City, MO-KS",Kansas City,1,true
+15,28180,28850,"Kapaa, HI",Kapaa,2,true
+31,28260,25055,"Kearney, NE",Kearney,2,true
+33,28300,39300,"Keene, NH",Keene,2,true
+18,28340,39402,"Kendallville, IN",Kendallville,2,true
+29,28380,38306,"Kennett, MO",Kennett,2,true
+53,28420,35275,"Kennewick-Richland, WA",Kennewick,1,true
+53,28420,58235,"Kennewick-Richland, WA",Richland,1,true
+48,28500,39040,"Kerrville, TX",Kerrville,2,true
+02,28540,38970,"Ketchikan, AK",Ketchikan,2,true
+12,28580,36550,"Key West, FL",Key West,2,true
+37,28620,35720,"Kill Devil Hills, NC",Kill Devil Hills,2,true
+48,28660,39148,"Killeen-Temple, TX",Killeen,1,true
+48,28660,72176,"Killeen-Temple, TX",Temple,1,true
+47,28700,08540,"Kingsport-Bristol, TN-VA",Bristol,1,true
+47,28700,39560,"Kingsport-Bristol, TN-VA",Kingsport,1,true
+36,28740,39727,"Kingston, NY",Kingston,1,true
+48,28780,39352,"Kingsville, TX",Kingsville,2,true
+37,28820,35920,"Kinston, NC",Kinston,2,true
+29,28860,39026,"Kirksville, MO",Kirksville,2,true
+41,28900,39700,"Klamath Falls, OR",Klamath Falls,2,true
+47,28940,40000,"Knoxville, TN",Knoxville,1,true
+18,29020,40392,"Kokomo, IN",Kokomo,1,true
+33,29060,40180,"Laconia, NH",Laconia,2,true
+55,29100,40775,"La Crosse-Onalaska, WI-MN",La Crosse,1,true
+55,29100,59925,"La Crosse-Onalaska, WI-MN",Onalaska,1,true
+22,29180,40735,"Lafayette, LA",Lafayette,1,true
+18,29200,40788,"Lafayette-West Lafayette, IN",Lafayette,1,true
+18,29200,82862,"Lafayette-West Lafayette, IN",West Lafayette,1,true
+41,29260,40350,"La Grande, OR",La Grande,2,true
+13,29300,44340,"LaGrange, GA-AL",LaGrange,2,true
+22,29340,41155,"Lake Charles, LA",Lake Charles,1,true
+12,29380,37775,"Lake City, FL",Lake City,2,true
+04,29420,37620,"Lake Havasu City-Kingman, AZ",Kingman,1,true
+04,29420,39370,"Lake Havasu City-Kingman, AZ",Lake Havasu City,1,true
+12,29460,38250,"Lakeland-Winter Haven, FL",Lakeland,1,true
+12,29460,78275,"Lakeland-Winter Haven, FL",Winter Haven,1,true
+48,29500,41164,"Lamesa, TX",Lamesa,2,true
+42,29540,41216,"Lancaster, PA",Lancaster,1,true
+26,29620,24120,"Lansing-East Lansing, MI",East Lansing,1,true
+26,29620,46000,"Lansing-East Lansing, MI",Lansing,1,true
+56,29660,45050,"Laramie, WY",Laramie,2,true
+48,29700,41464,"Laredo, TX",Laredo,1,true
+35,29740,39380,"Las Cruces, NM",Las Cruces,1,true
+35,29780,39940,"Las Vegas, NM",Las Vegas,2,true
+32,29820,31900,"Las Vegas-Henderson-Paradise, NV",Henderson,1,true
+32,29820,40000,"Las Vegas-Henderson-Paradise, NV",Las Vegas,1,true
+32,29820,54600,"Las Vegas-Henderson-Paradise, NV",Paradise,1,true
+28,29860,39640,"Laurel, MS",Laurel,2,true
+37,29900,37220,"Laurinburg, NC",Laurinburg,2,true
+20,29940,38900,"Lawrence, KS",Lawrence,1,true
+47,29980,41340,"Lawrenceburg, TN",Lawrenceburg,2,true
+40,30020,41850,"Lawton, OK",Lawton,1,true
+29,30060,41168,"Lebanon, MO",Lebanon,2,true
+33,30100,41300,"Lebanon, NH-VT",Lebanon,2,true
+42,30140,42168,"Lebanon, PA",Lebanon,1,true
+48,30220,42448,"Levelland, TX",Levelland,2,true
+42,30260,42976,"Lewisburg, PA",Lewisburg,2,true
+47,30280,41860,"Lewisburg, TN",Lewisburg,2,true
+16,30300,46540,"Lewiston, ID-WA",Lewiston,1,true
+23,30340,02060,"Lewiston-Auburn, ME",Auburn,1,true
+23,30340,38740,"Lewiston-Auburn, ME",Lewiston,1,true
+42,30380,43000,"Lewistown, PA",Lewistown,2,true
+31,30420,26910,"Lexington, NE",Lexington,2,true
+21,30460,46027,"Lexington-Fayette, KY",Lexington-Fayette,1,true
+20,30580,39825,"Liberal, KS",Liberal,2,true
+39,30620,43554,"Lima, OH",Lima,1,true
+17,30660,43536,"Lincoln, IL",Lincoln,2,true
+31,30700,28000,"Lincoln, NE",Lincoln,1,true
+05,30780,15190,"Little Rock-North Little Rock-Conway, AR",Conway,1,true
+05,30780,41000,"Little Rock-North Little Rock-Conway, AR",Little Rock,1,true
+05,30780,50450,"Little Rock-North Little Rock-Conway, AR",North Little Rock,1,true
+42,30820,44128,"Lock Haven, PA",Lock Haven,2,true
+49,30860,45860,"Logan, UT-ID",Logan,1,true
+18,30900,44658,"Logansport, IN",Logansport,2,true
+21,30940,47476,"London, KY",London,2,true
+48,30980,43888,"Longview, TX",Longview,1,true
+53,31020,40245,"Longview, WA",Longview,1,true
+35,31060,42320,"Los Alamos, NM",Los Alamos,2,true
+06,31080,02000,"Los Angeles-Long Beach-Anaheim, CA",Anaheim,1,true
+06,31080,02462,"Los Angeles-Long Beach-Anaheim, CA",Arcadia,1,true
+06,31080,08954,"Los Angeles-Long Beach-Anaheim, CA",Burbank,1,true
+06,31080,11530,"Los Angeles-Long Beach-Anaheim, CA",Carson,1,true
+06,31080,16532,"Los Angeles-Long Beach-Anaheim, CA",Costa Mesa,1,true
+06,31080,25380,"Los Angeles-Long Beach-Anaheim, CA",Fountain Valley,1,true
+06,31080,28168,"Los Angeles-Long Beach-Anaheim, CA",Gardena,1,true
+06,31080,30000,"Los Angeles-Long Beach-Anaheim, CA",Glendale,1,true
+06,31080,36770,"Los Angeles-Long Beach-Anaheim, CA",Irvine,1,true
+06,31080,43000,"Los Angeles-Long Beach-Anaheim, CA",Long Beach,1,true
+06,31080,44000,"Los Angeles-Long Beach-Anaheim, CA",Los Angeles,1,true
+06,31080,51182,"Los Angeles-Long Beach-Anaheim, CA",Newport Beach,1,true
+06,31080,53980,"Los Angeles-Long Beach-Anaheim, CA",Orange,1,true
+06,31080,56000,"Los Angeles-Long Beach-Anaheim, CA",Pasadena,1,true
+06,31080,69000,"Los Angeles-Long Beach-Anaheim, CA",Santa Ana,1,true
+06,31080,70000,"Los Angeles-Long Beach-Anaheim, CA",Santa Monica,1,true
+06,31080,80000,"Los Angeles-Long Beach-Anaheim, CA",Torrance,1,true
+06,31080,80854,"Los Angeles-Long Beach-Anaheim, CA",Tustin,1,true
+21,31140,48006,"Louisville/Jefferson County, KY-IN",Louisville/Jefferson County metro government (balance),1,true
+48,31180,45000,"Lubbock, TX",Lubbock,1,true
+26,31220,49640,"Ludington, MI",Ludington,2,true
+48,31260,45072,"Lufkin, TX",Lufkin,2,true
+37,31300,39700,"Lumberton, NC",Lumberton,2,true
+51,31340,47672,"Lynchburg, VA",Lynchburg,1,true
+17,31380,45889,"Macomb, IL",Macomb,2,true
+13,31420,49008,"Macon-Bibb County, GA",Macon-Bibb County,1,true
+06,31460,45022,"Madera, CA",Madera,1,true
+18,31500,45990,"Madison, IN",Madison,2,true
+55,31540,48000,"Madison, WI",Madison,1,true
+21,31580,49368,"Madisonville, KY",Madisonville,2,true
+05,31620,43460,"Magnolia, AR",Magnolia,2,true
+36,31660,44710,"Malone, NY",Malone,2,true
+05,31680,43610,"Malvern, AR",Malvern,2,true
+33,31700,45140,"Manchester-Nashua, NH",Manchester,1,true
+33,31700,50260,"Manchester-Nashua, NH",Nashua,1,true
+20,31740,44250,"Manhattan, KS",Manhattan,1,true
+55,31820,48500,"Manitowoc, WI",Manitowoc,2,true
+27,31860,39878,"Mankato, MN",Mankato,1,true
+39,31900,47138,"Mansfield, OH",Mansfield,1,true
+39,31930,47628,"Marietta, OH",Marietta,2,true
+55,31940,49300,"Marinette, WI-MI",Marinette,2,true
+18,31980,46908,"Marion, IN",Marion,2,true
+37,32000,41420,"Marion, NC",Marion,2,true
+39,32020,47754,"Marion, OH",Marion,2,true
+26,32100,51900,"Marquette, MI",Marquette,2,true
+27,32140,40688,"Marshall, MN",Marshall,2,true
+29,32180,46316,"Marshall, MO",Marshall,2,true
+19,32260,49755,"Marshalltown, IA",Marshalltown,2,true
+47,32280,46240,"Martin, TN",Martin,2,true
+51,32300,49784,"Martinsville, VA",Martinsville,2,true
+29,32340,46640,"Maryville, MO",Maryville,2,true
+19,32380,50160,"Mason City, IA",Mason City,2,true
+72,32420,52431,"Mayagüez, PR",Mayagüez,1,true
+21,32460,50898,"Mayfield, KY",Mayfield,2,true
+21,32500,51024,"Maysville, KY",Maysville,2,true
+40,32540,44800,"McAlester, OK",McAlester,2,true
+48,32580,22660,"McAllen-Edinburg-Mission, TX",Edinburg,1,true
+48,32580,45384,"McAllen-Edinburg-Mission, TX",McAllen,1,true
+48,32580,48768,"McAllen-Edinburg-Mission, TX",Mission,1,true
+28,32620,43280,"McComb, MS",McComb,2,true
+47,32660,45100,"McMinnville, TN",McMinnville,2,true
+20,32700,43950,"McPherson, KS",McPherson,2,true
+42,32740,48360,"Meadville, PA",Meadville,2,true
+41,32780,47000,"Medford, OR",Medford,1,true
+47,32820,48000,"Memphis, TN-MS-AR",Memphis,1,true
+55,32860,51025,"Menomonie, WI",Menomonie,2,true
+06,32900,46898,"Merced, CA",Merced,1,true
+28,32940,46640,"Meridian, MS",Meridian,2,true
+29,33020,47648,"Mexico, MO",Mexico,2,true
+40,33060,48000,"Miami, OK",Miami,2,true
+12,33100,07300,"Miami-Fort Lauderdale-Pompano Beach, FL",Boca Raton,1,true
+12,33100,07875,"Miami-Fort Lauderdale-Pompano Beach, FL",Boynton Beach,1,true
+12,33100,14250,"Miami-Fort Lauderdale-Pompano Beach, FL",Coral Gables,1,true
+12,33100,16725,"Miami-Fort Lauderdale-Pompano Beach, FL",Deerfield Beach,1,true
+12,33100,17100,"Miami-Fort Lauderdale-Pompano Beach, FL",Delray Beach,1,true
+12,33100,17935,"Miami-Fort Lauderdale-Pompano Beach, FL",Doral,1,true
+12,33100,24000,"Miami-Fort Lauderdale-Pompano Beach, FL",Fort Lauderdale,1,true
+12,33100,35875,"Miami-Fort Lauderdale-Pompano Beach, FL",Jupiter,1,true
+12,33100,36100,"Miami-Fort Lauderdale-Pompano Beach, FL",Kendall,1,true
+12,33100,45000,"Miami-Fort Lauderdale-Pompano Beach, FL",Miami,1,true
+12,33100,45025,"Miami-Fort Lauderdale-Pompano Beach, FL",Miami Beach,1,true
+12,33100,54075,"Miami-Fort Lauderdale-Pompano Beach, FL",Palm Beach Gardens,1,true
+12,33100,58050,"Miami-Fort Lauderdale-Pompano Beach, FL",Pompano Beach,1,true
+12,33100,69700,"Miami-Fort Lauderdale-Pompano Beach, FL",Sunrise,1,true
+12,33100,76600,"Miami-Fort Lauderdale-Pompano Beach, FL",West Palm Beach,1,true
+18,33140,42246,"Michigan City-La Porte, IN",La Porte,1,true
+18,33140,48798,"Michigan City-La Porte, IN",Michigan City,1,true
+21,33180,51924,"Middlesborough, KY",Middlesborough,2,true
+26,33220,53780,"Midland, MI",Midland,1,true
+48,33260,48072,"Midland, TX",Midland,1,true
+13,33300,51492,"Milledgeville, GA",Milledgeville,2,true
+55,33340,53000,"Milwaukee-Waukesha, WI",Milwaukee,1,true
+55,33340,84250,"Milwaukee-Waukesha, WI",Waukesha,1,true
+22,33380,50885,"Minden, LA",Minden,2,true
+48,33420,48684,"Mineral Wells, TX",Mineral Wells,2,true
+27,33460,06616,"Minneapolis-St. Paul-Bloomington, MN-WI",Bloomington,1,true
+27,33460,17288,"Minneapolis-St. Paul-Bloomington, MN-WI",Eagan,1,true
+27,33460,18116,"Minneapolis-St. Paul-Bloomington, MN-WI",Eden Prairie,1,true
+27,33460,18188,"Minneapolis-St. Paul-Bloomington, MN-WI",Edina,1,true
+27,33460,43000,"Minneapolis-St. Paul-Bloomington, MN-WI",Minneapolis,1,true
+27,33460,43252,"Minneapolis-St. Paul-Bloomington, MN-WI",Minnetonka,1,true
+27,33460,51730,"Minneapolis-St. Paul-Bloomington, MN-WI",Plymouth,1,true
+27,33460,58000,"Minneapolis-St. Paul-Bloomington, MN-WI",St. Paul,1,true
+38,33500,53380,"Minot, ND",Minot,2,true
+30,33540,50200,"Missoula, MT",Missoula,1,true
+46,33580,43100,"Mitchell, SD",Mitchell,2,true
+29,33620,49034,"Moberly, MO",Moberly,2,true
+01,33660,50000,"Mobile, AL",Mobile,1,true
+06,33700,48354,"Modesto, CA",Modesto,1,true
+22,33740,51410,"Monroe, LA",Monroe,1,true
+26,33780,55020,"Monroe, MI",Monroe,1,true
+01,33860,51000,"Montgomery, AL",Montgomery,1,true
+08,33940,51745,"Montrose, CO",Montrose,2,true
+37,33980,44320,"Morehead City, NC",Morehead City,2,true
+22,34020,52040,"Morgan City, LA",Morgan City,2,true
+54,34060,55756,"Morgantown, WV",Morgantown,1,true
+47,34100,50280,"Morristown, TN",Morristown,1,true
+16,34140,54550,"Moscow, ID",Moscow,2,true
+53,34180,47245,"Moses Lake, WA",Moses Lake,2,true
+13,34220,53060,"Moultrie, GA",Moultrie,2,true
+05,34260,47390,"Mountain Home, AR",Mountain Home,2,true
+16,34300,54730,"Mountain Home, ID",Mountain Home,2,true
+37,34340,44800,"Mount Airy, NC",Mount Airy,2,true
+54,34350,56342,"Mount Gay-Shamrock, WV",Mount Gay-Shamrock,2,true
+26,34380,56020,"Mount Pleasant, MI",Mount Pleasant,2,true
+48,34420,49800,"Mount Pleasant, TX",Mount Pleasant,2,true
+21,34460,54084,"Mount Sterling, KY",Mount Sterling,2,true
+17,34500,51180,"Mount Vernon, IL",Mount Vernon,2,true
+39,34540,53102,"Mount Vernon, OH",Mount Vernon,2,true
+53,34580,01990,"Mount Vernon-Anacortes, WA",Anacortes,1,true
+53,34580,47560,"Mount Vernon-Anacortes, WA",Mount Vernon,1,true
+18,34620,51876,"Muncie, IN",Muncie,1,true
+21,34660,54642,"Murray, KY",Murray,2,true
+19,34700,55110,"Muscatine, IA",Muscatine,2,true
+26,34740,56320,"Muskegon, MI",Muskegon,1,true
+40,34780,50050,"Muskogee, OK",Muskogee,2,true
+45,34820,16405,"Myrtle Beach-Conway-North Myrtle Beach, SC-NC",Conway,1,true
+45,34820,49075,"Myrtle Beach-Conway-North Myrtle Beach, SC-NC",Myrtle Beach,1,true
+45,34820,51280,"Myrtle Beach-Conway-North Myrtle Beach, SC-NC",North Myrtle Beach,1,true
+48,34860,50256,"Nacogdoches, TX",Nacogdoches,2,true
+06,34900,50258,"Napa, CA",Napa,1,true
+12,34940,43083,"Naples-Marco Island, FL",Marco Island,1,true
+12,34940,47625,"Naples-Marco Island, FL",Naples,1,true
+47,34980,27740,"Nashville-Davidson--Murfreesboro--Franklin, TN",Franklin,1,true
+47,34980,51560,"Nashville-Davidson--Murfreesboro--Franklin, TN",Murfreesboro,1,true
+47,34980,52006,"Nashville-Davidson--Murfreesboro--Franklin, TN",Nashville-Davidson metropolitan government (balance),1,true
+28,35020,50440,"Natchez, MS-LA",Natchez,2,true
+22,35060,53545,"Natchitoches, LA",Natchitoches,2,true
+37,35100,46340,"New Bern, NC",New Bern,1,true
+45,35140,49570,"Newberry, SC",Newberry,2,true
+18,35220,52740,"New Castle, IN",New Castle,2,true
+42,35260,53368,"New Castle, PA",New Castle,2,true
+09,35300,47515,"New Haven-Milford, CT",Milford city (balance),1,true
+09,35300,52000,"New Haven-Milford, CT",New Haven,1,true
+22,35380,50115,"New Orleans-Metairie, LA",Metairie,1,true
+22,35380,55000,"New Orleans-Metairie, LA",New Orleans,1,true
+39,35420,22456,"New Philadelphia-Dover, OH",Dover,2,true
+39,35420,55216,"New Philadelphia-Dover, OH",New Philadelphia,2,true
+41,35440,52450,"Newport, OR",Newport,2,true
+47,35460,53000,"Newport, TN",Newport,2,true
+27,35580,46042,"New Ulm, MN",New Ulm,2,true
+34,35620,36000,"New York-Newark-Jersey City, NY-NJ-PA",Jersey City,1,true
+34,35620,38580,"New York-Newark-Jersey City, NY-NJ-PA",Lakewood,1,true
+34,35620,51000,"New York-Newark-Jersey City, NY-NJ-PA",Newark,1,true
+34,35620,51210,"New York-Newark-Jersey City, NY-NJ-PA",New Brunswick,1,true
+36,35620,51000,"New York-Newark-Jersey City, NY-NJ-PA",New York,1,true
+36,35620,81677,"New York-Newark-Jersey City, NY-NJ-PA",White Plains,1,true
+26,35660,57760,"Niles, MI",Niles,1,true
+04,35700,49640,"Nogales, AZ",Nogales,2,true
+31,35740,34615,"Norfolk, NE",Norfolk,2,true
+31,35820,35000,"North Platte, NE",North Platte,2,true
+12,35840,07950,"North Port-Sarasota-Bradenton, FL",Bradenton,1,true
+12,35840,49675,"North Port-Sarasota-Bradenton, FL",North Port,1,true
+12,35840,64175,"North Port-Sarasota-Bradenton, FL",Sarasota,1,true
+12,35840,73900,"North Port-Sarasota-Bradenton, FL",Venice,1,true
+18,35860,55116,"North Vernon, IN",North Vernon,2,true
+37,35900,47880,"North Wilkesboro, NC",North Wilkesboro,2,true
+39,35940,57302,"Norwalk, OH",Norwalk,2,true
+09,35980,52280,"Norwich-New London, CT",New London,1,true
+09,35980,56200,"Norwich-New London, CT",Norwich,1,true
+53,36020,50360,"Oak Harbor, WA",Oak Harbor,2,true
+12,36100,50750,"Ocala, FL",Ocala,1,true
+34,36140,54360,"Ocean City, NJ",Ocean City,1,true
+48,36220,53388,"Odessa, TX",Odessa,1,true
+49,36260,13850,"Ogden-Clearfield, UT",Clearfield,1,true
+49,36260,55980,"Ogden-Clearfield, UT",Ogden,1,true
+36,36300,46019,"Ogdensburg-Massena, NY",Massena,2,true
+36,36300,54485,"Ogdensburg-Massena, NY",Ogdensburg,2,true
+42,36340,56456,"Oil City, PA",Oil City,2,true
+12,36380,51200,"Okeechobee, FL",Okeechobee,2,true
+40,36420,55000,"Oklahoma City, OK",Oklahoma City,1,true
+36,36460,54716,"Olean, NY",Olean,2,true
+53,36500,36745,"Olympia-Lacey-Tumwater, WA",Lacey,1,true
+53,36500,51300,"Olympia-Lacey-Tumwater, WA",Olympia,1,true
+53,36500,72905,"Olympia-Lacey-Tumwater, WA",Tumwater,1,true
+19,36540,16860,"Omaha-Council Bluffs, NE-IA",Council Bluffs,1,true
+31,36540,37000,"Omaha-Council Bluffs, NE-IA",Omaha,1,true
+36,36580,54881,"Oneonta, NY",Oneonta,2,true
+41,36620,54900,"Ontario, OR-ID",Ontario,2,true
+22,36660,58045,"Opelousas, LA",Opelousas,2,true
+45,36700,53080,"Orangeburg, SC",Orangeburg,2,true
+12,36740,36950,"Orlando-Kissimmee-Sanford, FL",Kissimmee,1,true
+12,36740,53000,"Orlando-Kissimmee-Sanford, FL",Orlando,1,true
+12,36740,63650,"Orlando-Kissimmee-Sanford, FL",Sanford,1,true
+55,36780,55750,"Oshkosh-Neenah, WI",Neenah,1,true
+55,36780,60500,"Oshkosh-Neenah, WI",Oshkosh,1,true
+19,36820,59925,"Oskaloosa, IA",Oskaloosa,2,true
+53,36830,52215,"Othello, WA",Othello,2,true
+17,36837,56926,"Ottawa, IL",Ottawa,2,true
+20,36840,53550,"Ottawa, KS",Ottawa,2,true
+19,36900,60465,"Ottumwa, IA",Ottumwa,2,true
+27,36940,49300,"Owatonna, MN",Owatonna,2,true
+21,36980,58620,"Owensboro, KY",Owensboro,1,true
+28,37060,54840,"Oxford, MS",Oxford,2,true
+06,37100,10046,"Oxnard-Thousand Oaks-Ventura, CA",Camarillo,1,true
+06,37100,54652,"Oxnard-Thousand Oaks-Ventura, CA",Oxnard,1,true
+06,37100,65042,"Oxnard-Thousand Oaks-Ventura, CA",San Buenaventura (Ventura),1,true
+06,37100,78582,"Oxnard-Thousand Oaks-Ventura, CA",Thousand Oaks,1,true
+01,37120,57648,"Ozark, AL",Ozark,2,true
+21,37140,58836,"Paducah, KY-IL",Paducah,2,true
+32,37220,53800,"Pahrump, NV",Pahrump,2,true
+12,37260,53875,"Palatka, FL",Palatka,2,true
+48,37300,54708,"Palestine, TX",Palestine,2,true
+12,37340,43975,"Palm Bay-Melbourne-Titusville, FL",Melbourne,1,true
+12,37340,54000,"Palm Bay-Melbourne-Titusville, FL",Palm Bay,1,true
+12,37340,71900,"Palm Bay-Melbourne-Titusville, FL",Titusville,1,true
+48,37420,54912,"Pampa, TX",Pampa,2,true
+12,37460,54700,"Panama City, FL",Panama City,1,true
+05,37500,53390,"Paragould, AR",Paragould,2,true
+47,37540,56720,"Paris, TN",Paris,2,true
+48,37580,55080,"Paris, TX",Paris,2,true
+54,37620,62140,"Parkersburg-Vienna, WV",Parkersburg,1,true
+54,37620,83500,"Parkersburg-Vienna, WV",Vienna,1,true
+20,37660,54675,"Parsons, KS",Parsons,2,true
+04,37740,53700,"Payson, AZ",Payson,2,true
+48,37770,56384,"Pearsall, TX",Pearsall,2,true
+48,37780,56516,"Pecos, TX",Pecos,2,true
+19,37800,62040,"Pella, IA",Pella,2,true
+12,37860,08300,"Pensacola-Ferry Pass-Brent, FL",Brent,1,true
+12,37860,22275,"Pensacola-Ferry Pass-Brent, FL",Ferry Pass,1,true
+12,37860,55925,"Pensacola-Ferry Pass-Brent, FL",Pensacola,1,true
+17,37900,59000,"Peoria, IL",Peoria,1,true
+18,37940,59328,"Peru, IN",Peru,2,true
+10,37980,77580,"Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",Wilmington,1,true
+34,37980,10000,"Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",Camden,1,true
+42,37980,60000,"Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",Philadelphia,1,true
+04,38060,10530,"Phoenix-Mesa-Chandler, AZ",Casa Grande,1,true
+04,38060,12000,"Phoenix-Mesa-Chandler, AZ",Chandler,1,true
+04,38060,46000,"Phoenix-Mesa-Chandler, AZ",Mesa,1,true
+04,38060,55000,"Phoenix-Mesa-Chandler, AZ",Phoenix,1,true
+04,38060,65000,"Phoenix-Mesa-Chandler, AZ",Scottsdale,1,true
+04,38060,73000,"Phoenix-Mesa-Chandler, AZ",Tempe,1,true
+28,38100,57160,"Picayune, MS",Picayune,2,true
+46,38180,49600,"Pierre, SD",Pierre,2,true
+05,38220,55310,"Pine Bluff, AR",Pine Bluff,1,true
+37,38240,51940,"Pinehurst-Southern Pines, NC",Pinehurst,2,true
+37,38240,63120,"Pinehurst-Southern Pines, NC",Southern Pines,2,true
+20,38260,56025,"Pittsburg, KS",Pittsburg,2,true
+42,38300,61000,"Pittsburgh, PA",Pittsburgh,1,true
+25,38340,53960,"Pittsfield, MA",Pittsfield,1,true
+48,38380,57980,"Plainview, TX",Plainview,2,true
+55,38420,63250,"Platteville, WI",Platteville,2,true
+36,38460,58574,"Plattsburgh, NY",Plattsburgh,2,true
+18,38500,60822,"Plymouth, IN",Plymouth,2,true
+16,38540,64090,"Pocatello, ID",Pocatello,1,true
+54,38580,64708,"Point Pleasant, WV-OH",Point Pleasant,2,true
+40,38620,59850,"Ponca City, OK",Ponca City,2,true
+72,38660,63820,"Ponce, PR",Ponce,1,true
+17,38700,61015,"Pontiac, IL",Pontiac,2,true
+29,38740,59096,"Poplar Bluff, MO",Poplar Bluff,2,true
+35,38780,59260,"Portales, NM",Portales,2,true
+53,38820,55365,"Port Angeles, WA",Port Angeles,2,true
+23,38860,60545,"Portland-South Portland, ME",Portland,1,true
+23,38860,71990,"Portland-South Portland, ME",South Portland,1,true
+41,38900,05350,"Portland-Vancouver-Hillsboro, OR-WA",Beaverton,1,true
+41,38900,34100,"Portland-Vancouver-Hillsboro, OR-WA",Hillsboro,1,true
+41,38900,59000,"Portland-Vancouver-Hillsboro, OR-WA",Portland,1,true
+41,38900,73650,"Portland-Vancouver-Hillsboro, OR-WA",Tigard,1,true
+53,38900,74060,"Portland-Vancouver-Hillsboro, OR-WA",Vancouver,1,true
+48,38920,58916,"Port Lavaca, TX",Port Lavaca,2,true
+12,38940,58715,"Port St. Lucie, FL",Port St. Lucie,1,true
+39,39020,64304,"Portsmouth, OH",Portsmouth,2,true
+42,39060,62432,"Pottsville, PA",Pottsville,2,true
+36,39100,47042,"Poughkeepsie-Newburgh-Middletown, NY",Middletown,1,true
+36,39100,50034,"Poughkeepsie-Newburgh-Middletown, NY",Newburgh,1,true
+36,39100,59641,"Poughkeepsie-Newburgh-Middletown, NY",Poughkeepsie,1,true
+36,39100,82750,"Poughkeepsie-Newburgh-Middletown, NY",Woodbury,1,true
+04,39150,57380,"Prescott Valley-Prescott, AZ",Prescott,1,true
+04,39150,57450,"Prescott Valley-Prescott, AZ",Prescott Valley,1,true
+49,39220,62030,"Price, UT",Price,2,true
+41,39260,59850,"Prineville, OR",Prineville,2,true
+44,39300,59000,"Providence-Warwick, RI-MA",Providence,1,true
+44,39300,74300,"Providence-Warwick, RI-MA",Warwick,1,true
+49,39340,57300,"Provo-Orem, UT",Orem,1,true
+49,39340,62470,"Provo-Orem, UT",Provo,1,true
+08,39380,62000,"Pueblo, CO",Pueblo,1,true
+53,39420,56625,"Pullman, WA",Pullman,2,true
+12,39460,59200,"Punta Gorda, FL",Punta Gorda,1,true
+17,39500,62367,"Quincy, IL-MO",Quincy,2,true
+55,39540,66000,"Racine, WI",Racine,1,true
+37,39580,10740,"Raleigh-Cary, NC",Cary,1,true
+37,39580,55000,"Raleigh-Cary, NC",Raleigh,1,true
+46,39660,52980,"Rapid City, SD",Rapid City,1,true
+48,39700,60836,"Raymondville, TX",Raymondville,2,true
+42,39740,63624,"Reading, PA",Reading,1,true
+06,39780,59892,"Red Bluff, CA",Red Bluff,2,true
+06,39820,59920,"Redding, CA",Redding,1,true
+27,39860,53620,"Red Wing, MN",Red Wing,2,true
+32,39900,60600,"Reno, NV",Reno,1,true
+16,39940,67420,"Rexburg, ID",Rexburg,2,true
+18,39980,64260,"Richmond, IN",Richmond,2,true
+51,40060,67000,"Richmond, VA",Richmond,1,true
+21,40080,05842,"Richmond-Berea, KY",Berea,2,true
+21,40080,65226,"Richmond-Berea, KY",Richmond,2,true
+48,40100,62168,"Rio Grande City-Roma, TX",Rio Grande City,2,true
+48,40100,63020,"Rio Grande City-Roma, TX",Roma,2,true
+06,40140,13210,"Riverside-San Bernardino-Ontario, CA",Chino,1,true
+06,40140,16350,"Riverside-San Bernardino-Ontario, CA",Corona,1,true
+06,40140,53896,"Riverside-San Bernardino-Ontario, CA",Ontario,1,true
+06,40140,55184,"Riverside-San Bernardino-Ontario, CA",Palm Desert,1,true
+06,40140,59962,"Riverside-San Bernardino-Ontario, CA",Redlands,1,true
+06,40140,62000,"Riverside-San Bernardino-Ontario, CA",Riverside,1,true
+06,40140,65000,"Riverside-San Bernardino-Ontario, CA",San Bernardino,1,true
+06,40140,78120,"Riverside-San Bernardino-Ontario, CA",Temecula,1,true
+56,40180,66220,"Riverton, WY",Riverton,2,true
+51,40220,68000,"Roanoke, VA",Roanoke,1,true
+37,40260,56900,"Roanoke Rapids, NC",Roanoke Rapids,2,true
+17,40300,64746,"Rochelle, IL",Rochelle,2,true
+27,40340,54880,"Rochester, MN",Rochester,1,true
+36,40380,63000,"Rochester, NY",Rochester,1,true
+17,40420,65000,"Rockford, IL",Rockford,1,true
+37,40460,57260,"Rockingham, NC",Rockingham,2,true
+48,40530,62804,"Rockport, TX",Rockport,2,true
+56,40540,67235,"Rock Springs, WY",Rock Springs,2,true
+37,40580,57500,"Rocky Mount, NC",Rocky Mount,1,true
+29,40620,62912,"Rolla, MO",Rolla,2,true
+13,40660,66668,"Rome, GA",Rome,1,true
+41,40700,63650,"Roseburg, OR",Roseburg,2,true
+35,40740,64930,"Roswell, NM",Roswell,2,true
+35,40760,65210,"Ruidoso, NM",Ruidoso,2,true
+05,40780,61670,"Russellville, AR",Russellville,2,true
+22,40820,66655,"Ruston, LA",Ruston,2,true
+50,40860,61225,"Rutland, VT",Rutland,2,true
+06,40900,24638,"Sacramento-Roseville-Folsom, CA",Folsom,1,true
+06,40900,59444,"Sacramento-Roseville-Folsom, CA",Rancho Cordova,1,true
+06,40900,62938,"Sacramento-Roseville-Folsom, CA",Roseville,1,true
+06,40900,64000,"Sacramento-Roseville-Folsom, CA",Sacramento,1,true
+06,40900,84816,"Sacramento-Roseville-Folsom, CA",West Sacramento,1,true
+04,40940,62000,"Safford, AZ",Safford,2,true
+26,40980,70520,"Saginaw, MI",Saginaw,1,true
+27,41060,56896,"St. Cloud, MN",St. Cloud,1,true
+49,41100,65330,"St. George, UT",St. George,1,true
+29,41140,64550,"St. Joseph, MO-KS",St. Joseph,1,true
+29,41180,64082,"St. Louis, MO-IL",St. Charles,1,true
+29,41180,65000,"St. Louis, MO-IL",St. Louis,1,true
+13,41220,67984,"St. Marys, GA",St. Marys,2,true
+42,41260,67344,"St. Marys, PA",St. Marys,2,true
+39,41400,69834,"Salem, OH",Salem,2,true
+41,41420,64900,"Salem, OR",Salem,1,true
+20,41460,62700,"Salina, KS",Salina,2,true
+06,41500,64224,"Salinas, CA",Salinas,1,true
+24,41540,69925,"Salisbury, MD-DE",Salisbury,1,true
+49,41620,67000,"Salt Lake City, UT",Salt Lake City,1,true
+48,41660,64472,"San Angelo, TX",San Angelo,1,true
+48,41700,50820,"San Antonio-New Braunfels, TX",New Braunfels,1,true
+48,41700,65000,"San Antonio-New Braunfels, TX",San Antonio,1,true
+06,41740,11194,"San Diego-Chula Vista-Carlsbad, CA",Carlsbad,1,true
+06,41740,13392,"San Diego-Chula Vista-Carlsbad, CA",Chula Vista,1,true
+06,41740,58520,"San Diego-Chula Vista-Carlsbad, CA",Poway,1,true
+06,41740,66000,"San Diego-Chula Vista-Carlsbad, CA",San Diego,1,true
+16,41760,72100,"Sandpoint, ID",Sandpoint,2,true
+39,41780,70380,"Sandusky, OH",Sandusky,2,true
+37,41820,59280,"Sanford, NC",Sanford,2,true
+06,41860,06000,"San Francisco-Oakland-Berkeley, CA",Berkeley,1,true
+06,41860,41992,"San Francisco-Oakland-Berkeley, CA",Livermore,1,true
+06,41860,53000,"San Francisco-Oakland-Berkeley, CA",Oakland,1,true
+06,41860,57792,"San Francisco-Oakland-Berkeley, CA",Pleasanton,1,true
+06,41860,60102,"San Francisco-Oakland-Berkeley, CA",Redwood City,1,true
+06,41860,67000,"San Francisco-Oakland-Berkeley, CA",San Francisco,1,true
+06,41860,68252,"San Francisco-Oakland-Berkeley, CA",San Mateo,1,true
+06,41860,68364,"San Francisco-Oakland-Berkeley, CA",San Rafael,1,true
+06,41860,68378,"San Francisco-Oakland-Berkeley, CA",San Ramon,1,true
+06,41860,73262,"San Francisco-Oakland-Berkeley, CA",South San Francisco,1,true
+06,41860,83346,"San Francisco-Oakland-Berkeley, CA",Walnut Creek,1,true
+72,41900,76167,"San Germán, PR",San Germán,1,true
+06,41940,17610,"San Jose-Sunnyvale-Santa Clara, CA",Cupertino,1,true
+06,41940,47766,"San Jose-Sunnyvale-Santa Clara, CA",Milpitas,1,true
+06,41940,49670,"San Jose-Sunnyvale-Santa Clara, CA",Mountain View,1,true
+06,41940,55282,"San Jose-Sunnyvale-Santa Clara, CA",Palo Alto,1,true
+06,41940,68000,"San Jose-Sunnyvale-Santa Clara, CA",San Jose,1,true
+06,41940,69084,"San Jose-Sunnyvale-Santa Clara, CA",Santa Clara,1,true
+06,41940,77000,"San Jose-Sunnyvale-Santa Clara, CA",Sunnyvale,1,true
+72,41980,06593,"San Juan-Bayamón-Caguas, PR",Bayamón,1,true
+72,41980,10334,"San Juan-Bayamón-Caguas, PR",Caguas,1,true
+72,41980,32522,"San Juan-Bayamón-Caguas, PR",Guaynabo,1,true
+72,41980,76770,"San Juan-Bayamón-Caguas, PR",San Juan,1,true
+06,42020,22300,"San Luis Obispo-Paso Robles, CA",El Paso de Robles (Paso Robles),1,true
+06,42020,68154,"San Luis Obispo-Paso Robles, CA",San Luis Obispo,1,true
+06,42100,69112,"Santa Cruz-Watsonville, CA",Santa Cruz,1,true
+06,42100,83668,"Santa Cruz-Watsonville, CA",Watsonville,1,true
+35,42140,70500,"Santa Fe, NM",Santa Fe,1,true
+72,42180,78145,"Santa Isabel, PR",Santa Isabel,2,true
+06,42200,69070,"Santa Maria-Santa Barbara, CA",Santa Barbara,1,true
+06,42200,69196,"Santa Maria-Santa Barbara, CA",Santa Maria,1,true
+06,42220,56784,"Santa Rosa-Petaluma, CA",Petaluma,1,true
+06,42220,70098,"Santa Rosa-Petaluma, CA",Santa Rosa,1,true
+26,42300,71740,"Sault Ste. Marie, MI",Sault Ste. Marie,2,true
+13,42340,69000,"Savannah, GA",Savannah,1,true
+42,42380,68096,"Sayre, PA",Sayre,2,true
+31,42420,44245,"Scottsbluff, NE",Scottsbluff,2,true
+01,42460,68736,"Scottsboro, AL",Scottsboro,2,true
+18,42500,68526,"Scottsburg, IN",Scottsburg,2,true
+42,42540,69000,"Scranton--Wilkes-Barre, PA",Scranton,1,true
+42,42540,85152,"Scranton--Wilkes-Barre, PA",Wilkes-Barre,1,true
+05,42620,63020,"Searcy, AR",Searcy,2,true
+53,42660,03180,"Seattle-Tacoma-Bellevue, WA",Auburn,1,true
+53,42660,05210,"Seattle-Tacoma-Bellevue, WA",Bellevue,1,true
+53,42660,22640,"Seattle-Tacoma-Bellevue, WA",Everett,1,true
+53,42660,35415,"Seattle-Tacoma-Bellevue, WA",Kent,1,true
+53,42660,38038,"Seattle-Tacoma-Bellevue, WA",Lakewood,1,true
+53,42660,57535,"Seattle-Tacoma-Bellevue, WA",Redmond,1,true
+53,42660,57745,"Seattle-Tacoma-Bellevue, WA",Renton,1,true
+53,42660,63000,"Seattle-Tacoma-Bellevue, WA",Seattle,1,true
+53,42660,70000,"Seattle-Tacoma-Bellevue, WA",Tacoma,1,true
+12,42680,64825,"Sebastian-Vero Beach, FL",Sebastian,1,true
+12,42680,74150,"Sebastian-Vero Beach, FL",Vero Beach,1,true
+12,42700,02750,"Sebring-Avon Park, FL",Avon Park,1,true
+12,42700,64875,"Sebring-Avon Park, FL",Sebring,1,true
+29,42740,66440,"Sedalia, MO",Sedalia,2,true
+42,42780,69216,"Selinsgrove, PA",Selinsgrove,2,true
+01,42820,69120,"Selma, AL",Selma,2,true
+45,42860,65095,"Seneca, SC",Seneca,2,true
+36,42900,66322,"Seneca Falls, NY",Seneca Falls,2,true
+47,42940,67120,"Sevierville, TN",Sevierville,2,true
+18,42980,68832,"Seymour, IN",Seymour,2,true
+55,43020,72925,"Shawano, WI",Shawano,2,true
+40,43060,66800,"Shawnee, OK",Shawnee,2,true
+55,43100,72975,"Sheboygan, WI",Sheboygan,1,true
+37,43140,61200,"Shelby, NC",Shelby,2,true
+47,43180,67760,"Shelbyville, TN",Shelbyville,2,true
+53,43220,63735,"Shelton, WA",Shelton,2,true
+56,43260,69845,"Sheridan, WY",Sheridan,2,true
+48,43300,19900,"Sherman-Denison, TX",Denison,1,true
+48,43300,67496,"Sherman-Denison, TX",Sherman,1,true
+04,43320,66470,"Show Low, AZ",Show Low,2,true
+22,43340,08920,"Shreveport-Bossier City, LA",Bossier City,1,true
+22,43340,70000,"Shreveport-Bossier City, LA",Shreveport,1,true
+39,43380,72424,"Sidney, OH",Sidney,2,true
+04,43420,20050,"Sierra Vista-Douglas, AZ",Douglas,1,true
+04,43420,66820,"Sierra Vista-Douglas, AZ",Sierra Vista,1,true
+29,43460,67790,"Sikeston, MO",Sikeston,2,true
+35,43500,73260,"Silver City, NM",Silver City,2,true
+19,43580,73335,"Sioux City, IA-NE-SD",Sioux City,1,true
+46,43620,59020,"Sioux Falls, SD",Sioux Falls,1,true
+48,43660,68624,"Snyder, TX",Snyder,2,true
+21,43700,71688,"Somerset, KY",Somerset,2,true
+42,43740,71776,"Somerset, PA",Somerset,2,true
+06,43760,72674,"Sonora, CA",Sonora,2,true
+18,43780,49932,"South Bend-Mishawaka, IN-MI",Mishawaka,1,true
+18,43780,71000,"South Bend-Mishawaka, IN-MI",South Bend,1,true
+45,43900,68290,"Spartanburg, SC",Spartanburg,1,true
+46,43940,60020,"Spearfish, SD",Spearfish,2,true
+19,43980,74280,"Spencer, IA",Spencer,2,true
+19,44020,74415,"Spirit Lake, IA",Spirit Lake,2,true
+53,44060,67000,"Spokane-Spokane Valley, WA",Spokane,1,true
+53,44060,67167,"Spokane-Spokane Valley, WA",Spokane Valley,1,true
+17,44100,72000,"Springfield, IL",Springfield,1,true
+25,44140,67000,"Springfield, MA",Springfield,1,true
+29,44180,70000,"Springfield, MO",Springfield,1,true
+39,44220,74118,"Springfield, OH",Springfield,1,true
+28,44260,70240,"Starkville, MS",Starkville,2,true
+42,44300,73808,"State College, PA",State College,1,true
+13,44340,73256,"Statesboro, GA",Statesboro,2,true
+51,44420,75216,"Staunton, VA",Staunton,1,true
+08,44460,73825,"Steamboat Springs, CO",Steamboat Springs,2,true
+48,44500,70208,"Stephenville, TX",Stephenville,2,true
+08,44540,73935,"Sterling, CO",Sterling,2,true
+17,44580,72546,"Sterling, IL",Sterling,2,true
+55,44620,77200,"Stevens Point, WI",Stevens Point,2,true
+40,44660,70300,"Stillwater, OK",Stillwater,2,true
+06,44700,75000,"Stockton, CA",Stockton,1,true
+19,44740,75630,"Storm Lake, IA",Storm Lake,2,true
+26,44780,76960,"Sturgis, MI",Sturgis,2,true
+48,44860,70904,"Sulphur Springs, TX",Sulphur Springs,2,true
+13,44900,74376,"Summerville, GA",Summerville,2,true
+45,44940,70405,"Sumter, SC",Sumter,1,true
+42,44980,75304,"Sunbury, PA",Sunbury,2,true
+06,45000,77364,"Susanville, CA",Susanville,2,true
+48,45020,71540,"Sweetwater, TX",Sweetwater,2,true
+36,45060,73000,"Syracuse, NY",Syracuse,1,true
+40,45140,72100,"Tahlequah, OK",Tahlequah,2,true
+01,45180,74352,"Talladega-Sylacauga, AL",Sylacauga,2,true
+01,45180,74592,"Talladega-Sylacauga, AL",Talladega,2,true
+12,45220,70600,"Tallahassee, FL",Tallahassee,1,true
+12,45300,12875,"Tampa-St. Petersburg-Clearwater, FL",Clearwater,1,true
+12,45300,39425,"Tampa-St. Petersburg-Clearwater, FL",Largo,1,true
+12,45300,56975,"Tampa-St. Petersburg-Clearwater, FL",Pinellas Park,1,true
+12,45300,63000,"Tampa-St. Petersburg-Clearwater, FL",St. Petersburg,1,true
+12,45300,71000,"Tampa-St. Petersburg-Clearwater, FL",Tampa,1,true
+35,45340,76200,"Taos, NM",Taos,2,true
+17,45380,74574,"Taylorville, IL",Taylorville,2,true
+18,45460,75428,"Terre Haute, IN",Terre Haute,1,true
+48,45500,72368,"Texarkana, TX-AR",Texarkana,1,true
+41,45520,72950,"The Dalles, OR",The Dalles,2,true
+12,45540,71625,"The Villages, FL",The Villages,1,true
+13,45580,76168,"Thomaston, GA",Thomaston,2,true
+13,45620,76224,"Thomasville, GA",Thomasville,2,true
+39,45660,76778,"Tiffin, OH",Tiffin,2,true
+13,45700,76476,"Tifton, GA",Tifton,2,true
+13,45740,76756,"Toccoa, GA",Toccoa,2,true
+39,45780,77000,"Toledo, OH",Toledo,1,true
+20,45820,71000,"Topeka, KS",Topeka,1,true
+09,45860,76500,"Torrington, CT",Torrington,2,true
+26,45900,80340,"Traverse City, MI",Traverse City,2,true
+34,45940,60900,"Trenton-Princeton, NJ",Princeton,1,true
+34,45940,74000,"Trenton-Princeton, NJ",Trenton,1,true
+01,45980,76920,"Troy, AL",Troy,2,true
+06,46020,30798,"Truckee-Grass Valley, CA",Grass Valley,2,true
+06,46020,80588,"Truckee-Grass Valley, CA",Truckee,2,true
+04,46060,77000,"Tucson, AZ",Tucson,1,true
+47,46100,45500,"Tullahoma-Manchester, TN",Manchester,2,true
+47,46100,75320,"Tullahoma-Manchester, TN",Tullahoma,2,true
+40,46140,75000,"Tulsa, OK",Tulsa,1,true
+28,46180,74840,"Tupelo, MS",Tupelo,2,true
+01,46220,77256,"Tuscaloosa, AL",Tuscaloosa,1,true
+16,46300,82810,"Twin Falls, ID",Twin Falls,1,true
+48,46340,74144,"Tyler, TX",Tyler,1,true
+06,46380,81134,"Ukiah, CA",Ukiah,2,true
+45,46420,73105,"Union, SC",Union,2,true
+47,46460,75940,"Union City, TN",Union City,2,true
+39,46500,79072,"Urbana, OH",Urbana,2,true
+15,46520,71550,"Urban Honolulu, HI",Urban Honolulu,1,true
+36,46540,63418,"Utica-Rome, NY",Rome,1,true
+36,46540,76540,"Utica-Rome, NY",Utica,1,true
+48,46620,74588,"Uvalde, TX",Uvalde,2,true
+13,46660,78800,"Valdosta, GA",Valdosta,1,true
+06,46700,81666,"Vallejo, CA",Vallejo,1,true
+39,46780,79562,"Van Wert, OH",Van Wert,2,true
+46,46820,66700,"Vermillion, SD",Vermillion,2,true
+49,46860,80090,"Vernal, UT",Vernal,2,true
+48,46900,75308,"Vernon, TX",Vernon,2,true
+28,46980,76720,"Vicksburg, MS",Vicksburg,2,true
+48,47020,75428,"Victoria, TX",Victoria,1,true
+13,47080,79388,"Vidalia, GA",Vidalia,2,true
+18,47180,79208,"Vincennes, IN",Vincennes,2,true
+34,47220,07600,"Vineland-Bridgeton, NJ",Bridgeton,1,true
+34,47220,76070,"Vineland-Bridgeton, NJ",Vineland,1,true
+25,47240,71970,"Vineyard Haven, MA",Vineyard Haven,2,true
+51,47260,35000,"Virginia Beach-Norfolk-Newport News, VA-NC",Hampton,1,true
+51,47260,56000,"Virginia Beach-Norfolk-Newport News, VA-NC",Newport News,1,true
+51,47260,57000,"Virginia Beach-Norfolk-Newport News, VA-NC",Norfolk,1,true
+51,47260,64000,"Virginia Beach-Norfolk-Newport News, VA-NC",Portsmouth,1,true
+51,47260,82000,"Virginia Beach-Norfolk-Newport News, VA-NC",Virginia Beach,1,true
+06,47300,82954,"Visalia, CA",Visalia,1,true
+18,47340,79370,"Wabash, IN",Wabash,2,true
+48,47380,76000,"Waco, TX",Waco,1,true
+38,47420,82660,"Wahpeton, ND-MN",Wahpeton,2,true
+53,47460,75775,"Walla Walla, WA",Walla Walla,1,true
+39,47540,80766,"Wapakoneta, OH",Wapakoneta,2,true
+13,47580,80508,"Warner Robins, GA",Warner Robins,1,true
+42,47620,81000,"Warren, PA",Warren,2,true
+29,47660,77092,"Warrensburg, MO",Warrensburg,2,true
+18,47700,80306,"Warsaw, IN",Warsaw,2,true
+18,47780,80504,"Washington, IN",Washington,2,true
+37,47820,71220,"Washington, NC",Washington,2,true
+11,47900,50000,"Washington-Arlington-Alexandria, DC-VA-MD-WV",Washington,1,true
+24,47900,07125,"Washington-Arlington-Alexandria, DC-VA-MD-WV",Bethesda,1,true
+24,47900,30325,"Washington-Arlington-Alexandria, DC-VA-MD-WV",Frederick,1,true
+24,47900,31175,"Washington-Arlington-Alexandria, DC-VA-MD-WV",Gaithersburg,1,true
+24,47900,67675,"Washington-Arlington-Alexandria, DC-VA-MD-WV",Rockville,1,true
+51,47900,01000,"Washington-Arlington-Alexandria, DC-VA-MD-WV",Alexandria,1,true
+51,47900,03000,"Washington-Arlington-Alexandria, DC-VA-MD-WV",Arlington,1,true
+51,47900,66672,"Washington-Arlington-Alexandria, DC-VA-MD-WV",Reston,1,true
+39,47920,81718,"Washington Court House, OH",Washington Court House,2,true
+19,47940,11755,"Waterloo-Cedar Falls, IA",Cedar Falls,1,true
+19,47940,82425,"Waterloo-Cedar Falls, IA",Waterloo,1,true
+46,47980,69300,"Watertown, SD",Watertown,2,true
+55,48020,26675,"Watertown-Fort Atkinson, WI",Fort Atkinson,2,true
+55,48020,83975,"Watertown-Fort Atkinson, WI",Watertown,2,true
+36,48060,26759,"Watertown-Fort Drum, NY",Fort Drum,1,true
+36,48060,78608,"Watertown-Fort Drum, NY",Watertown,1,true
+12,48100,75375,"Wauchula, FL",Wauchula,2,true
+55,48140,84475,"Wausau-Weston, WI",Wausau,1,true
+55,48140,86025,"Wausau-Weston, WI",Weston,1,true
+13,48180,80956,"Waycross, GA",Waycross,2,true
+40,48220,79450,"Weatherford, OK",Weatherford,2,true
+39,48260,74608,"Weirton-Steubenville, WV-OH",Steubenville,1,true
+54,48260,85156,"Weirton-Steubenville, WV-OH",Weirton,1,true
+53,48300,77105,"Wenatchee, WA",Wenatchee,1,true
+29,48460,78928,"West Plains, MO",West Plains,2,true
+28,48500,79120,"West Point, MS",West Point,2,true
+54,48540,86452,"Wheeling, WV-OH",Wheeling,1,true
+55,48580,86925,"Whitewater, WI",Whitewater,2,true
+20,48620,79000,"Wichita, KS",Wichita,1,true
+48,48660,79000,"Wichita Falls, TX",Wichita Falls,1,true
+42,48700,85312,"Williamsport, PA",Williamsport,1,true
+38,48780,86220,"Williston, ND",Williston,2,true
+27,48820,70420,"Willmar, MN",Willmar,2,true
+37,48900,74440,"Wilmington, NC",Wilmington,1,true
+39,48940,85792,"Wilmington, OH",Wilmington,2,true
+37,48980,74540,"Wilson, NC",Wilson,2,true
+51,49020,86720,"Winchester, VA-WV",Winchester,1,true
+20,49060,79950,"Winfield, KS",Winfield,2,true
+32,49080,84800,"Winnemucca, NV",Winnemucca,2,true
+27,49100,71032,"Winona, MN",Winona,2,true
+37,49180,75000,"Winston-Salem, NC",Winston-Salem,1,true
+55,49220,49675,"Wisconsin Rapids-Marshfield, WI",Marshfield,2,true
+55,49220,88200,"Wisconsin Rapids-Marshfield, WI",Wisconsin Rapids,2,true
+40,49260,82150,"Woodward, OK",Woodward,2,true
+39,49300,86548,"Wooster, OH",Wooster,2,true
+25,49340,82000,"Worcester, MA-CT",Worcester,1,true
+27,49380,71734,"Worthington, MN",Worthington,2,true
+53,49420,80010,"Yakima, WA",Yakima,1,true
+46,49460,73060,"Yankton, SD",Yankton,2,true
+72,49500,88035,"Yauco, PR",Yauco,1,true
+42,49620,32448,"York-Hanover, PA",Hanover,1,true
+42,49620,87048,"York-Hanover, PA",York,1,true
+39,49660,07454,"Youngstown-Warren-Boardman, OH-PA",Boardman,1,true
+39,49660,80892,"Youngstown-Warren-Boardman, OH-PA",Warren,1,true
+39,49660,88000,"Youngstown-Warren-Boardman, OH-PA",Youngstown,1,true
+06,49700,86972,"Yuba City, CA",Yuba City,1,true
+04,49740,85540,"Yuma, AZ",Yuma,1,true
+39,49780,88084,"Zanesville, OH",Zanesville,2,true
+48,49820,80716,"Zapata, TX",Zapata,2,true
