@@ -1,3 +1,4 @@
+
 ################################################
 #
 # Replication of the state-level blueNOTE model
@@ -10,31 +11,58 @@ using JuMP
 using Complementarity
 using DataFrames
 
+##########
+# FUNCTIONS
+##########
+
+#replace here with "collect"
+function key_to_vec(d::Dict,index_num::Int64)
+  return [k[index_num] for k in keys(d)]
+end
+
+function fill_zero(source::Dict,tofill::Dict)
+  for k in keys(source)
+      if !haskey(tofill,k)
+          push!(tofill,k=>0)
+      end
+  end
+end
+
+function fill_zero(source::Tuple, tofill::Dict)
+# Assume all possible permutations of keys should be present
+# and determine which are missing.
+  allkeys = vcat(collect(Base.Iterators.product(source...))...)
+  missingkeys = setdiff(allkeys, collect(keys(tofill)))
+
+# Add
+  [push!(tofill, fill=>0) for fill in missingkeys]
+  return tofill
+end
+
+#function here simplifies the loading and subsequent subsetting of the dataframes
+function read_data_temp(file::String,year::Int64,dir::String,desc::String)
+  df = SLiDE.read_file(dir,CSVInput(name=string(file,".csv"),descriptor=desc))
+  df = df[df[!,:yr].==year,:]
+  return df
+end
+
+function df_to_dict(df::DataFrame,remove_columns::Vector{Symbol},value_column::Symbol)
+  colnames = setdiff(names(df),[remove_columns; value_column])
+  return Dict(tuple(row[colnames]...)=>row[:Val] for row in eachrow(df))
+end
+
+
+
+
 ############
 # LOAD DATA
 ############
 
-# For the time being, these result from a call to gdxdump
-# for each parameter in the winddcdatabase.gdx file
-
-# First need to select a year for the model to be based off of
-mod_year = 2014
+# year for the model to be based off of
+mod_year = 2016
 
 #specify the path where the dumped csv files are stored
 data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
-
-#function here simplifies the loading and subsequent subsetting of the dataframes
-function read_data_temp(file::String,year::Int64,dir::String,desc::String)
-    df = SLiDE.read_file(dir,CSVInput(name=string(file,".csv"),descriptor=desc))
-    df = df[df[!,:yr].==year,:]
-    return df
-end
-
-function df_to_dict(df::DataFrame,remove_columns::Vector{Symbol},value_column::Symbol)
-    colnames = setdiff(names(df),[remove_columns; value_column])
-    return Dict(tuple(row[colnames]...)=>row[:Val] for row in eachrow(df))
-end
-
 
 #blueNOTE contains a dictionary of the parameters needed to specify the model
 blueNOTE = Dict(
@@ -66,77 +94,20 @@ blueNOTE = Dict(
     :nd0 => df_to_dict(read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"),[:yr],:Val)
 )
 
-##########
-# FUNCTIONS
-##########
-
-#replace here with "collect"
-function key_to_vec(d::Dict,index_num::Int64)
-    return [k[index_num] for k in keys(d)]
-end
-
-function fill_zero(source::Dict,tofill::Dict)
-    for k in keys(source)
-        if !haskey(tofill,k)
-            push!(tofill,k=>0)
-        end
-    end
-end
-
-function fill_zero(source::Tuple, tofill::Dict)
- 
-  # Assume all possible permutations of keys should be present
-  # and determine which are missing.
-  allkeys = vcat(collect(Base.Iterators.product(source...))...)
-  missingkeys = setdiff(allkeys, collect(keys(tofill)))
-
-  # Add
-  [push!(tofill, fill=>0) for fill in missingkeys]
-  return tofill
-end
-
-
 ###############
 # -- SETS --
 ###############
 
-
-
-
-#need to create a dictionary with unique r/s keys in ys0
-#but requires us to remove the third 'g' key in the r/s/g 
-#dict keys in the ys0 parameter
-y_set = Dict()
-y_vector = []
-for keys in blueNOTE[:ys0]
-    newkey = [keys[1][1],keys[1][2]]
-    push!(y_vector,newkey)
-end
-y_vector = unique(y_vector)
-
-for i in y_vector
-    push!(y_set,(i[1],i[2])=>0)
-end
-
-x_set = blueNOTE[:s0]
-pd_set = blueNOTE[:xd0]
-
-#here creating a placeholder set to make sure we don't modify blueNOTE[:rx0]
-temp_a2 = blueNOTE[:rx0]
-fill_zero(blueNOTE[:a0],temp_a2)
-a_set = temp_a2
-
-
-
 # read sets from their dumped CSVs
+# these are converted to a vector of strings such that we can use them to populate variable indices
+# and to use them as as conditionals (e.g. see the use of goods_margins)
 regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
 sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
 goods = sectors;
 margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
 goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
 
-
-
+# need to fill in zeros to avoid missing keys
 fill_zero(tuple(regions,sectors,goods),blueNOTE[:ys0])
 fill_zero(tuple(regions,goods,sectors),blueNOTE[:id0])
 fill_zero(tuple(regions,sectors),blueNOTE[:ld0])
@@ -146,8 +117,8 @@ fill_zero(tuple(regions,goods),blueNOTE[:m0])
 fill_zero(tuple(regions,goods),blueNOTE[:x0])
 fill_zero(tuple(regions,goods),blueNOTE[:rx0])
 fill_zero(tuple(regions,margins,goods),blueNOTE[:md0])
-fill_zero(tuple(regions,goods_margins,margins),blueNOTE[:nm0])
-fill_zero(tuple(regions,goods_margins,margins),blueNOTE[:dm0])
+fill_zero(tuple(regions,goods,margins),blueNOTE[:nm0])
+fill_zero(tuple(regions,goods,margins),blueNOTE[:dm0])
 fill_zero(tuple(regions,goods),blueNOTE[:s0])
 fill_zero(tuple(regions,goods),blueNOTE[:a0])
 fill_zero(tuple(regions,goods),blueNOTE[:ta0])
@@ -164,6 +135,11 @@ fill_zero(tuple(regions,goods),blueNOTE[:xd0])
 fill_zero(tuple(regions,goods),blueNOTE[:dd0])
 fill_zero(tuple(regions,goods),blueNOTE[:nd0])
 
+a_set = Dict()
+[a_set[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
+# y_check is used to make sure the r/s combination is a valid output
+y_check = Dict()
+[y_check[r,s] = sum(blueNOTE[:ys0][r,s,g] for g in goods) for r in regions for s in sectors]
 
 
 ##############
@@ -214,24 +190,16 @@ end
 
 cge = MCPModel();
 
-# some small value that acts 
-# as a lower limit to variable values
-sv = 0
-
-#need to create starting values for primal variables
-y_start = Dict()
-x_start = Dict()
-ms_start = Dict()
-[y_start[r,s] = sum(blueNOTE[:ys0][r,s,g] for g in goods) for r in regions for s in sectors]
-[x_start[r,g] = blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g] for r in regions for g in goods]
-[ms_start[r,m] = sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins) for r in regions for m in margins]
+# small value that acts as a lower limit to variable values
+# default is zero
+sv = 0.00
 
 #sectors
-@variable(cge,Y[r in regions,s in sectors]>=sv,start=y_start[r,s])
-@variable(cge,X[r in regions,g in goods]>=sv,start=x_start[r,g]) # Disposition
-@variable(cge,A[r in regions,g in goods]>=sv,start=blueNOTE[:a0][r,g]) # Absorption
-@variable(cge,C[r in regions]>=sv,start=blueNOTE[:c0][(r,)]) # Aggregate final demand
-@variable(cge,MS[r in regions,m in margins]>=sv,start=ms_start[r,m]) # Margin supply
+@variable(cge,Y[r in regions,s in sectors]>=sv,start=1)
+@variable(cge,X[r in regions,g in goods]>=sv,start=1)
+@variable(cge,A[r in regions,g in goods]>=sv,start=1)
+@variable(cge,C[r in regions]>=sv,start=1)
+@variable(cge,MS[r in regions,m in margins]>=sv,start=1)
 
 #commodities:
 @variable(cge,PA[r in regions,g in goods]>=sv,start=1) # Regional market (input)
@@ -269,10 +237,10 @@ ms_start = Dict()
   (blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g])*(PFX/RX[r,g])^4 );
 
 @NLexpression(cge,AN[r in regions,g in goods],
-  blueNOTE[:xn0][r,g]*(PN[g]/RX[r,g])^4 );
+  blueNOTE[:xn0][r,g]*(PN[g]/(RX[r,g]))^4 );
 
 @NLexpression(cge,AD[r in regions,g in goods],
-  blueNOTE[:xd0][r,g]*(PD[r,g]/RX[r,g])^4 );
+  blueNOTE[:xd0][r,g] * (PD[r,g] / (RX[r,g]))^4 );
 
   ###
 
@@ -299,46 +267,51 @@ ms_start = Dict()
 @NLexpression(cge,CD[r in regions,g in goods],
   blueNOTE[:cd0][r,g]*PC[r] / PA[r,g] );
 
+
 ###############################
 # -- Zero Profit Conditions --
 ###############################
 
 @mapping(cge,profit_y[r in regions,s in sectors],
-                sum(PA[r,g] * blueNOTE[:id0][r,g,s] for g in goods if (blueNOTE[:id0][r,g,s] > 0) ) 
+                sum(PA[r,g] * blueNOTE[:id0][r,g,s] for g in goods) 
                 + PL[r] * AL[r,s]
                 + PK[r,s] * AK[r,s]
-                == 
-                sum(PY[r,g] * blueNOTE[:ys0][r,s,g] for g in goods if (blueNOTE[:ys0][r,s,g]>0) )
+                - 
+                sum(PY[r,g] * blueNOTE[:ys0][r,s,g] for g in goods) * (1-blueNOTE[:ty0][r,s])
 );
+
 
 @mapping(cge,profit_x[r in regions,g in goods],
                   PY[r,g] * blueNOTE[:s0][r,g] 
-                  == 
-                  PFX * AX[r,g]
+                  - 
+                  (PFX * AX[r,g]
                 + PN[g] * AN[r,g]
-                + PD[r,g] * AD[r,g]
+                + PD[r,g] * AD[r,g])
 );
+
 
 @mapping(cge,profit_a[r in regions,g in goods],
-                  PY[r,g] * blueNOTE[:s0][r,g] 
-                  == 
-                  PFX * AX[r,g]
-                + PN[g] * AN[r,g]
-                + PD[r,g] * AD[r,g]
-);
+                  PN[g] * DN[r,g] 
+                + PD[r,g] * DD[r,g] 
+                + PFX * (1+blueNOTE[:tm0][r,g]) * MD[r,g]
+                + sum(PM[r,m] * blueNOTE[:md0][r,m,g] for m in margins)
+                  - ( 
+                  PA[r,g] * (1-blueNOTE[:ta0][r,g]) * blueNOTE[:a0][r,g] 
+                + PFX * blueNOTE[:rx0][r,g]
+));
 
 @mapping(cge,profit_c[r in regions],
-#!!!!
-                  sum(PA[r,g] * CD[r,g] for g in goods if haskey(a_set,(r,g)))
-                  ==
+                  sum(PA[r,g] * CD[r,g] for g in goods)
+                  - 
                   PC[r] * blueNOTE[:c0][(r,)]
 );
 
+
 @mapping(cge,profit_ms[r in regions, m in margins],
-    sum(PN[gm]   * blueNOTE[:nm0][r,gm,m] for gm in goods_margins if (blueNOTE[:nm0][r,gm,m] > 0) )
-  + sum(PD[r,gm] * blueNOTE[:dm0][r,gm,m] for gm in goods_margins if (blueNOTE[:dm0][r,gm,m] > 0) )
-  == 
-  PM[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins if (blueNOTE[:md0][r,m,gm] > 0) )
+    sum(PN[gm]   * blueNOTE[:nm0][r,gm,m] for gm in goods_margins)
+  + sum(PD[r,gm] * blueNOTE[:dm0][r,gm,m] for gm in goods_margins)
+    - 
+    PM[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins)
 );
 
 
@@ -346,85 +319,87 @@ ms_start = Dict()
 # -- Market Clearing Conditions -- 
 ###################################
 
+
 @mapping(cge,market_pa[r in regions, g in goods],
         A[r,g] * blueNOTE[:a0][r,g] 
-        == 
+        - ( 
         blueNOTE[:g0][r,g] 
-      + blueNOTE[:i0][r,g]
-      + C[r] * CD[r,g]
-      + sum(Y[r,s] * blueNOTE[:id0][r,g,s] for s in sectors if (blueNOTE[:id0][r,g,s] > 0))
+        + blueNOTE[:i0][r,g]
+        + C[r] * CD[r,g]
+        + sum(Y[r,s] * blueNOTE[:id0][r,g,s] for s in sectors if (y_check[r,s] > 0))
+        )
 );
 
 
 @mapping(cge,market_py[r in regions, g in goods],
-        sum(Y[r,s] * blueNOTE[:ys0][r,s,g] for s in sectors if (blueNOTE[:ys0][r,s,g] > 0))
+        sum(Y[r,s] * blueNOTE[:ys0][r,s,g] for s in sectors)
       + blueNOTE[:yh0][r,g]
-        ==
+        - 
         X[r,g] * blueNOTE[:s0][r,g]
 );
 
+
 @mapping(cge,market_pd[r in regions, g in goods],
         X[r,g] * AD[r,g] 
-        == 
+        - ( 
         A[r,g] * DD[r,g]
-      + sum(MS[r,m] * blueNOTE[:dm0][r,g,m] for m in margins if (g in goods_margins && (blueNOTE[:dm0][r,g,m] > 0)) )  
+        + sum(MS[r,m] * blueNOTE[:dm0][r,g,m] for m in margins if (g in goods_margins ) )  
+        )
 );
 
 @mapping(cge,market_pn[g in goods],
-#!!!!
-        sum(X[r,g] * AN[r,g] for r in regions if haskey(x_set,(r,g)))
-        == 
-#!!!!        
-        sum(A[r,g] * DN[r,g] for r in regions if haskey(a_set,(r,g)))
-      + sum(MS[r,m] * blueNOTE[:nm0][r,g,m] for r in regions for m in margins if (g in goods_margins && (blueNOTE[:nm0][r,g,m] > 0)) )
-);
+        sum(X[r,g] * AN[r,g] for r in regions)
+        - ( 
+        sum(A[r,g] * DN[r,g] for r in regions)
+        + sum(MS[r,m] * blueNOTE[:nm0][r,g,m] for r in regions for m in margins if (g in goods_margins) )
+));
 
 @mapping(cge,market_pl[r in regions],
-        sum(blueNOTE[:ld0][r,s] for s in sectors if (blueNOTE[:ld0][r,s] > 0))
-        == 
-#!!!!
-        sum(Y[r,s] * AL[r,s] for s in sectors if haskey(y_set,(r,s)))
+        sum(blueNOTE[:ld0][r,s] for s in sectors)
+        - 
+        sum(Y[r,s] * AL[r,s] for s in sectors)
 );
+
 
 @mapping(cge,market_pk[r in regions, s in sectors],
         blueNOTE[:kd0][r,s]
-        == 
-        Y[r,s] * AK[r,s]
+        - Y[r,s] * AK[r,s]
 );
 
 @mapping(cge,market_pm[r in regions, m in margins],
-        MS[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins if (blueNOTE[:md0][r,m,gm] > 0))
-        ==
-        sum(A[r,g] * blueNOTE[:md0][r,m,g] for g in goods if (blueNOTE[:md0][r,m,g] > 0))
-);
+        MS[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins)
+        - (
+        sum(A[r,g] * blueNOTE[:md0][r,m,g] for g in goods)
+));
 
 @mapping(cge,market_pc[r in regions],
-        C[r] * blueNOTE[:c0][(r,)] == RA[r] / PC[r]
-);
+        C[r] * blueNOTE[:c0][(r,)] - ( RA[r] / PC[r]
+));
+
 
 @mapping(cge,market_pfx,
-#will fix the reference here...
         sum(blueNOTE[:bopdef0][(r,)] for r in regions)
-#!!!!
-        + sum(X[r,g] * AX[r,g] for r in regions for g in goods if haskey(x_set,(r,g)))
-        + sum(A[r,g] * blueNOTE[:x0][r,g] for r in regions for g in goods if haskey(a_set,(r,g)))
-        ==
-        sum(A[r,g] * MD[r,g] for r in regions for g in goods)
-        );
+        + sum(X[r,g] * AX[r,g] for r in regions for g in goods)
+# add a set here        
+        + sum(A[r,g] * blueNOTE[:rx0][r,g] for r in regions for g in goods if (a_set[r,g] != 0))
+#need a_set here        
+        - sum(A[r,g] * MD[r,g] for r in regions for g in goods)
+);
 
 @mapping(cge,income_ra[r in regions],
-        RA[r] == 
-        sum(PY[r,g]*blueNOTE[:yh0][r,g] for g in goods if (blueNOTE[:yh0][r,g] > 0) )
+        RA[r] - ( 
+        sum(PY[r,g]*blueNOTE[:yh0][r,g] for g in goods)
 #will fix reference here...        
         + PFX * (blueNOTE[:bopdef0][(r,)] + blueNOTE[:hhadj][(r,)])
         - sum(PA[r,g] * (blueNOTE[:g0][r,g] + blueNOTE[:i0][r,g]) for g in goods)
-        + PL[r] * sum(blueNOTE[:ld0][r,s] for s in sectors if (blueNOTE[:ld0][r,s] > 0) )
-        + sum(PK[r,s] * blueNOTE[:kd0][r,s] for s in sectors if (blueNOTE[:kd0][r,s] > 0) )
+        + PL[r] * sum(blueNOTE[:ld0][r,s] for s in sectors)
+        + sum(PK[r,s] * blueNOTE[:kd0][r,s] for s in sectors)
 #changed tm to tm0 here...        
-        + sum(A[r,g] * MD[r,g]* PFX * blueNOTE[:tm0][r,g] for g in goods if haskey(a_set,(r,g)) )
+        + sum(A[r,g] * MD[r,g]* PFX * blueNOTE[:tm0][r,g] for g in goods if (a_set[r,g] != 0))
 #change ta to ta0 here
-        + sum(A[r,g] * blueNOTE[:a0][r,g]*PA[r,g]*blueNOTE[:ta0][r,g] for g in goods if haskey(a_set,(r,g)) )
-);
+        + sum(A[r,g] * blueNOTE[:a0][r,g]*PA[r,g]*blueNOTE[:ta0][r,g] for g in goods if (a_set[r,g] != 0) )
+        + sum(Y[r,s] * blueNOTE[:ys0][r,s,g] * blueNOTE[:ty0][r,s] for s in sectors for g in goods)
+));
 
 
 ####################################
@@ -433,12 +408,20 @@ ms_start = Dict()
 
 # equations with conditions cannot be paired 
 # see workaround here: https://github.com/chkwon/Complementarity.jl/issues/37
-[fix(PK[r,s],1,force=true) for r in regions for s in sectors if !(blueNOTE[:kd0][r,s] > 0)];
-[fix(PA[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:a0][r,g]>0)];
-[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:s0][r,g]>0)];
-[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:xd0][r,g] > 0)];
+[fix(PK[r,s],1;force=true) for r in regions for s in sectors if !(blueNOTE[:kd0][r,s] > 0)]
+[fix(PA[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:a0][r,g]>0)]
+[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(y_check[r,g]>0)]
 
-#@complementarity(cge,profit_y,Y)
+
+[fix(Y[r,s],1,force=true) for r in regions for s in sectors if !(y_check[r,s] > 0)]
+[fix(X[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:s0][r,g] > 0)]
+
+# following lines are used in the GAMS version but not here 
+# and result in a non-zero residual for the benchmark
+#a_fix = Dict()
+#[a_fix[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
+#[fix(PD[r,g],0,force=true) for r in regions for g in goods if !(blueNOTE[:xd0][r,g] != 0)]
+#[fix(A[r,g],0,force=true) for r in regions for g in goods if !(a_fix[r,g] != 0)]
 
 @complementarity(cge,profit_y,Y);
 @complementarity(cge,profit_x,X);
@@ -457,7 +440,18 @@ ms_start = Dict()
 @complementarity(cge,income_ra,RA);
 
 
+####################
+# -- Model Solve --
+####################
+
+#set up the options for the path solver
 PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
+
+# export the path license string to the environment
+# this is now done in the SLiDE initiation steps 
 ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
+
+# solve the model
 status = solveMCP(cge)
+
 
