@@ -94,6 +94,7 @@ blueNOTE = Dict(
     :nd0 => df_to_dict(read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"),[:yr],:Val)
 )
 
+
 ###############
 # -- SETS --
 ###############
@@ -135,6 +136,15 @@ fill_zero(tuple(regions,goods),blueNOTE[:xd0])
 fill_zero(tuple(regions,goods),blueNOTE[:dd0])
 fill_zero(tuple(regions,goods),blueNOTE[:nd0])
 
+#need to have both benchmark and counterfactual tax rates
+#more important here is the distinction between tm and tm0
+#since the ratio of the two is used in the calculation of 
+#the value share - good to be clear on ta as well though
+blueNOTE[:tm] = blueNOTE[:tm0]
+blueNOTE[:ta] = blueNOTE[:ta0]
+
+#following subsets are used to limit the size of the model
+#similar to conditionals within GAMS
 a_set = Dict()
 [a_set[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
 # y_check is used to make sure the r/s combination is a valid output
@@ -250,7 +260,7 @@ sv = 0.00
 #!!!! here replaced first :tm with :tm0
 @NLexpression(cge,CDM[r in regions,g in goods],
   ((1-theta_m[r,g])*CDN[r,g]^(1-4)+theta_m[r,g]*
-  (PFX*(1+blueNOTE[:tm0][r,g])/(1+blueNOTE[:tm0][r,g]))^(1-4))^(1/(1-4)) 
+  (PFX*(1+blueNOTE[:tm][r,g])/(1+blueNOTE[:tm0][r,g]))^(1-4))^(1/(1-4)) 
   );
 
   ###
@@ -262,7 +272,7 @@ sv = 0.00
   blueNOTE[:dd0][r,g]*(CDN[r,g]/PD[r,g])^2*(CDM[r,g]/CDN[r,g])^4 );
 
 @NLexpression(cge,MD[r in regions,g in goods],
-  blueNOTE[:m0][r,g]*(CDM[r,g]*(1+blueNOTE[:tm0][r,g])/(PFX*(1+blueNOTE[:tm0][r,g])))^4 );
+  blueNOTE[:m0][r,g]*(CDM[r,g]*(1+blueNOTE[:tm][r,g])/(PFX*(1+blueNOTE[:tm0][r,g])))^4 );
 
 @NLexpression(cge,CD[r in regions,g in goods],
   blueNOTE[:cd0][r,g]*PC[r] / PA[r,g] );
@@ -296,7 +306,7 @@ sv = 0.00
                 + PFX * (1+blueNOTE[:tm0][r,g]) * MD[r,g]
                 + sum(PM[r,m] * blueNOTE[:md0][r,m,g] for m in margins)
                   - ( 
-                  PA[r,g] * (1-blueNOTE[:ta0][r,g]) * blueNOTE[:a0][r,g] 
+                  PA[r,g] * (1-blueNOTE[:ta][r,g]) * blueNOTE[:a0][r,g] 
                 + PFX * blueNOTE[:rx0][r,g]
 ));
 
@@ -397,7 +407,7 @@ sv = 0.00
 #changed tm to tm0 here...        
         + sum(A[r,g] * MD[r,g]* PFX * blueNOTE[:tm0][r,g] for g in goods if (a_set[r,g] != 0))
 #change ta to ta0 here
-        + sum(A[r,g] * blueNOTE[:a0][r,g]*PA[r,g]*blueNOTE[:ta0][r,g] for g in goods if (a_set[r,g] != 0) )
+        + sum(A[r,g] * blueNOTE[:a0][r,g]*PA[r,g]*blueNOTE[:ta][r,g] for g in goods if (a_set[r,g] != 0) )
         + sum(Y[r,s] * blueNOTE[:ys0][r,s,g] * blueNOTE[:ty0][r,s] for s in sectors for g in goods)
 ));
 
