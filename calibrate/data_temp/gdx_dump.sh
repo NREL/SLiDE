@@ -1,9 +1,8 @@
 # dumping all data from the national_cgeparm_raw and windc_base gdx files
 # that is to be used in the calibration exercise
 #
-# these operations will be replaced when datastream 
-# and calibration are fully replicated in SLiDE
-# exports sets
+# these operations will be replaced when datastream is replicated
+
 
 #exporting data from windc_base.gdx
 #following are all sets
