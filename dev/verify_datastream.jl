@@ -5,6 +5,10 @@ using Printf
 
 using SLiDE
 
+"""
+    make_uniform(df::DataFrame, cols::Array{Symbol,1})
+This function is specific to the 
+"""
 function make_uniform(df::DataFrame, cols::Array{Symbol,1})
     .&(size(names(df)) == size(cols), length(setdiff(cols, names(df))) > 0) ?
         df = edit_with(df, Rename.(names(df), cols))[:,cols] : nothing
@@ -14,26 +18,29 @@ function make_uniform(df::DataFrame, cols::Array{Symbol,1})
     return unique(sort(df, names(df)[1:end-1]));
 end
 
-function compare_summary(df_lst::Array{DataFrame,1}, ind::Array{Symbol,1}; value = :value)
+"""
+    compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; value = :value)
+"""
+function compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; value = :value)
     df_lst = copy(df_lst)
 
     # Sort inputs in order of longest to shortest DataFrame.
     # This is important when preserving missing values to indicate inconsistencies.
     ii_sort = reverse(sortperm(size.(df_lst,1)))
     df_lst = df_lst[ii_sort]
-    ind = ind[ii_sort]
+    inds = inds[ii_sort]
 
-    vals = Symbol.(value, :_, ind)
+    vals = Symbol.(value, :_, inds)
     [df = edit_with(df, [Add(col, true); Rename.(value, Symbol(value, :_, col))])
-        for (df, col) in zip(df_lst, ind)]
+        for (df, col) in zip(df_lst, inds)]
     cols = intersect(intersect(names.(df_lst)...))
 
     df = df_lst[1]
-    [df = join(df, df_lst[ii], on = cols, kind = :left) for ii in 2:length(ind)]
-    [df[!,col] .= .!ismissing.(df[:,col]) for col in ind]
+    [df = join(df, df_lst[ii], on = cols, kind = :left) for ii in 2:length(inds)]
+    [df[!,col] .= .!ismissing.(df[:,col]) for col in inds]
 
     # Are all keys equal/present in the DataFrame?
-    df[!,:equal_keys] .= prod.(eachrow(df[:,ind]))
+    df[!,:equal_keys] .= prod.(eachrow(df[:,inds]))
     
     # Are there discrepancies between PRESENT values?
     # df[!,:equal_values] .= df[:,vals[1]] .== df[:,vals[2]]
@@ -42,36 +49,76 @@ function compare_summary(df_lst::Array{DataFrame,1}, ind::Array{Symbol,1}; value
     # df[ii_compare,:equal_values] .= length.(unique.(eachrow(df[ii_compare,vals]))) .== 1
     df[ii_compare,:equal_values] .= length.(unique.(skipmissing.(eachrow(df[ii_compare,vals])))) .== 1
 
-    return sort(df[:,[cols; sort(vals); sort(ind); [:equal_keys, :equal_values]]], cols)
+    return sort(df[:,[cols; sort(vals); sort(inds); [:equal_keys, :equal_values]]], cols)
 end
 
-function compare_values(df_lst::Array{DataFrame,1}, ind::Array{Symbol,1}; value = :value)
+"""
+    compare_values(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; value = :value)
+"""
+function compare_values(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; value = :value)
     df_lst = copy(df_lst)
 
-    df = dropmissing(compare_summary(copy.(df_lst), ind;), :equal_values);
+    df = dropmissing(compare_summary(copy.(df_lst), inds;), :equal_values);
     df = df[.!df[:,:equal_values],:];
     size(df,1) == 0 ? println("All values are consistent.") : @warn("Values inconsistent.")
     return df
 end
 
-function compare_keys(df_lst::Array{DataFrame,1}, ind::Array{Symbol,1}; value = :value)
+"""
+    compare_keys2(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; value = :value)
+"""
+function compare_keys2(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; value = :value)
     df_lst = copy(df_lst)
 
-    N = length(ind);
+    N = length(inds);
     cols = setdiff(intersect(names.(df_lst)...), [value])
     ii_other = setdiff.(fill(1:N,N), 1:N)
 
-    d_temp = Dict(col => Dict(ind[ii] =>
+    d_temp = Dict(col => Dict(inds[ii] =>
             setdiff(unique(df_lst[ii][:,col]), unique([df_lst[ii_other[ii]]...;][:,col]))
         for ii in 1:N) for col in cols)
 
-    # [all(length.(values(d1)).==0) ? pop!(d_temp,k1) :
-    #     [pop!(d_temp[k1],k2) for (k2,d2) in d1 if length(d2)==0] for (k1,d1) in d_temp]
-
     d = Dict(k1 => Dict(k2 => sort(d2) for (k2,d2) in d1 if length(d2) != 0)
         for (k1,d1) in d_temp if any(length.(values(d1)).!==0))
-    
-    # Print summary.
+    return d
+end
+
+
+function compare_keys(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; value = :value)
+    df_lst = copy(df_lst)
+
+    N = length(inds);
+    cols = setdiff(intersect(names.(df_lst)...), [value])
+    ii_other = setdiff.(fill(1:N,N), 1:N)
+
+    d_unique = Dict(col => Dict(inds[ii] => sort(unique(df_lst[ii][:,col]))
+        for ii in 1:N) for col in cols);
+    d_lower = Dict(col => Dict(inds[ii] => lowercase.(d_unique[col][inds[ii]]) for ii in 1:N) for col in cols);
+
+    CHECKCASE = Dict(col => any(length.(unique.(values(d_lower[col]))) .!==
+        length.(values(d_unique[col]))) for col in cols)
+
+    d_all = Dict(col => CHECKCASE[col] ? sort(unique([values(d_unique[col])...;])) :
+        sort(unique([values(d_lower[col])...;])) for col in cols);
+
+    df = DataFrame()
+
+    for col in cols
+
+        df_temp = DataFrame(key = fill(col, size(d_all[col])))
+        d_check = CHECKCASE[col] ? d_unique[col] : d_lower[col]
+
+        [df_temp[!,ind] = [v in d_check[ind] ? d_unique[col][ind][v .== d_check[ind]][1] :
+            missing for v in d_all[col]] for ind in inds]
+        df_temp = unique(df_temp[length.(unique.(eachrow(df_temp[:,inds]))) .> 1, :])
+
+        df = vcat(df,df_temp)
+    end
+    return df
+end
+
+
+function print_key_comparison(d)
     isempty(d) ? println("All sets are consistent.") : println("Set differences:")
     for (k1,d1) in d
         @printf("  %s\n", k1)
@@ -79,7 +126,6 @@ function compare_keys(df_lst::Array{DataFrame,1}, ind::Array{Symbol,1}; value = 
                 string((length(d2) > 1 ? string.(d2[1:end-1], ", ") : "")..., d2[end]))
             for (k2,d2) in d1]
     end
-    return d_temp
 end
 
 # ******************************************************************************************
@@ -95,7 +141,8 @@ lst = y["FileInput"];
 
 df_attn = Dict()
 
-# for inp in lst
+# for inp in lst[[end]]
+
 #     println("\n",uppercase(inp.f1));
 
 #     dfs = read_file(joinpath(path_slide, inp.f1));
@@ -112,7 +159,9 @@ df_attn = Dict()
 #         global dfb = edit_with(dfb, x)
 #     end
 
-#     d = compare_keys(copy.([dfs, dfb]), [:slide, :bluenote]);
+#     global df_keys = compare_keys(copy.([dfs, dfb]), [:slide, :bluenote]);
+#     size(df_keys,1) == 0 ? println("All keys are consistent.") : show(df_keys);
+#     println("");
 
 #     # Resolve MINOR discrepancies to compare values.
 #     x = [Replace(:output_bea_windc, "subsidies", "Subsidies"),  # bea
@@ -170,4 +219,94 @@ df_attn = Dict()
 # dfc[4,:value] *= 10;
 # dfa = dfa[1:end-1,:]
 
+
+N = 2
+dfa = DataFrame(year = sort(repeat([2019,2020], outer=[2])),
+                region = repeat(["co","wi"], outer=[2]),
+                value = 1:N*2);
+dfb = edit_with(copy(dfa), Drop(:region, "co", "=="))
+
+dfc = copy(dfa)
+
+dfc[2,:region] = "md"
+# dfc[3,:region] = "Co"
+dfc[end,:value] = 1
+
 # ******************************************************************************************
+df_lst = copy.([dfa,dfb,dfc]);
+inds = [:a,:b,:c];
+
+leavespace = false;
+
+df = compare_keys(df_lst, inds)
+
+LENS = [length.(skipmissing(values(row)))[1] for row in eachrow(df[:,inds])];
+[df[ismissing.(df[:,ind]),ind] .= repeat.(" ", LENS[ismissing.(df[:,ind])]) for ind in inds]
+
+d = Dict(key => Dict(ind => df[df[:,:key] .== key, ind] for ind in inds) for key in allkeys)
+
+# print_key_comparison(df::DataFrame; leavespace = false)
+
+# df = copy(df_keys)
+# df[!,:other] .= df[:,:bluenote] + 1.1
+
+
+
+# df = convert_type.(String, df);
+# inds = names(df)[2:end];
+# allkeys = unique(df[:,1]);
+
+
+# [df[ismissing.(df[:,ind]),ind] .= "" for ind in inds]
+
+# d = Dict(key => Dict(ind => unique(skipmissing(df[df[:,:key] .== key, ind])) for ind in inds) for key in allkeys)
+
+
+
+    # df_temp = DataFrame(keys = sort(unique([[df[:,col] for df in df_lst]...;])));
+
+    
+    # [df_temp[!,k2] .= [k3 in lowercase.(d_unique[k1][k2]) ? d_unique[k1][k2][k3 .== lowercase.(d_unique[k1][k2])][1] : missing for k3 in df_temp[:,:keys]] for k2 in inds]
+    
+
+
+
+#     d_temp = Dict(col => Dict(inds[ii] =>
+#             setdiff(unique(df_lst[ii][:,col]), unique([df_lst[ii_other[ii]]...;][:,col]))
+#         for ii in 1:N) for col in cols)
+
+#     # [all(length.(values(d1)).==0) ? pop!(d_temp,k1) :
+#     #     [pop!(d_temp[k1],k2) for (k2,d2) in d1 if length(d2)==0] for (k1,d1) in d_temp]
+
+#     d = Dict(k1 => Dict(k2 => sort(d2) for (k2,d2) in d1 if length(d2) != 0)
+#         for (k1,d1) in d_temp if any(length.(values(d1)).!==0))
+    
+
+
+# for (k1,d1) in d
+#     @printf("  %s\n", k1)
+#     [@printf("    %-10s[%s]\n", k2,
+#             string((length(d2) > 1 ? string.(d2[1:end-1], ", ") : "")..., d2[end]))
+#         for (k2,d2) in d1]
+# end
+
+
+
+
+
+    # Print summary.
+    # isempty(d) ? println("All sets are consistent.") : println("Set differences:")
+
+    # for (k1,d1) in d
+    #     @printf("  %s\n", k1)
+    #     [@printf("    %-10s[%s]\n", k2,
+    #             string((length(d2) > 1 ? string.(d2[1:end-1], ", ") : "")..., d2[end]))
+    #         for (k2,d2) in d1 if length(d2) > 0]
+        
+
+
+
+        # [@printf("    %-10s%s\n", k2, string(string.(d2, " ")...)) for (k2,d2) in d1]
+    # end
+    # return d
+# # end
