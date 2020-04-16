@@ -89,10 +89,18 @@ cal = Dict(
     :tm0 => df_to_dict(read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"),:yr,:Val)
 )
 
+fd_set = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_fd.csv"),descriptor="fd set"))[!,:Dim1]);
+i_set = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_i.csv"),descriptor="i set"))[!,:Dim1]);
+j_set = i_set
+ts_set = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_ts.csv"),descriptor="ts set"))[!,:Dim1]);
+va_set = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_va.csv"),descriptor="va set"))[!,:Dim1]);
+#yr_set = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_yr.csv"),descriptor="yr set"))[!,:Dim1]);
 
 calib = Model()
 
-@variable(calib,ys0_est[j,i]>=0,start=)
+fill_zero(tuple(j_set,i_set),cal[:ys0])
+
+@variable(calib,ys0_est[j in j_set,i in i_set]>=0,start=cal[:ys0][j,i])
 @variable(calib,fs0_est[i]>=0,start=)
 @variable(calib,ms0_est[i,m]>=0,start=)
 @variable(calib,y0_est[i]>=0,start=)
