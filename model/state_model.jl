@@ -52,8 +52,6 @@ function df_to_dict(df::DataFrame,remove_columns::Vector{Symbol},value_column::S
 end
 
 
-
-
 ############
 # LOAD DATA
 ############
@@ -463,5 +461,6 @@ ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH
 
 # solve the model
 status = solveMCP(cge)
+
 
 
