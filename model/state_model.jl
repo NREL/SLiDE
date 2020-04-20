@@ -141,6 +141,7 @@ fill_zero(tuple(regions,goods),blueNOTE[:nd0])
 blueNOTE[:tm] = blueNOTE[:tm0]
 blueNOTE[:ta] = blueNOTE[:ta0]
 
+
 #following subsets are used to limit the size of the model
 #similar to conditionals within GAMS
 a_set = Dict()
@@ -222,6 +223,7 @@ sv = 0.00
 
 #consumer:
 @variable(cge,RA[r in regions]>=sv,start=blueNOTE[:c0][(r,)]) # Representative agent
+
 
 ###############################
 # -- PLACEHOLDER VARIABLES --
@@ -391,7 +393,7 @@ sv = 0.00
 # add a set here        
         + sum(A[r,g] * blueNOTE[:rx0][r,g] for r in regions for g in goods if (a_set[r,g] != 0))
 #need a_set here        
-        - sum(A[r,g] * MD[r,g] for r in regions for g in goods)
+        - sum(A[r,g] * MD[r,g] for r in regions for g in goods if (a_set[r,g] != 0))
 );
 
 @mapping(cge,income_ra[r in regions],
@@ -402,9 +404,7 @@ sv = 0.00
         - sum(PA[r,g] * (blueNOTE[:g0][r,g] + blueNOTE[:i0][r,g]) for g in goods)
         + PL[r] * sum(blueNOTE[:ld0][r,s] for s in sectors)
         + sum(PK[r,s] * blueNOTE[:kd0][r,s] for s in sectors)
-#changed tm to tm0 here...        
-        + sum(A[r,g] * MD[r,g]* PFX * blueNOTE[:tm0][r,g] for g in goods if (a_set[r,g] != 0))
-#change ta to ta0 here
+        + sum(A[r,g] * MD[r,g]* PFX * blueNOTE[:tm][r,g] for g in goods if (a_set[r,g] != 0))
         + sum(A[r,g] * blueNOTE[:a0][r,g]*PA[r,g]*blueNOTE[:ta][r,g] for g in goods if (a_set[r,g] != 0) )
         + sum(Y[r,s] * blueNOTE[:ys0][r,s,g] * blueNOTE[:ty0][r,s] for s in sectors for g in goods)
 ));
@@ -461,6 +461,7 @@ ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH
 
 # solve the model
 status = solveMCP(cge)
+
 
 
 
