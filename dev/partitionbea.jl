@@ -6,8 +6,20 @@ using Query
 
 using SLiDE
 
-
 """
+    make_square(df::Vararg{DataFrame})
+This function returns (a) DataFrame(s) with all possible permutations of descriptive columns
+(i.e., ones not labeled "value"), by adding zeros where values are missing.
+This can be used to ensure consistent array size during calculations.
+
+# Argument:
+- `df::DataFrame`: DataFrame(s) in need of zeros. If multiple DataFrames are input,
+    descriptor columns will be made consistent across all DataFrames.
+
+# Returns:
+- `df::DataFrame` or `df::Tuple(DataFrame, ...)`: A DataFrame or list of DataFrames of the
+    same size and with the same descriptor columns. The DataFrame(s) will be sorted by
+    descriptor column values such that row order is equal across all input DataFrames.
 """
 function make_square(df::Vararg{DataFrame})
     df = ensurearray(df)
@@ -29,6 +41,14 @@ function make_square(df::Vararg{DataFrame})
 end
 
 """
+    permute_as_dataframe(x)
+This function creates a new DataFrame filled with all permutations of input values.
+
+# Argument:
+- `x::NamedTuple` of column names and values to include.
+
+# Returns:
+- `df::DataFrame` of all permutations of input values.
 """
 function permute_as_dataframe(x)
     df = sort(DataFrame(vcat(collect(Base.Iterators.product(ensurearray.(values(x))...))...)));
@@ -37,11 +57,30 @@ function permute_as_dataframe(x)
 end
 
 """
-    sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true)
-    sum_over(df::DataFrame, col::Symbol; values_only = true)
+    sum_over(df::DataFrame, col::Array{Symbol,1}; kwargs...)
+    sum_over(df::DataFrame, col::Symbol; kwargs...)
+This function sums a DataFrame over the specified column(s) and returns either
+a list of values or the full DataFrame.
+
+# Arguments:
+- `df::DataFrame`: DataFrame to sum.
+- `col::Symbol` or `col::Array{Symbol,1}`: columns over which to sum.
+
+# Keyword Arguments:
+- `values_only::Bool = true`: Should the function return a list of values or an altered DataFrame?
+    - Set to `true` (default) if populating an existing DataFrame including all of the
+        columns in the input DataFrame (in the same order) with the exception of that/those
+        in `col`.
+    - Set to `false` if modifying or copying the input DataFrame.
+
+# Returns:
+- `lst::Array{Float64,1}` of summed values in the order determined by the descriptor columns
+    if `values_only = true` (default)
+- `df::DataFrame`: Modified input DataFrame if `values_only = false`
+
 """
 function sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true)
-
+    
     val_cols = names(df)[all.(eachcol(typeof.(df) .== Float64))]
     by_cols = setdiff(names(df), [col; val_cols])
 
