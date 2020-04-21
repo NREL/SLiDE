@@ -106,6 +106,7 @@ goods = sectors;
 margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
 goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
 
+
 # need to fill in zeros to avoid missing keys
 fill_zero(tuple(regions,sectors,goods),blueNOTE[:ys0])
 fill_zero(tuple(regions,goods,sectors),blueNOTE[:id0])
@@ -141,7 +142,6 @@ fill_zero(tuple(regions,goods),blueNOTE[:nd0])
 blueNOTE[:tm] = blueNOTE[:tm0]
 blueNOTE[:ta] = blueNOTE[:ta0]
 
-
 #following subsets are used to limit the size of the model
 #similar to conditionals within GAMS
 a_set = Dict()
@@ -164,31 +164,49 @@ theta_m  = Dict() #domestic share of absorption
 
 for k in keys(blueNOTE[:ld0])
     val = blueNOTE[:ld0][k] / (blueNOTE[:kd0][k] + blueNOTE[:ld0][k])
+    if isnan(val)
+      val = 0
+    end
     push!(alpha_kl,k=>val)
 end
 
 for k in keys(blueNOTE[:x0])
     val = (blueNOTE[:x0][k] - blueNOTE[:rx0][k]) / blueNOTE[:s0][k]   
+    if isnan(val)
+      val = 0
+    end
     push!(alpha_x,k=>val)
 end
 
 for k in keys(blueNOTE[:xd0])
     val = blueNOTE[:xd0][k] / blueNOTE[:s0][k]
+    if isnan(val)
+      val = 0
+    end
     push!(alpha_d,k=>val)
 end
 
 for k in keys(blueNOTE[:xn0])
     val = blueNOTE[:xn0][k] / blueNOTE[:s0][k]
+    if isnan(val)
+      val = 0
+    end
     push!(alpha_n,k=>val)
 end
 
 for k in keys(blueNOTE[:nd0])
     val = blueNOTE[:nd0][k] / (blueNOTE[:nd0][k] + blueNOTE[:dd0][k])
+    if isnan(val)
+      val = 0
+    end
     push!(theta_n,k=>val)
 end
 
 for k in keys(blueNOTE[:tm0])
     val = (1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k] / (blueNOTE[:nd0][k]+blueNOTE[:dd0][k]+(1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k])
+    if isnan(val)
+      val = 0
+    end
     push!(theta_m,k=>val)
 end
 
@@ -305,10 +323,11 @@ sv = 0.00
                 + PD[r,g] * DD[r,g] 
                 + PFX * (1+blueNOTE[:tm0][r,g]) * MD[r,g]
                 + sum(PM[r,m] * blueNOTE[:md0][r,m,g] for m in margins)
-                  - ( 
+                - ( 
                   PA[r,g] * (1-blueNOTE[:ta][r,g]) * blueNOTE[:a0][r,g] 
                 + PFX * blueNOTE[:rx0][r,g]
-));
+                )
+);
 
 @mapping(cge,profit_c[r in regions],
                   sum(PA[r,g] * CD[r,g] for g in goods)
@@ -362,7 +381,8 @@ sv = 0.00
         - ( 
         sum(A[r,g] * DN[r,g] for r in regions)
         + sum(MS[r,m] * blueNOTE[:nm0][r,g,m] for r in regions for m in margins if (g in goods_margins) )
-));
+        )
+);
 
 @mapping(cge,market_pl[r in regions],
         sum(blueNOTE[:ld0][r,s] for s in sectors)
@@ -378,13 +398,15 @@ sv = 0.00
 
 @mapping(cge,market_pm[r in regions, m in margins],
         MS[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins)
-        - (
+        - 
         sum(A[r,g] * blueNOTE[:md0][r,m,g] for g in goods)
-));
+);
 
 @mapping(cge,market_pc[r in regions],
-        C[r] * blueNOTE[:c0][(r,)] - ( RA[r] / PC[r]
-));
+        C[r] * blueNOTE[:c0][(r,)] 
+        - 
+        RA[r] / PC[r]
+);
 
 
 @mapping(cge,market_pfx,
@@ -397,7 +419,8 @@ sv = 0.00
 );
 
 @mapping(cge,income_ra[r in regions],
-        RA[r] - ( 
+        RA[r] - 
+        ( 
         sum(PY[r,g]*blueNOTE[:yh0][r,g] for g in goods)
 #will fix reference here...        
         + PFX * (blueNOTE[:bopdef0][(r,)] + blueNOTE[:hhadj][(r,)])
@@ -407,7 +430,8 @@ sv = 0.00
         + sum(A[r,g] * MD[r,g]* PFX * blueNOTE[:tm][r,g] for g in goods if (a_set[r,g] != 0))
         + sum(A[r,g] * blueNOTE[:a0][r,g]*PA[r,g]*blueNOTE[:ta][r,g] for g in goods if (a_set[r,g] != 0) )
         + sum(Y[r,s] * blueNOTE[:ys0][r,s,g] * blueNOTE[:ty0][r,s] for s in sectors for g in goods)
-));
+        )
+);
 
 
 ####################################
@@ -417,19 +441,18 @@ sv = 0.00
 # equations with conditions cannot be paired 
 # see workaround here: https://github.com/chkwon/Complementarity.jl/issues/37
 [fix(PK[r,s],1;force=true) for r in regions for s in sectors if !(blueNOTE[:kd0][r,s] > 0)]
-[fix(PA[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:a0][r,g]>0)]
 [fix(PY[r,g],1,force=true) for r in regions for g in goods if !(y_check[r,g]>0)]
-
-
+[fix(PA[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:a0][r,g]>0)]
+[fix(PD[r,g],1,force=true) for r in regions for g in goods if (blueNOTE[:xd0][r,g] == 0)]
 [fix(Y[r,s],1,force=true) for r in regions for s in sectors if !(y_check[r,s] > 0)]
 [fix(X[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:s0][r,g] > 0)]
 
-# following lines are used in the GAMS version but not here 
-# and result in a non-zero residual for the benchmark
-#a_fix = Dict()
-#[a_fix[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
-#[fix(PD[r,g],0,force=true) for r in regions for g in goods if !(blueNOTE[:xd0][r,g] != 0)]
-#[fix(A[r,g],0,force=true) for r in regions for g in goods if !(a_fix[r,g] != 0)]
+a_fix = Dict()
+[a_fix[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
+
+[fix(A[r,g],1,force=true) for r in regions for g in goods if (a_fix[r,g] == 0)]
+
+
 
 @complementarity(cge,profit_y,Y);
 @complementarity(cge,profit_x,X);
@@ -458,6 +481,7 @@ PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
 # export the path license string to the environment
 # this is now done in the SLiDE initiation steps 
 ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
+
 
 # solve the model
 status = solveMCP(cge)
