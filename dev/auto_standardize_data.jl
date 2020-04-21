@@ -7,21 +7,15 @@ using YAML
 
 using SLiDE  # see src/SLiDE.jl
 
-READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "readfiles"))
+READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "readfiles"))    # *
 
-check_one = false;
-file_check = "use_det"; # index of parsed files to check.
+files_parse = XLSXInput("generate_yaml.xlsx", "parse", "B1:B180", "parse")                      # *
+files_parse = write_yaml(READ_DIR, files_parse) # *
 
-files_parse = XLSXInput("generate_yaml.xlsx", "parse", "B1:E180", "parse")
-files_parse = write_yaml(READ_DIR, files_parse)
-
-.&(check_one, any(occursin.(file_check, files_parse))) ?
-    files_parse = files_parse[occursin.(file_check, files_parse)] : nothing
-length(files_parse) == 1 ? check_one = true : nothing
-check_one ? y = read_file(joinpath(READ_DIR, files_parse[1])) : nothing
+y = read_file(files_parse[1])
 
 files_parse = run_yaml(files_parse);
-check_one ? df = read_file(joinpath(y["PathOut"]...)) : nothing
+df = read_file(joinpath(y["PathOut"]...))
 
 # ******************************************************************************************
 # EDIT MANUALLY TO CHECK:

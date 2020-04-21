@@ -11,44 +11,44 @@ XLSXInput:
   sheet:      [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
   descriptor: [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
 
-Describe:
-  col: yr
+# Describe:
+#   col: yr
 
-Order:
-  - {col: yr,         type: Int}
-# - {col: input_bea,  type: String}
-  - {col: i,     type: String}
-# - {col: output_bea, type: String}
-  - {col: j,     type: String}
-  - {col: units,      type: String}
-  - {col: value,      type: Int}
+# Order:
+#   - {col: yr,         type: Int}
+# # - {col: input_bea,  type: String}
+#   - {col: i,          type: String}
+# # - {col: output_bea, type: String}
+#   - {col: j,          type: String}
+#   - {col: units,      type: String}
+#   - {col: value,      type: Int}
 
-Rename:
-  - {from: IOCode, to: input_bea}
-  - {from: Name,   to: input_desc}
+# Rename:
+#   - {from: IOCode, to: input_bea}
+#   - {from: Name,   to: input_desc}
 
-Melt:
-  on:  [input_bea, input_desc]
-  var: output_desc
-  val: value
+# Melt:
+#   on:  [input_bea, input_desc]
+#   var: output_desc
+#   val: value
 
-Add:
-  col: units
-  val: millions of us dollars (USD)
+# Add:
+#   col: units
+#   val: millions of us dollars (USD)
 
-Map:
-  - file:   [parse, bea_summary.csv]
-    from:   bea_desc
-    to:     [bea_code, bea_windc]
-    input:  output_desc
-    output: [output_bea, j]
-  - file:   [parse, bea_summary.csv]
-    from:   [bea_code, bea_desc]
-    to:     bea_windc
-    input:  [input_bea, input_desc]
-    output: i
+# Map:
+#   - file:   [parse, bea_summary.csv]
+#     from:   bea_desc
+#     to:     [bea_code, bea_windc]
+#     input:  output_desc
+#     output: [output_bea, j]
+#   - file:   [parse, bea_summary.csv]
+#     from:   [bea_code, bea_desc]
+#     to:     bea_windc
+#     input:  [input_bea, input_desc]
+#     output: i
 
-Replace:
-  col:  value
-  from: "..."
-  to:   0
+# Replace:
+#   col:  value
+#   from: "..."
+#   to:   0

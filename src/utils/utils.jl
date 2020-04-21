@@ -81,22 +81,23 @@ function convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1})
 end
 
 convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
+convert_type(::Type{Array{T}}, x::Any) where T<:Any = convert_type.(T, x)
 convert_type(::Type{Array{T,1}}, x::Any) where T<:Any = convert_type.(T, x)
 
 convert_type(::Type{T}, x::Missing) where T<:Real = x;
 convert_type(::Type{T}, x::Missing) where T<:AbstractString = x;
 convert_type(::Type{Any}, x::Any) = x
 
-function convert_type(
-    ::Type{Dict{Any,Any}},
-    df::DataFrame,
-    value_col::Symbol;
-    remove_col::Array{Symbol,1}=[]
-)
-    key_col = setdiff(names(df), [[value_col]; remove_col]);
-    d = Dict(values(row[key_col]) => row[value_col] for row in eachrow(df));
-    return d
-end
+# function convert_type(
+#     ::Type{Dict{Any,Any}},
+#     df::DataFrame,
+#     value_col::Symbol;
+#     remove_col::Array{Symbol,1}=[]
+# )
+#     key_col = setdiff(names(df), [[value_col]; remove_col]);
+#     d = Dict(values(row[key_col]) => row[value_col] for row in eachrow(df));
+#     return d
+# end
 
 convert_type(::Type{T}, x::Any) where T = T(x)
 
@@ -105,14 +106,14 @@ convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : 
 """
 Returns true/false if the the DataType or object is an array.
 """
-isarray(::Type{Array{T}}) where T <: Any = true
-isarray(x::Array{T}) where T <: Any = true
+isarray(::Type{Array{T,1}}) where T <: Any = true
+isarray(x::Array{T,1}) where T <: Any = true
 isarray(::Any) = false
 
 """
 Returns an array.
 """
-ensurearray(x::Array{T}) where T <: Any = x
+# ensurearray(x::Array{T}) where T <: Any = x
 ensurearray(x::Array{T,1}) where T <: Any = x
 ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
 ensurearray(x::Any) = [x]

@@ -18,9 +18,9 @@ Describe:
 Order:
   - {col: yr,         type: Int}
 # - {col: input_bea,  type: String}
-  - {col: i,  type: String}
+  - {col: i,          type: String}
 # - {col: output_bea, type: String}
-  - {col: j,  type: String}
+  - {col: j,          type: String}
   - {col: units,      type: String}
   - {col: value,      type: Int}
 

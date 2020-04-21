@@ -80,7 +80,7 @@ a list of values or the full DataFrame.
 
 """
 function sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true)
-    
+
     val_cols = names(df)[all.(eachcol(typeof.(df) .== Float64))]
     by_cols = setdiff(names(df), [col; val_cols])
 
@@ -101,30 +101,30 @@ BASE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE"))), "..");
 # ******************************************************************************************
 #   READ BLUENOTE DATA -- For benchmarking!
 # ******************************************************************************************
-# BLUE_DIR = joinpath(BASE_DIR, "data", "windc_output", "2a_build_national_cgeparm_raw");
-# bluenote_lst = [x for x in readdir(BLUE_DIR) if occursin(".csv", x)];
-# bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst);
+BLUE_DIR = joinpath(BASE_DIR, "data", "windc_output", "2a_build_national_cgeparm_raw");
+bluenote_lst = [x for x in readdir(BLUE_DIR) if occursin(".csv", x)];
+bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst);
 
-# # Add supply/use info for checking.
-# BLUE_DIR_IN = joinpath(BASE_DIR, "data", "windc_output", "1b_stream_windc_base");
-# [bluenote[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
-#     Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
-#     Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]];
+# Add supply/use info for checking.
+BLUE_DIR_IN = joinpath(BASE_DIR, "data", "windc_output", "1b_stream_windc_base");
+[bluenote[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
+    Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
+    Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]];
 
-# for k in [:supply, :use]
-#     # global bluenote[k] = edit_with(bluenote[k], Drop(:value, 0, "=="))
-#     # global bluenote[k] = io[k] |> @filter(_.yr in set[:yr]) |> DataFrame
-#     global bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3)
-#     global bluenote[k][!,:units] .= UNITS
-# end
+for k in [:supply, :use]
+    # global bluenote[k] = edit_with(bluenote[k], Drop(:value, 0, "=="))
+    # global bluenote[k] = io[k] |> @filter(_.yr in set[:yr]) |> DataFrame
+    global bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3)
+    # global bluenote[k][!,:units] .= UNITS
+end
 
 # ******************************************************************************************
 #   READ SETS AND SLiDE SUPPLY/USE DATA.
 # ******************************************************************************************
 SET_DIR = joinpath(BASE_DIR, "data", "coresets");
-set_lst = convert_type.(Symbol, ["i", "fd", "m", "ts", "va", "yr"]);
+set_list = convert_type.(Symbol, ["i", "fd", "m", "ts", "va", "yr"]);
 
-set = Dict(k => Matrix(sort(read_file(joinpath(SET_DIR, string(k, ".csv"))))) for k in set_lst)
+set = Dict(k => Matrix(sort(read_file(joinpath(SET_DIR, string(k, ".csv"))))) for k in set_list)
 set[:j] = set[:i]
 set[:imrg] = Matrix(DataFrame(imrg = ["fbt","gmt","mvt"]));
 
@@ -144,7 +144,7 @@ for k in keys(io)
     # global io[k][!,:units] .= UNITS
 end
 
-io[:supply], io[:use]  = make_square(io[:supply], io[:use]);
+io[:supply], io[:use] = make_square(io[:supply], io[:use]);
 
 # ******************************************************************************************
 #   PARTITION DATA INTO PARAMETERS.
@@ -266,10 +266,12 @@ io[:a0][!,:value] .= sum_over(io[:fd0], :fd) + sum_over(io[:id0], :j)
 
 # Tax net subsidy rate on intermediate demand.
 #   tm0(yr,i)$duty0(yr,i) = duty0(yr,i)/m0(yr,i);
-io[:tm0][!, :value] .=  io[:duty0][:,:value] ./ io[:m0][:,:value]
+i_div = io[:m0][:,:value] .!= 0.0
+io[:tm0][i_div, :value] .=  io[:duty0][i_div,:value] ./ io[:m0][i_div,:value]
 
 # Import tariff
 #   ta0(yr,i)$(tax0(yr,i)-sbd0(yr,i)) = (tax0(yr,i) - sbd0(yr,i))/a0(yr,i);
+i_div = io[:a0][:,:value] .!= 0.0
 io[:ta0][!, :value] .= (io[:tax0][:,:value] - io[:sbd0][:,:value]) ./ io[:a0][:,:value]
 
 # Drop zero and NaN values. If running partitionbea_check.jl, do so first.
