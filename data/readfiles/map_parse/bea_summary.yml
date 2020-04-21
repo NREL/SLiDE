@@ -20,6 +20,5 @@ Rename:
   - {from: to,          to: bea_windc}
 
 Replace:
-  col:  category
-  from: goods
-  to:   gds
+- {col: category,  from: goods, to: gds}
+- {col: bea_windc, from: upper, to: lower}

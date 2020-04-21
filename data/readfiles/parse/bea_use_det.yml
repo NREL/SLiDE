@@ -13,24 +13,24 @@ XLSXInput:
   descriptor: [2007, 2012]
 
 Describe:
-  col: year
+  col: yr
 
 Order:
-  - {col: year,             type: Int}
-  - {col: input_bea_code,   type: String}
-  - {col: input_bea_windc,  type: String}
-  - {col: output_bea_code,  type: String}
-  - {col: output_bea_windc, type: String}
-  - {col: units,            type: String}
-  - {col: value,            type: Int}
+  - {col: yr,         type: Int}
+# - {col: input_bea,  type: String}
+  - {col: i,     type: String}
+# - {col: output_bea, type: String}
+  - {col: j,     type: String}
+  - {col: units,      type: String}
+  - {col: value,      type: Int}
 
 Rename:
-  - {from: Code,                  to: input_bea_code}
-  - {from: Commodity Description, to: input_bea_desc}
+  - {from: Code,                  to: input_bea}
+  - {from: Commodity Description, to: input_desc}
 
 Melt:
-  on:  [input_bea_code, input_bea_desc]
-  var: output_bea_code
+  on:  [input_bea, input_desc]
+  var: output_bea
   val: value
 
 Add:
@@ -41,13 +41,13 @@ Map:
   - file:   [parse, bea_detail.csv]
     from:   bea_code
     to:     [bea_desc, bea_windc]
-    input:  output_bea_code
-    output: [output_bea_desc, output_bea_windc]
+    input:  output_bea
+    output: [output_desc, j]
   - file:   [parse, bea_detail.csv]
     from:   [bea_code, bea_desc]
     to:     bea_windc
-    input:  [input_bea_code, input_bea_desc]
-    output: input_bea_windc
+    input:  [input_bea, input_desc]
+    output: i
 
 Replace:
   col:  value

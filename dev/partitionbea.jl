@@ -1,0 +1,239 @@
+using CSV
+using DataFrames
+using DelimitedFiles
+using YAML
+using Query
+
+using SLiDE
+
+
+"""
+"""
+function make_square(df::Vararg{DataFrame})
+    df = ensurearray(df)
+
+    cols_key = [setdiff(cols,[:value]) for cols in names.(df)]
+    cols_temp = Symbol.(1:length.(cols_key)[1])
+
+    keys_all = unique([[edit_with(df[ii][:,cols_key[ii]], Rename.(cols_key[ii], cols_temp))
+        for ii in 1:length(df)]...;])
+
+    keys_unique = Tuple(unique.(eachcol(keys_all)));
+    keys_all = sort(DataFrame(vcat(collect(Base.Iterators.product(keys_unique...))...)));
+
+    [df[ii] = edit_with(join(keys_all, df[ii], on = Pair.(cols_temp, cols_key[ii]), kind = :left),
+        Rename.(cols_temp, cols_key[ii])) for ii in 1:length(df)]
+    [df[ii][ismissing.(df[ii][:,:value]),:value] .= 0.0 for ii in 1:length(df)]
+
+    return length(df) == 1 ? df[1] : Tuple(df)
+end
+
+"""
+"""
+function permute_as_dataframe(x)
+    df = sort(DataFrame(vcat(collect(Base.Iterators.product(ensurearray.(values(x))...))...)));
+    df = edit_with(df, Rename.(names(df), keys(x)))
+    return df
+end
+
+"""
+    sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true)
+    sum_over(df::DataFrame, col::Symbol; values_only = true)
+"""
+function sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true)
+
+    val_cols = names(df)[all.(eachcol(typeof.(df) .== Float64))]
+    by_cols = setdiff(names(df), [col; val_cols])
+
+    df = by(df, by_cols, Pair.(val_cols, sum))
+    df = edit_with(df, Rename.(setdiff(names(df), by_cols), val_cols));
+
+    return values_only ? df[:,val_cols[1]] : df
+end
+
+function sum_over(df::DataFrame, col::Symbol; values_only = true)
+    return sum_over(df, [col]; values_only = values_only)
+end
+
+
+UNITS = "billions of us dollars (USD)"
+BASE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE"))), "..");
+
+# ******************************************************************************************
+#   READ BLUENOTE DATA -- For benchmarking!
+# ******************************************************************************************
+# BLUE_DIR = joinpath(BASE_DIR, "data", "windc_output", "2a_build_national_cgeparm_raw");
+# bluenote_lst = [x for x in readdir(BLUE_DIR) if occursin(".csv", x)];
+# bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst);
+
+# # Add supply/use info for checking.
+# BLUE_DIR_IN = joinpath(BASE_DIR, "data", "windc_output", "1b_stream_windc_base");
+# [bluenote[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
+#     Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
+#     Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]];
+
+# for k in [:supply, :use]
+#     # global bluenote[k] = edit_with(bluenote[k], Drop(:value, 0, "=="))
+#     # global bluenote[k] = io[k] |> @filter(_.yr in set[:yr]) |> DataFrame
+#     global bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3)
+#     global bluenote[k][!,:units] .= UNITS
+# end
+
+# ******************************************************************************************
+#   READ SETS AND SLiDE SUPPLY/USE DATA.
+# ******************************************************************************************
+SET_DIR = joinpath(BASE_DIR, "data", "coresets");
+set_lst = convert_type.(Symbol, ["i", "fd", "m", "ts", "va", "yr"]);
+
+set = Dict(k => Matrix(sort(read_file(joinpath(SET_DIR, string(k, ".csv"))))) for k in set_lst)
+set[:j] = set[:i]
+set[:imrg] = Matrix(DataFrame(imrg = ["fbt","gmt","mvt"]));
+
+# Read supply/use data.
+DATA_DIR = joinpath(BASE_DIR, "data", "output");
+io_lst = convert_type.(Symbol, ["supply", "use"]);
+io = Dict(k => read_file(joinpath(DATA_DIR, string("bea_", k, ".csv"))) for k in io_lst);
+
+# Perform some minor edits that will apply to all parameters in order to maintain
+# consistency with the data in build_national_cgeparm_raw.gdx for easier benchmarking.
+
+for k in keys(io)
+    global io[k] = edit_with(io[k], Drop.([:value, :units], [0, "all"], "=="))
+    global io[k] = io[k] |> @filter(_.yr in set[:yr]) |> DataFrame
+
+    global io[k][!,:value] .= round.(io[k][:,:value]*1E-3, digits=3)
+    # global io[k][!,:units] .= UNITS
+end
+
+io[:supply], io[:use]  = make_square(io[:supply], io[:use]);
+
+# ******************************************************************************************
+#   PARTITION DATA INTO PARAMETERS.
+# ******************************************************************************************
+
+# Read from use data.
+#   id0(yr,i(ir_use),j(jc_use)) = use(yr,ir_use,jc_use);
+#   fd0(yr,i(ir_use),fd(jc_use)) = use(yr,ir_use,jc_use);
+#   va0(yr,va(ir_use),j(jc_use)) = use(yr,ir_use,jc_use);
+#   ts0(yr,ts(ir_use),j(jc_use)) = use(yr,ir_use,jc_use);
+#   x0(yr,i(ir_use)) = use(yr,ir_use,"exports");
+io[:id0] = io[:use] |> @filter(.&(_.i in set[:i],  _.j in set[:j] ))  |> DataFrame
+io[:fd0] = io[:use] |> @filter(.&(_.i in set[:i],  _.j in set[:fd]))  |> DataFrame
+io[:va0] = io[:use] |> @filter(.&(_.i in set[:va], _.j in set[:j] ))  |> DataFrame
+io[:ts0] = io[:use] |> @filter(.&(_.i in set[:ts], _.j in set[:j] ))  |> DataFrame
+io[:x0]  = io[:use] |> @filter(.&(_.i in set[:i],  _.j == "exports")) |> DataFrame
+
+io[:va0] = edit_with(io[:va0], Rename(:i, :va));
+io[:fd0] = edit_with(io[:fd0], Rename(:j, :fd));
+
+# Read from supply data.
+#   ys0(yr,j(jc_supply),i(ir_supply)) = supply(yr,ir_supply,jc_supply);
+#   m0(yr,i(ir_supply)) = supply(yr,ir_supply,"imports");
+#   mrg0(yr,i(ir_supply)) = supply(yr,ir_supply,"margins");
+#   trn0(yr,i(ir_supply)) = supply(yr,ir_supply,"trncost");
+#   cif0(yr,i(ir_supply)) = supply(yr,ir_supply,"ciffob");
+#   duty0(yr,i(ir_supply)) = supply(yr,ir_supply,"duties");
+#   tax0(yr,i(ir_supply)) = supply(yr,ir_supply,"tax");
+#   sbd0(yr,i(ir_supply)) = - supply(yr,ir_supply,"subsidies");
+io[:ys0]   = io[:supply] |> @filter(.&(_.i in set[:i], _.j in set[:j]))   |> DataFrame
+io[:m0]    = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "imports")) |> DataFrame
+io[:mrg0]  = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "margins")) |> DataFrame
+io[:trn0]  = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "trncost")) |> DataFrame
+io[:cif0]  = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "ciffob"))  |> DataFrame
+io[:duty0] = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "duties"))  |> DataFrame
+io[:tax0]  = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "tax"))     |> DataFrame
+io[:sbd0]  = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "subsidies")) |> DataFrame
+
+# Treat negative inputs as outputs.
+#   ys0(yr,j,i) = ys0(yr,j,i) - min(0,id0(yr,i,j));
+#   id0(yr,i,j) = max(0,id0(yr,i,j));
+#   ts0(yr,'subsidies',j) = - ts0(yr,'subsidies',j);
+#   sbd0(yr,i(ir_supply)) = - supply(yr,ir_supply,"subsidies");
+io[:ys0][!,:value] = io[:ys0][:,:value] - [minimum([0,x]) for x in io[:id0][:,:value]]
+io[:id0][!,:value] = [maximum([0,x]) for x in io[:id0][:,:value]]
+io[:ts0][io[:ts0][:,:i] .== "subsidies", :value] *= -1
+io[:sbd0][!,:value] *= -1
+
+# Adjust transport margins for transport sectors according to CIF/FOB adjustments.
+# Insurance imports are specified as net of adjustments.
+#   trn0(yr,i)$(cif0(yr,i) AND NOT SAMEAS(i,'ins')) = trn0(yr,i) + cif0(yr,i);
+#   m0(yr,i)$(SAMEAS(i,'ins')) = m0(yr,i) + cif0(yr,i);
+#   cif0(yr,i) = 0;
+i_ins = io[:cif0][:,:i] .== "ins";
+io[:trn0][.!i_ins, :value] .= io[:trn0][.!i_ins,:value] + io[:cif0][.!i_ins,:value]
+io[:m0  ][  i_ins, :value] .= io[:m0][i_ins,:value] + io[:cif0][i_ins,:value]
+io[:cif0][      !, :value] .= 0.0
+
+# Aggregate supply and gross output
+#   s0(yr,j) = sum(i,ys0(yr,i,j));
+#   y0(yr,i) = sum(j, ys0(yr,j,i));
+io[:s0] = sum_over(io[:ys0], :i; values_only = false)   # aggregate supply
+io[:y0] = sum_over(io[:ys0], :j; values_only = false)   # gross output
+
+# ******************************************************************************************
+
+# Initialize empty DataFrames where values will be calculated.
+io[:a0]  = permute_as_dataframe((yr = set[:yr], i = set[:i]))
+io[:tm0] = permute_as_dataframe((yr = set[:yr], i = set[:i], value = 0.0))
+io[:ta0] = permute_as_dataframe((yr = set[:yr], i = set[:i], value = 0.0))
+io[:ms0] = permute_as_dataframe((yr = set[:yr], i = set[:i], m = set[:m], value = 0.0))
+io[:md0] = permute_as_dataframe((yr = set[:yr], m = set[:m], i = set[:i], value = 0.0))
+
+# Balance of payments deficit
+#   bopdef(yr) = 0;
+io[:bopdef] = permute_as_dataframe((yr = set[:yr], value = 0.0))
+
+# Margin supply
+#   ms0(yr,i,"trd") = max(-mrg0(yr,i),0);
+#   ms0(yr,i,'trn') = max(-trn0(yr,i),0);
+io[:ms0][io[:ms0][:,:m] .== "trd", :value] .= [maximum([-x, 0]) for x in io[:mrg0][:,:value]]
+io[:ms0][io[:ms0][:,:m] .== "trn", :value] .= [maximum([-x, 0]) for x in io[:trn0][:,:value]]
+
+# Margin demand
+#   md0(yr,"trd",i) = max(mrg0(yr,i),0);
+#   md0(yr,'trn',i) = max(trn0(yr,i),0);
+io[:md0][io[:md0][:,:m] .== "trd", :value] .= [maximum([ x, 0]) for x in io[:mrg0][:,:value]]
+io[:md0][io[:md0][:,:m] .== "trn", :value] .= [maximum([ x, 0]) for x in io[:trn0][:,:value]]
+
+# Household supply
+# Move household supply of recycled goods into the domestic output market
+# from which some may be exported. Net out margin supply from output.
+#   fs0(yr,i) = -min(0, fd0(yr,i,'pce'));
+#   y0(yr,i) = sum(j,ys0(yr,j,i)) + fs0(yr,i) - sum(m,ms0(yr,i,m));
+io[:fs0] = io[:fd0] |> @filter(_.fd == "pce") |> DataFrame
+io[:fs0][!,:value] .= - [minimum([ x, 0]) for x in io[:fs0][:,:value]]
+io[:y0][!,:value]  .= sum_over(io[:ys0], :j) + io[:fs0][:,:value] - sum_over(io[:ms0], :m)
+
+# Armington supply
+#   a0(yr,i) = sum(fd, fd0(yr,i,fd)) + sum(j, id0(yr,i,j));
+io[:a0][!,:value] .= sum_over(io[:fd0], :fd) + sum_over(io[:id0], :j)
+
+# Remove commodity taxes and subsidies on the goods which are produced solely
+# for supplying retail sales margin:
+#   y0(yr,imrg) = 0;
+#   a0(yr,imrg) = 0;
+#   tax0(yr,imrg) = 0;
+#   sbd0(yr,imrg) = 0;
+#   x0(yr,imrg) = 0;
+#   m0(yr,imrg) = 0;
+#   md0(yr,m,imrg) = 0;
+#   duty0(yr,imrg) = 0;
+# !!!! This is probably the worst possible way to do this. Working on using either Query or
+# DataFramesMeta. This is challenging because there isn't a simple way to isolate a
+# DataFrame slice.
+[io[k][.|(io[k][:,:i] .== set[:imrg][1], io[k][:,:i] .== set[:imrg][2],
+          io[k][:,:i] .== set[:imrg][3]), :value] .= 0.0
+    for k in [:y0, :a0, :tax0, :sbd0, :x0, :m0, :md0, :duty0]]
+
+# Tax net subsidy rate on intermediate demand.
+#   tm0(yr,i)$duty0(yr,i) = duty0(yr,i)/m0(yr,i);
+io[:tm0][!, :value] .=  io[:duty0][:,:value] ./ io[:m0][:,:value]
+
+# Import tariff
+#   ta0(yr,i)$(tax0(yr,i)-sbd0(yr,i)) = (tax0(yr,i) - sbd0(yr,i))/a0(yr,i);
+io[:ta0][!, :value] .= (io[:tax0][:,:value] - io[:sbd0][:,:value]) ./ io[:a0][:,:value]
+
+# Drop zero and NaN values. If running partitionbea_check.jl, do so first.
+# include("partitionbea_check.jl")
+# [io[k] = edit_with(io[k], Drop.(:value, [NaN, 0.0], "==")) for k in keys(io)];
+# println("Done.")

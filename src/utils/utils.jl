@@ -105,12 +105,14 @@ convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : 
 """
 Returns true/false if the the DataType or object is an array.
 """
-isarray(::Type{Array{T,1}}) where T <: Any = true
-isarray(x::Array{T,1}) where T <: Any = true
+isarray(::Type{Array{T}}) where T <: Any = true
+isarray(x::Array{T}) where T <: Any = true
 isarray(::Any) = false
 
 """
 Returns an array.
 """
+ensurearray(x::Array{T}) where T <: Any = x
 ensurearray(x::Array{T,1}) where T <: Any = x
+ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
 ensurearray(x::Any) = [x]

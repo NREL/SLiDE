@@ -10,9 +10,9 @@ using SLiDE  # see src/SLiDE.jl
 READ_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "readfiles"))
 
 check_one = false;
-file_check = "cfs"; # index of parsed files to check.
+file_check = "use_det"; # index of parsed files to check.
 
-files_parse = XLSXInput("generate_yaml.xlsx", "parse", "J1:L180", "parse")
+files_parse = XLSXInput("generate_yaml.xlsx", "parse", "B1:E180", "parse")
 files_parse = write_yaml(READ_DIR, files_parse)
 
 .&(check_one, any(occursin.(file_check, files_parse))) ?

@@ -404,23 +404,23 @@ S00401,Scrap,srp_use,gds
 S00402,Used and secondhand goods,sec_use,gds
 S00300,Noncomparable imports,imp_oth,gds
 S00900,Rest of the world adjustment,rwa_oth,gds
-T017,Total industry supply,TotalBasic,
+T017,Total industry supply,totalbasic,
 331314,Secondary smelting and alloying of aluminum,sme_pmt,gds
-MDTY,Import duties,Duties,
-TOP,Tax on products,Tax,
-SUB,Subsidies,Subsidies,
+MDTY,Import duties,duties,
+TOP,Tax on products,tax,
+SUB,Subsidies,subsidies,
 S00101,Federal electric utilities,ele_fen,gds
 S00201,State and local government passenger transit,trn_sle,gds
 S00202,State and local government electric utilities,ele_sle,gds
-T007,Total Commodity Output,Output,
+T007,Total Commodity Output,output,
 MCIF,Imports,imports,
-TRADE,Trade margins,Margins,
+TRADE,Trade margins,margins,
 MADJ,CIF/FOB Adjustments on Imports,ciffob,
-TRANS,Transportation costs,TrnCost,
-T013,Total product supply (basic prices),BasicSupply,
-T014,Total trade and transportation margins,TrdTrn,
-T015,Total tax less subsidies on products,TaxLesSubsidies,
-T016,Total product supply (purchaser prices),Supply,
+TRANS,Transportation costs,trncost,
+T013,Total product supply (basic prices),basicsupply,
+T014,Total trade and transportation margins,trdtrn,
+T015,Total tax less subsidies on products,taxlessubsidies,
+T016,Total product supply (purchaser prices),supply,
 T005,Total intermediate inputs,interm,
 V00100,Compensation of employees,compen,valueadded
 T00OTOP,Other taxes on production,othtax,valueadded
