@@ -58,8 +58,10 @@ export convert_type
 export datatype
 export isarray
 export ensurearray
+export permute
 
 export edit_with
+export fill_zero
 export read_file
 export load_from
 export gams_to_dataframe

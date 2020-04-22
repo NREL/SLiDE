@@ -172,10 +172,6 @@ function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
     (fields, types) = (string.(fieldnames(T)), T.types)
 
     # Fill the datatype with the input.
-    # if any(isarray.(T.types)) & !all(isarray.(T.types))
-    #     inps = [isarray(type) ? ensurearray(convert_type.(type, d[field])) :
-    #         convert_type.(type, d[field]) for (field,type) in it]
-    #     lst = [T(inps...)]~
     if .&(any(isarray.(types)), !all(isarray.(types)))
         # Restructure data into a list of inputs in the order and type required when
         # creating the datatype. Ensure that all array entries should, in fact, be arrays.
@@ -213,8 +209,6 @@ function load_from(::Type{T}, df::DataFrame) where T <: Any
     # If one of the struct fields is an ARRAY, we here assume that it is the length of the
     # entire DataFrame, and all other fields are duplicates.
     if any(isarray.(T.types))
-    # if all(isarray.(T.types))
-        # inps = [df[:,field] for (field,type) in it]
         inps = [isarray(type) ? df[:,field] : df[1,field] for (field,type) in it]
         lst = [T(inps...)]
     # If each row in the input df fills one and only one struct,

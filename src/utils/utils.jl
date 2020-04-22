@@ -37,7 +37,6 @@ Base.uppercase(x::Int) = x
 Base.uppercase(x::Symbol) = Symbol(uppercase(string(x)))
 Base.uppercase(x::Missing) = missing
 
-
 """
     Base.occursin(x::Symbol, y::Symbol)
     Base.occursin(x::String, y::Symbol)
@@ -52,13 +51,11 @@ Base.occursin(x::String, y::Symbol) = occursin(x, string(y))
 Converts `x` into the specified `Type{T}`.
 
 # Arguments
-
-- `::Type{T}`:
-- `x<:Any`
+- `::Type{T}`: target DataType.
+- `x<:Any`: value to convert.
 
 # Returns
 Data in specified type
-
 """
 convert_type(::Type{T}, x::Any) where T<:AbstractString = string(x)
 convert_type(::Type{T}, x::Date) where T<:Integer = Dates.year(x)
@@ -68,7 +65,6 @@ function convert_type(::Type{T}, x::AbstractString) where T<:Integer
     return convert_type(T, convert_type(Float64, x))
 end
 
-# convert_type(::Type{T}, x::AbstractString) where T<:Real = parse(T, replace(x, "," => ""))
 function convert_type(::Type{T}, x::AbstractString) where T<:Real
     return parse(T, reduce(replace, ["," => "", "\"" => ""], init = x))
 end
@@ -77,7 +73,6 @@ convert_type(::Type{T}, x::Symbol) where T<:Real = convert_type(T, convert_type(
 
 function convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1})
     return vcat(DataFrame.(lst)...)
-    # return DataFrame(Dict(key => [x[key] for x in lst] for key in keys(lst[1])))
 end
 
 convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
@@ -87,17 +82,6 @@ convert_type(::Type{Array{T,1}}, x::Any) where T<:Any = convert_type.(T, x)
 convert_type(::Type{T}, x::Missing) where T<:Real = x;
 convert_type(::Type{T}, x::Missing) where T<:AbstractString = x;
 convert_type(::Type{Any}, x::Any) = x
-
-# function convert_type(
-#     ::Type{Dict{Any,Any}},
-#     df::DataFrame,
-#     value_col::Symbol;
-#     remove_col::Array{Symbol,1}=[]
-# )
-#     key_col = setdiff(names(df), [[value_col]; remove_col]);
-#     d = Dict(values(row[key_col]) => row[value_col] for row in eachrow(df));
-#     return d
-# end
 
 convert_type(::Type{T}, x::Any) where T = T(x)
 
@@ -111,9 +95,29 @@ isarray(x::Array{T,1}) where T <: Any = true
 isarray(::Any) = false
 
 """
-Returns an array.
+    ensurearray(x::Any)
 """
-# ensurearray(x::Array{T}) where T <: Any = x
 ensurearray(x::Array{T,1}) where T <: Any = x
 ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
 ensurearray(x::Any) = [x]
+
+"""
+    permute(x::Any)
+This function finds all possible permutations of the input arrays.
+
+# Arguments
+- `x::Tuple` or `x::NamedTuple{}` or `x::Array`: list of arrays to permute.
+    If `x` is a NamedTuple, its values will be permuted.
+
+# Returns
+- `x::Array{Tuple,1}`: list of all possible permutations of the input values.
+    If `x` does not contain at least one array, there will be nothing to permute and the function will return `x`.
+"""
+function permute(x::Tuple{Array, Vararg{Any}})
+    return length(x) == 1 ? sort(unique(x[1])) :
+        [collect(Base.Iterators.product(sort.(unique.(ensurearray.(x)))...))...;]
+end
+
+permute(x::Tuple) = sort(unique(ensurearray(x)))
+permute(x::NamedTuple) = permute(values(x))
+permute(x::Array) = any(isarray.(x)) ? permute(Tuple(x)) : sort(unique(x))

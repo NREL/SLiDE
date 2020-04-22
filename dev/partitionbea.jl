@@ -41,7 +41,7 @@ function make_square(df::Vararg{DataFrame})
 end
 
 """
-    permute_as_dataframe(x)
+    fill_zero(x)
 This function creates a new DataFrame filled with all permutations of input values.
 
 # Argument:
@@ -50,11 +50,11 @@ This function creates a new DataFrame filled with all permutations of input valu
 # Returns:
 - `df::DataFrame` of all permutations of input values.
 """
-function permute_as_dataframe(x)
-    df = sort(DataFrame(vcat(collect(Base.Iterators.product(ensurearray.(values(x))...))...)));
-    df = edit_with(df, Rename.(names(df), keys(x)))
-    return df
-end
+# function fill_zero(x)
+#     df = sort(DataFrame(vcat(collect(Base.Iterators.product(ensurearray.(values(x))...))...)));
+#     df = edit_with(df, Rename.(names(df), keys(x)))
+#     return df
+# end
 
 """
     sum_over(df::DataFrame, col::Array{Symbol,1}; kwargs...)
@@ -124,9 +124,9 @@ end
 SET_DIR = joinpath(BASE_DIR, "data", "coresets");
 set_list = convert_type.(Symbol, ["i", "fd", "m", "ts", "va", "yr"]);
 
-set = Dict(k => Matrix(sort(read_file(joinpath(SET_DIR, string(k, ".csv"))))) for k in set_list)
+set = Dict(k => sort(read_file(joinpath(SET_DIR, string(k, ".csv"))))[:,1] for k in set_list)
 set[:j] = set[:i]
-set[:imrg] = Matrix(DataFrame(imrg = ["fbt","gmt","mvt"]));
+set[:imrg] = ["fbt","gmt","mvt"];
 
 # Read supply/use data.
 DATA_DIR = joinpath(BASE_DIR, "data", "output");
@@ -144,7 +144,9 @@ for k in keys(io)
     # global io[k][!,:units] .= UNITS
 end
 
-io[:supply], io[:use] = make_square(io[:supply], io[:use]);
+# io[:supply], io[:use] = make_square(io[:supply], io[:use]);
+io[:supply], io[:use] = fill_zero(io[:supply], io[:use]; permute_keys = true);
+# size(io[:supply])
 
 # ******************************************************************************************
 #   PARTITION DATA INTO PARAMETERS.
@@ -212,15 +214,15 @@ io[:y0] = sum_over(io[:ys0], :j; values_only = false)   # gross output
 # ******************************************************************************************
 
 # Initialize empty DataFrames where values will be calculated.
-io[:a0]  = permute_as_dataframe((yr = set[:yr], i = set[:i]))
-io[:tm0] = permute_as_dataframe((yr = set[:yr], i = set[:i], value = 0.0))
-io[:ta0] = permute_as_dataframe((yr = set[:yr], i = set[:i], value = 0.0))
-io[:ms0] = permute_as_dataframe((yr = set[:yr], i = set[:i], m = set[:m], value = 0.0))
-io[:md0] = permute_as_dataframe((yr = set[:yr], m = set[:m], i = set[:i], value = 0.0))
+io[:a0]  = fill_zero((yr = set[:yr], i = set[:i]))
+io[:tm0] = fill_zero((yr = set[:yr], i = set[:i]))
+io[:ta0] = fill_zero((yr = set[:yr], i = set[:i]))
+io[:ms0] = fill_zero((yr = set[:yr], i = set[:i], m = set[:m]))
+io[:md0] = fill_zero((yr = set[:yr], m = set[:m], i = set[:i]))
 
 # Balance of payments deficit
 #   bopdef(yr) = 0;
-io[:bopdef] = permute_as_dataframe((yr = set[:yr], value = 0.0))
+io[:bopdef] = fill_zero((yr = set[:yr], ))
 
 # Margin supply
 #   ms0(yr,i,"trd") = max(-mrg0(yr,i),0);
@@ -272,9 +274,7 @@ io[:tm0][i_div, :value] .=  io[:duty0][i_div,:value] ./ io[:m0][i_div,:value]
 # Import tariff
 #   ta0(yr,i)$(tax0(yr,i)-sbd0(yr,i)) = (tax0(yr,i) - sbd0(yr,i))/a0(yr,i);
 i_div = io[:a0][:,:value] .!= 0.0
-io[:ta0][!, :value] .= (io[:tax0][:,:value] - io[:sbd0][:,:value]) ./ io[:a0][:,:value]
+io[:ta0][i_div, :value] .= (io[:tax0][i_div,:value] - io[:sbd0][i_div,:value]) ./ io[:a0][i_div,:value]
 
-# Drop zero and NaN values. If running partitionbea_check.jl, do so first.
 # include("partitionbea_check.jl")
-# [io[k] = edit_with(io[k], Drop.(:value, [NaN, 0.0], "==")) for k in keys(io)];
-# println("Done.")
+println("Done.")

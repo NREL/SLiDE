@@ -154,33 +154,6 @@ function edit_with(df::DataFrame, x::Melt)
     return df
 end
 
-# function edit_with(df::DataFrame, x::Operate)
-#     # Perform operation on columns. Isolate columns to be operated on.
-#     # Append original columns that might be replaced "_0" to preserve information.
-#     df_val = convert_type.(Float64, copy(df[:,x.input]))
-#     x.output in x.input ? df = edit_with(df, Rename(x.output, Symbol(x.output, :_0))) :
-#         nothing
-#     df[!,x.output] .= broadcast(datatype(x.operation), [col for col in eachcol(df_val)]...)
-
-#     # !!!! SOS how do we deal with floating point arithmetic? (ex: 1.1 + 0.1 = 1.2000000000000002)
-#     df[!,x.output] .= round.(df[:,x.output], digits=8)
-
-#     # Adjust labeling columns.
-#     for (from, to) in zip(x.from, x.to)
-#         if from in names(df) && to in names(df) && from !== to
-#             df_comment = dropmissing(unique(df[:, [from; to]]))
-#             df[!, Symbol(from, :_0)] .= df[:,from]
-#             df = edit_with(df, Replace.(from, df_comment[:,from], df_comment[:,to]))
-#         end
-#     end
-    
-#     # Reorder DataFrame columns to show all columns involved in the operation last.
-#     # This could aid in troubleshooting.
-#     cols = intersect([setdiff(x.input, [x.output]); Symbol(x.output, :_0); x.output;
-#         reverse(sort([Symbol.(x.from, :_0); x.from])); reverse(sort(x.to))], names(df));
-#     return df[:,[setdiff(names(df), cols); cols]]
-# end
-
 function edit_with(df::DataFrame, x::Operate)
     # If it is a ROW-WISE operation,
     if Symbol(1) == x.axis || occursin(:row, lowercase(x.axis))
@@ -304,4 +277,125 @@ function edit_with(y::Dict{Any,Any}; shorten = false)
     
     length(intersect(names(df), [:from,:to])) == 2 ? sort!(df, [:to, :from]) : nothing
     return df
+end
+
+
+"""
+    fill_zero(keys_unique::NamedTuple; value_colnames)
+    fill_zero(keys_unique::NamedTuple, df::DataFrame)
+    fill_zero(df::DataFrame...)
+    fill_zero(d::Dict...)
+    fill_zero(keys_unique, d::Dict)
+
+# Arguments
+- `keys_unique::Tuple`: A list of arrays whose permutations should be included in the
+    resultant dictionary.
+- `keys_unique::NamedTuple`: A list of arrays whose permutations should be included in the
+    resultant dictionary. The NamedTuple's keys correspond to the DataFrame columns where
+    they will be stored.
+- `d::Dict...`: The dictionary/ies to edit.
+- `df::DataFrame...`: The DataFrame(s) to edit.
+
+# Keyword Arguments
+- `value_colnames::Any = :value`: "value" column labels to add and set to zero when creating
+    a new DataFrame. Default is `:value`.
+
+# Usage
+This function can be used to fill zeros in either a dictionary or DataFrame.
+- Options for DataFrame editing:
+    - If only (a) dictionary/ies is/are input, the dictionaries will be edited such that
+        they all contain all permutations of their key values. All dictionaries in a
+        resultant list of dictionaries will be the same length.
+    - If a dictionary is input with a list of keys, it will be edited to ensure that it
+        includes all permutations.
+    - If only a list of keys is input, a new dictionary will be created, containing all key
+        permutations with values initialized to zero.
+- Options for DataFrame editing:
+    - If only (a) DataFrame(s) is/are input, the DataFrame(s) will be edited such that
+        they all contain all permutations of their key values. All DataFrames in a
+        resultant list of DataFrames will be the same length.
+    - If a DataFrame is input with a NamedTuple, it will be edited to ensure that it
+        includes all permutations of the NamedTuple's values.
+    - If only a NamedTuple is input, a new DataFrame will be created, containing all key
+        permutations with values initialized to zero.
+
+# Returns
+- `d::Dict...` if input included dictionaries and/or Tuples
+- `df::DataFrame...` if input included DataFrames and/or NamedTuples
+"""
+function fill_zero(keys_unique::NamedTuple; value_colnames = :value)
+    # Extract descriptor column names from the NamedTuple.
+    # Then, create a DataFrame of all permutations of the input keys.
+    cols = collect(keys(keys_unique));
+
+    df_keys_all = sort(DataFrame(Tuple.(permute(keys_unique))))
+    df_keys_all = edit_with(df_keys_all, [Rename.(names(df_keys_all), cols);  # name columns
+        Add.(convert_type.(Symbol, value_colnames), 0.0)])                    # add zeros
+    return df_keys_all
+end
+
+function fill_zero(keys_unique::NamedTuple, df::DataFrame)
+    df_keys_all = fill_zero(keys_unique)
+    df = fill_zero(df, df_keys_all)[1]
+    return df
+end
+
+function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
+    df = ensurearray(df)
+    # Save names of columns containing values to fill zeros later.
+    # Find descriptor columns to permute OR make consistent across input DataFrames.
+    value_colnames = [names(x)[all.(eachcol(supertype.(typeof.(x)) .== AbstractFloat))] for x in df]
+    cols = intersect(setdiff.(names.(df), value_colnames)...)
+
+    # Find a unique list of descriptor keys in the input DataFrame(s). Permute as desired.
+    df_keys_all = sort(unique([[x[:,cols] for x in df]...;]));
+    
+    if permute_keys
+        keys_unique = NamedTuple{Tuple(cols,)}(unique.(eachcol(df_keys_all)),)
+        df_keys_all = fill_zero(keys_unique)[:,cols]
+    end
+
+    # For each DataFrame in the list, join the input DataFrame to DataFrame keys_all on the
+    # descriptor columns shared by both DataFrames. Using a left join will add "missing"
+    # where a descriptor was not already present, which will be replaced by zero.
+    # 
+    # !!!! After edit_with(df, Replace) is generalized to be type-agnostic,
+    # [df[ii] = edit_with(join(df_keys_all, df[ii], on = cols, kind = :left),
+    #     Replace.(value_colnames[ii], missing, 0.0)) for ii in 1:length(df)]
+    for ii in 1:length(df)
+        global df[ii] = join(df_keys_all, df[ii], on = cols, kind = :left)
+        [global df[ii][ismissing.(df[ii][:,col]),col] .= 0.0 for col in value_colnames[ii]]
+    end
+    return length(df) == 1 ? df[1] : Tuple(df)
+end
+
+function fill_zero(keys_unique::Tuple; permute_keys::Bool = true)
+    keys_unique = length(keys_unique) == 1 ? keys_unique[1] : keys_unique
+    keys_all = permute_keys ? permute(keys_unique) : keys_unique
+
+    d = Dict(k => 0 for k in keys_all)
+    return d
+end
+
+function fill_zero(keys_unique::Any, d::Dict; permute_keys::Bool = true)
+    # If permuting keys, find all possible permutations of keys that should be present
+    # and determine which are missing.
+    keys_all = permute_keys ? permute(keys_unique) : keys_unique
+    keys_missing = setdiff(keys_all, collect(keys(d)))
+
+    # Add missing keys to the dictionary and return.
+    [push!(d, k => 0) for k in keys_missing]
+    return d
+end
+
+function fill_zero(d::Vararg{Dict}; permute_keys::Bool = true)
+    d = ensurearray(d)
+    # Find all keys present in the dictionary and permute if neccessary.
+    keys_unique = unique([collect.(keys.(d))...;])
+    keys_unique = any(length.(keys_unique) .> 1) && permute_keys ?
+        unique.(eachcol(DataFrame(keys_unique))) : keys_unique
+    
+    # Add missing keys to the dictionary/ies and return.
+    d = [fill_zero(keys_unique, x; permute_keys = permute_keys) for x in d]
+    return length(d) == 1 ? d[1] : Tuple(d)
 end
