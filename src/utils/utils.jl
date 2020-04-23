@@ -54,6 +54,12 @@ Converts `x` into the specified `Type{T}`.
 - `::Type{T}`: target DataType.
 - `x<:Any`: value to convert.
 
+# Keyword Arguments
+Options available when converting a DataFrame into a dictionary of keys pointing to a value:
+- `drop_cols = []`: Columns not to include in
+    the keys. By default, no columns are dropped.
+- `value_col::Symbol = :end`: If converting
+
 # Returns
 Data in specified type
 """
@@ -71,8 +77,18 @@ end
 
 convert_type(::Type{T}, x::Symbol) where T<:Real = convert_type(T, convert_type(String, x))
 
-function convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1})
-    return vcat(DataFrame.(lst)...)
+convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1}) = [DataFrame.(lst)...;]
+
+function convert_type(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :end)
+    # Find and save the column containing values and that/those containing keys.
+    # This assums that the last column in the DataFrame contains the value, unless specified
+    # otherwise by the value_col keyword argument.
+    value_col = value_col == :end ? names(df)[end] : value_col
+    key_cols = setdiff(names(df), convert_type.(Symbol, ensurearray(drop_cols)), [value_col])
+
+    d = Dict((length(key_cols) == 1 ? (row[key_cols]) : (row[key_cols]...,)) => row[value_col]
+        for row in eachrow(df))
+    return d
 end
 
 convert_type(::Type{DataType}, x::AbstractString) = datatype(x)

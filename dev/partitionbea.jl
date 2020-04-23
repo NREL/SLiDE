@@ -6,55 +6,6 @@ using Query
 
 using SLiDE
 
-"""
-    make_square(df::Vararg{DataFrame})
-This function returns (a) DataFrame(s) with all possible permutations of descriptive columns
-(i.e., ones not labeled "value"), by adding zeros where values are missing.
-This can be used to ensure consistent array size during calculations.
-
-# Argument:
-- `df::DataFrame`: DataFrame(s) in need of zeros. If multiple DataFrames are input,
-    descriptor columns will be made consistent across all DataFrames.
-
-# Returns:
-- `df::DataFrame` or `df::Tuple(DataFrame, ...)`: A DataFrame or list of DataFrames of the
-    same size and with the same descriptor columns. The DataFrame(s) will be sorted by
-    descriptor column values such that row order is equal across all input DataFrames.
-"""
-function make_square(df::Vararg{DataFrame})
-    df = ensurearray(df)
-
-    cols_key = [setdiff(cols,[:value]) for cols in names.(df)]
-    cols_temp = Symbol.(1:length.(cols_key)[1])
-
-    keys_all = unique([[edit_with(df[ii][:,cols_key[ii]], Rename.(cols_key[ii], cols_temp))
-        for ii in 1:length(df)]...;])
-
-    keys_unique = Tuple(unique.(eachcol(keys_all)));
-    keys_all = sort(DataFrame(vcat(collect(Base.Iterators.product(keys_unique...))...)));
-
-    [df[ii] = edit_with(join(keys_all, df[ii], on = Pair.(cols_temp, cols_key[ii]), kind = :left),
-        Rename.(cols_temp, cols_key[ii])) for ii in 1:length(df)]
-    [df[ii][ismissing.(df[ii][:,:value]),:value] .= 0.0 for ii in 1:length(df)]
-
-    return length(df) == 1 ? df[1] : Tuple(df)
-end
-
-"""
-    fill_zero(x)
-This function creates a new DataFrame filled with all permutations of input values.
-
-# Argument:
-- `x::NamedTuple` of column names and values to include.
-
-# Returns:
-- `df::DataFrame` of all permutations of input values.
-"""
-# function fill_zero(x)
-#     df = sort(DataFrame(vcat(collect(Base.Iterators.product(ensurearray.(values(x))...))...)));
-#     df = edit_with(df, Rename.(names(df), keys(x)))
-#     return df
-# end
 
 """
     sum_over(df::DataFrame, col::Array{Symbol,1}; kwargs...)
@@ -144,9 +95,7 @@ for k in keys(io)
     # global io[k][!,:units] .= UNITS
 end
 
-# io[:supply], io[:use] = make_square(io[:supply], io[:use]);
 io[:supply], io[:use] = fill_zero(io[:supply], io[:use]; permute_keys = true);
-# size(io[:supply])
 
 # ******************************************************************************************
 #   PARTITION DATA INTO PARAMETERS.
@@ -190,8 +139,9 @@ io[:sbd0]  = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "subsidies")) |> D
 #   id0(yr,i,j) = max(0,id0(yr,i,j));
 #   ts0(yr,'subsidies',j) = - ts0(yr,'subsidies',j);
 #   sbd0(yr,i(ir_supply)) = - supply(yr,ir_supply,"subsidies");
-io[:ys0][!,:value] = io[:ys0][:,:value] - [minimum([0,x]) for x in io[:id0][:,:value]]
-io[:id0][!,:value] = [maximum([0,x]) for x in io[:id0][:,:value]]
+# io[:ys0][!,:value] = io[:ys0][:,:value] - [minimum([0,x]) for x in io[:id0][:,:value]]
+io[:ys0][!,:value] = io[:ys0][:,:value] - min.(0, io[:id0][:,:value])
+io[:id0][!,:value] = max.(0, io[:id0][:,:value])
 io[:ts0][io[:ts0][:,:i] .== "subsidies", :value] *= -1
 io[:sbd0][!,:value] *= -1
 
@@ -227,14 +177,14 @@ io[:bopdef] = fill_zero((yr = set[:yr], ))
 # Margin supply
 #   ms0(yr,i,"trd") = max(-mrg0(yr,i),0);
 #   ms0(yr,i,'trn') = max(-trn0(yr,i),0);
-io[:ms0][io[:ms0][:,:m] .== "trd", :value] .= [maximum([-x, 0]) for x in io[:mrg0][:,:value]]
-io[:ms0][io[:ms0][:,:m] .== "trn", :value] .= [maximum([-x, 0]) for x in io[:trn0][:,:value]]
+io[:ms0][io[:ms0][:,:m] .== "trd", :value] .= max.(-io[:mrg0][:,:value], 0)
+io[:ms0][io[:ms0][:,:m] .== "trn", :value] .= max.(-io[:trn0][:,:value], 0)
 
 # Margin demand
 #   md0(yr,"trd",i) = max(mrg0(yr,i),0);
 #   md0(yr,'trn',i) = max(trn0(yr,i),0);
-io[:md0][io[:md0][:,:m] .== "trd", :value] .= [maximum([ x, 0]) for x in io[:mrg0][:,:value]]
-io[:md0][io[:md0][:,:m] .== "trn", :value] .= [maximum([ x, 0]) for x in io[:trn0][:,:value]]
+io[:md0][io[:md0][:,:m] .== "trd", :value] .= max.(io[:mrg0][:,:value], 0)
+io[:md0][io[:md0][:,:m] .== "trn", :value] .= max.(io[:mrg0][:,:value], 0)
 
 # Household supply
 # Move household supply of recycled goods into the domestic output market
@@ -242,7 +192,7 @@ io[:md0][io[:md0][:,:m] .== "trn", :value] .= [maximum([ x, 0]) for x in io[:trn
 #   fs0(yr,i) = -min(0, fd0(yr,i,'pce'));
 #   y0(yr,i) = sum(j,ys0(yr,j,i)) + fs0(yr,i) - sum(m,ms0(yr,i,m));
 io[:fs0] = io[:fd0] |> @filter(_.fd == "pce") |> DataFrame
-io[:fs0][!,:value] .= - [minimum([ x, 0]) for x in io[:fs0][:,:value]]
+io[:fs0][!,:value] .= - min.(io[:fs0][:,:value], 0)
 io[:y0][!,:value]  .= sum_over(io[:ys0], :j) + io[:fs0][:,:value] - sum_over(io[:ms0], :m)
 
 # Armington supply
