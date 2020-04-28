@@ -23,18 +23,18 @@ Describe:
   col: source
 
 Order:
-  - {col: year,   type: Int}
-  - {col: state,  type: String}
+  - {col: yr,     type: Int}
+  - {col: r,      type: String}
   - {col: source, type: String}
   - {col: units,  type: String}
   - {col: value,  type: Float64}
 
 Rename:
-  - {from: State, to: state}
+  - {from: State, to: r}
 
 Melt:
-  on:  state
-  var: year
+  on:  r
+  var: yr
   val: value
 
 Add:
@@ -45,10 +45,10 @@ Map:
   - file:   [parse, regions.csv]
     from:   from
     to:     to
-    input:  state
-    output: state
+    input:  r
+    output: r
 
 Drop:
-  - col: year
+  - col: yr
     val: 1997
     operation: "<"

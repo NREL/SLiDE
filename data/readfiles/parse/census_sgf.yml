@@ -13,8 +13,18 @@ CSVInput:
   - {name: sgf_2014-2016.csv, descriptor: 2014-2016}
 
 Order:
-  - {col: year,      type: Int}
-  - {col: state,     type: String}
-# - {col: sgf_windc, type: String}
+  - {col: yr,        type: Int}
+  - {col: r,         type: String}
+# - {col: ec_desc,   type: String}
+  - {col: ec,        type: String}
+# - {col: windc_code,type: String}
   - {col: units,     type: String}
   - {col: value,     type: Float64}
+# - {col: units_0, type: String}
+# - {col: value_0, type: Any}
+# - {col: factor,  type: Any}
+
+Drop:
+  - col: r
+    val: us
+    operation: "=="

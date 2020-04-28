@@ -18,55 +18,53 @@ CSVInput:
 # - {name: SAGDP11N__ALL_AREAS_1998_2017.csv, descriptor: Contributions to percent change in real GDP}
 
 # Describe:
-#  col: component
+#  col: gdpcat
 
 Order:
-  - {col: year,          type: Int}
-# - {col: region_code,   type: String}
-  - {col: region_desc,   type: String}
-  - {col: component,     type: String}
-  - {col: industry_id,   type: String}
-# - {col: industry_code, type: String}
-# - {col: industry_desc, type: String}
-  - {col: units,         type: String}
-  - {col: value,         type: Float64}
-  - {col: units_0,    type: String}
-  - {col: value_0,    type: Any}
-  - {col: factor,     type: Any}
+  - {col: yr,     type: Int}
+  - {col: r,      type: String}
+  - {col: gdpcat, type: String}
+  - {col: si,     type: String}
+# - {col: n,      type: String}
+# - {col: desc,   type: String}
+  - {col: units,  type: String}
+  - {col: value,  type: Float64}
+# - {col: units_0, type: String}
+# - {col: value_0, type: Any}
+# - {col: factor,  type: Any}
 
 Rename:
-  - {from: GeoFIPS,                to: region_code}
-  - {from: GeoName,                to: region_desc}
+  - {from: GeoName,                to: r}
+  - {from: ComponentName,          to: gdpcat}
+  - {from: IndustryId,             to: si}
   - {from: Unit,                   to: units}
-  - {from: Description,            to: industry_desc}
-  - {from: ComponentName,          to: component}
-  - {from: IndustryClassification, to: industry_code}
-  - {from: IndustryId,             to: industry_id}
+  - {from: IndustryClassification, to: n}
+  - {from: Description,            to: desc}
 
 Match:
-  - on:     \"(?<region_code>.{5})\"
-    input:  region_code
-    output: region_code
-  - on:     (?<region_desc>.*)\*
-    input:  region_desc
-    output: region_desc
+# - on:     \"(?<region_code>.{5})\"
+#   input:  region_code
+#   output: region_code
+  - on:     (?<r>.*)\*
+    input:  r
+    output: r
 
 Melt:
-  on:  [region_code, region_desc, component, units, industry_id, industry_code, industry_desc]
-  var: year
+  on:  [r, gdpcat, si, units, si, n, desc]
+  var: yr
   val: value
 
 Map:
   - file:   [parse, gsp.csv]
     from:   from
     to:     to
-    input:  component
-    output: component
+    input:  gdpcat
+    output: gdpcat
   - file:   [parse, regions.csv]
     from:   from
     to:     to
-    input:  region_desc
-    output: region_desc
+    input:  r
+    output: r
   - file:   [parse, units.csv]
     from:   from
     to:     [to, factor, units_factor]
@@ -79,13 +77,13 @@ Replace:
     to:   0
 
 Drop:
-  - col: [Region, TableName]
+  - col: [Region, TableName, GeoFIPS]
     val: all
     operation: "=="
-  - col: [IndustryClassification, Description, region_code]
-    val: all
-    operation: "=="
-  - col: component
+# - col: [IndustryClassification, Description]
+#   val: all
+#   operation: "=="
+  - col: gdpcat
     val: missing
     operation: "=="
 

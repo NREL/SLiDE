@@ -12,12 +12,12 @@ XLSXInput:
   descriptor: crude_oil
 
 Order:
-  - {col: year,  type: Int}
+  - {col: yr,    type: Int}
   - {col: units, type: String}
   - {col: value, type: Float64}
 
 Rename:
-  - {from: Date, to: year}
+  - {from: Date, to: yr}
   - {from: U.S. Crude Oil Composite Acquisition Cost by Refiners (Dollars per Barrel), to: value}
 
 Add:
@@ -27,6 +27,6 @@ Add:
     val: crude oil composite acquisition cost by refiners
 
 Drop:
-  - col: year
+  - col: yr
     val: 1997
     operation: "<"

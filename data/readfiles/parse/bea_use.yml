@@ -3,7 +3,7 @@ Editable: true
 
 Path: [.., data, datasources, BEA, IO]
 
-PathOut: [.., data, output, bea_use.csv]
+PathOut: [.., data, output, use.csv]
 
 XLSXInput:
   name:  Use_SUT_Framework_1997-2017_SUM.xlsx
@@ -21,7 +21,7 @@ Order:
 # - {col: output_bea, type: String}
   - {col: j,          type: String}
   - {col: units,      type: String}
-  - {col: value,      type: Int}
+  - {col: value,      type: Float64}
 
 Rename:
   - {from: IOCode, to: input_bea}
@@ -47,8 +47,21 @@ Map:
     to:     bea_windc
     input:  [input_bea, input_desc]
     output: i
+  - file:   [parse, units.csv]
+    from:   from
+    to:     [to, factor, units_factor]
+    input:  units
+    output: [units, factor, units_factor]
 
 Replace:
   col:  value
   from: "..."
   to:   0
+
+Operate:
+  operation: "*"
+  axis:   col
+  from:   units
+  to:     units_factor
+  input:  [value, factor]
+  output: value

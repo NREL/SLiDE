@@ -10,39 +10,36 @@ CSVInput:
   descriptor: seds
 
 Order:
-  - {col: year,        type: Int}
-  - {col: state,       type: String}
-  - {col: msn_code,    type: String}
-  - {col: source_code, type: String}
-  - {col: sector_code, type: String}
-  - {col: units,       type: String}
-  - {col: value,       type: Float64}
-  - {col: units_0,    type: String}
-  - {col: value_0,    type: Any}
-  - {col: factor,     type: Any}
+# Naming consistent with readseds.gms
+  - {col: yr,     type: Int}
+  - {col: sr,     type: String}
+  - {col: msn,    type: String}
+  - {col: source, type: String}
+  - {col: sector, type: String}
+  - {col: units,  type: String}
+  - {col: value,  type: Float64}
+# - {col: units_0, type: String}
+# - {col: value_0, type: Any}
+# - {col: factor,  type: Any}
 
 Rename:
   - {from: upper,     to: lower}
-  - {from: statecode, to: state}
-  - {from: msn,       to: msn_code}
+  - {from: year,      to: yr}
+  - {from: statecode, to: sr}
+  - {from: msn,       to: msn}
   - {from: data,      to: value}
-
-# Match:
-#   on:     (?<source_code>.{2})(?<sector_code>.{2})(?<units>.)
-#   input:  msn_code
-#   output: ["source_code", "sector_code", "units"]
 
 Map:
   - file:   [parse, msn.csv]
     from:   msn_code
     to:     [source_code, sector_code, units]
-    input:  msn_code
-    output: [source_code, sector_code, units]
+    input:  msn
+    output: [source, sector, units]
   - file:   [parse, regions.csv]
     from:   from
     to:     to
-    input:  state
-    output: state
+    input:  sr
+    output: sr
   - file:   [parse, units.csv]
     from:   from
     to:     [to, factor, units_factor]
@@ -58,7 +55,7 @@ Drop:
   - col: "Data_Status"
     val: all
     operation: "=="
-  - col: year
+  - col: yr
     val: 1997
     operation: "<"
 # - col: value

@@ -12,39 +12,39 @@ XLSXInput:
   descriptor: 1998
 
 Describe:
-  col: year
+  col: yr
 
 Order:
-  - {col: year,      type: Int}
-  - {col: state,     type: String}
-  - {col: sgf_desc,  type: String}
-  - {col: sgf_code,  type: String}
-  - {col: windc_code,type: String}
+  - {col: yr,        type: Int}
+  - {col: r,         type: String}
+# - {col: ec_desc,   type: String}
+  - {col: ec,        type: String}
+# - {col: windc_code,type: String}
   - {col: units,     type: String}
   - {col: value,     type: Float64}
-# - {col: units_0,    type: String}
-# - {col: value_0,    type: Any}
-# - {col: factor,     type: Any}
+# - {col: units_0, type: String}
+# - {col: value_0, type: Any}
+# - {col: factor,  type: Any}
 
 Rename:
-  - {from: missing, to: sgf_desc}
+  - {from: missing, to: ec_desc}
 
 Melt:
-  on:  sgf_desc
-  var: state
+  on:  ec_desc
+  var: r
   val: value
 
 Map:
   - file:   [parse, sgf.csv]
     from:   from
-    to:     [sgf_desc, sgf_code, windc_code, units]
-    input:  sgf_desc
-    output: [sgf_desc, sgf_code, windc_code, units]
+    to:     [sgf_desc, sgf_code, units]
+    input:  ec_desc
+    output: [ec_desc, ec, units]
   - file:   [parse, regions.csv]
     from:   from
     to:     to
-    input:  state
-    output: state
+    input:  r
+    output: r
   - file:   [parse, units.csv]
     from:   from
     to:     [to, factor, units_factor]
@@ -60,9 +60,10 @@ Drop:
   - col: missing
     val: missing
     operation: "=="
-# - col: sgf_code
-#   val: missing
-#   operation: "=="
+# !!!! Dropping DIREXP for now. Does not appear to be used in the buildstream and it maps to multiple input SGF descriptors.
+  - col: ec
+    val: [missing, DIREXP]
+    operation: "=="
 
 Operate:
   operation: "*"

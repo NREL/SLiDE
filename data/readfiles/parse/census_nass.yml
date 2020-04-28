@@ -10,40 +10,43 @@ CSVInput:
   descriptor: 2012
 
 Order:
-  - {col: year,       type: Int}
-  - {col: state,      type: String}
-  - {col: naics_code, type: String}
-# - {col: naics_level,type: Any}
-  - {col: units,      type: Any}
-  - {col: value,      type: Any}
-# - {col: units_0,    type: String}
-# - {col: value_0,    type: Any}
-# - {col: factor,     type: Any}
+  - {col: yr,    type: Int}
+# !!!! Should be r, not sr, since "us" not included
+# - {col: sr,    type: String}
+  - {col: r,     type: String}
+  - {col: n,     type: String}
+  - {col: units, type: Any}
+  - {col: value, type: Any}
+# - {col: units_0, type: String}
+# - {col: value_0, type: Any}
+# - {col: factor,  type: Any}
 
 Rename:
   - {from: upper,           to: lower}
-  - {from: domain category, to: naics_code}
+  - {from: year,            to: yr}
+  - {from: state,           to: r}
+  - {from: domain category, to: n}
 
 Match:
-  on:     \((?<naics_code>.*)\)
-  input:  naics_code
-  output: naics_code
+  on:     \((?<n>.*)\)
+  input:  n
+  output: n
 
 Add:
   col: units
   val: us dollars (USD)
 
 Map:
-  - file:   [parse, naics.csv]
-    from:   naics_code
-    to:     naics_level
-    input:  naics_code
-    output: naics_level
+# - file:   [parse, naics.csv]
+#   from:   naics_code
+#   to:     naics_level
+#   input:  n
+#   output: n_level
   - file:   [parse, regions.csv]
     from:   from
     to:     to
-    input:  state
-    output: state
+    input:  r
+    output: r
   - file:   [parse, units.csv]
     from:   from
     to:     [to, factor, units_factor]

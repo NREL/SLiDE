@@ -75,18 +75,6 @@ git-tree-sha1 = "c8f94de86731698373f3c82a8aa40d8ab765c50c"
 uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
 version = "0.5.9"
 
-[[CodecBzip2]]
-deps = ["BinaryProvider", "Libdl", "TranscodingStreams"]
-git-tree-sha1 = "5db086e510c11b4c87d05067627eadb2dc079995"
-uuid = "523fee87-0ab8-5b00-afb7-3ecf72e48cfd"
-version = "0.6.0"
-
-[[CodecZlib]]
-deps = ["BinaryProvider", "Libdl", "TranscodingStreams"]
-git-tree-sha1 = "05916673a2627dd91b4969ff8ba6941bc85a960e"
-uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
-version = "0.6.0"
-
 [[Codecs]]
 deps = ["Test"]
 git-tree-sha1 = "70885e5e038cba1c4c17a84ad6c40756e10a4fb5"
@@ -236,22 +224,10 @@ git-tree-sha1 = "d3ea5532668bf9bdd5e8d5f16571e0b520cbbb9f"
 uuid = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 version = "0.12.5"
 
-[[HTTP]]
-deps = ["Base64", "Dates", "IniFile", "MbedTLS", "Sockets"]
-git-tree-sha1 = "fe31f4ff144392ad8176f5c7c03cca6ba320271c"
-uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-version = "0.8.14"
-
 [[InfrastructureSystems]]
 deps = ["CSV", "DataFrames", "Dates", "HDF5", "InteractiveUtils", "JSON", "JSON2", "Logging", "Mustache", "Test", "TimeSeries", "UUIDs", "YAML"]
 git-tree-sha1 = "388c625c188c3170b5293481d3498ed746315b33"
 uuid = "2cd47ed4-ca9b-11e9-27f2-ab636a7671f1"
-version = "0.5.0"
-
-[[IniFile]]
-deps = ["Test"]
-git-tree-sha1 = "098e4d2c533924c921f9f9847274f2ad89e018b8"
-uuid = "83e8ac13-25f8-5344-8a64-a9f2b223428f"
 version = "0.5.0"
 
 [[InteractiveUtils]]
@@ -292,12 +268,6 @@ deps = ["Dates", "Mmap", "Parsers", "Test", "UUIDs"]
 git-tree-sha1 = "3989e277c668f2c1c9b7595a7f489510e78d3e73"
 uuid = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 version = "0.1.13"
-
-[[JSONSchema]]
-deps = ["BinaryProvider", "HTTP", "JSON"]
-git-tree-sha1 = "b0a7f9328967df5213691d318a03cf70ea8c76b1"
-uuid = "7d188eb4-7ad8-530c-ae41-71a32a6d4692"
-version = "0.2.0"
 
 [[JuMP]]
 deps = ["Calculus", "DataStructures", "ForwardDiff", "LinearAlgebra", "MathOptInterface", "NaNMath", "Random", "SparseArrays", "Statistics"]
@@ -353,16 +323,10 @@ deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[MathOptInterface]]
-deps = ["BenchmarkTools", "CodecBzip2", "CodecZlib", "JSON", "JSONSchema", "LinearAlgebra", "MutableArithmetics", "OrderedCollections", "SparseArrays", "Test", "Unicode"]
-git-tree-sha1 = "27f2ef85879b8f1d144266ab44f076ba0dfbd8a1"
+deps = ["BenchmarkTools", "LinearAlgebra", "OrderedCollections", "SparseArrays", "Test", "Unicode"]
+git-tree-sha1 = "7088ff9a77e8ecd773cc788787ad027cfb627170"
 uuid = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
-version = "0.9.13"
-
-[[MbedTLS]]
-deps = ["BinaryProvider", "Dates", "Libdl", "Random", "Sockets"]
-git-tree-sha1 = "85f5947b53c8cfd53ccfa3f4abae31faa22c2181"
-uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
-version = "0.7.0"
+version = "0.9.5"
 
 [[Missings]]
 deps = ["DataAPI"]
@@ -378,12 +342,6 @@ deps = ["Printf", "Tables"]
 git-tree-sha1 = "f39de3a12232eb47bd0629b3a661054287780276"
 uuid = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
 version = "0.5.13"
-
-[[MutableArithmetics]]
-deps = ["LinearAlgebra", "SparseArrays", "Test"]
-git-tree-sha1 = "e1edd618a8f39d16f8595dd622a63b25f759cf8a"
-uuid = "d8a4904e-b15c-11e9-3269-09a3773c0cb0"
-version = "0.2.9"
 
 [[NLSolversBase]]
 deps = ["DiffResults", "Distributed", "FiniteDiff", "ForwardDiff"]
@@ -467,9 +425,9 @@ deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[RecipesBase]]
-git-tree-sha1 = "d352369b00094cadb43d694333b051b3d55abaf2"
+git-tree-sha1 = "54f8ceb165a0f6d083f0d12cb4996f5367c6edbc"
 uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
-version = "1.0.0"
+version = "1.0.1"
 
 [[Reexport]]
 deps = ["Pkg"]
@@ -520,9 +478,9 @@ version = "0.8.0"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "5a3bcb6233adabde68ebc97be66e95dcb787424c"
+git-tree-sha1 = "4118cba3529e99af61aea9a83f7bfd3cff5ffb28"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "0.12.1"
+version = "0.12.2"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -561,12 +519,6 @@ deps = ["Dates", "DelimitedFiles", "RecipesBase", "Reexport", "Statistics", "Tab
 git-tree-sha1 = "abd4bd489ed0ed88532498d1aa1d2e41d7b05485"
 uuid = "9e3dc215-6440-5c97-bce1-76c03772f85e"
 version = "0.16.0"
-
-[[TranscodingStreams]]
-deps = ["Random", "Test"]
-git-tree-sha1 = "7c53c35547de1c5b9d46a4797cf6d8253807108c"
-uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
-version = "0.9.5"
 
 [[URIParser]]
 deps = ["Unicode"]

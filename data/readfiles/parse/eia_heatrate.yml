@@ -10,13 +10,16 @@ CSVInput:
   descriptor: heatrate
 
 Order:
-  - {col: year,   type: Int}
+  - {col: yr,     type: Int}
   - {col: source, type: String}
   - {col: units,  type: String}
   - {col: value,  type: Float64}
 
+Rename:
+  - {from: year, to: yr}
+
 Melt:
-  on:  year
+  on:  yr
   var: source
   val: value
 

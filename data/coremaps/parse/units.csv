@@ -1,5 +1,6 @@
 from,to,factor,units_factor
 billion btu,billion btu,1.0,
+billions of US dollars (USD),billions of US dollars (USD),1.0,
 btu per kilowatthour,btu per kilowatthour,1.0,
 great circle distance in miles,great circle distance in miles,1.0,
 million btu,million btu,1.0,

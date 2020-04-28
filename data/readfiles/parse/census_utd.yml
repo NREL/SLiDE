@@ -10,46 +10,47 @@ CSVInput:
   - {name: "State Exports by NAICS Commodities.csv", descriptor: exports}
 
 Describe:
-  col: flow
+  col: t
 
 Order:
-  - {col: year,        type: Int}
-  - {col: flow,        type: String}
-  - {col: state,       type: String}
-  - {col: country,     type: String}
-  - {col: naics_code,  type: String}
-# - {col: naics_level, type: Any}
-  - {col: units,       type: String}
-  - {col: value,       type: Float64}
-  - {col: units_0,    type: String}
-  - {col: value_0,    type: Any}
-  - {col: factor,     type: Any}
+  - {col: yr,      type: Int}
+  - {col: t,       type: String}
+  - {col: r,       type: String}
+# - {col: country, type: String}
+  - {col: n,       type: String}
+# - {col: n_level, type: Any}
+  - {col: units,   type: String}
+  - {col: value,   type: Float64}
+# - {col: units_0, type: String}
+# - {col: value_0, type: Any}
+# - {col: factor,  type: Any}
 
 Rename:
   - {from: upper, to: lower}
-  - {from: time,  to: year}
+  - {from: time,  to: yr}
+  - {from: state, to: r}
   - {from: ["customs value (gen) ($us)", "total exports value ($us)"], to: value}
 
 Match:
-  on:     (?<naics_code>\d*) (?<naics_desc>.*)
+  on:     (?<n>\d*) (?<n_desc>.*)
   input:  commodity
-  output: [naics_code, naics_desc]
+  output: [n, n_desc]
 
 Add:
   col: units
   val: us dollars (USD)
 
 Map:
-  - file:   [parse, naics.csv]
-    from:   naics_code
-    to:     naics_level
-    input:  naics_code
-    output: naics_level
+# - file:   [parse, naics.csv]
+#   from:   naics_code
+#   to:     naics_level
+#   input:  n
+#   output: n_level
   - file:   [parse, regions.csv]
     from:   from
     to:     to
-    input:  state
-    output: state
+    input:  r
+    output: r
   - file:   [parse, regions.csv]
     from:   from
     to:     to
@@ -62,12 +63,15 @@ Map:
     output: [units, factor, units_factor]
 
 Drop:
-  - col: year
+  - col: yr
     val: 2017 through November
     operation: "=="
   - col: country
     val: world total
     operation: "!="
+  - col: r
+    val: unknown
+    operation: "=="
 
 Operate:
   operation: "*"

@@ -82,13 +82,13 @@ set[:imrg] = ["fbt","gmt","mvt"];
 # Read supply/use data.
 DATA_DIR = joinpath(BASE_DIR, "data", "output");
 io_lst = convert_type.(Symbol, ["supply", "use"]);
-io = Dict(k => read_file(joinpath(DATA_DIR, string("bea_", k, ".csv"))) for k in io_lst);
+io = Dict(k => read_file(joinpath(DATA_DIR, string(k, ".csv"))) for k in io_lst);
 
 # Perform some minor edits that will apply to all parameters in order to maintain
 # consistency with the data in build_national_cgeparm_raw.gdx for easier benchmarking.
 
 for k in keys(io)
-    global io[k] = edit_with(io[k], Drop.([:value, :units], [0, "all"], "=="))
+    global io[k] = edit_with(io[k], Drop.([:value, :units], [0., "all"], "=="))
     global io[k] = io[k] |> @filter(_.yr in set[:yr]) |> DataFrame
 
     global io[k][!,:value] .= round.(io[k][:,:value]*1E-3, digits=3)

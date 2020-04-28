@@ -10,59 +10,65 @@ CSVInput:
 # - {name: SAEXP2_1997_2017_ALL_AREAS_.csv, descriptor: Per capita personal consumption expenditures (PCE) by state}
 
 # Describe:
-#  col: component
+#   col: component
 
 Order:
-  - {col: year,          type: Int}
-# - {col: region_code,   type: String}
-  - {col: region_desc,   type: String}
-# - {col: component,     type: String}
-  - {col: windc_code,    type: String}
-# - {col: industry_desc, type: String}
-  - {col: units,         type: String}
-  - {col: value,         type: Float64}
+  - {col: yr,        type: Int}
+  - {col: r,         type: String}
+# - {col: component, type: String}
+  - {col: pg,        type: String}
+# - {col: desc,      type: String}
+  - {col: units,     type: String}
+  - {col: value,     type: Float64}
 
 Rename:
-  - {from: GeoFIPS,       to: region_code}
-  - {from: GeoName,       to: region_desc}
-  - {from: Unit,          to: units}
-  - {from: Description,   to: industry_desc}
+  - {from: GeoName,       to: r}
   - {from: ComponentName, to: component}
+  - {from: Description,   to: desc}
+  - {from: Unit,          to: units}
 
-Match:
-  - on:     \"(?<region_code>.{2})000\"
-    input:  region_code
-    output: region_code
+# Match:
+# - on:     \"(?<region_code>.{2})000\"
+#   input:  region_code
+#   output: region_code
 
 Melt:
-  on:  [region_code, region_desc, component, units, industry_desc]
-  var: year
+  on:  [r, component, desc, units]
+  var: yr
   val: value
 
 Map:
   - file:   [parse, pce.csv]
     from:   from
     to:     to
-    input:  industry_desc
-    output: windc_code
+    input:  desc
+    output: pg
   - file:   [parse, regions.csv]
     from:   from
     to:     to
-    input:  region_desc
-    output: region_desc
+    input:  r
+    output: r
   - file:   [parse, units.csv]
     from:   from
-    to:     to
+    to:     [to, factor, units_factor]
     input:  units
-    output: units
+    output: [units, factor, units_factor]
 
 Drop:
-  - col: [Region, TableName, Line, IndustryClassification]
+  - col: [GeoFIPS, Region, TableName, ComponentName, Line, IndustryClassification]
     val: all
     operation: "=="
-  - col: component
-    val: Per capita personal consumption expenditures (PCE) by state
-    operation: "=="
+# - col: component
+#   val: Per capita personal consumption expenditures (PCE) by state
+#   operation: "=="
 # - col: value
 #   val: missing
 #   operation: "=="
+
+Operate:
+  operation: "*"
+  axis:   col
+  from:   units
+  to:     units_factor
+  input:  [value, factor]
+  output: value

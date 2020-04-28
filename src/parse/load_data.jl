@@ -153,6 +153,7 @@ df = DataFrame(from = ["State"], to = ["region"])
 load_from(Rename, df)
 ```
 """
+# function load_from(::Type{T}, d::Array{Dict{Any,Any},1}) where T <: Any
 function load_from(::Type{T}, d::Array{Dict{Any,Any},1}) where T <: Any
     lst = all(isarray.(T.types)) ? ensurearray(load_from(T, convert_type(DataFrame, d))) :
         vcat(ensurearray(load_from.(T, d))...)

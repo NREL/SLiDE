@@ -4,7 +4,7 @@ Editable: true
 
 Path: [.., data, datasources, BEA_2007_2012]
 
-PathOut: [.., data, output, bea_use_det.csv]
+PathOut: [.., data, output, use_det.csv]
 
 XLSXInput:
   name:  Use_SUT_Framework_2007_2012_DET.xlsx
@@ -22,7 +22,7 @@ Order:
 # - {col: output_bea, type: String}
   - {col: j,          type: String}
   - {col: units,      type: String}
-  - {col: value,      type: Int}
+  - {col: value,      type: Float64}
 
 Rename:
   - {from: Code,                  to: input_bea}
@@ -48,8 +48,21 @@ Map:
     to:     bea_windc
     input:  [input_bea, input_desc]
     output: i
+  - file:   [parse, units.csv]
+    from:   from
+    to:     [to, factor, units_factor]
+    input:  units
+    output: [units, factor, units_factor]
 
 Replace:
   col:  value
   from: missing
   to:   0
+
+Operate:
+  operation: "*"
+  axis:   col
+  from:   units
+  to:     units_factor
+  input:  [value, factor]
+  output: value

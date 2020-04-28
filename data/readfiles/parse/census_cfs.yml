@@ -7,18 +7,22 @@ PathOut: [.., data, output, cfs.csv]
 
 CSVInput:
   name: cfs_2012_pumf_csv.txt
-  descriptor: cfs
+  descriptor: 2012
+
+Describe:
+  col: yr
 
 Order:
+  - {col: yr,                       type: Int}
   - {col: shipmt_id,                type: Int}
   - {col: orig_state,               type: String}
   - {col: orig_metro,               type: Int}
   - {col: dest_state,               type: String}
   - {col: dest_metro,               type: Int}
   - {col: quarter,                  type: Int}
-  - {col: naics,                    type: Int}
-# - {col: naics_level,              type: String}
-  - {col: sctg,                     type: Int}
+  - {col: n,                        type: Int}
+# - {col: n_level,                  type: String}
+  - {col: sg,                       type: Int}
   - {col: mode,                     type: Int}
   - {col: temp_cntl_yn,             type: Bool}
   - {col: export_yn,                type: Bool}
@@ -40,6 +44,8 @@ Rename:
   - {from: upper,   to: lower}
   - {from: orig_ma, to: orig_metro}
   - {from: dest_ma, to: dest_metro}
+  - {from: naics,   to: n}
+  - {from: sctg,    to: sg}
 
 Add:
   - {col: shipmt_value_units,       val: us dollars (USD)}
@@ -63,11 +69,11 @@ Map:
     to:     to
     input:  export_cntry
     output: export_cntry
-  - file:   [parse, units_standardize.csv]
+  - file:   [parse, units.csv]
     from:   from
-    to:     [factor, to]
+    to:     [to, factor, units_factor]
     input:  shipmt_value_units
-    output: [factor, units]
+    output: [units, factor, units_factor]
 
 Replace:
   - col:  temp_cntl_yn
@@ -81,8 +87,8 @@ Replace:
     to:   ""
 
 Drop:
-  - {col: sctg,       val: "-",  operation: "occursin"}
-# Why is this dropped?
+  - {col: sg,       val: "-",  operation: "occursin"}
+# !!!! Why is the following dropped?
   - {col: export_yn,  val: true, operation: "=="}
 # !!!! I don't think the following should be dropped before the state data is totaled.
   - {col: orig_metro, val: 0,    operation: "=="}
@@ -92,6 +98,6 @@ Operate:
   operation: "*"
   axis:   col
   from:   units
-  to:     units
+  to:     units_factor
   input:  [shipmt_value, wgt_factor, factor]
   output: value

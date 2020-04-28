@@ -10,10 +10,11 @@ CSVInput:
   descriptor: metro
 
 Order:
+  - {col: yr,         type: Int}
   - {col: orig_metro, type: String}
   - {col: dest_metro, type: String}
-  - {col: naics,      type: Int}
-  - {col: sctg,       type: Int}
+  - {col: n,          type: Int}
+  - {col: sg,         type: Int}
   - {col: units,      type: String}
   - {col: value,      type: Float64}
 
@@ -22,5 +23,5 @@ Operate:
   axis:   row
   from:   nothing
   to:     nothing
-  input:  [orig_metro, dest_metro, naics, sctg, units]
+  input:  [orig_metro, dest_metro, n, sg, units]
   output: value

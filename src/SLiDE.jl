@@ -3,8 +3,6 @@ Module for constructing SLiDE objects.
 """
 module SLiDE
 
-# setenv("PATH_LICENSE_STRING", "2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0")
-
 #################################################################################
 # IMPORTS
 import CSV
@@ -13,7 +11,9 @@ import Dates
 import DelimitedFiles
 import JSON
 import Logging
+import Printf
 # import Revise
+import Statistics
 import Test
 import XLSX
 import YAML
@@ -69,10 +69,14 @@ export gams_to_dataframe
 export write_yaml
 export run_yaml
 
+export compare_summary
+export compare_keys
+export compare_values
+
 #################################################################################
 # INCLUDES
 """
-*See [PowerSystems.jl](https://github.com/NREL/PowerSystems.jl/blob/master/src/PowerSystems.jl).*
+* See [PowerSystems.jl](https://github.com/NREL/PowerSystems.jl/blob/master/src/PowerSystems.jl).*
 Supertype for all SLiDE types.
 All subtypes must include a InfrastructureSystemsInternal member.
 Subtypes should call InfrastructureSystemsInternal() by default, but also must
@@ -98,6 +102,7 @@ include(joinpath("parse", "generated_load", "includes.jl"))
 
 include(joinpath("parse", "load_data.jl"))
 include(joinpath("parse", "edit_data.jl"))
+include(joinpath("parse", "check_data.jl"))
 
 function __init__()
     # See: http://pages.cs.wisc.edu/~ferris/path/LICENSE

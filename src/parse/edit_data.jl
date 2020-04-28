@@ -180,7 +180,7 @@ function edit_with(df::DataFrame, x::Operate)
         end
     end
     # !!!! SOS how do we deal with floating point arithmetic? (ex: 1.1 + 0.1 = 1.2000000000000002)
-    df[!,x.output] .= round.(df[:,x.output], digits=8)
+    df[!,x.output] .= round.(df[:,x.output], digits=11)
     return df
 end
 
