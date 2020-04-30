@@ -229,12 +229,12 @@ This operation can only be performed once per dataframe.",
             {
                 "name": "from",
                 "comment": "value to replace",
-                "data_type": "String"
+                "data_type": "Any"
             },
             {
                 "name": "to",
                 "comment": "new value",
-                "data_type": "String"
+                "data_type": "Any"
             }
         ],
         "supertype": "Edit"

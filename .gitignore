@@ -2,6 +2,8 @@
 .git/
 .vscode/
 
+admin/
+
 data/Edit.jl
 data/scratch*.jl
 data/datasources/

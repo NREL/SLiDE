@@ -31,13 +31,15 @@ end
 
 # ******************************************************************************************
 
-path_slide = joinpath("..","data","output")
-path_bluenote = joinpath("..","data","windc_output","1b_stream_windc_base")
+# PATHS TO DATA LOCATIONS:
+# - path_side is general: the contents of this directory should have been created by
+#     auto_standardize_data.
+# - path_bluenote is specific to where Caroline stored WiNDC windc_datastream output.
+#     This line must be changed to be consistent with user-specific file storage organizations.
+path_slide = joinpath("data","output")
+path_bluenote = joinpath("data","windc_output","1b_stream_windc_base")
 
-# dfs = DataFrame()
-# dfb = DataFrame()
-
-y = read_file("verify_data.yml");
+y = read_file(joinpath("dev", "verify_data.yml"));
 lst = y["FileInput"];
 
 df_attn = Dict()

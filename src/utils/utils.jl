@@ -50,6 +50,9 @@ Base.occursin(x::String, y::Symbol) = occursin(x, string(y))
     convert_type(::Dict{Any,Any}, df::DataFrame, value_col::Symbol; kwargs...)
 Converts `x` into the specified `Type{T}`.
 
+Consider extending [convert](https://docs.julialang.org/en/v1/base/base/#Base.convert)
+function (!!!!)
+
 # Arguments
 - `::Type{T}`: target DataType.
 - `x<:Any`: value to convert.
@@ -79,14 +82,17 @@ convert_type(::Type{T}, x::Symbol) where T<:Real = convert_type(T, convert_type(
 
 convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1}) = [DataFrame.(lst)...;]
 
-function convert_type(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :end)
+function convert_type(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :Float)
     # Find and save the column containing values and that/those containing keys.
-    # This assums that the last column in the DataFrame contains the value, unless specified
-    # otherwise by the value_col keyword argument.
-    value_col = value_col == :end ? names(df)[end] : value_col
-    key_cols = setdiff(names(df), convert_type.(Symbol, ensurearray(drop_cols)), [value_col])
+    # If no value column indicator is specified, find the first DataFrame column of floats.
+    if value_col == :Float
+        value_col = names(df)[supertype.(eltypes(dropmissing(df))) .== AbstractFloat][1]
+    end
 
-    d = Dict((length(key_cols) == 1 ? (row[key_cols]) : (row[key_cols]...,)) => row[value_col]
+    key_cols = setdiff(names(df), convert_type.(Symbol, ensurearray(drop_cols)), [value_col])
+    ONEKEY = length(key_cols) == 1
+
+    d = Dict((ONEKEY ? row[key_cols[1]] : (row[key_cols]...,)) => row[value_col]
         for row in eachrow(df))
     return d
 end
@@ -96,12 +102,15 @@ convert_type(::Type{Array{T}}, x::Any) where T<:Any = convert_type.(T, x)
 convert_type(::Type{Array{T,1}}, x::Any) where T<:Any = convert_type.(T, x)
 
 convert_type(::Type{T}, x::Missing) where T<:Real = x;
-convert_type(::Type{T}, x::Missing) where T<:AbstractString = x;
+convert_type(::Type{T}, x::Missing) where T<:AbstractString = x
+convert_type(::Type{Any}, x::AbstractString) = "missing" == lowercase(x) ? missing : x
 convert_type(::Type{Any}, x::Any) = x
 
 convert_type(::Type{T}, x::Any) where T = T(x)
 
 convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : false
+
+# [@printf("%-8s %s\n", T, fieldnames(T)[T.types .== Any]) for T in subtypes(Edit) if Any in T.types]
 
 """
 Returns true/false if the the DataType or object is an array.
@@ -115,6 +124,7 @@ isarray(::Any) = false
 """
 ensurearray(x::Array{T,1}) where T <: Any = x
 ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
+ensurearray(x::UnitRange) = collect(x)
 ensurearray(x::Any) = [x]
 
 """
@@ -129,11 +139,34 @@ This function finds all possible permutations of the input arrays.
 - `x::Array{Tuple,1}`: list of all possible permutations of the input values.
     If `x` does not contain at least one array, there will be nothing to permute and the function will return `x`.
 """
-function permute(x::Tuple{Array, Vararg{Any}})
-    return length(x) == 1 ? sort(unique(x[1])) :
-        [collect(Base.Iterators.product(sort.(unique.(ensurearray.(x)))...))...;]
+function permute(df::DataFrame)
+    cols = names(df)
+    df = sort(DataFrame(Tuple.(permute(unique.(eachcol(df))))))
+    return edit_with(df, Rename.(names(df), cols))
 end
 
-permute(x::Tuple) = sort(unique(ensurearray(x)))
-permute(x::NamedTuple) = permute(values(x))
-permute(x::Array) = any(isarray.(x)) ? permute(Tuple(x)) : sort(unique(x))
+function permute(x::Tuple)
+    xperm = if length(x) == 1
+        sort(unique(x[1]))
+    else
+        [collect(Base.Iterators.product(sort.(unique.(ensurearray.(x)))...))...;]
+    end
+    return xperm
+end
+
+function permute(x::NamedTuple)
+    cols = keys(x)
+    xperm = eachcol(sort(DataFrame(Tuple.(permute(values(x))))))
+    return NamedTuple{Tuple(cols,)}(xperm,)
+end
+
+function permute(x::Array)
+    xperm = if any(isarray.(x))
+        permute(Tuple(x))
+    elseif length(unique(length.(x))) .== 1 && all(length.(x) .> 1)
+        permute(unique.(eachcol(DataFrame(x))))
+    else
+        sort(unique(x))
+    end
+    return xperm
+end

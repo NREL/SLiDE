@@ -27,6 +27,9 @@ const IS = InfrastructureSystems
 #################################################################################
 
 # First, generate structs to ensure all exports are possible.
+const SLIDE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), ".."))
+export SLIDE_DIR
+
 include(joinpath("utils", "generate_structs.jl"))
 
 # EXPORTS

@@ -54,23 +54,20 @@ function edit_with(df::DataFrame, x::Add)
 end
 
 function edit_with(df::DataFrame, x::Drop)
-    if x.col in names(df)
-        # Drop an entire column. It is helpful to remove dead weight with the first edit.
-        if (typeof(x.val) == String) && occursin(lowercase(x.val), "all")
-            df = df[:, setdiff(names(df), [x.col])]
-
-        # Drop rows based on value.
+    !(x.col in names(df)) && (return df)
+    if x.val === "all"  # Drop entire column to remove dead weight right away.
+        df = df[:, setdiff(names(df), [x.col])]
+    else  # Drop rows using an operation or based on a value.
+        if x.val === missing
+            dropmissing!(df, x.col)
+        elseif x.val === "unique"
+            unique!(df, x.col)
         else
-            if typeof(x.val) == String
-                occursin(lowercase(x.val), "missing") ? dropmissing!(df, x.col) :
-                    occursin(lowercase(x.val), "unique") ? unique!(df, x.col) : nothing
-            end
-            # Perform generalized drops specified by the operation field.
-            # !!!! Add error if broadcast not possible.
-            df[!,x.col] .= convert_type.(typeof(x.val), df[:,x.col])
-            df = x.operation == "occursin" ?
-                df[.!broadcast(datatype(x.operation), x.val, df[:,x.col]), :] :
+            df = if x.operation == "occursin"
+                df[.!broadcast(datatype(x.operation), x.val, df[:,x.col]), :]
+            else
                 df[.!broadcast(datatype(x.operation), df[:,x.col], x.val), :]
+            end
         end
     end
     return df
@@ -102,11 +99,19 @@ end
 
 function edit_with(df::DataFrame, x::Map; kind = :left)
     # Save all input column names, read the map file, and isolate relevant columns.
-    # This prevents duplicate columns in the final DataFrame.
+    # # This prevents duplicate columns in the final DataFrame.
     cols = unique([names(df); x.output])
-    df_map = read_file(x)
+    df_map = copy(read_file(x))
     df_map = unique(df_map[:,unique([x.from; x.to])])
-
+    
+    # If there are duplicate columns in from/to, differentiate between the two to save results.
+    duplicates = intersect(x.from, x.to)
+    if length(duplicates) > 0
+        (ii_from, ii_to) = (occursin.(duplicates, x.from), occursin.(duplicates, x.to));
+        x.from[ii_from] = Symbol.(x.from[ii_from], :_0)
+        [df_map[!,Symbol(col, :_0)] .= df_map[:,col] for col in duplicates]
+    end
+    
     # Rename columns in the mapping DataFrame to temporary values in case any of these
     # columns were already present in the input DataFrame.
     temp_to = Symbol.(string.("to_", 1:length(x.to)))
@@ -116,19 +121,17 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
     # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
     # DataFrame are used since (!!!! assuming all missing values were dropped), all values
     # in the mapping DataFrame should be the same.
-    [df[!,col] .= convert_type.(unique(typeof.(df_map[:,col_map])), df[:,col])
+    [df[!,col] .= convert_type.(unique(typeof.(skipmissing(df_map[:,col_map]))), df[:,col])
         for (col_map, col) in zip(temp_from, x.input)]
 
-    df = join(df, df_map, on = Pair.(x.input, temp_from);
-        kind = kind, makeunique = true)
-    
+    df = join(df, df_map, on = Pair.(x.input, temp_from); kind = kind, makeunique = true)
+  
     # Remove all output column names that might already be in the DataFrame. These will be
     # overwritten by the columns from the mapping DataFrame. Finally, remane mapping "to"
     # columns from their temporary to output values.
     df = df[:, setdiff(names(df), x.output)]
     df = edit_with(df, Rename.(temp_to, x.output))
-
-    return df[:, cols]
+    return df[:,cols]
 end
 
 function edit_with(df::DataFrame, x::Match)
@@ -199,36 +202,21 @@ function edit_with(df::DataFrame, x::Order)
 end
 
 function edit_with(df::DataFrame, x::Rename)
-    (from_temp, to_temp) = lowercase.((x.from, x.to))
-    
-    # Explicitly rename the specified column if it exists in the dataframe.
-    x.from in names(df) ? rename!(df, x.from => x.to) :
+    x.from in names(df) && (rename!(df, x.from => x.to))
 
-        # If we are, instead, changing the CASE of all column names...
-        .&(occursin(:upper, from_temp), occursin(:lower, to_temp)) ?
-            df = edit_with(df, Rename.(names(df), lowercase.(names(df)))) :
-            .&(occursin(:lower, from_temp), occursin(:upper, to_temp)) ?
-                df = edit_with(df, Rename.(names(df), uppercase.(names(df)))) :
-                nothing
+    x.to == :upper && (df = edit_with.(df, Rename.(names(df), uppercase.(names(df)))))
+    x.to == :lower && (df = edit_with.(df, Rename.(names(df), lowercase.(names(df)))))
     return df
 end
 
 function edit_with(df::DataFrame, x::Replace)
-    if x.col in names(df)
-        df[!, x.col] .= convert_type.(String, df[:, x.col])
-        (from_temp, to_temp) = lowercase.((x.from, x.to))
-
-        .&(occursin("upper", from_temp), occursin("lower", to_temp)) ?
-            df[!, x.col] .= lowercase.(df[:, x.col]) :
-            .&(occursin("lower", from_temp), occursin("upper", to_temp)) ?
-                df[!, x.col] .= uppercase.(df[:, x.col]) :
-                nothing
-
-        from_temp == "missing" ?
-            all(typeof.(df[:,x.col]) .== Missing) ?
-                df = edit_with(df, Add(x.col, x.to)) :
-                df[ismissing.(df[:,x.col]), x.col] .= x.to :
-            df[!, x.col][strip.(string.(df[:,x.col])) .== x.from] .= x.to
+    !(x.col in names(df)) && (return df)
+    df[!,x.col] .= if x.to === "upper"
+        uppercase.(df[:,x.col])
+    elseif x.to === "lower"
+        lowercase.(df[:,x.col])
+    else
+        replace(df[:,x.col], x.from => x.to)
     end
     return df
 end
@@ -323,38 +311,43 @@ This function can be used to fill zeros in either a dictionary or DataFrame.
 - `d::Dict...` if input included dictionaries and/or Tuples
 - `df::DataFrame...` if input included DataFrames and/or NamedTuples
 """
-function fill_zero(keys_unique::NamedTuple; value_colnames = :value)
-    # Extract descriptor column names from the NamedTuple.
-    # Then, create a DataFrame of all permutations of the input keys.
-    cols = collect(keys(keys_unique));
-
-    df_keys_all = sort(DataFrame(Tuple.(permute(keys_unique))))
-    df_keys_all = edit_with(df_keys_all, [Rename.(names(df_keys_all), cols);  # name columns
-        Add.(convert_type.(Symbol, value_colnames), 0.0)])                    # add zeros
-    return df_keys_all
+function fill_zero(keys_fill::NamedTuple; value_colnames = :value)
+    df_fill = DataFrame(permute(keys_fill))
+    return edit_with(df_fill, Add.(convert_type.(Symbol, value_colnames), 0.))
 end
 
-function fill_zero(keys_unique::NamedTuple, df::DataFrame)
-    df_keys_all = fill_zero(keys_unique)
-    df = fill_zero(df, df_keys_all)[1]
+function fill_zero(keys_fill::Tuple; permute_keys::Bool = true)
+    keys_all = permute_keys ? permute(keys_fill) : keys_fill
+    d = Dict(k => 0. for k in keys_all)
+    return d
+end
+
+function fill_zero(d::Vararg{Dict}; permute_keys::Bool = true)
+    d = copy.(ensurearray(d))
+    # Find all keys present in the input dictionary/ies and ensure all are present.
+    keys_fill = unique([collect.(keys.(d))...;])
+    d = [fill_zero(keys_fill, x; permute_keys = permute_keys) for x in d]
+    return length(d) == 1 ? d[1] : Tuple(d)
+end
+
+function fill_zero(keys_fill::NamedTuple, df::DataFrame)
+    df_fill = fill_zero(keys_fill)
+    df = fill_zero(copy(df), df_fill)[1]
     return df
 end
 
 function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
-    df = ensurearray(df)
+    df = copy.(ensurearray(df))
     # Save names of columns containing values to fill zeros later.
     # Find descriptor columns to permute OR make consistent across input DataFrames.
-    value_colnames = [names(x)[all.(eachcol(supertype.(typeof.(x)) .== AbstractFloat))] for x in df]
+    value_colnames = [names(x)[supertype.(eltypes(dropmissing(x))) .== AbstractFloat] for x in df]
     cols = intersect(setdiff.(names.(df), value_colnames)...)
 
     # Find a unique list of descriptor keys in the input DataFrame(s). Permute as desired.
-    df_keys_all = sort(unique([[x[:,cols] for x in df]...;]));
+    # https://discourse.julialang.org/t/style-question-ternary-operator-or-short-circuit-operator-or-if-end/34224
+    df_fill = sort(unique([[x[:,cols] for x in df]...;]))
+    permute_keys && (df_keys_all = permute(df_fill))
     
-    if permute_keys
-        keys_unique = NamedTuple{Tuple(cols,)}(unique.(eachcol(df_keys_all)),)
-        df_keys_all = fill_zero(keys_unique)[:,cols]
-    end
-
     # For each DataFrame in the list, join the input DataFrame to DataFrame keys_all on the
     # descriptor columns shared by both DataFrames. Using a left join will add "missing"
     # where a descriptor was not already present, which will be replaced by zero.
@@ -363,39 +356,19 @@ function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
     # [df[ii] = edit_with(join(df_keys_all, df[ii], on = cols, kind = :left),
     #     Replace.(value_colnames[ii], missing, 0.0)) for ii in 1:length(df)]
     for ii in 1:length(df)
-        global df[ii] = join(df_keys_all, df[ii], on = cols, kind = :left)
-        [global df[ii][ismissing.(df[ii][:,col]),col] .= 0.0 for col in value_colnames[ii]]
+        df[ii] = join(df_keys_all, df[ii], on = cols, kind = :left)
+        [df[ii][ismissing.(df[ii][:,col]),col] .= 0. for col in value_colnames[ii]]
     end
     return length(df) == 1 ? df[1] : Tuple(df)
 end
 
-function fill_zero(keys_unique::Tuple; permute_keys::Bool = true)
-    keys_unique = length(keys_unique) == 1 ? keys_unique[1] : keys_unique
-    keys_all = permute_keys ? permute(keys_unique) : keys_unique
-
-    d = Dict(k => 0 for k in keys_all)
-    return d
-end
-
-function fill_zero(keys_unique::Any, d::Dict; permute_keys::Bool = true)
+function fill_zero(keys_fill::Any, d::Dict; permute_keys::Bool = true)
+    d = copy(d)
     # If permuting keys, find all possible permutations of keys that should be present
-    # and determine which are missing.
-    keys_all = permute_keys ? permute(keys_unique) : keys_unique
+    # and determine which are missing. Then add missing keys to the dictionary and return.
+    keys_all = permute_keys ? permute(keys_fill) : keys_fill
     keys_missing = setdiff(keys_all, collect(keys(d)))
 
-    # Add missing keys to the dictionary and return.
-    [push!(d, k => 0) for k in keys_missing]
+    [push!(d, k => 0.) for k in keys_missing]
     return d
-end
-
-function fill_zero(d::Vararg{Dict}; permute_keys::Bool = true)
-    d = ensurearray(d)
-    # Find all keys present in the dictionary and permute if neccessary.
-    keys_unique = unique([collect.(keys.(d))...;])
-    keys_unique = any(length.(keys_unique) .> 1) && permute_keys ?
-        unique.(eachcol(DataFrame(keys_unique))) : keys_unique
-    
-    # Add missing keys to the dictionary/ies and return.
-    d = [fill_zero(keys_unique, x; permute_keys = permute_keys) for x in d]
-    return length(d) == 1 ? d[1] : Tuple(d)
 end

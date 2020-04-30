@@ -47,17 +47,17 @@ end
 
 
 UNITS = "billions of us dollars (USD)"
-BASE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE"))), "..");
+# BASE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE"))), "..");
 
 # ******************************************************************************************
 #   READ BLUENOTE DATA -- For benchmarking!
 # ******************************************************************************************
-BLUE_DIR = joinpath(BASE_DIR, "data", "windc_output", "2a_build_national_cgeparm_raw");
-bluenote_lst = [x for x in readdir(BLUE_DIR) if occursin(".csv", x)];
+BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw");
+bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)];
 bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst);
 
 # Add supply/use info for checking.
-BLUE_DIR_IN = joinpath(BASE_DIR, "data", "windc_output", "1b_stream_windc_base");
+BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base");
 [bluenote[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
     Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
     Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]];
@@ -69,10 +69,10 @@ for k in [:supply, :use]
     # global bluenote[k][!,:units] .= UNITS
 end
 
-# ******************************************************************************************
-#   READ SETS AND SLiDE SUPPLY/USE DATA.
-# ******************************************************************************************
-SET_DIR = joinpath(BASE_DIR, "data", "coresets");
+# # ******************************************************************************************
+# #   READ SETS AND SLiDE SUPPLY/USE DATA.
+# # ******************************************************************************************
+SET_DIR = joinpath("data", "coresets");
 set_list = convert_type.(Symbol, ["i", "fd", "m", "ts", "va", "yr"]);
 
 set = Dict(k => sort(read_file(joinpath(SET_DIR, string(k, ".csv"))))[:,1] for k in set_list)
@@ -80,7 +80,7 @@ set[:j] = set[:i]
 set[:imrg] = ["fbt","gmt","mvt"];
 
 # Read supply/use data.
-DATA_DIR = joinpath(BASE_DIR, "data", "output");
+DATA_DIR = joinpath("data", "output");
 io_lst = convert_type.(Symbol, ["supply", "use"]);
 io = Dict(k => read_file(joinpath(DATA_DIR, string(k, ".csv"))) for k in io_lst);
 
@@ -209,11 +209,8 @@ io[:a0][!,:value] .= sum_over(io[:fd0], :fd) + sum_over(io[:id0], :j)
 #   m0(yr,imrg) = 0;
 #   md0(yr,m,imrg) = 0;
 #   duty0(yr,imrg) = 0;
-# !!!! This is probably the worst possible way to do this. Working on using either Query or
-# DataFramesMeta. This is challenging because there isn't a simple way to isolate a
-# DataFrame slice.
-[io[k][.|(io[k][:,:i] .== set[:imrg][1], io[k][:,:i] .== set[:imrg][2],
-          io[k][:,:i] .== set[:imrg][3]), :value] .= 0.0
+# Here's how to do this: https://discourse.julialang.org/t/dataframes-obtaining-the-subset-of-rows-by-a-set-of-values/15923/10
+[io[k][findall(in(set[:imrg]), io[k][:,:i]), :value] .= 0.0
     for k in [:y0, :a0, :tax0, :sbd0, :x0, :m0, :md0, :duty0]]
 
 # Tax net subsidy rate on intermediate demand.

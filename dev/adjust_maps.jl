@@ -27,7 +27,7 @@ if length(filename) > 0
     df = edit_with(df, vcat([vcat(y[k]) for k in ["Rename", "Match"]]...))
     df[!,:naics_level] .= string.(length.(df[:,:naics_level]))
     df = edit_with(df, vcat([vcat(y[k]) for k in ["Replace", "Order"]]...))
-    CSV.write(joinpath(y["PathOut"]...), unique(df))
+    CSV.write(joinpath(SLIDE_DIR, y["PathOut"]...), unique(df))
 end
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -48,7 +48,7 @@ if length(filename) > 0
         for yy in string.(1997:2016)]...)
 
     df = edit_with(df, vcat([vcat(y[k]) for k in ["Drop", "Map", "Order"]]...))
-    CSV.write(joinpath(y["PathOut"]...), df)
+    CSV.write(joinpath(SLIDE_DIR, y["PathOut"]...), df)
 end
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -70,5 +70,5 @@ if length(filename) > 0
     df = edit_with(df, Rename.(input, outputs[end]))
 
     df = edit_with(df, y["Order"])
-    CSV.write(joinpath(y["PathOut"]...), df)
+    CSV.write(joinpath(SLIDE_DIR, y["PathOut"]...), df)
 end

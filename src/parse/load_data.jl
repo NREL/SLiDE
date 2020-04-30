@@ -36,17 +36,16 @@ the `data/coremaps` directory. It returns a .csv file.
     to (lists of) those types.
 """
 function read_file(path::Array{String,1}, file::GAMSInput; shorten = false)
-    filepath = joinpath(path..., file.name)
+    filepath = joinpath(SLIDE_DIR, path..., file.name)
     xf = readlines(filepath)
     df = gams_to_dataframe(xf; colnames = file.col)
     return df
 end
 
 function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
-    filepath = joinpath(path..., file.name)
+    filepath = joinpath(SLIDE_DIR, path..., file.name)
     df = CSV.read(filepath; silencewarnings = true, ignoreemptylines = true)
-
-    NUMTEST = 10;
+    NUMTEST = min(10, size(df,1))
 
     # A column name containing the word "Column" indicates that the input csv file was
     # missing a column header. Multiple (more than 2?) columns with missing header suggests
@@ -60,13 +59,13 @@ function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
 
         HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf) .!= 0)))) .> 1)[2]
         df = CSV.read(filepath, silencewarnings = true, ignoreemptylines = true; 
-            header = HEAD);
+            header = HEAD)
     end
 
     # Remove footer rows. These are identified by rows at the bottom of the sheet that are
     # empty with the exception of the first column.
     if all(ismissing.(values(df[end,2:end])))
-        x = sum.([Int.(ismissing.(values(row))) for row in eachrow(df[end-NUMTEST:end,:])]);
+        x = sum.([Int.(ismissing.(values(row))) for row in eachrow(df[end-NUMTEST:end,:])])
         FOOT = size(df)[1] - (length(x) - (findmax(x)[2]-1))
         df = df[1:FOOT,:]
     end
@@ -76,7 +75,7 @@ function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
 end
 
 function read_file(path::Array{String,1}, file::XLSXInput; shorten = false)
-    filepath = joinpath(path..., file.name)
+    filepath = joinpath(SLIDE_DIR, path..., file.name)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
     
     # Delete rows containing only missing values.
@@ -95,12 +94,14 @@ end
 function read_file(editor::T) where T <: Edit
     # !!!! Should we avoid including specific paths within functions?
     # !!!! Need to throw error if this is called when "file" is not a field.
-    DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "coremaps"))
+    # DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "coremaps"))
+    DIR = joinpath("data", "coremaps")
     df = read_file(joinpath(DIR, editor.file))
     return df
 end
 
 function read_file(file::String; colnames = false)
+    file = joinpath(SLIDE_DIR, file)
 
     if occursin(".map", file) | occursin(".set", file)
         return gams_to_dataframe(readlines(file); colnames = colnames)
@@ -153,31 +154,26 @@ df = DataFrame(from = ["State"], to = ["region"])
 load_from(Rename, df)
 ```
 """
-# function load_from(::Type{T}, d::Array{Dict{Any,Any},1}) where T <: Any
 function load_from(::Type{T}, d::Array{Dict{Any,Any},1}) where T <: Any
-    lst = all(isarray.(T.types)) ? ensurearray(load_from(T, convert_type(DataFrame, d))) :
+    lst = if all(isarray.(T.types))
+        ensurearray(load_from(T, convert_type(DataFrame, d)))
+    else
         vcat(ensurearray(load_from.(T, d))...)
+    end
     return size(lst)[1] == 1 ? lst[1] : lst
 end
 
 function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
-    # Is this a list to a filename? If given a list of directories ending in a filename,
-    # join those directories in one path. This capability mac and windows compatability.
-    FILES = [".csv", ".xlsx", ".txt", ".map", ".set"]
-    [(typeof(lst) .== Array{String,1}) &&
-            (any(occursin.(FILES, lst[end]))) &&
-            (!all([any(occursin.(FILES, v)) for v in lst[1:end-1]])) ?
-        d[k] = joinpath(lst...) : nothing for (k,lst) in d]
-
-    # Fill the datatype with the values in the dictionary keys, ensuring correct type.
+    # Fill the datatype with the values in the dictionary keys, ensuring correct t.
     (fields, types) = (string.(fieldnames(T)), T.types)
+    d = _load_path(d)
 
     # Fill the datatype with the input.
-    if .&(any(isarray.(types)), !all(isarray.(types)))
+    # if length(unique(isarray.(types))) == 2
+    if any(isarray.(types)) && !all(isarray.(types))
         # Restructure data into a list of inputs in the order and type required when
         # creating the datatype. Ensure that all array entries should, in fact, be arrays.
-        inps = [isarray(type) ? ensurearray(convert_type.(type, d[field])) :
-            convert_type.(type, d[field]) for (field,type) in zip(fields, types)]
+        inps = [_load_as_type(T, d[f], t) for (f,t) in zip(fields, types)]
         inpscorrect = isarray.(inps) .== isarray.(types)
 
         # If all inputs are of the correct structure, fill the data type.
@@ -185,6 +181,8 @@ function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
             lst = [T(inps...)]
         # If some inputs are arrays when they shouldn't be, expand these into a new list of
         # dictionaries to create a list of datatypes, including all array values.
+        # First, create a dictionary determining whether the entry needs to be split.
+        # Then, split the dictionary into a list of arrays where necessary.
         else
             LEN = length(inps[findmax(.!inpscorrect)[2]])
             splitarray = Dict(fields[ii] => !inpscorrect[ii] for ii in 1:length(inps))
@@ -199,32 +197,76 @@ function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
 end
 
 function load_from(::Type{T}, df::DataFrame) where T <: Any
-    it = zip(fieldnames(T), T.types)
+    (fields, types) = (fieldnames(T), T.types)
 
-    # Convert the necessary DataFrame columns into the correct type,
-    # and save the column names to include. This ensures the dataframe columns are imported
-    # into the struct type in the correct order.
-    [df[!, field] .= convert_type.(type, df[:, field])
-        for (field,type) in it if field in names(df)]
+    # Print warning if DataFrame is missing required columns.
+    missing_fields = setdiff(fields, names(df))
+    if length(missing_fields) > 0
+        @warn(string("DataFrame columns missing required fields to fill DataType ", Rename),
+            missing_fields)
+    end
 
     # If one of the struct fields is an ARRAY, we here assume that it is the length of the
     # entire DataFrame, and all other fields are duplicates.
     if any(isarray.(T.types))
-        inps = [isarray(type) ? df[:,field] : df[1,field] for (field,type) in it]
+        inps = [_load_as_type(T, df[:, f], t) for (f,t) in zip(fields, types)]
         lst = [T(inps...)]
     # If each row in the input df fills one and only one struct,
     # create a list of structures from each DataFrame row.
     else
-        cols = [field for (field, type) in it]
-        lst = [T(values(row)...) for row in eachrow(df[:,cols])]
+        lst = [T((_load_as_type(T, row[f], t) for (f,t) in zip(fields, types))...)
+            for row in eachrow(df)]
     end
     return size(lst)[1] == 1 ? lst[1] : lst
 end
 
+"""
+    _load_path(d::Dict)
+Edits directories containing a list of directories ending in a file name as one path.
+"""
+function _load_path(d::Dict)
+    FILES = [".csv", ".xlsx", ".txt", ".map", ".set"]
+    for (k, lst) in d
+        if typeof(lst) .== Array{String,1}
+            ii_file = [any(occursin.(FILES, x)) for x in lst]
+            (ii_file[end] && .!any(ii_file[1:end-1])) && (d[k] = joinpath(lst...))
+        end
+    end
+    return d
+end
+
+"""
+    _load_as_type(::Type{Any}, entry, type::DataType)
+Converts an entry to the required DataType
+"""
+function _load_as_type(entry, type::DataType)
+    entry = ensurearray(convert_type.(type, entry))
+    !isarray(type) && (entry = entry[1])
+    return entry
+end
+
+_load_as_type(::Type{T}, entry, type::DataType) where T<:Any = _load_as_type(entry, type)
+_load_as_type(::Type{Rename}, entry, type::DataType) = _load_as_type(_load_case(entry), type)
+_load_as_type(::Type{Replace}, entry, type::DataType) = _load_as_type(_load_case(entry), type)
+
+"""
+    _load_case(entry::AbstractString)
+Standardizes string identifiers that indicate a case change (upper-to-lower or vice-versa)
+for easier editing.
+"""
+function _load_case(entry::AbstractString)
+    occursin("upper", lowercase(entry)) && (entry = "upper")
+    occursin("lower", lowercase(entry)) && (entry = "lower")
+
+    "all" == lowercase(entry)    && (entry = "all")
+    "unique" == lowercase(entry) && (entry = "unique")
+    return entry
+end
+
+_load_case(entry::Any) = entry
 
 """
     write_yaml(path, file::XLSXInput)
-
 This function reads an XLSX file and writes a new yaml file containing the information in
 each spreadsheet column. Sheet names in the XLSX file correspond to the directory where new
 files will be printed (`path/file.sheet/`). Yaml files will be named after the text in the
@@ -257,7 +299,7 @@ function write_yaml(path, file::XLSXInput)
     for COL in 1:size(df_all,2)
         println("Generating ", filenames[COL])
         lines = dropmissing(df_all, COL)[:,COL]
-        open(filenames[COL], "w") do f
+        open(joinpath(SLIDE_DIR, filenames[COL]), "w") do f
             println(f, string("# Autogenerated from ", file.name))
             for line in lines
                 any(occursin.(KEYS, line)) ? println(f, "") : nothing
@@ -293,7 +335,7 @@ function run_yaml(filename::String)
     if haskey(y, "Editable") && y["Editable"]
         println(string("Standardizing ", filename))
         df = unique(edit_with(y))
-        CSV.write(joinpath(y["PathOut"]...), df)
+        CSV.write(joinpath(SLIDE_DIR, y["PathOut"]...), df)
         return nothing
     else
         return filename

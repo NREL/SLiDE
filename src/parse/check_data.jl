@@ -13,11 +13,11 @@
     Default values is `1E-6`.
 """
 function compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol = 1E-6)
-    df_lst = copy(df_lst)
+    df_lst = copy.(df_lst)
     N = length(df_lst)
 
     # Rename columns to indicate which values go with which data set.
-    val_0 = [names(df)[all.(eachcol(supertype.(typeof.(df)) .== AbstractFloat))] for df in df_lst]
+    val_0 = [names(df)[supertype.(eltypes(dropmissing(df))) .== AbstractFloat] for df in df_lst]
     val_0 = intersect(val_0...)
     vals = [Symbol.(val_0, :_, ind) for ind in inds]
     cols = setdiff(intersect(names.(df_lst)...), val_0);
@@ -60,7 +60,7 @@ end
     DataFrames and indicators.
 """
 function compare_values(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
-    df_lst = copy(df_lst)
+    df_lst = copy.(df_lst)
 
     df = compare_summary(copy.(df_lst), inds);
     df = df[.!df[:,:equal_values],:];
@@ -79,10 +79,10 @@ end
     DataFrames and indicators.
 """
 function compare_keys(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
-    df_lst = copy(df_lst)
+    df_lst = copy.(df_lst)
     N = length(inds);
 
-    cols = [names(df)[all.(eachcol(supertype.(typeof.(df)) .!= AbstractFloat))] for df in df_lst]
+    cols = [names(df)[supertype.(eltypes(dropmissing(df))) .!= AbstractFloat] for df in df_lst]
     cols = intersect(cols...)
 
     ii_other = setdiff.(fill(1:N,N), 1:N)
