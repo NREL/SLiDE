@@ -8,25 +8,21 @@ using SLiDE
 
 """
     make_uniform(df::DataFrame, cols::Array{Symbol,1})
-This function is specific to the 
+This function is specific to the verify_datastream.jl file. It makes input DataFrames
+uniform (same columns; should add support to standardize types)
 """
 function make_uniform(df::DataFrame, cols::Array{Symbol,1})
     .&(size(names(df)) == size(cols), length(setdiff(cols, names(df))) > 0) ?
         df = edit_with(df, Rename.(names(df), cols))[:,cols] : nothing
     df = df[:,cols]
-        
+
+    # !!!! Assumptions about value column name and type: (1) values are stored in a column
+    # named :value and (2) values are type FLOAT64. This is a common theme throughout SLiDE;
+    # may need to address.
+    df[!,:value] .= convert_type.(Float64, df[:,:value])
+
     df = edit_with(df, Drop(:value, 0.0, "=="));
     return unique(sort(df, names(df)[1:end-1]));
-end
-
-function print_key_comparison(d)
-    isempty(d) ? println("All sets are consistent.") : println("Set differences:")
-    for (k1,d1) in d
-        @printf("  %s\n", k1)
-        [@printf("    %-10s[%s]\n", k2,
-                string((length(d2) > 1 ? string.(d2[1:end-1], ", ") : "")..., d2[end]))
-            for (k2,d2) in d1]
-    end
 end
 
 # ******************************************************************************************
@@ -45,7 +41,7 @@ lst = y["FileInput"];
 df_attn = Dict()
 
 # Iterate through list of datafiles to compare and shared column names.
-for inp in lst[1:end-1]
+for inp in lst[[5]]
     println("\n",uppercase(inp.f1));
 
     # For SLiDE and bluenote data sets, read and save the DataFrames.
@@ -89,43 +85,3 @@ end
 # dfb = read_file(joinpath(path_bluenote, "sgf_units.csv"));
 # dfb = make_uniform(edit_with(dfb, Replace(:sgf_code, "othtax", "OTHTAX")), cols);
 # display(first(dfb,4));
-
-# ******************************************************************************************
-# cols = [:orig_state, :dest_state, :naics, :sctg, :units, :value];
-# dfs = read_file(joinpath(path_slide, "cfs_state.csv"));
-# dfs = make_uniform(dfs, cols);
-# display(first(dfs,4));
-
-# dfb = read_file(joinpath(path_bluenote, "cfsdata_st_units.csv"));
-# dfb = make_uniform(dfb, cols);
-# # dfb = edit_with(dfb, Rename.(names(dfb),cols))
-# display(first(dfb,4));
-
-# d = compare_keys(copy.([dfs,dfb]), [:slide,:bluenote])
-# df = compare_summary(copy.([dfs,dfb]), [:slide,:bluenote]);
-
-
-
-# ******************************************************************************************
-# dfs = read_file(joinpath(path_slide, "cfs.csv"));
-
-
-# ******************************************************************************************
-# TESTING -- Make three DataFrames with differing keys and values to test the compare_*.
-# N = 2
-# dfa = DataFrame(yr = sort(repeat([2019,2020], outer=[2])),
-#                 r = repeat(["co","wi"], outer=[2]),
-#                 v1 = Float64.(1:N*2),
-#                 # v2 = Float64.(1:N*2),
-#                 );
-# dfb = edit_with(copy(dfa), Drop(:r, "co", "=="))
-
-# dfc = copy(dfa)
-
-# dfc[2,:r] = "md"
-# dfc[3,:r] = "Co"
-# dfc[end,:v1] = 1.
-
-# df_lst = copy.([dfa,dfb,dfc]);
-# inds = [:a,:b,:c];
-# tol = 1E-6

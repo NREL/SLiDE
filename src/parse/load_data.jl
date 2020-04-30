@@ -241,7 +241,7 @@ Converts an entry to the required DataType
 """
 function _load_as_type(entry, type::DataType)
     entry = ensurearray(convert_type.(type, entry))
-    !isarray(type) && (entry = entry[1])
+    (!isarray(type) && length(entry) == 1) && (entry = entry[1])
     return entry
 end
 
