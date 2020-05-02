@@ -2,9 +2,9 @@
 
 [[ArrayInterface]]
 deps = ["LinearAlgebra", "Requires", "SparseArrays"]
-git-tree-sha1 = "5f34aee5e5dbc1ce5cfb137d63f719a64d98ae82"
+git-tree-sha1 = "649c08a5a3a513f4662673d3777fe6ccb4df9f5d"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "2.8.5"
+version = "2.8.7"
 
 [[ArrayLayouts]]
 deps = ["FillArrays", "LinearAlgebra"]
@@ -28,10 +28,10 @@ uuid = "9e28174c-4ba2-5203-b857-d8d62c4213ee"
 version = "0.8.10"
 
 [[BinaryProvider]]
-deps = ["Libdl", "SHA"]
-git-tree-sha1 = "5b08ed6036d9d3f0ee6369410b830f8873d4024c"
+deps = ["Libdl", "Logging", "SHA"]
+git-tree-sha1 = "428e9106b1ff27593cbd979afac9b45b82372b8c"
 uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
-version = "0.5.8"
+version = "0.5.9"
 
 [[Blosc]]
 deps = ["BinaryProvider", "CMakeWrapper", "Libdl"]
@@ -71,9 +71,9 @@ version = "0.7.7"
 
 [[CodeTracking]]
 deps = ["InteractiveUtils", "UUIDs"]
-git-tree-sha1 = "c8f94de86731698373f3c82a8aa40d8ab765c50c"
+git-tree-sha1 = "ef95614491ce00eff5ebc3bbb957cf8b3b3dd3e8"
 uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
-version = "0.5.9"
+version = "0.5.10"
 
 [[Codecs]]
 deps = ["Test"]
@@ -106,9 +106,9 @@ uuid = "8f4d0f93-b110-5947-807f-2305c1781a2d"
 version = "1.4.1"
 
 [[DataAPI]]
-git-tree-sha1 = "00612b2fbe534a539dc7f70106c71e3a943d9b98"
+git-tree-sha1 = "176e23402d80e7743fc26c19c681bfb11246af32"
 uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
-version = "1.2.0"
+version = "1.3.0"
 
 [[DataFrames]]
 deps = ["CategoricalArrays", "Compat", "DataAPI", "InvertedIndices", "IteratorInterfaceExtensions", "Missings", "PooledArrays", "Printf", "REPL", "Reexport", "SortingAlgorithms", "Statistics", "TableTraits", "Tables", "Unicode"]
@@ -124,9 +124,9 @@ version = "0.5.0"
 
 [[DataStructures]]
 deps = ["InteractiveUtils", "OrderedCollections"]
-git-tree-sha1 = "9faa13be79557bf4c5713fb912b0e3c5aa33d046"
+git-tree-sha1 = "6166ecfaf2b8bbf2b68d791bc1d54501f345d314"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.17.13"
+version = "0.17.15"
 
 [[DataValueInterfaces]]
 git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
@@ -198,9 +198,9 @@ uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays"]
-git-tree-sha1 = "51cc2f9bc4eb9c6c0e81ec2f779d1085583cc956"
+git-tree-sha1 = "5322d34d7600d3429665b37bcf7628dc602a28cc"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "0.8.7"
+version = "0.8.8"
 
 [[FiniteDiff]]
 deps = ["ArrayInterface", "LinearAlgebra", "Requires", "SparseArrays", "StaticArrays"]
@@ -277,9 +277,9 @@ version = "0.20.1"
 
 [[JuliaInterpreter]]
 deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
-git-tree-sha1 = "2eadbbde5534346cbb837c3a75b377cba477a06d"
+git-tree-sha1 = "dda48f397146fcd0b520c38a17a749e0f890ab84"
 uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
-version = "0.7.13"
+version = "0.7.14"
 
 [[LazyArrays]]
 deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra", "MacroTools", "StaticArrays"]
@@ -308,9 +308,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[LoweredCodeUtils]]
 deps = ["JuliaInterpreter"]
-git-tree-sha1 = "1c41621653250b2824b6e664ac5bd805558aeff9"
+git-tree-sha1 = "695206e7ec13cbec6e6ee4d19af7464e80f4d1ad"
 uuid = "6f1432cf-f94c-5a45-995e-cdbf5db27b0b"
-version = "0.4.3"
+version = "0.4.4"
 
 [[MacroTools]]
 deps = ["Markdown", "Random"]

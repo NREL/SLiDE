@@ -72,7 +72,7 @@ for inp in lst[[5]]
     # Compare values. Print a warning if there are discrepancies and
     # save the summary DataFrame in a list of DataFrames in need of attention.
     global df = compare_values(copy.([dfs, dfb]), [:slide, :bluenote]);
-    size(df,1) > 0 ? df_attn[inp.f1[1:end-4]] = df : nothing
+    size(df,1) > 0 && (df_attn[inp.f1[1:end-4]] = df)
 end
 
 # ******************************************************************************************

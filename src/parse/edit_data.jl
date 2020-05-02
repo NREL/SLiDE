@@ -54,6 +54,8 @@ function edit_with(df::DataFrame, x::Add)
 end
 
 function edit_with(df::DataFrame, x::Drop)
+    # Ternary operator:
+    # https://discourse.julialang.org/t/style-question-ternary-operator-or-short-circuit-operator-or-if-end/34224/2
     !(x.col in names(df)) && (return df)
     if x.val === "all"  # Drop entire column to remove dead weight right away.
         df = df[:, setdiff(names(df), [x.col])]
@@ -135,17 +137,16 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
 end
 
 function edit_with(df::DataFrame, x::Match)
-    # First, ensure that all row values are strings that can be matched with a Regex.
-    !all(typeof(df[:,x.input]) .== String) ?
-        df[!,x.input] .= convert_type.(String, df[:,x.input]) : nothing
+    # Ensure all row values are strings and can be matched with a Regex, and do so.
+    # Temporarily remove missing values, just in case.
+    col = edit_with(copy(df), Replace(x.input, missing, ""))[:,x.input]
+    m = match.(x.on, convert_type.(String, col))
     
     # Add empty columns for all output columns not already in the DataFrame.
-    cols = setdiff(x.output, names(df))
-    df = edit_with(df, Add.(cols, fill("", size(cols))))
-
-    # Find all matches! Where there is a match, fill in the empty cells.
-    m = match.(x.on, df[:, x.input])
-    [m[ii] != nothing ? [df[ii,out] = m[ii][out] for out in x.output] : nothing
+    # Where there is a match, fill empty cells. If values in the input column,
+    # leave cells without a match unchanged.
+    df = edit_with(df, Add.(setdiff(x.output, names(df)), ""))
+    [m[ii] != nothing && ([df[ii,out] = m[ii][out] for out in x.output])
         for ii in 1:length(m)]
     return df
 end
@@ -159,30 +160,30 @@ end
 
 function edit_with(df::DataFrame, x::Operate)
     # If it is a ROW-WISE operation,
-    if Symbol(1) == x.axis || occursin(:row, lowercase(x.axis))
-        df = by(df, x.input, x.output => datatype(x.operation));
-        df = edit_with(df, Rename.(setdiff(names(df),x.input), [x.output]));
+    if x.axis == :row
+        df = by(df, x.input, x.output => datatype(x.operation))
+        df = edit_with(df, Rename.(setdiff(names(df), x.input), ensurearray(x.output)))
     end
 
     # If it is a COLUMN-WISE operation, 
-    if Symbol(2) == x.axis || occursin(:col, lowercase(x.axis))
+    if x.axis == :col
         # Isolate columns to be operated on.
         # Append original columns that might be replaced "_0" to preserve information.
         df_val = convert_type.(Float64, copy(df[:,x.input]))
-        x.output in x.input ? df = edit_with(df, Rename(x.output, Symbol(x.output, :_0))) :
-            nothing
+        x.output in x.input && (df = edit_with(df, Rename(x.output, Symbol(x.output, :_0))))
         df[!,x.output] .= broadcast(datatype(x.operation), [col for col in eachcol(df_val)]...)
 
-        # Adjust labeling columns.
+        # Adjust labeling columns: If both from/to descriptive columns are distinct and
+        # in the DataFrame, Replace the column values from -> to.
         for (from, to) in zip(x.from, x.to)
-            if from in names(df) && to in names(df) && from !== to
+            if length(intersect(names(df), [from,to])) == 2
                 df_comment = dropmissing(unique(df[:, [from; to]]))
                 df[!, Symbol(from, :_0)] .= df[:,from]
                 df = edit_with(df, Replace.(from, df_comment[:,from], df_comment[:,to]))
             end
         end
     end
-    # !!!! SOS how do we deal with floating point arithmetic? (ex: 1.1 + 0.1 = 1.2000000000000002)
+    # !!!! How to handle floating point arithmetic? (ex: 1.1 + 0.1 = 1.2000000000000002)
     df[!,x.output] .= round.(df[:,x.output], digits=11)
     return df
 end
@@ -203,9 +204,8 @@ end
 
 function edit_with(df::DataFrame, x::Rename)
     x.from in names(df) && (rename!(df, x.from => x.to))
-
-    x.to == :upper && (df = edit_with.(df, Rename.(names(df), uppercase.(names(df)))))
-    x.to == :lower && (df = edit_with.(df, Rename.(names(df), lowercase.(names(df)))))
+    x.to == :upper && (df = edit_with(df, Rename.(names(df), uppercase.(names(df)))))
+    x.to == :lower && (df = edit_with(df, Rename.(names(df), lowercase.(names(df)))))
     return df
 end
 
@@ -231,40 +231,49 @@ function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
 end
 
 function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
-    df = read_file(y["Path"], file; shorten = shorten);
-    
+    df = read_file(y["Path"], file; shorten = shorten)
     # Specify the order in which edits must occur. "Drop" is included twice, once at the
     # beginning and once at the end. First, drop entire columns. Last, drop specific values.
     EDITS = ["Rename", "Group", "Match", "Melt", "Add", "Map", "Replace", "Drop", "Operate"]
 
     # Find which of these edits are represented in the yaml file of defined edits.
-    KEYS = intersect(EDITS, [k for k in keys(y)]);
-    "Drop" in KEYS ? KEYS = ["Drop"; KEYS] : nothing
+    KEYS = intersect(EDITS, collect(keys(y)))
+    "Drop" in KEYS && pushfirst!(KEYS, "Drop")
 
-    [df = edit_with(df, y[k]) for k in KEYS];
+    [df = edit_with(df, y[k]) for k in KEYS]
     
     # Add a descriptor to identify the data from the file that was just added.
     # Then, reorder the columns and set them to the correct types.
     # This ensures consistency when concattenating.
-    df = "Describe" in keys(y) ? edit_with(df, y["Describe"], file) : df;
-    df = "Order" in keys(y) ? edit_with(df, y["Order"]) : df;
+    "Describe" in keys(y) && (df = edit_with(df, y["Describe"], file))
+    "Order" in keys(y)    && (df = edit_with(df, y["Order"]))
     return df
 end
 
 function edit_with(files::Array{T}, y::Dict{Any,Any}; shorten = false) where T<:File
-    df = DataFrame();
-    [df = vcat(df, edit_with(file, y; shorten = shorten)) for file in files]
-    return df
+    return [[edit_with(file, y; shorten = shorten) for file in files]...;]
 end
 
 function edit_with(y::Dict{Any,Any}; shorten = false)
-    file = [v for (k,v) in y
-        if isarray(v) ? any(broadcast(<:, typeof.(v), File)) : typeof(v)<:File]
-    file = length(file) == 1 ? file[1] : vcat(file...)
+    # Find all dictionary keys corresponding to file names and save these in a list.
+    file = convert_type(Array, find_oftype(y, File))
     df = edit_with(file, y; shorten = shorten)
-    
-    length(intersect(names(df), [:from,:to])) == 2 ? sort!(df, [:to, :from]) : nothing
-    return df
+    return _sort_datastream(df)
+end
+
+"""
+"""
+function _sort_datastream(df::DataFrame)
+    colidx = 1:size(df,2)
+    isvalue = istype(df, AbstractFloat)
+    ii = colidx[.!isvalue]
+
+    # If it's a mapping dataframe...
+    if length(ii) == length(setdiff(names(df),[:factor]))
+        ii = intersect(sortperm(length.(unique.(eachcol(df)))), ii)
+        splice!(ii, 2:1, colidx[isvalue])
+    end
+    return sort(df, ii)
 end
 
 
@@ -317,9 +326,8 @@ function fill_zero(keys_fill::NamedTuple; value_colnames = :value)
 end
 
 function fill_zero(keys_fill::Tuple; permute_keys::Bool = true)
-    keys_all = permute_keys ? permute(keys_fill) : keys_fill
-    d = Dict(k => 0. for k in keys_all)
-    return d
+    permute_keys && (keys_fill = permute(keys_fill))
+    return Dict(k => 0. for k in keys_fill)
 end
 
 function fill_zero(d::Vararg{Dict}; permute_keys::Bool = true)
@@ -340,7 +348,7 @@ function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
     df = copy.(ensurearray(df))
     # Save names of columns containing values to fill zeros later.
     # Find descriptor columns to permute OR make consistent across input DataFrames.
-    value_colnames = [names(x)[supertype.(eltypes(dropmissing(x))) .== AbstractFloat] for x in df]
+    value_colnames = find_oftype.(df, AbstractFloat)
     cols = intersect(setdiff.(names.(df), value_colnames)...)
 
     # Find a unique list of descriptor keys in the input DataFrame(s). Permute as desired.
@@ -366,8 +374,8 @@ function fill_zero(keys_fill::Any, d::Dict; permute_keys::Bool = true)
     d = copy(d)
     # If permuting keys, find all possible permutations of keys that should be present
     # and determine which are missing. Then add missing keys to the dictionary and return.
-    keys_all = permute_keys ? permute(keys_fill) : keys_fill
-    keys_missing = setdiff(keys_all, collect(keys(d)))
+    permute_keys && (keys_fill = permute(keys_fill))
+    keys_missing = setdiff(keys_fill, collect(keys(d)))
 
     [push!(d, k => 0.) for k in keys_missing]
     return d

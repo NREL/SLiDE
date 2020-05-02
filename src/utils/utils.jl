@@ -13,6 +13,9 @@ function datatype(str::String)
     return isdefined(SLiDE, type) ? eval(type) : nothing
 end
 
+
+Base.broadcastable(x::InvertedIndex{T}) where {T<:Any} = [x];
+
 """
     Base.strip(x::Missing)
     Base.strip(x::Number)
@@ -98,8 +101,10 @@ function convert_type(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Sy
 end
 
 convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
+
 convert_type(::Type{Array{T}}, x::Any) where T<:Any = convert_type.(T, x)
 convert_type(::Type{Array{T,1}}, x::Any) where T<:Any = convert_type.(T, x)
+convert_type(::Type{Array}, d::Dict) = [collect(values(d))...;]
 
 convert_type(::Type{T}, x::Missing) where T<:Real = x;
 convert_type(::Type{T}, x::Missing) where T<:AbstractString = x
@@ -126,6 +131,21 @@ ensurearray(x::Array{T,1}) where T <: Any = x
 ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
 ensurearray(x::UnitRange) = collect(x)
 ensurearray(x::Any) = [x]
+
+
+istype(df::DataFrame, T::DataType) = broadcast(<:, eltypes(dropmissing(df)), T)
+
+
+"""
+    find_oftype(df::DataFrame, T::DataType)
+    find_oftype(df::Dict, T::DataType)
+"""
+find_oftype(df::DataFrame, T::DataType) = names(df)[istype(df, T)]
+find_oftype(df::DataFrame, T::InvertedIndex{DataType}) = names(df)[.!istype(df, T.skip)]
+
+function find_oftype(d::Dict, T::DataType)
+    return Dict(k => v for (k,v) in d if any(broadcast(<:, typeof.(ensurearray(v)), T)))
+end
 
 """
     permute(x::Any)

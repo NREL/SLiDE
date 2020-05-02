@@ -60,7 +60,7 @@ Replace:
 
 Operate:
   operation: "*"
-  axis:   col
+  axis:   2
   from:   units
   to:     units_factor
   input:  [value, factor]

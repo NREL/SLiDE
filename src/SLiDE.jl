@@ -60,8 +60,10 @@ export File
 export convert_type
 export datatype
 export isarray
+export istype
 export ensurearray
 export permute
+export find_oftype
 
 export edit_with
 export fill_zero

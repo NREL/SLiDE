@@ -17,10 +17,11 @@ function compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol 
     N = length(df_lst)
 
     # Rename columns to indicate which values go with which data set.
-    val_0 = [names(df)[supertype.(eltypes(dropmissing(df))) .== AbstractFloat] for df in df_lst]
-    val_0 = intersect(val_0...)
+    val_0 = intersect(find_oftype.(df_lst, Not(AbstractFloat))...)
+    # val_0 = [names(df)[supertype.(eltypes(dropmissing(df))) .== AbstractFloat] for df in df_lst]
+    # val_0 = intersect(val_0...)
     vals = [Symbol.(val_0, :_, ind) for ind in inds]
-    cols = setdiff(intersect(names.(df_lst)...), val_0);
+    cols = setdiff(intersect(names.(df_lst)...), val_0)
 
     # Print warning if attempting to compare multiple values at once. We're not there yet.
     if length(val_0) > 1
@@ -62,8 +63,8 @@ end
 function compare_values(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
     df_lst = copy.(df_lst)
 
-    df = compare_summary(copy.(df_lst), inds);
-    df = df[.!df[:,:equal_values],:];
+    df = compare_summary(copy.(df_lst), inds)
+    df = df[.!df[:,:equal_values],:]
     size(df,1) == 0 ? println("All values are consistent.") : @warn("Values inconsistent.")
     return df
 end
@@ -80,22 +81,24 @@ end
 """
 function compare_keys(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
     df_lst = copy.(df_lst)
-    N = length(inds);
+    N = length(inds)
 
-    cols = [names(df)[supertype.(eltypes(dropmissing(df))) .!= AbstractFloat] for df in df_lst]
-    cols = intersect(cols...)
-
+    cols = intersect(find_oftype.(df_lst, Not(AbstractFloat))...)
+    # cols = intersect([names(df)[.!istype(df, AbstractFloat)] for df in df_lst])
+    # cols = [names(df)[supertype.(eltypes(dropmissing(df))) .!= AbstractFloat] for df in df_lst]
+    # cols = intersect(cols...)
+    
     ii_other = setdiff.(fill(1:N,N), 1:N)
 
     d_unique = Dict(col => Dict(inds[ii] => sort(unique(df_lst[ii][:,col]))
-        for ii in 1:N) for col in cols);
+        for ii in 1:N) for col in cols)
     d_lower = Dict(col => Dict(inds[ii] => lowercase.(d_unique[col][inds[ii]]) for ii in 1:N) for col in cols);
 
     CHECKCASE = Dict(col => any(length.(unique.(values(d_lower[col]))) .!==
         length.(values(d_unique[col]))) for col in cols)
 
     d_all = Dict(col => CHECKCASE[col] ? sort(unique([values(d_unique[col])...;])) :
-        sort(unique([values(d_lower[col])...;])) for col in cols);
+        sort(unique([values(d_lower[col])...;])) for col in cols)
 
     df = DataFrame()
 
