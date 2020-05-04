@@ -14,6 +14,10 @@ data/old/readfiles/
 data/coremaps/temp/
 data/coremaps/windc/
 data/readfiles/~$*
+data/readfiles/map_bluenote/
+data/readfiles/map_parse/
+data/readfiles/map_scale/
+data/readfiles/parse/
 data/outputs_csv/
 data/windc_output/
 
