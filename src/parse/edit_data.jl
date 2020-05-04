@@ -54,8 +54,6 @@ function edit_with(df::DataFrame, x::Add)
 end
 
 function edit_with(df::DataFrame, x::Drop)
-    # Ternary operator:
-    # https://discourse.julialang.org/t/style-question-ternary-operator-or-short-circuit-operator-or-if-end/34224/2
     !(x.col in names(df)) && (return df)
     if x.val === "all"  # Drop entire column to remove dead weight right away.
         df = df[:, setdiff(names(df), [x.col])]
@@ -65,6 +63,7 @@ function edit_with(df::DataFrame, x::Drop)
         elseif x.val === "unique"
             unique!(df, x.col)
         else
+            df[!,x.col] .= convert_type.(typeof(x.val), df[:,x.col])
             df = if x.operation == "occursin"
                 df[.!broadcast(datatype(x.operation), x.val, df[:,x.col]), :]
             else
@@ -84,7 +83,7 @@ function edit_with(df::DataFrame, x::Group)
     # Editing with a map will remove all rows that do not contain relevant information.
     # Add a column indicating where each data set STOPS, assuming all completely blank rows
     # were removed by read_file().
-    df_split = edit_with(copy(df), Map(x.file, [x.from], [x.to], [x.input], [x.output]); kind = :inner);
+    df_split = edit_with(copy(df), convert_type(Map, x); kind = :inner)
     sort!(unique!(df_split), :start)
     df_split[!, :stop] .= vcat(df_split[2:end, :start] .- 2, [size(df)[1]])
 
@@ -116,18 +115,17 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
     
     # Rename columns in the mapping DataFrame to temporary values in case any of these
     # columns were already present in the input DataFrame.
-    temp_to = Symbol.(string.("to_", 1:length(x.to)))
-    temp_from = Symbol.(string.("from_", 1:length(x.from)))
+    temp_to = Symbol.(:to_, 1:length(x.to))
+    temp_from = Symbol.(:from_, 1:length(x.from))
     df_map = edit_with(df_map, Rename.([x.to; x.from], [temp_to; temp_from]))
 
     # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
-    # DataFrame are used since (!!!! assuming all missing values were dropped), all values
-    # in the mapping DataFrame should be the same.
-    [df[!,col] .= convert_type.(unique(typeof.(skipmissing(df_map[:,col_map]))), df[:,col])
-        for (col_map, col) in zip(temp_from, x.input)]
-
+    # DataFrame are used since all values in each column should be of the same type.
+    [df[!,col] .= convert_type.(type, df[:,col])
+        for (type,col) in zip(eltypes(dropmissing(df_map[:,temp_from])), x.input)]
+            
     df = join(df, df_map, on = Pair.(x.input, temp_from); kind = kind, makeunique = true)
-  
+    
     # Remove all output column names that might already be in the DataFrame. These will be
     # overwritten by the columns from the mapping DataFrame. Finally, remane mapping "to"
     # columns from their temporary to output values.
@@ -216,7 +214,7 @@ function edit_with(df::DataFrame, x::Replace)
     elseif x.to === "lower"
         lowercase.(df[:,x.col])
     else
-        replace(df[:,x.col], x.from => x.to)
+        replace(strip.(df[:,x.col]), x.from => x.to)
     end
     return df
 end
@@ -239,7 +237,7 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
     # Find which of these edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, collect(keys(y)))
     "Drop" in KEYS && pushfirst!(KEYS, "Drop")
-
+    
     [df = edit_with(df, y[k]) for k in KEYS]
     
     # Add a descriptor to identify the data from the file that was just added.
@@ -262,14 +260,19 @@ function edit_with(y::Dict{Any,Any}; shorten = false)
 end
 
 """
+    _sort_datastream(df::DataFrame)
+Returns the edited DataFrame, stored in a nicely-sorted order. This is most helpful for
+mapping and developing. Sorting isn't *necessary* and we could remove this function to save
+some time for users.
 """
 function _sort_datastream(df::DataFrame)
     colidx = 1:size(df,2)
     isvalue = istype(df, AbstractFloat)
     ii = colidx[.!isvalue]
 
-    # If it's a mapping dataframe...
+    # If it's a mapping dataframe...s
     if length(ii) == length(setdiff(names(df),[:factor]))
+        :state_code in names(df) && (ii = intersect(colidx[occursin.(:code, names(df))], ii))
         ii = intersect(sortperm(length.(unique.(eachcol(df)))), ii)
         splice!(ii, 2:1, colidx[isvalue])
     end
@@ -352,21 +355,14 @@ function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
     cols = intersect(setdiff.(names.(df), value_colnames)...)
 
     # Find a unique list of descriptor keys in the input DataFrame(s). Permute as desired.
-    # https://discourse.julialang.org/t/style-question-ternary-operator-or-short-circuit-operator-or-if-end/34224
     df_fill = sort(unique([[x[:,cols] for x in df]...;]))
-    permute_keys && (df_keys_all = permute(df_fill))
+    permute_keys && (df_fill = permute(df_fill))
     
     # For each DataFrame in the list, join the input DataFrame to DataFrame keys_all on the
     # descriptor columns shared by both DataFrames. Using a left join will add "missing"
     # where a descriptor was not already present, which will be replaced by zero.
-    # 
-    # !!!! After edit_with(df, Replace) is generalized to be type-agnostic,
-    # [df[ii] = edit_with(join(df_keys_all, df[ii], on = cols, kind = :left),
-    #     Replace.(value_colnames[ii], missing, 0.0)) for ii in 1:length(df)]
-    for ii in 1:length(df)
-        df[ii] = join(df_keys_all, df[ii], on = cols, kind = :left)
-        [df[ii][ismissing.(df[ii][:,col]),col] .= 0. for col in value_colnames[ii]]
-    end
+    [df[ii] = edit_with(join(df_fill, df[ii], on = cols, kind = :left),
+        Replace.(value_colnames[ii], missing, 0.0)) for ii in 1:length(df)]
     return length(df) == 1 ? df[1] : Tuple(df)
 end
 

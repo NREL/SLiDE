@@ -23,6 +23,7 @@ SLiDE.Group
 SLiDE.Map
 SLiDE.Match
 SLiDE.Melt
+SLiDE.Operate
 SLiDE.Order
 SLiDE.Rename
 SLiDE.Replace

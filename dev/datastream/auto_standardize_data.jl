@@ -7,29 +7,23 @@ using YAML
 
 using SLiDE  # see src/SLiDE.jl
 
+
 READ_DIR = joinpath("data", "readfiles")
 
-files_map = [
-    XLSXInput("generate_yaml.xlsx", "map_parse", "K1:K150", "map_parse"),
-    # XLSXInput("generate_yaml.xlsx", "map_scale", "B1:Z150", "map_scale"),
-    # XLSXInput("generate_yaml.xlsx", "map_bluenote", "B1:Z150", "map_bluenote"),
-]
+files_parse = XLSXInput("generate_yaml.xlsx", "parse", "B1:Z180", "parse")
 
-files_map = write_yaml(READ_DIR, files_map)
-y_read = [read_file(files_map[ii]) for ii in 1:length(files_map)]
+files_parse = write_yaml(READ_DIR, files_parse)
+y_read = [read_file(files_parse[ii]) for ii in 1:length(files_parse)]
 
-files_map = run_yaml(files_map)
-df = [read_file(joinpath(y_read[ii]["PathOut"]...)) for ii in 1:length(y_read)];
-
-include("adjust_maps.jl")
+files_parse = run_yaml(files_parse)
+# df = [read_file(joinpath(y_read[ii]["PathOut"]...)) for ii in 1:length(y_read)]
 
 # ******************************************************************************************
 # EDIT MANUALLY TO CHECK:
-# ii_file = 9;
+# ii_file = length(y_read)
 # y = y_read[ii_file];
 # files = [[y[k] for k in collect(keys(y))[occursin.("Input", keys(y))]]...;]
 
-# ii_input = 1;
 # for ii_input in 1:1
 #     file = files[ii_input]
 #     println(file)

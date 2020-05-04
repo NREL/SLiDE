@@ -12,8 +12,9 @@ This function is specific to the verify_datastream.jl file. It makes input DataF
 uniform (same columns; should add support to standardize types)
 """
 function make_uniform(df::DataFrame, cols::Array{Symbol,1})
-    .&(size(names(df)) == size(cols), length(setdiff(cols, names(df))) > 0) ?
-        df = edit_with(df, Rename.(names(df), cols))[:,cols] : nothing
+    if size(names(df)) == size(cols) && (length(setdiff(cols, names(df))) > 0)
+        df = edit_with(df, Rename.(names(df), cols))[:,cols]
+    end
     df = df[:,cols]
 
     # !!!! Assumptions about value column name and type: (1) values are stored in a column
@@ -35,13 +36,13 @@ end
 path_slide = joinpath("data","output")
 path_bluenote = joinpath("data","windc_output","1b_stream_windc_base")
 
-y = read_file(joinpath("dev", "verify_data.yml"));
+y = read_file(joinpath("dev", "verify_datastream.yml"));
 lst = y["FileInput"];
 
 df_attn = Dict()
 
 # Iterate through list of datafiles to compare and shared column names.
-for inp in lst[[5]]
+for inp in lst[1:end-1]
     println("\n",uppercase(inp.f1));
 
     # For SLiDE and bluenote data sets, read and save the DataFrames.
@@ -61,7 +62,7 @@ for inp in lst[[5]]
     # end
 
     global df_keys = compare_keys(copy.([dfs, dfb]), [:slide, :bluenote]);
-    size(df_keys,1) == 0 ? println("All keys are consistent.") : show(df_keys);
+    # size(df_keys,1) == 0 ? println("All keys are consistent.") : show(df_keys);
     println("");
 
     # Resolve MINOR discrepancy to compare values for heatrate calculations.

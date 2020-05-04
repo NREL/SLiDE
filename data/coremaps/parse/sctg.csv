@@ -1,50 +1,50 @@
 sctg_code,sctg_desc,windc_code
 01,Animals and Fish (live),agr
-01,Animals and Fish (live),fof
 02,Cereal Grains (includes seed),agr
 03,"Agricultural Products (excludes Animal Feed, Cereal Grains, and Forage Products)",agr
 04,"Animal Feed, Eggs, Honey, and Other Products of Animal Origin",agr
-04,"Animal Feed, Eggs, Honey, and Other Products of Animal Origin",fbp
 05,"Meat, Poultry, Fish, Seafood, and Their Preparations",agr
+30,"Textiles, Leather, and Articles of Textiles or Leather",alt
+35,"Electronic and Other Electrical Equipment and Components, and Office Equipment",cep
+20,Basic Chemicals,che
+21,Pharmaceutical Products,che
+22,Fertilizers,che
+23,Other Chemical Products and Preparations,che
+35,"Electronic and Other Electrical Equipment and Components, and Office Equipment",eec
+04,"Animal Feed, Eggs, Honey, and Other Products of Animal Origin",fbp
 05,"Meat, Poultry, Fish, Seafood, and Their Preparations",fbp
 06,"Milled Grain Products and Preparations, and Bakery Products",fbp
 07,"Other Prepared Foodstuffs, and Fats and Oils",fbp
 08,Alcoholic Beverages and Denatured Alcohol,fbp
 09,Tobacco Products,fbp
+33,Articles of Base Metal,fmt
+01,Animals and Fish (live),fof
+25,Logs and Other Wood in the Rough,fof
+39,"Furniture, Mattresses and Mattress Supports, Lamps, Lighting Fittings, and Illuminated Signs",fpd
+34,Machinery,mch
 10,Monumental or Building Stone,min
 11,Natural Sands,min
 12,Gravel and Crushed Stone (excludes Dolomite and Slate),min
 13,Other Non-Metallic Minerals not elsewhere classified,min
 14,Metallic Ores and Concentrates,min
-15,Coal,
-16,Crude Petroleum,
+38,Precision Instruments and Apparatus,mmf
+40,Miscellaneous Manufactured Products,mmf
+36,Motorized and Other Vehicles (includes parts),mot
+31,Non-Metallic Mineral Products,nmp
 17,"Gasoline, Aviation Turbine Fuel, and Ethanol (includes Kerosene, and Fuel Alcohols)",oil
 18,"Fuel Oils (includes Diesel, Bunker C, and Biodiesel)",oil
+37,"Transportation Equipment, not elsewhere classified",ote
 19,"Other Coal and Petroleum Products, not elsewhere classified",pet
-20,Basic Chemicals,che
-21,Pharmaceutical Products,che
-22,Fertilizers,che
-23,Other Chemical Products and Preparations,che
 24,Plastics and Rubber,pla
-25,Logs and Other Wood in the Rough,fof
-26,Wood Products,wpd
+32,Base Metal in Primary or Semi-Finished Forms and in Finished Basic Shapes,pmt
 27,"Pulp, Newsprint, Paper, and Paperboard",ppd
 28,Paper or Paperboard Articles,ppd
 29,Printed Products,pri
-30,"Textiles, Leather, and Articles of Textiles or Leather",alt
 30,"Textiles, Leather, and Articles of Textiles or Leather",tex
-31,Non-Metallic Mineral Products,nmp
-32,Base Metal in Primary or Semi-Finished Forms and in Finished Basic Shapes,pmt
-33,Articles of Base Metal,fmt
-34,Machinery,mch
-35,"Electronic and Other Electrical Equipment and Components, and Office Equipment",cep
-35,"Electronic and Other Electrical Equipment and Components, and Office Equipment",eec
-36,Motorized and Other Vehicles (includes parts),mot
-37,"Transportation Equipment, not elsewhere classified",ote
-38,Precision Instruments and Apparatus,mmf
-39,"Furniture, Mattresses and Mattress Supports, Lamps, Lighting Fittings, and Illuminated Signs",fpd
-40,Miscellaneous Manufactured Products,mmf
 41,"Waste and Scrap (excludes of agriculture or food, see 041xx)",use
+26,Wood Products,wpd
+00,SCTG suppressed,
+15,Coal,
+16,Crude Petroleum,
 43,Mixed Freight,
 99,Missing Code,
-00,SCTG suppressed,

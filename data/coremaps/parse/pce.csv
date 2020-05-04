@@ -1,25 +1,25 @@
 from,to
 Clothing and footwear,clo
 Durable goods,dur
-Gasoline and other energy goods,enr
-Food and beverages purchased for off-premises consumption,foo
+Final consumption expenditures of nonprofit institutions serving households (NPISHs),npish
 Financial services and insurance,fsr
-Goods,gds
-Household consumption expenditures (for services),hce
-Furnishings and durable household equipment,hdr
-Health care,hea
+Food and beverages purchased for off-premises consumption,foo
 Food services and accommodations,htl
+Furnishings and durable household equipment,hdr
+Gasoline and other energy goods,enr
+Goods,gds
+Gross output of nonprofit institutions,npi
+Health care,hea
+Household consumption expenditures (for services),hce
+Housing and utilities,utl
+Less: Receipts from sales of goods and services by nonprofit institutions,nps
 Motor vehicles and parts,mvp
 Nondurable goods,ndr
-Gross output of nonprofit institutions,npi
-Final consumption expenditures of nonprofit institutions serving households (NPISHs),npish
-Less: Receipts from sales of goods and services by nonprofit institutions,nps
 Other durable goods,odg
 Other nondurable goods,ong
 Other services,osr
 Personal consumption expenditures,pce
-Recreational goods and vehicles,rec
 Recreation services,rsr
+Recreational goods and vehicles,rec
 Services,ser
 Transportation services,trn
-Housing and utilities,utl

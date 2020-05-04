@@ -71,6 +71,8 @@ Data in specified type
 """
 convert_type(::Type{T}, x::Any) where T<:AbstractString = string(x)
 convert_type(::Type{T}, x::Date) where T<:Integer = Dates.year(x)
+
+convert_type(::Type{Map}, x::Group) = Map(x.file, [x.from], [x.to], [x.input], [x.output])
 convert_type(::Type{T}, x::AbstractString) where T<:AbstractString = string(strip(x))
 
 function convert_type(::Type{T}, x::AbstractString) where T<:Integer
@@ -88,10 +90,7 @@ convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1}) = [DataFrame.(lst).
 function convert_type(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :Float)
     # Find and save the column containing values and that/those containing keys.
     # If no value column indicator is specified, find the first DataFrame column of floats.
-    if value_col == :Float
-        value_col = names(df)[supertype.(eltypes(dropmissing(df))) .== AbstractFloat][1]
-    end
-
+    value_col == :Float && (value_col = find_oftype(df, AbstractFloat)[1])
     key_cols = setdiff(names(df), convert_type.(Symbol, ensurearray(drop_cols)), [value_col])
     ONEKEY = length(key_cols) == 1
 

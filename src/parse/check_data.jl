@@ -8,7 +8,7 @@
     values/keys are present in each DataFrame. There must be an equal number of input
     DataFrames and indicators.
 
-# Keyword Arguments
+# Keyword Argument
 - `tol::Float64 = 1E-6`: Tolerance used when determining whether values are equal.
     Default values is `1E-6`.
 """
@@ -17,9 +17,7 @@ function compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol 
     N = length(df_lst)
 
     # Rename columns to indicate which values go with which data set.
-    val_0 = intersect(find_oftype.(df_lst, Not(AbstractFloat))...)
-    # val_0 = [names(df)[supertype.(eltypes(dropmissing(df))) .== AbstractFloat] for df in df_lst]
-    # val_0 = intersect(val_0...)
+    val_0 = intersect(find_oftype.(df_lst, AbstractFloat)...)
     vals = [Symbol.(val_0, :_, ind) for ind in inds]
     cols = setdiff(intersect(names.(df_lst)...), val_0)
 
@@ -46,7 +44,7 @@ function compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol 
     df_comp = (maximum.(skipmissing.(eachrow(df[:,vals]))) .- df[:,vals]) ./
         Statistics.mean.(skipmissing.(eachrow(df[:,vals])))
     df[!,:equal_values] .= all.(skipmissing.(eachrow(df_comp .< tol)))
-
+    
     return sort(df[:,[cols; sort(vals); sort(inds); [:equal_keys, :equal_values]]], cols)
 end
 
@@ -59,13 +57,17 @@ end
 - `inds::Array{Symbol,1}`: List of indicators that describe each DataFrame and track which
     values/keys are present in each DataFrame. There must be an equal number of input
     DataFrames and indicators.
-"""
-function compare_values(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
-    df_lst = copy.(df_lst)
 
-    df = compare_summary(copy.(df_lst), inds)
+# Keyword Argument
+- `tol::Float64 = 1E-6`: Tolerance used when determining whether values are equal.
+    Default values is `1E-6`.
+"""
+function compare_values(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol = 1E-6)
+    df_lst = copy.(df_lst)
+    df = compare_summary(copy.(df_lst), inds; tol = tol)
     df = df[.!df[:,:equal_values],:]
-    size(df,1) == 0 ? println("All values are consistent.") : @warn("Values inconsistent.")
+
+    size(df,1) > 0 && @warn("Inconsistent values:", df)
     return df
 end
 
@@ -82,18 +84,14 @@ end
 function compare_keys(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
     df_lst = copy.(df_lst)
     N = length(inds)
-
     cols = intersect(find_oftype.(df_lst, Not(AbstractFloat))...)
-    # cols = intersect([names(df)[.!istype(df, AbstractFloat)] for df in df_lst])
-    # cols = [names(df)[supertype.(eltypes(dropmissing(df))) .!= AbstractFloat] for df in df_lst]
-    # cols = intersect(cols...)
-    
-    ii_other = setdiff.(fill(1:N,N), 1:N)
 
+    # Determine whether to consider case when comparing keys. Only consider case if there
+    # instances of the same keys with differing cases in the same DataFrame.
     d_unique = Dict(col => Dict(inds[ii] => sort(unique(df_lst[ii][:,col]))
         for ii in 1:N) for col in cols)
-    d_lower = Dict(col => Dict(inds[ii] => lowercase.(d_unique[col][inds[ii]]) for ii in 1:N) for col in cols);
-
+    d_lower = Dict(col => Dict(inds[ii] => lowercase.(d_unique[col][inds[ii]])
+        for ii in 1:N) for col in cols);
     CHECKCASE = Dict(col => any(length.(unique.(values(d_lower[col]))) .!==
         length.(values(d_unique[col]))) for col in cols)
 
@@ -103,7 +101,6 @@ function compare_keys(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
     df = DataFrame()
 
     for col in cols
-
         df_temp = DataFrame(key = fill(col, size(d_all[col])))
         d_check = CHECKCASE[col] ? d_unique[col] : d_lower[col]
 
@@ -111,7 +108,9 @@ function compare_keys(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
             missing for v in d_all[col]] for ind in inds]
         df_temp = unique(df_temp[length.(unique.(eachrow(df_temp[:,inds]))) .> 1, :])
 
-        df = vcat(df,df_temp)
+        df = [df; df_temp]
     end
+    
+    size(df,1) > 0 && @warn("Inconsistent keys:", df)
     return df
 end

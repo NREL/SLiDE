@@ -59,9 +59,8 @@ edit_with(df, editor)
 
 ```@setup ex2
 using SLiDE, DataFrames
-BASE_DIR = joinpath(abspath(dirname(Base.find_package("SLiDE"))), "..")
-y = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.yml"]...))
-df = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.csv"]...))
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
 ```
 
 ```@repl ex2
@@ -72,9 +71,8 @@ df
 
 ```@setup ex2_datastream_drop_1
 using SLiDE, DataFrames
-BASE_DIR = joinpath(abspath(dirname(Base.find_package("SLiDE"))), "..")
-y = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.yml"]...))
-df = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.csv"]...))
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
 ```
 
 ```@repl ex2_datastream_drop_1
@@ -89,16 +87,15 @@ df = edit_with(df, editor)
 
 ```@setup ex2_datastream_rename
 using SLiDE, DataFrames
-BASE_DIR = joinpath(abspath(dirname(Base.find_package("SLiDE"))), "..")
-y = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.yml"]...))
-df = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.csv"]...))
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
 df = edit_with(df, [[y[k] for k in ["Drop"]]...;])
 ```
 
 ```@repl ex2_datastream_rename
 editor = Rename(
     from = :IOCode,
-    to   = :input_code);
+    to   = :n);
 df = edit_with(df, editor)
 ```
 
@@ -106,9 +103,8 @@ df = edit_with(df, editor)
 
 ```@setup ex2_datastream_group
 using SLiDE, DataFrames
-BASE_DIR = joinpath(abspath(dirname(Base.find_package("SLiDE"))), "..")
-y = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.yml"]...))
-df = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.csv"]...))
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
 df = edit_with(df, [[y[k] for k in ["Drop", "Rename"]]...;])
 ```
 
@@ -117,8 +113,8 @@ editor = Group(
     file   = joinpath("parse", "regions.csv"),
     from   = :from,
     to     = :to,
-    input  = :input_code,
-    output = :region);
+    input  = :n,
+    output = :r);
 df = edit_with(df, editor)
 ```
 
@@ -126,17 +122,16 @@ df = edit_with(df, editor)
 
 ```@setup ex2_datastream_match
 using SLiDE, DataFrames
-BASE_DIR = joinpath(abspath(dirname(Base.find_package("SLiDE"))), "..")
-y = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.yml"]...))
-df = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.csv"]...))
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
 df = edit_with(df, [[y[k] for k in ["Drop", "Rename", "Group"]]...;])
 ```
 
 ```@repl ex2_datastream_match
 editor = Match(
-    on     = r"\((?<input_code>.*)\)",
-    input  = :input_code,
-    output = [:input_code]);
+    on     = r"\((?<n>.*)\)",
+    input  = :n,
+    output = [:n]);
 df = edit_with(df, editor)
 ```
 
@@ -144,37 +139,16 @@ df = edit_with(df, editor)
 
 ```@setup ex2_datastream_melt
 using SLiDE, DataFrames
-BASE_DIR = joinpath(abspath(dirname(Base.find_package("SLiDE"))), "..")
-y = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.yml"]...))
-df = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.csv"]...))
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
 df = edit_with(df, [[y[k] for k in ["Drop", "Rename", "Group", "Match"]]...;])
 ```
 
 ```@repl ex2_datastream_melt
 editor = Melt(
-    on  = [:input_code, :region],
-    var = :year,
+    on  = [:n, :r],
+    var = :yr,
     val = :value);
-df = edit_with(df, editor)
-```
-
-#### [`SLiDE.Map`](@ref)
-
-```@setup ex2_datastream_map
-using SLiDE, DataFrames
-BASE_DIR = joinpath(abspath(dirname(Base.find_package("SLiDE"))), "..")
-y = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.yml"]...))
-df = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.csv"]...))
-df = edit_with(df, [[y[k] for k in ["Drop", "Rename", "Group", "Match", "Melt"]]...;])
-```
-
-```@repl ex2_datastream_map
-editor = Map(
-    file   = joinpath("parse", "bea.csv"),
-    from   = [:bea_code],
-    to     = [:bea_desc, :bea_windc],
-    input  = [:input_code],
-    output = [:input_desc, :input_windc]);
 df = edit_with(df, editor)
 ```
 
@@ -182,16 +156,41 @@ df = edit_with(df, editor)
 
 ```@setup ex2_datastream_add
 using SLiDE, DataFrames
-BASE_DIR = joinpath(abspath(dirname(Base.find_package("SLiDE"))), "..")
-y = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.yml"]...))
-df = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.csv"]...))
-df = edit_with(df, [[y[k] for k in ["Drop", "Rename", "Group", "Match", "Melt", "Map"]]...;])
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
+df = edit_with(df, [[y[k] for k in ["Drop", "Rename", "Group", "Match", "Melt"]]...;])
 ```
 
 ```@repl ex2_datastream_add
 editor = Add(
     col = :units,
-    val = "USD");
+    val = "thousands of us dollars (USD)");
+df = edit_with(df, editor)
+```
+
+#### [`SLiDE.Map`](@ref)
+
+```@setup ex2_datastream_map
+using SLiDE, DataFrames
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
+df = edit_with(df, [[y[k] for k in ["Drop", "Rename", "Group", "Match", "Melt", "Add"]]...;])
+```
+
+```@repl ex2_datastream_map
+editor = [Map(
+    file   = joinpath("parse", "bea.csv"),
+    from   = [:bea_code],
+    to     = [:bea_desc, :bea_windc],
+    input  = [:n],
+    output = [:desc, :i]),
+Map(
+    file = joinpath("parse", "units.csv"),
+    from = [:from],
+    to = [:to, :factor, :units_factor],
+    input = [:units],
+    output = [:to, :factor, :units_factor]
+)];
 df = edit_with(df, editor)
 ```
 
@@ -199,16 +198,52 @@ df = edit_with(df, editor)
 
 ```@setup ex2_datastream_replace
 using SLiDE, DataFrames
-BASE_DIR = joinpath(abspath(dirname(Base.find_package("SLiDE"))), "..")
-y = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.yml"]...))
-df = read_file(joinpath([BASE_DIR, "tests", "data", "test_datastream.csv"]...))
-df = edit_with(df, [[y[k] for k in ["Drop", "Rename", "Group", "Match", "Melt", "Map", "Add"]]...;])
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
+df = edit_with(df, [[y[k] for k in ["Drop", "Rename", "Group", "Match", "Melt", "Add", "Map"]]...;])
 ```
 
 ```@repl ex2_datastream_replace
 editor = Replace(
     col  = :value,
-    from = "missing",
-    to   = "0");
+    from = missing,
+    to   = 0);
+df = edit_with(df, editor)
+```
+
+#### [`SLiDE.Drop`](@ref)
+
+```@setup ex2_datastream_drop_2
+using SLiDE, DataFrames
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
+df = edit_with(df, [[y[k] for k in ["Drop", "Rename", "Group", "Match", "Melt", "Add", "Map", "Replace"]]...;])
+```
+
+```@repl ex2_datastream_drop_2
+editor = Drop(
+    col  = :value,
+    val = 0,
+    operation = "<");
+df = edit_with(df, editor)
+```
+
+#### [`SLiDE.Operate`]
+
+```@setup ex2_datastream_operate
+using SLiDE, DataFrames
+y = read_file(joinpath("tests", "data", "test_datastream.yml"))
+df = read_file(joinpath("tests", "data", "test_datastream.csv"))
+df = edit_with(df, [[y[k] for k in ["Drop", "Rename", "Group", "Match", "Melt", "Add", "Map", "Replace", "Drop"]]...;])
+```
+
+```@repl ex2_datastream_operate
+editor = Operate(
+    axis = :col,
+    operation = "*"
+    from = [:units],
+    to = [:units_factor]
+    input = [:value, :factor],
+    output = [:value]);
 df = edit_with(df, editor)
 ```

@@ -184,7 +184,7 @@ io[:ms0][io[:ms0][:,:m] .== "trn", :value] .= max.(-io[:trn0][:,:value], 0)
 #   md0(yr,"trd",i) = max(mrg0(yr,i),0);
 #   md0(yr,'trn',i) = max(trn0(yr,i),0);
 io[:md0][io[:md0][:,:m] .== "trd", :value] .= max.(io[:mrg0][:,:value], 0)
-io[:md0][io[:md0][:,:m] .== "trn", :value] .= max.(io[:mrg0][:,:value], 0)
+io[:md0][io[:md0][:,:m] .== "trn", :value] .= max.(io[:trn0][:,:value], 0)
 
 # Household supply
 # Move household supply of recycled goods into the domestic output market

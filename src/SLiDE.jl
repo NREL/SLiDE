@@ -97,13 +97,13 @@ abstract type Check <: DataStream end
 # abstract type CGEModel <: EconomicSystemsType end
 # abstract type CGEModel end
 
-# UTILITIES
-include(joinpath("utils", "utils.jl"))
-
 # PARSING
 include(joinpath("parse", "generated_check", "includes.jl"))
 include(joinpath("parse", "generated_edit", "includes.jl"))
 include(joinpath("parse", "generated_load", "includes.jl"))
+
+# UTILITIES
+include(joinpath("utils", "utils.jl"))
 
 include(joinpath("parse", "load_data.jl"))
 include(joinpath("parse", "edit_data.jl"))

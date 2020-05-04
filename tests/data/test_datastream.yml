@@ -2,57 +2,75 @@ Path: [data]
 
 CSVInput:
     name: test_datastream.csv
-    descriptor: 2020
+    descriptor: 2020-05-03
 
-# Order:
-#     - {col: year,       type: Int}
-#     # - {col: from_code, type: String}
-#     # - {col: from_desc, type: String}
-#     - {col: from_aggr,  type: String}
-#     # - {col: to_code,   type: String}
-#     # - {col: to_desc,   type: String}
-#     - {col: to_aggr,    type: String}
-#     - {col: value,      type: Int}
-#     - {col: units,      type: String}
-    
+Order:
+  - {col: updated, type: Date}
+  - {col: yr,    type: Int}
+  - {col: r,     type: String}
+  - {col: n,     type: Int}
+  - {col: desc,  type: String}
+  - {col: i,     type: String}
+  - {col: units, type: String}
+  - {col: value, type: Float64}
+  - {col: units_0, type: String}
+  - {col: value_0, type: Any}
+  - {col: factor,  type: Any}
+
+Describe:
+  col: updated
+
 Rename:
   - from: IOCode
-    to:   input_code
+    to:   n
   - from: Name
-    to:   input_desc
+    to:   desc
 
 Group:
   file:   [parse, regions.csv]
   from:   from
   to:     to
-  input:  input_code
-  output: region
+  input:  n
+  output: r
 
 Match:
-  on:     \((?<input_code>.*)\)
-  input:  input_code
-  output: input_code
+  on:     \((?<n>.*)\)
+  input:  n
+  output: n
 
 Melt:
-  on:  [input_code, region]
-  var: year
+  on:  [n, r]
+  var: yr
   val: value
-
-Map:
-    file:   [parse, bea.csv]
-    from:   bea_code
-    to:     [bea_desc, bea_windc]
-    input:  input_code
-    output: [input_desc, input_windc]
 
 Add:
   col:  units
-  val:  USD
+  val:  thousands of us dollars (USD)
+
+Map:
+  - file:   [parse, bea.csv]
+    from:   bea_code
+    to:     [bea_desc, bea_windc]
+    input:  n
+    output: [desc, i]
+  - file:   [parse, units.csv]
+    from:   from
+    to:     [to, factor, units_factor]
+    input:  units
+    output: [units, factor, units_factor]
 
 Replace:
   col:  value
   from: missing
   to:   0
+
+Operate:
+  operation: "*"
+  axis:   col
+  from:   units
+  to:     units_factor
+  input:  [value, factor]
+  output: value
 
 Drop:
   - col: linenum

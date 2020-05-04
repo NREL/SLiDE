@@ -11,6 +11,12 @@ CSVInput:
   - name: [Manual, units_append.csv]
     descriptor: other
 
+Order:
+  - {col: from,       type: Any}
+  - {col: sgf_desc,   type: String}
+  - {col: sgf_code,   type: Any}
+  - {col: windc_code, type: Any}
+
 Map:
   - file:   [parse, units_standardize.csv]
     from:   from
