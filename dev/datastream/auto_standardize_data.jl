@@ -7,7 +7,6 @@ using YAML
 
 using SLiDE  # see src/SLiDE.jl
 
-
 READ_DIR = joinpath("data", "readfiles")
 
 files_parse = XLSXInput("generate_yaml.xlsx", "parse", "B1:Z180", "parse")

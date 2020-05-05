@@ -36,10 +36,13 @@ df2 = sort(DataFrame(
     r = repeat(r, inner=[NYR]),
     value = Float64.(1:NYR*NR)))
 df3 = edit_with(copy(df2), Add(:units, "millions of us dollars (usd)"))
+df4 = edit_with(copy(df3), Rename(:value, :Val))
 
 d1 = convert_type(Dict, df1)
 d2 = convert_type(Dict, df2)
-d3 = convert_type(Dict, df3; drop_cols = :units)
+d3a = convert_type(Dict, df3; drop_cols = [:units])
+d3b = convert_type(Dict, df3; drop_cols = :units)
+d4 = convert_type(Dict, df4; drop_cols = :units, value_col = :Val)
 
 # ******************************************************************************************
 # Simple examples.

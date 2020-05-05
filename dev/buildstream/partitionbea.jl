@@ -64,9 +64,9 @@ BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
 [bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3)
     for k in [:supply,:use]]
 
-# # ******************************************************************************************
-# #   READ SETS AND SLiDE SUPPLY/USE DATA.
-# # ******************************************************************************************
+# ******************************************************************************************
+#   READ SETS AND SLiDE SUPPLY/USE DATA.
+# ******************************************************************************************
 SET_DIR = joinpath("data", "coresets")
 set_list = convert_type.(Symbol, ["i", "fd", "m", "ts", "va", "yr"])
 

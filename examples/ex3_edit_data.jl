@@ -11,7 +11,6 @@ Standardize data read from csv file into DataFrame and manipulated using the
 
 This example will most-likely eventually be incorporated into some build stream method.
 Relevant functions can be found in the associated files:
-
 - load_from() - src/parse/load_data.jl
 - edit_with() - src/parse/edit_data.jl
 - read_file() - src/parse/load_data.jl
@@ -29,8 +28,8 @@ df = read_file(joinpath(DATA_DIR, "test_datastream.csv"))
 # single-line if-then statements:
 #   <if> && (<else>)
 # See:
-# https://docs.julialang.org/en/v1/manual/control-flow/#man-conditional-evaluation-1
 # https://discourse.julialang.org/t/style-question-ternary-operator-or-short-circuit-operator-or-if-end/34224/2
+# https://docs.julialang.org/en/v1/manual/control-flow/#man-conditional-evaluation-1
 # https://docs.julialang.org/en/v1/manual/control-flow/#Short-Circuit-Evaluation-1
 "Drop"     in keys(y) && (df = edit_with(df, y["Drop"]))
 "Rename"   in keys(y) && (df = edit_with(df, y["Rename"]))
@@ -45,4 +44,4 @@ df = read_file(joinpath(DATA_DIR, "test_datastream.csv"))
 "Describe" in keys(y) && (df = edit_with(df, y["Describe"], y["CSVInput"]))
 "Order"    in keys(y) && (df = edit_with(df, y["Order"]))
 
-# show(df)
+show(df)
