@@ -28,7 +28,6 @@ a list of values or the full DataFrame.
 - `lst::Array{Float64,1}` of summed values in the order determined by the descriptor columns
     if `values_only = true` (default)
 - `df::DataFrame`: Modified input DataFrame if `values_only = false`
-
 """
 function sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true)
 
@@ -36,7 +35,7 @@ function sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true)
     by_cols = setdiff(names(df), [col; val_cols])
 
     df = by(df, by_cols, Pair.(val_cols, sum))
-    df = edit_with(df, Rename.(setdiff(names(df), by_cols), val_cols));
+    df = edit_with(df, Rename.(setdiff(names(df), by_cols), val_cols))
 
     return values_only ? df[:,val_cols[1]] : df
 end
@@ -47,42 +46,38 @@ end
 
 
 UNITS = "billions of us dollars (USD)"
-# BASE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE"))), "..");
 
 # ******************************************************************************************
 #   READ BLUENOTE DATA -- For benchmarking!
 # ******************************************************************************************
-BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw");
-bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)];
-bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst);
+BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw")
+bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
+bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(
+    read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
 
 # Add supply/use info for checking.
-BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base");
+BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
 [bluenote[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
     Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
-    Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]];
+    Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]]
 
-for k in [:supply, :use]
-    # global bluenote[k] = edit_with(bluenote[k], Drop(:value, 0, "=="))
-    # global bluenote[k] = io[k] |> @filter(_.yr in set[:yr]) |> DataFrame
-    global bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3)
-    # global bluenote[k][!,:units] .= UNITS
-end
+[bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3)
+    for k in [:supply,:use]]
 
 # # ******************************************************************************************
 # #   READ SETS AND SLiDE SUPPLY/USE DATA.
 # # ******************************************************************************************
-SET_DIR = joinpath("data", "coresets");
-set_list = convert_type.(Symbol, ["i", "fd", "m", "ts", "va", "yr"]);
+SET_DIR = joinpath("data", "coresets")
+set_list = convert_type.(Symbol, ["i", "fd", "m", "ts", "va", "yr"])
 
 set = Dict(k => sort(read_file(joinpath(SET_DIR, string(k, ".csv"))))[:,1] for k in set_list)
 set[:j] = set[:i]
-set[:imrg] = ["fbt","gmt","mvt"];
+set[:imrg] = ["fbt","gmt","mvt"]
 
 # Read supply/use data.
-DATA_DIR = joinpath("data", "output");
-io_lst = convert_type.(Symbol, ["supply", "use"]);
-io = Dict(k => read_file(joinpath(DATA_DIR, string(k, ".csv"))) for k in io_lst);
+DATA_DIR = joinpath("data", "output")
+io_lst = convert_type.(Symbol, ["supply", "use"])
+io = Dict(k => read_file(joinpath(DATA_DIR, string(k, ".csv"))) for k in io_lst)
 
 # Perform some minor edits that will apply to all parameters in order to maintain
 # consistency with the data in build_national_cgeparm_raw.gdx for easier benchmarking.
@@ -95,7 +90,7 @@ for k in keys(io)
     # global io[k][!,:units] .= UNITS
 end
 
-io[:supply], io[:use] = fill_zero(io[:supply], io[:use]; permute_keys = true);
+io[:supply], io[:use] = fill_zero(io[:supply], io[:use]; permute_keys = true)
 
 # ******************************************************************************************
 #   PARTITION DATA INTO PARAMETERS.
@@ -150,7 +145,7 @@ io[:sbd0][!,:value] *= -1
 #   trn0(yr,i)$(cif0(yr,i) AND NOT SAMEAS(i,'ins')) = trn0(yr,i) + cif0(yr,i);
 #   m0(yr,i)$(SAMEAS(i,'ins')) = m0(yr,i) + cif0(yr,i);
 #   cif0(yr,i) = 0;
-i_ins = io[:cif0][:,:i] .== "ins";
+i_ins = io[:cif0][:,:i] .== "ins"
 io[:trn0][.!i_ins, :value] .= io[:trn0][.!i_ins,:value] + io[:cif0][.!i_ins,:value]
 io[:m0  ][  i_ins, :value] .= io[:m0][i_ins,:value] + io[:cif0][i_ins,:value]
 io[:cif0][      !, :value] .= 0.0

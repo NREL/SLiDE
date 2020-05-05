@@ -1,5 +1,5 @@
-chk = Dict(k => edit_with(copy(chk[k]), Rename(:value, k)) for k in [:supply, :use])
-chk[:supply], chk[:use]  = make_square(chk[:supply], chk[:use]);
+chk = copy(io)
+[chk[k] = edit_with(copy(chk[k]), Rename(:value, k)) for k in [:supply, :use]]
 
 #   interm(yr,j(jc_use),"use") = use(yr,"interm",jc_use);
 #   basicva(yr,j(jc_use),"use") = use(yr,"basicvalueadded",jc_use);
@@ -18,7 +18,6 @@ chk[:totaluse]   = chk[:use] |> @filter(.&(_.i in set[:i],           _.j == "tot
 #   tsupply(yr,i(ir_supply),'supply') = supply(yr,ir_supply,"Supply");
 chk[:basicsupply] = chk[:supply] |> @filter(.&(_.i in set[:i], _.j == "basicsupply")) |> DataFrame
 chk[:tsupply]     = chk[:supply] |> @filter(.&(_.i in set[:i], _.j == "supply"))      |> DataFrame
-
 
 # Total intermediate inputs (purchasers' prices)
 #   interm(yr,j,'id0') = sum(i,id0(yr,i,j));
@@ -46,7 +45,7 @@ chk[:valueadded][!, :chk] .= chk[:valueadded][!, :use] - chk[:valueadded][!, :va
 #   taxtotal(yr,"ts_taxes") = sum(j, ts0(yr,"taxes",j));
 #   taxtotal(yr,"s0") = sum(i,sbd0(yr,i));
 #   taxtotal(yr,"t0+duty") = sum(i,tax0(yr,i)+duty0(yr,i));
-chk[:taxtotal] = permute_as_dataframe((yr = set[:yr], units = "billions of us dollars (USD)"))
+chk[:taxtotal] = DataFrame(yr = set[:yr])
 chk[:taxtotal][!, :ts_subsidies] .= sum_over(chk[:ts0][chk[:ts0][:,:i] .== "subsidies", :], :j)
 chk[:taxtotal][!, :ts_taxes] .= sum_over(chk[:ts0][chk[:ts0][:,:i] .== "taxes", :], :j)
 chk[:taxtotal][!, :s0] .= sum_over(chk[:sbd0], :i)
@@ -92,7 +91,6 @@ chk[:tsupply][!, :totaluse] .= sum_over(chk[:id0], :j) + sum_over(chk[:fd0], :fd
 chk[:tsupply][!, :chk]        .= chk[:tsupply][:, :supply] - chk[:tsupply][:, :totaluse]
 chk[:tsupply][!, :supply_use] .= chk[:tsupply][:, :ys0_etc] - chk[:tsupply][:, :totaluse]
 
-
 # Check on accounting identities.
 #   details(yr,i,"y0") = y0(yr,i);
 #   details(yr,i,"m0") = m0(yr,i) + duty0(yr,i);
@@ -104,7 +102,7 @@ chk[:tsupply][!, :supply_use] .= chk[:tsupply][:, :ys0_etc] - chk[:tsupply][:, :
 #   details(yr,i,"balance") = y0(yr,i)+m0(yr,i)+duty0(yr,i) + tax0(yr,i)-sbd0(yr,i)
 #       - sum(j, id0(yr,i,j)) - sum(fd,fd0(yr,i,fd)) - x0(yr,i)
 # 		+ (mrg0(yr,i) + trn0(yr,i));
-chk[:details] = permute_as_dataframe((yr = set[:yr], i = set[:j], units = "billions of us dollars (USD)"))
+chk[:details] = DataFrame(permute((yr = set[:yr], i = set[:i])))
 chk[:details][!,:y0] .= chk[:y0][:,:value]
 chk[:details][!,:m0] .= chk[:m0][:,:value] + chk[:duty0][:,:value]
 chk[:details][!,:mrg_trn] .= chk[:mrg0][:,:value] + chk[:trn0][:,:value]
@@ -126,4 +124,7 @@ chk[:details][!,:balance] .=
     # imrginfo(yr,"m0",imrg) = m0(yr,imrg);
     # imrginfo(yr,"duty0",imrg) = duty0(yr,imrg);
     # imrginfo(yr,m,imrg) = md0(yr,m,imrg);
-chk[:imrg] = permute_as_dataframe((yr = set[:yr], value = 0.0))
+chk[:imrg] = fill_zero((yr = set[:yr],))
+
+# Only keep keys unique to the "chk" Dictionary.
+chk = Dict(k => chk[k] for k in setdiff(keys(chk), keys(io)))
