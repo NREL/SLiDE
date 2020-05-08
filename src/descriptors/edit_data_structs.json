@@ -18,7 +18,7 @@
     },
     {
         "struct_name": "Drop",
-        "docstring": "Remove information from the dataframe",
+        "docstring": "Remove information from the dataframe - either an entire column or rows containing specified values.",
         "fields": [
             {
                 "name": "col",
@@ -147,7 +147,7 @@ This operation can only be performed once per dataframe.",
     },
     {
         "struct_name": "Operate",
-        "docstring": "Perform an operation (+, -, *, /) across multiple DataFrame columns.",
+        "docstring": "Perform an arithmetic operation across multiple DataFrame columns.",
         "fields": [
             {
                 "name": "axis",
@@ -241,7 +241,7 @@ This operation can only be performed once per dataframe.",
     },
     {
         "struct_name": "Match",
-        "docstring": "",
+        "docstring": "Extract values from the specified column into a column or columns based on the specified regular expression.",
         "fields": [
             {
                 "name": "on",

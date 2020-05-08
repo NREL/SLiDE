@@ -1,5 +1,4 @@
 function stack_by(df, col, val, input, output)
-
     cols = unique(vcat(names(df), output))
 
     df[!,:start] = (1:size(df)[1]) .+ 1
@@ -14,7 +13,6 @@ function stack_by(df, col, val, input, output)
 
     df = df[df[:,output[1]] .!= "", :]
     return df[:, cols]
-
 end
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -24,9 +22,9 @@ if length(filename) > 0
     println(string("Standardizing ", filename[1]))
     y = read_file(filename[1])
     df = read_file(y["Path"], y["XLSXInput"])
-    df = edit_with(df, vcat([vcat(y[k]) for k in ["Rename", "Match"]]...))
-    df[!,:naics_level] .= string.(length.(df[:,:naics_level]))
-    df = edit_with(df, vcat([vcat(y[k]) for k in ["Replace", "Order"]]...))
+    df = edit_with(df, [[y[k] for k in ["Rename", "Match"]]...;])
+    df[!,:naics_level] .= length.(df[:,:naics_level])
+    df = edit_with(df, [[y[k] for k in ["Replace", "Order"]]...;])
     CSV.write(joinpath(SLIDE_DIR, y["PathOut"]...), unique(df))
 end
 
@@ -43,11 +41,11 @@ if length(filename) > 0
     # None of the Edit DataTypes are quite equiped to handle this.
     # df_map = df_map[:, names(df_map)[.!occursin.("line_num", names(df_map))]]
     cols = [:from, :sgf_desc, :units]
-    df = vcat([edit_with(df_map[:, occursin.(yy, names(df_map))],
+    df = [[edit_with(df_map[:, occursin.(yy, names(df_map))],
             Rename.(names(df_map)[occursin.(yy, names(df_map))], cols))
-        for yy in string.(1997:2016)]...)
+        for yy in string.(1997:2016)]...;]
 
-    df = edit_with(df, vcat([vcat(y[k]) for k in ["Drop", "Map", "Order"]]...))
+    df = edit_with(df, [[y[k] for k in ["Drop", "Map", "Order"]]...;])
     CSV.write(joinpath(SLIDE_DIR, y["PathOut"]...), df)
 end
 
@@ -69,6 +67,7 @@ if length(filename) > 0
         for (val, output) in collect(zip(vals, outputs))[1:end-1]]
     df = edit_with(df, Rename.(input, outputs[end]))
 
-    df = edit_with(df, y["Order"])
+    global df = edit_with(df, y["Order"])
     CSV.write(joinpath(SLIDE_DIR, y["PathOut"]...), df)
 end
+

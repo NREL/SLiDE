@@ -61,7 +61,7 @@ BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
     Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
     Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]]
 
-[bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3)
+[bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3) # convert millions -> billions USD
     for k in [:supply,:use]]
 
 # ******************************************************************************************

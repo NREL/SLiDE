@@ -5,33 +5,38 @@
     edit_with(df::DataFrame, x::Describe, file::T) where T<:File
     edit_with(file::T, y::Dict{Any,Any}; kwargs...)
     edit_with(files::Array{T,N} where N, y::Dict{Any,Any}; kwargs...) where T<:File
-
 This function edits the input DataFrame `df` and returns the resultant DataFrame.
 
 # Arguments
-
 - `df::DataFrame`: The DataFrame on which to perform the edit.
-- `editor::T where T<:Edit`: DataType containing information about which edit to perform. The following edit options are available and detailed below:
-    - [`SLiDE.Add`](@ref): Add new column `col` filled with `val`.
-    - [`SLiDE.Describe`](@ref): This DataType is required when multiple DataFrames will be
-        appended into one output file (say, if multiple sheets from an XLSX file are
-        included). Before the DataFrames are appended, a column `col` will be added and
-        filled with the value in the file descriptor.
+- `editor::T where T<:Edit`: DataType containing information about which edit to perform.
+    The following edit options are available and detailed below. If given a dictionary of
+    edits, they will be made in this order:
+    - [`SLiDE.Drop`](@ref): Remove information from the DataFrame -- either an entire column
+        or rows containing specified values.
+    - [`SLiDE.Rename`](@ref): Change column name `from` -> `to`.
     - [`SLiDE.Group`](@ref): Use to edit files containing data in successive dataframes with
         an identifying header cell or row.
-    - [`SLiDE.Map`](@ref): Define an `output` column containing values based on those in an
-        `input` column. The mapping columns `from` -> `to` are contained in a .csv `file` in
-        the coremaps directory. The columns `input` and `from` should contain the same
-        values, as should `output` and `to`.
+    - [`SLiDE.Match`](@ref): Extract values from the specified column into a column or
+        columns based on the specified regular expression.
     - [`SLiDE.Melt`](@ref): Normalize the dataframe by 'melting' columns into rows, 
         lengthening the dataframe by duplicating values in the column `on` into new rows and
         defining 2 new columns:
         1. `var` with header names from the original dataframe.
         2. `val` with column values from the original dataframe.
+    - [`SLiDE.Add`](@ref): Add new column `col` filled with `val`.
+    - [`SLiDE.Map`](@ref): Define an `output` column containing values based on those in an
+        `input` column. The mapping columns `from` -> `to` are contained in a .csv `file` in
+        the coremaps directory. The columns `input` and `from` should contain the same
+        values, as should `output` and `to`.
+    - [`SLiDE.Replace`](@ref): Replace values in `col` `from` -> `to`.
+    - [`SLiDE.Operate`](@ref): Perform an arithmetic operation across multiple DataFrame columns or rows.
+    - [`SLiDE.Describe`](@ref): This DataType is required when multiple DataFrames will be
+        appended into one output file (say, if multiple sheets from an XLSX file are
+        included). Before the DataFrames are appended, a column `col` will be added and
+        filled with the value in the file descriptor.
     - [`SLiDE.Order`](@ref): Rearranges columns in the order specified by `cols` and sets
         them to the specified type.
-    - [`SLiDE.Rename`](@ref): Change column name `from` -> `to`.
-    - [`SLiDE.Replace`](@ref): Replace values in `col` `from` -> `to`.
 - `file::T where T <: File`: Data file containing information to read.
 - `files::Array{T} where T <: File`: List of data files.
 - `y::Dict{Any,Any}`: Dictionary containing all editing structures among other values read
@@ -39,13 +44,11 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
     names, or the edits will not be made.
 
 # Keywords
-
 - `shorten::Bool = false` or `shorten::Int`: if an integer length is specified, the
     DataFrame will be shortened to the input value. This is meant to aid troubleshooting
     during development.
 
 # Returns
-
 - `df::DataFrame`: including edit(s)
 """
 function edit_with(df::DataFrame, x::Add)
