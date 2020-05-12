@@ -6,18 +6,6 @@
 #
 ####################################
 
-#temporal setup
-# mod_year is the first year modeled,
-# the year read from the blueNOTE dataset,
-# and thus the benchmark year
-mod_year = 2016
-# last year modeled
-end_year = 2020
-# index used in the model is the set of years modeled here
-years = mod_year:end_year
-#years = [mod_year, 2018, 2020]
-
-
 using SLiDE
 using CSV
 using JuMP
@@ -27,6 +15,33 @@ using DataFrames
 # Note - using the comlementarity package until the native JuMP implementation 
 #        of complementarity constraints allows for exponents neq 0/1/2
 #               --- most recently tested on May 11, 2020 --- 
+
+#################
+# -- FUNCTIONS --
+#################
+
+# -- Temporal setup --
+
+# mod_year is the first year modeled,
+# the year read from the blueNOTE dataset,
+# and thus the benchmark year
+mod_year = 2016
+
+# last year modeled
+end_year = 2020
+
+# index used in the model is the set of years modeled here
+years = mod_year:end_year
+
+#last year is the maximum of all years
+years_last = maximum(years)
+#years = [mod_year, 2018, 2020]
+
+# -- Major Assumptions -- 
+rho = 0.04    # discount factor   
+i = 0.05      # interest rate         
+g = 0.03      # labor growth rate
+delta  = 0.02 # capital depreciation factor
 
 
 #################
@@ -229,6 +244,23 @@ for k in keys(blueNOTE[:tm0])
 end
 
 
+#!!!! talk to caroline or sourabh about this...
+k0 = Dict()
+
+for k in keys(blueNOTE[:kd0])
+    for t in years
+        newkey = tuple(k[1],k[2],t)
+        if t==mod_year
+            push!(k0,newkey=>blueNOTE[:kd0][k])
+        end
+        if t!=mod_year 
+            push!(k0,newkey=>0)
+        end
+    end
+end
+
+
+
 ##################
 # -- VARIABLES -- 
 ##################
@@ -245,6 +277,8 @@ sv = 0.00
 @variable(cge,A[r in regions, g in goods, t in years]>=sv,start=1)
 @variable(cge,C[r in regions, t in years]>=sv,start=1)
 @variable(cge,MS[r in regions, m in margins, t in years]>=sv,start=1)
+@variable(cge,K[r in regions, s in sectors, t in years],start=blueNOTE[:kd0][r,s])
+@variable(cge,I[r in regions, s in sectors, t in years],start=((1-delta)^(t-mod_year) * blueNOTE[:kd0][r,s]))
 
 #commodities:
 @variable(cge,PA[r in regions, g in goods, t in years]>=sv,start=1) # Regional market (input)
@@ -275,9 +309,17 @@ sv = 0.00
 
 #demand for capital in VA
 @NLexpression(cge,AK[r in regions,s in sectors, t in years],
-  blueNOTE[:kd0][r,s] * CVA[r,s,t] / PK[r,s,t] );
+  K[r,s,t] * CVA[r,s,t] / PK[r,s,t] );
 
-  ###
+
+  
+#alpha_k = (1/(1+(1-delta)))
+#@NLexpression(cge,RRK[r in regions, s in sectors, t in years],
+#    RK[r,s,t] ^ (1 - alpha_k) * PK[r,s,t] ^ alpha_k
+#);
+#@NLexpression(cge,ARK[r in regions, s in sectors])
+
+###
 
 #CES function for output demand - including
 # exports (absent of re-exports) times the price for foreign exchange, 
@@ -384,6 +426,15 @@ sv = 0.00
         PC[r,t] * blueNOTE[:c0][(r,)]
 );
 
+@mapping(cge,profit_k[r in regions, s in sectors, t in years],
+
+);
+
+@mapping(cge,profit_i[r in regions, s in sectors, t in years],
+    PY[r,s,t] 
+    - 
+    sum(PK[r,s,tt] for tt in [t+1] if (t!=years_last))
+);
 
 @mapping(cge,profit_ms[r in regions, m in margins, t in years],
 # provision of margins to national market
@@ -420,6 +471,7 @@ sv = 0.00
         sum(Y[r,s,t] * blueNOTE[:ys0][r,s,g] for s in sectors)
 # household production (exogenous)        
         + blueNOTE[:yh0][r,g]
+        + I[r,g,t]
         - 
 # aggregate supply (akin to market demand)                
         X[r,g,t] * blueNOTE[:s0][r,g]
@@ -458,9 +510,21 @@ sv = 0.00
 
 @mapping(cge,market_pk[r in regions, s in sectors, t in years],
 # supply of capital available to each sector
-        blueNOTE[:kd0][r,s]
+        K[r,s,t]        
 # demand for capital in each sector        
         - Y[r,s,t] * AK[r,s,t]
+);
+
+@mapping(cge,market_pi[r in regions, s in sectors, t in years],
+#starting value of investment for the first year
+        sum(k0[r,s,tt] for tt in [t] if (t==mod_year) )
+#previous year's decayed capital if not the first year
+        + (1-delta) * sum(K[r,s,tt] for tt in [t-1] if (t!=mod_year) )
+#contemporaneous investment        
+        + I[r,s,t]
+        - 
+#existing capital        
+        K[r,s,t]
 );
 
 @mapping(cge,market_pm[r in regions, m in margins, t in years],
@@ -498,7 +562,7 @@ sv = 0.00
 # labor income        
         PL[r,t] * sum(blueNOTE[:ld0][r,s] for s in sectors)
 # capital income        
-        + sum(PK[r,s,t] * blueNOTE[:kd0][r,s] for s in sectors)
+        + sum(PK[r,s,t] * K[r,s,t] for s in sectors)
 # provision of household supply          
         + sum(PY[r,g,t]*blueNOTE[:yh0][r,g] for g in goods)
 # revenue or costs of foreign exchange including household adjustment   
