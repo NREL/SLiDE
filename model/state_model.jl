@@ -11,9 +11,14 @@ using JuMP
 using Complementarity
 using DataFrames
 
-##########
-# FUNCTIONS
-##########
+# Note - using the comlementarity package until the native JuMP implementation 
+#        of complementarity constraints allows for exponents neq 0/1/2
+#               --- most recently tested on May 11, 2020 --- 
+
+
+#################
+# -- FUNCTIONS --
+#################
 
 #replace here with "collect"
 function key_to_vec(d::Dict,index_num::Int64)
@@ -106,7 +111,6 @@ goods = sectors;
 margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
 goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
 
-
 # need to fill in zeros to avoid missing keys
 fill_zero(tuple(regions,sectors,goods),blueNOTE[:ys0])
 fill_zero(tuple(regions,goods,sectors),blueNOTE[:id0])
@@ -141,12 +145,17 @@ fill_zero(tuple(regions,goods),blueNOTE[:nd0])
 #the value share - good to be clear on ta as well though
 blueNOTE[:tm] = blueNOTE[:tm0]
 blueNOTE[:ta] = blueNOTE[:ta0]
+blueNOTE[:ty] = blueNOTE[:ty0]
+
 
 #following subsets are used to limit the size of the model
-#similar to conditionals within GAMS
+# the a_set restricits the A variables indices to those
+# with positive armington supply or re-exports
 a_set = Dict()
 [a_set[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
-# y_check is used to make sure the r/s combination is a valid output
+
+# y_check is used to make sure the r/s combination 
+# has a reference amount of sectoral supply
 y_check = Dict()
 [y_check[r,s] = sum(blueNOTE[:ys0][r,s,g] for g in goods) for r in regions for s in sectors]
 
@@ -247,35 +256,47 @@ sv = 0.00
 # -- PLACEHOLDER VARIABLES --
 ###############################
 
+#cobb-douglas function for value added (VA)
 @NLexpression(cge,CVA[r in regions,s in sectors],
-  PL[r]^alpha_kl[r,s] * PK[r,s] ^(1-alpha_kl[r,s]) );
+  PL[r]^alpha_kl[r,s] * PK[r,s] ^ (1-alpha_kl[r,s]) );
 
+#demand for labor in VA
 @NLexpression(cge,AL[r in regions, s in sectors],
   blueNOTE[:ld0][r,s] * CVA[r,s] / PL[r] );
 
+#demand for capital in VA
 @NLexpression(cge,AK[r in regions,s in sectors],
   blueNOTE[:kd0][r,s] * CVA[r,s] / PK[r,s] );
 
   ###
 
+#CES function for output demand - including
+# exports (absent of re-exports) times the price for foreign exchange, 
+# region's supply to national market times the national market price
+# regional supply to local market times domestic price
 @NLexpression(cge,RX[r in regions,g in goods],
   (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5) );
 
+#demand for exports via demand function
 @NLexpression(cge,AX[r in regions,g in goods],
   (blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g])*(PFX/RX[r,g])^4 );
 
+#demand for contribution to national market 
 @NLexpression(cge,AN[r in regions,g in goods],
   blueNOTE[:xn0][r,g]*(PN[g]/(RX[r,g]))^4 );
 
+#demand for regionals supply to local market
 @NLexpression(cge,AD[r in regions,g in goods],
   blueNOTE[:xd0][r,g] * (PD[r,g] / (RX[r,g]))^4 );
 
   ###
 
+# CES function for tradeoff between national and domestic market
 @NLexpression(cge,CDN[r in regions,g in goods],
   (theta_n[r,g]*PN[g]^(1-2)+(1-theta_n[r,g])*PD[r,g]^(1-2))^(1/(1-2)) );
 
-#!!!! here replaced first :tm with :tm0
+# CES function for tradeoff between domestic consumption and foreign exports
+# recall tm in the import tariff thus tm / tm0 is the relative change in import tariff rates
 @NLexpression(cge,CDM[r in regions,g in goods],
   ((1-theta_m[r,g])*CDN[r,g]^(1-4)+theta_m[r,g]*
   (PFX*(1+blueNOTE[:tm][r,g])/(1+blueNOTE[:tm0][r,g]))^(1-4))^(1/(1-4)) 
@@ -283,15 +304,19 @@ sv = 0.00
 
   ###
 
+# regions demand from the national market <- note nesting of CDN in CDM
 @NLexpression(cge,DN[r in regions,g in goods],
   blueNOTE[:nd0][r,g]*(CDN[r,g]/PN[g])^2*(CDM[r,g]/CDN[r,g])^4 );
 
+# region demand from local market <- note nesting of CDN in CDM
 @NLexpression(cge,DD[r in regions,g in goods],
   blueNOTE[:dd0][r,g]*(CDN[r,g]/PD[r,g])^2*(CDM[r,g]/CDN[r,g])^4 );
 
+# import demand
 @NLexpression(cge,MD[r in regions,g in goods],
   blueNOTE[:m0][r,g]*(CDM[r,g]*(1+blueNOTE[:tm][r,g])/(PFX*(1+blueNOTE[:tm0][r,g])))^4 );
 
+# final demand
 @NLexpression(cge,CD[r in regions,g in goods],
   blueNOTE[:cd0][r,g]*PC[r] / PA[r,g] );
 
@@ -301,46 +326,65 @@ sv = 0.00
 ###############################
 
 @mapping(cge,profit_y[r in regions,s in sectors],
-                sum(PA[r,g] * blueNOTE[:id0][r,g,s] for g in goods) 
-                + PL[r] * AL[r,s]
-                + PK[r,s] * AK[r,s]
-                - 
-                sum(PY[r,g] * blueNOTE[:ys0][r,s,g] for g in goods) * (1-blueNOTE[:ty0][r,s])
+# cost of intermediate demand
+        sum(PA[r,g] * blueNOTE[:id0][r,g,s] for g in goods) 
+# cost of labor inputs
+        + PL[r] * AL[r,s]
+# cost of capital inputs
+        + PK[r,s] * AK[r,s]
+        - 
+# revenue from sectoral supply (take note of r/s/g indices on ys0)                
+        sum(PY[r,g] * blueNOTE[:ys0][r,s,g] for g in goods) * (1-blueNOTE[:ty][r,s])
 );
 
 
 @mapping(cge,profit_x[r in regions,g in goods],
-                  PY[r,g] * blueNOTE[:s0][r,g] 
-                  - 
-                  (PFX * AX[r,g]
-                + PN[g] * AN[r,g]
-                + PD[r,g] * AD[r,g])
+# output 'cost' from aggregate supply
+        PY[r,g] * blueNOTE[:s0][r,g] 
+        - (
+# revenues from foreign exchange
+        PFX * AX[r,g]
+# revenues from national market                  
+        + PN[g] * AN[r,g]
+# revenues from domestic market
+        + PD[r,g] * AD[r,g])
 );
 
 
 @mapping(cge,profit_a[r in regions,g in goods],
-                  PN[g] * DN[r,g] 
-                + PD[r,g] * DD[r,g] 
-                + PFX * (1+blueNOTE[:tm0][r,g]) * MD[r,g]
-                + sum(PM[r,m] * blueNOTE[:md0][r,m,g] for m in margins)
-                - ( 
-                  PA[r,g] * (1-blueNOTE[:ta][r,g]) * blueNOTE[:a0][r,g] 
-                + PFX * blueNOTE[:rx0][r,g]
-                )
+# costs from national market
+        PN[g] * DN[r,g] 
+# costs from domestic market                  
+        + PD[r,g] * DD[r,g] 
+# costs from imports, including import tariff
+        + PFX * (1+blueNOTE[:tm][r,g]) * MD[r,g]
+# costs of margin demand                
+        + sum(PM[r,m] * blueNOTE[:md0][r,m,g] for m in margins)
+        - ( 
+# revenues from regional market based on armington supply               
+        PA[r,g] * (1-blueNOTE[:ta][r,g]) * blueNOTE[:a0][r,g] 
+# revenues from re-exports                   
+        + PFX * blueNOTE[:rx0][r,g]
+        )
 );
 
 @mapping(cge,profit_c[r in regions],
-                  sum(PA[r,g] * CD[r,g] for g in goods)
-                  - 
-                  PC[r] * blueNOTE[:c0][(r,)]
+# costs of inputs - computed as final demand times regional market prices
+        sum(PA[r,g] * CD[r,g] for g in goods)
+        - 
+# revenues/benefit computed as CPI * reference consumption                  
+        PC[r] * blueNOTE[:c0][(r,)]
 );
 
 
 @mapping(cge,profit_ms[r in regions, m in margins],
-    sum(PN[gm]   * blueNOTE[:nm0][r,gm,m] for gm in goods_margins)
-  + sum(PD[r,gm] * blueNOTE[:dm0][r,gm,m] for gm in goods_margins)
-    - 
-    PM[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins)
+# provision of margins to national market
+        sum(PN[gm]   * blueNOTE[:nm0][r,gm,m] for gm in goods_margins)
+# provision of margins to domestic market    
+        + sum(PD[r,gm] * blueNOTE[:dm0][r,gm,m] for gm in goods_margins)
+        - 
+# total margin demand    
+        PM[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins)
 );
 
 
@@ -348,88 +392,117 @@ sv = 0.00
 # -- Market Clearing Conditions -- 
 ###################################
 
-
 @mapping(cge,market_pa[r in regions, g in goods],
+# absorption or supply
         A[r,g] * blueNOTE[:a0][r,g] 
         - ( 
+# government demand (exogenous)       
         blueNOTE[:g0][r,g] 
+# demand for investment (exogenous)
         + blueNOTE[:i0][r,g]
+# final demand        
         + C[r] * CD[r,g]
+# intermediate demand        
         + sum(Y[r,s] * blueNOTE[:id0][r,g,s] for s in sectors if (y_check[r,s] > 0))
         )
 );
 
-
 @mapping(cge,market_py[r in regions, g in goods],
+# sectoral supply
         sum(Y[r,s] * blueNOTE[:ys0][r,s,g] for s in sectors)
-      + blueNOTE[:yh0][r,g]
+# household production (exogenous)        
+        + blueNOTE[:yh0][r,g]
         - 
+# aggregate supply (akin to market demand)                
         X[r,g] * blueNOTE[:s0][r,g]
 );
 
 
 @mapping(cge,market_pd[r in regions, g in goods],
+# aggregate supply
         X[r,g] * AD[r,g] 
         - ( 
+# demand for local market          
         A[r,g] * DD[r,g]
+# margin supply from local market
         + sum(MS[r,m] * blueNOTE[:dm0][r,g,m] for m in margins if (g in goods_margins ) )  
         )
 );
 
 @mapping(cge,market_pn[g in goods],
+# supply to the national market
         sum(X[r,g] * AN[r,g] for r in regions)
         - ( 
+# demand from the national market 
         sum(A[r,g] * DN[r,g] for r in regions)
+# market supply to the national market        
         + sum(MS[r,m] * blueNOTE[:nm0][r,g,m] for r in regions for m in margins if (g in goods_margins) )
         )
 );
 
 @mapping(cge,market_pl[r in regions],
+# supply of labor
         sum(blueNOTE[:ld0][r,s] for s in sectors)
         - 
+# demand for labor in all sectors        
         sum(Y[r,s] * AL[r,s] for s in sectors)
 );
 
-
 @mapping(cge,market_pk[r in regions, s in sectors],
+# supply of capital available to each sector
         blueNOTE[:kd0][r,s]
+# demand for capital in each sector        
         - Y[r,s] * AK[r,s]
 );
 
 @mapping(cge,market_pm[r in regions, m in margins],
+# margin supply 
         MS[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins)
         - 
+# margin demand        
         sum(A[r,g] * blueNOTE[:md0][r,m,g] for g in goods)
 );
 
 @mapping(cge,market_pc[r in regions],
+# final demand
         C[r] * blueNOTE[:c0][(r,)] 
         - 
+# consumption / utiltiy        
         RA[r] / PC[r]
 );
 
 
 @mapping(cge,market_pfx,
+# balance of payments (exogenous)
         sum(blueNOTE[:bopdef0][(r,)] for r in regions)
+# supply of exports     
         + sum(X[r,g] * AX[r,g] for r in regions for g in goods)
-# add a set here        
+# supply of re-exports        
         + sum(A[r,g] * blueNOTE[:rx0][r,g] for r in regions for g in goods if (a_set[r,g] != 0))
-#need a_set here        
+# import demand        
         - sum(A[r,g] * MD[r,g] for r in regions for g in goods if (a_set[r,g] != 0))
 );
 
 @mapping(cge,income_ra[r in regions],
+# consumption/utility
         RA[r] - 
         ( 
-        sum(PY[r,g]*blueNOTE[:yh0][r,g] for g in goods)
-#will fix reference here...        
-        + PFX * (blueNOTE[:bopdef0][(r,)] + blueNOTE[:hhadj][(r,)])
-        - sum(PA[r,g] * (blueNOTE[:g0][r,g] + blueNOTE[:i0][r,g]) for g in goods)
-        + PL[r] * sum(blueNOTE[:ld0][r,s] for s in sectors)
+# labor income        
+        PL[r] * sum(blueNOTE[:ld0][r,s] for s in sectors)
+# capital income        
         + sum(PK[r,s] * blueNOTE[:kd0][r,s] for s in sectors)
+# provision of household supply          
+        + sum(PY[r,g]*blueNOTE[:yh0][r,g] for g in goods)
+# revenue or costs of foreign exchange including household adjustment   
+        + PFX * (blueNOTE[:bopdef0][(r,)] + blueNOTE[:hhadj][(r,)])
+# government and investment provision        
+        - sum(PA[r,g] * (blueNOTE[:g0][r,g] + blueNOTE[:i0][r,g]) for g in goods)
+# import taxes - assumes lumpsum recycling
         + sum(A[r,g] * MD[r,g]* PFX * blueNOTE[:tm][r,g] for g in goods if (a_set[r,g] != 0))
+# taxes on intermediate demand - assumes lumpsum recycling
         + sum(A[r,g] * blueNOTE[:a0][r,g]*PA[r,g]*blueNOTE[:ta][r,g] for g in goods if (a_set[r,g] != 0) )
-        + sum(Y[r,s] * blueNOTE[:ys0][r,s,g] * blueNOTE[:ty0][r,s] for s in sectors for g in goods)
+# production taxes - assumes lumpsum recycling  
+        + sum(Y[r,s] * blueNOTE[:ys0][r,s,g] * blueNOTE[:ty][r,s] for s in sectors for g in goods)
         )
 );
 
@@ -446,14 +519,10 @@ sv = 0.00
 [fix(PD[r,g],1,force=true) for r in regions for g in goods if (blueNOTE[:xd0][r,g] == 0)]
 [fix(Y[r,s],1,force=true) for r in regions for s in sectors if !(y_check[r,s] > 0)]
 [fix(X[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:s0][r,g] > 0)]
+[fix(A[r,g],1,force=true) for r in regions for g in goods if (a_set[r,g] == 0)]
 
-a_fix = Dict()
-[a_fix[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
-
-[fix(A[r,g],1,force=true) for r in regions for g in goods if (a_fix[r,g] == 0)]
-
-
-
+# define complementarity conditions
+# note the pattern of ZPC -> primal variable  &  MCC -> dual variable (price)
 @complementarity(cge,profit_y,Y);
 @complementarity(cge,profit_x,X);
 @complementarity(cge,profit_a,A);
@@ -481,7 +550,6 @@ PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
 # export the path license string to the environment
 # this is now done in the SLiDE initiation steps 
 ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
-
 
 # solve the model
 status = solveMCP(cge)
