@@ -224,7 +224,7 @@ end
 # -- VARIABLES -- 
 ##################
 
-year_after_mod_year = 1
+year_after_mod_year = 10
 years = mod_year:(mod_year + year_after_mod_year)
 
 cge = MCPModel();
@@ -474,7 +474,7 @@ sv = 0.00
 );
 
 
-@mapping(cge,market_pfx[t],
+@mapping(cge,market_pfx[t in years],
 # balance of payments (exogenous)
         sum(blueNOTE[:bopdef0][(r,)] for r in regions)
 # supply of exports     
@@ -485,12 +485,12 @@ sv = 0.00
         - sum(A[r,g,t] * MD[r,g,t] for r in regions for g in goods if (a_set[r,g] != 0))
 );
 
-@mapping(cge,income_ra[r in regions],
+@mapping(cge,income_ra[r in regions, t in years],
 # consumption/utility
         RA[r,t] - 
         ( 
 # labor income        
-        PL[r,y] * sum(blueNOTE[:ld0][r,s] for s in sectors)
+        PL[r,t] * sum(blueNOTE[:ld0][r,s] for s in sectors)
 # capital income        
         + sum(PK[r,s,t] * blueNOTE[:kd0][r,s] for s in sectors)
 # provision of household supply          
@@ -515,13 +515,13 @@ sv = 0.00
 
 # equations with conditions cannot be paired 
 # see workaround here: https://github.com/chkwon/Complementarity.jl/issues/37
-[fix(PK[r,s,t],1;force=true) for r in regions for s in sectors if !(blueNOTE[:kd0][r,s] > 0)]
-[fix(PY[r,g,t],1,force=true) for r in regions for g in goods if !(y_check[r,g]>0)]
-[fix(PA[r,g,t],1,force=true) for r in regions for g in goods if !(blueNOTE[:a0][r,g]>0)]
-[fix(PD[r,g,t],1,force=true) for r in regions for g in goods if (blueNOTE[:xd0][r,g] == 0)]
-[fix(Y[r,s,t],1,force=true) for r in regions for s in sectors if !(y_check[r,s] > 0)]
-[fix(X[r,g,t],1,force=true) for r in regions for g in goods if !(blueNOTE[:s0][r,g] > 0)]
-[fix(A[r,g,t],1,force=true) for r in regions for g in goods if (a_set[r,g] == 0)]
+[fix(PK[r,s,t],1;force=true) for r in regions for s in sectors for t in years if !(blueNOTE[:kd0][r,s] > 0)]
+[fix(PY[r,g,t],1,force=true) for r in regions for g in goods for t in years if !(y_check[r,g]>0)]
+[fix(PA[r,g,t],1,force=true) for r in regions for g in goods for t in years if !(blueNOTE[:a0][r,g]>0)]
+[fix(PD[r,g,t],1,force=true) for r in regions for g in goods for t in years if (blueNOTE[:xd0][r,g] == 0)]
+[fix(Y[r,s,t],1,force=true) for r in regions for s in sectors for t in years if !(y_check[r,s] > 0)]
+[fix(X[r,g,t],1,force=true) for r in regions for g in goods for t in years if !(blueNOTE[:s0][r,g] > 0)]
+[fix(A[r,g,t],1,force=true) for r in regions for g in goods for t in years if (a_set[r,g] == 0)]
 
 # define complementarity conditions
 # note the pattern of ZPC -> primal variable  &  MCC -> dual variable (price)
