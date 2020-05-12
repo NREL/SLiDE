@@ -1,9 +1,22 @@
 
-################################################
+####################################
 #
-# Replication of the state-level blueNOTE model
+# Extension of Canonical blueNOTE 
+#    model to include dynamics
 #
-################################################
+####################################
+
+#temporal setup
+# mod_year is the first year modeled,
+# the year read from the blueNOTE dataset,
+# and thus the benchmark year
+mod_year = 2016
+# last year modeled
+end_year = 2020
+# index used in the model is the set of years modeled here
+years = mod_year:end_year
+#years = [mod_year, 2018, 2020]
+
 
 using SLiDE
 using CSV
@@ -39,7 +52,6 @@ function fill_zero(source::Tuple, tofill::Dict)
   allkeys = vcat(collect(Base.Iterators.product(source...))...)
   missingkeys = setdiff(allkeys, collect(keys(tofill)))
 
-# Add
   [push!(tofill, fill=>0) for fill in missingkeys]
   return tofill
 end
@@ -60,9 +72,6 @@ end
 ############
 # LOAD DATA
 ############
-
-# year for the model to be based off of
-mod_year = 2016
 
 #specify the path where the dumped csv files are stored
 data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
@@ -224,9 +233,6 @@ end
 # -- VARIABLES -- 
 ##################
 
-year_after_mod_year = 10
-years = mod_year:(mod_year + year_after_mod_year)
-
 cge = MCPModel();
 
 # small value that acts as a lower limit to variable values
@@ -278,7 +284,7 @@ sv = 0.00
 # region's supply to national market times the national market price
 # regional supply to local market times domestic price
 @NLexpression(cge,RX[r in regions,g in goods, t in years],
-  (alpha_x[r,g,t]*PFX[t]^5+alpha_n[r,g]*PN[g,t]^5+alpha_d[r,g]*PD[r,g,t]^5)^(1/5) );
+  (alpha_x[r,g]*PFX[t]^5+alpha_n[r,g]*PN[g,t]^5+alpha_d[r,g]*PD[r,g,t]^5)^(1/5) );
 
 #demand for exports via demand function
 @NLexpression(cge,AX[r in regions,g in goods, t in years],
