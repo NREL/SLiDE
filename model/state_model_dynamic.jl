@@ -1,4 +1,3 @@
-
 ####################################
 #
 # Extension of Canonical blueNOTE 
@@ -28,7 +27,7 @@ using DataFrames
 mod_year = 2016
 
 # last year modeled
-end_year = 2020
+end_year = 2017
 
 # index used in the model is the set of years modeled here
 years = mod_year:end_year
@@ -37,16 +36,73 @@ years = mod_year:end_year
 years_last = maximum(years)
 #years = [mod_year, 2018, 2020]
 
+bool_firstyear = Dict()
+bool_lastyear = Dict()
+for t in years
+        if t!=years_last
+                push!(bool_lastyear,t=>0)
+        else
+                push!(bool_lastyear,t=>1)
+        end
+
+        if t!=mod_year
+                push!(bool_firstyear,t=>0)
+        else
+                push!(bool_firstyear,t=>1)
+        end
+end
+```
+PARAMETER       g       Growth rate             /0.02/
+                r       Interest rate           /0.05/
+
+*	Capital stock in the base year is defined by the
+*	capital-output ratio, letting base year output be unity:
+
+
+                kref    Capital-output ratio    /3.00/
+
+                k0	Capital stock in period 0 / 1 /
+		l0	Labor supply in period 0  / 1 /
+
+
+                delta   Depreciation rate       /0.07/
+
+		rk0	Steady-state cost of capital,
+                kvs     Base year capital value share,
+                lref    Base year labor input,
+		taxk(t)	Capital tax rate,
+		qref(t) Reference quantity path,
+                pref(t) Reference price path,
+                alpha(t) Utility discount parameters (budget shares);
+```                
+
+
 # -- Major Assumptions -- 
 rho = 0.04    # discount factor   
 i = 0.05      # interest rate         
-g = 0.03      # labor growth rate
+g = 0.0      # growth rate
 delta  = 0.02 # capital depreciation factor
 
+pgrowth = Dict()
+alpha = Dict()
+for t in years
+        push!(pgrowth,t=>(1/(1+i))^(t-mod_year))
+        push!(alpha,t=>((1 + g) / (1 + i) ) ^(t-mod_year) )
+end
 
-#################
+t_alpha = alpha
+
+for k in keys(alpha)
+        alpha[k] = alpha[k] / sum(t_alpha[tt] for tt in years)
+end
+
+
+#steady state rental rate of capital is interest plus depreciation
+rk0 = i + delta
+
+##################
 # -- FUNCTIONS --
-#################
+##################
 
 #replace here with "collect"
 function key_to_vec(d::Dict,index_num::Int64)
@@ -244,23 +300,6 @@ for k in keys(blueNOTE[:tm0])
 end
 
 
-#!!!! talk to caroline or sourabh about this...
-k0 = Dict()
-
-for k in keys(blueNOTE[:kd0])
-    for t in years
-        newkey = tuple(k[1],k[2],t)
-        if t==mod_year
-            push!(k0,newkey=>blueNOTE[:kd0][k])
-        end
-        if t!=mod_year 
-            push!(k0,newkey=>0)
-        end
-    end
-end
-
-
-
 ##################
 # -- VARIABLES -- 
 ##################
@@ -277,47 +316,43 @@ sv = 0.00
 @variable(cge,A[r in regions, g in goods, t in years]>=sv,start=1)
 @variable(cge,C[r in regions, t in years]>=sv,start=1)
 @variable(cge,MS[r in regions, m in margins, t in years]>=sv,start=1)
-@variable(cge,K[r in regions, s in sectors, t in years],start=blueNOTE[:kd0][r,s])
-@variable(cge,I[r in regions, s in sectors, t in years],start=((1-delta)^(t-mod_year) * blueNOTE[:kd0][r,s]))
+@variable(cge,K[r in regions, s in sectors, t in years]>=sv,start=blueNOTE[:kd0][r,s])
+@variable(cge,I[r in regions, s in sectors, t in years]>=sv,start=(delta * blueNOTE[:kd0][r,s]))
 
 #commodities:
-@variable(cge,PA[r in regions, g in goods, t in years]>=sv,start=1) # Regional market (input)
-@variable(cge,PY[r in regions, g in goods, t in years]>=sv,start=1) # Regional market (output)
-@variable(cge,PD[r in regions, g in goods, t in years]>=sv,start=1) # Local market price
-@variable(cge,PN[g in goods, t in years]>=sv,start=1) # National market
-@variable(cge,PL[r in regions, t in years]>=sv,start=1) # Wage rate
-@variable(cge,PK[r in regions, s in sectors, t in years]>=sv,start=1) # Rental rate of capital
-@variable(cge,PM[r in regions, m in margins, t in years]>=sv,start=1) # Margin price
-@variable(cge,PC[r in regions, t in years]>=sv,start=1) # Consumer price index
-@variable(cge,PFX[t in years]>=sv,start=1) # Foreign exchange
+@variable(cge,PA[r in regions, g in goods, t in years]>=sv,start=pgrowth[t]) # Regional market (input)
+@variable(cge,PY[r in regions, g in goods, t in years]>=sv,start=pgrowth[t]) # Regional market (output)
+@variable(cge,PD[r in regions, g in goods, t in years]>=sv,start=pgrowth[t]) # Local market price
+@variable(cge,PN[g in goods, t in years]>=sv,start=pgrowth[t]) # National market
+@variable(cge,PL[r in regions, t in years]>=sv,start=pgrowth[t]) # Wage rate
+@variable(cge,PK[r in regions, s in sectors, t in years]>=sv,start=pgrowth[t] * (1+i)) # Rental rate of capital ###
+@variable(cge,RK[r in regions, s in sectors, t in years]>=sv,start=pgrowth[t] * rk0) # Capital return rate ###
+@variable(cge,TK[r in regions, s in sectors]>=sv,start=blueNOTE[:kd0][r,s]) ### Terminal capital amount
+@variable(cge,PKT[r in regions, s in sectors]>=sv,start=pgrowth[years_last]) # Terminal capital cost
+@variable(cge,PM[r in regions, m in margins, t in years]>=sv,start=pgrowth[t]) # Margin price
+@variable(cge,PC[r in regions, t in years]>=sv,start=pgrowth[t]) # Consumer price index #####
+@variable(cge,PFX[t in years]>=sv,start=pgrowth[t]) # Foreign exchange
 
 #consumer:
-@variable(cge,RA[r in regions, t in years]>=sv,start=blueNOTE[:c0][(r,)]) # Representative agent
+#@variable(cge,RA[r in regions,t in years]>=sv,start=pgrowth[t] * blueNOTE[:c0][(r,)]) # Representative agent
+@variable(cge,RA[r in regions, t in years]>=sv,start = pgrowth[t] * blueNOTE[:c0][(r,)]) # Representative agent
 
 
 ###############################
 # -- PLACEHOLDER VARIABLES --
 ###############################
 
-#cobb-douglas function for value added (VA)
+#cobb-douglas function for value added (VA) ######
 @NLexpression(cge,CVA[r in regions,s in sectors,t in years],
-  PL[r,t]^alpha_kl[r,s] * PK[r,s,t] ^ (1-alpha_kl[r,s]) );
+  PL[r,t]^alpha_kl[r,s] * (RK[r,s,t] / rk0) ^ (1-alpha_kl[r,s]) );
 
 #demand for labor in VA
 @NLexpression(cge,AL[r in regions, s in sectors, t in years],
   blueNOTE[:ld0][r,s] * CVA[r,s,t] / PL[r,t] );
 
-#demand for capital in VA
+#demand for capital in VA ######
 @NLexpression(cge,AK[r in regions,s in sectors, t in years],
-  K[r,s,t] * CVA[r,s,t] / PK[r,s,t] );
-
-
-  
-#alpha_k = (1/(1+(1-delta)))
-#@NLexpression(cge,RRK[r in regions, s in sectors, t in years],
-#    RK[r,s,t] ^ (1 - alpha_k) * PK[r,s,t] ^ alpha_k
-#);
-#@NLexpression(cge,ARK[r in regions, s in sectors])
+  blueNOTE[:kd0][r,s] * CVA[r,s,t] / (RK[r,s,t] / rk0) );
 
 ###
 
@@ -381,8 +416,8 @@ sv = 0.00
         sum(PA[r,g,t] * blueNOTE[:id0][r,g,s] for g in goods) 
 # cost of labor inputs
         + PL[r,t] * AL[r,s,t]
-# cost of capital inputs
-        + PK[r,s,t] * AK[r,s,t]
+# cost of capital inputs #####
+        + (RK[r,s,t] / rk0) * AK[r,s,t]
         - 
 # revenue from sectoral supply (take note of r/s/g indices on ys0)                
         sum(PY[r,g,t] * blueNOTE[:ys0][r,s,g] for g in goods) * (1-blueNOTE[:ty][r,s])
@@ -426,14 +461,19 @@ sv = 0.00
         PC[r,t] * blueNOTE[:c0][(r,)]
 );
 
+#!!! might need to switch signs here...
 @mapping(cge,profit_k[r in regions, s in sectors, t in years],
-
+        PK[r,s,t] 
+        - (
+        RK[r,s,t]
+        + (1-delta) * (t!=years_last ? PK[r,s,t+1] : PKT[r,s])
+        )
 );
 
 @mapping(cge,profit_i[r in regions, s in sectors, t in years],
-    PY[r,s,t] 
-    - 
-    sum(PK[r,s,tt] for tt in [t+1] if (t!=years_last))
+        PY[r,s,t] 
+        - 
+        (t!=years_last ? PK[r,s,t+1] : PKT[r,s])
 );
 
 @mapping(cge,profit_ms[r in regions, m in margins, t in years],
@@ -471,7 +511,7 @@ sv = 0.00
         sum(Y[r,s,t] * blueNOTE[:ys0][r,s,g] for s in sectors)
 # household production (exogenous)        
         + blueNOTE[:yh0][r,g]
-        + I[r,g,t]
+#        + I[r,g,t]
         - 
 # aggregate supply (akin to market demand)                
         X[r,g,t] * blueNOTE[:s0][r,g]
@@ -509,22 +549,35 @@ sv = 0.00
 );
 
 @mapping(cge,market_pk[r in regions, s in sectors, t in years],
-# supply of capital available to each sector
-        K[r,s,t]        
-# demand for capital in each sector        
-        - Y[r,s,t] * AK[r,s,t]
+# initial capacity if the first year
+# else previous year's decayed capital
+#        (t==mod_year && blueNOTE[:kd0][r,s])
+#        (t > mod_year ? ((1-delta) * K[r,s,t-1]) : blueNOTE[:kd0][r,s] ) 
+        (t==mod_year ? blueNOTE[:kd0][r,s] : I[r,s,t-1])
+        + (1-delta) * (t>mod_year ? K[r,s,t-1] : 0)
+        - 
+#current year's capital capital        
+        K[r,s,t]
 );
 
-@mapping(cge,market_pi[r in regions, s in sectors, t in years],
-#starting value of investment for the first year
-        sum(k0[r,s,tt] for tt in [t] if (t==mod_year) )
-#previous year's decayed capital if not the first year
-        + (1-delta) * sum(K[r,s,tt] for tt in [t-1] if (t!=mod_year) )
-#contemporaneous investment        
-        + I[r,s,t]
-        - 
-#existing capital        
+@mapping(cge,market_rk[r in regions, s in sectors, t in years],
         K[r,s,t]
+        -
+        Y[r,s,t] * blueNOTE[:kd0][r,s] * CVA[r,s,t] / (RK[r,s,t] / rk0)
+);
+
+#terminal investment constraint
+@mapping(cge,market_pkt[r in regions, s in sectors],
+        (1-delta) * K[r,s,years_last] 
+        + I[r,s,years_last] 
+        - 
+        TK[r,s]
+);
+
+@mapping(cge,termk[r in regions, s in sectors],
+        I[r,s,years_last] / (I[r,s,years_last-1] + (blueNOTE[:kd0][r,s]==0 && + 1e-6))
+        - 
+        Y[r,s,years_last] / Y[r,s,years_last-1]
 );
 
 @mapping(cge,market_pm[r in regions, m in margins, t in years],
@@ -534,15 +587,6 @@ sv = 0.00
 # margin demand        
         sum(A[r,g,t] * blueNOTE[:md0][r,m,g] for g in goods)
 );
-
-@mapping(cge,market_pc[r in regions, t in years],
-# final demand
-        C[r,t] * blueNOTE[:c0][(r,)] 
-        - 
-# consumption / utiltiy        
-        RA[r,t] / PC[r,t]
-);
-
 
 @mapping(cge,market_pfx[t in years],
 # balance of payments (exogenous)
@@ -555,14 +599,24 @@ sv = 0.00
         - sum(A[r,g,t] * MD[r,g,t] for r in regions for g in goods if (a_set[r,g] != 0))
 );
 
+#######
+@mapping(cge,market_pc[r in regions, t in years],
+# final demand
+#        alpha[t] * C[r,t] * blueNOTE[:c0][(r,)]
+        C[r,t] * blueNOTE[:c0][(r,)]
+        - 
+# consumption / utiltiy        
+        RA[r,t] / PC[r,t]
+);
+
+#@mapping(cge,income_ra[r in regions],
 @mapping(cge,income_ra[r in regions, t in years],
 # consumption/utility
-        RA[r,t] - 
-        ( 
+        RA[r,t] 
+        - 
+        (
 # labor income        
         PL[r,t] * sum(blueNOTE[:ld0][r,s] for s in sectors)
-# capital income        
-        + sum(PK[r,s,t] * K[r,s,t] for s in sectors)
 # provision of household supply          
         + sum(PY[r,g,t]*blueNOTE[:yh0][r,g] for g in goods)
 # revenue or costs of foreign exchange including household adjustment   
@@ -574,7 +628,13 @@ sv = 0.00
 # taxes on intermediate demand - assumes lumpsum recycling
         + sum(A[r,g,t] * blueNOTE[:a0][r,g]*PA[r,g,t]*blueNOTE[:ta][r,g] for g in goods if (a_set[r,g] != 0) )
 # production taxes - assumes lumpsum recycling  
-        + sum(Y[r,s,t] * blueNOTE[:ys0][r,s,g] * blueNOTE[:ty][r,s] for s in sectors for g in goods)
+        + sum(pgrowth[t] * Y[r,s,t] * blueNOTE[:ys0][r,s,g] * blueNOTE[:ty][r,s] for s in sectors for g in goods)
+
+# income from first period
+        + bool_firstyear[t] * sum(PK[r,s,t] * K[r,s,t] for s in sectors) / (1+i)
+
+#cost of terminal year investment
+        + bool_lastyear[t] * sum(PKT[r,s] * TK[r,s] for s in sectors)
         )
 );
 
@@ -586,12 +646,15 @@ sv = 0.00
 # equations with conditions cannot be paired 
 # see workaround here: https://github.com/chkwon/Complementarity.jl/issues/37
 [fix(PK[r,s,t],1;force=true) for r in regions for s in sectors for t in years if !(blueNOTE[:kd0][r,s] > 0)]
+[fix(RK[r,s,t],1;force=true) for r in regions for s in sectors for t in years if !(blueNOTE[:kd0][r,s] > 0)]
 [fix(PY[r,g,t],1,force=true) for r in regions for g in goods for t in years if !(y_check[r,g]>0)]
 [fix(PA[r,g,t],1,force=true) for r in regions for g in goods for t in years if !(blueNOTE[:a0][r,g]>0)]
 [fix(PD[r,g,t],1,force=true) for r in regions for g in goods for t in years if (blueNOTE[:xd0][r,g] == 0)]
 [fix(Y[r,s,t],1,force=true) for r in regions for s in sectors for t in years if !(y_check[r,s] > 0)]
 [fix(X[r,g,t],1,force=true) for r in regions for g in goods for t in years if !(blueNOTE[:s0][r,g] > 0)]
 [fix(A[r,g,t],1,force=true) for r in regions for g in goods for t in years if (a_set[r,g] == 0)]
+[fix(K[r,s,t],0;force=true) for r in regions for s in sectors for t in years if !(blueNOTE[:kd0][r,s] > 0)]
+[fix(I[r,s,t],1e-5;force=true) for r in regions for s in sectors for t in years if !(blueNOTE[:kd0][r,s] > 0)]
 
 # define complementarity conditions
 # note the pattern of ZPC -> primal variable  &  MCC -> dual variable (price)
@@ -605,11 +668,17 @@ sv = 0.00
 @complementarity(cge,market_pd,PD);
 @complementarity(cge,market_pn,PN);
 @complementarity(cge,market_pl,PL);
-@complementarity(cge,market_pk,PK);
 @complementarity(cge,market_pm,PM);
 @complementarity(cge,market_pc,PC);
 @complementarity(cge,market_pfx,PFX);
 @complementarity(cge,income_ra,RA);
+@complementarity(cge,market_pk,PK);
+@complementarity(cge,market_rk,RK);
+@complementarity(cge,market_pkt,PKT)
+@complementarity(cge,termk,TK)
+@complementarity(cge,profit_k,K)
+@complementarity(cge,profit_i,I)
+
 
 
 ####################
@@ -617,7 +686,8 @@ sv = 0.00
 ####################
 
 #set up the options for the path solver
-PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
+#PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
+PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=0)
 
 # export the path license string to the environment
 # this is now done in the SLiDE initiation steps 
