@@ -16,6 +16,9 @@ end
 
 Base.broadcastable(x::InvertedIndex{T}) where {T<:Any} = [x];
 
+Base.split(str::Missing) = str
+Base.split(str::Missing, splitter::Any) = str
+
 """
     Base.strip(x::Missing)
     Base.strip(x::Number)
@@ -26,19 +29,35 @@ Base.strip(x::Number) = x
 
 """
     Base.lowercase(x::Symbol)
-Extends `lowercase` to handle symbols.
+Extends `lowercase` to handle other data types.
 """
 Base.lowercase(x::Int) = x
 Base.lowercase(x::Symbol) = Symbol(lowercase(string(x)))
 Base.lowercase(x::Missing) = missing
 
 """
+    Base.titlecase(x::Symbol)
+Extends `titlecase` to handle other data types.
+"""
+Base.titlecase(x::Int) = x
+Base.titlecase(x::Symbol) = Symbol(titlecase(string(x)))
+Base.titlecase(x::Missing) = missing
+
+"""
     Base.uppercase(x::Symbol)
-Extends `uppercase` to handle symbols.
+Extends `uppercase` to handle other data types.
 """
 Base.uppercase(x::Int) = x
 Base.uppercase(x::Symbol) = Symbol(uppercase(string(x)))
 Base.uppercase(x::Missing) = missing
+
+"""
+    Base.uppercasefirst(x::Symbol)
+Extends `uppercasefirst` to handle other data types.
+"""
+Base.uppercasefirst(x::Int) = x
+Base.uppercasefirst(x::Symbol) = Symbol(uppercasefirst(string(x)))
+Base.uppercasefirst(x::Missing) = missing
 
 """
     Base.occursin(x::Symbol, y::Symbol)
@@ -72,7 +91,8 @@ Data in specified type
 convert_type(::Type{T}, x::Any) where T<:AbstractString = string(x)
 convert_type(::Type{T}, x::Date) where T<:Integer = Dates.year(x)
 
-convert_type(::Type{Map}, x::Group) = Map(x.file, [x.from], [x.to], [x.input], [x.output])
+convert_type(::Type{Map}, x::Group) = Map(x.file, [x.from], x.to, [x.input], x.output)
+
 convert_type(::Type{T}, x::AbstractString) where T<:AbstractString = string(strip(x))
 
 function convert_type(::Type{T}, x::AbstractString) where T<:Integer

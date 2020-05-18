@@ -40,7 +40,7 @@ end
 
 function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
     filepath = joinpath(SLIDE_DIR, path..., file.name)
-    df = CSV.read(filepath; silencewarnings = true, ignoreemptylines = true)
+    df = CSV.read(filepath; silencewarnings = true, ignoreemptylines = true, comment = "#")
     NUMTEST = min(10, size(df,1))
 
     # A column name containing the word "Column" indicates that the input csv file was
@@ -114,7 +114,7 @@ function read_file(file::String; colnames = false)
         return y
 
     elseif occursin(".csv", file)
-        df = CSV.read(file, silencewarnings = true, ignoreemptylines=true)
+        df = CSV.read(file, silencewarnings = true, ignoreemptylines=true, comment = "#")
         return df
     end
 end
@@ -248,11 +248,14 @@ Standardizes string identifiers that indicate a case change (upper-to-lower or v
 for easier editing.
 """
 function _load_case(entry::AbstractString)
-    occursin("upper", lowercase(entry)) && (entry = "upper")
-    occursin("lower", lowercase(entry)) && (entry = "lower")
+    test = lowercase(entry)
+    
+    occursin("lower", test) && (entry = "lower")
+    occursin("upper", test) && (entry = "uppercasefirst" == test ? "uppercasefirst" : "upper")
+    occursin("titlecase", test) && (entry = "titlecase")
 
-    "all" == lowercase(entry)    && (entry = "all")
-    "unique" == lowercase(entry) && (entry = "unique")
+    "all" == test    && (entry = "all")
+    "unique" == test && (entry = "unique")
     return entry
 end
 
@@ -288,7 +291,7 @@ column's first row.
 """
 function write_yaml(path, file::XLSXInput)
     # List all key words in the yaml file and use to add (purely aesthetic) spacing.
-    KEYS = string.([IU.subtypes.(IU.subtypes(DataStream))...; ["Path", "PathOut"]], ":")
+    KEYS = string.([IU.subtypes.(IU.subtypes(DataStream))...; "PathIn"], ":")
     
     # Read the XLSX file, identify relevant (not "missing"), and generate list of resultant
     # yaml file names.
@@ -335,6 +338,7 @@ A file might not be "editable" if SLiDE functionality cannot make all of the spe
     was/were not ran by the function because they were annotated with `Editable: false`
 """
 function run_yaml(filename::String)
+    println(string("Reading ", filename))
     y = read_file(filename)
     if haskey(y, "Editable") && y["Editable"]
         println(string("Standardizing ", filename))

@@ -134,7 +134,6 @@ io[:sbd0]  = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "subsidies")) |> D
 #   id0(yr,i,j) = max(0,id0(yr,i,j));
 #   ts0(yr,'subsidies',j) = - ts0(yr,'subsidies',j);
 #   sbd0(yr,i(ir_supply)) = - supply(yr,ir_supply,"subsidies");
-# io[:ys0][!,:value] = io[:ys0][:,:value] - [minimum([0,x]) for x in io[:id0][:,:value]]
 io[:ys0][!,:value] = io[:ys0][:,:value] - min.(0, io[:id0][:,:value])
 io[:id0][!,:value] = max.(0, io[:id0][:,:value])
 io[:ts0][io[:ts0][:,:i] .== "subsidies", :value] *= -1

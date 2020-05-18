@@ -79,25 +79,27 @@ end
 
 function edit_with(df::DataFrame, x::Group)
     # First, add a column to the original DataFrame indicating where the data set begins.
-    cols = unique(push!(names(df), x.output))
+    cols = unique([names(df); x.output])
     df[!,:start] = (1:size(df)[1]) .+ 1
 
-    # Next, create a DataFrame describing where to "split" the input DataFrame.
-    # Editing with a map will remove all rows that do not contain relevant information.
-    # Add a column indicating where each data set STOPS, assuming all completely blank rows
-    # were removed by read_file().
+    # # Next, create a DataFrame describing where to "split" the input DataFrame.
+    # # Editing with a map will remove all rows that do not contain relevant information.
+    # # Add a column indicating where each data set STOPS, assuming all completely blank rows
+    # # were removed by read_file().
     df_split = edit_with(copy(df), convert_type(Map, x); kind = :inner)
     sort!(unique!(df_split), :start)
     df_split[!, :stop] .= vcat(df_split[2:end, :start] .- 2, [size(df)[1]])
 
     # Add a new, blank output column to store identifying information about the data block.
     # Then, fill this column based on the identifying row numbers in df_split.
-    df[!,x.output] .= ""
-    [df[row[:start]:row[:stop], x.output] .= row[x.output] for row in eachrow(df_split)]
+    for out in x.output
+        df[!,out] .= ""
+        [df[row[:start]:row[:stop], out] .= row[out] for row in eachrow(df_split)]
+    end
 
     # Finally, remove header rows (these will be blank in the output column),
     # as well as the column describing where the sub-DataFrames begin.
-    df = df[df[:,x.output] .!= "", :]
+    df = edit_with(df, Drop.(x.output, "", "=="))
     return df[:, cols]
 end
 
@@ -124,8 +126,12 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
 
     # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
     # DataFrame are used since all values in each column should be of the same type.
-    [df[!,col] .= convert_type.(type, df[:,col])
-        for (type,col) in zip(eltypes(dropmissing(df_map[:,temp_from])), x.input)]
+    types = [eltypes(dropmissing(df[:,x.input])) eltypes(dropmissing(df_map[:,temp_from]))]
+    types = [any(row .== String) ? String : row[end] for row in eachrow(types)]
+    for (col, col_map, type) in zip(x.input, temp_from, types)
+        df[!,col] .= convert_type.(type, df[:,col])
+        df_map[!,col_map] .= convert_type.(type, df_map[:,col_map])
+    end
             
     df = join(df, df_map, on = Pair.(x.input, temp_from); kind = kind, makeunique = true)
     
@@ -168,6 +174,8 @@ function edit_with(df::DataFrame, x::Operate)
 
     # If it is a COLUMN-WISE operation, 
     if x.axis == :col
+        cols = [setdiff(names(df), unique([x.from; x.to; x.input; x.output])); x.output; x.from]
+
         # Isolate columns to be operated on.
         # Append original columns that might be replaced "_0" to preserve information.
         df_val = convert_type.(Float64, copy(df[:,x.input]))
@@ -212,10 +220,10 @@ end
 
 function edit_with(df::DataFrame, x::Replace)
     !(x.col in names(df)) && (return df)
-    df[!,x.col] .= if x.to === "upper"
-        uppercase.(df[:,x.col])
-    elseif x.to === "lower"
-        lowercase.(df[:,x.col])
+    df[!,x.col] .= if x.to === "lower"  lowercase.(df[:,x.col])
+    elseif x.to === "upper"             uppercase.(df[:,x.col])
+    elseif x.to === "uppercasefirst"    uppercasefirst.(lowercase.(df[:,x.col]))
+    elseif x.to === "titlecase"         titlecase.(df[:,x.col])
     else
         replace(strip.(df[:,x.col]), x.from => x.to)
     end
@@ -232,12 +240,12 @@ function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
 end
 
 function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
-    df = read_file(y["Path"], file; shorten = shorten)
+    df = read_file(y["PathIn"], file; shorten = shorten)
     # Specify the order in which edits must occur. "Drop" is included twice, once at the
     # beginning and once at the end. First, drop entire columns. Last, drop specific values.
     EDITS = ["Rename", "Group", "Match", "Melt", "Add", "Map", "Replace", "Drop", "Operate"]
 
-    # Find which of these edits are represented in the yaml file of defined edits.
+    # Find which of thyese edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, collect(keys(y)))
     "Drop" in KEYS && pushfirst!(KEYS, "Drop")
     

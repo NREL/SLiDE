@@ -21,7 +21,7 @@ filename = files_map[occursin.(joinpath("parse","naics"), files_map)]
 if length(filename) > 0
     println(string("Standardizing ", filename[1]))
     y = read_file(filename[1])
-    df = read_file(y["Path"], y["XLSXInput"])
+    df = read_file(y["PathIn"], y["XLSXInput"])
     df = edit_with(df, [[y[k] for k in ["Rename", "Match"]]...;])
     df[!,:naics_level] .= length.(df[:,:naics_level])
     df = edit_with(df, [[y[k] for k in ["Replace", "Order"]]...;])
@@ -34,7 +34,7 @@ filename = files_map[occursin.(joinpath("parse","sgf"), files_map)]
 if length(filename) > 0
     println(string("Standardizing ", filename[1]))
     y = read_file(filename[1])
-    df_map = read_file(y["Path"], y["CSVInput"])
+    df_map = read_file(y["PathIn"], y["CSVInput"])
     df_map = edit_with(df_map, y["Drop"])
 
     # Make horizontally-concatennated DataFrames one, normalized database.
@@ -56,12 +56,12 @@ filename = files_map[occursin.(joinpath("scale", "naics"), files_map)]
 if length(filename) > 0
     println(string("Standardizing ", filename[1]))
     y = read_file(filename[1])
-    df = read_file(y["Path"], y["CSVInput"])
+    df = read_file(y["PathIn"], y["CSVInput"])
     
     col = :naics_level
     input = [:naics_code, :naics_desc]
-    vals = ["sector", "subsector", "industry_group", "naics_industry", "national_industry"]
-    outputs = [Symbol.(val, ["_code", "_desc"]) for val in vals]
+    vals = ["sector", "subsector", "industry group", "naics industry", "national industry"]
+    outputs = [Symbol.(replace(val, " " => "_"), ["_code", "_desc"]) for val in vals]
 
     [global df = stack_by(df, col, val, input, output)
         for (val, output) in collect(zip(vals, outputs))[1:end-1]]

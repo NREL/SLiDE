@@ -68,7 +68,7 @@
             {
                 "name": "to",
                 "comment": "name of the mapping column containing output values",
-                "data_type": "Symbol"
+                "data_type": "Array{Symbol,1}"
             },
             {
                 "name": "input",
@@ -78,7 +78,7 @@
             {
                 "name": "output",
                 "comment": "name of the output column created",
-                "data_type": "Symbol"
+                "data_type": "Array{Symbol,1}"
             }
         ],
         "supertype": "Edit"
