@@ -276,7 +276,7 @@ naics_code,naics_desc,naics_level
 238910,Site preparation contractors,national industry
 23899,All other specialty trade contractors,naics industry
 238990,All other specialty trade contractors,national industry
-31-33,Manufacturing,sector
+31-33,Manufacturing,naics industry
 311,Food manufacturing,subsector
 3111,Animal food manufacturing,industry group
 31111,Animal food manufacturing,naics industry
@@ -1089,7 +1089,7 @@ naics_code,naics_desc,naics_level
 425110,Business to business electronic markets,national industry
 42512,Wholesale trade agents and brokers,naics industry
 425120,Wholesale trade agents and brokers,national industry
-44-45,Retail trade,sector
+44-45,Retail trade,naics industry
 441,Motor vehicle and parts dealers,subsector
 4411,Automobile dealers,industry group
 44111,New car dealers,naics industry
@@ -1252,7 +1252,7 @@ naics_code,naics_desc,naics_level
 454310,Fuel dealers,national industry
 45439,Other direct selling establishments,naics industry
 454390,Other direct selling establishments,national industry
-48-49,Transportation and warehousing,sector
+48-49,Transportation and warehousing,naics industry
 481,Air transportation,subsector
 4811,Scheduled air transportation,industry group
 48111,Scheduled air transportation,naics industry

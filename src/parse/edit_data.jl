@@ -52,11 +52,30 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 - `df::DataFrame`: including edit(s)
 """
 function edit_with(df::DataFrame, x::Add)
-    df[!, x.col] .= x.val
+    # If adding the length of a string...
+    if typeof(x.val) == String && occursin("length", x.val)
+        m = match(r"(?<col>\S*) length", x.val)
+
+        # If this is not indicating a column length to add, add the value and exit.
+        if (m === nothing || !(Symbol(m[:col]) in names(df)))
+            df[!, x.col] .= x.val
+            return df
+        end
+        # If possible, return the length of characters  in the string.
+        col_len = Symbol(m[:col])
+        df[!, x.col] .= [ismissing(val_len) ? missing : length(convert_type(String, val_len))
+            for val_len in df[:,col_len]]
+    else
+        df[!, x.col] .= x.val
+    end
     return df
 end
 
 function edit_with(df::DataFrame, x::Drop)
+    if x.val === "all" && x.operation == "occursin"
+        df = edit_with(df, Drop.(names(df)[occursin.(x.col, names(df))], "all", "=="))
+    end
+
     !(x.col in names(df)) && (return df)
     if x.val === "all"  # Drop entire column to remove dead weight right away.
         df = df[:, setdiff(names(df), [x.col])]
@@ -126,14 +145,16 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
 
     # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
     # DataFrame are used since all values in each column should be of the same type.
-    types = [eltypes(dropmissing(df[:,x.input])) eltypes(dropmissing(df_map[:,temp_from]))]
-    types = [any(row .== String) ? String : row[end] for row in eachrow(types)]
-    for (col, col_map, type) in zip(x.input, temp_from, types)
-        df[!,col] .= convert_type.(type, df[:,col])
-        df_map[!,col_map] .= convert_type.(type, df_map[:,col_map])
-    end
+    [df[!,col] .= convert_type.(type, df[:,col])
+        for (type,col) in zip(eltypes(dropmissing(df_map[:,temp_from])), x.input)]
+    # types = [eltypes(dropmissing(df[:,x.input])) eltypes(dropmissing(df_map[:,temp_from]))]
+    # types = [any(row .== String) ? String : row[end] for row in eachrow(types)]
+    # for (col, col_map, type) in zip(x.input, temp_from, types)
+    #     df[!,col] .= convert_type.(type, df[:,col])
+    #     df_map[!,col_map] .= convert_type.(type, df_map[:,col_map])
+    # end
             
-    df = join(df, df_map, on = Pair.(x.input, temp_from); kind = kind, makeunique = true)
+    df = join(df, df_map, on = Pair.(x.input, temp_from); kind = x.kind, makeunique = true)
     
     # Remove all output column names that might already be in the DataFrame. These will be
     # overwritten by the columns from the mapping DataFrame. Finally, remane mapping "to"
@@ -144,17 +165,26 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
 end
 
 function edit_with(df::DataFrame, x::Match)
-    # Ensure all row values are strings and can be matched with a Regex, and do so.
-    # Temporarily remove missing values, just in case.
-    col = edit_with(copy(df), Replace(x.input, missing, ""))[:,x.input]
-    m = match.(x.on, convert_type.(String, col))
-    
-    # Add empty columns for all output columns not already in the DataFrame.
-    # Where there is a match, fill empty cells. If values in the input column,
-    # leave cells without a match unchanged.
-    df = edit_with(df, Add.(setdiff(x.output, names(df)), ""))
-    [m[ii] != nothing && ([df[ii,out] = m[ii][out] for out in x.output])
-        for ii in 1:length(m)]
+    if x.on == r"expand range"
+        ROWS, COLS = size(df)
+        cols = names(df)
+        df = [[DataFrame(Dict(cols[jj] =>
+                cols[jj] == x.input ? _expand_range(df[ii,jj]) : df[ii,jj]
+            for jj in 1:COLS)) for ii in 1:ROWS]...;]
+    else
+        # Ensure all row values are strings and can be matched with a Regex, and do so.
+        # Temporarily remove missing values, just in case.
+        df[:,x.input] .= convert_type.(String, df[:,x.input])
+        col = edit_with(copy(df), Replace(x.input, missing, ""))[:,x.input]
+        m = match.(x.on, col)
+        
+        # Add empty columns for all output columns not already in the DataFrame.
+        # Where there is a match, fill empty cells. If values in the input column,
+        # leave cells without a match unchanged.
+        df = edit_with(df, Add.(setdiff(x.output, names(df)), ""))
+        [m[ii] != nothing && ([df[ii,out] = m[ii][out] for out in x.output])
+            for ii in 1:length(m)]
+    end
     return df
 end
 
@@ -220,14 +250,28 @@ end
 
 function edit_with(df::DataFrame, x::Replace)
     !(x.col in names(df)) && (return df)
+
+    if x.from === missing && Symbol(x.to) in names(df)
+        df[ismissing.(df[:,x.col]),x.col] .= df[ismissing.(df[:,x.col]), Symbol(x.to)]
+        return df
+    end
+
     df[!,x.col] .= if x.to === "lower"  lowercase.(df[:,x.col])
     elseif x.to === "upper"             uppercase.(df[:,x.col])
     elseif x.to === "uppercasefirst"    uppercasefirst.(lowercase.(df[:,x.col]))
     elseif x.to === "titlecase"         titlecase.(df[:,x.col])
     else
-        replace(strip.(df[:,x.col]), x.from => x.to)
+        replace(strip.(copy(df[:,x.col])), x.from => x.to)
     end
     return df
+end
+
+function edit_with(df::DataFrame, x::Stack)
+    df = [[edit_with(df[:, occursin.(indicator, names(df))],
+        [Rename.(names(df)[occursin.(indicator, names(df))], x.col);
+            Add(x.var, replace(string(indicator), "_" => " "))]
+    ) for indicator in x.on]...;]
+    return dropmissing(df)
 end
 
 function edit_with(df::DataFrame, lst::Array{T}) where T<:Edit
@@ -243,7 +287,7 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
     df = read_file(y["PathIn"], file; shorten = shorten)
     # Specify the order in which edits must occur. "Drop" is included twice, once at the
     # beginning and once at the end. First, drop entire columns. Last, drop specific values.
-    EDITS = ["Rename", "Group", "Match", "Melt", "Add", "Map", "Replace", "Drop", "Operate"]
+    EDITS = ["Rename", "Group", "Stack", "Match", "Melt", "Add", "Map", "Replace", "Drop", "Operate"]
 
     # Find which of thyese edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, collect(keys(y)))
@@ -267,7 +311,7 @@ function edit_with(y::Dict{Any,Any}; shorten = false)
     # Find all dictionary keys corresponding to file names and save these in a list.
     file = convert_type(Array, find_oftype(y, File))
     df = edit_with(file, y; shorten = shorten)
-    return _sort_datastream(df)
+    # return _sort_datastream(df)
 end
 
 """
@@ -290,6 +334,34 @@ function _sort_datastream(df::DataFrame)
     return sort(df, ii)
 end
 
+"""
+    _expand_range()
+"""
+function _expand_range(x::T) where T <: AbstractString
+    if occursin("-", x)
+        if all(string(strip(x)) .!= ["31-33", "44-45", "48-49"])
+            x = split(x, "-")
+            x = ensurearray(convert_type(Int, x[1]):convert_type(Int, x[1][1:end-1] * x[end][end]))
+        end
+    else
+        x = convert_type(Int, x)
+    end
+    return x
+end
+
+function _expand_range(x::String)
+    if match(r"\D", x) !== nothing
+        m = String.([m.match for m in collect(eachmatch(r"\D.*?", x))])
+        # length(setdiff(m, [",","-"," "])) .== 0 && (x = [_expand_range.(split(x, ","))...;])
+        x = length(setdiff(m, [",","-"," "])) .== 0 ? [_expand_range.(split(x, ","))...;] : missing
+    else
+        x = convert_type(Int, x)
+    end
+    return x
+end
+
+_expand_range(x::Missing) = x
+_expand_range(x::Int) = x
 
 """
     fill_zero(keys_unique::NamedTuple; value_colnames)

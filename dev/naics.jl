@@ -7,46 +7,6 @@ using YAML
 
 using SLiDE  # see src/SLiDE.jl
 
-function SLiDE.edit_with(df::DataFrame, x::Map; kind = :left)
-    # Save all input column names, read the map file, and isolate relevant columns.
-    # # This prevents duplicate columns in the final DataFrame.
-    cols = unique([names(df); x.output])
-    df_map = copy(read_file(x))
-    df_map = unique(df_map[:,unique([x.from; x.to])])
-    
-    # If there are duplicate columns in from/to, differentiate between the two to save results.
-    duplicates = intersect(x.from, x.to)
-    if length(duplicates) > 0
-        (ii_from, ii_to) = (occursin.(duplicates, x.from), occursin.(duplicates, x.to));
-        x.from[ii_from] = Symbol.(x.from[ii_from], :_0)
-        [df_map[!,Symbol(col, :_0)] .= df_map[:,col] for col in duplicates]
-    end
-    
-    # Rename columns in the mapping DataFrame to temporary values in case any of these
-    # columns were already present in the input DataFrame.
-    temp_to = Symbol.(:to_, 1:length(x.to))
-    temp_from = Symbol.(:from_, 1:length(x.from))
-    df_map = edit_with(df_map, Rename.([x.to; x.from], [temp_to; temp_from]))
-
-    # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
-    # DataFrame are used since all values in each column should be of the same type.
-    types = [eltypes(dropmissing(df[:,x.input])) eltypes(dropmissing(df_map[:,temp_from]))]
-    types = [any(row .== String) ? String : row[end] for row in eachrow(types)]
-    for (col, col_map, type) in zip(x.input, temp_from, types)
-        df[!,col] .= convert_type.(type, df[:,col])
-        df_map[!,col_map] .= convert_type.(type, df_map[:,col_map])
-    end
-            
-    df = join(df, df_map, on = Pair.(x.input, temp_from); kind = kind, makeunique = true)
-    
-    # Remove all output column names that might already be in the DataFrame. These will be
-    # overwritten by the columns from the mapping DataFrame. Finally, remane mapping "to"
-    # columns from their temporary to output values.
-    df = df[:, setdiff(names(df), x.output)]
-    df = edit_with(df, Rename.(temp_to, x.output))
-    return df[:,cols]
-end
-
 # path = ["data", "datasources", "BEA_2007_2012"]
 # x1 = XLSXInput("Supply_2007_2012_DET.xlsx", "NAICS Codes", "A5:B1025", "sector")
 
@@ -105,8 +65,10 @@ end
 
 function _expand_range(x::T) where T <: AbstractString
     if occursin("-", x)
-        x = split(x, "-")
-        x = ensurearray(convert_type(Int, x[1]):convert_type(Int, x[1][1:end-1] * x[end]))
+        if all(string(strip(x)) .!= ["31-33", "44-45", "48-49"])
+            x = split(x, "-")
+            x = ensurearray(convert_type(Int, x[1]):convert_type(Int, x[1][1:end-1] * x[end][end]))
+        end
     else
         x = convert_type(Int, x)
     end
@@ -128,8 +90,9 @@ _expand_range(x::Missing) = x
 # MAP NAICS
 cols = names(df)
 col_set = [:naics_code]
-ROWS, COLS = size(df)
 
+
+ROWS, COLS = size(df)
 df = [[DataFrame(Dict(cols[jj] =>
         cols[jj] in col_set ? _expand_range(df[ii,jj]) : df[ii,jj]
     for jj in 1:COLS)) for ii in 1:ROWS]...;]

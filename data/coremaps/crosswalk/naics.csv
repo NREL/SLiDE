@@ -1,0 +1,110 @@
+naics_code,windc_code,naics_desc
+1111,agr,Oilseed and grain farming
+1112,agr,Vegetable and melon farming
+1113,agr,Fruit and tree nut farming
+1114,agr,"Greenhouse, nursery, and floriculture production"
+1119,agr,Other crop farming
+1121,agr,Cattle ranching and farming
+1122,agr,Hog and pig farming
+1123,agr,Poultry and egg production
+1124,agr,Sheep and goat farming
+1125,agr,Aquaculture
+1129,agr,Other animal production
+3151,alt,Apparel knitting mills
+3152,alt,Cut and sew apparel manufacturing
+3159,alt,Apparel accessories and other apparel manufacturing
+3161,alt,Leather and hide tanning and finishing
+3162,alt,Footwear manufacturing
+3169,alt,Other leather and allied product manufacturing
+3341,cep,Computer and peripheral equipment manufacturing
+3342,cep,Communications equipment manufacturing
+3343,cep,Audio and video equipment manufacturing
+3344,cep,Semiconductor and other electronic component manufacturing
+3345,cep,"Navigational, measuring, electromedical, and control instruments manufacturing"
+3346,cep,Manufacturing and reproducing magnetic and optical media
+3251,che,Basic chemical manufacturing
+3252,che,"Resin, synthetic rubber, and artificial and synthetic fibers and filaments manufacturing"
+3253,che,"Pesticide, fertilizer, and other agricultural chemical manufacturing"
+3254,che,Pharmaceutical and medicine manufacturing
+3255,che,"Paint, coating, and adhesive manufacturing"
+3256,che,"Soap, cleaning compound, and toilet preparation manufacturing"
+3259,che,Other chemical product and preparation manufacturing
+3351,eec,Electric lighting equipment manufacturing
+3352,eec,Household appliance manufacturing
+3353,eec,Electrical equipment manufacturing
+3359,eec,Other electrical equipment and component manufacturing
+3111,fbp,Animal food manufacturing
+3112,fbp,Grain and oilseed milling
+3113,fbp,Sugar and confectionery product manufacturing
+3114,fbp,Fruit and vegetable preserving and specialty food manufacturing
+3115,fbp,Dairy product manufacturing
+3116,fbp,Animal slaughtering and processing
+3117,fbp,Seafood product preparation and packaging
+3118,fbp,Bakeries and tortilla manufacturing
+3119,fbp,Other food manufacturing
+3121,fbp,Beverage manufacturing
+3122,fbp,Tobacco manufacturing
+3315,fmt,Foundries
+3321,fmt,Forging and stamping
+3322,fmt,Cutlery and handtool manufacturing
+3323,fmt,Architectural and structural metals manufacturing
+3324,fmt,"Boiler, tank, and shipping container manufacturing"
+3325,fmt,Hardware manufacturing
+3326,fmt,Spring and wire product manufacturing
+3327,fmt,"Machine shops; turned product; and screw, nut, and bolt manufacturing"
+3329,fmt,Other fabricated metal product manufacturing
+3331,fmt,"Agriculture, construction, and mining machinery manufacturing"
+1132,fof,Forest nurseries and gathering of forest products
+1133,fof,Logging
+1141,fof,Fishing
+3371,fpd,Household and institutional furniture and kitchen cabinet manufacturing
+3372,fpd,Office furniture (including fixtures) manufacturing
+3379,fpd,Other furniture related product manufacturing
+3332,mch,Industrial machinery manufacturing
+3333,mch,Commercial and service industry machinery manufacturing
+3334,mch,"Ventilation, heating, air-conditioning, and commercial refrigeration equipment manufacturing"
+3335,mch,Metalworking machinery manufacturing
+3336,mch,"Engine, turbine, and power transmission equipment manufacturing"
+3339,mch,Other general purpose machinery manufacturing
+2121,min,Coal mining
+2122,min,Metal ore mining
+2123,min,Nonmetallic mineral mining and quarrying
+3391,mmf,Medical equipment and supplies manufacturing
+3399,mmf,Other miscellaneous manufacturing
+3361,mot,Motor vehicle manufacturing
+3362,mot,Motor vehicle body and trailer manufacturing
+3363,mot,Motor vehicle parts manufacturing
+3271,nmp,Clay product and refractory manufacturing
+3272,nmp,Glass and glass product manufacturing
+3273,nmp,Cement and concrete product manufacturing
+3274,nmp,Lime and gypsum product manufacturing
+3279,nmp,Other nonmetallic mineral product manufacturing
+2111,oil,Oil and gas extraction
+3364,ote,Aerospace product and parts manufacturing
+3365,ote,Railroad rolling stock manufacturing
+3366,ote,Ship and boat building
+3369,ote,Other transportation equipment manufacturing
+9800,oth,
+9900,oth,
+3241,pet,Petroleum and coal products manufacturing
+3261,pla,Plastics product manufacturing
+3262,pla,Rubber product manufacturing
+3311,pmt,Iron and steel mills and ferroalloy manufacturing
+3312,pmt,Steel product manufacturing from purchased steel
+3313,pmt,Alumina and aluminum production and processing
+3314,pmt,Nonferrous metal (except aluminum) production and processing
+3221,ppd,"Pulp, paper, and paperboard mills"
+3222,ppd,Converted paper product manufacturing
+3231,pri,Printing and related support activities
+5112,pub,Software publishers
+3131,tex,"Fiber, yarn, and thread mills"
+3132,tex,Fabric mills
+3133,tex,Textile and fabric finishing and fabric coating mills
+3141,tex,Textile furnishings mills
+3149,tex,Other textile product mills
+9100,use,
+9200,use,
+9300,use,
+3211,wpd,Sawmills and wood preservation
+3212,wpd,"Veneer, plywood, and engineered wood product manufacturing"
+3219,wpd,Other wood product manufacturing

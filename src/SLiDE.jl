@@ -44,6 +44,7 @@ export Order
 export Match
 export Rename
 export Replace
+export Stack
 
 export CSVInput
 export GAMSInput

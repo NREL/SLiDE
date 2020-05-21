@@ -91,7 +91,7 @@ Data in specified type
 convert_type(::Type{T}, x::Any) where T<:AbstractString = string(x)
 convert_type(::Type{T}, x::Date) where T<:Integer = Dates.year(x)
 
-convert_type(::Type{Map}, x::Group) = Map(x.file, [x.from], x.to, [x.input], x.output)
+convert_type(::Type{Map}, x::Group) = Map(x.file, [x.from], x.to, [x.input], x.output, :inner)
 
 convert_type(::Type{T}, x::AbstractString) where T<:AbstractString = string(strip(x))
 
