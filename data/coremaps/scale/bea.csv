@@ -5,17 +5,17 @@ sector_code,summary_code,underlying_code,detail_code,sector_desc,summary_desc,un
 11,111CA,111,111300,"Agriculture, forestry, fishing, and hunting",Farms,Crop production,Fruit and tree nut farming
 11,111CA,111,111400,"Agriculture, forestry, fishing, and hunting",Farms,Crop production,"Greenhouse, nursery, and floriculture production"
 11,111CA,111,111900,"Agriculture, forestry, fishing, and hunting",Farms,Crop production,Other crop farming
-11,111CA,112,112120,"Agriculture, forestry, fishing, and hunting",Farms,Animal production and aquaculture,Dairy cattle and milk production
 11,111CA,112,1121A0,"Agriculture, forestry, fishing, and hunting",Farms,Animal production and aquaculture,"Beef cattle ranching and farming, including feedlots and dual-purpose ranching and farming"
-11,111CA,112,112300,"Agriculture, forestry, fishing, and hunting",Farms,Animal production and aquaculture,Poultry and egg production
+11,111CA,112,112120,"Agriculture, forestry, fishing, and hunting",Farms,Animal production and aquaculture,Dairy cattle and milk production
 11,111CA,112,112A00,"Agriculture, forestry, fishing, and hunting",Farms,Animal production and aquaculture,"Animal production, except cattle and poultry and eggs"
+11,111CA,112,112300,"Agriculture, forestry, fishing, and hunting",Farms,Animal production and aquaculture,Poultry and egg production
 11,113FF,113FF,113000,"Agriculture, forestry, fishing, and hunting","Forestry, fishing, and related activities","Forestry, fishing, and related activities",Forestry and logging
 11,113FF,113FF,114000,"Agriculture, forestry, fishing, and hunting","Forestry, fishing, and related activities","Forestry, fishing, and related activities","Fishing, hunting and trapping"
 11,113FF,113FF,115000,"Agriculture, forestry, fishing, and hunting","Forestry, fishing, and related activities","Forestry, fishing, and related activities",Support activities for agriculture and forestry
 21,211,211,211000,Mining,Oil and gas extraction,Oil and gas extraction,Oil and gas extraction
 21,212,212,212100,Mining,"Mining, except oil and gas","Mining, except oil and gas",Coal mining
-21,212,212,212230,Mining,"Mining, except oil and gas","Mining, except oil and gas","Copper, nickel, lead, and zinc mining"
 21,212,212,2122A0,Mining,"Mining, except oil and gas","Mining, except oil and gas","Iron, gold, silver, and other metal ore mining"
+21,212,212,212230,Mining,"Mining, except oil and gas","Mining, except oil and gas","Copper, nickel, lead, and zinc mining"
 21,212,212,212310,Mining,"Mining, except oil and gas","Mining, except oil and gas",Stone mining and quarrying
 21,212,212,2123A0,Mining,"Mining, except oil and gas","Mining, except oil and gas",Other nonmetallic mineral mining and quarrying
 21,213,213,213111,Mining,Support activities for mining,Support activities for mining,Drilling oil and gas wells
@@ -25,16 +25,171 @@ sector_code,summary_code,underlying_code,detail_code,sector_desc,summary_desc,un
 22,22,2212NW,221300,Utilities,Utilities,"Natural gas distribution and water, sewage and other systems","Water, sewage and other systems"
 23,23,23EH,233210,Construction,Construction,"Education, hospital, and health structures",Health care structures
 23,23,23EH,233262,Construction,Construction,"Education, hospital, and health structures",Educational and vocational structures
-23,23,23MR,230301,Construction,Construction,Maintenance and repair construction,Nonresidential maintenance and repair
-23,23,23MR,230302,Construction,Construction,Maintenance and repair construction,Residential maintenance and repair
 23,23,23OC,2332A0,Construction,Construction,Office and commercial structures,Office and commercial structures
-23,23,23OR,233412,Construction,Construction,Other residential construction,Multifamily residential structures
-23,23,23OR,2334A0,Construction,Construction,Other residential construction,Other residential structures
+23,23,23PC,233240,Construction,Construction,Power and communication structures,Power and communication structures
+23,23,23TH,2332C0,Construction,Construction,Transportation structures and highways and streets,Transportation structures and highways and streets
 23,23,23OT,233230,Construction,Construction,Other nonresidential structures,Manufacturing structures
 23,23,23OT,2332D0,Construction,Construction,Other nonresidential structures,Other nonresidential structures
-23,23,23PC,233240,Construction,Construction,Power and communication structures,Power and communication structures
 23,23,23SF,233411,Construction,Construction,Single-family residential structures,Single-family residential structures
-23,23,23TH,2332C0,Construction,Construction,Transportation structures and highways and streets,Transportation structures and highways and streets
+23,23,23OR,233412,Construction,Construction,Other residential construction,Multifamily residential structures
+23,23,23OR,2334A0,Construction,Construction,Other residential construction,Other residential structures
+23,23,23MR,230301,Construction,Construction,Maintenance and repair construction,Nonresidential maintenance and repair
+23,23,23MR,230302,Construction,Construction,Maintenance and repair construction,Residential maintenance and repair
+33DG,321,321,321100,Durable goods,Wood products,Wood products,Sawmills and wood preservation
+33DG,321,321,321200,Durable goods,Wood products,Wood products,"Veneer, plywood, and engineered wood product manufacturing"
+33DG,321,321,321910,Durable goods,Wood products,Wood products,Millwork
+33DG,321,321,3219A0,Durable goods,Wood products,Wood products,All other wood product manufacturing
+33DG,327,327,327100,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Clay product and refractory manufacturing
+33DG,327,327,327200,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Glass and glass product manufacturing
+33DG,327,327,327310,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Cement manufacturing
+33DG,327,327,327320,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Ready-mix concrete manufacturing
+33DG,327,327,327330,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,"Concrete pipe, brick, and block manufacturing"
+33DG,327,327,327390,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Other concrete product manufacturing
+33DG,327,327,327400,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Lime and gypsum product manufacturing
+33DG,327,327,327910,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Abrasive product manufacturing
+33DG,327,327,327991,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Cut stone and stone product manufacturing
+33DG,327,327,327992,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Ground or treated mineral and earth manufacturing
+33DG,327,327,327993,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Mineral wool manufacturing
+33DG,327,327,327999,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Miscellaneous nonmetallic mineral products
+33DG,331,3311IS,331110,Durable goods,Primary metals,Iron and steel mills and manufacturing from purchased steel,Iron and steel mills and ferroalloy manufacturing
+33DG,331,3311IS,331200,Durable goods,Primary metals,Iron and steel mills and manufacturing from purchased steel,Steel product manufacturing from purchased steel
+33DG,331,3313NF,331313,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Alumina refining and primary aluminum production
+33DG,331,3313NF,331314,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Secondary smelting and alloying of aluminum
+33DG,331,3313NF,33131B,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Aluminum product manufacturing from purchased aluminum
+33DG,331,3313NF,331410,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Nonferrous metal (except aluminum) smelting and refining
+33DG,331,3313NF,331420,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,"Copper rolling, drawing, extruding and alloying"
+33DG,331,3313NF,331490,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,"Nonferrous metal (except copper and aluminum) rolling, drawing, extruding and alloying"
+33DG,331,3313NF,331510,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Ferrous metal foundries
+33DG,331,3313NF,331520,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Nonferrous metal foundries
+33DG,332,332,33211A,Durable goods,Fabricated metal products,Fabricated metal products,"All other forging, stamping, and sintering"
+33DG,332,332,332114,Durable goods,Fabricated metal products,Fabricated metal products,Custom roll forming
+33DG,332,332,332119,Durable goods,Fabricated metal products,Fabricated metal products,"Metal crown, closure, and other metal stamping (except automotive)"
+33DG,332,332,332200,Durable goods,Fabricated metal products,Fabricated metal products,Cutlery and handtool manufacturing
+33DG,332,332,332310,Durable goods,Fabricated metal products,Fabricated metal products,Plate work and fabricated structural product manufacturing
+33DG,332,332,332320,Durable goods,Fabricated metal products,Fabricated metal products,Ornamental and architectural metal products manufacturing
+33DG,332,332,332410,Durable goods,Fabricated metal products,Fabricated metal products,Power boiler and heat exchanger manufacturing
+33DG,332,332,332420,Durable goods,Fabricated metal products,Fabricated metal products,Metal tank (heavy gauge) manufacturing
+33DG,332,332,332430,Durable goods,Fabricated metal products,Fabricated metal products,"Metal can, box, and other metal container (light gauge) manufacturing"
+33DG,332,332,332500,Durable goods,Fabricated metal products,Fabricated metal products,Hardware manufacturing
+33DG,332,332,332600,Durable goods,Fabricated metal products,Fabricated metal products,Spring and wire product manufacturing
+33DG,332,332,332710,Durable goods,Fabricated metal products,Fabricated metal products,Machine shops
+33DG,332,332,332720,Durable goods,Fabricated metal products,Fabricated metal products,"Turned product and screw, nut, and bolt manufacturing"
+33DG,332,332,332800,Durable goods,Fabricated metal products,Fabricated metal products,"Coating, engraving, heat treating and allied activities"
+33DG,332,332,33291A,Durable goods,Fabricated metal products,Fabricated metal products,Valve and fittings other than plumbing
+33DG,332,332,332913,Durable goods,Fabricated metal products,Fabricated metal products,Plumbing fixture fitting and trim manufacturing
+33DG,332,332,332991,Durable goods,Fabricated metal products,Fabricated metal products,Ball and roller bearing manufacturing
+33DG,332,332,33299A,Durable goods,Fabricated metal products,Fabricated metal products,"Ammunition, arms, ordnance, and accessories manufacturing"
+33DG,332,332,332996,Durable goods,Fabricated metal products,Fabricated metal products,Fabricated pipe and pipe fitting manufacturing
+33DG,332,332,332999,Durable goods,Fabricated metal products,Fabricated metal products,Other fabricated metal manufacturing
+33DG,333,33311,333111,Durable goods,Machinery,Agricultural implement manufacturing,Farm machinery and equipment manufacturing
+33DG,333,33311,333112,Durable goods,Machinery,Agricultural implement manufacturing,Lawn and garden equipment manufacturing
+33DG,333,33312,333120,Durable goods,Machinery,Construction machinery manufacturing,Construction machinery manufacturing
+33DG,333,33313,333130,Durable goods,Machinery,Mining and oil and gas field machinery manufacturing,Mining and oil and gas field machinery manufacturing
+33DG,333,3332OM,333242,Durable goods,Machinery,Other machinery,Semiconductor machinery manufacturing
+33DG,333,3332OM,33329A,Durable goods,Machinery,Other machinery,Other industrial machinery manufacturing
+33DG,333,3332OM,333314,Durable goods,Machinery,Other machinery,Optical instrument and lens manufacturing
+33DG,333,3332OM,333316,Durable goods,Machinery,Other machinery,Photographic and photocopying equipment manufacturing
+33DG,333,3332OM,333318,Durable goods,Machinery,Other machinery,Other commercial and service industry machinery manufacturing
+33DG,333,3332OM,333413,Durable goods,Machinery,Other machinery,Industrial and commercial fan and blower and air purification equipment manufacturing
+33DG,333,3332OM,333414,Durable goods,Machinery,Other machinery,Heating equipment (except warm air furnaces) manufacturing
+33DG,333,3332OM,333415,Durable goods,Machinery,Other machinery,"Air conditioning, refrigeration, and warm air heating equipment manufacturing"
+33DG,333,3332OM,333511,Durable goods,Machinery,Other machinery,Industrial mold manufacturing
+33DG,333,3332OM,333517,Durable goods,Machinery,Other machinery,Machine tool manufacturing
+33DG,333,3332OM,333514,Durable goods,Machinery,Other machinery,"Special tool, die, jig, and fixture manufacturing"
+33DG,333,3332OM,33351B,Durable goods,Machinery,Other machinery,"Cutting and machine tool accessory, rolling mill, and other metalworking machinery manufacturing"
+33DG,333,3332OM,333611,Durable goods,Machinery,Other machinery,Turbine and turbine generator set units manufacturing
+33DG,333,3332OM,333612,Durable goods,Machinery,Other machinery,"Speed changer, industrial high-speed drive, and gear manufacturing"
+33DG,333,3332OM,333613,Durable goods,Machinery,Other machinery,Mechanical power transmission equipment manufacturing
+33DG,333,3332OM,333618,Durable goods,Machinery,Other machinery,Other engine equipment manufacturing
+33DG,333,3332OM,33391A,Durable goods,Machinery,Other machinery,Pump and pumping equipment manufacturing
+33DG,333,3332OM,333912,Durable goods,Machinery,Other machinery,Air and gas compressor manufacturing
+33DG,333,3332OM,333920,Durable goods,Machinery,Other machinery,Material handling equipment manufacturing
+33DG,333,3332OM,333991,Durable goods,Machinery,Other machinery,Power-driven handtool manufacturing
+33DG,333,3332OM,33399A,Durable goods,Machinery,Other machinery,Other general purpose machinery manufacturing
+33DG,333,3332OM,333993,Durable goods,Machinery,Other machinery,Packaging machinery manufacturing
+33DG,333,3332OM,333994,Durable goods,Machinery,Other machinery,Industrial process furnace and oven manufacturing
+33DG,333,3332OM,33399B,Durable goods,Machinery,Other machinery,Fluid power process machinery
+33DG,334,3341,334111,Durable goods,Computer and electronic products,Computer and peripheral equipment manufacturing,Electronic computer manufacturing
+33DG,334,3341,334112,Durable goods,Computer and electronic products,Computer and peripheral equipment manufacturing,Computer storage device manufacturing
+33DG,334,3341,334118,Durable goods,Computer and electronic products,Computer and peripheral equipment manufacturing,Computer terminals and other computer peripheral equipment manufacturing
+33DG,334,3342,334210,Durable goods,Computer and electronic products,Communications equipment manufacturing,Telephone apparatus manufacturing
+33DG,334,3342,334220,Durable goods,Computer and electronic products,Communications equipment manufacturing,Broadcast and wireless communications equipment
+33DG,334,3342,334290,Durable goods,Computer and electronic products,Communications equipment manufacturing,Other communications equipment manufacturing
+33DG,334,3344,334413,Durable goods,Computer and electronic products,Semiconductor and other electronic component manufacturing,Semiconductor and related device manufacturing
+33DG,334,3344,334418,Durable goods,Computer and electronic products,Semiconductor and other electronic component manufacturing,Printed circuit assembly (electronic assembly) manufacturing
+33DG,334,3344,33441A,Durable goods,Computer and electronic products,Semiconductor and other electronic component manufacturing,Other electronic component manufacturing
+33DG,334,3345,334510,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Electromedical and electrotherapeutic apparatus manufacturing
+33DG,334,3345,334511,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing","Search, detection, and navigation instruments manufacturing"
+33DG,334,3345,334512,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Automatic environmental control manufacturing
+33DG,334,3345,334513,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Industrial process variable instruments manufacturing
+33DG,334,3345,334514,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Totalizing fluid meter and counting device manufacturing
+33DG,334,3345,334515,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Electricity and signal testing instruments manufacturing
+33DG,334,3345,334516,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Analytical laboratory instrument manufacturing
+33DG,334,3345,334517,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Irradiation apparatus manufacturing
+33DG,334,3345,33451A,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing","Watch, clock, and other measuring and controlling device manufacturing"
+33DG,334,334X,334300,Durable goods,Computer and electronic products,Other computer and electronic product manufacturing,Audio and video equipment manufacturing
+33DG,334,334X,334610,Durable goods,Computer and electronic products,Other computer and electronic product manufacturing,Manufacturing and reproducing magnetic and optical media
+33DG,335,335,335110,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Electric lamp bulb and part manufacturing
+33DG,335,335,335120,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Lighting fixture manufacturing
+33DG,335,335,335210,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Small electrical appliance manufacturing
+33DG,335,335,335221,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Household cooking appliance manufacturing
+33DG,335,335,335222,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Household refrigerator and home freezer manufacturing
+33DG,335,335,335224,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Household laundry equipment manufacturing
+33DG,335,335,335228,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Other major household appliance manufacturing
+33DG,335,335,335311,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components","Power, distribution, and specialty transformer manufacturing"
+33DG,335,335,335312,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Motor and generator manufacturing
+33DG,335,335,335313,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Switchgear and switchboard apparatus manufacturing
+33DG,335,335,335314,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Relay and industrial control manufacturing
+33DG,335,335,335911,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Storage battery manufacturing
+33DG,335,335,335912,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Primary battery manufacturing
+33DG,335,335,335920,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Communication and energy wire and cable manufacturing
+33DG,335,335,335930,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Wiring device manufacturing
+33DG,335,335,335991,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Carbon and graphite product manufacturing
+33DG,335,335,335999,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",All other miscellaneous electrical equipment and component manufacturing
+33DG,3361MV,336111,336111,Durable goods,"Motor vehicles, bodies and trailers, and parts",Automobile manufacturing,Automobile manufacturing
+33DG,3361MV,336112,336112,Durable goods,"Motor vehicles, bodies and trailers, and parts",Light truck and utility vehicle manufacturing,Light truck and utility vehicle manufacturing
+33DG,3361MV,33612,336120,Durable goods,"Motor vehicles, bodies and trailers, and parts",Heavy duty truck manufacturing,Heavy duty truck manufacturing
+33DG,3361MV,3362BP,336211,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle body manufacturing
+33DG,3361MV,3362BP,336212,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Truck trailer manufacturing
+33DG,3361MV,3362BP,336213,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor home manufacturing
+33DG,3361MV,3362BP,336214,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Travel trailer and camper manufacturing
+33DG,3361MV,3362BP,336310,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle gasoline engine and engine parts manufacturing
+33DG,3361MV,3362BP,336320,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle electrical and electronic equipment manufacturing
+33DG,3361MV,3362BP,3363A0,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing","Motor vehicle steering, suspension component (except spring), and brake systems manufacturing"
+33DG,3361MV,3362BP,336350,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle transmission and power train parts manufacturing
+33DG,3361MV,3362BP,336360,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle seating and interior trim manufacturing
+33DG,3361MV,3362BP,336370,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle metal stamping
+33DG,3361MV,3362BP,336390,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Other motor vehicle parts manufacturing
+33DG,3364OT,3364,336411,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing,Aircraft manufacturing
+33DG,3364OT,3364,336412,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing,Aircraft engine and engine parts manufacturing
+33DG,3364OT,3364,336413,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing,Other aircraft parts and auxiliary equipment manufacturing
+33DG,3364OT,3364,336414,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing,Guided missile and space vehicle manufacturing
+33DG,3364OT,3364,33641A,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing,Propulsion units and parts for space vehicles and guided missiles
+33DG,3364OT,3365AO,336500,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,Railroad rolling stock manufacturing
+33DG,3364OT,3365AO,336611,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,Ship building and repairing
+33DG,3364OT,3365AO,336612,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,Boat building
+33DG,3364OT,3365AO,336991,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,"Motorcycle, bicycle, and parts manufacturing"
+33DG,3364OT,3365AO,336992,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,"Military armored vehicle, tank, and tank component manufacturing"
+33DG,3364OT,3365AO,336999,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,All other transportation equipment manufacturing
+33DG,337,337,337110,Durable goods,Furniture and related products,Furniture and related products,Wood kitchen cabinet and countertop manufacturing
+33DG,337,337,337121,Durable goods,Furniture and related products,Furniture and related products,Upholstered household furniture manufacturing
+33DG,337,337,337122,Durable goods,Furniture and related products,Furniture and related products,Nonupholstered wood household furniture manufacturing
+33DG,337,337,33712N,Durable goods,Furniture and related products,Furniture and related products,Other household nonupholstered furniture
+33DG,337,337,337127,Durable goods,Furniture and related products,Furniture and related products,Institutional furniture manufacturing
+33DG,337,337,33721A,Durable goods,Furniture and related products,Furniture and related products,Office furniture and custom architectural woodwork and millwork manufacturing
+33DG,337,337,337215,Durable goods,Furniture and related products,Furniture and related products,"Showcase, partition, shelving, and locker manufacturing"
+33DG,337,337,337900,Durable goods,Furniture and related products,Furniture and related products,Other furniture related product manufacturing
+33DG,339,3391,339112,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing,Surgical and medical instrument manufacturing
+33DG,339,3391,339113,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing,Surgical appliance and supplies manufacturing
+33DG,339,3391,339114,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing,Dental equipment and supplies manufacturing
+33DG,339,3391,339115,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing,Ophthalmic goods manufacturing
+33DG,339,3391,339116,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing,Dental laboratories
+33DG,339,3399,339910,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,Jewelry and silverware manufacturing
+33DG,339,3399,339920,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,Sporting and athletic goods manufacturing
+33DG,339,3399,339930,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,"Doll, toy, and game manufacturing"
+33DG,339,3399,339940,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,Office supplies (except paper) manufacturing
+33DG,339,3399,339950,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,Sign manufacturing
+33DG,339,3399,339990,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,All other miscellaneous manufacturing
 31ND,311FT,311,311111,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Dog and cat food manufacturing
 31ND,311FT,311,311119,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Other animal food manufacturing
 31ND,311FT,311,311210,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Flour milling and malt manufacturing
@@ -45,12 +200,12 @@ sector_code,summary_code,underlying_code,detail_code,sector_desc,summary_desc,un
 31ND,311FT,311,311300,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Sugar and confectionery product manufacturing
 31ND,311FT,311,311410,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Frozen food manufacturing
 31ND,311FT,311,311420,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,"Fruit and vegetable canning, pickling, and drying"
+31ND,311FT,311,31151A,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Fluid milk and butter manufacturing
 31ND,311FT,311,311513,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Cheese manufacturing
 31ND,311FT,311,311514,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,"Dry, condensed, and evaporated dairy product manufacturing"
-31ND,311FT,311,31151A,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Fluid milk and butter manufacturing
 31ND,311FT,311,311520,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Ice cream and frozen dessert manufacturing
-31ND,311FT,311,311615,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Poultry processing
 31ND,311FT,311,31161A,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,"Animal (except poultry) slaughtering, rendering, and processing"
+31ND,311FT,311,311615,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Poultry processing
 31ND,311FT,311,311700,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Seafood product preparation and packaging
 31ND,311FT,311,311810,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,Bread and bakery product manufacturing
 31ND,311FT,311,3118A0,Nondurable goods,Food and beverage and tobacco products,Food manufacturing,"Cookie, cracker, pasta, and tortilla manufacturing"
@@ -115,161 +270,6 @@ sector_code,summary_code,underlying_code,detail_code,sector_desc,summary_desc,un
 31ND,326,326,326210,Nondurable goods,Plastics and rubber products,Plastics and rubber products,Tire manufacturing
 31ND,326,326,326220,Nondurable goods,Plastics and rubber products,Plastics and rubber products,Rubber and plastics hoses and belting manufacturing
 31ND,326,326,326290,Nondurable goods,Plastics and rubber products,Plastics and rubber products,Other rubber product manufacturing
-33DG,321,321,321100,Durable goods,Wood products,Wood products,Sawmills and wood preservation
-33DG,321,321,321200,Durable goods,Wood products,Wood products,"Veneer, plywood, and engineered wood product manufacturing"
-33DG,321,321,321910,Durable goods,Wood products,Wood products,Millwork
-33DG,321,321,3219A0,Durable goods,Wood products,Wood products,All other wood product manufacturing
-33DG,327,327,327100,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Clay product and refractory manufacturing
-33DG,327,327,327200,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Glass and glass product manufacturing
-33DG,327,327,327310,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Cement manufacturing
-33DG,327,327,327320,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Ready-mix concrete manufacturing
-33DG,327,327,327330,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,"Concrete pipe, brick, and block manufacturing"
-33DG,327,327,327390,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Other concrete product manufacturing
-33DG,327,327,327400,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Lime and gypsum product manufacturing
-33DG,327,327,327910,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Abrasive product manufacturing
-33DG,327,327,327991,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Cut stone and stone product manufacturing
-33DG,327,327,327992,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Ground or treated mineral and earth manufacturing
-33DG,327,327,327993,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Mineral wool manufacturing
-33DG,327,327,327999,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products,Miscellaneous nonmetallic mineral products
-33DG,331,3311IS,331110,Durable goods,Primary metals,Iron and steel mills and manufacturing from purchased steel,Iron and steel mills and ferroalloy manufacturing
-33DG,331,3311IS,331200,Durable goods,Primary metals,Iron and steel mills and manufacturing from purchased steel,Steel product manufacturing from purchased steel
-33DG,331,3313NF,331313,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Alumina refining and primary aluminum production
-33DG,331,3313NF,331314,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Secondary smelting and alloying of aluminum
-33DG,331,3313NF,33131B,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Aluminum product manufacturing from purchased aluminum
-33DG,331,3313NF,331410,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Nonferrous metal (except aluminum) smelting and refining
-33DG,331,3313NF,331420,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,"Copper rolling, drawing, extruding and alloying"
-33DG,331,3313NF,331490,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,"Nonferrous metal (except copper and aluminum) rolling, drawing, extruding and alloying"
-33DG,331,3313NF,331510,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Ferrous metal foundries
-33DG,331,3313NF,331520,Durable goods,Primary metals,Nonferrous metal production and processing and foundries,Nonferrous metal foundries
-33DG,332,332,332114,Durable goods,Fabricated metal products,Fabricated metal products,Custom roll forming
-33DG,332,332,332119,Durable goods,Fabricated metal products,Fabricated metal products,"Metal crown, closure, and other metal stamping (except automotive)"
-33DG,332,332,33211A,Durable goods,Fabricated metal products,Fabricated metal products,"All other forging, stamping, and sintering"
-33DG,332,332,332200,Durable goods,Fabricated metal products,Fabricated metal products,Cutlery and handtool manufacturing
-33DG,332,332,332310,Durable goods,Fabricated metal products,Fabricated metal products,Plate work and fabricated structural product manufacturing
-33DG,332,332,332320,Durable goods,Fabricated metal products,Fabricated metal products,Ornamental and architectural metal products manufacturing
-33DG,332,332,332410,Durable goods,Fabricated metal products,Fabricated metal products,Power boiler and heat exchanger manufacturing
-33DG,332,332,332420,Durable goods,Fabricated metal products,Fabricated metal products,Metal tank (heavy gauge) manufacturing
-33DG,332,332,332430,Durable goods,Fabricated metal products,Fabricated metal products,"Metal can, box, and other metal container (light gauge) manufacturing"
-33DG,332,332,332500,Durable goods,Fabricated metal products,Fabricated metal products,Hardware manufacturing
-33DG,332,332,332600,Durable goods,Fabricated metal products,Fabricated metal products,Spring and wire product manufacturing
-33DG,332,332,332710,Durable goods,Fabricated metal products,Fabricated metal products,Machine shops
-33DG,332,332,332720,Durable goods,Fabricated metal products,Fabricated metal products,"Turned product and screw, nut, and bolt manufacturing"
-33DG,332,332,332800,Durable goods,Fabricated metal products,Fabricated metal products,"Coating, engraving, heat treating and allied activities"
-33DG,332,332,332913,Durable goods,Fabricated metal products,Fabricated metal products,Plumbing fixture fitting and trim manufacturing
-33DG,332,332,33291A,Durable goods,Fabricated metal products,Fabricated metal products,Valve and fittings other than plumbing
-33DG,332,332,332991,Durable goods,Fabricated metal products,Fabricated metal products,Ball and roller bearing manufacturing
-33DG,332,332,332996,Durable goods,Fabricated metal products,Fabricated metal products,Fabricated pipe and pipe fitting manufacturing
-33DG,332,332,332999,Durable goods,Fabricated metal products,Fabricated metal products,Other fabricated metal manufacturing
-33DG,332,332,33299A,Durable goods,Fabricated metal products,Fabricated metal products,"Ammunition, arms, ordnance, and accessories manufacturing"
-33DG,333,33311,333111,Durable goods,Machinery,Agricultural implement manufacturing,Farm machinery and equipment manufacturing
-33DG,333,33311,333112,Durable goods,Machinery,Agricultural implement manufacturing,Lawn and garden equipment manufacturing
-33DG,333,33312,333120,Durable goods,Machinery,Construction machinery manufacturing,Construction machinery manufacturing
-33DG,333,33313,333130,Durable goods,Machinery,Mining and oil and gas field machinery manufacturing,Mining and oil and gas field machinery manufacturing
-33DG,333,3332OM,333242,Durable goods,Machinery,Other machinery,Semiconductor machinery manufacturing
-33DG,333,3332OM,33329A,Durable goods,Machinery,Other machinery,Other industrial machinery manufacturing
-33DG,333,3332OM,333314,Durable goods,Machinery,Other machinery,Optical instrument and lens manufacturing
-33DG,333,3332OM,333316,Durable goods,Machinery,Other machinery,Photographic and photocopying equipment manufacturing
-33DG,333,3332OM,333318,Durable goods,Machinery,Other machinery,Other commercial and service industry machinery manufacturing
-33DG,333,3332OM,333413,Durable goods,Machinery,Other machinery,Industrial and commercial fan and blower and air purification equipment manufacturing
-33DG,333,3332OM,333414,Durable goods,Machinery,Other machinery,Heating equipment (except warm air furnaces) manufacturing
-33DG,333,3332OM,333415,Durable goods,Machinery,Other machinery,"Air conditioning, refrigeration, and warm air heating equipment manufacturing"
-33DG,333,3332OM,333511,Durable goods,Machinery,Other machinery,Industrial mold manufacturing
-33DG,333,3332OM,333514,Durable goods,Machinery,Other machinery,"Special tool, die, jig, and fixture manufacturing"
-33DG,333,3332OM,333517,Durable goods,Machinery,Other machinery,Machine tool manufacturing
-33DG,333,3332OM,33351B,Durable goods,Machinery,Other machinery,"Cutting and machine tool accessory, rolling mill, and other metalworking machinery manufacturing"
-33DG,333,3332OM,333611,Durable goods,Machinery,Other machinery,Turbine and turbine generator set units manufacturing
-33DG,333,3332OM,333612,Durable goods,Machinery,Other machinery,"Speed changer, industrial high-speed drive, and gear manufacturing"
-33DG,333,3332OM,333613,Durable goods,Machinery,Other machinery,Mechanical power transmission equipment manufacturing
-33DG,333,3332OM,333618,Durable goods,Machinery,Other machinery,Other engine equipment manufacturing
-33DG,333,3332OM,333912,Durable goods,Machinery,Other machinery,Air and gas compressor manufacturing
-33DG,333,3332OM,33391A,Durable goods,Machinery,Other machinery,Pump and pumping equipment manufacturing
-33DG,333,3332OM,333920,Durable goods,Machinery,Other machinery,Material handling equipment manufacturing
-33DG,333,3332OM,333991,Durable goods,Machinery,Other machinery,Power-driven handtool manufacturing
-33DG,333,3332OM,333993,Durable goods,Machinery,Other machinery,Packaging machinery manufacturing
-33DG,333,3332OM,333994,Durable goods,Machinery,Other machinery,Industrial process furnace and oven manufacturing
-33DG,333,3332OM,33399A,Durable goods,Machinery,Other machinery,Other general purpose machinery manufacturing
-33DG,333,3332OM,33399B,Durable goods,Machinery,Other machinery,Fluid power process machinery
-33DG,334,3341,334111,Durable goods,Computer and electronic products,Computer and peripheral equipment manufacturing,Electronic computer manufacturing
-33DG,334,3341,334112,Durable goods,Computer and electronic products,Computer and peripheral equipment manufacturing,Computer storage device manufacturing
-33DG,334,3341,334118,Durable goods,Computer and electronic products,Computer and peripheral equipment manufacturing,Computer terminals and other computer peripheral equipment manufacturing
-33DG,334,3342,334210,Durable goods,Computer and electronic products,Communications equipment manufacturing,Telephone apparatus manufacturing
-33DG,334,3342,334220,Durable goods,Computer and electronic products,Communications equipment manufacturing,Broadcast and wireless communications equipment
-33DG,334,3342,334290,Durable goods,Computer and electronic products,Communications equipment manufacturing,Other communications equipment manufacturing
-33DG,334,3344,334413,Durable goods,Computer and electronic products,Semiconductor and other electronic component manufacturing,Semiconductor and related device manufacturing
-33DG,334,3344,334418,Durable goods,Computer and electronic products,Semiconductor and other electronic component manufacturing,Printed circuit assembly (electronic assembly) manufacturing
-33DG,334,3344,33441A,Durable goods,Computer and electronic products,Semiconductor and other electronic component manufacturing,Other electronic component manufacturing
-33DG,334,3345,334510,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Electromedical and electrotherapeutic apparatus manufacturing
-33DG,334,3345,334511,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing","Search, detection, and navigation instruments manufacturing"
-33DG,334,3345,334512,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Automatic environmental control manufacturing
-33DG,334,3345,334513,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Industrial process variable instruments manufacturing
-33DG,334,3345,334514,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Totalizing fluid meter and counting device manufacturing
-33DG,334,3345,334515,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Electricity and signal testing instruments manufacturing
-33DG,334,3345,334516,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Analytical laboratory instrument manufacturing
-33DG,334,3345,334517,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing",Irradiation apparatus manufacturing
-33DG,334,3345,33451A,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing","Watch, clock, and other measuring and controlling device manufacturing"
-33DG,334,334X,334300,Durable goods,Computer and electronic products,Other computer and electronic product manufacturing,Audio and video equipment manufacturing
-33DG,334,334X,334610,Durable goods,Computer and electronic products,Other computer and electronic product manufacturing,Manufacturing and reproducing magnetic and optical media
-33DG,335,335,335110,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Electric lamp bulb and part manufacturing
-33DG,335,335,335120,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Lighting fixture manufacturing
-33DG,335,335,335210,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Small electrical appliance manufacturing
-33DG,335,335,335221,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Household cooking appliance manufacturing
-33DG,335,335,335222,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Household refrigerator and home freezer manufacturing
-33DG,335,335,335224,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Household laundry equipment manufacturing
-33DG,335,335,335228,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Other major household appliance manufacturing
-33DG,335,335,335311,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components","Power, distribution, and specialty transformer manufacturing"
-33DG,335,335,335312,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Motor and generator manufacturing
-33DG,335,335,335313,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Switchgear and switchboard apparatus manufacturing
-33DG,335,335,335314,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Relay and industrial control manufacturing
-33DG,335,335,335911,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Storage battery manufacturing
-33DG,335,335,335912,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Primary battery manufacturing
-33DG,335,335,335920,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Communication and energy wire and cable manufacturing
-33DG,335,335,335930,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Wiring device manufacturing
-33DG,335,335,335991,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",Carbon and graphite product manufacturing
-33DG,335,335,335999,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components",All other miscellaneous electrical equipment and component manufacturing
-33DG,3361MV,336111,336111,Durable goods,"Motor vehicles, bodies and trailers, and parts",Automobile manufacturing,Automobile manufacturing
-33DG,3361MV,336112,336112,Durable goods,"Motor vehicles, bodies and trailers, and parts",Light truck and utility vehicle manufacturing,Light truck and utility vehicle manufacturing
-33DG,3361MV,33612,336120,Durable goods,"Motor vehicles, bodies and trailers, and parts",Heavy duty truck manufacturing,Heavy duty truck manufacturing
-33DG,3361MV,3362BP,336211,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle body manufacturing
-33DG,3361MV,3362BP,336212,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Truck trailer manufacturing
-33DG,3361MV,3362BP,336213,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor home manufacturing
-33DG,3361MV,3362BP,336214,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Travel trailer and camper manufacturing
-33DG,3361MV,3362BP,336310,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle gasoline engine and engine parts manufacturing
-33DG,3361MV,3362BP,336320,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle electrical and electronic equipment manufacturing
-33DG,3361MV,3362BP,336350,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle transmission and power train parts manufacturing
-33DG,3361MV,3362BP,336360,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle seating and interior trim manufacturing
-33DG,3361MV,3362BP,336370,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Motor vehicle metal stamping
-33DG,3361MV,3362BP,336390,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing",Other motor vehicle parts manufacturing
-33DG,3361MV,3362BP,3363A0,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing","Motor vehicle steering, suspension component (except spring), and brake systems manufacturing"
-33DG,3364OT,3364,336411,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing,Aircraft manufacturing
-33DG,3364OT,3364,336412,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing,Aircraft engine and engine parts manufacturing
-33DG,3364OT,3364,336413,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing,Other aircraft parts and auxiliary equipment manufacturing
-33DG,3364OT,3364,336414,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing,Guided missile and space vehicle manufacturing
-33DG,3364OT,3364,33641A,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing,Propulsion units and parts for space vehicles and guided missiles
-33DG,3364OT,3365AO,336500,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,Railroad rolling stock manufacturing
-33DG,3364OT,3365AO,336611,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,Ship building and repairing
-33DG,3364OT,3365AO,336612,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,Boat building
-33DG,3364OT,3365AO,336991,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,"Motorcycle, bicycle, and parts manufacturing"
-33DG,3364OT,3365AO,336992,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,"Military armored vehicle, tank, and tank component manufacturing"
-33DG,3364OT,3365AO,336999,Durable goods,Other transportation equipment,All other transportation equipment manufacturing,All other transportation equipment manufacturing
-33DG,337,337,337110,Durable goods,Furniture and related products,Furniture and related products,Wood kitchen cabinet and countertop manufacturing
-33DG,337,337,337121,Durable goods,Furniture and related products,Furniture and related products,Upholstered household furniture manufacturing
-33DG,337,337,337122,Durable goods,Furniture and related products,Furniture and related products,Nonupholstered wood household furniture manufacturing
-33DG,337,337,337127,Durable goods,Furniture and related products,Furniture and related products,Institutional furniture manufacturing
-33DG,337,337,33712N,Durable goods,Furniture and related products,Furniture and related products,Other household nonupholstered furniture
-33DG,337,337,337215,Durable goods,Furniture and related products,Furniture and related products,"Showcase, partition, shelving, and locker manufacturing"
-33DG,337,337,33721A,Durable goods,Furniture and related products,Furniture and related products,Office furniture and custom architectural woodwork and millwork manufacturing
-33DG,337,337,337900,Durable goods,Furniture and related products,Furniture and related products,Other furniture related product manufacturing
-33DG,339,3391,339112,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing,Surgical and medical instrument manufacturing
-33DG,339,3391,339113,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing,Surgical appliance and supplies manufacturing
-33DG,339,3391,339114,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing,Dental equipment and supplies manufacturing
-33DG,339,3391,339115,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing,Ophthalmic goods manufacturing
-33DG,339,3391,339116,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing,Dental laboratories
-33DG,339,3399,339910,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,Jewelry and silverware manufacturing
-33DG,339,3399,339920,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,Sporting and athletic goods manufacturing
-33DG,339,3399,339930,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,"Doll, toy, and game manufacturing"
-33DG,339,3399,339940,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,Office supplies (except paper) manufacturing
-33DG,339,3399,339950,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,Sign manufacturing
-33DG,339,3399,339990,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing,All other miscellaneous manufacturing
 42,42,4231,423100,Wholesale trade,Wholesale trade,Motor vehicle and motor vehicle parts and supplies,Motor vehicle and motor vehicle parts and supplies
 42,42,4234,423400,Wholesale trade,Wholesale trade,Professional and commercial equipment and supplies,Professional and commercial equipment and supplies
 42,42,4236,423600,Wholesale trade,Wholesale trade,Household appliances and electrical and electronic goods,Household appliances and electrical and electronic goods
@@ -314,21 +314,21 @@ sector_code,summary_code,underlying_code,detail_code,sector_desc,summary_desc,un
 51,514,518,518200,Information,"Data processing, internet publishing, and other information services","Data processing, hosting, and related services","Data processing, hosting, and related services"
 51,514,519,519130,Information,"Data processing, internet publishing, and other information services",Other information services,Internet publishing and broadcasting and Web search portals
 51,514,519,5191A0,Information,"Data processing, internet publishing, and other information services",Other information services,"News syndicates, libraries, archives and all other information services"
-52,521CI,521CI,522A00,Finance and insurance,"Federal Reserve banks, credit intermediation, and related activities","Federal Reserve banks, credit intermediation, and related activities",Nondepository credit intermediation and related activities
 52,521CI,521CI,52A000,Finance and insurance,"Federal Reserve banks, credit intermediation, and related activities","Federal Reserve banks, credit intermediation, and related activities",Monetary authorities and depository credit intermediation
-52,523,523,523900,Finance and insurance,"Securities, commodity contracts, and investments","Securities, commodity contracts, and investments",Other financial investment activities
+52,521CI,521CI,522A00,Finance and insurance,"Federal Reserve banks, credit intermediation, and related activities","Federal Reserve banks, credit intermediation, and related activities",Nondepository credit intermediation and related activities
 52,523,523,523A00,Finance and insurance,"Securities, commodity contracts, and investments","Securities, commodity contracts, and investments",Securities and commodity contracts intermediation and brokerage
+52,523,523,523900,Finance and insurance,"Securities, commodity contracts, and investments","Securities, commodity contracts, and investments",Other financial investment activities
 52,524,524113,524113,Finance and insurance,Insurance carriers and related activities,Direct life insurance carriers,Direct life insurance carriers
 52,524,5241X,5241XX,Finance and insurance,Insurance carriers and related activities,"Insurance carriers, except direct life","Insurance carriers, except direct life"
 52,524,5242,524200,Finance and insurance,Insurance carriers and related activities,"Agencies, brokerages, and other insurance related activities","Insurance agencies, brokerages, and related activities"
 52,525,525,525000,Finance and insurance,"Funds, trusts, and other financial vehicles","Funds, trusts, and other financial vehicles","Funds, trusts, and other financial vehicles"
-53,532RL,532RL,532100,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets,Automotive equipment rental and leasing
-53,532RL,532RL,532400,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets,Commercial and industrial machinery and equipment rental and leasing
-53,532RL,532RL,532A00,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets,General and consumer goods rental
-53,532RL,532RL,533000,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets,Lessors of nonfinancial intangible assets
 53,HS,HSO,531HSO,Real estate and rental and leasing,Housing,Owner-occupied housing,Owner-occupied housing
 53,HS,HST,531HST,Real estate and rental and leasing,Housing,Tenant-occupied housing,Tenant-occupied housing
 53,ORE,ORE,531ORE,Real estate and rental and leasing,Other real estate,Other real estate,Other real estate
+53,532RL,532RL,532100,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets,Automotive equipment rental and leasing
+53,532RL,532RL,532A00,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets,General and consumer goods rental
+53,532RL,532RL,532400,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets,Commercial and industrial machinery and equipment rental and leasing
+53,532RL,532RL,533000,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets,Lessors of nonfinancial intangible assets
 54,5411,5411,541100,Professional and technical services,Legal services,Legal services,Legal services
 54,5412OP,5412,541200,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Accounting, tax preparation, bookkeeping, and payroll services","Accounting, tax preparation, bookkeeping, and payroll services"
 54,5412OP,5413,541300,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Architectural, engineering, and related services","Architectural, engineering, and related services"
@@ -337,9 +337,9 @@ sector_code,summary_code,underlying_code,detail_code,sector_desc,summary_desc,un
 54,5412OP,5417,541700,Professional and technical services,"Miscellaneous professional, scientific, and technical services",Scientific research and development services,Scientific research and development services
 54,5412OP,5418,541800,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Advertising, public relations, and related services","Advertising, public relations, and related services"
 54,5412OP,541X,541400,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Specialized design services and other professional, scientific, and technical services",Specialized design services
+54,5412OP,541X,5419A0,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Specialized design services and other professional, scientific, and technical services","All other miscellaneous professional, scientific, and technical services"
 54,5412OP,541X,541920,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Specialized design services and other professional, scientific, and technical services",Photographic services
 54,5412OP,541X,541940,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Specialized design services and other professional, scientific, and technical services",Veterinary services
-54,5412OP,541X,5419A0,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Specialized design services and other professional, scientific, and technical services","All other miscellaneous professional, scientific, and technical services"
 54,5415,5415,541511,Professional and technical services,Computer systems design and related services,Computer systems design and related services,Custom computer programming services
 54,5415,5415,541512,Professional and technical services,Computer systems design and related services,Computer systems design and related services,Computer systems design services
 54,5415,5415,54151A,Professional and technical services,Computer systems design and related services,Computer systems design and related services,"Other computer related services, including facilities management"
@@ -367,12 +367,12 @@ sector_code,summary_code,underlying_code,detail_code,sector_desc,summary_desc,un
 62,623,623,623A00,Health care and social assistance,Nursing and residential care facilities,Nursing and residential care facilities,Nursing and community care facilities
 62,623,623,623B00,Health care and social assistance,Nursing and residential care facilities,Nursing and residential care facilities,"Residential mental health, substance abuse, and other residential care facilities"
 62,624,624,624100,Health care and social assistance,Social assistance,Social assistance,Individual and family services
-62,624,624,624400,Health care and social assistance,Social assistance,Social assistance,Child day care services
 62,624,624,624A00,Health care and social assistance,Social assistance,Social assistance,"Community food, housing, and other relief services, including vocational rehabilitation services"
+62,624,624,624400,Health care and social assistance,Social assistance,Social assistance,Child day care services
 71,711AS,711AS,711100,"Arts, entertainment, and recreation","Performing arts, spectator sports, museums, and related activities","Performing arts, spectator sports, museums, and related activities",Performing arts companies
 71,711AS,711AS,711200,"Arts, entertainment, and recreation","Performing arts, spectator sports, museums, and related activities","Performing arts, spectator sports, museums, and related activities",Spectator sports
-71,711AS,711AS,711500,"Arts, entertainment, and recreation","Performing arts, spectator sports, museums, and related activities","Performing arts, spectator sports, museums, and related activities","Independent artists, writers, and performers"
 71,711AS,711AS,711A00,"Arts, entertainment, and recreation","Performing arts, spectator sports, museums, and related activities","Performing arts, spectator sports, museums, and related activities",Promoters of performing arts and sports and agents for public figures
+71,711AS,711AS,711500,"Arts, entertainment, and recreation","Performing arts, spectator sports, museums, and related activities","Performing arts, spectator sports, museums, and related activities","Independent artists, writers, and performers"
 71,711AS,711AS,712000,"Arts, entertainment, and recreation","Performing arts, spectator sports, museums, and related activities","Performing arts, spectator sports, museums, and related activities","Museums, historical sites, zoos, and parks"
 71,713,713,713100,"Arts, entertainment, and recreation","Amusements, gambling, and recreation industries","Amusements, gambling, and recreation industries",Amusement parks and arcades
 71,713,713,713200,"Arts, entertainment, and recreation","Amusements, gambling, and recreation industries","Amusements, gambling, and recreation industries",Gambling industries (except casino hotels)
@@ -393,18 +393,18 @@ sector_code,summary_code,underlying_code,detail_code,sector_desc,summary_desc,un
 81,81,813,813A00,"Other services, except government","Other services, except government","Religious, grantmaking, civic, professional, and similar organizations","Grantmaking, giving, and social advocacy organizations"
 81,81,813,813B00,"Other services, except government","Other services, except government","Religious, grantmaking, civic, professional, and similar organizations","Civic, social, professional, and similar organizations"
 81,81,814,814000,"Other services, except government","Other services, except government",Private households,Private households
+G,GFGD,GFGD,S00500,Government,Federal general government (defense),Federal general government (defense),Federal general government (defense)
+G,GFGN,GFGN,S00600,Government,Federal general government (nondefense),Federal general government (nondefense),Federal general government (nondefense)
 G,GFE,GFE,491000,Government,Federal government enterprises,Federal government enterprises,Postal service
 G,GFE,GFE,S00101,Government,Federal government enterprises,Federal government enterprises,Federal electric utilities
 G,GFE,GFE,S00102,Government,Federal government enterprises,Federal government enterprises,Other federal government enterprises
-G,GFGD,GFGD,S00500,Government,Federal general government (defense),Federal general government (defense),Federal general government (defense)
-G,GFGN,GFGN,S00600,Government,Federal general government (nondefense),Federal general government (nondefense),Federal general government (nondefense)
-G,GSLE,GSLE,S00201,Government,State and local government enterprises,State and local government enterprises,State and local government passenger transit
-G,GSLE,GSLE,S00202,Government,State and local government enterprises,State and local government enterprises,State and local government electric utilities
-G,GSLE,GSLE,S00203,Government,State and local government enterprises,State and local government enterprises,Other state and local government enterprises
 G,GSLG,GSLGE,GSLGE,Government,State and local general government,State and local government (educational services),State and local government (educational services)
 G,GSLG,GSLGH,GSLGH,Government,State and local general government,State and local government (hospitals and health services),State and local government (hospitals and health services)
 G,GSLG,GSLGO,GSLGO,Government,State and local general government,State and local government (other services),State and local government (other services)
-Other,Other,S003,S00300,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports,Noncomparable imports
-Other,Other,S009,S00900,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports and rest-of-the-world adjustment,Rest of the world adjustment,Rest of the world adjustment
+G,GSLE,GSLE,S00201,Government,State and local government enterprises,State and local government enterprises,State and local government passenger transit
+G,GSLE,GSLE,S00202,Government,State and local government enterprises,State and local government enterprises,State and local government electric utilities
+G,GSLE,GSLE,S00203,Government,State and local government enterprises,State and local government enterprises,Other state and local government enterprises
 Used,Used,S004,S00401,"Scrap, used and secondhand goods","Scrap, used and secondhand goods","Scrap, used and secondhand goods",Scrap
 Used,Used,S004,S00402,"Scrap, used and secondhand goods","Scrap, used and secondhand goods","Scrap, used and secondhand goods",Used and secondhand goods
+Other,Other,S003,S00300,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports,Noncomparable imports
+Other,Other,S009,S00900,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports and rest-of-the-world adjustment,Rest of the world adjustment,Rest of the world adjustment

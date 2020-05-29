@@ -8,26 +8,13 @@ sector_code,summary_code,underlying_code,sector_desc,summary_desc,underlying_des
 22,22,2211,Utilities,Utilities,"Electric power generation, transmission, and distribution"
 22,22,2212NW,Utilities,Utilities,"Natural gas distribution and water, sewage and other systems"
 23,23,23EH,Construction,Construction,"Education, hospital, and health structures"
-23,23,23MR,Construction,Construction,Maintenance and repair construction
 23,23,23OC,Construction,Construction,Office and commercial structures
-23,23,23OR,Construction,Construction,Other residential construction
-23,23,23OT,Construction,Construction,Other nonresidential structures
 23,23,23PC,Construction,Construction,Power and communication structures
-23,23,23SF,Construction,Construction,Single-family residential structures
 23,23,23TH,Construction,Construction,Transportation structures and highways and streets
-31ND,311FT,311,Nondurable goods,Food and beverage and tobacco products,Food manufacturing
-31ND,311FT,3121,Nondurable goods,Food and beverage and tobacco products,Beverage manufacturing
-31ND,311FT,3122,Nondurable goods,Food and beverage and tobacco products,Tobacco manufacturing
-31ND,313TT,313TT,Nondurable goods,Textile mills and textile product mills,Textile mills and textile product mills
-31ND,315AL,315AL,Nondurable goods,Apparel and leather and allied products,Apparel and leather and allied products
-31ND,322,322,Nondurable goods,Paper products,Paper products
-31ND,323,323,Nondurable goods,Printing and related support activities,Printing and related support activities
-31ND,324,324,Nondurable goods,Petroleum and coal products,Petroleum and coal products
-31ND,325,3251,Nondurable goods,Chemical products,Basic chemical manufacturing
-31ND,325,3252,Nondurable goods,Chemical products,"Resin, rubber, and artificial fibers manufacturing"
-31ND,325,3254,Nondurable goods,Chemical products,Pharmaceutical and medicine manufacturing
-31ND,325,325X,Nondurable goods,Chemical products,Other chemical manufacturing
-31ND,326,326,Nondurable goods,Plastics and rubber products,Plastics and rubber products
+23,23,23OT,Construction,Construction,Other nonresidential structures
+23,23,23SF,Construction,Construction,Single-family residential structures
+23,23,23OR,Construction,Construction,Other residential construction
+23,23,23MR,Construction,Construction,Maintenance and repair construction
 33DG,321,321,Durable goods,Wood products,Wood products
 33DG,327,327,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products
 33DG,331,3311IS,Durable goods,Primary metals,Iron and steel mills and manufacturing from purchased steel
@@ -52,6 +39,19 @@ sector_code,summary_code,underlying_code,sector_desc,summary_desc,underlying_des
 33DG,337,337,Durable goods,Furniture and related products,Furniture and related products
 33DG,339,3391,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing
 33DG,339,3399,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing
+31ND,311FT,311,Nondurable goods,Food and beverage and tobacco products,Food manufacturing
+31ND,311FT,3121,Nondurable goods,Food and beverage and tobacco products,Beverage manufacturing
+31ND,311FT,3122,Nondurable goods,Food and beverage and tobacco products,Tobacco manufacturing
+31ND,313TT,313TT,Nondurable goods,Textile mills and textile product mills,Textile mills and textile product mills
+31ND,315AL,315AL,Nondurable goods,Apparel and leather and allied products,Apparel and leather and allied products
+31ND,322,322,Nondurable goods,Paper products,Paper products
+31ND,323,323,Nondurable goods,Printing and related support activities,Printing and related support activities
+31ND,324,324,Nondurable goods,Petroleum and coal products,Petroleum and coal products
+31ND,325,3251,Nondurable goods,Chemical products,Basic chemical manufacturing
+31ND,325,3252,Nondurable goods,Chemical products,"Resin, rubber, and artificial fibers manufacturing"
+31ND,325,3254,Nondurable goods,Chemical products,Pharmaceutical and medicine manufacturing
+31ND,325,325X,Nondurable goods,Chemical products,Other chemical manufacturing
+31ND,326,326,Nondurable goods,Plastics and rubber products,Plastics and rubber products
 42,42,4231,Wholesale trade,Wholesale trade,Motor vehicle and motor vehicle parts and supplies
 42,42,4234,Wholesale trade,Wholesale trade,Professional and commercial equipment and supplies
 42,42,4236,Wholesale trade,Wholesale trade,Household appliances and electrical and electronic goods
@@ -96,10 +96,10 @@ sector_code,summary_code,underlying_code,sector_desc,summary_desc,underlying_des
 52,524,5241X,Finance and insurance,Insurance carriers and related activities,"Insurance carriers, except direct life"
 52,524,5242,Finance and insurance,Insurance carriers and related activities,"Agencies, brokerages, and other insurance related activities"
 52,525,525,Finance and insurance,"Funds, trusts, and other financial vehicles","Funds, trusts, and other financial vehicles"
-53,532RL,532RL,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets
 53,HS,HSO,Real estate and rental and leasing,Housing,Owner-occupied housing
 53,HS,HST,Real estate and rental and leasing,Housing,Tenant-occupied housing
 53,ORE,ORE,Real estate and rental and leasing,Other real estate,Other real estate
+53,532RL,532RL,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets
 54,5411,5411,Professional and technical services,Legal services,Legal services
 54,5412OP,5412,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Accounting, tax preparation, bookkeeping, and payroll services"
 54,5412OP,5413,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Architectural, engineering, and related services"
@@ -130,13 +130,13 @@ sector_code,summary_code,underlying_code,sector_desc,summary_desc,underlying_des
 81,81,812,"Other services, except government","Other services, except government",Personal and laundry services
 81,81,813,"Other services, except government","Other services, except government","Religious, grantmaking, civic, professional, and similar organizations"
 81,81,814,"Other services, except government","Other services, except government",Private households
-G,GFE,GFE,Government,Federal government enterprises,Federal government enterprises
 G,GFGD,GFGD,Government,Federal general government (defense),Federal general government (defense)
 G,GFGN,GFGN,Government,Federal general government (nondefense),Federal general government (nondefense)
-G,GSLE,GSLE,Government,State and local government enterprises,State and local government enterprises
+G,GFE,GFE,Government,Federal government enterprises,Federal government enterprises
 G,GSLG,GSLGE,Government,State and local general government,State and local government (educational services)
 G,GSLG,GSLGH,Government,State and local general government,State and local government (hospitals and health services)
 G,GSLG,GSLGO,Government,State and local general government,State and local government (other services)
+G,GSLE,GSLE,Government,State and local government enterprises,State and local government enterprises
+Used,Used,S004,"Scrap, used and secondhand goods","Scrap, used and secondhand goods","Scrap, used and secondhand goods"
 Other,Other,S003,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports
 Other,Other,S009,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports and rest-of-the-world adjustment,Rest of the world adjustment
-Used,Used,S004,"Scrap, used and secondhand goods","Scrap, used and secondhand goods","Scrap, used and secondhand goods"

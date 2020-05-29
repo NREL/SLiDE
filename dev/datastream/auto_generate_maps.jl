@@ -149,62 +149,43 @@ end
 READ_DIR = joinpath("data", "readfiles")
 
 files_map = [
-    # XLSXInput("generate_yaml.xlsx", "map_parse", "B1:D150", "map_parse"),
-    # XLSXInput("generate_yaml.xlsx", "map_scale", "K1:K150", "map_scale"),
-    # XLSXInput("generate_yaml.xlsx", "map_bluenote", "G1:G150", "map_bluenote"),
-    XLSXInput("generate_yaml.xlsx", "map_crosswalk", "F1:F150", "map_crosswalk")
+    XLSXInput("generate_yaml.xlsx", "map_parse",     "B1:Z150", "map_parse"),
+    XLSXInput("generate_yaml.xlsx", "map_scale",     "B1:Z150", "map_scale"),
+    XLSXInput("generate_yaml.xlsx", "map_bluenote",  "B1:Z150", "map_bluenote"),
+    XLSXInput("generate_yaml.xlsx", "map_crosswalk", "B1:Z150", "map_crosswalk")
 ]
 
 files_map = write_yaml(READ_DIR, files_map)
 y_read = [read_file(files_map[ii]) for ii in 1:length(files_map)]
 
-# ind = Symbol.([m[:ind] for m in match.(r"(?<ind>\w*).yml", files_map)])
-# files_map = run_yaml(files_map)
-# df = [read_file(joinpath(y_read[ii]["PathOut"]...)) for ii in 1:length(y_read)];
+files_map = run_yaml(files_map)
 
-# include(joinpath(SLIDE_DIR, "dev", "datastream", "adjust_maps.jl"))
-# [df[ii] = sort(edit_with(df[ii],
-#         Rename(:windc_code, Symbol(:windc_code_, ind[ii]))))
-#     for ii in 1:length(df)]
-# [df[ii][!,:naics_code] .= convert_type.(String, df[ii][:,:naics_code]) for ii in 1:length(df)]
-
-# df_sector = df[1]
-# [global df_sector = join(df_sector, df[ii], on = :naics_code, kind = :outer, makeunique = true) for ii in 2:length(df)]
-
-# cols_sector = [
-#     sort(names(df_sector)[occursin.(:code, names(df_sector))]);
-#     sort(names(df_sector)[occursin.(:desc, names(df_sector))])]
-# df_sector = df_sector[:,cols_sector]
-
+include(joinpath(SLIDE_DIR, "dev", "datastream", "adjust_maps.jl"))
+df = [read_file(joinpath(y_read[ii]["PathOut"]...)) for ii in 1:length(y_read)];
 
 # ******************************************************************************************
 # EDIT MANUALLY TO CHECK:
-ii_file = length(y_read);
-y = y_read[ii_file];
-files = [[y[k] for k in collect(keys(y))[occursin.("Input", keys(y))]]...;]
+# ii_file = length(y_read);
+# y = y_read[ii_file];
+# files = [[y[k] for k in collect(keys(y))[occursin.("Input", keys(y))]]...;]
 
-ii_input = 1;
-for ii_input in 1:1
-    file = files[ii_input]
-    println(file)
-    global df = read_file(y["PathIn"], file)
+# ii_input = 1;
+# for ii_input in 1:1
+#     file = files[ii_input]
+#     println(file)
+#     global df = read_file(y["PathIn"], file)
 
-    "Drop"     in keys(y) && (df = edit_with(df, y["Drop"]))
-    "Rename"   in keys(y) && (df = edit_with(df, y["Rename"]))
-    "Group"    in keys(y) && (df = edit_with(df, y["Group"]))
-    "Stack"    in keys(y) && (df = edit_with(df, y["Stack"]))
-    "Match"    in keys(y) && (df = edit_with(df, y["Match"]))
-    "Melt"     in keys(y) && (df = edit_with(df, y["Melt"]))
-    "Add"      in keys(y) && (df = edit_with(df, y["Add"]))
-    "Map"      in keys(y) && (df = edit_with(df, y["Map"]))
-    "Replace"  in keys(y) && (df = edit_with(df, y["Replace"]))
-    "Drop"     in keys(y) && (df = edit_with(df, y["Drop"]))
-    "Operate"  in keys(y) && (df = edit_with(df, y["Operate"]))
-    "Describe" in keys(y) && (df = edit_with(df, y["Describe"], file))
-    "Order"    in keys(y) && (df = edit_with(df, y["Order"]))
-end
-
-# df_no_naics = copy(df[df[:,:naics_code].===missing,:])
-# dropmissing!(df, :naics_code)
-sort!(df, :windc_code)
-df = edit_with(df, Replace.(names(df)[occursin.(:desc,names(df))], "upper", "uppercasefirst"))
+#     "Drop"     in keys(y) && (df = edit_with(df, y["Drop"]))
+#     "Rename"   in keys(y) && (df = edit_with(df, y["Rename"]))
+#     "Group"    in keys(y) && (df = edit_with(df, y["Group"]))
+#     "Stack"    in keys(y) && (df = edit_with(df, y["Stack"]))
+#     "Match"    in keys(y) && (df = edit_with(df, y["Match"]))
+#     "Melt"     in keys(y) && (df = edit_with(df, y["Melt"]))
+#     "Add"      in keys(y) && (df = edit_with(df, y["Add"]))
+#     "Map"      in keys(y) && (df = edit_with(df, y["Map"]))
+#     "Replace"  in keys(y) && (df = edit_with(df, y["Replace"]))
+#     "Drop"     in keys(y) && (df = edit_with(df, y["Drop"]))
+#     "Operate"  in keys(y) && (df = edit_with(df, y["Operate"]))
+#     "Describe" in keys(y) && (df = edit_with(df, y["Describe"], file))
+#     "Order"    in keys(y) && (df = edit_with(df, y["Order"]))
+# end

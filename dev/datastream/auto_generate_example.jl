@@ -52,10 +52,3 @@ end
 x = y["Operate"]
 cols = [setdiff(names(df), unique([x.from; x.to; x.input; x.output]))[1:end-2]; x.output; x.from]
 [inp in ensurearray(x.output) ? Symbol(inp, :_0) : inp for inp in x.input]
-
-
-# [to in ensurearray(x.to) ? Symbol(inp, :_0) : inp for inp in x.input]
-
-
-
-# # first(df,4)

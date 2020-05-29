@@ -507,8 +507,8 @@ S00900,,rwa_oth,oth,Rest of the world adjustment
 21,,,,Mining
 22,,,uti,Utilities
 23,,,con,Construction
-31ND,,,,Nondurable goods
 33DG,,,,Durable goods
+31ND,,,,Nondurable goods
 42,,,wht,Wholesale trade
 44RT,,,,Retail trade
 48TW,,,,"Transportation and warehousing, excluding postal service"
@@ -524,21 +524,13 @@ S00900,,rwa_oth,oth,Rest of the world adjustment
 72,,,,Accommodation and food services
 81,,,osv,"Other services, except government"
 G,,,,Government
-Other,,,oth,Noncomparable imports and rest-of-the-world adjustment
 Used,,,use,"Scrap, used and secondhand goods"
+Other,,,oth,Noncomparable imports and rest-of-the-world adjustment
 111CA,,,agr,Farms
 113FF,,,fof,"Forestry, fishing, and related activities"
 211,,,oil,Oil and gas extraction
 212,,,min,"Mining, except oil and gas"
 213,,,smn,Support activities for mining
-311FT,,,fbp,Food and beverage and tobacco products
-313TT,,,tex,Textile mills and textile product mills
-315AL,,,alt,Apparel and leather and allied products
-322,,,ppd,Paper products
-323,,,pri,Printing and related support activities
-324,,,pet,Petroleum and coal products
-325,,,che,Chemical products
-326,,,pla,Plastics and rubber products
 321,,,wpd,Wood products
 327,,,nmp,Nonmetallic mineral products
 331,,,pmt,Primary metals
@@ -550,6 +542,14 @@ Used,,,use,"Scrap, used and secondhand goods"
 3364OT,,,ote,Other transportation equipment
 337,,,fpd,Furniture and related products
 339,,,mmf,Miscellaneous manufacturing
+311FT,,,fbp,Food and beverage and tobacco products
+313TT,,,tex,Textile mills and textile product mills
+315AL,,,alt,Apparel and leather and allied products
+322,,,ppd,Paper products
+323,,,pri,Printing and related support activities
+324,,,pet,Petroleum and coal products
+325,,,che,Chemical products
+326,,,pla,Plastics and rubber products
 441,,,mvt,Motor vehicle and parts dealers
 445,,,fbt,Food and beverage stores
 452,,,gmt,General merchandise stores
@@ -570,9 +570,9 @@ Used,,,use,"Scrap, used and secondhand goods"
 523,,,sec,"Securities, commodity contracts, and investments"
 524,,,ins,Insurance carriers and related activities
 525,,,fin,"Funds, trusts, and other financial vehicles"
-532RL,,,rnt,Rental and leasing services and lessors of intangible assets
 HS,,,hou,Housing
 ORE,,,ore,Other real estate
+532RL,,,rnt,Rental and leasing services and lessors of intangible assets
 5411,,,leg,Legal services
 5412OP,,,tsv,"Miscellaneous professional, scientific, and technical services"
 5415,,,com,Computer systems design and related services
@@ -587,30 +587,23 @@ ORE,,,ore,Other real estate
 713,,,rec,"Amusements, gambling, and recreation industries"
 721,,,amd,Accommodation
 722,,,res,Food services and drinking places
-GFE,,,fen,Federal government enterprises
 GFGD,,,fdd,Federal general government (defense)
 GFGN,,,fnd,Federal general government (nondefense)
-GSLE,,,sle,State and local government enterprises
+GFE,,,fen,Federal government enterprises
 GSLG,,,slg,State and local general government
+GSLE,,,sle,State and local government enterprises
 111,,,,Crop production
 112,,,,Animal production and aquaculture
 2211,,,,"Electric power generation, transmission, and distribution"
 2212NW,,,,"Natural gas distribution and water, sewage and other systems"
 23EH,,,,"Education, hospital, and health structures"
-23MR,,,,Maintenance and repair construction
 23OC,,,,Office and commercial structures
-23OR,,,,Other residential construction
-23OT,,,,Other nonresidential structures
 23PC,,,,Power and communication structures
-23SF,,,,Single-family residential structures
 23TH,,,,Transportation structures and highways and streets
-311,,,,Food manufacturing
-3121,,,,Beverage manufacturing
-3122,,,,Tobacco manufacturing
-3251,,,,Basic chemical manufacturing
-3252,,,,"Resin, rubber, and artificial fibers manufacturing"
-3254,,,,Pharmaceutical and medicine manufacturing
-325X,,,,Other chemical manufacturing
+23OT,,,,Other nonresidential structures
+23SF,,,,Single-family residential structures
+23OR,,,,Other residential construction
+23MR,,,,Maintenance and repair construction
 3311IS,,,,Iron and steel mills and manufacturing from purchased steel
 3313NF,,,,Nonferrous metal production and processing and foundries
 33311,,,,Agricultural implement manufacturing
@@ -628,6 +621,13 @@ GSLG,,,slg,State and local general government
 3365AO,,,,All other transportation equipment manufacturing
 3391,,,,Medical equipment and supplies manufacturing
 3399,,,,Other miscellaneous manufacturing
+311,,,,Food manufacturing
+3121,,,,Beverage manufacturing
+3122,,,,Tobacco manufacturing
+3251,,,,Basic chemical manufacturing
+3252,,,,"Resin, rubber, and artificial fibers manufacturing"
+3254,,,,Pharmaceutical and medicine manufacturing
+325X,,,,Other chemical manufacturing
 4231,,,,Motor vehicle and motor vehicle parts and supplies
 4234,,,,Professional and commercial equipment and supplies
 4236,,,,Household appliances and electrical and electronic goods
@@ -677,9 +677,9 @@ HST,,,,Tenant-occupied housing
 812,,,,Personal and laundry services
 813,,,,"Religious, grantmaking, civic, professional, and similar organizations"
 814,,,,Private households
+S004,,,,"Scrap, used and secondhand goods"
 S003,,,,Noncomparable imports
 S009,,,,Rest of the world adjustment
-S004,,,,"Scrap, used and secondhand goods"
 T005,,interm,interm,
 V001,,,compen,
 V003,,,surplus,

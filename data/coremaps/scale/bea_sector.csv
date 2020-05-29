@@ -3,8 +3,8 @@ sector_code,sector_desc
 21,Mining
 22,Utilities
 23,Construction
-31ND,Nondurable goods
 33DG,Durable goods
+31ND,Nondurable goods
 42,Wholesale trade
 44RT,Retail trade
 48TW,"Transportation and warehousing, excluding postal service"
@@ -20,5 +20,5 @@ sector_code,sector_desc
 72,Accommodation and food services
 81,"Other services, except government"
 G,Government
-Other,Noncomparable imports and rest-of-the-world adjustment
 Used,"Scrap, used and secondhand goods"
+Other,Noncomparable imports and rest-of-the-world adjustment

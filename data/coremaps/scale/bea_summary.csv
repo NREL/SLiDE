@@ -6,14 +6,6 @@ sector_code,summary_code,sector_desc,summary_desc
 21,213,Mining,Support activities for mining
 22,22,Utilities,Utilities
 23,23,Construction,Construction
-31ND,311FT,Nondurable goods,Food and beverage and tobacco products
-31ND,313TT,Nondurable goods,Textile mills and textile product mills
-31ND,315AL,Nondurable goods,Apparel and leather and allied products
-31ND,322,Nondurable goods,Paper products
-31ND,323,Nondurable goods,Printing and related support activities
-31ND,324,Nondurable goods,Petroleum and coal products
-31ND,325,Nondurable goods,Chemical products
-31ND,326,Nondurable goods,Plastics and rubber products
 33DG,321,Durable goods,Wood products
 33DG,327,Durable goods,Nonmetallic mineral products
 33DG,331,Durable goods,Primary metals
@@ -25,6 +17,14 @@ sector_code,summary_code,sector_desc,summary_desc
 33DG,3364OT,Durable goods,Other transportation equipment
 33DG,337,Durable goods,Furniture and related products
 33DG,339,Durable goods,Miscellaneous manufacturing
+31ND,311FT,Nondurable goods,Food and beverage and tobacco products
+31ND,313TT,Nondurable goods,Textile mills and textile product mills
+31ND,315AL,Nondurable goods,Apparel and leather and allied products
+31ND,322,Nondurable goods,Paper products
+31ND,323,Nondurable goods,Printing and related support activities
+31ND,324,Nondurable goods,Petroleum and coal products
+31ND,325,Nondurable goods,Chemical products
+31ND,326,Nondurable goods,Plastics and rubber products
 42,42,Wholesale trade,Wholesale trade
 44RT,441,Retail trade,Motor vehicle and parts dealers
 44RT,445,Retail trade,Food and beverage stores
@@ -46,9 +46,9 @@ sector_code,summary_code,sector_desc,summary_desc
 52,523,Finance and insurance,"Securities, commodity contracts, and investments"
 52,524,Finance and insurance,Insurance carriers and related activities
 52,525,Finance and insurance,"Funds, trusts, and other financial vehicles"
-53,532RL,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets
 53,HS,Real estate and rental and leasing,Housing
 53,ORE,Real estate and rental and leasing,Other real estate
+53,532RL,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets
 54,5411,Professional and technical services,Legal services
 54,5412OP,Professional and technical services,"Miscellaneous professional, scientific, and technical services"
 54,5415,Professional and technical services,Computer systems design and related services
@@ -65,10 +65,10 @@ sector_code,summary_code,sector_desc,summary_desc
 72,721,Accommodation and food services,Accommodation
 72,722,Accommodation and food services,Food services and drinking places
 81,81,"Other services, except government","Other services, except government"
-G,GFE,Government,Federal government enterprises
 G,GFGD,Government,Federal general government (defense)
 G,GFGN,Government,Federal general government (nondefense)
-G,GSLE,Government,State and local government enterprises
+G,GFE,Government,Federal government enterprises
 G,GSLG,Government,State and local general government
-Other,Other,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports and rest-of-the-world adjustment
+G,GSLE,Government,State and local government enterprises
 Used,Used,"Scrap, used and secondhand goods","Scrap, used and secondhand goods"
+Other,Other,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports and rest-of-the-world adjustment

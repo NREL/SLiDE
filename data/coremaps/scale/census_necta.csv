@@ -1,158 +1,7 @@
 state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_desc,necta_desc,nectadiv_desc,place_desc,nmemi,nectapci
-9,015,09190,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Brooklyn town,1,false
-9,015,40500,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Killingly town,1,false
-9,015,59980,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Plainfield town,1,false
-9,015,61030,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Pomfret town,1,false
-9,015,62710,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Putnam town,1,false
-9,015,73420,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sterling town,1,false
-9,015,75870,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Thompson town,1,false
-9,015,88190,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Woodstock town,1,false
-9,001,08070,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Bridgeport city and town,1,false
-9,001,18850,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Darien town,1,false
-9,001,23890,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Easton town,1,false
-9,001,26620,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Fairfield town,1,false
-9,001,33620,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Greenwich town,1,false
-9,001,48620,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Monroe town,1,false
-9,001,50580,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,New Canaan town,1,false
-9,001,56060,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Norwalk city and town,1,false
-9,001,63480,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Redding town,1,false
-9,001,63970,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Ridgefield town,1,false
-9,001,68170,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Shelton city and town,1,false
-9,001,73070,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Stamford city and town,1,false
-9,001,74190,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Stratford town,1,false
-9,001,77200,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Trumbull town,1,false
-9,001,83430,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Weston town,1,false
-9,001,83500,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Westport town,1,false
-9,001,86370,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Wilton town,1,false
-9,001,04720,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Bethel town,1,false
-9,001,08980,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Brookfield town,1,false
-9,001,18500,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Danbury city and town,1,false
-9,001,50860,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,New Fairfield town,1,false
-9,001,52980,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Newtown town,1,false
-9,001,68310,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Sherman town,1,false
-9,005,08210,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Bridgewater town,1,false
-9,005,52630,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,New Milford town,1,false
-9,005,04930,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Bethlehem town,1,false
-9,005,80490,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Watertown town,1,false
-9,005,87910,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Woodbury town,1,false
-9,007,14300,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Chester town,1,false
-9,007,15350,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Clinton town,1,false
-9,007,19130,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Deep River town,1,false
-9,007,20810,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Durham town,1,false
-9,007,26270,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Essex town,1,false
-9,007,40710,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Killingworth town,1,false
-9,007,47080,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Middlefield town,1,false
-9,007,57320,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Old Saybrook town,1,false
-9,007,81680,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Westbrook town,1,false
-9,009,01220,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Ansonia city and town,1,false
-9,009,19550,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Derby city and town,1,false
-9,009,47535,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Milford city and town,1,false
-9,009,58300,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Oxford town,1,false
-9,009,67610,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Seymour town,1,false
-9,009,69640,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Southbury town,1,false
-9,009,87700,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Woodbridge town,1,false
-9,009,04580,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Bethany town,1,false
-9,009,07310,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Branford town,1,false
-9,009,14160,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Cheshire town,1,false
-9,009,22910,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,East Haven town,1,false
-9,009,34950,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Guilford town,1,false
-9,009,35650,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Hamden town,1,false
-9,009,44560,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Madison town,1,false
-9,009,46520,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Meriden city and town,1,false
-9,009,52070,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,New Haven city and town,1,false
-9,009,53890,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,North Branford town,1,false
-9,009,54870,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,North Haven town,1,false
-9,009,57600,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Orange town,1,false
-9,009,78740,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Wallingford town,1,false
-9,009,82870,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,West Haven city and town,1,false
-9,009,03250,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Beacon Falls town,1,false
-9,009,46940,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Middlebury town,1,false
-9,009,49950,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Naugatuck borough and town,1,false
-9,009,62290,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Prospect town,1,false
-9,009,80070,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Waterbury city and town,1,false
-9,009,87560,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Wolcott town,1,false
-9,003,02060,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Avon town,1,false
-9,003,04300,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Berlin town,1,false
-9,003,05910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Bloomfield town,1,false
-9,003,08490,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Bristol city and town,1,false
-9,003,10100,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Burlington town,1,false
-9,003,12270,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Canton town,1,false
-9,003,22070,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Granby town,1,false
-9,003,22630,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Hartford town,1,false
-9,003,27600,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Farmington town,1,false
-9,003,31240,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Glastonbury town,1,false
-9,003,32640,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Granby town,1,false
-9,003,37070,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Hartford city and town,1,false
-9,003,37140,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Hartland town,1,false
-9,003,44700,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Manchester town,1,false
-9,003,45820,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Marlborough town,1,false
-9,003,50440,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,New Britain city and town,1,false
-9,003,52140,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Newington town,1,false
-9,003,60120,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Plainville town,1,false
-9,003,65370,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Rocky Hill town,1,false
-9,003,68940,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Simsbury town,1,false
-9,003,70550,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Southington town,1,false
-9,003,71390,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,South Windsor town,1,false
-9,003,82590,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,West Hartford town,1,false
-9,003,84900,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Wethersfield town,1,false
-9,003,87000,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Windsor town,1,false
-9,003,24800,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,East Windsor town,1,false
-9,003,25990,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Enfield town,1,false
-9,003,74540,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Suffield town,1,false
-9,003,87070,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Windsor Locks town,1,false
-9,005,02760,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Barkhamsted town,1,false
-9,005,37280,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Harwinton town,1,false
-9,005,51350,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,New Hartford town,1,false
-9,005,60750,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Plymouth town,1,false
-9,005,75730,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Thomaston town,1,false
-9,005,16050,790,78400,,"Springfield-Hartford-West Hartford, MA-CT","Torrington, CT",,Colebrook town,2,false
-9,005,76570,790,78400,,"Springfield-Hartford-West Hartford, MA-CT","Torrington, CT",,Torrington city and town,2,false
-9,005,86440,790,78400,,"Springfield-Hartford-West Hartford, MA-CT","Torrington, CT",,Winchester town,2,false
-9,007,18080,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Cromwell town,1,false
-9,007,22280,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Haddam town,1,false
-9,007,22490,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Hampton town,1,false
-9,007,35230,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Haddam town,1,false
-9,007,47360,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Middletown city and town,1,false
-9,007,61800,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Portland town,1,false
-9,011,15910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Colchester town,1,false
-9,011,42390,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Lebanon town,1,false
-9,013,01080,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Andover town,1,false
-9,013,06260,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Bolton town,1,false
-9,013,16400,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Columbia town,1,false
-9,013,17800,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Coventry town,1,false
-9,013,25360,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Ellington town,1,false
-9,013,37910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Hebron town,1,false
-9,013,44910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Mansfield town,1,false
-9,013,72090,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Stafford town,1,false
-9,013,76290,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Tolland town,1,false
-9,013,77830,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Union town,1,false
-9,013,78250,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Vernon town,1,false
-9,013,85950,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Willington town,1,false
-9,013,69220,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Somers town,1,false
-9,015,01430,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Ashford town,1,false
-9,015,13810,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Chaplin town,1,false
-9,015,67400,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Scotland town,1,false
-9,015,86790,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Windham town,1,false
-9,011,06820,,76450,,,"Norwich-New London-Westerly, CT-RI",,Bozrah town,1,false
-9,011,23400,,76450,,,"Norwich-New London-Westerly, CT-RI",,East Lyme town,1,false
-9,011,29910,,76450,,,"Norwich-New London-Westerly, CT-RI",,Franklin town,1,false
-9,011,33900,,76450,,,"Norwich-New London-Westerly, CT-RI",,Griswold town,1,false
-9,011,34250,,76450,,,"Norwich-New London-Westerly, CT-RI",,Groton town,1,false
-9,011,42600,,76450,,,"Norwich-New London-Westerly, CT-RI",,Ledyard town,1,false
-9,011,43230,,76450,,,"Norwich-New London-Westerly, CT-RI",,Lisbon town,1,false
-9,011,44210,,76450,,,"Norwich-New London-Westerly, CT-RI",,Lyme town,1,false
-9,011,48900,,76450,,,"Norwich-New London-Westerly, CT-RI",,Montville town,1,false
-9,011,52350,,76450,,,"Norwich-New London-Westerly, CT-RI",,New London city and town,1,false
-9,011,55500,,76450,,,"Norwich-New London-Westerly, CT-RI",,North Stonington town,1,false
-9,011,56270,,76450,,,"Norwich-New London-Westerly, CT-RI",,Norwich city and town,1,false
-9,011,57040,,76450,,,"Norwich-New London-Westerly, CT-RI",,Old Lyme town,1,false
-9,011,62150,,76450,,,"Norwich-New London-Westerly, CT-RI",,Preston town,1,false
-9,011,66210,,76450,,,"Norwich-New London-Westerly, CT-RI",,Salem town,1,false
-9,011,71670,,76450,,,"Norwich-New London-Westerly, CT-RI",,Sprague town,1,false
-9,011,73770,,76450,,,"Norwich-New London-Westerly, CT-RI",,Stonington town,1,false
-9,011,78600,,76450,,,"Norwich-New London-Westerly, CT-RI",,Voluntown town,1,false
-9,011,80280,,76450,,,"Norwich-New London-Westerly, CT-RI",,Waterford town,1,false
-9,015,12130,,76450,,,"Norwich-New London-Westerly, CT-RI",,Canterbury town,1,false
+25,011,51265,715,70450,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Athol, MA",,Orange town,2,false
+25,027,02480,715,70450,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Athol, MA",,Athol town,2,false
+25,027,53120,715,70450,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Athol, MA",,Petersham town,2,false
 23,011,02100,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Augusta city,2,false
 23,011,04020,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Belgrade town,2,false
 23,011,12350,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Chelsea town,2,false
@@ -172,92 +21,9 @@ state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_d
 23,011,82945,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,West Gardiner town,2,false
 23,011,86165,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Windsor town,2,false
 23,011,86970,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Winthrop town,2,false
-23,011,00590,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Albion town,2,false
-23,011,04475,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Benton town,2,false
-23,011,13470,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Clinton town,2,false
-23,011,54560,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Oakland town,2,false
-23,011,78190,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Unity unorganized territory,2,false
-23,011,80740,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Waterville city,2,false
-23,011,86515,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Winslow town,2,false
 23,015,69645,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Somerville town,2,false
 23,015,85010,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Whitefield town,2,false
-23,025,24320,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Fairfield town,2,false
 23,027,56450,710,70600,,"Augusta-Waterville, ME","Augusta, ME",,Palermo town,2,false
-23,027,09270,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Burnham town,2,false
-23,031,22955,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Eliot town,1,false
-23,031,37270,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Kittery town,1,false
-23,031,87985,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,York town,1,false
-23,001,02060,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Auburn city,1,false
-23,001,29255,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Greene town,1,false
-23,001,38565,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Leeds town,1,false
-23,001,38740,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Lewiston city,1,false
-23,001,40035,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Lisbon town,1,false
-23,001,44585,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Mechanic Falls town,1,false
-23,001,46160,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Minot town,1,false
-23,001,60020,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Poland town,1,false
-23,001,64570,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Sabattus town,1,false
-23,001,77800,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Turner town,1,false
-23,001,79585,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Wales town,1,false
-23,001,19105,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Durham town,1,false
-23,005,08430,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Brunswick town,2,false
-23,005,31390,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Harpswell town,2,false
-23,005,02655,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Baldwin town,1,false
-23,005,10180,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Cape Elizabeth town,1,false
-23,005,11125,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Casco town,1,false
-23,005,12300,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Chebeague Island town,1,false
-23,005,15430,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Cumberland town,1,false
-23,005,24495,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Falmouth town,1,false
-23,005,26525,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Freeport town,1,false
-23,005,27025,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Frye Island town,1,false
-23,005,28240,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Gorham town,1,false
-23,005,28870,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Gray town,1,false
-23,005,41067,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Long Island town,1,false
-23,005,48085,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Naples town,1,false
-23,005,48820,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,New Gloucester town,1,false
-23,005,53860,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,North Yarmouth town,1,false
-23,005,60545,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Portland city,1,false
-23,005,60685,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Pownal town,1,false
-23,005,61945,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Raymond town,1,false
-23,005,66145,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Scarborough town,1,false
-23,005,66775,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Sebago town,1,false
-23,005,71990,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,South Portland city,1,false
-23,005,73670,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Standish town,1,false
-23,005,82105,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Westbrook city,1,false
-23,005,86025,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Windham town,1,false
-23,005,87845,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Yarmouth town,1,false
-23,011,46405,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Monmouth town,1,false
-23,015,18475,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Dresden town,2,false
-23,015,84140,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Westport Island town,2,false
-23,015,87075,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Wiscasset town,2,false
-23,017,08710,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Buckfield town,1,false
-23,017,10005,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Canton town,1,false
-23,017,31670,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Hartford town,1,false
-23,017,32370,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Hebron town,1,false
-23,023,01570,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Arrowsic town,2,false
-23,023,03355,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Bath city,2,false
-23,023,06260,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Bowdoin town,2,false
-23,023,06365,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Bowdoinham town,2,false
-23,023,27295,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Georgetown town,2,false
-23,023,58515,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Phippsburg town,2,false
-23,023,76960,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Topsham town,2,false
-23,023,81930,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,West Bath town,2,false
-23,023,87460,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Woolwich town,2,false
-23,031,01605,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Arundel town,1,false
-23,031,04860,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Biddeford city,1,false
-23,031,09410,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Buxton town,1,false
-23,031,14485,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Cornish town,1,false
-23,031,16725,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Dayton town,1,false
-23,031,33665,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Hollis town,1,false
-23,031,36535,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Kennebunk town,1,false
-23,031,36745,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Kennebunkport town,1,false
-23,031,39195,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Limerick town,1,false
-23,031,39405,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Limington town,1,false
-23,031,41750,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Lyman town,1,false
-23,031,55085,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Old Orchard Beach town,1,false
-23,031,64675,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Saco city,1,false
-23,031,80530,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Waterboro town,1,false
-23,031,65760,775,77950,,"Portland-Lewiston-South Portland, ME","Sanford, ME",,Sanford town,2,false
-23,031,67475,775,77950,,"Portland-Lewiston-South Portland, ME","Sanford, ME",,Shapleigh town,2,false
 23,009,01185,,70750,,,"Bangor, ME",,Amherst town,1,false
 23,009,02165,,70750,,,"Bangor, ME",,Aurora town,1,false
 23,009,16935,,70750,,,"Bangor, ME",,Dedham town,1,false
@@ -304,9 +70,47 @@ state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_d
 23,019,78780,,70750,,,"Bangor, ME",,Veazie town,1,false
 23,021,70655,,70750,,,"Bangor, ME",,Southeast Piscataquis unorganized territory,1,false
 23,027,86760,,70750,,,"Bangor, ME",,Winterport town,1,false
-23,031,04720,,73050,,,"Dover-Durham, NH-ME",,Berwick town,1,false
-23,031,38425,,73050,,,"Dover-Durham, NH-ME",,Lebanon town,1,false
-23,031,70030,,73050,,,"Dover-Durham, NH-ME",,South Berwick town,1,false
+25,001,03690,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Barnstable Town city,1,false
+25,001,07175,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Bourne town,1,false
+25,001,07980,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Brewster town,1,false
+25,001,12995,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Chatham town,1,false
+25,001,16775,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Dennis town,1,false
+25,001,19295,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Eastham town,1,false
+25,001,23105,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Falmouth town,1,false
+25,001,29020,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Harwich town,1,false
+25,001,39100,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Mashpee town,1,false
+25,001,51440,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Orleans town,1,false
+25,001,59735,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Sandwich town,1,false
+25,001,74385,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Wellfleet town,1,false
+25,001,82525,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Yarmouth town,1,false
+25,023,38540,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Marion town,1,false
+25,023,72985,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Wareham town,1,false
+50,017,53425,,71050,,,"Barre, VT",,Orange town,2,false
+50,017,76750,,71050,,,"Barre, VT",,Washington town,2,false
+50,017,84175,,71050,,,"Barre, VT",,Williamstown town,2,false
+50,023,03175,,71050,,,"Barre, VT",,Barre city,2,false
+50,023,03250,,71050,,,"Barre, VT",,Barre town,2,false
+50,023,05650,,71050,,,"Barre, VT",,Berlin town,2,false
+50,023,11350,,71050,,,"Barre, VT",,Calais town,2,false
+50,023,21925,,71050,,,"Barre, VT",,East Montpelier town,2,false
+50,023,43600,,71050,,,"Barre, VT",,Marshfield town,2,false
+50,023,44500,,71050,,,"Barre, VT",,Middlesex town,2,false
+50,023,46000,,71050,,,"Barre, VT",,Montpelier city,2,false
+50,023,55825,,71050,,,"Barre, VT",,Plainfield town,2,false
+50,023,85525,,71050,,,"Barre, VT",,Woodbury town,2,false
+50,023,86125,,71050,,,"Barre, VT",,Worcester town,2,false
+50,003,04825,,71350,,,"Bennington, VT",,Bennington town,2,false
+50,003,27962,,71350,,,"Bennington, VT",,Glastenbury town,2,false
+50,003,57025,,71350,,,"Bennington, VT",,Pownal town,2,false
+50,003,63550,,71350,,,"Bennington, VT",,Shaftsbury town,2,false
+50,003,85675,,71350,,,"Bennington, VT",,Woodford town,2,false
+33,007,05140,,71500,,,"Berlin, NH",,Berlin city,2,false
+33,007,19300,,71500,,,"Berlin, NH",,Dummer town,2,false
+33,007,30260,,71500,,,"Berlin, NH",,Gorham town,2,false
+33,007,47860,,71500,,,"Berlin, NH",,Milan town,2,false
+33,007,63860,,71500,,,"Berlin, NH",,Randolph town,2,false
+33,007,68980,,71500,,,"Berlin, NH",,Shelburne town,2,false
+33,007,73060,,71500,,,"Berlin, NH",,Stark town,2,false
 25,005,38225,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Mansfield town,1,false
 25,009,01465,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Andover town,1,false
 25,009,07420,715,71650,71654,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Boston-Cambridge-Newton, MA",Boxford town,1,false
@@ -427,9 +231,23 @@ state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_d
 25,009,45245,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Newburyport city,1,false
 25,009,59245,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Salisbury town,1,false
 25,009,77150,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",West Newbury town,1,false
+33,015,02340,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Atkinson town,1,false
+33,015,17140,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Danville town,1,false
+33,015,21380,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",East Kingston town,1,false
+33,015,27940,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Fremont town,1,false
+33,015,32900,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Hampstead town,1,false
+33,015,33460,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Hampton Falls town,1,false
+33,015,39780,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Kensington town,1,false
+33,015,40100,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Kingston town,1,false
+33,015,52900,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Newton town,1,false
+33,015,62500,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Plaistow town,1,false
+33,015,67620,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Sandown town,1,false
+33,015,68260,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Seabrook town,1,false
+33,015,71140,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",South Hampton town,1,false
 25,009,34550,715,71650,74204,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lawrence-Methuen Town-Salem, MA-NH",Lawrence city,1,false
 25,009,40710,715,71650,74204,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lawrence-Methuen Town-Salem, MA-NH",Methuen Town city,1,false
 25,009,46365,715,71650,74204,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lawrence-Methuen Town-Salem, MA-NH",North Andover town,1,false
+33,015,66660,715,71650,74204,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lawrence-Methuen Town-Salem, MA-NH",Salem town,1,false
 25,017,01955,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Ashby town,1,false
 25,017,03005,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Ayer town,1,false
 25,017,05805,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Billerica town,1,false
@@ -444,6 +262,7 @@ state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_d
 25,017,71025,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Tyngsborough town,1,false
 25,017,76135,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Westford town,1,false
 25,027,28950,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Harvard town,1,false
+33,011,59940,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Pelham town,1,false
 25,009,37490,715,71650,74854,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lynn-Saugus-Marblehead, MA",Lynn city,1,false
 25,009,38400,715,71650,74854,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lynn-Saugus-Marblehead, MA",Marblehead town,1,false
 25,009,43580,715,71650,74854,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lynn-Saugus-Marblehead, MA",Nahant town,1,false
@@ -451,6 +270,25 @@ state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_d
 25,009,68645,715,71650,74854,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lynn-Saugus-Marblehead, MA",Swampscott town,1,false
 25,017,17825,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Dunstable town,1,false
 25,017,52805,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Pepperell town,1,false
+33,011,01300,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Amherst town,1,false
+33,011,08100,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Brookline town,1,false
+33,011,31540,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Greenfield town,1,false
+33,011,31940,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Greenville town,1,false
+33,011,37140,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Hollis town,1,false
+33,011,37940,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Hudson town,1,false
+33,011,42260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Litchfield town,1,false
+33,011,44580,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Lyndeborough town,1,false
+33,011,46260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Mason town,1,false
+33,011,47540,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Merrimack town,1,false
+33,011,48020,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Milford town,1,false
+33,011,49140,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Mont Vernon town,1,false
+33,011,50260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Nashua city,1,false
+33,011,76260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Temple town,1,false
+33,011,85220,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Wilton town,1,false
+33,015,12100,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Chester town,1,false
+33,015,17940,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Derry town,1,false
+33,015,43220,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Londonderry town,1,false
+33,015,85780,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Windham town,1,false
 25,009,05595,715,71650,76524,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Peabody-Salem-Beverly, MA",Beverly city,1,false
 25,009,16250,715,71650,76524,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Peabody-Salem-Beverly, MA",Danvers town,1,false
 25,009,52490,715,71650,76524,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Peabody-Salem-Beverly, MA",Peabody city,1,false
@@ -464,41 +302,222 @@ state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_d
 25,023,33920,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Lakeville town,1,false
 25,023,40850,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Middleborough town,1,false
 25,023,57600,715,71650,78254,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Taunton-Middleborough-Norton, MA",Rochester town,1,false
-25,001,03690,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Barnstable Town city,1,false
-25,001,07175,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Bourne town,1,false
-25,001,07980,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Brewster town,1,false
-25,001,12995,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Chatham town,1,false
-25,001,16775,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Dennis town,1,false
-25,001,19295,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Eastham town,1,false
-25,001,23105,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Falmouth town,1,false
-25,001,29020,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Harwich town,1,false
-25,001,39100,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Mashpee town,1,false
-25,001,51440,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Orleans town,1,false
-25,001,59735,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Sandwich town,1,false
-25,001,74385,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Wellfleet town,1,false
-25,001,82525,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Yarmouth town,1,false
-25,005,00520,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Acushnet town,1,false
-25,005,16425,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Dartmouth town,1,false
-25,005,22130,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Fairhaven town,1,false
-25,005,45000,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,New Bedford city,1,false
-25,005,02690,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Attleboro city,1,false
-25,005,23000,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Fall River city,1,false
-25,005,46575,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Attleborough town,1,false
-25,005,56375,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Rehoboth town,1,false
-25,005,60645,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Seekonk town,1,false
-25,005,62430,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Somerset town,1,false
-25,005,68750,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Swansea town,1,false
-25,005,77570,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Westport town,1,false
-25,011,51265,715,70450,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Athol, MA",,Orange town,2,false
-25,013,08470,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Brimfield town,1,false
-25,013,30665,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Holland town,1,false
-25,021,04930,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Bellingham town,1,false
-25,021,54100,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Plainville town,1,false
-25,023,38540,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Marion town,1,false
-25,023,72985,715,70900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Barnstable Town, MA",,Wareham town,1,false
-25,023,39450,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Mattapoisett town,1,false
-25,027,02480,715,70450,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Athol, MA",,Athol town,2,false
-25,027,53120,715,70450,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Athol, MA",,Petersham town,2,false
+9,001,08070,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Bridgeport city and town,1,false
+9,001,18850,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Darien town,1,false
+9,001,23890,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Easton town,1,false
+9,001,26620,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Fairfield town,1,false
+9,001,33620,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Greenwich town,1,false
+9,001,48620,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Monroe town,1,false
+9,001,50580,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,New Canaan town,1,false
+9,001,56060,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Norwalk city and town,1,false
+9,001,63480,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Redding town,1,false
+9,001,63970,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Ridgefield town,1,false
+9,001,68170,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Shelton city and town,1,false
+9,001,73070,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Stamford city and town,1,false
+9,001,74190,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Stratford town,1,false
+9,001,77200,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Trumbull town,1,false
+9,001,83430,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Weston town,1,false
+9,001,83500,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Westport town,1,false
+9,001,86370,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Wilton town,1,false
+9,009,01220,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Ansonia city and town,1,false
+9,009,19550,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Derby city and town,1,false
+9,009,47535,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Milford city and town,1,false
+9,009,58300,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Oxford town,1,false
+9,009,67610,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Seymour town,1,false
+9,009,69640,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Southbury town,1,false
+9,009,87700,720,71950,,"Bridgeport-New Haven-Stamford, CT","Bridgeport-Stamford-Norwalk, CT",,Woodbridge town,1,false
+23,005,08430,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Brunswick town,2,false
+23,005,31390,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Harpswell town,2,false
+23,015,18475,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Dresden town,2,false
+23,015,84140,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Westport Island town,2,false
+23,015,87075,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Wiscasset town,2,false
+23,023,01570,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Arrowsic town,2,false
+23,023,03355,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Bath city,2,false
+23,023,06260,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Bowdoin town,2,false
+23,023,06365,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Bowdoinham town,2,false
+23,023,27295,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Georgetown town,2,false
+23,023,58515,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Phippsburg town,2,false
+23,023,76960,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Topsham town,2,false
+23,023,81930,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,West Bath town,2,false
+23,023,87460,775,72250,,"Portland-Lewiston-South Portland, ME","Brunswick, ME",,Woolwich town,2,false
+50,001,26300,,72400,,,"Burlington-South Burlington, VT",,Ferrisburgh town,1,false
+50,001,40075,,72400,,,"Burlington-South Burlington, VT",,Lincoln town,1,false
+50,001,45550,,72400,,,"Burlington-South Burlington, VT",,Monkton town,1,false
+50,001,70075,,72400,,,"Burlington-South Burlington, VT",,Starksboro town,1,false
+50,001,74650,,72400,,,"Burlington-South Burlington, VT",,Vergennes city,1,false
+50,007,06550,,72400,,,"Burlington-South Burlington, VT",,Bolton town,1,false
+50,007,10675,,72400,,,"Burlington-South Burlington, VT",,Burlington city,1,false
+50,007,13300,,72400,,,"Burlington-South Burlington, VT",,Charlotte town,1,false
+50,007,14875,,72400,,,"Burlington-South Burlington, VT",,Colchester town,1,false
+50,007,24175,,72400,,,"Burlington-South Burlington, VT",,Essex town,1,false
+50,007,33475,,72400,,,"Burlington-South Burlington, VT",,Hinesburg town,1,false
+50,007,34600,,72400,,,"Burlington-South Burlington, VT",,Huntington town,1,false
+50,007,36700,,72400,,,"Burlington-South Burlington, VT",,Jericho town,1,false
+50,007,45250,,72400,,,"Burlington-South Burlington, VT",,Milton town,1,false
+50,007,59275,,72400,,,"Burlington-South Burlington, VT",,Richmond town,1,false
+50,007,62050,,72400,,,"Burlington-South Burlington, VT",,St. George town,1,false
+50,007,64300,,72400,,,"Burlington-South Burlington, VT",,Shelburne town,1,false
+50,007,66175,,72400,,,"Burlington-South Burlington, VT",,South Burlington city,1,false
+50,007,73975,,72400,,,"Burlington-South Burlington, VT",,Underhill town,1,false
+50,007,80350,,72400,,,"Burlington-South Burlington, VT",,Westford town,1,false
+50,007,84475,,72400,,,"Burlington-South Burlington, VT",,Williston town,1,false
+50,007,85150,,72400,,,"Burlington-South Burlington, VT",,Winooski city,1,false
+50,011,24925,,72400,,,"Burlington-South Burlington, VT",,Fairfax town,1,false
+50,011,26500,,72400,,,"Burlington-South Burlington, VT",,Fletcher town,1,false
+50,011,27700,,72400,,,"Burlington-South Burlington, VT",,Georgia town,1,false
+50,011,61675,,72400,,,"Burlington-South Burlington, VT",,St. Albans city,1,false
+50,011,61750,,72400,,,"Burlington-South Burlington, VT",,St. Albans town,1,false
+50,011,71725,,72400,,,"Burlington-South Burlington, VT",,Swanton town,1,false
+50,013,29275,,72400,,,"Burlington-South Burlington, VT",,Grand Isle town,1,false
+50,013,50650,,72400,,,"Burlington-South Burlington, VT",,North Hero town,1,false
+50,013,67000,,72400,,,"Burlington-South Burlington, VT",,South Hero town,1,false
+50,015,11500,,72400,,,"Burlington-South Burlington, VT",,Cambridge town,1,false
+50,023,18550,,72400,,,"Burlington-South Burlington, VT",,Duxbury town,1,false
+33,013,06260,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Boscawen town,2,false
+33,013,06500,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Bow town,2,false
+33,013,09860,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Canterbury town,2,false
+33,013,12420,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Chichester town,2,false
+33,013,14200,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Concord city,2,false
+33,013,24900,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Epsom town,2,false
+33,013,37540,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Hopkinton town,2,false
+33,013,43380,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Loudon town,2,false
+33,013,61940,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Pittsfield town,2,false
+33,013,66980,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Salisbury town,2,false
+33,013,78580,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Warner town,2,false
+33,013,80020,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Webster town,2,false
+9,001,04720,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Bethel town,1,false
+9,001,08980,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Brookfield town,1,false
+9,001,18500,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Danbury city and town,1,false
+9,001,50860,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,New Fairfield town,1,false
+9,001,52980,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Newtown town,1,false
+9,001,68310,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Sherman town,1,false
+9,005,08210,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,Bridgewater town,1,false
+9,005,52630,720,72850,,"Bridgeport-New Haven-Stamford, CT","Danbury, CT",,New Milford town,1,false
+23,031,04720,,73050,,,"Dover-Durham, NH-ME",,Berwick town,1,false
+23,031,38425,,73050,,,"Dover-Durham, NH-ME",,Lebanon town,1,false
+23,031,70030,,73050,,,"Dover-Durham, NH-ME",,South Berwick town,1,false
+33,017,03460,,73050,,,"Dover-Durham, NH-ME",,Barrington town,1,false
+33,017,18820,,73050,,,"Dover-Durham, NH-ME",,Dover city,1,false
+33,017,19700,,73050,,,"Dover-Durham, NH-ME",,Durham town,1,false
+33,017,26020,,73050,,,"Dover-Durham, NH-ME",,Farmington town,1,false
+33,017,41460,,73050,,,"Dover-Durham, NH-ME",,Lee town,1,false
+33,017,44820,,73050,,,"Dover-Durham, NH-ME",,Madbury town,1,false
+33,017,47700,,73050,,,"Dover-Durham, NH-ME",,Middleton town,1,false
+33,017,48660,,73050,,,"Dover-Durham, NH-ME",,Milton town,1,false
+33,017,51220,,73050,,,"Dover-Durham, NH-ME",,New Durham town,1,false
+33,017,65140,,73050,,,"Dover-Durham, NH-ME",,Rochester city,1,false
+33,017,65540,,73050,,,"Dover-Durham, NH-ME",,Rollinsford town,1,false
+33,017,69940,,73050,,,"Dover-Durham, NH-ME",,Somersworth city,1,false
+33,017,73860,,73050,,,"Dover-Durham, NH-ME",,Strafford town,1,false
+25,011,05560,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Bernardston town,2,false
+25,011,14885,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Colrain town,2,false
+25,011,21780,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Erving town,2,false
+25,011,25730,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Gill town,2,false
+25,011,27100,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Greenfield Town city,2,false
+25,011,29650,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Heath town,2,false
+25,011,35285,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Leyden town,2,false
+25,011,42285,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Montague town,2,false
+25,011,47835,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Northfield town,2,false
+9,003,02060,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Avon town,1,false
+9,003,04300,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Berlin town,1,false
+9,003,05910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Bloomfield town,1,false
+9,003,08490,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Bristol city and town,1,false
+9,003,10100,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Burlington town,1,false
+9,003,12270,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Canton town,1,false
+9,003,22070,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Granby town,1,false
+9,003,22630,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Hartford town,1,false
+9,003,27600,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Farmington town,1,false
+9,003,31240,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Glastonbury town,1,false
+9,003,32640,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Granby town,1,false
+9,003,37070,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Hartford city and town,1,false
+9,003,37140,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Hartland town,1,false
+9,003,44700,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Manchester town,1,false
+9,003,45820,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Marlborough town,1,false
+9,003,50440,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,New Britain city and town,1,false
+9,003,52140,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Newington town,1,false
+9,003,60120,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Plainville town,1,false
+9,003,65370,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Rocky Hill town,1,false
+9,003,68940,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Simsbury town,1,false
+9,003,70550,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Southington town,1,false
+9,003,71390,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,South Windsor town,1,false
+9,003,82590,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,West Hartford town,1,false
+9,003,84900,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Wethersfield town,1,false
+9,003,87000,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Windsor town,1,false
+9,005,02760,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Barkhamsted town,1,false
+9,005,37280,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Harwinton town,1,false
+9,005,51350,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,New Hartford town,1,false
+9,005,60750,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Plymouth town,1,false
+9,005,75730,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Thomaston town,1,false
+9,007,18080,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Cromwell town,1,false
+9,007,22280,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Haddam town,1,false
+9,007,22490,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,East Hampton town,1,false
+9,007,35230,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Haddam town,1,false
+9,007,47360,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Middletown city and town,1,false
+9,007,61800,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Portland town,1,false
+9,011,15910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Colchester town,1,false
+9,011,42390,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Lebanon town,1,false
+9,013,01080,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Andover town,1,false
+9,013,06260,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Bolton town,1,false
+9,013,16400,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Columbia town,1,false
+9,013,17800,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Coventry town,1,false
+9,013,25360,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Ellington town,1,false
+9,013,37910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Hebron town,1,false
+9,013,44910,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Mansfield town,1,false
+9,013,72090,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Stafford town,1,false
+9,013,76290,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Tolland town,1,false
+9,013,77830,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Union town,1,false
+9,013,78250,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Vernon town,1,false
+9,013,85950,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Willington town,1,false
+9,015,01430,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Ashford town,1,false
+9,015,13810,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Chaplin town,1,false
+9,015,67400,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Scotland town,1,false
+9,015,86790,790,73450,,"Springfield-Hartford-West Hartford, MA-CT","Hartford-West Hartford-East Hartford, CT",,Windham town,1,false
+33,005,12260,,73750,,,"Keene, NH",,Chesterfield town,2,false
+33,005,29220,,73750,,,"Keene, NH",,Gilsum town,2,false
+33,005,34420,,73750,,,"Keene, NH",,Harrisville town,2,false
+33,005,39300,,73750,,,"Keene, NH",,Keene city,2,false
+33,005,45460,,73750,,,"Keene, NH",,Marlborough town,2,false
+33,005,45700,,73750,,,"Keene, NH",,Marlow town,2,false
+33,005,50580,,73750,,,"Keene, NH",,Nelson town,2,false
+33,005,64420,,73750,,,"Keene, NH",,Richmond town,2,false
+33,005,65700,,73750,,,"Keene, NH",,Roxbury town,2,false
+33,005,74900,,73750,,,"Keene, NH",,Sullivan town,2,false
+33,005,75300,,73750,,,"Keene, NH",,Surry town,2,false
+33,005,75700,,73750,,,"Keene, NH",,Swanzey town,2,false
+33,005,77380,,73750,,,"Keene, NH",,Troy town,2,false
+33,005,82660,,73750,,,"Keene, NH",,Westmoreland town,2,false
+33,005,85540,,73750,,,"Keene, NH",,Winchester town,2,false
+33,001,28740,,73900,,,"Laconia, NH",,Gilford town,2,false
+33,001,40180,,73900,,,"Laconia, NH",,Laconia city,2,false
+33,009,08980,,74350,,,"Lebanon, NH-VT",,Canaan town,2,false
+33,009,18740,,74350,,,"Lebanon, NH-VT",,Dorchester town,2,false
+33,009,24340,,74350,,,"Lebanon, NH-VT",,Enfield town,2,false
+33,009,30820,,74350,,,"Lebanon, NH-VT",,Grafton town,2,false
+33,009,33860,,74350,,,"Lebanon, NH-VT",,Hanover town,2,false
+33,009,41300,,74350,,,"Lebanon, NH-VT",,Lebanon city,2,false
+33,009,44260,,74350,,,"Lebanon, NH-VT",,Lyme town,2,false
+33,009,58340,,74350,,,"Lebanon, NH-VT",,Orange town,2,false
+33,009,58500,,74350,,,"Lebanon, NH-VT",,Orford town,2,false
+33,009,61060,,74350,,,"Lebanon, NH-VT",,Piermont town,2,false
+33,019,15060,,74350,,,"Lebanon, NH-VT",,Cornish town,2,false
+33,019,16340,,74350,,,"Lebanon, NH-VT",,Croydon town,2,false
+33,019,31220,,74350,,,"Lebanon, NH-VT",,Grantham town,2,false
+33,019,62340,,74350,,,"Lebanon, NH-VT",,Plainfield town,2,false
+50,017,07375,,74350,,,"Lebanon, NH-VT",,Bradford town,2,false
+50,017,15700,,74350,,,"Lebanon, NH-VT",,Corinth town,2,false
+50,017,25675,,74350,,,"Lebanon, NH-VT",,Fairlee town,2,false
+50,017,70675,,74350,,,"Lebanon, NH-VT",,Strafford town,2,false
+50,017,72400,,74350,,,"Lebanon, NH-VT",,Thetford town,2,false
+50,017,73675,,74350,,,"Lebanon, NH-VT",,Tunbridge town,2,false
+50,017,74950,,74350,,,"Lebanon, NH-VT",,Vershire town,2,false
+50,017,79975,,74350,,,"Lebanon, NH-VT",,West Fairlee town,2,false
+50,027,32275,,74350,,,"Lebanon, NH-VT",,Hartford town,2,false
+50,027,32425,,74350,,,"Lebanon, NH-VT",,Hartland town,2,false
+50,027,52900,,74350,,,"Lebanon, NH-VT",,Norwich town,2,false
+50,027,60850,,74350,,,"Lebanon, NH-VT",,Royalton town,2,false
+50,027,63775,,74350,,,"Lebanon, NH-VT",,Sharon town,2,false
+50,027,83050,,74350,,,"Lebanon, NH-VT",,West Windsor town,2,false
+50,027,84925,,74350,,,"Lebanon, NH-VT",,Windsor town,2,false
 25,027,01885,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Ashburnham town,1,false
 25,027,23875,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Fitchburg city,1,false
 25,027,25485,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Gardner city,1,false
@@ -509,50 +528,88 @@ state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_d
 25,027,69275,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Templeton town,1,false
 25,027,77010,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Westminster town,1,false
 25,027,80405,715,74500,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Leominster-Gardner, MA",,Winchendon town,1,false
-25,027,06015,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Blackstone town,1,false
-25,027,41585,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Millville town,1,false
-25,027,02760,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Auburn town,1,false
-25,027,03740,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Barre town,1,false
-25,027,07525,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Boylston town,1,false
-25,027,09105,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Brookfield town,1,false
-25,027,12715,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Charlton town,1,false
-25,027,14395,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Clinton town,1,false
-25,027,17300,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Douglas town,1,false
-25,027,17685,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Dudley town,1,false
-25,027,18560,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,East Brookfield town,1,false
-25,027,26430,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Grafton town,1,false
-25,027,30560,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Holden town,1,false
-25,027,31435,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Hubbardston town,1,false
-25,027,34165,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Lancaster town,1,false
-25,027,34795,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Leicester town,1,false
-25,027,41340,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Millbury town,1,false
-25,027,45105,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,New Braintree town,1,false
-25,027,46820,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Northborough town,1,false
-25,027,46925,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Northbridge town,1,false
-25,027,47135,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,North Brookfield town,1,false
-25,027,50670,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Oakham town,1,false
-25,027,51825,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Oxford town,1,false
-25,027,52420,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Paxton town,1,false
-25,027,55395,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Princeton town,1,false
-25,027,58825,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Rutland town,1,false
-25,027,61800,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Shrewsbury town,1,false
-25,027,63345,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Southbridge Town city,1,false
-25,027,66105,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Spencer town,1,false
-25,027,67385,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sterling town,1,false
-25,027,68155,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sturbridge town,1,false
-25,027,68610,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sutton town,1,false
-25,027,71480,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Upton town,1,false
-25,027,71620,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Uxbridge town,1,false
-25,027,73090,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Warren town,1,false
-25,027,73895,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Webster town,1,false
-25,027,75015,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Westborough town,1,false
-25,027,75155,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,West Boylston town,1,false
-25,027,75400,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,West Brookfield town,1,false
-25,027,82000,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Worcester city,1,false
+23,001,02060,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Auburn city,1,false
+23,001,29255,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Greene town,1,false
+23,001,38565,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Leeds town,1,false
+23,001,38740,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Lewiston city,1,false
+23,001,40035,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Lisbon town,1,false
+23,001,44585,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Mechanic Falls town,1,false
+23,001,46160,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Minot town,1,false
+23,001,60020,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Poland town,1,false
+23,001,64570,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Sabattus town,1,false
+23,001,77800,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Turner town,1,false
+23,001,79585,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Wales town,1,false
+23,011,46405,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Monmouth town,1,false
+23,017,08710,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Buckfield town,1,false
+23,017,10005,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Canton town,1,false
+23,017,31670,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Hartford town,1,false
+23,017,32370,775,74650,,"Portland-Lewiston-South Portland, ME","Lewiston-Auburn, ME",,Hebron town,1,false
+33,011,04500,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Bedford town,1,false
+33,011,29860,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Goffstown town,1,false
+33,011,45140,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Manchester city,1,false
+33,011,50740,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,New Boston town,1,false
+33,011,79780,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Weare town,1,false
+33,013,00660,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Allenstown town,1,false
+33,013,19460,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Dunbarton town,1,false
+33,013,37300,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Hooksett town,1,false
+33,013,60020,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Pembroke town,1,false
+33,015,02820,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Auburn town,1,false
+33,015,09300,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Candia town,1,false
+25,005,00520,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Acushnet town,1,false
+25,005,16425,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Dartmouth town,1,false
+25,005,22130,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Fairhaven town,1,false
+25,005,45000,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,New Bedford city,1,false
+25,023,39450,715,75550,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","New Bedford, MA",,Mattapoisett town,1,false
+9,007,14300,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Chester town,1,false
+9,007,15350,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Clinton town,1,false
+9,007,19130,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Deep River town,1,false
+9,007,20810,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Durham town,1,false
+9,007,26270,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Essex town,1,false
+9,007,40710,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Killingworth town,1,false
+9,007,47080,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Middlefield town,1,false
+9,007,57320,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Old Saybrook town,1,false
+9,007,81680,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Westbrook town,1,false
+9,009,04580,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Bethany town,1,false
+9,009,07310,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Branford town,1,false
+9,009,14160,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Cheshire town,1,false
+9,009,22910,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,East Haven town,1,false
+9,009,34950,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Guilford town,1,false
+9,009,35650,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Hamden town,1,false
+9,009,44560,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Madison town,1,false
+9,009,46520,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Meriden city and town,1,false
+9,009,52070,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,New Haven city and town,1,false
+9,009,53890,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,North Branford town,1,false
+9,009,54870,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,North Haven town,1,false
+9,009,57600,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Orange town,1,false
+9,009,78740,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,Wallingford town,1,false
+9,009,82870,720,75700,,"Bridgeport-New Haven-Stamford, CT","New Haven, CT",,West Haven city and town,1,false
 25,003,14010,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,Clarksburg town,2,false
 25,003,24120,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,Florida town,2,false
 25,003,46225,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,North Adams city,2,false
 25,003,79985,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,Williamstown town,2,false
+50,003,69775,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,Stamford town,2,false
+9,011,06820,,76450,,,"Norwich-New London-Westerly, CT-RI",,Bozrah town,1,false
+9,011,23400,,76450,,,"Norwich-New London-Westerly, CT-RI",,East Lyme town,1,false
+9,011,29910,,76450,,,"Norwich-New London-Westerly, CT-RI",,Franklin town,1,false
+9,011,33900,,76450,,,"Norwich-New London-Westerly, CT-RI",,Griswold town,1,false
+9,011,34250,,76450,,,"Norwich-New London-Westerly, CT-RI",,Groton town,1,false
+9,011,42600,,76450,,,"Norwich-New London-Westerly, CT-RI",,Ledyard town,1,false
+9,011,43230,,76450,,,"Norwich-New London-Westerly, CT-RI",,Lisbon town,1,false
+9,011,44210,,76450,,,"Norwich-New London-Westerly, CT-RI",,Lyme town,1,false
+9,011,48900,,76450,,,"Norwich-New London-Westerly, CT-RI",,Montville town,1,false
+9,011,52350,,76450,,,"Norwich-New London-Westerly, CT-RI",,New London city and town,1,false
+9,011,55500,,76450,,,"Norwich-New London-Westerly, CT-RI",,North Stonington town,1,false
+9,011,56270,,76450,,,"Norwich-New London-Westerly, CT-RI",,Norwich city and town,1,false
+9,011,57040,,76450,,,"Norwich-New London-Westerly, CT-RI",,Old Lyme town,1,false
+9,011,62150,,76450,,,"Norwich-New London-Westerly, CT-RI",,Preston town,1,false
+9,011,66210,,76450,,,"Norwich-New London-Westerly, CT-RI",,Salem town,1,false
+9,011,71670,,76450,,,"Norwich-New London-Westerly, CT-RI",,Sprague town,1,false
+9,011,73770,,76450,,,"Norwich-New London-Westerly, CT-RI",,Stonington town,1,false
+9,011,78600,,76450,,,"Norwich-New London-Westerly, CT-RI",,Voluntown town,1,false
+9,011,80280,,76450,,,"Norwich-New London-Westerly, CT-RI",,Waterford town,1,false
+9,015,12130,,76450,,,"Norwich-New London-Westerly, CT-RI",,Canterbury town,1,false
+44,009,35380,,76450,,,"Norwich-New London-Westerly, CT-RI",,Hopkinton town,1,false
+44,009,77000,,76450,,,"Norwich-New London-Westerly, CT-RI",,Westerly town,1,false
 25,003,00555,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Adams town,1,false
 25,003,04545,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Becket town,1,false
 25,003,13345,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Cheshire town,1,false
@@ -569,15 +626,130 @@ state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_d
 25,003,73335,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Washington town,1,false
 25,003,80685,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Windsor town,1,false
 25,015,40990,770,76600,,"Pittsfield-North Adams, MA-VT","Pittsfield, MA",,Middlefield town,1,false
-25,011,05560,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Bernardston town,2,false
-25,011,14885,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Colrain town,2,false
-25,011,21780,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Erving town,2,false
-25,011,25730,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Gill town,2,false
-25,011,27100,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Greenfield Town city,2,false
-25,011,29650,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Heath town,2,false
-25,011,35285,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Leyden town,2,false
-25,011,42285,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Montague town,2,false
-25,011,47835,790,73300,,"Springfield-Hartford-West Hartford, MA-CT","Greenfield Town, MA",,Northfield town,2,false
+23,001,19105,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Durham town,1,false
+23,005,02655,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Baldwin town,1,false
+23,005,10180,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Cape Elizabeth town,1,false
+23,005,11125,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Casco town,1,false
+23,005,12300,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Chebeague Island town,1,false
+23,005,15430,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Cumberland town,1,false
+23,005,24495,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Falmouth town,1,false
+23,005,26525,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Freeport town,1,false
+23,005,27025,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Frye Island town,1,false
+23,005,28240,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Gorham town,1,false
+23,005,28870,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Gray town,1,false
+23,005,41067,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Long Island town,1,false
+23,005,48085,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Naples town,1,false
+23,005,48820,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,New Gloucester town,1,false
+23,005,53860,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,North Yarmouth town,1,false
+23,005,60545,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Portland city,1,false
+23,005,60685,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Pownal town,1,false
+23,005,61945,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Raymond town,1,false
+23,005,66145,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Scarborough town,1,false
+23,005,66775,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Sebago town,1,false
+23,005,71990,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,South Portland city,1,false
+23,005,73670,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Standish town,1,false
+23,005,82105,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Westbrook city,1,false
+23,005,86025,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Windham town,1,false
+23,005,87845,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Yarmouth town,1,false
+23,031,01605,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Arundel town,1,false
+23,031,04860,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Biddeford city,1,false
+23,031,09410,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Buxton town,1,false
+23,031,14485,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Cornish town,1,false
+23,031,16725,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Dayton town,1,false
+23,031,33665,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Hollis town,1,false
+23,031,36535,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Kennebunk town,1,false
+23,031,36745,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Kennebunkport town,1,false
+23,031,39195,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Limerick town,1,false
+23,031,39405,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Limington town,1,false
+23,031,41750,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Lyman town,1,false
+23,031,55085,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Old Orchard Beach town,1,false
+23,031,64675,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Saco city,1,false
+23,031,80530,775,76750,,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,Waterboro town,1,false
+23,031,22955,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Eliot town,1,false
+23,031,37270,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Kittery town,1,false
+23,031,87985,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,York town,1,false
+33,015,07220,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Brentwood town,1,false
+33,015,24660,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Epping town,1,false
+33,015,25380,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Exeter town,1,false
+33,015,31700,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Greenland town,1,false
+33,015,33060,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Hampton town,1,false
+33,015,50980,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,New Castle town,1,false
+33,015,51380,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Newfields town,1,false
+33,015,51620,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Newington town,1,false
+33,015,52340,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Newmarket town,1,false
+33,015,54580,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,North Hampton town,1,false
+33,015,62900,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Portsmouth city,1,false
+33,015,66180,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Rye town,1,false
+33,015,74340,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Stratham town,1,false
+25,005,02690,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Attleboro city,1,false
+25,005,23000,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Fall River city,1,false
+25,005,46575,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Attleborough town,1,false
+25,005,56375,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Rehoboth town,1,false
+25,005,60645,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Seekonk town,1,false
+25,005,62430,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Somerset town,1,false
+25,005,68750,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Swansea town,1,false
+25,005,77570,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Westport town,1,false
+25,021,04930,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Bellingham town,1,false
+25,021,54100,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Plainville town,1,false
+25,027,06015,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Blackstone town,1,false
+25,027,41585,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Millville town,1,false
+44,001,05140,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Barrington town,1,false
+44,001,09280,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Bristol town,1,false
+44,001,73760,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Warren town,1,false
+44,003,18640,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Coventry town,1,false
+44,003,22240,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,East Greenwich town,1,false
+44,003,74300,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Warwick city,1,false
+44,003,77720,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,West Greenwich town,1,false
+44,003,78440,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,West Warwick town,1,false
+44,005,36820,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Jamestown town,1,false
+44,005,42400,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Little Compton town,1,false
+44,005,45460,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Middletown town,1,false
+44,005,49960,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Newport city,1,false
+44,005,57880,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Portsmouth town,1,false
+44,005,70880,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Tiverton town,1,false
+44,007,11800,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Burrillville town,1,false
+44,007,14140,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Central Falls city,1,false
+44,007,19180,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Cranston city,1,false
+44,007,20080,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Cumberland town,1,false
+44,007,22960,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,East Providence city,1,false
+44,007,27460,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Foster town,1,false
+44,007,30340,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Glocester town,1,false
+44,007,37720,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Johnston town,1,false
+44,007,41500,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Lincoln town,1,false
+44,007,51760,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Providence town,1,false
+44,007,52480,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Smithfield town,1,false
+44,007,54640,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Pawtucket city,1,false
+44,007,59000,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Providence city,1,false
+44,007,64220,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Scituate town,1,false
+44,007,66200,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Smithfield town,1,false
+44,007,80780,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Woonsocket city,1,false
+44,009,14500,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Charlestown town,1,false
+44,009,25300,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Exeter town,1,false
+44,009,48340,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Narragansett town,1,false
+44,009,51580,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Kingstown town,1,false
+44,009,61160,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Richmond town,1,false
+44,009,67460,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,South Kingstown town,1,false
+50,021,11950,,77650,,,"Rutland, VT",,Castleton town,2,false
+50,021,14350,,77650,,,"Rutland, VT",,Chittenden town,2,false
+50,021,14500,,77650,,,"Rutland, VT",,Clarendon town,2,false
+50,021,34450,,77650,,,"Rutland, VT",,Hubbardton town,2,false
+50,021,35425,,77650,,,"Rutland, VT",,Ira town,2,false
+50,021,44125,,77650,,,"Rutland, VT",,Mendon town,2,false
+50,021,44800,,77650,,,"Rutland, VT",,Middletown Springs town,2,false
+50,021,55600,,77650,,,"Rutland, VT",,Pittsford town,2,false
+50,021,57250,,77650,,,"Rutland, VT",,Proctor town,2,false
+50,021,61225,,77650,,,"Rutland, VT",,Rutland city,2,false
+50,021,61300,,77650,,,"Rutland, VT",,Rutland town,2,false
+50,021,65275,,77650,,,"Rutland, VT",,Shrewsbury town,2,false
+50,021,75925,,77650,,,"Rutland, VT",,Wallingford town,2,false
+50,021,82300,,77650,,,"Rutland, VT",,West Rutland town,2,false
+23,031,65760,775,77950,,"Portland-Lewiston-South Portland, ME","Sanford, ME",,Sanford town,2,false
+23,031,67475,775,77950,,"Portland-Lewiston-South Portland, ME","Sanford, ME",,Shapleigh town,2,false
+9,003,24800,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,East Windsor town,1,false
+9,003,25990,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Enfield town,1,false
+9,003,74540,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Suffield town,1,false
+9,003,87070,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Windsor Locks town,1,false
+9,013,69220,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Somers town,1,false
 25,011,02095,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Ashfield town,1,false
 25,011,15200,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Conway town,1,false
 25,011,16670,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Deerfield town,1,false
@@ -625,250 +797,78 @@ state_code,county_code,cousub_code,cnecta_code,necta_code,nectadiv_code,cnecta_d
 25,015,76380,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Westhampton town,1,false
 25,015,79915,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Williamsburg town,1,false
 25,015,82175,790,78100,,"Springfield-Hartford-West Hartford, MA-CT","Springfield, MA-CT",,Worthington town,1,false
+9,005,16050,790,78400,,"Springfield-Hartford-West Hartford, MA-CT","Torrington, CT",,Colebrook town,2,false
+9,005,76570,790,78400,,"Springfield-Hartford-West Hartford, MA-CT","Torrington, CT",,Torrington city and town,2,false
+9,005,86440,790,78400,,"Springfield-Hartford-West Hartford, MA-CT","Torrington, CT",,Winchester town,2,false
 25,007,01585,,78500,,,"Vineyard Haven, MA",,Aquinnah town,2,false
 25,007,13800,,78500,,,"Vineyard Haven, MA",,Chilmark town,2,false
 25,007,21150,,78500,,,"Vineyard Haven, MA",,Edgartown town,2,false
 25,007,50390,,78500,,,"Vineyard Haven, MA",,Oak Bluffs town,2,false
 25,007,69940,,78500,,,"Vineyard Haven, MA",,Tisbury town,2,false
 25,007,78235,,78500,,,"Vineyard Haven, MA",,West Tisbury town,2,false
-33,015,02340,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Atkinson town,1,false
-33,015,17140,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Danville town,1,false
-33,015,21380,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",East Kingston town,1,false
-33,015,27940,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Fremont town,1,false
-33,015,32900,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Hampstead town,1,false
-33,015,33460,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Hampton Falls town,1,false
-33,015,39780,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Kensington town,1,false
-33,015,40100,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Kingston town,1,false
-33,015,52900,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Newton town,1,false
-33,015,62500,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Plaistow town,1,false
-33,015,67620,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Sandown town,1,false
-33,015,68260,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",Seabrook town,1,false
-33,015,71140,715,71650,73604,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Haverhill-Newburyport-Amesbury Town, MA-NH",South Hampton town,1,false
-33,015,66660,715,71650,74204,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lawrence-Methuen Town-Salem, MA-NH",Salem town,1,false
-33,011,59940,715,71650,74804,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Lowell-Billerica-Chelmsford, MA-NH",Pelham town,1,false
-33,011,01300,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Amherst town,1,false
-33,011,08100,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Brookline town,1,false
-33,011,31540,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Greenfield town,1,false
-33,011,31940,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Greenville town,1,false
-33,011,37140,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Hollis town,1,false
-33,011,37940,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Hudson town,1,false
-33,011,42260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Litchfield town,1,false
-33,011,44580,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Lyndeborough town,1,false
-33,011,46260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Mason town,1,false
-33,011,47540,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Merrimack town,1,false
-33,011,48020,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Milford town,1,false
-33,011,49140,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Mont Vernon town,1,false
-33,011,50260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Nashua city,1,false
-33,011,76260,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Temple town,1,false
-33,011,85220,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Wilton town,1,false
-33,015,12100,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Chester town,1,false
-33,015,17940,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Derry town,1,false
-33,015,43220,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Londonderry town,1,false
-33,015,85780,715,71650,75404,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Boston-Cambridge-Nashua, MA-NH","Nashua, NH-MA",Windham town,1,false
-33,011,04500,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Bedford town,1,false
-33,011,29860,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Goffstown town,1,false
-33,011,45140,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Manchester city,1,false
-33,011,50740,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,New Boston town,1,false
-33,011,79780,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Weare town,1,false
-33,013,06260,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Boscawen town,2,false
-33,013,06500,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Bow town,2,false
-33,013,09860,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Canterbury town,2,false
-33,013,12420,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Chichester town,2,false
-33,013,14200,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Concord city,2,false
-33,013,24900,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Epsom town,2,false
-33,013,37540,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Hopkinton town,2,false
-33,013,43380,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Loudon town,2,false
-33,013,61940,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Pittsfield town,2,false
-33,013,66980,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Salisbury town,2,false
-33,013,78580,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Warner town,2,false
-33,013,80020,715,72700,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Concord, NH",,Webster town,2,false
-33,013,00660,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Allenstown town,1,false
-33,013,19460,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Dunbarton town,1,false
-33,013,37300,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Hooksett town,1,false
-33,013,60020,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Pembroke town,1,false
-33,015,02820,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Auburn town,1,false
-33,015,09300,715,74950,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Manchester, NH",,Candia town,1,false
-33,015,07220,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Brentwood town,1,false
-33,015,24660,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Epping town,1,false
-33,015,25380,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Exeter town,1,false
-33,015,31700,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Greenland town,1,false
-33,015,33060,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Hampton town,1,false
-33,015,50980,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,New Castle town,1,false
-33,015,51380,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Newfields town,1,false
-33,015,51620,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Newington town,1,false
-33,015,52340,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Newmarket town,1,false
-33,015,54580,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,North Hampton town,1,false
-33,015,62900,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Portsmouth city,1,false
-33,015,66180,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Rye town,1,false
-33,015,74340,715,76900,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Portsmouth, NH-ME",,Stratham town,1,false
-33,001,28740,,73900,,,"Laconia, NH",,Gilford town,2,false
-33,001,40180,,73900,,,"Laconia, NH",,Laconia city,2,false
-33,005,12260,,73750,,,"Keene, NH",,Chesterfield town,2,false
-33,005,29220,,73750,,,"Keene, NH",,Gilsum town,2,false
-33,005,34420,,73750,,,"Keene, NH",,Harrisville town,2,false
-33,005,39300,,73750,,,"Keene, NH",,Keene city,2,false
-33,005,45460,,73750,,,"Keene, NH",,Marlborough town,2,false
-33,005,45700,,73750,,,"Keene, NH",,Marlow town,2,false
-33,005,50580,,73750,,,"Keene, NH",,Nelson town,2,false
-33,005,64420,,73750,,,"Keene, NH",,Richmond town,2,false
-33,005,65700,,73750,,,"Keene, NH",,Roxbury town,2,false
-33,005,74900,,73750,,,"Keene, NH",,Sullivan town,2,false
-33,005,75300,,73750,,,"Keene, NH",,Surry town,2,false
-33,005,75700,,73750,,,"Keene, NH",,Swanzey town,2,false
-33,005,77380,,73750,,,"Keene, NH",,Troy town,2,false
-33,005,82660,,73750,,,"Keene, NH",,Westmoreland town,2,false
-33,005,85540,,73750,,,"Keene, NH",,Winchester town,2,false
-33,007,05140,,71500,,,"Berlin, NH",,Berlin city,2,false
-33,007,19300,,71500,,,"Berlin, NH",,Dummer town,2,false
-33,007,30260,,71500,,,"Berlin, NH",,Gorham town,2,false
-33,007,47860,,71500,,,"Berlin, NH",,Milan town,2,false
-33,007,63860,,71500,,,"Berlin, NH",,Randolph town,2,false
-33,007,68980,,71500,,,"Berlin, NH",,Shelburne town,2,false
-33,007,73060,,71500,,,"Berlin, NH",,Stark town,2,false
-33,009,08980,,74350,,,"Lebanon, NH-VT",,Canaan town,2,false
-33,009,18740,,74350,,,"Lebanon, NH-VT",,Dorchester town,2,false
-33,009,24340,,74350,,,"Lebanon, NH-VT",,Enfield town,2,false
-33,009,30820,,74350,,,"Lebanon, NH-VT",,Grafton town,2,false
-33,009,33860,,74350,,,"Lebanon, NH-VT",,Hanover town,2,false
-33,009,41300,,74350,,,"Lebanon, NH-VT",,Lebanon city,2,false
-33,009,44260,,74350,,,"Lebanon, NH-VT",,Lyme town,2,false
-33,009,58340,,74350,,,"Lebanon, NH-VT",,Orange town,2,false
-33,009,58500,,74350,,,"Lebanon, NH-VT",,Orford town,2,false
-33,009,61060,,74350,,,"Lebanon, NH-VT",,Piermont town,2,false
-33,017,03460,,73050,,,"Dover-Durham, NH-ME",,Barrington town,1,false
-33,017,18820,,73050,,,"Dover-Durham, NH-ME",,Dover city,1,false
-33,017,19700,,73050,,,"Dover-Durham, NH-ME",,Durham town,1,false
-33,017,26020,,73050,,,"Dover-Durham, NH-ME",,Farmington town,1,false
-33,017,41460,,73050,,,"Dover-Durham, NH-ME",,Lee town,1,false
-33,017,44820,,73050,,,"Dover-Durham, NH-ME",,Madbury town,1,false
-33,017,47700,,73050,,,"Dover-Durham, NH-ME",,Middleton town,1,false
-33,017,48660,,73050,,,"Dover-Durham, NH-ME",,Milton town,1,false
-33,017,51220,,73050,,,"Dover-Durham, NH-ME",,New Durham town,1,false
-33,017,65140,,73050,,,"Dover-Durham, NH-ME",,Rochester city,1,false
-33,017,65540,,73050,,,"Dover-Durham, NH-ME",,Rollinsford town,1,false
-33,017,69940,,73050,,,"Dover-Durham, NH-ME",,Somersworth city,1,false
-33,017,73860,,73050,,,"Dover-Durham, NH-ME",,Strafford town,1,false
-33,019,15060,,74350,,,"Lebanon, NH-VT",,Cornish town,2,false
-33,019,16340,,74350,,,"Lebanon, NH-VT",,Croydon town,2,false
-33,019,31220,,74350,,,"Lebanon, NH-VT",,Grantham town,2,false
-33,019,62340,,74350,,,"Lebanon, NH-VT",,Plainfield town,2,false
-44,001,05140,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Barrington town,1,false
-44,001,09280,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Bristol town,1,false
-44,001,73760,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Warren town,1,false
-44,003,18640,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Coventry town,1,false
-44,003,22240,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,East Greenwich town,1,false
-44,003,74300,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Warwick city,1,false
-44,003,77720,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,West Greenwich town,1,false
-44,003,78440,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,West Warwick town,1,false
-44,005,36820,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Jamestown town,1,false
-44,005,42400,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Little Compton town,1,false
-44,005,45460,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Middletown town,1,false
-44,005,49960,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Newport city,1,false
-44,005,57880,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Portsmouth town,1,false
-44,005,70880,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Tiverton town,1,false
-44,007,11800,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Burrillville town,1,false
-44,007,14140,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Central Falls city,1,false
-44,007,19180,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Cranston city,1,false
-44,007,20080,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Cumberland town,1,false
-44,007,22960,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,East Providence city,1,false
-44,007,27460,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Foster town,1,false
-44,007,30340,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Glocester town,1,false
-44,007,37720,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Johnston town,1,false
-44,007,41500,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Lincoln town,1,false
-44,007,51760,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Providence town,1,false
-44,007,52480,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Smithfield town,1,false
-44,007,54640,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Pawtucket city,1,false
-44,007,59000,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Providence city,1,false
-44,007,64220,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Scituate town,1,false
-44,007,66200,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Smithfield town,1,false
-44,007,80780,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Woonsocket city,1,false
-44,009,14500,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Charlestown town,1,false
-44,009,25300,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Exeter town,1,false
-44,009,48340,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Narragansett town,1,false
-44,009,51580,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,North Kingstown town,1,false
-44,009,61160,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,Richmond town,1,false
-44,009,67460,715,77200,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Providence-Warwick, RI-MA",,South Kingstown town,1,false
-44,009,35380,,76450,,,"Norwich-New London-Westerly, CT-RI",,Hopkinton town,1,false
-44,009,77000,,76450,,,"Norwich-New London-Westerly, CT-RI",,Westerly town,1,false
-50,003,69775,770,76150,,"Pittsfield-North Adams, MA-VT","North Adams, MA-VT",,Stamford town,2,false
-50,001,26300,,72400,,,"Burlington-South Burlington, VT",,Ferrisburgh town,1,false
-50,001,40075,,72400,,,"Burlington-South Burlington, VT",,Lincoln town,1,false
-50,001,45550,,72400,,,"Burlington-South Burlington, VT",,Monkton town,1,false
-50,001,70075,,72400,,,"Burlington-South Burlington, VT",,Starksboro town,1,false
-50,001,74650,,72400,,,"Burlington-South Burlington, VT",,Vergennes city,1,false
-50,003,04825,,71350,,,"Bennington, VT",,Bennington town,2,false
-50,003,27962,,71350,,,"Bennington, VT",,Glastenbury town,2,false
-50,003,57025,,71350,,,"Bennington, VT",,Pownal town,2,false
-50,003,63550,,71350,,,"Bennington, VT",,Shaftsbury town,2,false
-50,003,85675,,71350,,,"Bennington, VT",,Woodford town,2,false
-50,007,06550,,72400,,,"Burlington-South Burlington, VT",,Bolton town,1,false
-50,007,10675,,72400,,,"Burlington-South Burlington, VT",,Burlington city,1,false
-50,007,13300,,72400,,,"Burlington-South Burlington, VT",,Charlotte town,1,false
-50,007,14875,,72400,,,"Burlington-South Burlington, VT",,Colchester town,1,false
-50,007,24175,,72400,,,"Burlington-South Burlington, VT",,Essex town,1,false
-50,007,33475,,72400,,,"Burlington-South Burlington, VT",,Hinesburg town,1,false
-50,007,34600,,72400,,,"Burlington-South Burlington, VT",,Huntington town,1,false
-50,007,36700,,72400,,,"Burlington-South Burlington, VT",,Jericho town,1,false
-50,007,45250,,72400,,,"Burlington-South Burlington, VT",,Milton town,1,false
-50,007,59275,,72400,,,"Burlington-South Burlington, VT",,Richmond town,1,false
-50,007,62050,,72400,,,"Burlington-South Burlington, VT",,St. George town,1,false
-50,007,64300,,72400,,,"Burlington-South Burlington, VT",,Shelburne town,1,false
-50,007,66175,,72400,,,"Burlington-South Burlington, VT",,South Burlington city,1,false
-50,007,73975,,72400,,,"Burlington-South Burlington, VT",,Underhill town,1,false
-50,007,80350,,72400,,,"Burlington-South Burlington, VT",,Westford town,1,false
-50,007,84475,,72400,,,"Burlington-South Burlington, VT",,Williston town,1,false
-50,007,85150,,72400,,,"Burlington-South Burlington, VT",,Winooski city,1,false
-50,011,24925,,72400,,,"Burlington-South Burlington, VT",,Fairfax town,1,false
-50,011,26500,,72400,,,"Burlington-South Burlington, VT",,Fletcher town,1,false
-50,011,27700,,72400,,,"Burlington-South Burlington, VT",,Georgia town,1,false
-50,011,61675,,72400,,,"Burlington-South Burlington, VT",,St. Albans city,1,false
-50,011,61750,,72400,,,"Burlington-South Burlington, VT",,St. Albans town,1,false
-50,011,71725,,72400,,,"Burlington-South Burlington, VT",,Swanton town,1,false
-50,013,29275,,72400,,,"Burlington-South Burlington, VT",,Grand Isle town,1,false
-50,013,50650,,72400,,,"Burlington-South Burlington, VT",,North Hero town,1,false
-50,013,67000,,72400,,,"Burlington-South Burlington, VT",,South Hero town,1,false
-50,015,11500,,72400,,,"Burlington-South Burlington, VT",,Cambridge town,1,false
-50,017,53425,,71050,,,"Barre, VT",,Orange town,2,false
-50,017,76750,,71050,,,"Barre, VT",,Washington town,2,false
-50,017,84175,,71050,,,"Barre, VT",,Williamstown town,2,false
-50,017,07375,,74350,,,"Lebanon, NH-VT",,Bradford town,2,false
-50,017,15700,,74350,,,"Lebanon, NH-VT",,Corinth town,2,false
-50,017,25675,,74350,,,"Lebanon, NH-VT",,Fairlee town,2,false
-50,017,70675,,74350,,,"Lebanon, NH-VT",,Strafford town,2,false
-50,017,72400,,74350,,,"Lebanon, NH-VT",,Thetford town,2,false
-50,017,73675,,74350,,,"Lebanon, NH-VT",,Tunbridge town,2,false
-50,017,74950,,74350,,,"Lebanon, NH-VT",,Vershire town,2,false
-50,017,79975,,74350,,,"Lebanon, NH-VT",,West Fairlee town,2,false
-50,021,11950,,77650,,,"Rutland, VT",,Castleton town,2,false
-50,021,14350,,77650,,,"Rutland, VT",,Chittenden town,2,false
-50,021,14500,,77650,,,"Rutland, VT",,Clarendon town,2,false
-50,021,34450,,77650,,,"Rutland, VT",,Hubbardton town,2,false
-50,021,35425,,77650,,,"Rutland, VT",,Ira town,2,false
-50,021,44125,,77650,,,"Rutland, VT",,Mendon town,2,false
-50,021,44800,,77650,,,"Rutland, VT",,Middletown Springs town,2,false
-50,021,55600,,77650,,,"Rutland, VT",,Pittsford town,2,false
-50,021,57250,,77650,,,"Rutland, VT",,Proctor town,2,false
-50,021,61225,,77650,,,"Rutland, VT",,Rutland city,2,false
-50,021,61300,,77650,,,"Rutland, VT",,Rutland town,2,false
-50,021,65275,,77650,,,"Rutland, VT",,Shrewsbury town,2,false
-50,021,75925,,77650,,,"Rutland, VT",,Wallingford town,2,false
-50,021,82300,,77650,,,"Rutland, VT",,West Rutland town,2,false
-50,023,03175,,71050,,,"Barre, VT",,Barre city,2,false
-50,023,03250,,71050,,,"Barre, VT",,Barre town,2,false
-50,023,05650,,71050,,,"Barre, VT",,Berlin town,2,false
-50,023,11350,,71050,,,"Barre, VT",,Calais town,2,false
-50,023,21925,,71050,,,"Barre, VT",,East Montpelier town,2,false
-50,023,43600,,71050,,,"Barre, VT",,Marshfield town,2,false
-50,023,44500,,71050,,,"Barre, VT",,Middlesex town,2,false
-50,023,46000,,71050,,,"Barre, VT",,Montpelier city,2,false
-50,023,55825,,71050,,,"Barre, VT",,Plainfield town,2,false
-50,023,85525,,71050,,,"Barre, VT",,Woodbury town,2,false
-50,023,86125,,71050,,,"Barre, VT",,Worcester town,2,false
-50,023,18550,,72400,,,"Burlington-South Burlington, VT",,Duxbury town,1,false
-50,027,32275,,74350,,,"Lebanon, NH-VT",,Hartford town,2,false
-50,027,32425,,74350,,,"Lebanon, NH-VT",,Hartland town,2,false
-50,027,52900,,74350,,,"Lebanon, NH-VT",,Norwich town,2,false
-50,027,60850,,74350,,,"Lebanon, NH-VT",,Royalton town,2,false
-50,027,63775,,74350,,,"Lebanon, NH-VT",,Sharon town,2,false
-50,027,83050,,74350,,,"Lebanon, NH-VT",,West Windsor town,2,false
-50,027,84925,,74350,,,"Lebanon, NH-VT",,Windsor town,2,false
+9,005,04930,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Bethlehem town,1,false
+9,005,80490,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Watertown town,1,false
+9,005,87910,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Woodbury town,1,false
+9,009,03250,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Beacon Falls town,1,false
+9,009,46940,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Middlebury town,1,false
+9,009,49950,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Naugatuck borough and town,1,false
+9,009,62290,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Prospect town,1,false
+9,009,80070,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Waterbury city and town,1,false
+9,009,87560,720,78700,,"Bridgeport-New Haven-Stamford, CT","Waterbury, CT",,Wolcott town,1,false
+23,011,00590,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Albion town,2,false
+23,011,04475,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Benton town,2,false
+23,011,13470,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Clinton town,2,false
+23,011,54560,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Oakland town,2,false
+23,011,78190,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Unity unorganized territory,2,false
+23,011,80740,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Waterville city,2,false
+23,011,86515,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Winslow town,2,false
+23,025,24320,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Fairfield town,2,false
+23,027,09270,710,78850,,"Augusta-Waterville, ME","Waterville, ME",,Burnham town,2,false
+9,015,09190,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Brooklyn town,1,false
+9,015,40500,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Killingly town,1,false
+9,015,59980,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Plainfield town,1,false
+9,015,61030,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Pomfret town,1,false
+9,015,62710,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Putnam town,1,false
+9,015,73420,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sterling town,1,false
+9,015,75870,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Thompson town,1,false
+9,015,88190,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Woodstock town,1,false
+25,013,08470,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Brimfield town,1,false
+25,013,30665,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Holland town,1,false
+25,027,02760,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Auburn town,1,false
+25,027,03740,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Barre town,1,false
+25,027,07525,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Boylston town,1,false
+25,027,09105,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Brookfield town,1,false
+25,027,12715,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Charlton town,1,false
+25,027,14395,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Clinton town,1,false
+25,027,17300,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Douglas town,1,false
+25,027,17685,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Dudley town,1,false
+25,027,18560,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,East Brookfield town,1,false
+25,027,26430,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Grafton town,1,false
+25,027,30560,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Holden town,1,false
+25,027,31435,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Hubbardston town,1,false
+25,027,34165,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Lancaster town,1,false
+25,027,34795,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Leicester town,1,false
+25,027,41340,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Millbury town,1,false
+25,027,45105,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,New Braintree town,1,false
+25,027,46820,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Northborough town,1,false
+25,027,46925,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Northbridge town,1,false
+25,027,47135,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,North Brookfield town,1,false
+25,027,50670,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Oakham town,1,false
+25,027,51825,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Oxford town,1,false
+25,027,52420,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Paxton town,1,false
+25,027,55395,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Princeton town,1,false
+25,027,58825,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Rutland town,1,false
+25,027,61800,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Shrewsbury town,1,false
+25,027,63345,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Southbridge Town city,1,false
+25,027,66105,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Spencer town,1,false
+25,027,67385,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sterling town,1,false
+25,027,68155,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sturbridge town,1,false
+25,027,68610,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Sutton town,1,false
+25,027,71480,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Upton town,1,false
+25,027,71620,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Uxbridge town,1,false
+25,027,73090,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Warren town,1,false
+25,027,73895,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Webster town,1,false
+25,027,75015,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Westborough town,1,false
+25,027,75155,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,West Boylston town,1,false
+25,027,75400,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,West Brookfield town,1,false
+25,027,82000,715,79600,,"Boston-Worcester-Providence, MA-RI-NH-CT-ME","Worcester, MA-CT",,Worcester city,1,false
