@@ -184,12 +184,14 @@ editor = [Map(
     to     = [:bea_desc, :bea_windc],
     input  = [:n],
     output = [:desc, :i]),
+    kind   = :left
 Map(
     file = joinpath("parse", "units.csv"),
     from = [:from],
     to = [:to, :factor, :units_factor],
     input = [:units],
-    output = [:to, :factor, :units_factor]
+    output = [:to, :factor, :units_factor],
+    kind   = :left
 )];
 df = edit_with(df, editor)
 ```

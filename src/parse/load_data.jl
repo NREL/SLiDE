@@ -40,7 +40,8 @@ end
 
 function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
     filepath = joinpath(SLIDE_DIR, path..., file.name)
-    df = CSV.read(filepath; silencewarnings = true, ignoreemptylines = true, comment = "#")
+    df = CSV.read(filepath; silencewarnings = true, ignoreemptylines = true, comment = "#",
+        missingstrings = ["","\xc9","..."])
     NUMTEST = min(10, size(df,1))
 
     # A column name containing the word "Column" indicates that the input csv file was
@@ -54,8 +55,8 @@ function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
         xf = xf[1:NUMTEST,:]
 
         HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf) .!= 0)))) .> 1)[2]
-        df = CSV.read(filepath, silencewarnings = true, ignoreemptylines = true; 
-            header = HEAD)
+        df = CSV.read(filepath, silencewarnings = true, ignoreemptylines = true,
+            missingstrings = ["","\xc9","..."]; header = HEAD)
     end
 
     # Remove footer rows. These are identified by rows at the bottom of the sheet that are
@@ -114,7 +115,8 @@ function read_file(file::String; colnames = false)
         return y
 
     elseif occursin(".csv", file)
-        df = CSV.read(file, silencewarnings = true, ignoreemptylines=true, comment = "#")
+        df = CSV.read(file, silencewarnings = true, ignoreemptylines=true, comment = "#",
+            missingstrings = ["","\xc9","..."])
         return df
     end
 end

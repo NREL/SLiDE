@@ -1,5 +1,5 @@
 from,factor,to,ref
-billions of us dollars (USD),1.00E+03,millions of us dollars (USD),partitionbea.gms
-millions of us dollars (USD),1,millions of us dollars (USD),all_gamsify.py
-thousands of us dollars (USD),1.00E-03,millions of us dollars (USD),all_gamsify.py
-us dollars (USD),1.00E-06,millions of us dollars (USD),all_gamsify.py
+billions of us dollars (USD),1.00E+00,billions of us dollars (USD),partitionbea.gms
+millions of us dollars (USD),1.00E-03,billions of us dollars (USD),all_gamsify.py
+thousands of us dollars (USD),1.00E-06,billions of us dollars (USD),all_gamsify.py
+us dollars (USD),1.00E-09,billions of us dollars (USD),all_gamsify.py

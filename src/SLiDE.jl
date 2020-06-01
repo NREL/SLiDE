@@ -12,6 +12,7 @@ import DelimitedFiles
 import JSON
 import Logging
 import Printf
+import Query
 # import Revise
 import Statistics
 import Test
@@ -72,6 +73,8 @@ export read_file
 export load_from
 export gams_to_dataframe
 
+export sum_over
+
 export write_yaml
 export run_yaml
 
@@ -105,6 +108,7 @@ include(joinpath("parse", "generated_load", "includes.jl"))
 
 # UTILITIES
 include(joinpath("utils", "utils.jl"))
+include(joinpath("utils", "calc.jl"))
 
 include(joinpath("parse", "load_data.jl"))
 include(joinpath("parse", "edit_data.jl"))

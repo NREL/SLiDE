@@ -6,47 +6,6 @@ using Query
 
 using SLiDE
 
-
-"""
-    sum_over(df::DataFrame, col::Array{Symbol,1}; kwargs...)
-    sum_over(df::DataFrame, col::Symbol; kwargs...)
-This function sums a DataFrame over the specified column(s) and returns either
-a list of values or the full DataFrame.
-
-# Arguments:
-- `df::DataFrame`: DataFrame to sum.
-- `col::Symbol` or `col::Array{Symbol,1}`: columns over which to sum.
-
-# Keyword Arguments:
-- `values_only::Bool = true`: Should the function return a list of values or an altered DataFrame?
-    - Set to `true` (default) if populating an existing DataFrame including all of the
-        columns in the input DataFrame (in the same order) with the exception of that/those
-        in `col`.
-    - Set to `false` if modifying or copying the input DataFrame.
-
-# Returns:
-- `lst::Array{Float64,1}` of summed values in the order determined by the descriptor columns
-    if `values_only = true` (default)
-- `df::DataFrame`: Modified input DataFrame if `values_only = false`
-"""
-function sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true, keepkeys = false)
-
-    inp_keys = df[:,find_oftype(df, Not(AbstractFloat))]
-    val_cols = find_oftype(df, AbstractFloat)
-    by_cols = setdiff(names(df), [col; val_cols])
-
-    df = by(df, by_cols, Pair.(val_cols, sum))
-    df = edit_with(df, Rename.(setdiff(names(df), by_cols), val_cols))
-
-    keepkeys && (df = join(inp_keys, df, on = by_cols, kind = :left))
-    return values_only ? df[:,val_cols[1]] : df
-end
-
-function sum_over(df::DataFrame, col::Symbol; values_only = true, keepkeys = false)
-    return sum_over(df, [col]; values_only = values_only, keepkeys = keepkeys)
-end
-
-
 UNITS = "billions of us dollars (USD)"
 
 # ******************************************************************************************
@@ -69,12 +28,9 @@ BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
 # ******************************************************************************************
 #   READ SETS AND SLiDE SUPPLY/USE DATA.
 # ******************************************************************************************
-SET_DIR = joinpath("data", "coresets")
-set_list = convert_type.(Symbol, ["i", "fd", "m", "ts", "va", "yr"])
-
-set = Dict(k => sort(read_file(joinpath(SET_DIR, string(k, ".csv"))))[:,1] for k in set_list)
-set[:j] = set[:i]
-set[:imrg] = ["fbt","gmt","mvt"]
+y = read_file(joinpath("dev","buildstream","setlist.yml"));
+set = Dict(Symbol(k) => sort(read_file(joinpath(y["SetPath"]..., ensurearray(v)...)))[:,1]
+    for (k,v) in y["SetInput"])
 
 # Read supply/use data.
 DATA_DIR = joinpath("data", "output")
@@ -88,7 +44,7 @@ for k in keys(io)
     global io[k] = edit_with(io[k], Drop.([:value, :units], [0., "all"], "=="))
     global io[k] = io[k] |> @filter(_.yr in set[:yr]) |> DataFrame
 
-    global io[k][!,:value] .= round.(io[k][:,:value]*1E-3, digits=3)
+    # global io[k][!,:value] .= round.(io[k][:,:value]*1E-3, digits=3)
     # global io[k][!,:units] .= UNITS
 end
 
@@ -99,11 +55,11 @@ io[:supply], io[:use] = fill_zero(io[:supply], io[:use]; permute_keys = true)
 # ******************************************************************************************
 
 # Read from use data.
-#   id0(yr,i(ir_use),j(jc_use)) = use(yr,ir_use,jc_use);
-#   fd0(yr,i(ir_use),fd(jc_use)) = use(yr,ir_use,jc_use);
-#   va0(yr,va(ir_use),j(jc_use)) = use(yr,ir_use,jc_use);
-#   ts0(yr,ts(ir_use),j(jc_use)) = use(yr,ir_use,jc_use);
-#   x0(yr,i(ir_use)) = use(yr,ir_use,"exports");
+#!  id0(yr,i(ir_use),j(jc_use)) = use(yr,ir_use,jc_use);
+#!  fd0(yr,i(ir_use),fd(jc_use)) = use(yr,ir_use,jc_use);
+#!  va0(yr,va(ir_use),j(jc_use)) = use(yr,ir_use,jc_use);
+#!  ts0(yr,ts(ir_use),j(jc_use)) = use(yr,ir_use,jc_use);
+#!  x0(yr,i(ir_use)) = use(yr,ir_use,"exports");
 io[:id0] = io[:use] |> @filter(.&(_.i in set[:i],  _.j in set[:j] ))  |> DataFrame
 io[:fd0] = io[:use] |> @filter(.&(_.i in set[:i],  _.j in set[:fd]))  |> DataFrame
 io[:va0] = io[:use] |> @filter(.&(_.i in set[:va], _.j in set[:j] ))  |> DataFrame
@@ -114,14 +70,14 @@ io[:va0] = edit_with(io[:va0], Rename(:i, :va));
 io[:fd0] = edit_with(io[:fd0], Rename(:j, :fd));
 
 # Read from supply data.
-#   ys0(yr,j(jc_supply),i(ir_supply)) = supply(yr,ir_supply,jc_supply);
-#   m0(yr,i(ir_supply)) = supply(yr,ir_supply,"imports");
-#   mrg0(yr,i(ir_supply)) = supply(yr,ir_supply,"margins");
-#   trn0(yr,i(ir_supply)) = supply(yr,ir_supply,"trncost");
-#   cif0(yr,i(ir_supply)) = supply(yr,ir_supply,"ciffob");
-#   duty0(yr,i(ir_supply)) = supply(yr,ir_supply,"duties");
-#   tax0(yr,i(ir_supply)) = supply(yr,ir_supply,"tax");
-#   sbd0(yr,i(ir_supply)) = - supply(yr,ir_supply,"subsidies");
+#!  ys0(yr,j(jc_supply),i(ir_supply)) = supply(yr,ir_supply,jc_supply);
+#!  m0(yr,i(ir_supply)) = supply(yr,ir_supply,"imports");
+#!  mrg0(yr,i(ir_supply)) = supply(yr,ir_supply,"margins");
+#!  trn0(yr,i(ir_supply)) = supply(yr,ir_supply,"trncost");
+#!  cif0(yr,i(ir_supply)) = supply(yr,ir_supply,"ciffob");
+#!  duty0(yr,i(ir_supply)) = supply(yr,ir_supply,"duties");
+#!  tax0(yr,i(ir_supply)) = supply(yr,ir_supply,"tax");
+#!  sbd0(yr,i(ir_supply)) = - supply(yr,ir_supply,"subsidies");
 io[:ys0]   = io[:supply] |> @filter(.&(_.i in set[:i], _.j in set[:j]))   |> DataFrame
 io[:m0]    = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "imports")) |> DataFrame
 io[:mrg0]  = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "margins")) |> DataFrame
@@ -132,10 +88,10 @@ io[:tax0]  = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "tax"))     |> Dat
 io[:sbd0]  = io[:supply] |> @filter(.&(_.i in set[:i], _.j == "subsidies")) |> DataFrame
 
 # Treat negative inputs as outputs.
-#   ys0(yr,j,i) = ys0(yr,j,i) - min(0,id0(yr,i,j));
-#   id0(yr,i,j) = max(0,id0(yr,i,j));
-#   ts0(yr,'subsidies',j) = - ts0(yr,'subsidies',j);
-#   sbd0(yr,i(ir_supply)) = - supply(yr,ir_supply,"subsidies");
+#!  ys0(yr,j,i) = ys0(yr,j,i) - min(0,id0(yr,i,j));
+#!  id0(yr,i,j) = max(0,id0(yr,i,j));
+#!  ts0(yr,'subsidies',j) = - ts0(yr,'subsidies',j);
+#!  sbd0(yr,i(ir_supply)) = - supply(yr,ir_supply,"subsidies");
 io[:ys0][!,:value] = io[:ys0][:,:value] - min.(0, io[:id0][:,:value])
 io[:id0][!,:value] = max.(0, io[:id0][:,:value])
 io[:ts0][io[:ts0][:,:i] .== "subsidies", :value] *= -1
@@ -143,17 +99,17 @@ io[:sbd0][!,:value] *= -1
 
 # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
 # Insurance imports are specified as net of adjustments.
-#   trn0(yr,i)$(cif0(yr,i) AND NOT SAMEAS(i,'ins')) = trn0(yr,i) + cif0(yr,i);
-#   m0(yr,i)$(SAMEAS(i,'ins')) = m0(yr,i) + cif0(yr,i);
-#   cif0(yr,i) = 0;
+#!  trn0(yr,i)$(cif0(yr,i) AND NOT SAMEAS(i,'ins')) = trn0(yr,i) + cif0(yr,i);
+#!  m0(yr,i)$(SAMEAS(i,'ins')) = m0(yr,i) + cif0(yr,i);
+#!  cif0(yr,i) = 0;
 i_ins = io[:cif0][:,:i] .== "ins"
 io[:trn0][.!i_ins, :value] .= io[:trn0][.!i_ins,:value] + io[:cif0][.!i_ins,:value]
 io[:m0  ][  i_ins, :value] .= io[:m0][i_ins,:value] + io[:cif0][i_ins,:value]
 io[:cif0][      !, :value] .= 0.0
 
 # Aggregate supply and gross output
-#   s0(yr,j) = sum(i,ys0(yr,i,j));
-#   y0(yr,i) = sum(j, ys0(yr,j,i));
+#!  s0(yr,j) = sum(i,ys0(yr,i,j));
+#!  y0(yr,i) = sum(j, ys0(yr,j,i));
 io[:s0] = sum_over(io[:ys0], :i; values_only = false)   # aggregate supply
 io[:y0] = sum_over(io[:ys0], :j; values_only = false)   # gross output
 
@@ -167,55 +123,55 @@ io[:ms0] = fill_zero((yr = set[:yr], i = set[:i], m = set[:m]))
 io[:md0] = fill_zero((yr = set[:yr], m = set[:m], i = set[:i]))
 
 # Balance of payments deficit
-#   bopdef(yr) = 0;
+#!  bopdef(yr) = 0;
 io[:bopdef] = fill_zero((yr = set[:yr], ))
 
 # Margin supply
-#   ms0(yr,i,"trd") = max(-mrg0(yr,i),0);
-#   ms0(yr,i,'trn') = max(-trn0(yr,i),0);
+#!  ms0(yr,i,"trd") = max(-mrg0(yr,i),0);
+#!  ms0(yr,i,'trn') = max(-trn0(yr,i),0);
 io[:ms0][io[:ms0][:,:m] .== "trd", :value] .= max.(-io[:mrg0][:,:value], 0)
 io[:ms0][io[:ms0][:,:m] .== "trn", :value] .= max.(-io[:trn0][:,:value], 0)
 
 # Margin demand
-#   md0(yr,"trd",i) = max(mrg0(yr,i),0);
-#   md0(yr,'trn',i) = max(trn0(yr,i),0);
+#!  md0(yr,"trd",i) = max(mrg0(yr,i),0);
+#!  md0(yr,'trn',i) = max(trn0(yr,i),0);
 io[:md0][io[:md0][:,:m] .== "trd", :value] .= max.(io[:mrg0][:,:value], 0)
 io[:md0][io[:md0][:,:m] .== "trn", :value] .= max.(io[:trn0][:,:value], 0)
 
 # Household supply
 # Move household supply of recycled goods into the domestic output market
 # from which some may be exported. Net out margin supply from output.
-#   fs0(yr,i) = -min(0, fd0(yr,i,'pce'));
-#   y0(yr,i) = sum(j,ys0(yr,j,i)) + fs0(yr,i) - sum(m,ms0(yr,i,m));
+#!  fs0(yr,i) = -min(0, fd0(yr,i,'pce'));
+#!  y0(yr,i) = sum(j,ys0(yr,j,i)) + fs0(yr,i) - sum(m,ms0(yr,i,m));
 io[:fs0] = io[:fd0] |> @filter(_.fd == "pce") |> DataFrame
 io[:fs0][!,:value] .= - min.(io[:fs0][:,:value], 0)
 io[:y0][!,:value]  .= sum_over(io[:ys0], :j) + io[:fs0][:,:value] - sum_over(io[:ms0], :m)
 
 # Armington supply
-#   a0(yr,i) = sum(fd, fd0(yr,i,fd)) + sum(j, id0(yr,i,j));
+#!  a0(yr,i) = sum(fd, fd0(yr,i,fd)) + sum(j, id0(yr,i,j));
 io[:a0][!,:value] .= sum_over(io[:fd0], :fd) + sum_over(io[:id0], :j)
 
 # Remove commodity taxes and subsidies on the goods which are produced solely
 # for supplying retail sales margin:
-#   y0(yr,imrg) = 0;
-#   a0(yr,imrg) = 0;
-#   tax0(yr,imrg) = 0;
-#   sbd0(yr,imrg) = 0;
-#   x0(yr,imrg) = 0;
-#   m0(yr,imrg) = 0;
-#   md0(yr,m,imrg) = 0;
-#   duty0(yr,imrg) = 0;
+#!  y0(yr,imrg) = 0;
+#!  a0(yr,imrg) = 0;
+#!  tax0(yr,imrg) = 0;
+#!  sbd0(yr,imrg) = 0;
+#!  x0(yr,imrg) = 0;
+#!  m0(yr,imrg) = 0;
+#!  md0(yr,m,imrg) = 0;
+#!  duty0(yr,imrg) = 0;
 # Here's how to do this: https://discourse.julialang.org/t/dataframes-obtaining-the-subset-of-rows-by-a-set-of-values/15923/10
 [io[k][findall(in(set[:imrg]), io[k][:,:i]), :value] .= 0.0
     for k in [:y0, :a0, :tax0, :sbd0, :x0, :m0, :md0, :duty0]]
 
 # Tax net subsidy rate on intermediate demand.
-#   tm0(yr,i)$duty0(yr,i) = duty0(yr,i)/m0(yr,i);
+#!  tm0(yr,i)$duty0(yr,i) = duty0(yr,i)/m0(yr,i);
 i_div = io[:m0][:,:value] .!= 0.0
 io[:tm0][i_div, :value] .=  io[:duty0][i_div,:value] ./ io[:m0][i_div,:value]
 
 # Import tariff
-#   ta0(yr,i)$(tax0(yr,i)-sbd0(yr,i)) = (tax0(yr,i) - sbd0(yr,i))/a0(yr,i);
+#!  ta0(yr,i)$(tax0(yr,i)-sbd0(yr,i)) = (tax0(yr,i) - sbd0(yr,i))/a0(yr,i);
 i_div = io[:a0][:,:value] .!= 0.0
 io[:ta0][i_div, :value] .= (io[:tax0][i_div,:value] - io[:sbd0][i_div,:value]) ./ io[:a0][i_div,:value]
 

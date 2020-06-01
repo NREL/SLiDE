@@ -53,11 +53,13 @@ Map:
     to:     [bea_desc, bea_windc]
     input:  n
     output: [desc, i]
+    kind:   left
   - file:   [parse, units.csv]
     from:   from
     to:     [to, factor, units_factor]
     input:  units
     output: [units, factor, units_factor]
+    kind:   left
 
 Replace:
   col:  value

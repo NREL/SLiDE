@@ -24,6 +24,7 @@ Base.split(str::Missing, splitter::Any) = str
     Base.strip(x::Number)
 Extends `strip` to ignore missing fields and numbers.
 """
+# Base.strip(x::String) = replace(x, r"^\s*\"*|\"*\s*$" => "")
 Base.strip(x::Missing) = x
 Base.strip(x::Number) = x
 
