@@ -7,6 +7,7 @@ This function evaluates an input string as a DataType if it is defined.
 Otherwise, it will return false.
 See: (thread on discourse.julialang.org)[https://discourse.julialang.org/t/parse-string-to-datatype/7118/9]
 """
+
 function datatype(str::String)
     # type = :($(Symbol(titlecase(str))))
     type = :($(Symbol(str)))
@@ -152,7 +153,7 @@ ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
 ensurearray(x::UnitRange) = collect(x)
 ensurearray(x::Any) = [x]
 
-
+         
 istype(df::DataFrame, T::DataType) = broadcast(<:, eltypes(dropmissing(df)), T)
 
 
