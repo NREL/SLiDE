@@ -2,21 +2,43 @@ path = ["data"]
 
 csvreading = CSVInput(name = "test_datastream.csv", descriptor = "1997");
 
-xlsxreading = [XLSXInput(name = "test_datastream.xlsx", sheet = "1999", range = "A7:J14", descriptor = "1999"),
-               XLSXInput(name = "test_datastream.xlsx", sheet = "2000", range = "A7:J14", descriptor = "2000")];
+xlsxreading = [
+    XLSXInput(name = "test_datastream.xlsx", sheet = "1999", range = "A7:J14", descriptor = "1999"),
+    XLSXInput(name = "test_datastream.xlsx", sheet = "2000", range = "A7:J14", descriptor = "2000")];
 
 ############################################################################################
 
+describing = Describe(col = :year);
+
+ordering = Order(
+    col = [:year, :from_code, :from_desc, :to_code, :to_desc, :value, :units],
+    type = [Int, String, String, String, String, Int, String]);
+
 renaming = [
-    Rename(from = :IOCode, to = :from_industry_code),
-    Rename(from = :Name,   to = :from_industry_desc)];
+    Rename(from = :IOCode, to = :from_code),
+    Rename(from = :Name,   to = :from_desc)];
 
-melting = Melt(on = [:from_industry_desc], var = :to_industry_desc, val = :value, type = Any);
+melting = Melt(
+    on = [:from_desc],
+    var = :to_desc,
+    val = :value,
+    type = Any);
 
-mapping = [
-    Map(file = "bea_all.csv", from = :desc, to = :code, input = :from_industry_desc, output = :from_industry_code),
-    Map(file = "bea_all.csv", from = :desc, to = :code, input = :to_industry_desc,   output = :to_industry_code)];
+adding = [
+    Add(col = :region, val = "Colorado"),
+    Add(col = :units, val = "millions of us dollars (USD)")];
 
-adding = Add(col = :units, val = "millions of us dollars (USD)");
+mapping = Map(
+        file = "regions.csv",
+        from = [:from],
+        to = [:to],
+        input = [:region],
+        output = [:region]);
 
-replacing = Replace(col = :value, from = "...", to = "0");
+joining = [
+    Join(file = "bea_all.csv", on = :from_desc, prefix = :from),
+    Join(file = "bea_all.csv", on = :to_desc, prefix = :to)];
+
+replacing = [
+    Replace(col = :value, from = "...",   to = 0),
+    Replace(col = :value, from = missing, to = 0)];

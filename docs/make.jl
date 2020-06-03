@@ -1,20 +1,14 @@
-BASE_PATH = abspath(joinpath(dirname(Base.find_package("SLiDE")), ".."))
-SRC_PATH = joinpath(BASE_PATH, "src")
+import Pkg; Pkg.add("InfrastructureSystems")
 
-# Add data paths.
-# push!(LOAD_PATH, DATA_PATH)
-# push!(LOAD_PATH, joinpath(DATA_PATH, "core_maps"))
-# push!(LOAD_PATH, joinpath(DATA_PATH, "readfiles"))
-
-# Add source paths.
-SRC_PATH in LOAD_PATH ? nothing : push!(LOAD_PATH, SRC_PATH)
-joinpath(SRC_PATH, "parse") in LOAD_PATH ? nothing : push!(LOAD_PATH, joinpath(SRC_PATH, "parse"))
+push!(LOAD_PATH, joinpath("..","src"))
+push!(LOAD_PATH, joinpath("..","src","parse"))
+push!(LOAD_PATH, joinpath("..","dev"))
+push!(LOAD_PATH, joinpath("..","dev","buildstream"))
 
 using DelimitedFiles
 using Documenter
 
 # Include SLiDE modules.
-# using Read
 using SLiDE
 
 # Now, generate the documentation.
@@ -22,10 +16,31 @@ makedocs(clean = true,
     modules = [SLiDE],
     format = Documenter.HTML(prettyurls = false),
     sitename="SLiDE",
+    authors="Maxwell Brown, Caroline Hughes",
     pages=[
         "Home" => "index.md",
-        "Data" => "lib/data.md",
-        "API" => Any[
-            "SLiDE" => "api/SLiDE.md"
-        ]
-    ])
+        "Data" => Any[
+            "blueNOTE Data Set" => "lib/data.md",
+            "Data Stream" => "lib/datastream.md",
+            "Build Stream" => "lib/buildstream.md",
+            "Scaling" => "lib/scaling.md"
+        ],
+        "Model" => "api/model.md",
+        "Functions" => "SLiDE.md"
+    ]
+)
+
+
+# pages = [
+#         "Home" => "index.md",
+#         "Manual" => Any[
+#             "Guide" => "man/guide.md",
+#             "man/examples.md",
+#             "man/syntax.md",
+#             "man/doctests.md",
+#             "man/latex.md",
+#             hide("man/hosting.md", [
+#                 "man/hosting/walkthrough.md"
+#             ]),
+#             "man/other-formats.md",
+#         ],

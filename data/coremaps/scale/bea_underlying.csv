@@ -1,0 +1,142 @@
+sector_code,summary_code,underlying_code,sector_desc,summary_desc,underlying_desc
+11,111CA,111,"Agriculture, forestry, fishing, and hunting",Farms,Crop production
+11,111CA,112,"Agriculture, forestry, fishing, and hunting",Farms,Animal production and aquaculture
+11,113FF,113FF,"Agriculture, forestry, fishing, and hunting","Forestry, fishing, and related activities","Forestry, fishing, and related activities"
+21,211,211,Mining,Oil and gas extraction,Oil and gas extraction
+21,212,212,Mining,"Mining, except oil and gas","Mining, except oil and gas"
+21,213,213,Mining,Support activities for mining,Support activities for mining
+22,22,2211,Utilities,Utilities,"Electric power generation, transmission, and distribution"
+22,22,2212NW,Utilities,Utilities,"Natural gas distribution and water, sewage and other systems"
+23,23,23EH,Construction,Construction,"Education, hospital, and health structures"
+23,23,23OC,Construction,Construction,Office and commercial structures
+23,23,23PC,Construction,Construction,Power and communication structures
+23,23,23TH,Construction,Construction,Transportation structures and highways and streets
+23,23,23OT,Construction,Construction,Other nonresidential structures
+23,23,23SF,Construction,Construction,Single-family residential structures
+23,23,23OR,Construction,Construction,Other residential construction
+23,23,23MR,Construction,Construction,Maintenance and repair construction
+33DG,321,321,Durable goods,Wood products,Wood products
+33DG,327,327,Durable goods,Nonmetallic mineral products,Nonmetallic mineral products
+33DG,331,3311IS,Durable goods,Primary metals,Iron and steel mills and manufacturing from purchased steel
+33DG,331,3313NF,Durable goods,Primary metals,Nonferrous metal production and processing and foundries
+33DG,332,332,Durable goods,Fabricated metal products,Fabricated metal products
+33DG,333,33311,Durable goods,Machinery,Agricultural implement manufacturing
+33DG,333,33312,Durable goods,Machinery,Construction machinery manufacturing
+33DG,333,33313,Durable goods,Machinery,Mining and oil and gas field machinery manufacturing
+33DG,333,3332OM,Durable goods,Machinery,Other machinery
+33DG,334,3341,Durable goods,Computer and electronic products,Computer and peripheral equipment manufacturing
+33DG,334,3342,Durable goods,Computer and electronic products,Communications equipment manufacturing
+33DG,334,3344,Durable goods,Computer and electronic products,Semiconductor and other electronic component manufacturing
+33DG,334,3345,Durable goods,Computer and electronic products,"Navigational, measuring, electromedical, and control instruments manufacturing"
+33DG,334,334X,Durable goods,Computer and electronic products,Other computer and electronic product manufacturing
+33DG,335,335,Durable goods,"Electrical equipment, appliances, and components","Electrical equipment, appliances, and components"
+33DG,3361MV,336111,Durable goods,"Motor vehicles, bodies and trailers, and parts",Automobile manufacturing
+33DG,3361MV,336112,Durable goods,"Motor vehicles, bodies and trailers, and parts",Light truck and utility vehicle manufacturing
+33DG,3361MV,33612,Durable goods,"Motor vehicles, bodies and trailers, and parts",Heavy duty truck manufacturing
+33DG,3361MV,3362BP,Durable goods,"Motor vehicles, bodies and trailers, and parts","Motor vehicle body, trailer, and parts manufacturing"
+33DG,3364OT,3364,Durable goods,Other transportation equipment,Aerospace product and parts manufacturing
+33DG,3364OT,3365AO,Durable goods,Other transportation equipment,All other transportation equipment manufacturing
+33DG,337,337,Durable goods,Furniture and related products,Furniture and related products
+33DG,339,3391,Durable goods,Miscellaneous manufacturing,Medical equipment and supplies manufacturing
+33DG,339,3399,Durable goods,Miscellaneous manufacturing,Other miscellaneous manufacturing
+31ND,311FT,311,Nondurable goods,Food and beverage and tobacco products,Food manufacturing
+31ND,311FT,3121,Nondurable goods,Food and beverage and tobacco products,Beverage manufacturing
+31ND,311FT,3122,Nondurable goods,Food and beverage and tobacco products,Tobacco manufacturing
+31ND,313TT,313TT,Nondurable goods,Textile mills and textile product mills,Textile mills and textile product mills
+31ND,315AL,315AL,Nondurable goods,Apparel and leather and allied products,Apparel and leather and allied products
+31ND,322,322,Nondurable goods,Paper products,Paper products
+31ND,323,323,Nondurable goods,Printing and related support activities,Printing and related support activities
+31ND,324,324,Nondurable goods,Petroleum and coal products,Petroleum and coal products
+31ND,325,3251,Nondurable goods,Chemical products,Basic chemical manufacturing
+31ND,325,3252,Nondurable goods,Chemical products,"Resin, rubber, and artificial fibers manufacturing"
+31ND,325,3254,Nondurable goods,Chemical products,Pharmaceutical and medicine manufacturing
+31ND,325,325X,Nondurable goods,Chemical products,Other chemical manufacturing
+31ND,326,326,Nondurable goods,Plastics and rubber products,Plastics and rubber products
+42,42,4231,Wholesale trade,Wholesale trade,Motor vehicle and motor vehicle parts and supplies
+42,42,4234,Wholesale trade,Wholesale trade,Professional and commercial equipment and supplies
+42,42,4236,Wholesale trade,Wholesale trade,Household appliances and electrical and electronic goods
+42,42,4238,Wholesale trade,Wholesale trade,"Machinery, equipment, and supplies"
+42,42,423X,Wholesale trade,Wholesale trade,Other durable goods merchant wholesalers
+42,42,4242,Wholesale trade,Wholesale trade,Drugs and druggists' sundries
+42,42,4244,Wholesale trade,Wholesale trade,Grocery and related product wholesalers
+42,42,4247,Wholesale trade,Wholesale trade,Petroleum and petroleum products
+42,42,424X,Wholesale trade,Wholesale trade,Other nondurable goods merchant wholesalers
+42,42,425,Wholesale trade,Wholesale trade,Wholesale electronic markets and agents and brokers
+42,42,42ID,Wholesale trade,Wholesale trade,Customs duties
+44RT,441,441,Retail trade,Motor vehicle and parts dealers,Motor vehicle and parts dealers
+44RT,445,445,Retail trade,Food and beverage stores,Food and beverage stores
+44RT,452,452,Retail trade,General merchandise stores,General merchandise stores
+44RT,4A0,444,Retail trade,Other retail,Building material and garden equipment and supplies dealers
+44RT,4A0,446,Retail trade,Other retail,Health and personal care stores
+44RT,4A0,447,Retail trade,Other retail,Gasoline stations
+44RT,4A0,448,Retail trade,Other retail,Clothing and clothing accessories stores
+44RT,4A0,454,Retail trade,Other retail,Nonstore retailers
+44RT,4A0,4A0X,Retail trade,Other retail,All other retail
+48TW,481,481,"Transportation and warehousing, excluding postal service",Air transportation,Air transportation
+48TW,482,482,"Transportation and warehousing, excluding postal service",Rail transportation,Rail transportation
+48TW,483,483,"Transportation and warehousing, excluding postal service",Water transportation,Water transportation
+48TW,484,484,"Transportation and warehousing, excluding postal service",Truck transportation,Truck transportation
+48TW,485,485,"Transportation and warehousing, excluding postal service",Transit and ground passenger transportation,Transit and ground passenger transportation
+48TW,486,486,"Transportation and warehousing, excluding postal service",Pipeline transportation,Pipeline transportation
+48TW,487OS,48A,"Transportation and warehousing, excluding postal service",Other transportation and support activities,Scenic and sightseeing transportation and support activities
+48TW,487OS,492,"Transportation and warehousing, excluding postal service",Other transportation and support activities,Couriers and messengers
+48TW,493,493,"Transportation and warehousing, excluding postal service",Warehousing and storage,Warehousing and storage
+51,511,5111,Information,"Publishing industries, except internet (includes software)","Newspaper, periodical, book, and directory publishers"
+51,511,5112,Information,"Publishing industries, except internet (includes software)",Software publishers
+51,512,512,Information,Motion picture and sound recording industries,Motion picture and sound recording industries
+51,513,515,Information,Broadcasting and telecommunications,Broadcasting (except Internet)
+51,513,5171,Information,Broadcasting and telecommunications,Wired telecommunications carriers
+51,513,5172,Information,Broadcasting and telecommunications,Wireless telecommunications carriers (except satellite)
+51,513,5174OT,Information,Broadcasting and telecommunications,"Other telecommunications, including satellite"
+51,514,518,Information,"Data processing, internet publishing, and other information services","Data processing, hosting, and related services"
+51,514,519,Information,"Data processing, internet publishing, and other information services",Other information services
+52,521CI,521CI,Finance and insurance,"Federal Reserve banks, credit intermediation, and related activities","Federal Reserve banks, credit intermediation, and related activities"
+52,523,523,Finance and insurance,"Securities, commodity contracts, and investments","Securities, commodity contracts, and investments"
+52,524,524113,Finance and insurance,Insurance carriers and related activities,Direct life insurance carriers
+52,524,5241X,Finance and insurance,Insurance carriers and related activities,"Insurance carriers, except direct life"
+52,524,5242,Finance and insurance,Insurance carriers and related activities,"Agencies, brokerages, and other insurance related activities"
+52,525,525,Finance and insurance,"Funds, trusts, and other financial vehicles","Funds, trusts, and other financial vehicles"
+53,HS,HSO,Real estate and rental and leasing,Housing,Owner-occupied housing
+53,HS,HST,Real estate and rental and leasing,Housing,Tenant-occupied housing
+53,ORE,ORE,Real estate and rental and leasing,Other real estate,Other real estate
+53,532RL,532RL,Real estate and rental and leasing,Rental and leasing services and lessors of intangible assets,Rental and leasing services and lessors of intangible assets
+54,5411,5411,Professional and technical services,Legal services,Legal services
+54,5412OP,5412,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Accounting, tax preparation, bookkeeping, and payroll services"
+54,5412OP,5413,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Architectural, engineering, and related services"
+54,5412OP,5416,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Management, scientific, and technical consulting services"
+54,5412OP,5417,Professional and technical services,"Miscellaneous professional, scientific, and technical services",Scientific research and development services
+54,5412OP,5418,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Advertising, public relations, and related services"
+54,5412OP,541X,Professional and technical services,"Miscellaneous professional, scientific, and technical services","Specialized design services and other professional, scientific, and technical services"
+54,5415,5415,Professional and technical services,Computer systems design and related services,Computer systems design and related services
+55,55,55,Management of companies and entreprises,Management of companies and enterprises,Management of companies and enterprises
+56,561,5613,Administrative and waste services,Administrative and support services,Employment services
+56,561,5617,Administrative and waste services,Administrative and support services,Services to buildings and dwellings
+56,561,561X,Administrative and waste services,Administrative and support services,Other administrative and support services
+56,562,562,Administrative and waste services,Waste management and remediation services,Waste management and remediation services
+61,61,61,Educational services,Educational services,Educational services
+62,621,6211,Health care and social assistance,Ambulatory health care services,Offices of physicians
+62,621,6212,Health care and social assistance,Ambulatory health care services,Offices of dentists
+62,621,6213,Health care and social assistance,Ambulatory health care services,Offices of other health practitioners
+62,621,6214,Health care and social assistance,Ambulatory health care services,Outpatient care centers
+62,621,6215OH,Health care and social assistance,Ambulatory health care services,Other ambulatory health care services
+62,622,622,Health care and social assistance,Hospitals,Hospitals
+62,623,623,Health care and social assistance,Nursing and residential care facilities,Nursing and residential care facilities
+62,624,624,Health care and social assistance,Social assistance,Social assistance
+71,711AS,711AS,"Arts, entertainment, and recreation","Performing arts, spectator sports, museums, and related activities","Performing arts, spectator sports, museums, and related activities"
+71,713,713,"Arts, entertainment, and recreation","Amusements, gambling, and recreation industries","Amusements, gambling, and recreation industries"
+72,721,721,Accommodation and food services,Accommodation,Accommodation
+72,722,722,Accommodation and food services,Food services and drinking places,Food services and drinking places
+81,81,811,"Other services, except government","Other services, except government",Repair and maintenance
+81,81,812,"Other services, except government","Other services, except government",Personal and laundry services
+81,81,813,"Other services, except government","Other services, except government","Religious, grantmaking, civic, professional, and similar organizations"
+81,81,814,"Other services, except government","Other services, except government",Private households
+G,GFGD,GFGD,Government,Federal general government (defense),Federal general government (defense)
+G,GFGN,GFGN,Government,Federal general government (nondefense),Federal general government (nondefense)
+G,GFE,GFE,Government,Federal government enterprises,Federal government enterprises
+G,GSLG,GSLGE,Government,State and local general government,State and local government (educational services)
+G,GSLG,GSLGH,Government,State and local general government,State and local government (hospitals and health services)
+G,GSLG,GSLGO,Government,State and local general government,State and local government (other services)
+G,GSLE,GSLE,Government,State and local government enterprises,State and local government enterprises
+Used,Used,S004,"Scrap, used and secondhand goods","Scrap, used and secondhand goods","Scrap, used and secondhand goods"
+Other,Other,S003,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports
+Other,Other,S009,Noncomparable imports and rest-of-the-world adjustment,Noncomparable imports and rest-of-the-world adjustment,Rest of the world adjustment
