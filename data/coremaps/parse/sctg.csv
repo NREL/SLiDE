@@ -1,0 +1,45 @@
+sctg_code,sctg_desc
+1,Animals and Fish (live)
+2,Cereal Grains (includes seed)
+3,"Agricultural Products (excludes Animal Feed, Cereal Grains, and Forage Products)"
+4,"Animal Feed, Eggs, Honey, and Other Products of Animal Origin"
+5,"Meat, Poultry, Fish, Seafood, and Their Preparations"
+6,"Milled Grain Products and Preparations, and Bakery Products"
+7,"Other Prepared Foodstuffs, and Fats and Oils"
+8,Alcoholic Beverages and Denatured Alcohol
+9,Tobacco Products
+10,Monumental or Building Stone
+11,Natural Sands
+12,Gravel and Crushed Stone (excludes Dolomite and Slate)
+13,Other Non-Metallic Minerals not elsewhere classified
+14,Metallic Ores and Concentrates
+15,Coal
+16,Crude Petroleum
+17,"Gasoline, Aviation Turbine Fuel, and Ethanol (includes Kerosene, and Fuel Alcohols)"
+18,"Fuel Oils (includes Diesel, Bunker C, and Biodiesel)"
+19,"Other Coal and Petroleum Products, not elsewhere classified"
+20,Basic Chemicals
+21,Pharmaceutical Products
+22,Fertilizers
+23,Other Chemical Products and Preparations
+24,Plastics and Rubber
+25,Logs and Other Wood in the Rough
+26,Wood Products
+27,"Pulp, Newsprint, Paper, and Paperboard"
+28,Paper or Paperboard Articles
+29,Printed Products
+30,"Textiles, Leather, and Articles of Textiles or Leather"
+31,Non-Metallic Mineral Products
+32,Base Metal in Primary or Semi-Finished Forms and in Finished Basic Shapes
+33,Articles of Base Metal
+34,Machinery
+35,"Electronic and Other Electrical Equipment and Components, and Office Equipment"
+36,Motorized and Other Vehicles (includes parts)
+37,"Transportation Equipment, not elsewhere classified"
+38,Precision Instruments and Apparatus
+39,"Furniture, Mattresses and Mattress Supports, Lamps, Lighting Fittings, and Illuminated Signs"
+40,Miscellaneous Manufactured Products
+41,"Waste and Scrap (excludes of agriculture or food, see 041xx)"
+43,Mixed Freight
+99,Missing Code
+0,SCTG suppressed
