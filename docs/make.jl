@@ -1,7 +1,9 @@
 import Pkg; Pkg.add("InfrastructureSystems")
 
-push!(LOAD_PATH, "../src/")
-push!(LOAD_PATH, "../src/parse")
+push!(LOAD_PATH, joinpath("..","src"))
+push!(LOAD_PATH, joinpath("..","src","parse"))
+push!(LOAD_PATH, joinpath("..","dev"))
+push!(LOAD_PATH, joinpath("..","dev","buildstream"))
 
 using DelimitedFiles
 using Documenter

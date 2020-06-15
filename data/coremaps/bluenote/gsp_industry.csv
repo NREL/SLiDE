@@ -1,4 +1,4 @@
-industry_id,windc_code,windc_desc,industry_code
+gsp_code,windc_code,windc_desc,industry_code
 66,adm,Administrative and support services,561
 4,agr,Farms,111-112
 37,air,Air transportation,481

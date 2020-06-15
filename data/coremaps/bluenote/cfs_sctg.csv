@@ -1,50 +1,50 @@
-sctg_code,windc_code,windc_desc
-01,agr,Farms
-01,fof,"Forestry, fishing, and related activities"
-02,agr,Farms
-03,agr,Farms
-04,agr,Farms
-04,fbp,Food and beverage and tobacco products
-05,agr,Farms
-05,fbp,Food and beverage and tobacco products
-06,fbp,Food and beverage and tobacco products
-07,fbp,Food and beverage and tobacco products
-08,fbp,Food and beverage and tobacco products
-09,fbp,Food and beverage and tobacco products
-10,min,"Mining, except oil and gas"
-11,min,"Mining, except oil and gas"
-12,min,"Mining, except oil and gas"
-13,min,"Mining, except oil and gas"
-14,min,"Mining, except oil and gas"
-15,,
-16,,
-17,oil,Oil and gas extraction
-18,oil,Oil and gas extraction
-19,pet,Petroleum and coal products
-20,che,Chemical products
-21,che,Chemical products
-22,che,Chemical products
-23,che,Chemical products
-24,pla,Plastics and rubber products
-25,fof,"Forestry, fishing, and related activities"
-26,wpd,Wood products
-27,ppd,Paper products
-28,ppd,Paper products
-29,pri,Printing and related support activities
-30,alt,Apparel and leather and allied products
-30,tex,Textile mills and textile product mills
-31,nmp,Nonmetallic mineral products
-32,pmt,Primary metals
-33,fmt,Fabricated metal products
-34,mch,Machinery
-35,cep,Computer and electronic products
-35,eec,"Electrical equipment, appliances, and components"
-36,mot,"Motor vehicles, bodies and trailers, and parts manufacturing"
-37,ote,Other transportation equipment
-38,mmf,Miscellaneous manufacturing
-39,fpd,Furniture and related products
-40,mmf,Miscellaneous manufacturing
-41,use,"Scrap, used and secondhand goods"
-43,,
-99,,
-00,,
+sctg_code,sctg_desc,windc_code,windc_desc
+1,Animals and Fish (live),agr,Farms
+1,Animals and Fish (live),fof,"Forestry, fishing, and related activities"
+2,Cereal Grains (includes seed),agr,Farms
+3,"Agricultural Products (excludes Animal Feed, Cereal Grains, and Forage Products)",agr,Farms
+4,"Animal Feed, Eggs, Honey, and Other Products of Animal Origin",agr,Farms
+4,"Animal Feed, Eggs, Honey, and Other Products of Animal Origin",fbp,Food and beverage and tobacco products
+5,"Meat, Poultry, Fish, Seafood, and Their Preparations",agr,Farms
+5,"Meat, Poultry, Fish, Seafood, and Their Preparations",fbp,Food and beverage and tobacco products
+6,"Milled Grain Products and Preparations, and Bakery Products",fbp,Food and beverage and tobacco products
+7,"Other Prepared Foodstuffs, and Fats and Oils",fbp,Food and beverage and tobacco products
+8,Alcoholic Beverages and Denatured Alcohol,fbp,Food and beverage and tobacco products
+9,Tobacco Products,fbp,Food and beverage and tobacco products
+10,Monumental or Building Stone,min,"Mining, except oil and gas"
+11,Natural Sands,min,"Mining, except oil and gas"
+12,Gravel and Crushed Stone (excludes Dolomite and Slate),min,"Mining, except oil and gas"
+13,Other Non-Metallic Minerals not elsewhere classified,min,"Mining, except oil and gas"
+14,Metallic Ores and Concentrates,min,"Mining, except oil and gas"
+15,Coal,,
+16,Crude Petroleum,,
+17,"Gasoline, Aviation Turbine Fuel, and Ethanol (includes Kerosene, and Fuel Alcohols)",oil,Oil and gas extraction
+18,"Fuel Oils (includes Diesel, Bunker C, and Biodiesel)",oil,Oil and gas extraction
+19,"Other Coal and Petroleum Products, not elsewhere classified",pet,Petroleum and coal products
+20,Basic Chemicals,che,Chemical products
+21,Pharmaceutical Products,che,Chemical products
+22,Fertilizers,che,Chemical products
+23,Other Chemical Products and Preparations,che,Chemical products
+24,Plastics and Rubber,pla,Plastics and rubber products
+25,Logs and Other Wood in the Rough,fof,"Forestry, fishing, and related activities"
+26,Wood Products,wpd,Wood products
+27,"Pulp, Newsprint, Paper, and Paperboard",ppd,Paper products
+28,Paper or Paperboard Articles,ppd,Paper products
+29,Printed Products,pri,Printing and related support activities
+30,"Textiles, Leather, and Articles of Textiles or Leather",alt,Apparel and leather and allied products
+30,"Textiles, Leather, and Articles of Textiles or Leather",tex,Textile mills and textile product mills
+31,Non-Metallic Mineral Products,nmp,Nonmetallic mineral products
+32,Base Metal in Primary or Semi-Finished Forms and in Finished Basic Shapes,pmt,Primary metals
+33,Articles of Base Metal,fmt,Fabricated metal products
+34,Machinery,mch,Machinery
+35,"Electronic and Other Electrical Equipment and Components, and Office Equipment",cep,Computer and electronic products
+35,"Electronic and Other Electrical Equipment and Components, and Office Equipment",eec,"Electrical equipment, appliances, and components"
+36,Motorized and Other Vehicles (includes parts),mot,"Motor vehicles, bodies and trailers, and parts manufacturing"
+37,"Transportation Equipment, not elsewhere classified",ote,Other transportation equipment
+38,Precision Instruments and Apparatus,mmf,Miscellaneous manufacturing
+39,"Furniture, Mattresses and Mattress Supports, Lamps, Lighting Fittings, and Illuminated Signs",fpd,Furniture and related products
+40,Miscellaneous Manufactured Products,mmf,Miscellaneous manufacturing
+41,"Waste and Scrap (excludes of agriculture or food, see 041xx)",use,"Scrap, used and secondhand goods"
+43,Mixed Freight,,
+99,Missing Code,,
+0,SCTG suppressed,,

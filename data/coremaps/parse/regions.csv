@@ -1,337 +1,344 @@
 from,to
-2,ak
 AK,ak
-ALASKA,ak
 Alaska,ak
+ALASKA,ak
 alaska,ak
-1,al
+2,ak
 AL,al
-ALABAMA,al
 Ala.,al
 Alabama,al
+ALABAMA,al
 alabama,al
-5,ar
+1,al
 AR,ar
-ARKANSAS,ar
 Ark.,ar
 Arkansas,ar
+ARKANSAS,ar
 arkansas,ar
-4,az
-ARIZONA,az
-AZ,az
+5,ar
 Ariz.,az
 Arizona,az
+ARIZONA,az
 arizona,az
-6,ca
+AZ,az
+4,az
 CA,ca
-CALIFORNIA,ca
 Calif.,ca
 California,ca
+CALIFORNIA,ca
 california,ca
-C,canada
-CANADA,canada
-Canada,canada
-canada,canada
-8,co
+6,ca
 CO,co
-COLORADO,co
 Colo.,co
 Colorado,co
+COLORADO,co
 colorado,co
-9,ct
-CONNECTICUT,ct
-CT,ct
+8,co
 Conn.,ct
 Connecticut,ct
+CONNECTICUT,ct
 connecticut,ct
-11,dc
+CT,ct
+9,ct
 D.C.,dc
 DC,dc
-DISTRICT OF COLUMBIA,dc
-Dist of Columbia,dc
 District of Columbia,dc
+DISTRICT OF COLUMBIA,dc
 district of columbia,dc
-10,de
+Dist of Columbia,dc
+11,dc
 DE,de
-DELAWARE,de
 Del.,de
 Delaware,de
+DELAWARE,de
 delaware,de
-Far West,far west
-X3,"federal offshore, gulf of mexico"
-X5,"federal offshore, pacific"
-12,fl
+10,de
 FL,fl
-FLORIDA,fl
 Fla.,fl
 Florida,fl
+FLORIDA,fl
 florida,fl
-13,ga
+12,fl
 GA,ga
-GEORGIA,ga
 Ga.,ga
 Georgia,ga
+GEORGIA,ga
 georgia,ga
-Great Lakes,great lakes
-15,hi
-HAWAII,hi
-HI,hi
+13,ga
 Hawaii,hi
+HAWAII,hi
 hawaii,hi
-19,ia
+HI,hi
+15,hi
 IA,ia
-IOWA,ia
 Iowa,ia
+IOWA,ia
 iowa,ia
-16,id
+19,ia
 ID,id
-IDAHO,id
 Idaho,id
+IDAHO,id
 idaho,id
-17,il
+16,id
 IL,il
-ILLINOIS,il
 Ill.,il
 Illinois,il
+ILLINOIS,il
 illinois,il
-18,in
+17,il
 IN,in
-INDIANA,in
 Ind.,in
 Indiana,in
+INDIANA,in
 indiana,in
-20,ks
-KANSAS,ks
-KS,ks
+18,in
 Kans.,ks
 Kansas,ks
+KANSAS,ks
 kansas,ks
-21,ky
-KENTUCKY,ky
-KY,ky
+KS,ks
+20,ks
 Kentucky,ky
-Ky.,ky
+KENTUCKY,ky
 kentucky,ky
-22,la
+KY,ky
+Ky.,ky
+21,ky
 LA,la
-LOUISIANA,la
 La.,la
 Louisiana,la
+LOUISIANA,la
 louisiana,la
-25,ma
+22,la
 MA,ma
-MASSACHUSETTS,ma
 Mass.,ma
 Massachusetts,ma
+MASSACHUSETTS,ma
 massachusetts,ma
-24,md
-MARYLAND,md
-MD,md
+25,ma
 Maryland,md
-Md.,md
+MARYLAND,md
 maryland,md
-23,me
-MAINE,me
-ME,me
+MD,md
+Md.,md
+24,md
 Maine,me
+MAINE,me
 maine,me
-M,mexico
-26,mi
+ME,me
+23,me
 MI,mi
-MICHIGAN,mi
 Mich.,mi
 Michigan,mi
+MICHIGAN,mi
 michigan,mi
-Mideast,mideast
-27,mn
-MINNESOTA,mn
-MN,mn
+26,mi
 Minn.,mn
 Minnesota,mn
+MINNESOTA,mn
 minnesota,mn
-29,mo
-MISSOURI,mo
-MO,mo
+MN,mn
+27,mn
 Missouri,mo
-Mo.,mo
+MISSOURI,mo
 missouri,mo
-28,ms
-MISSISSIPPI,ms
-MS,ms
+MO,mo
+Mo.,mo
+29,mo
 Miss.,ms
 Mississippi,ms
+MISSISSIPPI,ms
 mississippi,ms
-30,mt
-MONTANA,mt
-MT,mt
+MS,ms
+28,ms
 Mont.,mt
 Montana,mt
+MONTANA,mt
 montana,mt
-37,nc
+MT,mt
+30,mt
 N.C.,nc
 NC,nc
-NORTH CAROLINA,nc
 North Carolina,nc
+NORTH CAROLINA,nc
 north carolina,nc
-38,nd
+37,nc
 N.D.,nd
 ND,nd
-NORTH DAKOTA,nd
 North Dakota,nd
+NORTH DAKOTA,nd
 north dakota,nd
-31,ne
+38,nd
 NE,ne
-NEBRASKA,ne
 Nebr.,ne
 Nebraska,ne
+NEBRASKA,ne
 nebraska,ne
-New England,new england
-33,nh
+31,ne
 N.H.,nh
-NEW HAMPSHIRE,nh
-NH,nh
 New Hampshire,nh
+NEW HAMPSHIRE,nh
 new hampshire,nh
-34,nj
+NH,nh
+33,nh
 N.J.,nj
-NEW JERSEY,nj
-NJ,nj
 New Jersey,nj
+NEW JERSEY,nj
 new jersey,nj
-35,nm
+NJ,nj
+34,nj
 N.M.,nm
-NEW MEXICO,nm
-NM,nm
 New Mexico,nm
+NEW MEXICO,nm
 new mexico,nm
-32,nv
-NEVADA,nv
-NV,nv
+NM,nm
+35,nm
 Nev.,nv
 Nevada,nv
+NEVADA,nv
 nevada,nv
-36,ny
+NV,nv
+32,nv
 N.Y.,ny
-NEW YORK,ny
-NY,ny
 New York,ny
+NEW YORK,ny
 new york,ny
-39,oh
+NY,ny
+36,ny
 OH,oh
-OHIO,oh
 Ohio,oh
+OHIO,oh
 ohio,oh
-40,ok
+39,oh
 OK,ok
-OKLAHOMA,ok
 Okla.,ok
 Oklahoma,ok
+OKLAHOMA,ok
 oklahoma,ok
-41,or
+40,ok
 OR,or
-OREGON,or
 Ore.,or
 Oregon,or
+OREGON,or
 oregon,or
-O,other
-42,pa
+41,or
 PA,pa
-PENNSYLVANIA,pa
 Pa.,pa
 Pennsylvania,pa
+PENNSYLVANIA,pa
 pennsylvania,pa
-Plains,plains
-PR,pr
-PUERTO RICO,pr
-Puerto Rico,pr
-Puerto rico,pr
-puerto rico,pr
-44,ri
+42,pa
 R.I.,ri
-RHODE ISLAND,ri
-RI,ri
 Rhode Island,ri
+RHODE ISLAND,ri
 rhode island,ri
-Rocky Mountain,rocky mountain
-45,sc
+RI,ri
+44,ri
 S.C.,sc
 SC,sc
-SOUTH CAROLINA,sc
 South Carolina,sc
+SOUTH CAROLINA,sc
 south carolina,sc
-46,sd
+45,sc
 S.D.,sd
 SD,sd
-SOUTH DAKOTA,sd
 South Dakota,sd
+SOUTH DAKOTA,sd
 south dakota,sd
-Southeast,southeast
-Southwest,southwest
-47,tn
-TENNESSEE,tn
-TN,tn
+46,sd
 Tenn.,tn
 Tennessee,tn
+TENNESSEE,tn
 tennessee,tn
-48,tx
-TEXAS,tx
-TX,tx
+TN,tn
+47,tn
 Tex.,tx
 Texas,tx
+TEXAS,tx
 texas,tx
-Unknown,unknown
-0,us
+TX,tx
+48,tx
 U.S.,us
-UNITED STATES,us
-US,us
 United States,us
+UNITED STATES,us
 united states,us
-49,ut
+US,us
+0,us
 UT,ut
-UTAH,ut
 Utah,ut
+UTAH,ut
 utah,ut
-51,va
+49,ut
 VA,va
-VIRGINIA,va
 Va.,va
 Virginia,va
+VIRGINIA,va
 virginia,va
-US Virgin Islands,vi
-VI,vi
-VIRGIN ISLANDS,vi
-Virgin Islands,vi
-Virgin islands,vi
-virgin islands,vi
-50,vt
-VERMONT,vt
-VT,vt
+51,va
 Vermont,vt
-Vt.,vt
+VERMONT,vt
 vermont,vt
-53,wa
+VT,vt
+Vt.,vt
+50,vt
 WA,wa
-WASHINGTON,wa
 Wash.,wa
 Washington,wa
+WASHINGTON,wa
 washington,wa
-55,wi
+53,wa
 WI,wi
-WISCONSIN,wi
 Wis.,wi
 Wisconsin,wi
+WISCONSIN,wi
 wisconsin,wi
-World Total,world total
-world total,world total
-54,wv
+55,wi
 W.Va.,wv
-WEST VIRGINIA,wv
-WV,wv
 West Virginia,wv
+WEST VIRGINIA,wv
 west virginia,wv
-56,wy
+WV,wv
+54,wv
 WY,wy
-WYOMING,wy
 Wyo.,wy
 Wyoming,wy
+WYOMING,wy
 wyoming,wy
+56,wy
+New England,new england
+Great Lakes,great lakes
+Plains,plains
+Southeast,southeast
+Mideast,mideast
+Southwest,southwest
+Rocky Mountain,rocky mountain
+Far West,far west
+Unknown,unknown
+VI,vi
+US Virgin Islands,vi
+Virgin Islands,vi
+virgin islands,vi
+Virgin islands,vi
+VIRGIN ISLANDS,vi
+PR,pr
+Puerto Rico,pr
+puerto rico,pr
+Puerto rico,pr
+PUERTO RICO,pr
+World Total,world total
+world total,world total
+Canada,canada
+CANADA,canada
+canada,canada
+X3,"federal offshore, gulf of mexico"
+X5,"federal offshore, pacific"
+C,canada
+M,mexico
+O,other
+01,al
+02,ak
+04,az
+05,ar
+06,ca
+08,co
+09,ct

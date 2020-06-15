@@ -30,15 +30,15 @@ adding = [
 
 mapping = Map(
         file = "regions.csv",
-        from = :from,
-        to = :to,
-        input = :region,
-        output = :region);
+        from = [:from],
+        to = [:to],
+        input = [:region],
+        output = [:region]);
 
 joining = [
     Join(file = "bea_all.csv", on = :from_desc, prefix = :from),
     Join(file = "bea_all.csv", on = :to_desc, prefix = :to)];
 
 replacing = [
-    Replace(col = :value, from = "...",     to = "0"),
-    Replace(col = :value, from = "missing", to = "0")];
+    Replace(col = :value, from = "...",   to = 0),
+    Replace(col = :value, from = missing, to = 0)];

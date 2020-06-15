@@ -13,7 +13,7 @@ state_code,necta_code,place_code,necta_desc,place_desc,nmemi,nectapci
 25,71650,72600,"Boston-Cambridge-Nashua, MA-NH",Waltham,1,true
 33,71650,50260,"Boston-Cambridge-Nashua, MA-NH",Nashua,1,true
 09,71950,08000,"Bridgeport-Stamford-Norwalk, CT",Bridgeport,1,true
-09,71950,47515,"Bridgeport-Stamford-Norwalk, CT",Milford,1,true
+09,71950,47515,"Bridgeport-Stamford-Norwalk, CT",Milford city (balance),1,true
 09,71950,55990,"Bridgeport-Stamford-Norwalk, CT",Norwalk,1,true
 09,71950,73000,"Bridgeport-Stamford-Norwalk, CT",Stamford,1,true
 09,71950,74260,"Bridgeport-Stamford-Norwalk, CT",Stratford,1,true

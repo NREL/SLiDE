@@ -1,0 +1,56 @@
+sctg_code,naics_code,windc_code,sctg_desc
+1,112,agr,Animals and Fish (live)
+1,112,fof,Animals and Fish (live)
+2,111,agr,Cereal Grains (includes seed)
+3,111,agr,"Agricultural Products (excludes Animal Feed, Cereal Grains, and Forage Products)"
+4,311,agr,"Animal Feed, Eggs, Honey, and Other Products of Animal Origin"
+4,311,fbp,"Animal Feed, Eggs, Honey, and Other Products of Animal Origin"
+5,311,agr,"Meat, Poultry, Fish, Seafood, and Their Preparations"
+5,311,fbp,"Meat, Poultry, Fish, Seafood, and Their Preparations"
+6,311,fbp,"Milled Grain Products and Preparations, and Bakery Products"
+7,311,fbp,"Other Prepared Foodstuffs, and Fats and Oils"
+8,312,fbp,Alcoholic Beverages and Denatured Alcohol
+9,312,fbp,Tobacco Products
+10,212,min,Monumental or Building Stone
+11,212,min,Natural Sands
+12,212,min,Gravel and Crushed Stone (excludes Dolomite and Slate)
+13,212,min,Other Non-Metallic Minerals not elsewhere classified
+14,212,min,Metallic Ores and Concentrates
+15,2121,,Coal
+16,211,,Crude Petroleum
+17,324,oil,"Gasoline, Aviation Turbine Fuel, and Ethanol (includes Kerosene, and Fuel Alcohols)"
+18,324,oil,"Fuel Oils (includes Diesel, Bunker C, and Biodiesel)"
+19,324,pet,"Other Coal and Petroleum Products, not elsewhere classified"
+20,325,che,Basic Chemicals
+21,325,che,Pharmaceutical Products
+22,325,che,Fertilizers
+23,325,che,Other Chemical Products and Preparations
+24,326,pla,Plastics and Rubber
+25,113,fof,Logs and Other Wood in the Rough
+26,321,wpd,Wood Products
+27,322,ppd,"Pulp, Newsprint, Paper, and Paperboard"
+28,322,ppd,Paper or Paperboard Articles
+29,323,pri,Printed Products
+30,313,alt,"Textiles, Leather, and Articles of Textiles or Leather"
+30,314,alt,"Textiles, Leather, and Articles of Textiles or Leather"
+30,315,alt,"Textiles, Leather, and Articles of Textiles or Leather"
+30,313,tex,"Textiles, Leather, and Articles of Textiles or Leather"
+30,314,tex,"Textiles, Leather, and Articles of Textiles or Leather"
+30,315,tex,"Textiles, Leather, and Articles of Textiles or Leather"
+31,327,nmp,Non-Metallic Mineral Products
+32,331,pmt,Base Metal in Primary or Semi-Finished Forms and in Finished Basic Shapes
+33,332,fmt,Articles of Base Metal
+34,333,mch,Machinery
+35,334,cep,"Electronic and Other Electrical Equipment and Components, and Office Equipment"
+35,335,cep,"Electronic and Other Electrical Equipment and Components, and Office Equipment"
+35,334,eec,"Electronic and Other Electrical Equipment and Components, and Office Equipment"
+35,335,eec,"Electronic and Other Electrical Equipment and Components, and Office Equipment"
+36,336,mot,Motorized and Other Vehicles (includes parts)
+37,336,ote,"Transportation Equipment, not elsewhere classified"
+38,339,mmf,Precision Instruments and Apparatus
+39,337,fpd,"Furniture, Mattresses and Mattress Supports, Lamps, Lighting Fittings, and Illuminated Signs"
+40,339,mmf,Miscellaneous Manufactured Products
+41,,use,"Waste and Scrap (excludes of agriculture or food, see 041xx)"
+43,,,Mixed Freight
+99,,,Missing Code
+0,,,SCTG suppressed

@@ -14,7 +14,7 @@ k = vcat(collect(Base.Iterators.product(inp...))...)
 d = Dict(k => 1.0 for k in k[1:end-2])
 
 function fill_zero(source::Tuple, tofill::Dict)
-
+    
     # Assume all possible permutations of keys should be present
     # and determine which are missing.
     allkeys = vcat(collect(Base.Iterators.product(source...))...)

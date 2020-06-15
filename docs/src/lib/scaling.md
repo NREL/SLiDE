@@ -24,7 +24,6 @@ Codes listed in the [Census Delineation Files](https://www.census.gov/geographie
 ### BEA
 
 
-
 ### NAICS
 
 The [NAICS Codes](https://www.census.gov/programs-surveys/economic-census/guidance/understanding-naics.html) are structured into the following levels, indicated by the number of digits in the code:

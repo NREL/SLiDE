@@ -1,0 +1,46 @@
+FileInput:
+  - colnames: [yr, i, j, units, value]
+    f1:
+      - supply.csv
+      - use.csv
+      - supply_det.csv
+      - use_det.csv
+    f2:
+      - supply_units.csv
+      - use_units.csv
+      - supply_det_units.csv
+      - use_det_units.csv
+  - colnames: [r, yr, gdpcat, si, units, value]
+    f1: gsp_state.csv
+    f2: gsp_units.csv
+  - colnames: [yr, r, pg, units, value]
+    f1: pce.csv
+    f2: pce_units.csv
+  - colnames: [orig_state, dest_state, n, sg, units, value]
+    f1: cfs_state.csv
+    f2: cfsdata_st_units.csv
+  - colnames: [orig_metro, dest_metro, n, sg, units, value]
+    f1: cfs_metro.csv
+    f2: cfsdata_ma_units.csv
+  - colnames: [r, n, units, value]
+    f1: nass.csv
+    f2: nass_units.csv
+  - colnames: [yr, r, ec, units, value]
+    f1: sgf.csv
+    f2: sgf_units.csv
+  - colnames: [r, n, yr, t, units, value]
+    f1: utd.csv
+    f2: usatrd_units.csv
+  - colnames: [yr, units, value]
+    f1: crude_oil.csv
+    f2: crude_oil_price_units.csv
+  - colnames: [source, r, yr, units, value]
+    f1: emissions.csv
+    f2: emissions_units.csv
+  - colnames: [yr,source,units,value]
+    f1: heatrate.csv
+    f2: heatrate_units.csv
+  # SEDS values are consistent, BUT this takes awhile. So skip if unnecessary.
+  - colnames: [source, sector, sr, yr, units, value]
+    f1: seds.csv
+    f2: seds_units.csv
