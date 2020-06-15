@@ -1,0 +1,83 @@
+Path: [data]
+
+CSVInput:
+    name: test_datastream.csv
+    descriptor: 2020-05-03
+
+Order:
+  - {col: updated, type: Date}
+  - {col: yr,    type: Int}
+  - {col: r,     type: String}
+  - {col: n,     type: Int}
+  - {col: desc,  type: String}
+  - {col: i,     type: String}
+  - {col: units, type: String}
+  - {col: value, type: Float64}
+  - {col: units_0, type: String}
+  - {col: value_0, type: Any}
+  - {col: factor,  type: Any}
+
+Describe:
+  col: updated
+
+Rename:
+  - from: IOCode
+    to:   n
+  - from: Name
+    to:   desc
+
+Group:
+  file:   [parse, regions.csv]
+  from:   from
+  to:     to
+  input:  n
+  output: r
+
+Match:
+  on:     \((?<n>.*)\)
+  input:  n
+  output: n
+
+Melt:
+  on:  [n, r]
+  var: yr
+  val: value
+
+Add:
+  col:  units
+  val:  thousands of us dollars (USD)
+
+Map:
+  - file:   [parse, bea.csv]
+    from:   bea_code
+    to:     [bea_desc, bea_windc]
+    input:  n
+    output: [desc, i]
+    kind:   left
+  - file:   [parse, units.csv]
+    from:   from
+    to:     [to, factor, units_factor]
+    input:  units
+    output: [units, factor, units_factor]
+    kind:   left
+
+Replace:
+  col:  value
+  from: missing
+  to:   0
+
+Operate:
+  operation: "*"
+  axis:   col
+  from:   units
+  to:     units_factor
+  input:  [value, factor]
+  output: value
+
+Drop:
+  - col: linenum
+    val: all
+    operation: "=="
+  - col: value
+    val: 0
+    operation: "<"
