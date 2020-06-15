@@ -73,7 +73,6 @@ data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "cal
 
 mod_year = 2016
 
-
 cal = Dict(
     :y0 => df_to_dict(read_data_temp("y0",mod_year,data_temp_dir,"Gross output"),:yr,:Val),
     :ys0 => df_to_dict(read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"),:yr,:Val),
@@ -216,6 +215,12 @@ end
 [fix(m0_est[i],cal[:m0][i],force=true) for i in i_set if haskey(cal[:m0],i)];
 [fix(m0_est[i],0,force=true) for i in i_set if !haskey(cal[:m0],i)];
 
+output_use_set = ["use","oth"]
 
+[fix(ys0_est[i,j],0,force=true) for i in output_use_set for j in j_set]
+
+JuMP.optimize!(calib)
+
+#output_va_0 = result_value(va0_est)
 
 #JuMP.value.(ms0_est)
