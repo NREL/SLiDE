@@ -27,7 +27,7 @@ using DataFrames
 mod_year = 2016
 
 # last year modeled
-end_year = 2020
+end_year = 2018
 
 # index used in the model is the set of years modeled here
 years = mod_year:end_year
@@ -207,7 +207,7 @@ blueNOTE[:ty] = blueNOTE[:ty0]
 
 
 #following subsets are used to limit the size of the model
-# the a_set restricits the A variables indices to those
+# the a_set restricts the A and PA variables indices to those
 # with positive armington supply or re-exports
 a_set = Dict()
 [a_set[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
@@ -490,8 +490,6 @@ sv = 0.00
         sum(Y[r,s,t] * blueNOTE[:ys0][r,s,g] for s in sectors)
 # household production (exogenous)        
         + blueNOTE[:yh0][r,g]
-# !!!! - check on investment here
-#        + I[r,g,t]
         - 
 # aggregate supply (akin to market demand)                
         X[r,g,t] * blueNOTE[:s0][r,g]

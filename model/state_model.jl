@@ -554,6 +554,3 @@ ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH
 # solve the model
 status = solveMCP(cge)
 
-
-
-
