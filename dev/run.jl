@@ -7,6 +7,7 @@ using YAML
 
 using SLiDE  # see src/SLiDE.jl
 
+
 # DATA STREAM -- This will take awhile (~10 minutes, maximum), but will only be necessary
 # the first time the SLiDE package is installed and when data is updated.
 @time include(joinpath(SLIDE_DIR, "dev", "datastream", "auto_generate_maps.jl"))     # ~60 seconds
@@ -15,3 +16,8 @@ using SLiDE  # see src/SLiDE.jl
 # BUILD STREAM -- Prepare data for the calibration scheme.
 # This is where user customizations can be applied (future work).
 @time include(joinpath(SLIDE_DIR, "dev", "buildstream", "partitionbea.jl"))  #  30 seconds
+
+# CALIBRATION -- Ensure market clearance conditions are met while minimizing
+# the distance between reference parameters and endogenous variables
+@time include(joinpath(SLIDE_DIR, "calibrate", "national_calibration.jl"))  #  30 seconds
+
