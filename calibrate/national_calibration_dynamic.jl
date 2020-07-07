@@ -119,7 +119,7 @@ end
 # -- Calibration --
 ####################
 
-calib = Model(with_optimizer(Ipopt.Optimizer,nlp_scaling_method="gradient-based",))
+calib = Model(with_optimizer(Ipopt.Optimizer,nlp_scaling_method="gradient-based"))
 
 @variable(calib,ys0_est[j in j_set,i in i_set]>=0,start=0);
 @variable(calib,fs0_est[i in i_set]>=0,start=0);
