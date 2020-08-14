@@ -6,7 +6,6 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 48,253,,10180,,tx,Jones County,,"Abilene, TX",,1,false
 48,441,,10180,,tx,Taylor County,,"Abilene, TX",,1,true
 40,123,,10220,,ok,Pontotoc County,,"Ada, OK",,2,true
-72,001,434,10260,,pr,Adjuntas Municipio,"Ponce-Coamo-Santa Isabel, PR","Adjuntas, PR",,2,true
 26,091,220,10300,,mi,Lenawee County,"Detroit-Warren-Ann Arbor, MI","Adrian, MI",,2,true
 72,003,,10380,,pr,Aguada Municipio,,"Aguadilla-Isabela, PR",,1,true
 72,005,,10380,,pr,Aguadilla Municipio,,"Aguadilla-Isabela, PR",,1,true
@@ -20,12 +19,11 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 39,133,184,10420,,oh,Portage County,"Cleveland-Akron-Canton, OH","Akron, OH",,1,true
 39,153,184,10420,,oh,Summit County,"Cleveland-Akron-Canton, OH","Akron, OH",,1,true
 35,035,,10460,,nm,Otero County,,"Alamogordo, NM",,2,true
-13,007,,10500,,ga,Baker County,,"Albany, GA",,1,false
 13,095,,10500,,ga,Dougherty County,,"Albany, GA",,1,true
 13,177,,10500,,ga,Lee County,,"Albany, GA",,1,true
 13,273,,10500,,ga,Terrell County,,"Albany, GA",,1,false
 13,321,,10500,,ga,Worth County,,"Albany, GA",,1,false
-41,043,440,10540,,or,Linn County,"Portland-Vancouver-Salem, OR-WA","Albany, OR",,1,true
+41,043,440,10540,,or,Linn County,"Portland-Vancouver-Salem, OR-WA","Albany-Lebanon, OR",,1,true
 36,001,104,10580,,ny,Albany County,"Albany-Schenectady, NY","Albany-Schenectady-Troy, NY",,1,true
 36,083,104,10580,,ny,Rensselaer County,"Albany-Schenectady, NY","Albany-Schenectady-Troy, NY",,1,true
 36,091,104,10580,,ny,Saratoga County,"Albany-Schenectady, NY","Albany-Schenectady-Troy, NY",,1,true
@@ -33,30 +31,34 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 36,095,104,10580,,ny,Schoharie County,"Albany-Schenectady, NY","Albany-Schenectady-Troy, NY",,1,false
 37,167,172,10620,,nc,Stanly County,"Charlotte-Concord, NC-SC","Albemarle, NC",,2,true
 27,047,,10660,,mn,Freeborn County,,"Albert Lea, MN",,2,true
-01,095,290,10700,,al,Marshall County,"Huntsville-Decatur-Albertville, AL","Albertville, AL",,2,true
+01,095,,10700,,al,Marshall County,,"Albertville, AL",,2,true
 35,001,106,10740,,nm,Bernalillo County,"Albuquerque-Santa Fe-Las Vegas, NM","Albuquerque, NM",,1,true
 35,043,106,10740,,nm,Sandoval County,"Albuquerque-Santa Fe-Las Vegas, NM","Albuquerque, NM",,1,true
 35,057,106,10740,,nm,Torrance County,"Albuquerque-Santa Fe-Las Vegas, NM","Albuquerque, NM",,1,false
 35,061,106,10740,,nm,Valencia County,"Albuquerque-Santa Fe-Las Vegas, NM","Albuquerque, NM",,1,false
+01,037,388,10760,,al,Coosa County,"Montgomery-Selma-Alexander City, AL","Alexander City, AL",,2,false
+01,123,388,10760,,al,Tallapoosa County,"Montgomery-Selma-Alexander City, AL","Alexander City, AL",,2,true
 22,043,,10780,,la,Grant Parish,,"Alexandria, LA",,1,false
 22,079,,10780,,la,Rapides Parish,,"Alexandria, LA",,1,true
 27,041,,10820,,mn,Douglas County,,"Alexandria, MN",,2,true
+48,131,204,10860,,tx,Duval County,"Corpus Christi-Kingsville-Alice, TX","Alice, TX",,2,false
 48,249,204,10860,,tx,Jim Wells County,"Corpus Christi-Kingsville-Alice, TX","Alice, TX",,2,true
-34,041,408,10900,,nj,Warren County,"New York-Newark, NY-NJ-CT-PA","Allentown-Bethlehem-Easton, PA-NJ",,1,true
-42,025,408,10900,,pa,Carbon County,"New York-Newark, NY-NJ-CT-PA","Allentown-Bethlehem-Easton, PA-NJ",,1,true
-42,077,408,10900,,pa,Lehigh County,"New York-Newark, NY-NJ-CT-PA","Allentown-Bethlehem-Easton, PA-NJ",,1,true
-42,095,408,10900,,pa,Northampton County,"New York-Newark, NY-NJ-CT-PA","Allentown-Bethlehem-Easton, PA-NJ",,1,true
+34,041,,10900,,nj,Warren County,,"Allentown-Bethlehem-Easton, PA-NJ",,1,true
+42,025,,10900,,pa,Carbon County,,"Allentown-Bethlehem-Easton, PA-NJ",,1,true
+42,077,,10900,,pa,Lehigh County,,"Allentown-Bethlehem-Easton, PA-NJ",,1,true
+42,095,,10900,,pa,Northampton County,,"Allentown-Bethlehem-Easton, PA-NJ",,1,true
 26,057,394,10940,,mi,Gratiot County,"Mount Pleasant-Alma, MI","Alma, MI",,2,true
 26,007,,10980,,mi,Alpena County,,"Alpena, MI",,2,true
-42,013,,11020,,pa,Blair County,,"Altoona, PA",,1,true
+42,013,107,11020,,pa,Blair County,"Altoona-Huntingdon, PA","Altoona, PA",,1,true
 40,065,,11060,,ok,Jackson County,,"Altus, OK",,2,true
-48,011,108,11100,,tx,Armstrong County,"Amarillo-Borger, TX","Amarillo, TX",,1,false
-48,065,108,11100,,tx,Carson County,"Amarillo-Borger, TX","Amarillo, TX",,1,false
-48,359,108,11100,,tx,Oldham County,"Amarillo-Borger, TX","Amarillo, TX",,1,false
-48,375,108,11100,,tx,Potter County,"Amarillo-Borger, TX","Amarillo, TX",,1,true
-48,381,108,11100,,tx,Randall County,"Amarillo-Borger, TX","Amarillo, TX",,1,true
+48,011,108,11100,,tx,Armstrong County,"Amarillo-Pampa-Borger, TX","Amarillo, TX",,1,false
+48,065,108,11100,,tx,Carson County,"Amarillo-Pampa-Borger, TX","Amarillo, TX",,1,false
+48,359,108,11100,,tx,Oldham County,"Amarillo-Pampa-Borger, TX","Amarillo, TX",,1,false
+48,375,108,11100,,tx,Potter County,"Amarillo-Pampa-Borger, TX","Amarillo, TX",,1,true
+48,381,108,11100,,tx,Randall County,"Amarillo-Pampa-Borger, TX","Amarillo, TX",,1,true
 13,249,,11140,,ga,Schley County,,"Americus, GA",,2,false
 13,261,,11140,,ga,Sumter County,,"Americus, GA",,2,true
+19,015,218,11180,,ia,Boone County,"Des Moines-Ames-West Des Moines, IA","Ames, IA",,1,false
 19,169,218,11180,,ia,Story County,"Des Moines-Ames-West Des Moines, IA","Ames, IA",,1,true
 36,057,104,11220,,ny,Montgomery County,"Albany-Schenectady, NY","Amsterdam, NY",,2,true
 02,020,,11260,,ak,Anchorage Municipality,,"Anchorage, AK",,1,true
@@ -64,62 +66,63 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 48,003,,11380,,tx,Andrews County,,"Andrews, TX",,2,true
 18,151,258,11420,,in,Steuben County,"Fort Wayne-Huntington-Auburn, IN","Angola, IN",,2,true
 26,161,220,11460,,mi,Washtenaw County,"Detroit-Warren-Ann Arbor, MI","Ann Arbor, MI",,1,true
-01,015,,11500,,al,Calhoun County,,"Anniston-Oxford-Jacksonville, AL",,1,true
+01,015,,11500,,al,Calhoun County,,"Anniston-Oxford, AL",,1,true
 55,015,118,11540,,wi,Calumet County,"Appleton-Oshkosh-Neenah, WI","Appleton, WI",,1,true
 55,087,118,11540,,wi,Outagamie County,"Appleton-Oshkosh-Neenah, WI","Appleton, WI",,1,true
 12,027,412,11580,,fl,DeSoto County,"North Port-Sarasota, FL","Arcadia, FL",,2,true
 40,019,,11620,,ok,Carter County,,"Ardmore, OK",,2,true
-72,013,490,11640,,pr,Arecibo Municipio,"San Juan-Carolina, PR","Arecibo, PR",,1,true
-72,027,490,11640,,pr,Camuy Municipio,"San Juan-Carolina, PR","Arecibo, PR",,1,true
-72,065,490,11640,,pr,Hatillo Municipio,"San Juan-Carolina, PR","Arecibo, PR",,1,true
-72,115,490,11640,,pr,Quebradillas Municipio,"San Juan-Carolina, PR","Arecibo, PR",,1,true
+40,085,,11620,,ok,Love County,,"Ardmore, OK",,2,false
+72,013,490,11640,,pr,Arecibo Municipio,"San Juan-Bayamón, PR","Arecibo, PR",,1,true
+72,027,490,11640,,pr,Camuy Municipio,"San Juan-Bayamón, PR","Arecibo, PR",,1,true
+72,065,490,11640,,pr,Hatillo Municipio,"San Juan-Bayamón, PR","Arecibo, PR",,1,true
+72,115,490,11640,,pr,Quebradillas Municipio,"San Juan-Bayamón, PR","Arecibo, PR",,1,true
 05,019,,11660,,ar,Clark County,,"Arkadelphia, AR",,2,true
-20,035,556,11680,,ks,Cowley County,"Wichita-Arkansas City-Winfield, KS","Arkansas City-Winfield, KS",,2,true
-37,021,120,11700,,nc,Buncombe County,"Asheville-Brevard, NC","Asheville, NC",,1,true
-37,087,120,11700,,nc,Haywood County,"Asheville-Brevard, NC","Asheville, NC",,1,true
-37,089,120,11700,,nc,Henderson County,"Asheville-Brevard, NC","Asheville, NC",,1,true
-37,115,120,11700,,nc,Madison County,"Asheville-Brevard, NC","Asheville, NC",,1,false
+37,021,120,11700,,nc,Buncombe County,"Asheville-Marion-Brevard, NC","Asheville, NC",,1,true
+37,087,120,11700,,nc,Haywood County,"Asheville-Marion-Brevard, NC","Asheville, NC",,1,true
+37,089,120,11700,,nc,Henderson County,"Asheville-Marion-Brevard, NC","Asheville, NC",,1,true
+37,115,120,11700,,nc,Madison County,"Asheville-Marion-Brevard, NC","Asheville, NC",,1,false
 39,005,360,11740,,oh,Ashland County,"Mansfield-Ashland-Bucyrus, OH","Ashland, OH",,2,true
 39,007,184,11780,,oh,Ashtabula County,"Cleveland-Akron-Canton, OH","Ashtabula, OH",,2,true
 41,007,,11820,,or,Clatsop County,,"Astoria, OR",,2,true
 20,005,312,11860,,ks,Atchison County,"Kansas City-Overland Park-Kansas City, MO-KS","Atchison, KS",,2,true
 39,009,,11900,,oh,Athens County,,"Athens, OH",,2,true
-47,107,174,11940,,tn,McMinn County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Athens, TN",,2,true
+47,107,174,11940,,tn,McMinn County,"Chattanooga-Cleveland-Dalton, TN-GA","Athens, TN",,2,true
 48,213,206,11980,,tx,Henderson County,"Dallas-Fort Worth, TX-OK","Athens, TX",,2,true
-13,059,122,12020,,ga,Clarke County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Athens-Clarke County, GA",,1,true
-13,195,122,12020,,ga,Madison County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Athens-Clarke County, GA",,1,false
-13,219,122,12020,,ga,Oconee County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Athens-Clarke County, GA",,1,true
-13,221,122,12020,,ga,Oglethorpe County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Athens-Clarke County, GA",,1,false
-13,013,122,12060,,ga,Barrow County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,015,122,12060,,ga,Bartow County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,035,122,12060,,ga,Butts County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,045,122,12060,,ga,Carroll County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,057,122,12060,,ga,Cherokee County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,063,122,12060,,ga,Clayton County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,067,122,12060,,ga,Cobb County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,077,122,12060,,ga,Coweta County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,085,122,12060,,ga,Dawson County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,089,122,12060,,ga,DeKalb County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,097,122,12060,,ga,Douglas County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,113,122,12060,,ga,Fayette County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,117,122,12060,,ga,Forsyth County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,121,122,12060,,ga,Fulton County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,135,122,12060,,ga,Gwinnett County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,143,122,12060,,ga,Haralson County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,149,122,12060,,ga,Heard County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,151,122,12060,,ga,Henry County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,159,122,12060,,ga,Jasper County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,171,122,12060,,ga,Lamar County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,199,122,12060,,ga,Meriwether County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,211,122,12060,,ga,Morgan County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,217,122,12060,,ga,Newton County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,223,122,12060,,ga,Paulding County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,227,122,12060,,ga,Pickens County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,231,122,12060,,ga,Pike County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,false
-13,247,122,12060,,ga,Rockdale County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,255,122,12060,,ga,Spalding County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
-13,297,122,12060,,ga,Walton County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Atlanta-Sandy Springs-Roswell, GA",,1,true
+13,059,122,12020,,ga,Clarke County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Athens-Clarke County, GA",,1,true
+13,195,122,12020,,ga,Madison County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Athens-Clarke County, GA",,1,false
+13,219,122,12020,,ga,Oconee County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Athens-Clarke County, GA",,1,true
+13,221,122,12020,,ga,Oglethorpe County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Athens-Clarke County, GA",,1,false
+13,013,122,12060,,ga,Barrow County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,015,122,12060,,ga,Bartow County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,035,122,12060,,ga,Butts County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,045,122,12060,,ga,Carroll County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,057,122,12060,,ga,Cherokee County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,063,122,12060,,ga,Clayton County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,067,122,12060,,ga,Cobb County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,077,122,12060,,ga,Coweta County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,085,122,12060,,ga,Dawson County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,089,122,12060,,ga,DeKalb County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,097,122,12060,,ga,Douglas County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,113,122,12060,,ga,Fayette County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,117,122,12060,,ga,Forsyth County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,121,122,12060,,ga,Fulton County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,135,122,12060,,ga,Gwinnett County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,143,122,12060,,ga,Haralson County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,149,122,12060,,ga,Heard County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,151,122,12060,,ga,Henry County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,159,122,12060,,ga,Jasper County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,171,122,12060,,ga,Lamar County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,199,122,12060,,ga,Meriwether County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,211,122,12060,,ga,Morgan County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,217,122,12060,,ga,Newton County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,223,122,12060,,ga,Paulding County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,227,122,12060,,ga,Pickens County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,231,122,12060,,ga,Pike County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,false
+13,247,122,12060,,ga,Rockdale County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,255,122,12060,,ga,Spalding County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
+13,297,122,12060,,ga,Walton County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Atlanta-Sandy Springs-Alpharetta, GA",,1,true
 34,001,428,12100,,nj,Atlantic County,"Philadelphia-Reading-Camden, PA-NJ-DE-MD","Atlantic City-Hammonton, NJ",,1,true
+01,053,426,12120,,al,Escambia County,"Pensacola-Ferry Pass, FL-AL","Atmore, AL",,2,true
 18,033,258,12140,,in,DeKalb County,"Fort Wayne-Huntington-Auburn, IN","Auburn, IN",,2,true
 36,011,532,12180,,ny,Cayuga County,"Syracuse-Auburn, NY","Auburn, NY",,2,true
 01,081,194,12220,,al,Lee County,"Columbus-Auburn-Opelika, GA-AL","Auburn-Opelika, AL",,1,true
@@ -132,12 +135,12 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 45,037,,12260,,sc,Edgefield County,,"Augusta-Richmond County, GA-SC",,1,false
 23,011,,12300,,me,Kennebec County,,"Augusta-Waterville, ME",,2,true
 27,099,462,12380,,mn,Mower County,"Rochester-Austin, MN","Austin, MN",,2,true
-48,021,,12420,,tx,Bastrop County,,"Austin-Round Rock, TX",,1,false
-48,055,,12420,,tx,Caldwell County,,"Austin-Round Rock, TX",,1,false
-48,209,,12420,,tx,Hays County,,"Austin-Round Rock, TX",,1,true
-48,453,,12420,,tx,Travis County,,"Austin-Round Rock, TX",,1,true
-48,491,,12420,,tx,Williamson County,,"Austin-Round Rock, TX",,1,true
-13,087,533,12460,,ga,Decatur County,"Tallahassee-Bainbridge, FL-GA","Bainbridge, GA",,2,true
+48,021,,12420,,tx,Bastrop County,,"Austin-Round Rock-Georgetown, TX",,1,false
+48,055,,12420,,tx,Caldwell County,,"Austin-Round Rock-Georgetown, TX",,1,false
+48,209,,12420,,tx,Hays County,,"Austin-Round Rock-Georgetown, TX",,1,true
+48,453,,12420,,tx,Travis County,,"Austin-Round Rock-Georgetown, TX",,1,true
+48,491,,12420,,tx,Williamson County,,"Austin-Round Rock-Georgetown, TX",,1,true
+13,087,,12460,,ga,Decatur County,,"Bainbridge, GA",,2,true
 06,029,,12540,,ca,Kern County,,"Bakersfield, CA",,1,true
 24,003,548,12580,,md,Anne Arundel County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Baltimore-Columbia-Towson, MD",,1,true
 24,005,548,12580,,md,Baltimore County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Baltimore-Columbia-Towson, MD",,1,true
@@ -148,14 +151,15 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 24,510,548,12580,,md,Baltimore city,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Baltimore-Columbia-Towson, MD",,1,true
 23,019,,12620,,me,Penobscot County,,"Bangor, ME",,1,true
 55,111,357,12660,,wi,Sauk County,"Madison-Janesville-Beloit, WI","Baraboo, WI",,2,true
-21,179,350,12680,,ky,Nelson County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Bardstown, KY",,2,true
+21,179,350,12680,,ky,Nelson County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Bardstown, KY",,2,true
 25,001,148,12700,,ma,Barnstable County,"Boston-Worcester-Providence, MA-RI-NH-CT","Barnstable Town, MA",,1,true
-50,023,,12740,,vt,Washington County,,"Barre, VT",,2,true
+50,023,162,12740,,vt,Washington County,"Burlington-South Burlington-Barre, VT","Barre, VT",,2,true
 40,147,538,12780,,ok,Washington County,"Tulsa-Muskogee-Bartlesville, OK","Bartlesville, OK",,2,true
-22,067,384,12820,,la,Morehouse Parish,"Monroe-Ruston-Bastrop, LA","Bastrop, LA",,2,true
 36,037,464,12860,,ny,Genesee County,"Rochester-Batavia-Seneca Falls, NY","Batavia, NY",,2,true
 05,063,,12900,,ar,Independence County,,"Batesville, AR",,2,true
+05,135,,12900,,ar,Sharp County,,"Batesville, AR",,2,false
 22,005,,12940,,la,Ascension Parish,,"Baton Rouge, LA",,1,true
+22,007,,12940,,la,Assumption Parish,,"Baton Rouge, LA",,1,false
 22,033,,12940,,la,East Baton Rouge Parish,,"Baton Rouge, LA",,1,true
 22,037,,12940,,la,East Feliciana Parish,,"Baton Rouge, LA",,1,false
 22,047,,12940,,la,Iberville Parish,,"Baton Rouge, LA",,1,true
@@ -170,7 +174,6 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 31,067,339,13100,,ne,Gage County,"Lincoln-Beatrice, NE","Beatrice, NE",,2,true
 48,199,,13140,,tx,Hardin County,,"Beaumont-Port Arthur, TX",,1,false
 48,245,,13140,,tx,Jefferson County,,"Beaumont-Port Arthur, TX",,1,true
-48,351,,13140,,tx,Newton County,,"Beaumont-Port Arthur, TX",,1,false
 48,361,,13140,,tx,Orange County,,"Beaumont-Port Arthur, TX",,1,true
 55,027,376,13180,,wi,Dodge County,"Milwaukee-Racine-Waukesha, WI","Beaver Dam, WI",,2,true
 54,019,,13220,,wv,Fayette County,,"Beckley, WV",,1,true
@@ -180,19 +183,16 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 39,091,198,13340,,oh,Logan County,"Columbus-Marion-Zanesville, OH","Bellefontaine, OH",,2,true
 53,073,,13380,,wa,Whatcom County,,"Bellingham, WA",,1,true
 27,007,,13420,,mn,Beltrami County,,"Bemidji, MN",,2,true
-41,017,140,13460,,or,Deschutes County,"Bend-Redmond-Prineville, OR","Bend-Redmond, OR",,1,true
+41,017,140,13460,,or,Deschutes County,"Bend-Prineville, OR","Bend, OR",,1,true
 45,069,,13500,,sc,Marlboro County,,"Bennettsville, SC",,2,true
 50,003,,13540,,vt,Bennington County,,"Bennington, VT",,2,true
-33,007,,13620,,nh,Coos County,,"Berlin, NH-VT",,2,true
-50,009,,13620,,vt,Essex County,,"Berlin, NH-VT",,2,false
-26,107,266,13660,,mi,Mecosta County,"Grand Rapids-Wyoming-Muskegon, MI","Big Rapids, MI",,2,true
-48,173,,13700,,tx,Glasscock County,,"Big Spring, TX",,2,false
+33,007,,13620,,nh,Coos County,,"Berlin, NH",,2,true
+26,107,266,13660,,mi,Mecosta County,"Grand Rapids-Kentwood-Muskegon, MI","Big Rapids, MI",,2,true
 48,227,,13700,,tx,Howard County,,"Big Spring, TX",,2,true
-51,051,,13720,,va,Dickenson County,,"Big Stone Gap, VA",,2,false
 51,195,,13720,,va,Wise County,,"Big Stone Gap, VA",,2,true
 51,720,,13720,,va,Norton city,,"Big Stone Gap, VA",,2,true
 30,009,,13740,,mt,Carbon County,,"Billings, MT",,1,false
-30,037,,13740,,mt,Golden Valley County,,"Billings, MT",,1,false
+30,095,,13740,,mt,Stillwater County,,"Billings, MT",,1,false
 30,111,,13740,,mt,Yellowstone County,,"Billings, MT",,1,true
 36,007,,13780,,ny,Broome County,,"Binghamton, NY",,1,true
 36,107,,13780,,ny,Tioga County,,"Binghamton, NY",,1,true
@@ -202,23 +202,20 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 01,073,142,13820,,al,Jefferson County,"Birmingham-Hoover-Talladega, AL","Birmingham-Hoover, AL",,1,true
 01,115,142,13820,,al,St. Clair County,"Birmingham-Hoover-Talladega, AL","Birmingham-Hoover, AL",,1,false
 01,117,142,13820,,al,Shelby County,"Birmingham-Hoover-Talladega, AL","Birmingham-Hoover, AL",,1,true
-01,127,142,13820,,al,Walker County,"Birmingham-Hoover-Talladega, AL","Birmingham-Hoover, AL",,1,false
 38,015,,13900,,nd,Burleigh County,,"Bismarck, ND",,1,true
 38,059,,13900,,nd,Morton County,,"Bismarck, ND",,1,true
 38,065,,13900,,nd,Oliver County,,"Bismarck, ND",,1,false
-38,085,,13900,,nd,Sioux County,,"Bismarck, ND",,1,false
 16,011,292,13940,,id,Bingham County,"Idaho Falls-Rexburg-Blackfoot, ID","Blackfoot, ID",,2,true
-51,063,,13980,,va,Floyd County,,"Blacksburg-Christiansburg-Radford, VA",,1,false
-51,071,,13980,,va,Giles County,,"Blacksburg-Christiansburg-Radford, VA",,1,false
-51,121,,13980,,va,Montgomery County,,"Blacksburg-Christiansburg-Radford, VA",,1,true
-51,155,,13980,,va,Pulaski County,,"Blacksburg-Christiansburg-Radford, VA",,1,false
-51,750,,13980,,va,Radford city,,"Blacksburg-Christiansburg-Radford, VA",,1,true
-17,039,145,14010,,il,De Witt County,"Bloomington-Pontiac, IL","Bloomington, IL",,1,false
+51,071,,13980,,va,Giles County,,"Blacksburg-Christiansburg, VA",,1,false
+51,121,,13980,,va,Montgomery County,,"Blacksburg-Christiansburg, VA",,1,true
+51,155,,13980,,va,Pulaski County,,"Blacksburg-Christiansburg, VA",,1,false
+51,750,,13980,,va,Radford city,,"Blacksburg-Christiansburg, VA",,1,true
 17,113,145,14010,,il,McLean County,"Bloomington-Pontiac, IL","Bloomington, IL",,1,true
 18,105,144,14020,,in,Monroe County,"Bloomington-Bedford, IN","Bloomington, IN",,1,true
 18,119,144,14020,,in,Owen County,"Bloomington-Bedford, IN","Bloomington, IN",,1,false
 42,037,146,14100,,pa,Columbia County,"Bloomsburg-Berwick-Sunbury, PA","Bloomsburg-Berwick, PA",,1,true
 42,093,146,14100,,pa,Montour County,"Bloomsburg-Berwick-Sunbury, PA","Bloomsburg-Berwick, PA",,1,true
+51,021,,14140,,va,Bland County,,"Bluefield, WV-VA",,2,false
 51,185,,14140,,va,Tazewell County,,"Bluefield, WV-VA",,2,true
 54,055,,14140,,wv,Mercer County,,"Bluefield, WV-VA",,2,true
 05,093,,14180,,ar,Mississippi County,,"Blytheville, AR",,2,true
@@ -228,9 +225,9 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 16,027,147,14260,,id,Canyon County,"Boise City-Mountain Home-Ontario, ID-OR","Boise City, ID",,1,false
 16,045,147,14260,,id,Gem County,"Boise City-Mountain Home-Ontario, ID-OR","Boise City, ID",,1,false
 16,073,147,14260,,id,Owyhee County,"Boise City-Mountain Home-Ontario, ID-OR","Boise City, ID",,1,false
-19,015,218,14340,,ia,Boone County,"Des Moines-Ames-West Des Moines, IA","Boone, IA",,2,true
+48,147,206,14300,,tx,Fannin County,"Dallas-Fort Worth, TX-OK","Bonham, TX",,2,true
 37,189,,14380,,nc,Watauga County,,"Boone, NC",,2,true
-48,233,108,14420,,tx,Hutchinson County,"Amarillo-Borger, TX","Borger, TX",,2,true
+48,233,108,14420,,tx,Hutchinson County,"Amarillo-Pampa-Borger, TX","Borger, TX",,2,true
 25,021,148,14460,14454,ma,Norfolk County,"Boston-Worcester-Providence, MA-RI-NH-CT","Boston-Cambridge-Newton, MA-NH","Boston, MA",1,true
 25,023,148,14460,14454,ma,Plymouth County,"Boston-Worcester-Providence, MA-RI-NH-CT","Boston-Cambridge-Newton, MA-NH","Boston, MA",1,true
 25,025,148,14460,14454,ma,Suffolk County,"Boston-Worcester-Providence, MA-RI-NH-CT","Boston-Cambridge-Newton, MA-NH","Boston, MA",1,true
@@ -247,75 +244,80 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 42,083,,14620,,pa,McKean County,,"Bradford, PA",,2,true
 27,021,,14660,,mn,Cass County,,"Brainerd, MN",,2,false
 27,035,,14660,,mn,Crow Wing County,,"Brainerd, MN",,2,true
-29,209,520,14700,,mo,Stone County,"Springfield-Branson, MO","Branson, MO",,2,false
-29,213,520,14700,,mo,Taney County,"Springfield-Branson, MO","Branson, MO",,2,true
+29,213,,14700,,mo,Taney County,,"Branson, MO",,2,true
 08,117,,14720,,co,Summit County,,"Breckenridge, CO",,2,true
-53,035,500,14740,,wa,Kitsap County,"Seattle-Tacoma, WA","Bremerton-Silverdale, WA",,1,true
+53,035,500,14740,,wa,Kitsap County,"Seattle-Tacoma, WA","Bremerton-Silverdale-Port Orchard, WA",,1,true
 48,477,288,14780,,tx,Washington County,"Houston-The Woodlands, TX","Brenham, TX",,2,true
-37,175,120,14820,,nc,Transylvania County,"Asheville-Brevard, NC","Brevard, NC",,2,true
+37,175,120,14820,,nc,Transylvania County,"Asheville-Marion-Brevard, NC","Brevard, NC",,2,true
 09,001,408,14860,,ct,Fairfield County,"New York-Newark, NY-NJ-CT-PA","Bridgeport-Stamford-Norwalk, CT",,1,true
 28,085,298,15020,,ms,Lincoln County,"Jackson-Vicksburg-Brookhaven, MS","Brookhaven, MS",,2,true
 41,015,,15060,,or,Curry County,,"Brookings, OR",,2,true
 46,011,,15100,,sd,Brookings County,,"Brookings, SD",,2,true
+47,075,297,15140,,tn,Haywood County,"Jackson-Brownsville, TN","Brownsville, TN",,2,true
 48,061,154,15180,,tx,Cameron County,"Brownsville-Harlingen-Raymondville, TX","Brownsville-Harlingen, TX",,1,true
 48,049,,15220,,tx,Brown County,,"Brownwood, TX",,2,true
 13,025,,15260,,ga,Brantley County,,"Brunswick, GA",,1,false
 13,127,,15260,,ga,Glynn County,,"Brunswick, GA",,1,true
 13,191,,15260,,ga,McIntosh County,,"Brunswick, GA",,1,false
-39,033,360,15340,,oh,Crawford County,"Mansfield-Ashland-Bucyrus, OH","Bucyrus, OH",,2,true
-36,029,160,15380,,ny,Erie County,"Buffalo-Cheektowaga, NY","Buffalo-Cheektowaga-Niagara Falls, NY",,1,true
-36,063,160,15380,,ny,Niagara County,"Buffalo-Cheektowaga, NY","Buffalo-Cheektowaga-Niagara Falls, NY",,1,true
+39,033,360,15340,,oh,Crawford County,"Mansfield-Ashland-Bucyrus, OH","Bucyrus-Galion, OH",,2,true
+36,029,160,15380,,ny,Erie County,"Buffalo-Cheektowaga-Olean, NY","Buffalo-Cheektowaga, NY",,1,true
+36,063,160,15380,,ny,Niagara County,"Buffalo-Cheektowaga-Olean, NY","Buffalo-Cheektowaga, NY",,1,true
 16,031,,15420,,id,Cassia County,,"Burley, ID",,2,true
 16,067,,15420,,id,Minidoka County,,"Burley, ID",,2,false
-17,071,,15460,,il,Henderson County,,"Burlington, IA-IL",,2,false
-19,057,,15460,,ia,Des Moines County,,"Burlington, IA-IL",,2,true
+17,071,161,15460,,il,Henderson County,"Burlington-Fort Madison-Keokuk, IA-IL-MO","Burlington, IA-IL",,2,false
+19,057,161,15460,,ia,Des Moines County,"Burlington-Fort Madison-Keokuk, IA-IL-MO","Burlington, IA-IL",,2,true
 37,001,268,15500,,nc,Alamance County,"Greensboro--Winston-Salem--High Point, NC","Burlington, NC",,1,true
-50,007,,15540,,vt,Chittenden County,,"Burlington-South Burlington, VT",,1,true
-50,011,,15540,,vt,Franklin County,,"Burlington-South Burlington, VT",,1,false
-50,013,,15540,,vt,Grand Isle County,,"Burlington-South Burlington, VT",,1,false
+50,007,162,15540,,vt,Chittenden County,"Burlington-South Burlington-Barre, VT","Burlington-South Burlington, VT",,1,true
+50,011,162,15540,,vt,Franklin County,"Burlington-South Burlington-Barre, VT","Burlington-South Burlington, VT",,1,false
+50,013,162,15540,,vt,Grand Isle County,"Burlington-South Burlington-Barre, VT","Burlington-South Burlington, VT",,1,false
 30,093,,15580,,mt,Silver Bow County,,"Butte-Silver Bow, MT",,2,true
 26,113,,15620,,mi,Missaukee County,,"Cadillac, MI",,2,false
 26,165,,15620,,mi,Wexford County,,"Cadillac, MI",,2,true
-13,129,122,15660,,ga,Gordon County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Calhoun, GA",,2,true
+13,129,174,15660,,ga,Gordon County,"Chattanooga-Cleveland-Dalton, TN-GA","Calhoun, GA",,2,true
 24,037,548,15680,,md,St. Mary's County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","California-Lexington Park, MD",,1,true
-24,019,548,15700,,md,Dorchester County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Cambridge, MD",,2,true
+24,019,480,15700,,md,Dorchester County,"Salisbury-Cambridge, MD-DE","Cambridge, MD",,2,true
 39,059,198,15740,,oh,Guernsey County,"Columbus-Marion-Zanesville, OH","Cambridge, OH",,2,true
 05,013,,15780,,ar,Calhoun County,,"Camden, AR",,2,false
 05,103,,15780,,ar,Ouachita County,,"Camden, AR",,2,true
+21,087,,15820,,ky,Green County,,"Campbellsville, KY",,2,false
 21,217,,15820,,ky,Taylor County,,"Campbellsville, KY",,2,true
 08,043,444,15860,,co,Fremont County,"Pueblo-Cañon City, CO","Cañon City, CO",,2,true
-17,057,426,15900,,il,Fulton County,"Peoria-Canton, IL","Canton, IL",,2,true
 39,019,184,15940,,oh,Carroll County,"Cleveland-Akron-Canton, OH","Canton-Massillon, OH",,1,false
 39,151,184,15940,,oh,Stark County,"Cleveland-Akron-Canton, OH","Canton-Massillon, OH",,1,true
-12,071,162,15980,,fl,Lee County,"Cape Coral-Fort Myers-Naples, FL","Cape Coral-Fort Myers, FL",,1,true
+12,071,163,15980,,fl,Lee County,"Cape Coral-Fort Myers-Naples, FL","Cape Coral-Fort Myers, FL",,1,true
 17,003,164,16020,,il,Alexander County,"Cape Girardeau-Sikeston, MO-IL","Cape Girardeau, MO-IL",,1,false
 29,017,164,16020,,mo,Bollinger County,"Cape Girardeau-Sikeston, MO-IL","Cape Girardeau, MO-IL",,1,false
 29,031,164,16020,,mo,Cape Girardeau County,"Cape Girardeau-Sikeston, MO-IL","Cape Girardeau, MO-IL",,1,true
 17,077,,16060,,il,Jackson County,,"Carbondale-Marion, IL",,1,true
+17,087,,16060,,il,Johnson County,,"Carbondale-Marion, IL",,1,false
 17,199,,16060,,il,Williamson County,,"Carbondale-Marion, IL",,1,true
 35,015,,16100,,nm,Eddy County,,"Carlsbad-Artesia, NM",,2,true
+19,027,,16140,,ia,Carroll County,,"Carroll, IA",,2,true
 32,510,456,16180,,nv,Carson City,"Reno-Carson City-Fernley, NV","Carson City, NV",,1,true
 56,025,,16220,,wy,Natrona County,,"Casper, WY",,1,true
 49,021,,16260,,ut,Iron County,,"Cedar City, UT",,2,true
 19,011,168,16300,,ia,Benton County,"Cedar Rapids-Iowa City, IA","Cedar Rapids, IA",,1,false
 19,105,168,16300,,ia,Jones County,"Cedar Rapids-Iowa City, IA","Cedar Rapids, IA",,1,false
 19,113,168,16300,,ia,Linn County,"Cedar Rapids-Iowa City, IA","Cedar Rapids, IA",,1,true
-13,233,122,16340,,ga,Polk County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Cedartown, GA",,2,true
+13,233,122,16340,,ga,Polk County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Cedartown, GA",,2,true
 39,107,338,16380,,oh,Mercer County,"Lima-Van Wert-Celina, OH","Celina, OH",,2,true
+21,177,,16420,,ky,Muhlenberg County,,"Central City, KY",,2,true
 17,121,476,16460,,il,Marion County,"St. Louis-St. Charles-Farmington, MO-IL","Centralia, IL",,2,true
 53,041,500,16500,,wa,Lewis County,"Seattle-Tacoma, WA","Centralia, WA",,2,true
 42,055,548,16540,,pa,Franklin County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Chambersburg-Waynesboro, PA",,1,true
 17,019,,16580,,il,Champaign County,,"Champaign-Urbana, IL",,1,true
-17,053,,16580,,il,Ford County,,"Champaign-Urbana, IL",,1,false
 17,147,,16580,,il,Piatt County,,"Champaign-Urbana, IL",,1,false
 54,005,170,16620,,wv,Boone County,"Charleston-Huntington-Ashland, WV-OH-KY","Charleston, WV",,1,false
 54,015,170,16620,,wv,Clay County,"Charleston-Huntington-Ashland, WV-OH-KY","Charleston, WV",,1,false
+54,035,170,16620,,wv,Jackson County,"Charleston-Huntington-Ashland, WV-OH-KY","Charleston, WV",,1,false
 54,039,170,16620,,wv,Kanawha County,"Charleston-Huntington-Ashland, WV-OH-KY","Charleston, WV",,1,true
+54,043,170,16620,,wv,Lincoln County,"Charleston-Huntington-Ashland, WV-OH-KY","Charleston, WV",,1,false
 17,029,,16660,,il,Coles County,,"Charleston-Mattoon, IL",,2,true
 17,035,,16660,,il,Cumberland County,,"Charleston-Mattoon, IL",,2,false
 45,015,,16700,,sc,Berkeley County,,"Charleston-North Charleston, SC",,1,true
 45,019,,16700,,sc,Charleston County,,"Charleston-North Charleston, SC",,1,true
 45,035,,16700,,sc,Dorchester County,,"Charleston-North Charleston, SC",,1,true
+37,007,172,16740,,nc,Anson County,"Charlotte-Concord, NC-SC","Charlotte-Concord-Gastonia, NC-SC",,1,false
 37,025,172,16740,,nc,Cabarrus County,"Charlotte-Concord, NC-SC","Charlotte-Concord-Gastonia, NC-SC",,1,false
 37,071,172,16740,,nc,Gaston County,"Charlotte-Concord, NC-SC","Charlotte-Concord-Gastonia, NC-SC",,1,false
 37,097,172,16740,,nc,Iredell County,"Charlotte-Concord, NC-SC","Charlotte-Concord-Gastonia, NC-SC",,1,true
@@ -327,26 +329,25 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 45,057,172,16740,,sc,Lancaster County,"Charlotte-Concord, NC-SC","Charlotte-Concord-Gastonia, NC-SC",,1,false
 45,091,172,16740,,sc,York County,"Charlotte-Concord, NC-SC","Charlotte-Concord-Gastonia, NC-SC",,1,false
 51,003,,16820,,va,Albemarle County,,"Charlottesville, VA",,1,true
-51,029,,16820,,va,Buckingham County,,"Charlottesville, VA",,1,false
 51,065,,16820,,va,Fluvanna County,,"Charlottesville, VA",,1,false
 51,079,,16820,,va,Greene County,,"Charlottesville, VA",,1,false
 51,125,,16820,,va,Nelson County,,"Charlottesville, VA",,1,false
 51,540,,16820,,va,Charlottesville city,,"Charlottesville, VA",,1,true
-13,047,174,16860,,ga,Catoosa County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Chattanooga, TN-GA",,1,true
-13,083,174,16860,,ga,Dade County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Chattanooga, TN-GA",,1,false
-13,295,174,16860,,ga,Walker County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Chattanooga, TN-GA",,1,true
-47,065,174,16860,,tn,Hamilton County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Chattanooga, TN-GA",,1,true
-47,115,174,16860,,tn,Marion County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Chattanooga, TN-GA",,1,false
-47,153,174,16860,,tn,Sequatchie County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Chattanooga, TN-GA",,1,false
+13,047,174,16860,,ga,Catoosa County,"Chattanooga-Cleveland-Dalton, TN-GA","Chattanooga, TN-GA",,1,true
+13,083,174,16860,,ga,Dade County,"Chattanooga-Cleveland-Dalton, TN-GA","Chattanooga, TN-GA",,1,false
+13,295,174,16860,,ga,Walker County,"Chattanooga-Cleveland-Dalton, TN-GA","Chattanooga, TN-GA",,1,true
+47,065,174,16860,,tn,Hamilton County,"Chattanooga-Cleveland-Dalton, TN-GA","Chattanooga, TN-GA",,1,true
+47,115,174,16860,,tn,Marion County,"Chattanooga-Cleveland-Dalton, TN-GA","Chattanooga, TN-GA",,1,false
+47,153,174,16860,,tn,Sequatchie County,"Chattanooga-Cleveland-Dalton, TN-GA","Chattanooga, TN-GA",,1,false
 56,021,,16940,,wy,Laramie County,,"Cheyenne, WY",,1,true
-17,031,176,16980,16974,il,Cook County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Arlington Heights, IL",1,true
-17,043,176,16980,16974,il,DuPage County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Arlington Heights, IL",1,true
-17,063,176,16980,16974,il,Grundy County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Arlington Heights, IL",1,false
-17,093,176,16980,16974,il,Kendall County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Arlington Heights, IL",1,true
-17,111,176,16980,16974,il,McHenry County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Arlington Heights, IL",1,true
-17,197,176,16980,16974,il,Will County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Arlington Heights, IL",1,true
+17,031,176,16980,16984,il,Cook County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Evanston, IL",1,true
+17,043,176,16980,16984,il,DuPage County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Evanston, IL",1,true
+17,063,176,16980,16984,il,Grundy County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Evanston, IL",1,false
+17,111,176,16980,16984,il,McHenry County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Evanston, IL",1,true
+17,197,176,16980,16984,il,Will County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Chicago-Naperville-Evanston, IL",1,true
 17,037,176,16980,20994,il,DeKalb County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Elgin, IL",1,false
 17,089,176,16980,20994,il,Kane County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Elgin, IL",1,true
+17,093,176,16980,20994,il,Kendall County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Elgin, IL",1,true
 18,073,176,16980,23844,in,Jasper County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Gary, IN",1,false
 18,089,176,16980,23844,in,Lake County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Gary, IN",1,true
 18,111,176,16980,23844,in,Newton County,"Chicago-Naperville, IL-IN-WI","Chicago-Naperville-Elgin, IL-IN-WI","Gary, IN",1,false
@@ -356,6 +357,7 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 06,007,,17020,,ca,Butte County,,"Chico, CA",,1,true
 39,141,198,17060,,oh,Ross County,"Columbus-Marion-Zanesville, OH","Chillicothe, OH",,2,true
 18,029,178,17140,,in,Dearborn County,"Cincinnati-Wilmington-Maysville, OH-KY-IN","Cincinnati, OH-KY-IN",,1,false
+18,047,178,17140,,in,Franklin County,"Cincinnati-Wilmington-Maysville, OH-KY-IN","Cincinnati, OH-KY-IN",,1,false
 18,115,178,17140,,in,Ohio County,"Cincinnati-Wilmington-Maysville, OH-KY-IN","Cincinnati, OH-KY-IN",,1,false
 18,161,178,17140,,in,Union County,"Cincinnati-Wilmington-Maysville, OH-KY-IN","Cincinnati, OH-KY-IN",,1,false
 21,015,178,17140,,ky,Boone County,"Cincinnati-Wilmington-Maysville, OH-KY-IN","Cincinnati, OH-KY-IN",,1,true
@@ -370,10 +372,6 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 39,025,178,17140,,oh,Clermont County,"Cincinnati-Wilmington-Maysville, OH-KY-IN","Cincinnati, OH-KY-IN",,1,true
 39,061,178,17140,,oh,Hamilton County,"Cincinnati-Wilmington-Maysville, OH-KY-IN","Cincinnati, OH-KY-IN",,1,true
 39,165,178,17140,,oh,Warren County,"Cincinnati-Wilmington-Maysville, OH-KY-IN","Cincinnati, OH-KY-IN",,1,true
-33,009,,17200,,nh,Grafton County,,"Claremont-Lebanon, NH-VT",,2,true
-33,019,,17200,,nh,Sullivan County,,"Claremont-Lebanon, NH-VT",,2,false
-50,017,,17200,,vt,Orange County,,"Claremont-Lebanon, NH-VT",,2,false
-50,027,,17200,,vt,Windsor County,,"Claremont-Lebanon, NH-VT",,2,true
 54,017,,17220,,wv,Doddridge County,,"Clarksburg, WV",,2,false
 54,033,,17220,,wv,Harrison County,,"Clarksburg, WV",,2,true
 54,091,,17220,,wv,Taylor County,,"Clarksburg, WV",,2,false
@@ -381,29 +379,32 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 21,047,,17300,,ky,Christian County,,"Clarksville, TN-KY",,1,false
 21,221,,17300,,ky,Trigg County,,"Clarksville, TN-KY",,1,false
 47,125,,17300,,tn,Montgomery County,,"Clarksville, TN-KY",,1,true
+47,161,,17300,,tn,Stewart County,,"Clarksville, TN-KY",,1,false
 06,033,,17340,,ca,Lake County,,"Clearlake, CA",,2,true
 28,011,185,17380,,ms,Bolivar County,"Cleveland-Indianola, MS","Cleveland, MS",,2,true
-47,011,174,17420,,tn,Bradley County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Cleveland, TN",,1,true
-47,139,174,17420,,tn,Polk County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Cleveland, TN",,1,false
+47,011,174,17420,,tn,Bradley County,"Chattanooga-Cleveland-Dalton, TN-GA","Cleveland, TN",,1,true
+47,139,174,17420,,tn,Polk County,"Chattanooga-Cleveland-Dalton, TN-GA","Cleveland, TN",,1,false
 39,035,184,17460,,oh,Cuyahoga County,"Cleveland-Akron-Canton, OH","Cleveland-Elyria, OH",,1,true
 39,055,184,17460,,oh,Geauga County,"Cleveland-Akron-Canton, OH","Cleveland-Elyria, OH",,1,true
 39,085,184,17460,,oh,Lake County,"Cleveland-Akron-Canton, OH","Cleveland-Elyria, OH",,1,true
 39,093,184,17460,,oh,Lorain County,"Cleveland-Akron-Canton, OH","Cleveland-Elyria, OH",,1,false
 39,103,184,17460,,oh,Medina County,"Cleveland-Akron-Canton, OH","Cleveland-Elyria, OH",,1,true
-12,051,,17500,,fl,Hendry County,,"Clewiston, FL",,2,true
+12,051,163,17500,,fl,Hendry County,"Cape Coral-Fort Myers-Naples, FL","Clewiston, FL",,2,true
 19,045,209,17540,,ia,Clinton County,"Davenport-Moline, IA-IL","Clinton, IA",,2,true
 35,009,188,17580,,nm,Curry County,"Clovis-Portales, NM","Clovis, NM",,2,true
-72,043,434,17620,,pr,Coamo Municipio,"Ponce-Coamo-Santa Isabel, PR","Coamo, PR",,2,true
-72,123,490,17640,,pr,Salinas Municipio,"San Juan-Carolina, PR","Coco, PR",,2,true
+72,043,434,17620,,pr,Coamo Municipio,"Ponce-Yauco-Coamo, PR","Coamo, PR",,2,true
+72,123,490,17640,,pr,Salinas Municipio,"San Juan-Bayamón, PR","Coco, PR",,2,true
 16,055,518,17660,,id,Kootenai County,"Spokane-Spokane Valley-Coeur d'Alene, WA-ID","Coeur d'Alene, ID",,1,true
 20,125,,17700,,ks,Montgomery County,,"Coffeyville, KS",,2,true
-26,023,,17740,,mi,Branch County,,"Coldwater, MI",,2,true
+26,023,310,17740,,mi,Branch County,"Kalamazoo-Battle Creek-Portage, MI","Coldwater, MI",,2,true
 48,041,,17780,,tx,Brazos County,,"College Station-Bryan, TX",,1,true
 48,051,,17780,,tx,Burleson County,,"College Station-Bryan, TX",,1,false
 48,395,,17780,,tx,Robertson County,,"College Station-Bryan, TX",,1,false
 08,041,,17820,,co,El Paso County,,"Colorado Springs, CO",,1,true
 08,119,,17820,,co,Teller County,,"Colorado Springs, CO",,1,false
 29,019,190,17860,,mo,Boone County,"Columbia-Moberly-Mexico, MO","Columbia, MO",,1,true
+29,053,190,17860,,mo,Cooper County,"Columbia-Moberly-Mexico, MO","Columbia, MO",,1,false
+29,089,190,17860,,mo,Howard County,"Columbia-Moberly-Mexico, MO","Columbia, MO",,1,false
 45,017,192,17900,,sc,Calhoun County,"Columbia-Orangeburg-Newberry, SC","Columbia, SC",,1,false
 45,039,192,17900,,sc,Fairfield County,"Columbia-Orangeburg-Newberry, SC","Columbia, SC",,1,false
 45,055,192,17900,,sc,Kershaw County,"Columbia-Orangeburg-Newberry, SC","Columbia, SC",,1,false
@@ -415,8 +416,10 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 13,145,194,17980,,ga,Harris County,"Columbus-Auburn-Opelika, GA-AL","Columbus, GA-AL",,1,false
 13,197,194,17980,,ga,Marion County,"Columbus-Auburn-Opelika, GA-AL","Columbus, GA-AL",,1,false
 13,215,194,17980,,ga,Muscogee County,"Columbus-Auburn-Opelika, GA-AL","Columbus, GA-AL",,1,true
+13,259,194,17980,,ga,Stewart County,"Columbus-Auburn-Opelika, GA-AL","Columbus, GA-AL",,1,false
+13,263,194,17980,,ga,Talbot County,"Columbus-Auburn-Opelika, GA-AL","Columbus, GA-AL",,1,false
 18,005,294,18020,,in,Bartholomew County,"Indianapolis-Carmel-Muncie, IN","Columbus, IN",,1,true
-28,087,,18060,,ms,Lowndes County,,"Columbus, MS",,2,true
+28,087,200,18060,,ms,Lowndes County,"Columbus-West Point, MS","Columbus, MS",,2,true
 31,141,,18100,,ne,Platte County,,"Columbus, NE",,2,true
 39,041,198,18140,,oh,Delaware County,"Columbus-Marion-Zanesville, OH","Columbus, OH",,1,true
 39,045,198,18140,,oh,Fairfield County,"Columbus-Marion-Zanesville, OH","Columbus, OH",,1,true
@@ -435,10 +438,9 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 47,141,,18260,,tn,Putnam County,,"Cookeville, TN",,2,true
 41,011,,18300,,or,Coos County,,"Coos Bay, OR",,2,true
 13,081,,18380,,ga,Crisp County,,"Cordele, GA",,2,true
-28,003,,18420,,ms,Alcorn County,,"Corinth, MS",,2,true
-13,137,,18460,,ga,Habersham County,,"Cornelia, GA",,2,true
+28,003,539,18420,,ms,Alcorn County,"Tupelo-Corinth, MS","Corinth, MS",,2,true
+13,137,122,18460,,ga,Habersham County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Cornelia, GA",,2,true
 36,101,236,18500,,ny,Steuben County,"Elmira-Corning, NY","Corning, NY",,2,true
-48,007,204,18580,,tx,Aransas County,"Corpus Christi-Kingsville-Alice, TX","Corpus Christi, TX",,1,false
 48,355,204,18580,,tx,Nueces County,"Corpus Christi-Kingsville-Alice, TX","Corpus Christi, TX",,1,true
 48,409,204,18580,,tx,San Patricio County,"Corpus Christi-Kingsville-Alice, TX","Corpus Christi, TX",,1,true
 48,349,206,18620,,tx,Navarro County,"Dallas-Fort Worth, TX-OK","Corsicana, TX",,2,true
@@ -453,6 +455,7 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 47,035,,18900,,tn,Cumberland County,,"Crossville, TN",,2,true
 01,043,142,18980,,al,Cullman County,"Birmingham-Hoover-Talladega, AL","Cullman, AL",,2,true
 37,099,,19000,,nc,Jackson County,,"Cullowhee, NC",,2,true
+37,173,,19000,,nc,Swain County,,"Cullowhee, NC",,2,false
 24,001,,19060,,md,Allegany County,,"Cumberland, MD-WV",,1,true
 54,057,,19060,,wv,Mineral County,,"Cumberland, MD-WV",,1,false
 48,085,206,19100,19124,tx,Collin County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Dallas-Plano-Irving, TX",1,true
@@ -462,14 +465,12 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 48,231,206,19100,19124,tx,Hunt County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Dallas-Plano-Irving, TX",1,false
 48,257,206,19100,19124,tx,Kaufman County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Dallas-Plano-Irving, TX",1,false
 48,397,206,19100,19124,tx,Rockwall County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Dallas-Plano-Irving, TX",1,true
-48,221,206,19100,23104,tx,Hood County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Fort Worth-Arlington, TX",1,false
-48,251,206,19100,23104,tx,Johnson County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Fort Worth-Arlington, TX",1,true
-48,367,206,19100,23104,tx,Parker County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Fort Worth-Arlington, TX",1,false
-48,425,206,19100,23104,tx,Somervell County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Fort Worth-Arlington, TX",1,false
-48,439,206,19100,23104,tx,Tarrant County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Fort Worth-Arlington, TX",1,true
-48,497,206,19100,23104,tx,Wise County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Fort Worth-Arlington, TX",1,false
-13,213,174,19140,,ga,Murray County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Dalton, GA",,1,true
-13,313,174,19140,,ga,Whitfield County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Dalton, GA",,1,true
+48,251,206,19100,23104,tx,Johnson County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Fort Worth-Arlington-Grapevine, TX",1,true
+48,367,206,19100,23104,tx,Parker County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Fort Worth-Arlington-Grapevine, TX",1,false
+48,439,206,19100,23104,tx,Tarrant County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Fort Worth-Arlington-Grapevine, TX",1,true
+48,497,206,19100,23104,tx,Wise County,"Dallas-Fort Worth, TX-OK","Dallas-Fort Worth-Arlington, TX","Fort Worth-Arlington-Grapevine, TX",1,false
+13,213,174,19140,,ga,Murray County,"Chattanooga-Cleveland-Dalton, TN-GA","Dalton, GA",,1,true
+13,313,174,19140,,ga,Whitfield County,"Chattanooga-Cleveland-Dalton, TN-GA","Dalton, GA",,1,true
 17,183,,19180,,il,Vermilion County,,"Danville, IL",,1,true
 21,021,,19220,,ky,Boyle County,,"Danville, KY",,2,true
 21,137,,19220,,ky,Lincoln County,,"Danville, KY",,2,false
@@ -480,18 +481,18 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 17,131,209,19340,,il,Mercer County,"Davenport-Moline, IA-IL","Davenport-Moline-Rock Island, IA-IL",,1,false
 17,161,209,19340,,il,Rock Island County,"Davenport-Moline, IA-IL","Davenport-Moline-Rock Island, IA-IL",,1,true
 19,163,209,19340,,ia,Scott County,"Davenport-Moline, IA-IL","Davenport-Moline-Rock Island, IA-IL",,1,true
-39,057,212,19380,,oh,Greene County,"Dayton-Springfield-Sidney, OH","Dayton, OH",,1,true
-39,109,212,19380,,oh,Miami County,"Dayton-Springfield-Sidney, OH","Dayton, OH",,1,true
-39,113,212,19380,,oh,Montgomery County,"Dayton-Springfield-Sidney, OH","Dayton, OH",,1,true
-47,143,174,19420,,tn,Rhea County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Dayton, TN",,2,true
-01,079,290,19460,,al,Lawrence County,"Huntsville-Decatur-Albertville, AL","Decatur, AL",,1,false
-01,103,290,19460,,al,Morgan County,"Huntsville-Decatur-Albertville, AL","Decatur, AL",,1,true
+47,143,174,19420,,tn,Rhea County,"Chattanooga-Cleveland-Dalton, TN-GA","Dayton, TN",,2,true
+39,057,212,19430,,oh,Greene County,"Dayton-Springfield-Kettering, OH","Dayton-Kettering, OH",,1,true
+39,109,212,19430,,oh,Miami County,"Dayton-Springfield-Kettering, OH","Dayton-Kettering, OH",,1,true
+39,113,212,19430,,oh,Montgomery County,"Dayton-Springfield-Kettering, OH","Dayton-Kettering, OH",,1,true
+01,079,290,19460,,al,Lawrence County,"Huntsville-Decatur, AL","Decatur, AL",,1,false
+01,103,290,19460,,al,Morgan County,"Huntsville-Decatur, AL","Decatur, AL",,1,true
 17,115,,19500,,il,Macon County,,"Decatur, IL",,1,true
 18,001,258,19540,,in,Adams County,"Fort Wayne-Huntington-Auburn, IN","Decatur, IN",,2,true
 39,039,,19580,,oh,Defiance County,,"Defiance, OH",,2,true
 48,465,,19620,,tx,Val Verde County,,"Del Rio, TX",,2,true
-12,035,422,19660,,fl,Flagler County,"Orlando-Deltona-Daytona Beach, FL","Deltona-Daytona Beach-Ormond Beach, FL",,1,true
-12,127,422,19660,,fl,Volusia County,"Orlando-Deltona-Daytona Beach, FL","Deltona-Daytona Beach-Ormond Beach, FL",,1,true
+12,035,422,19660,,fl,Flagler County,"Orlando-Lakeland-Deltona, FL","Deltona-Daytona Beach-Ormond Beach, FL",,1,true
+12,127,422,19660,,fl,Volusia County,"Orlando-Lakeland-Deltona, FL","Deltona-Daytona Beach-Ormond Beach, FL",,1,true
 35,029,,19700,,nm,Luna County,,"Deming, NM",,2,true
 08,001,216,19740,,co,Adams County,"Denver-Aurora, CO","Denver-Aurora-Lakewood, CO",,1,true
 08,005,216,19740,,co,Arapahoe County,"Denver-Aurora, CO","Denver-Aurora-Lakewood, CO",,1,true
@@ -506,6 +507,7 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 22,011,217,19760,,la,Beauregard Parish,"DeRidder-Fort Polk South, LA","DeRidder, LA",,2,true
 19,049,218,19780,,ia,Dallas County,"Des Moines-Ames-West Des Moines, IA","Des Moines-West Des Moines, IA",,1,true
 19,077,218,19780,,ia,Guthrie County,"Des Moines-Ames-West Des Moines, IA","Des Moines-West Des Moines, IA",,1,false
+19,099,218,19780,,ia,Jasper County,"Des Moines-Ames-West Des Moines, IA","Des Moines-West Des Moines, IA",,1,false
 19,121,218,19780,,ia,Madison County,"Des Moines-Ames-West Des Moines, IA","Des Moines-West Des Moines, IA",,1,false
 19,153,218,19780,,ia,Polk County,"Des Moines-Ames-West Des Moines, IA","Des Moines-West Des Moines, IA",,1,true
 19,181,218,19780,,ia,Warren County,"Des Moines-Ames-West Des Moines, IA","Des Moines-West Des Moines, IA",,1,false
@@ -515,30 +517,34 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 26,099,220,19820,47664,mi,Macomb County,"Detroit-Warren-Ann Arbor, MI","Detroit-Warren-Dearborn, MI","Warren-Troy-Farmington Hills, MI",1,true
 26,125,220,19820,47664,mi,Oakland County,"Detroit-Warren-Ann Arbor, MI","Detroit-Warren-Dearborn, MI","Warren-Troy-Farmington Hills, MI",1,true
 26,147,220,19820,47664,mi,St. Clair County,"Detroit-Warren-Ann Arbor, MI","Detroit-Warren-Dearborn, MI","Warren-Troy-Farmington Hills, MI",1,false
+38,007,,19860,,nd,Billings County,,"Dickinson, ND",,2,false
 38,089,,19860,,nd,Stark County,,"Dickinson, ND",,2,true
 17,103,221,19940,,il,Lee County,"Dixon-Sterling, IL","Dixon, IL",,2,true
 20,057,,19980,,ks,Ford County,,"Dodge City, KS",,2,true
-01,061,222,20020,,al,Geneva County,"Dothan-Enterprise-Ozark, AL","Dothan, AL",,1,false
-01,067,222,20020,,al,Henry County,"Dothan-Enterprise-Ozark, AL","Dothan, AL",,1,false
-01,069,222,20020,,al,Houston County,"Dothan-Enterprise-Ozark, AL","Dothan, AL",,1,true
+01,061,222,20020,,al,Geneva County,"Dothan-Ozark, AL","Dothan, AL",,1,false
+01,067,222,20020,,al,Henry County,"Dothan-Ozark, AL","Dothan, AL",,1,false
+01,069,222,20020,,al,Houston County,"Dothan-Ozark, AL","Dothan, AL",,1,true
+13,003,,20060,,ga,Atkinson County,,"Douglas, GA",,2,false
 13,069,,20060,,ga,Coffee County,,"Douglas, GA",,2,true
 10,001,428,20100,,de,Kent County,"Philadelphia-Reading-Camden, PA-NJ-DE-MD","Dover, DE",,1,true
 13,167,,20140,,ga,Johnson County,,"Dublin, GA",,2,false
 13,175,,20140,,ga,Laurens County,,"Dublin, GA",,2,true
+13,283,,20140,,ga,Treutlen County,,"Dublin, GA",,2,false
 42,033,524,20180,,pa,Clearfield County,"State College-DuBois, PA","DuBois, PA",,2,true
 19,061,,20220,,ia,Dubuque County,,"Dubuque, IA",,1,true
 27,017,,20260,,mn,Carlton County,,"Duluth, MN-WI",,1,false
+27,075,,20260,,mn,Lake County,,"Duluth, MN-WI",,1,false
 27,137,,20260,,mn,St. Louis County,,"Duluth, MN-WI",,1,true
 55,031,,20260,,wi,Douglas County,,"Duluth, MN-WI",,1,true
 48,341,,20300,,tx,Moore County,,"Dumas, TX",,2,true
 40,137,,20340,,ok,Stephens County,,"Duncan, OK",,2,true
-37,085,450,20380,,nc,Harnett County,"Raleigh-Durham-Chapel Hill, NC","Dunn, NC",,2,true
 08,067,,20420,,co,La Plata County,,"Durango, CO",,2,true
 40,013,206,20460,,ok,Bryan County,"Dallas-Fort Worth, TX-OK","Durant, OK",,2,true
-37,037,450,20500,,nc,Chatham County,"Raleigh-Durham-Chapel Hill, NC","Durham-Chapel Hill, NC",,1,true
-37,063,450,20500,,nc,Durham County,"Raleigh-Durham-Chapel Hill, NC","Durham-Chapel Hill, NC",,1,true
-37,135,450,20500,,nc,Orange County,"Raleigh-Durham-Chapel Hill, NC","Durham-Chapel Hill, NC",,1,true
-37,145,450,20500,,nc,Person County,"Raleigh-Durham-Chapel Hill, NC","Durham-Chapel Hill, NC",,1,false
+37,037,450,20500,,nc,Chatham County,"Raleigh-Durham-Cary, NC","Durham-Chapel Hill, NC",,1,true
+37,063,450,20500,,nc,Durham County,"Raleigh-Durham-Cary, NC","Durham-Chapel Hill, NC",,1,true
+37,077,450,20500,,nc,Granville County,"Raleigh-Durham-Cary, NC","Durham-Chapel Hill, NC",,1,false
+37,135,450,20500,,nc,Orange County,"Raleigh-Durham-Cary, NC","Durham-Chapel Hill, NC",,1,true
+37,145,450,20500,,nc,Person County,"Raleigh-Durham-Cary, NC","Durham-Chapel Hill, NC",,1,false
 47,045,,20540,,tn,Dyer County,,"Dyersburg, TN",,2,true
 48,323,,20580,,tx,Maverick County,,"Eagle Pass, TX",,2,true
 24,041,548,20660,,md,Talbot County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Easton, MD",,2,true
@@ -550,12 +556,11 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 48,481,288,20900,,tx,Wharton County,"Houston-The Woodlands, TX","El Campo, TX",,2,true
 06,025,,20940,,ca,Imperial County,,"El Centro, CA",,1,true
 05,139,,20980,,ar,Union County,,"El Dorado, AR",,2,true
-37,029,545,21020,,nc,Camden County,"Virginia Beach-Norfolk, VA-NC","Elizabeth City, NC",,2,false
 37,139,545,21020,,nc,Pasquotank County,"Virginia Beach-Norfolk, VA-NC","Elizabeth City, NC",,2,true
 37,143,545,21020,,nc,Perquimans County,"Virginia Beach-Norfolk, VA-NC","Elizabeth City, NC",,2,false
-21,093,350,21060,,ky,Hardin County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Elizabethtown-Fort Knox, KY",,1,true
-21,123,350,21060,,ky,Larue County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Elizabethtown-Fort Knox, KY",,1,false
-21,163,350,21060,,ky,Meade County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Elizabethtown-Fort Knox, KY",,1,false
+21,093,350,21060,,ky,Hardin County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Elizabethtown-Fort Knox, KY",,1,true
+21,123,350,21060,,ky,Larue County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Elizabethtown-Fort Knox, KY",,1,false
+21,163,350,21060,,ky,Meade County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Elizabethtown-Fort Knox, KY",,1,false
 40,009,,21120,,ok,Beckham County,,"Elk City, OK",,2,true
 18,039,515,21140,,in,Elkhart County,"South Bend-Elkhart-Mishawaka, IN-MI","Elkhart-Goshen, IN",,1,true
 54,083,,21180,,wv,Randolph County,,"Elkins, WV",,2,true
@@ -565,14 +570,17 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 36,015,236,21300,,ny,Chemung County,"Elmira-Corning, NY","Elmira, NY",,1,true
 48,141,238,21340,,tx,El Paso County,"El Paso-Las Cruces, TX-NM","El Paso, TX",,1,true
 48,229,238,21340,,tx,Hudspeth County,"El Paso-Las Cruces, TX-NM","El Paso, TX",,1,false
+20,017,,21380,,ks,Chase County,,"Emporia, KS",,2,false
 20,111,,21380,,ks,Lyon County,,"Emporia, KS",,2,true
-40,047,,21420,,ok,Garfield County,,"Enid, OK",,2,true
-01,031,222,21460,,al,Coffee County,"Dothan-Enterprise-Ozark, AL","Enterprise, AL",,2,true
+40,047,,21420,,ok,Garfield County,,"Enid, OK",,1,true
+01,031,,21460,,al,Coffee County,,"Enterprise, AL",,2,true
 42,049,240,21500,,pa,Erie County,"Erie-Meadville, PA","Erie, PA",,1,true
 26,041,,21540,,mi,Delta County,,"Escanaba, MI",,2,true
 35,039,106,21580,,nm,Rio Arriba County,"Albuquerque-Santa Fe-Las Vegas, NM","Española, NM",,2,true
-41,039,,21660,,or,Lane County,,"Eugene, OR",,1,true
-06,023,,21700,,ca,Humboldt County,,"Eureka-Arcata-Fortuna, CA",,2,true
+01,005,,21640,,al,Barbour County,,"Eufaula, AL-GA",,2,true
+13,239,,21640,,ga,Quitman County,,"Eufaula, AL-GA",,2,false
+41,039,,21660,,or,Lane County,,"Eugene-Springfield, OR",,1,true
+06,023,,21700,,ca,Humboldt County,,"Eureka-Arcata, CA",,2,true
 56,041,,21740,,wy,Uinta County,,"Evanston, WY",,2,true
 18,129,,21780,,in,Posey County,,"Evansville, IN-KY",,1,false
 18,163,,21780,,in,Vanderburgh County,,"Evansville, IN-KY",,1,true
@@ -580,6 +588,7 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 21,101,,21780,,ky,Henderson County,,"Evansville, IN-KY",,1,true
 02,090,,21820,,ak,Fairbanks North Star Borough,,"Fairbanks, AK",,1,true
 19,101,,21840,,ia,Jefferson County,,"Fairfield, IA",,2,true
+27,091,,21860,,mn,Martin County,,"Fairmont, MN",,2,true
 54,049,390,21900,,wv,Marion County,"Morgantown-Fairmont, WV","Fairmont, WV",,2,true
 32,001,,21980,,nv,Churchill County,,"Fallon, NV",,2,true
 27,027,244,22020,,mn,Clay County,"Fargo-Wahpeton, ND-MN","Fargo, ND-MN",,1,true
@@ -587,15 +596,15 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 27,131,378,22060,,mn,Rice County,"Minneapolis-St. Paul, MN-WI","Faribault-Northfield, MN",,2,true
 29,187,476,22100,,mo,St. Francois County,"St. Louis-St. Charles-Farmington, MO-IL","Farmington, MO",,2,true
 35,045,,22140,,nm,San Juan County,,"Farmington, NM",,1,true
-37,051,246,22180,,nc,Cumberland County,"Fayetteville-Lumberton-Laurinburg, NC","Fayetteville, NC",,1,true
-37,093,246,22180,,nc,Hoke County,"Fayetteville-Lumberton-Laurinburg, NC","Fayetteville, NC",,1,true
-05,007,,22220,,ar,Benton County,,"Fayetteville-Springdale-Rogers, AR-MO",,1,true
-05,087,,22220,,ar,Madison County,,"Fayetteville-Springdale-Rogers, AR-MO",,1,false
-05,143,,22220,,ar,Washington County,,"Fayetteville-Springdale-Rogers, AR-MO",,1,true
-29,119,,22220,,mo,McDonald County,,"Fayetteville-Springdale-Rogers, AR-MO",,1,false
+37,051,246,22180,,nc,Cumberland County,"Fayetteville-Sanford-Lumberton, NC","Fayetteville, NC",,1,true
+37,085,246,22180,,nc,Harnett County,"Fayetteville-Sanford-Lumberton, NC","Fayetteville, NC",,1,false
+37,093,246,22180,,nc,Hoke County,"Fayetteville-Sanford-Lumberton, NC","Fayetteville, NC",,1,true
+05,007,,22220,,ar,Benton County,,"Fayetteville-Springdale-Rogers, AR",,1,true
+05,087,,22220,,ar,Madison County,,"Fayetteville-Springdale-Rogers, AR",,1,false
+05,143,,22220,,ar,Washington County,,"Fayetteville-Springdale-Rogers, AR",,1,true
 27,111,,22260,,mn,Otter Tail County,,"Fergus Falls, MN",,2,true
 32,019,456,22280,,nv,Lyon County,"Reno-Carson City-Fernley, NV","Fernley, NV",,2,true
-39,063,248,22300,,oh,Hancock County,"Findlay-Tiffin, OH","Findlay, OH",,2,true
+39,063,534,22300,,oh,Hancock County,"Toledo-Findlay-Tiffin, OH","Findlay, OH",,2,true
 13,017,,22340,,ga,Ben Hill County,,"Fitzgerald, GA",,2,true
 04,005,,22380,,az,Coconino County,,"Flagstaff, AZ",,1,true
 26,049,220,22420,,mi,Genesee County,"Detroit-Warren-Ann Arbor, MI","Flint, MI",,1,true
@@ -609,31 +618,32 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 08,069,,22660,,co,Larimer County,,"Fort Collins, CO",,1,true
 19,187,,22700,,ia,Webster County,,"Fort Dodge, IA",,2,true
 29,169,,22780,,mo,Pulaski County,,"Fort Leonard Wood, MO",,2,true
-17,067,,22800,,il,Hancock County,,"Fort Madison-Keokuk, IA-IL-MO",,2,false
-19,111,,22800,,ia,Lee County,,"Fort Madison-Keokuk, IA-IL-MO",,2,true
-29,045,,22800,,mo,Clark County,,"Fort Madison-Keokuk, IA-IL-MO",,2,false
+17,067,161,22800,,il,Hancock County,"Burlington-Fort Madison-Keokuk, IA-IL-MO","Fort Madison-Keokuk, IA-IL-MO",,2,false
+19,111,161,22800,,ia,Lee County,"Burlington-Fort Madison-Keokuk, IA-IL-MO","Fort Madison-Keokuk, IA-IL-MO",,2,true
+29,045,161,22800,,mo,Clark County,"Burlington-Fort Madison-Keokuk, IA-IL-MO","Fort Madison-Keokuk, IA-IL-MO",,2,false
 08,087,,22820,,co,Morgan County,,"Fort Morgan, CO",,2,true
+01,049,497,22840,,al,DeKalb County,"Scottsboro-Fort Payne, AL","Fort Payne, AL",,2,true
 22,115,217,22860,,la,Vernon Parish,"DeRidder-Fort Polk South, LA","Fort Polk South, LA",,2,true
 05,033,,22900,,ar,Crawford County,,"Fort Smith, AR-OK",,1,true
+05,047,,22900,,ar,Franklin County,,"Fort Smith, AR-OK",,1,false
 05,131,,22900,,ar,Sebastian County,,"Fort Smith, AR-OK",,1,true
-40,079,,22900,,ok,Le Flore County,,"Fort Smith, AR-OK",,1,false
 40,135,,22900,,ok,Sequoyah County,,"Fort Smith, AR-OK",,1,false
 18,003,258,23060,,in,Allen County,"Fort Wayne-Huntington-Auburn, IN","Fort Wayne, IN",,1,true
-18,179,258,23060,,in,Wells County,"Fort Wayne-Huntington-Auburn, IN","Fort Wayne, IN",,1,false
 18,183,258,23060,,in,Whitley County,"Fort Wayne-Huntington-Auburn, IN","Fort Wayne, IN",,1,false
 18,023,320,23140,,in,Clinton County,"Lafayette-West Lafayette-Frankfort, IN","Frankfort, IN",,2,true
 21,005,336,23180,,ky,Anderson County,"Lexington-Fayette--Richmond--Frankfort, KY","Frankfort, KY",,2,false
 21,073,336,23180,,ky,Franklin County,"Lexington-Fayette--Richmond--Frankfort, KY","Frankfort, KY",,2,true
-48,171,,23240,,tx,Gillespie County,,"Fredericksburg, TX",,2,true
+48,171,314,23240,,tx,Gillespie County,"Kerrville-Fredericksburg, TX","Fredericksburg, TX",,2,true
 17,177,466,23300,,il,Stephenson County,"Rockford-Freeport-Rochelle, IL","Freeport, IL",,2,true
 31,053,420,23340,,ne,Dodge County,"Omaha-Council Bluffs-Fremont, NE-IA","Fremont, NE",,2,true
-39,143,,23380,,oh,Sandusky County,,"Fremont, OH",,2,true
-06,019,260,23420,,ca,Fresno County,"Fresno-Madera, CA","Fresno, CA",,1,true
+39,143,534,23380,,oh,Sandusky County,"Toledo-Findlay-Tiffin, OH","Fremont, OH",,2,true
+06,019,260,23420,,ca,Fresno County,"Fresno-Madera-Hanford, CA","Fresno, CA",,1,true
 01,055,,23460,,al,Etowah County,,"Gadsden, AL",,1,true
 45,021,273,23500,,sc,Cherokee County,"Greenville-Spartanburg-Anderson, SC","Gaffney, SC",,2,true
 12,001,264,23540,,fl,Alachua County,"Gainesville-Lake City, FL","Gainesville, FL",,1,true
 12,041,264,23540,,fl,Gilchrist County,"Gainesville-Lake City, FL","Gainesville, FL",,1,false
-13,139,122,23580,,ga,Hall County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Gainesville, GA",,1,true
+12,075,264,23540,,fl,Levy County,"Gainesville-Lake City, FL","Gainesville, FL",,1,false
+13,139,122,23580,,ga,Hall County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Gainesville, GA",,1,true
 48,097,206,23620,,tx,Cooke County,"Dallas-Fort Worth, TX-OK","Gainesville, TX",,2,true
 17,095,,23660,,il,Knox County,,"Galesburg, IL",,2,true
 35,031,,23700,,nm,McKinley County,,"Gallup, NM",,2,true
@@ -643,6 +653,8 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 45,043,396,23860,,sc,Georgetown County,"Myrtle Beach-Conway, SC-NC","Georgetown, SC",,2,true
 42,001,276,23900,,pa,Adams County,"Harrisburg-York-Lebanon, PA","Gettysburg, PA",,1,true
 56,005,,23940,,wy,Campbell County,,"Gillette, WY",,2,true
+56,011,,23940,,wy,Crook County,,"Gillette, WY",,2,false
+56,045,,23940,,wy,Weston County,,"Gillette, WY",,2,false
 21,009,150,23980,,ky,Barren County,"Bowling Green-Glasgow, KY","Glasgow, KY",,2,true
 21,169,150,23980,,ky,Metcalfe County,"Bowling Green-Glasgow, KY","Glasgow, KY",,2,false
 36,113,104,24020,,ny,Warren County,"Albany-Schenectady, NY","Glens Falls, NY",,1,true
@@ -651,18 +663,19 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 08,097,233,24060,,co,Pitkin County,"Edwards-Glenwood Springs, CO","Glenwood Springs, CO",,2,false
 36,035,104,24100,,ny,Fulton County,"Albany-Schenectady, NY","Gloversville, NY",,2,true
 37,191,,24140,,nc,Wayne County,,"Goldsboro, NC",,1,true
+48,221,206,24180,,tx,Hood County,"Dallas-Fort Worth, TX-OK","Granbury, TX",,2,true
 27,119,,24220,,mn,Polk County,,"Grand Forks, ND-MN",,1,true
 38,035,,24220,,nd,Grand Forks County,,"Grand Forks, ND-MN",,1,true
 31,079,,24260,,ne,Hall County,,"Grand Island, NE",,1,true
-31,081,,24260,,ne,Hamilton County,,"Grand Island, NE",,1,false
 31,093,,24260,,ne,Howard County,,"Grand Island, NE",,1,false
 31,121,,24260,,ne,Merrick County,,"Grand Island, NE",,1,false
 08,077,,24300,,co,Mesa County,,"Grand Junction, CO",,1,true
-26,015,266,24340,,mi,Barry County,"Grand Rapids-Wyoming-Muskegon, MI","Grand Rapids-Wyoming, MI",,1,false
-26,081,266,24340,,mi,Kent County,"Grand Rapids-Wyoming-Muskegon, MI","Grand Rapids-Wyoming, MI",,1,true
-26,117,266,24340,,mi,Montcalm County,"Grand Rapids-Wyoming-Muskegon, MI","Grand Rapids-Wyoming, MI",,1,false
-26,139,266,24340,,mi,Ottawa County,"Grand Rapids-Wyoming-Muskegon, MI","Grand Rapids-Wyoming, MI",,1,false
-35,006,106,24380,,nm,Cibola County,"Albuquerque-Santa Fe-Las Vegas, NM","Grants, NM",,2,true
+27,061,,24330,,mn,Itasca County,,"Grand Rapids, MN",,2,true
+26,067,266,24340,,mi,Ionia County,"Grand Rapids-Kentwood-Muskegon, MI","Grand Rapids-Kentwood, MI",,1,false
+26,081,266,24340,,mi,Kent County,"Grand Rapids-Kentwood-Muskegon, MI","Grand Rapids-Kentwood, MI",,1,true
+26,117,266,24340,,mi,Montcalm County,"Grand Rapids-Kentwood-Muskegon, MI","Grand Rapids-Kentwood, MI",,1,false
+26,139,266,24340,,mi,Ottawa County,"Grand Rapids-Kentwood-Muskegon, MI","Grand Rapids-Kentwood, MI",,1,false
+35,006,,24380,,nm,Cibola County,,"Grants, NM",,2,true
 41,033,366,24420,,or,Josephine County,"Medford-Grants Pass, OR","Grants Pass, OR",,1,true
 20,009,,24460,,ks,Barton County,,"Great Bend, KS",,2,true
 30,013,,24500,,mt,Cascade County,,"Great Falls, MT",,1,true
@@ -671,37 +684,36 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 55,061,267,24580,,wi,Kewaunee County,"Green Bay-Shawano, WI","Green Bay, WI",,1,false
 55,083,267,24580,,wi,Oconto County,"Green Bay-Shawano, WI","Green Bay, WI",,1,false
 47,059,,24620,,tn,Greene County,,"Greeneville, TN",,2,true
-25,011,521,24640,,ma,Franklin County,"Springfield-Greenfield Town, MA","Greenfield Town, MA",,2,true
 37,081,268,24660,,nc,Guilford County,"Greensboro--Winston-Salem--High Point, NC","Greensboro-High Point, NC",,1,true
 37,151,268,24660,,nc,Randolph County,"Greensboro--Winston-Salem--High Point, NC","Greensboro-High Point, NC",,1,false
 37,157,268,24660,,nc,Rockingham County,"Greensboro--Winston-Salem--High Point, NC","Greensboro-High Point, NC",,1,false
 18,031,294,24700,,in,Decatur County,"Indianapolis-Carmel-Muncie, IN","Greensburg, IN",,2,true
 28,151,,24740,,ms,Washington County,,"Greenville, MS",,2,true
-37,147,274,24780,,nc,Pitt County,"Greenville-Washington, NC","Greenville, NC",,1,true
-39,037,212,24820,,oh,Darke County,"Dayton-Springfield-Sidney, OH","Greenville, OH",,2,true
-45,007,273,24860,,sc,Anderson County,"Greenville-Spartanburg-Anderson, SC","Greenville-Anderson-Mauldin, SC",,1,false
-45,045,273,24860,,sc,Greenville County,"Greenville-Spartanburg-Anderson, SC","Greenville-Anderson-Mauldin, SC",,1,true
-45,059,273,24860,,sc,Laurens County,"Greenville-Spartanburg-Anderson, SC","Greenville-Anderson-Mauldin, SC",,1,false
-45,077,273,24860,,sc,Pickens County,"Greenville-Spartanburg-Anderson, SC","Greenville-Anderson-Mauldin, SC",,1,true
+37,147,272,24780,,nc,Pitt County,"Greenville-Kinston-Washington, NC","Greenville, NC",,1,true
+39,037,212,24820,,oh,Darke County,"Dayton-Springfield-Kettering, OH","Greenville, OH",,2,true
+45,007,273,24860,,sc,Anderson County,"Greenville-Spartanburg-Anderson, SC","Greenville-Anderson, SC",,1,false
+45,045,273,24860,,sc,Greenville County,"Greenville-Spartanburg-Anderson, SC","Greenville-Anderson, SC",,1,true
+45,059,273,24860,,sc,Laurens County,"Greenville-Spartanburg-Anderson, SC","Greenville-Anderson, SC",,1,false
+45,077,273,24860,,sc,Pickens County,"Greenville-Spartanburg-Anderson, SC","Greenville-Anderson, SC",,1,true
 28,015,,24900,,ms,Carroll County,,"Greenwood, MS",,2,false
 28,083,,24900,,ms,Leflore County,,"Greenwood, MS",,2,true
-45,001,273,24940,,sc,Abbeville County,"Greenville-Spartanburg-Anderson, SC","Greenwood, SC",,2,false
 45,047,273,24940,,sc,Greenwood County,"Greenville-Spartanburg-Anderson, SC","Greenwood, SC",,2,true
 28,043,,24980,,ms,Grenada County,,"Grenada, MS",,2,true
-72,015,490,25020,,pr,Arroyo Municipio,"San Juan-Carolina, PR","Guayama, PR",,1,true
-72,057,490,25020,,pr,Guayama Municipio,"San Juan-Carolina, PR","Guayama, PR",,1,true
-72,109,490,25020,,pr,Patillas Municipio,"San Juan-Carolina, PR","Guayama, PR",,1,true
-28,045,,25060,,ms,Hancock County,,"Gulfport-Biloxi-Pascagoula, MS",,1,true
-28,047,,25060,,ms,Harrison County,,"Gulfport-Biloxi-Pascagoula, MS",,1,true
-28,059,,25060,,ms,Jackson County,,"Gulfport-Biloxi-Pascagoula, MS",,1,false
+72,015,490,25020,,pr,Arroyo Municipio,"San Juan-Bayamón, PR","Guayama, PR",,1,true
+72,057,490,25020,,pr,Guayama Municipio,"San Juan-Bayamón, PR","Guayama, PR",,1,true
+72,109,490,25020,,pr,Patillas Municipio,"San Juan-Bayamón, PR","Guayama, PR",,1,true
+28,045,,25060,,ms,Hancock County,,"Gulfport-Biloxi, MS",,1,true
+28,047,,25060,,ms,Harrison County,,"Gulfport-Biloxi, MS",,1,true
+28,059,,25060,,ms,Jackson County,,"Gulfport-Biloxi, MS",,1,false
+28,131,,25060,,ms,Stone County,,"Gulfport-Biloxi, MS",,1,false
 40,139,,25100,,ok,Texas County,,"Guymon, OK",,2,true
 24,043,548,25180,,md,Washington County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Hagerstown-Martinsburg, MD-WV",,1,true
 54,003,548,25180,,wv,Berkeley County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Hagerstown-Martinsburg, MD-WV",,1,true
+54,065,548,25180,,wv,Morgan County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Hagerstown-Martinsburg, MD-WV",,1,false
 16,013,,25200,,id,Blaine County,,"Hailey, ID",,2,true
 16,025,,25200,,id,Camas County,,"Hailey, ID",,2,false
-16,063,,25200,,id,Lincoln County,,"Hailey, ID",,2,false
 22,105,406,25220,,la,Tangipahoa Parish,"New Orleans-Metairie-Hammond, LA-MS","Hammond, LA",,1,true
-06,031,546,25260,,ca,Kings County,"Visalia-Porterville-Hanford, CA","Hanford-Corcoran, CA",,1,true
+06,031,260,25260,,ca,Kings County,"Fresno-Madera-Hanford, CA","Hanford-Corcoran, CA",,1,true
 29,127,448,25300,,mo,Marion County,"Quincy-Hannibal, IL-MO","Hannibal, MO",,2,true
 29,173,448,25300,,mo,Ralls County,"Quincy-Hannibal, IL-MO","Hannibal, MO",,2,false
 42,041,276,25420,,pa,Cumberland County,"Harrisburg-York-Lebanon, PA","Harrisburg-Carlisle, PA",,1,true
@@ -709,38 +721,42 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 42,099,276,25420,,pa,Perry County,"Harrisburg-York-Lebanon, PA","Harrisburg-Carlisle, PA",,1,false
 05,009,,25460,,ar,Boone County,,"Harrison, AR",,2,true
 05,101,,25460,,ar,Newton County,,"Harrison, AR",,2,false
-51,165,277,25500,,va,Rockingham County,"Harrisonburg-Staunton-Waynesboro, VA","Harrisonburg, VA",,1,true
-51,660,277,25500,,va,Harrisonburg city,"Harrisonburg-Staunton-Waynesboro, VA","Harrisonburg, VA",,1,true
-09,003,278,25540,,ct,Hartford County,"Hartford-West Hartford, CT","Hartford-West Hartford-East Hartford, CT",,1,true
-09,007,278,25540,,ct,Middlesex County,"Hartford-West Hartford, CT","Hartford-West Hartford-East Hartford, CT",,1,true
-09,013,278,25540,,ct,Tolland County,"Hartford-West Hartford, CT","Hartford-West Hartford-East Hartford, CT",,1,true
+51,165,277,25500,,va,Rockingham County,"Harrisonburg-Staunton, VA","Harrisonburg, VA",,1,true
+51,660,277,25500,,va,Harrisonburg city,"Harrisonburg-Staunton, VA","Harrisonburg, VA",,1,true
+09,003,278,25540,,ct,Hartford County,"Hartford-East Hartford, CT","Hartford-East Hartford-Middletown, CT",,1,true
+09,007,278,25540,,ct,Middlesex County,"Hartford-East Hartford, CT","Hartford-East Hartford-Middletown, CT",,1,true
+09,013,278,25540,,ct,Tolland County,"Hartford-East Hartford, CT","Hartford-East Hartford-Middletown, CT",,1,true
 31,001,,25580,,ne,Adams County,,"Hastings, NE",,2,true
-28,035,,25620,,ms,Forrest County,,"Hattiesburg, MS",,1,true
-28,073,,25620,,ms,Lamar County,,"Hattiesburg, MS",,1,true
-28,111,,25620,,ms,Perry County,,"Hattiesburg, MS",,1,false
+28,031,279,25620,,ms,Covington County,"Hattiesburg-Laurel, MS","Hattiesburg, MS",,1,false
+28,035,279,25620,,ms,Forrest County,"Hattiesburg-Laurel, MS","Hattiesburg, MS",,1,true
+28,073,279,25620,,ms,Lamar County,"Hattiesburg-Laurel, MS","Hattiesburg, MS",,1,true
+28,111,279,25620,,ms,Perry County,"Hattiesburg-Laurel, MS","Hattiesburg, MS",,1,false
 20,051,,25700,,ks,Ellis County,,"Hays, KS",,2,true
-49,051,482,25720,,ut,Wasatch County,"Salt Lake City-Provo-Orem, UT","Heber, UT",,2,true
+49,043,482,25720,,ut,Summit County,"Salt Lake City-Provo-Orem, UT","Heber, UT",,2,true
+49,051,482,25720,,ut,Wasatch County,"Salt Lake City-Provo-Orem, UT","Heber, UT",,2,false
 30,043,,25740,,mt,Jefferson County,,"Helena, MT",,2,false
 30,049,,25740,,mt,Lewis and Clark County,,"Helena, MT",,2,true
 05,107,,25760,,ar,Phillips County,,"Helena-West Helena, AR",,2,true
-37,181,450,25780,,nc,Vance County,"Raleigh-Durham-Chapel Hill, NC","Henderson, NC",,2,true
+37,181,450,25780,,nc,Vance County,"Raleigh-Durham-Cary, NC","Henderson, NC",,2,true
 48,117,,25820,,tx,Deaf Smith County,,"Hereford, TX",,2,true
 41,049,,25840,,or,Morrow County,,"Hermiston-Pendleton, OR",,2,false
 41,059,,25840,,or,Umatilla County,,"Hermiston-Pendleton, OR",,2,true
-37,003,280,25860,,nc,Alexander County,"Hickory-Lenoir, NC","Hickory-Lenoir-Morganton, NC",,1,false
-37,023,280,25860,,nc,Burke County,"Hickory-Lenoir, NC","Hickory-Lenoir-Morganton, NC",,1,true
-37,027,280,25860,,nc,Caldwell County,"Hickory-Lenoir, NC","Hickory-Lenoir-Morganton, NC",,1,true
-37,035,280,25860,,nc,Catawba County,"Hickory-Lenoir, NC","Hickory-Lenoir-Morganton, NC",,1,true
+37,003,,25860,,nc,Alexander County,,"Hickory-Lenoir-Morganton, NC",,1,false
+37,023,,25860,,nc,Burke County,,"Hickory-Lenoir-Morganton, NC",,1,true
+37,027,,25860,,nc,Caldwell County,,"Hickory-Lenoir-Morganton, NC",,1,true
+37,035,,25860,,nc,Catawba County,,"Hickory-Lenoir-Morganton, NC",,1,true
 26,059,,25880,,mi,Hillsdale County,,"Hillsdale, MI",,2,true
 15,001,,25900,,hi,Hawaii County,,"Hilo, HI",,2,true
-45,013,,25940,,sc,Beaufort County,,"Hilton Head Island-Bluffton-Beaufort, SC",,1,true
-45,053,,25940,,sc,Jasper County,,"Hilton Head Island-Bluffton-Beaufort, SC",,1,false
+45,013,,25940,,sc,Beaufort County,,"Hilton Head Island-Bluffton, SC",,1,true
+45,053,,25940,,sc,Jasper County,,"Hilton Head Island-Bluffton, SC",,1,false
 13,179,496,25980,,ga,Liberty County,"Savannah-Hinesville-Statesboro, GA","Hinesville, GA",,1,true
 13,183,496,25980,,ga,Long County,"Savannah-Hinesville-Statesboro, GA","Hinesville, GA",,1,false
 35,025,,26020,,nm,Lea County,,"Hobbs, NM",,2,true
-26,005,266,26090,,mi,Allegan County,"Grand Rapids-Wyoming-Muskegon, MI","Holland, MI",,2,true
+26,005,266,26090,,mi,Allegan County,"Grand Rapids-Kentwood-Muskegon, MI","Holland, MI",,2,true
 12,017,,26140,,fl,Citrus County,,"Homosassa Springs, FL",,1,true
 41,027,,26220,,or,Hood River County,,"Hood River, OR",,2,true
+05,057,,26260,,ar,Hempstead County,,"Hope, AR",,2,true
+05,099,,26260,,ar,Nevada County,,"Hope, AR",,2,false
 05,051,284,26300,,ar,Garland County,"Hot Springs-Malvern, AR","Hot Springs, AR",,1,true
 26,061,,26340,,mi,Houghton County,,"Houghton, MI",,2,true
 26,083,,26340,,mi,Keweenaw County,,"Houghton, MI",,2,false
@@ -756,20 +772,20 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 48,339,288,26420,,tx,Montgomery County,"Houston-The Woodlands, TX","Houston-The Woodlands-Sugar Land, TX",,1,false
 48,473,288,26420,,tx,Waller County,"Houston-The Woodlands, TX","Houston-The Woodlands-Sugar Land, TX",,1,false
 36,021,104,26460,,ny,Columbia County,"Albany-Schenectady, NY","Hudson, NY",,2,true
-42,061,,26500,,pa,Huntingdon County,,"Huntingdon, PA",,2,true
+42,061,107,26500,,pa,Huntingdon County,"Altoona-Huntingdon, PA","Huntingdon, PA",,2,true
 18,069,258,26540,,in,Huntington County,"Fort Wayne-Huntington-Auburn, IN","Huntington, IN",,2,true
 21,019,170,26580,,ky,Boyd County,"Charleston-Huntington-Ashland, WV-OH-KY","Huntington-Ashland, WV-KY-OH",,1,true
+21,043,170,26580,,ky,Carter County,"Charleston-Huntington-Ashland, WV-OH-KY","Huntington-Ashland, WV-KY-OH",,1,false
 21,089,170,26580,,ky,Greenup County,"Charleston-Huntington-Ashland, WV-OH-KY","Huntington-Ashland, WV-KY-OH",,1,true
 39,087,170,26580,,oh,Lawrence County,"Charleston-Huntington-Ashland, WV-OH-KY","Huntington-Ashland, WV-KY-OH",,1,true
 54,011,170,26580,,wv,Cabell County,"Charleston-Huntington-Ashland, WV-OH-KY","Huntington-Ashland, WV-KY-OH",,1,true
-54,043,170,26580,,wv,Lincoln County,"Charleston-Huntington-Ashland, WV-OH-KY","Huntington-Ashland, WV-KY-OH",,1,false
 54,079,170,26580,,wv,Putnam County,"Charleston-Huntington-Ashland, WV-OH-KY","Huntington-Ashland, WV-KY-OH",,1,true
 54,099,170,26580,,wv,Wayne County,"Charleston-Huntington-Ashland, WV-OH-KY","Huntington-Ashland, WV-KY-OH",,1,true
-01,083,290,26620,,al,Limestone County,"Huntsville-Decatur-Albertville, AL","Huntsville, AL",,1,false
-01,089,290,26620,,al,Madison County,"Huntsville-Decatur-Albertville, AL","Huntsville, AL",,1,true
-48,455,288,26660,,tx,Trinity County,"Houston-The Woodlands, TX","Huntsville, TX",,2,false
+01,083,290,26620,,al,Limestone County,"Huntsville-Decatur, AL","Huntsville, AL",,1,false
+01,089,290,26620,,al,Madison County,"Huntsville-Decatur, AL","Huntsville, AL",,1,true
 48,471,288,26660,,tx,Walker County,"Houston-The Woodlands, TX","Huntsville, TX",,2,true
 46,005,,26700,,sd,Beadle County,,"Huron, SD",,2,true
+46,073,,26700,,sd,Jerauld County,,"Huron, SD",,2,false
 20,155,,26740,,ks,Reno County,,"Hutchinson, KS",,2,true
 27,085,378,26780,,mn,McLeod County,"Minneapolis-St. Paul, MN-WI","Hutchinson, MN",,2,true
 16,019,292,26820,,id,Bonneville County,"Idaho Falls-Rexburg-Blackfoot, ID","Idaho Falls, ID",,1,true
@@ -788,23 +804,24 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 18,133,294,26900,,in,Putnam County,"Indianapolis-Carmel-Muncie, IN","Indianapolis-Carmel-Anderson, IN",,1,false
 18,145,294,26900,,in,Shelby County,"Indianapolis-Carmel-Muncie, IN","Indianapolis-Carmel-Anderson, IN",,1,false
 28,133,185,26940,,ms,Sunflower County,"Cleveland-Indianola, MS","Indianola, MS",,2,true
-26,067,266,26960,,mi,Ionia County,"Grand Rapids-Wyoming-Muskegon, MI","Ionia, MI",,2,true
 19,103,168,26980,,ia,Johnson County,"Cedar Rapids-Iowa City, IA","Iowa City, IA",,1,true
 19,183,168,26980,,ia,Washington County,"Cedar Rapids-Iowa City, IA","Iowa City, IA",,1,false
-26,043,,27020,,mi,Dickinson County,,"Iron Mountain, MI-WI",,2,true
-55,037,,27020,,wi,Florence County,,"Iron Mountain, MI-WI",,2,false
+26,043,361,27020,,mi,Dickinson County,"Marinette-Iron Mountain, WI-MI","Iron Mountain, MI-WI",,2,true
+55,037,361,27020,,wi,Florence County,"Marinette-Iron Mountain, WI-MI","Iron Mountain, MI-WI",,2,false
 36,109,296,27060,,ny,Tompkins County,"Ithaca-Cortland, NY","Ithaca, NY",,1,true
 26,075,,27100,,mi,Jackson County,,"Jackson, MI",,1,true
 28,029,298,27140,,ms,Copiah County,"Jackson-Vicksburg-Brookhaven, MS","Jackson, MS",,1,false
 28,049,298,27140,,ms,Hinds County,"Jackson-Vicksburg-Brookhaven, MS","Jackson, MS",,1,true
+28,051,298,27140,,ms,Holmes County,"Jackson-Vicksburg-Brookhaven, MS","Jackson, MS",,1,false
 28,089,298,27140,,ms,Madison County,"Jackson-Vicksburg-Brookhaven, MS","Jackson, MS",,1,true
 28,121,298,27140,,ms,Rankin County,"Jackson-Vicksburg-Brookhaven, MS","Jackson, MS",,1,true
 28,127,298,27140,,ms,Simpson County,"Jackson-Vicksburg-Brookhaven, MS","Jackson, MS",,1,false
 28,163,298,27140,,ms,Yazoo County,"Jackson-Vicksburg-Brookhaven, MS","Jackson, MS",,1,false
 39,079,,27160,,oh,Jackson County,,"Jackson, OH",,2,true
-47,023,,27180,,tn,Chester County,,"Jackson, TN",,1,false
-47,033,,27180,,tn,Crockett County,,"Jackson, TN",,1,false
-47,113,,27180,,tn,Madison County,,"Jackson, TN",,1,true
+47,023,297,27180,,tn,Chester County,"Jackson-Brownsville, TN","Jackson, TN",,1,false
+47,033,297,27180,,tn,Crockett County,"Jackson-Brownsville, TN","Jackson, TN",,1,false
+47,053,297,27180,,tn,Gibson County,"Jackson-Brownsville, TN","Jackson, TN",,1,false
+47,113,297,27180,,tn,Madison County,"Jackson-Brownsville, TN","Jackson, TN",,1,true
 16,081,,27220,,id,Teton County,,"Jackson, WY-ID",,2,false
 56,039,,27220,,wy,Teton County,,"Jackson, WY-ID",,2,true
 12,003,300,27260,,fl,Baker County,"Jacksonville-St. Marys-Palatka, FL-GA","Jacksonville, FL",,1,false
@@ -819,15 +836,17 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 38,093,,27420,,nd,Stutsman County,,"Jamestown, ND",,2,true
 36,013,,27460,,ny,Chautauqua County,,"Jamestown-Dunkirk-Fredonia, NY",,2,true
 55,105,357,27500,,wi,Rock County,"Madison-Janesville-Beloit, WI","Janesville-Beloit, WI",,1,true
+01,127,142,27530,,al,Walker County,"Birmingham-Hoover-Talladega, AL","Jasper, AL",,2,true
 18,037,,27540,,in,Dubois County,,"Jasper, IN",,2,true
 18,125,,27540,,in,Pike County,,"Jasper, IN",,2,false
 72,073,,27580,,pr,Jayuya Municipio,,"Jayuya, PR",,2,true
-13,157,122,27600,,ga,Jackson County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Jefferson, GA",,2,true
+13,157,122,27600,,ga,Jackson County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Jefferson, GA",,2,true
 29,027,,27620,,mo,Callaway County,,"Jefferson City, MO",,1,false
 29,051,,27620,,mo,Cole County,,"Jefferson City, MO",,1,true
 29,135,,27620,,mo,Moniteau County,,"Jefferson City, MO",,1,false
 29,151,,27620,,mo,Osage County,,"Jefferson City, MO",,1,false
-13,305,,27700,,ga,Wayne County,,"Jesup, GA",,2,true
+22,053,324,27660,,la,Jefferson Davis Parish,"Lake Charles-Jennings, LA","Jennings, LA",,2,true
+13,305,496,27700,,ga,Wayne County,"Savannah-Hinesville-Statesboro, GA","Jesup, GA",,2,true
 47,019,304,27740,,tn,Carter County,"Johnson City-Kingsport-Bristol, TN-VA","Johnson City, TN",,1,true
 47,171,304,27740,,tn,Unicoi County,"Johnson City-Kingsport-Bristol, TN-VA","Johnson City, TN",,1,false
 47,179,304,27740,,tn,Washington County,"Johnson City-Kingsport-Bristol, TN-VA","Johnson City, TN",,1,true
@@ -836,12 +855,9 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 05,111,308,27860,,ar,Poinsett County,"Jonesboro-Paragould, AR","Jonesboro, AR",,1,false
 29,097,309,27900,,mo,Jasper County,"Joplin-Miami, MO-OK","Joplin, MO",,1,true
 29,145,309,27900,,mo,Newton County,"Joplin-Miami, MO-OK","Joplin, MO",,1,false
-20,061,358,27920,,ks,Geary County,"Manhattan-Junction City, KS","Junction City, KS",,2,true
 02,110,,27940,,ak,Juneau City and Borough,,"Juneau, AK",,2,true
-15,005,,27980,,hi,Kalawao County,,"Kahului-Wailuku-Lahaina, HI",,1,false
 15,009,,27980,,hi,Maui County,,"Kahului-Wailuku-Lahaina, HI",,1,true
 26,077,310,28020,,mi,Kalamazoo County,"Kalamazoo-Battle Creek-Portage, MI","Kalamazoo-Portage, MI",,1,true
-26,159,310,28020,,mi,Van Buren County,"Kalamazoo-Battle Creek-Portage, MI","Kalamazoo-Portage, MI",,1,false
 30,029,,28060,,mt,Flathead County,,"Kalispell, MT",,2,true
 17,091,176,28100,,il,Kankakee County,"Chicago-Naperville, IL-IN-WI","Kankakee, IL",,1,true
 20,091,312,28140,,ks,Johnson County,"Kansas City-Overland Park-Kansas City, MO-KS","Kansas City, MO-KS",,1,true
@@ -864,37 +880,35 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 33,005,,28300,,nh,Cheshire County,,"Keene, NH",,2,true
 18,113,258,28340,,in,Noble County,"Fort Wayne-Huntington-Auburn, IN","Kendallville, IN",,2,true
 29,069,,28380,,mo,Dunklin County,,"Kennett, MO",,2,true
-53,005,,28420,,wa,Benton County,,"Kennewick-Richland, WA",,1,true
-53,021,,28420,,wa,Franklin County,,"Kennewick-Richland, WA",,1,true
-48,265,,28500,,tx,Kerr County,,"Kerrville, TX",,2,true
+53,005,313,28420,,wa,Benton County,"Kennewick-Richland-Walla Walla, WA","Kennewick-Richland, WA",,1,true
+53,021,313,28420,,wa,Franklin County,"Kennewick-Richland-Walla Walla, WA","Kennewick-Richland, WA",,1,true
+48,265,314,28500,,tx,Kerr County,"Kerrville-Fredericksburg, TX","Kerrville, TX",,2,true
 02,130,,28540,,ak,Ketchikan Gateway Borough,,"Ketchikan, AK",,2,true
-12,087,,28580,,fl,Monroe County,,"Key West, FL",,2,true
+12,087,370,28580,,fl,Monroe County,"Miami-Port St. Lucie-Fort Lauderdale, FL","Key West, FL",,2,true
 37,055,545,28620,,nc,Dare County,"Virginia Beach-Norfolk, VA-NC","Kill Devil Hills, NC",,2,true
-37,177,545,28620,,nc,Tyrrell County,"Virginia Beach-Norfolk, VA-NC","Kill Devil Hills, NC",,2,false
 48,027,,28660,,tx,Bell County,,"Killeen-Temple, TX",,1,true
 48,099,,28660,,tx,Coryell County,,"Killeen-Temple, TX",,1,true
 48,281,,28660,,tx,Lampasas County,,"Killeen-Temple, TX",,1,false
-47,073,304,28700,,tn,Hawkins County,"Johnson City-Kingsport-Bristol, TN-VA","Kingsport-Bristol-Bristol, TN-VA",,1,true
-47,163,304,28700,,tn,Sullivan County,"Johnson City-Kingsport-Bristol, TN-VA","Kingsport-Bristol-Bristol, TN-VA",,1,true
-51,169,304,28700,,va,Scott County,"Johnson City-Kingsport-Bristol, TN-VA","Kingsport-Bristol-Bristol, TN-VA",,1,false
-51,191,304,28700,,va,Washington County,"Johnson City-Kingsport-Bristol, TN-VA","Kingsport-Bristol-Bristol, TN-VA",,1,false
-51,520,304,28700,,va,Bristol city,"Johnson City-Kingsport-Bristol, TN-VA","Kingsport-Bristol-Bristol, TN-VA",,1,false
+47,073,304,28700,,tn,Hawkins County,"Johnson City-Kingsport-Bristol, TN-VA","Kingsport-Bristol, TN-VA",,1,true
+47,163,304,28700,,tn,Sullivan County,"Johnson City-Kingsport-Bristol, TN-VA","Kingsport-Bristol, TN-VA",,1,true
+51,169,304,28700,,va,Scott County,"Johnson City-Kingsport-Bristol, TN-VA","Kingsport-Bristol, TN-VA",,1,false
+51,191,304,28700,,va,Washington County,"Johnson City-Kingsport-Bristol, TN-VA","Kingsport-Bristol, TN-VA",,1,false
+51,520,304,28700,,va,Bristol city,"Johnson City-Kingsport-Bristol, TN-VA","Kingsport-Bristol, TN-VA",,1,false
 36,111,408,28740,,ny,Ulster County,"New York-Newark, NY-NJ-CT-PA","Kingston, NY",,1,true
 48,261,204,28780,,tx,Kenedy County,"Corpus Christi-Kingsville-Alice, TX","Kingsville, TX",,2,false
 48,273,204,28780,,tx,Kleberg County,"Corpus Christi-Kingsville-Alice, TX","Kingsville, TX",,2,true
-37,107,,28820,,nc,Lenoir County,,"Kinston, NC",,2,true
+37,107,272,28820,,nc,Lenoir County,"Greenville-Kinston-Washington, NC","Kinston, NC",,2,true
 29,001,,28860,,mo,Adair County,,"Kirksville, MO",,2,true
 29,197,,28860,,mo,Schuyler County,,"Kirksville, MO",,2,false
 41,035,,28900,,or,Klamath County,,"Klamath Falls, OR",,2,true
-47,001,314,28940,,tn,Anderson County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,true
-47,009,314,28940,,tn,Blount County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,true
-47,013,314,28940,,tn,Campbell County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,false
-47,057,314,28940,,tn,Grainger County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,false
-47,093,314,28940,,tn,Knox County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,true
-47,105,314,28940,,tn,Loudon County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,true
-47,129,314,28940,,tn,Morgan County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,false
-47,145,314,28940,,tn,Roane County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,false
-47,173,314,28940,,tn,Union County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,false
+47,001,315,28940,,tn,Anderson County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,true
+47,009,315,28940,,tn,Blount County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,true
+47,013,315,28940,,tn,Campbell County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,false
+47,093,315,28940,,tn,Knox County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,true
+47,105,315,28940,,tn,Loudon County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,true
+47,129,315,28940,,tn,Morgan County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,false
+47,145,315,28940,,tn,Roane County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,false
+47,173,315,28940,,tn,Union County,"Knoxville-Morristown-Sevierville, TN","Knoxville, TN",,1,false
 18,067,316,29020,,in,Howard County,"Kokomo-Peru, IN","Kokomo, IN",,1,true
 33,001,148,29060,,nh,Belknap County,"Boston-Worcester-Providence, MA-RI-NH-CT","Laconia, NH",,2,true
 27,055,,29100,,mn,Houston County,,"La Crosse-Onalaska, WI-MN",,1,true
@@ -907,33 +921,41 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 18,007,320,29200,,in,Benton County,"Lafayette-West Lafayette-Frankfort, IN","Lafayette-West Lafayette, IN",,1,false
 18,015,320,29200,,in,Carroll County,"Lafayette-West Lafayette-Frankfort, IN","Lafayette-West Lafayette, IN",,1,false
 18,157,320,29200,,in,Tippecanoe County,"Lafayette-West Lafayette-Frankfort, IN","Lafayette-West Lafayette, IN",,1,true
+18,171,320,29200,,in,Warren County,"Lafayette-West Lafayette-Frankfort, IN","Lafayette-West Lafayette, IN",,1,false
 41,061,,29260,,or,Union County,,"La Grande, OR",,2,true
-13,285,122,29300,,ga,Troup County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","LaGrange, GA",,2,true
-22,019,,29340,,la,Calcasieu Parish,,"Lake Charles, LA",,1,true
-22,023,,29340,,la,Cameron Parish,,"Lake Charles, LA",,1,false
+01,017,122,29300,,al,Chambers County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","LaGrange, GA-AL",,2,false
+13,285,122,29300,,ga,Troup County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","LaGrange, GA-AL",,2,true
+22,019,324,29340,,la,Calcasieu Parish,"Lake Charles-Jennings, LA","Lake Charles, LA",,1,true
+22,023,324,29340,,la,Cameron Parish,"Lake Charles-Jennings, LA","Lake Charles, LA",,1,false
 12,023,264,29380,,fl,Columbia County,"Gainesville-Lake City, FL","Lake City, FL",,2,true
-04,015,332,29420,,az,Mohave County,"Las Vegas-Henderson, NV-AZ","Lake Havasu City-Kingman, AZ",,1,true
-12,105,,29460,,fl,Polk County,,"Lakeland-Winter Haven, FL",,1,true
+04,015,,29420,,az,Mohave County,,"Lake Havasu City-Kingman, AZ",,1,true
+12,105,422,29460,,fl,Polk County,"Orlando-Lakeland-Deltona, FL","Lakeland-Winter Haven, FL",,1,true
 48,115,,29500,,tx,Dawson County,,"Lamesa, TX",,2,true
 42,071,,29540,,pa,Lancaster County,,"Lancaster, PA",,1,true
-26,037,330,29620,,mi,Clinton County,"Lansing-East Lansing-Owosso, MI","Lansing-East Lansing, MI",,1,true
-26,045,330,29620,,mi,Eaton County,"Lansing-East Lansing-Owosso, MI","Lansing-East Lansing, MI",,1,true
-26,065,330,29620,,mi,Ingham County,"Lansing-East Lansing-Owosso, MI","Lansing-East Lansing, MI",,1,true
+26,037,,29620,,mi,Clinton County,,"Lansing-East Lansing, MI",,1,true
+26,045,,29620,,mi,Eaton County,,"Lansing-East Lansing, MI",,1,true
+26,065,,29620,,mi,Ingham County,,"Lansing-East Lansing, MI",,1,true
+26,155,,29620,,mi,Shiawassee County,,"Lansing-East Lansing, MI",,1,false
 56,001,,29660,,wy,Albany County,,"Laramie, WY",,2,true
 48,479,,29700,,tx,Webb County,,"Laredo, TX",,1,true
 35,013,238,29740,,nm,Doña Ana County,"El Paso-Las Cruces, TX-NM","Las Cruces, NM",,1,true
+35,033,106,29780,,nm,Mora County,"Albuquerque-Santa Fe-Las Vegas, NM","Las Vegas, NM",,2,false
 35,047,106,29780,,nm,San Miguel County,"Albuquerque-Santa Fe-Las Vegas, NM","Las Vegas, NM",,2,true
-32,003,332,29820,,nv,Clark County,"Las Vegas-Henderson, NV-AZ","Las Vegas-Henderson-Paradise, NV",,1,true
-28,061,,29860,,ms,Jasper County,,"Laurel, MS",,2,false
-28,067,,29860,,ms,Jones County,,"Laurel, MS",,2,true
-37,165,246,29900,,nc,Scotland County,"Fayetteville-Lumberton-Laurinburg, NC","Laurinburg, NC",,2,true
+32,003,332,29820,,nv,Clark County,"Las Vegas-Henderson, NV","Las Vegas-Henderson-Paradise, NV",,1,true
+28,061,279,29860,,ms,Jasper County,"Hattiesburg-Laurel, MS","Laurel, MS",,2,false
+28,067,279,29860,,ms,Jones County,"Hattiesburg-Laurel, MS","Laurel, MS",,2,true
+37,165,246,29900,,nc,Scotland County,"Fayetteville-Sanford-Lumberton, NC","Laurinburg, NC",,2,true
 20,045,312,29940,,ks,Douglas County,"Kansas City-Overland Park-Kansas City, MO-KS","Lawrence, KS",,1,true
 47,099,400,29980,,tn,Lawrence County,"Nashville-Davidson--Murfreesboro, TN","Lawrenceburg, TN",,2,true
 40,031,,30020,,ok,Comanche County,,"Lawton, OK",,1,true
 40,033,,30020,,ok,Cotton County,,"Lawton, OK",,1,false
 29,105,,30060,,mo,Laclede County,,"Lebanon, MO",,2,true
+33,009,,30100,,nh,Grafton County,,"Lebanon, NH-VT",,2,true
+33,019,,30100,,nh,Sullivan County,,"Lebanon, NH-VT",,2,false
+50,017,,30100,,vt,Orange County,,"Lebanon, NH-VT",,2,false
+50,027,,30100,,vt,Windsor County,,"Lebanon, NH-VT",,2,true
 42,075,276,30140,,pa,Lebanon County,"Harrisburg-York-Lebanon, PA","Lebanon, PA",,1,true
-48,219,352,30220,,tx,Hockley County,"Lubbock-Levelland, TX","Levelland, TX",,2,true
+48,219,352,30220,,tx,Hockley County,"Lubbock-Plainview-Levelland, TX","Levelland, TX",,2,true
 42,119,146,30260,,pa,Union County,"Bloomsburg-Berwick-Sunbury, PA","Lewisburg, PA",,2,true
 47,117,400,30280,,tn,Marshall County,"Nashville-Davidson--Murfreesboro, TN","Lewisburg, TN",,2,true
 16,069,,30300,,id,Nez Perce County,,"Lewiston, ID-WA",,1,true
@@ -962,50 +984,48 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 42,035,558,30820,,pa,Clinton County,"Williamsport-Lock Haven, PA","Lock Haven, PA",,2,true
 16,041,,30860,,id,Franklin County,,"Logan, UT-ID",,1,false
 49,005,,30860,,ut,Cache County,,"Logan, UT-ID",,1,true
-54,045,170,30880,,wv,Logan County,"Charleston-Huntington-Ashland, WV-OH-KY","Logan, WV",,2,true
 18,017,,30900,,in,Cass County,,"Logansport, IN",,2,true
+21,051,,30940,,ky,Clay County,,"London, KY",,2,false
 21,121,,30940,,ky,Knox County,,"London, KY",,2,true
 21,125,,30940,,ky,Laurel County,,"London, KY",,2,true
 21,235,,30940,,ky,Whitley County,,"London, KY",,2,true
-48,183,346,30980,,tx,Gregg County,"Longview-Marshall, TX","Longview, TX",,1,true
-48,401,346,30980,,tx,Rusk County,"Longview-Marshall, TX","Longview, TX",,1,false
-48,459,346,30980,,tx,Upshur County,"Longview-Marshall, TX","Longview, TX",,1,false
+48,183,,30980,,tx,Gregg County,,"Longview, TX",,1,true
+48,203,,30980,,tx,Harrison County,,"Longview, TX",,1,false
+48,401,,30980,,tx,Rusk County,,"Longview, TX",,1,false
+48,459,,30980,,tx,Upshur County,,"Longview, TX",,1,false
 53,015,440,31020,,wa,Cowlitz County,"Portland-Vancouver-Salem, OR-WA","Longview, WA",,1,true
 35,028,106,31060,,nm,Los Alamos County,"Albuquerque-Santa Fe-Las Vegas, NM","Los Alamos, NM",,2,true
 06,059,348,31080,11244,ca,Orange County,"Los Angeles-Long Beach, CA","Los Angeles-Long Beach-Anaheim, CA","Anaheim-Santa Ana-Irvine, CA",1,true
 06,037,348,31080,31084,ca,Los Angeles County,"Los Angeles-Long Beach, CA","Los Angeles-Long Beach-Anaheim, CA","Los Angeles-Long Beach-Glendale, CA",1,true
-18,019,350,31140,,in,Clark County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,true
-18,043,350,31140,,in,Floyd County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,true
-18,061,350,31140,,in,Harrison County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
-18,143,350,31140,,in,Scott County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
-18,175,350,31140,,in,Washington County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
-21,029,350,31140,,ky,Bullitt County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,true
-21,103,350,31140,,ky,Henry County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
-21,111,350,31140,,ky,Jefferson County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,true
-21,185,350,31140,,ky,Oldham County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,true
-21,211,350,31140,,ky,Shelby County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
-21,215,350,31140,,ky,Spencer County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
-21,223,350,31140,,ky,Trimble County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
-48,107,352,31180,,tx,Crosby County,"Lubbock-Levelland, TX","Lubbock, TX",,1,false
-48,303,352,31180,,tx,Lubbock County,"Lubbock-Levelland, TX","Lubbock, TX",,1,true
-48,305,352,31180,,tx,Lynn County,"Lubbock-Levelland, TX","Lubbock, TX",,1,false
+18,019,350,31140,,in,Clark County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Louisville/Jefferson County, KY-IN",,1,true
+18,043,350,31140,,in,Floyd County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Louisville/Jefferson County, KY-IN",,1,true
+18,061,350,31140,,in,Harrison County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
+18,175,350,31140,,in,Washington County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
+21,029,350,31140,,ky,Bullitt County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Louisville/Jefferson County, KY-IN",,1,true
+21,103,350,31140,,ky,Henry County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
+21,111,350,31140,,ky,Jefferson County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Louisville/Jefferson County, KY-IN",,1,true
+21,185,350,31140,,ky,Oldham County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Louisville/Jefferson County, KY-IN",,1,true
+21,211,350,31140,,ky,Shelby County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
+21,215,350,31140,,ky,Spencer County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Louisville/Jefferson County, KY-IN",,1,false
+48,107,352,31180,,tx,Crosby County,"Lubbock-Plainview-Levelland, TX","Lubbock, TX",,1,false
+48,303,352,31180,,tx,Lubbock County,"Lubbock-Plainview-Levelland, TX","Lubbock, TX",,1,true
+48,305,352,31180,,tx,Lynn County,"Lubbock-Plainview-Levelland, TX","Lubbock, TX",,1,false
 26,105,,31220,,mi,Mason County,,"Ludington, MI",,2,true
 48,005,,31260,,tx,Angelina County,,"Lufkin, TX",,2,true
-37,155,246,31300,,nc,Robeson County,"Fayetteville-Lumberton-Laurinburg, NC","Lumberton, NC",,2,true
+37,155,246,31300,,nc,Robeson County,"Fayetteville-Sanford-Lumberton, NC","Lumberton, NC",,2,true
 51,009,,31340,,va,Amherst County,,"Lynchburg, VA",,1,true
 51,011,,31340,,va,Appomattox County,,"Lynchburg, VA",,1,false
 51,019,,31340,,va,Bedford County,,"Lynchburg, VA",,1,true
 51,031,,31340,,va,Campbell County,,"Lynchburg, VA",,1,true
-51,515,,31340,,va,Bedford city,,"Lynchburg, VA",,1,true
 51,680,,31340,,va,Lynchburg city,,"Lynchburg, VA",,1,true
 17,109,,31380,,il,McDonough County,,"Macomb, IL",,2,true
-13,021,356,31420,,ga,Bibb County,"Macon-Warner Robins, GA","Macon, GA",,1,true
-13,079,356,31420,,ga,Crawford County,"Macon-Warner Robins, GA","Macon, GA",,1,false
-13,169,356,31420,,ga,Jones County,"Macon-Warner Robins, GA","Macon, GA",,1,false
-13,207,356,31420,,ga,Monroe County,"Macon-Warner Robins, GA","Macon, GA",,1,false
-13,289,356,31420,,ga,Twiggs County,"Macon-Warner Robins, GA","Macon, GA",,1,false
-06,039,260,31460,,ca,Madera County,"Fresno-Madera, CA","Madera, CA",,1,true
-18,077,350,31500,,in,Jefferson County,"Louisville/Jefferson County--Elizabethtown--Madison, KY-IN","Madison, IN",,2,true
+13,021,356,31420,,ga,Bibb County,"Macon-Bibb County--Warner Robins, GA","Macon-Bibb County, GA",,1,true
+13,079,356,31420,,ga,Crawford County,"Macon-Bibb County--Warner Robins, GA","Macon-Bibb County, GA",,1,false
+13,169,356,31420,,ga,Jones County,"Macon-Bibb County--Warner Robins, GA","Macon-Bibb County, GA",,1,false
+13,207,356,31420,,ga,Monroe County,"Macon-Bibb County--Warner Robins, GA","Macon-Bibb County, GA",,1,false
+13,289,356,31420,,ga,Twiggs County,"Macon-Bibb County--Warner Robins, GA","Macon-Bibb County, GA",,1,false
+06,039,260,31460,,ca,Madera County,"Fresno-Madera-Hanford, CA","Madera, CA",,1,true
+18,077,,31500,,in,Jefferson County,,"Madison, IN",,2,true
 55,021,357,31540,,wi,Columbia County,"Madison-Janesville-Beloit, WI","Madison, WI",,1,false
 55,025,357,31540,,wi,Dane County,"Madison-Janesville-Beloit, WI","Madison, WI",,1,true
 55,045,357,31540,,wi,Green County,"Madison-Janesville-Beloit, WI","Madison, WI",,1,false
@@ -1015,43 +1035,42 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 36,033,,31660,,ny,Franklin County,,"Malone, NY",,2,true
 05,059,284,31680,,ar,Hot Spring County,"Hot Springs-Malvern, AR","Malvern, AR",,2,true
 33,011,148,31700,,nh,Hillsborough County,"Boston-Worcester-Providence, MA-RI-NH-CT","Manchester-Nashua, NH",,1,true
-20,149,358,31740,,ks,Pottawatomie County,"Manhattan-Junction City, KS","Manhattan, KS",,1,false
-20,161,358,31740,,ks,Riley County,"Manhattan-Junction City, KS","Manhattan, KS",,1,true
+20,061,,31740,,ks,Geary County,,"Manhattan, KS",,1,false
+20,149,,31740,,ks,Pottawatomie County,,"Manhattan, KS",,1,false
+20,161,,31740,,ks,Riley County,,"Manhattan, KS",,1,true
 55,071,,31820,,wi,Manitowoc County,,"Manitowoc, WI",,2,true
-27,013,359,31860,,mn,Blue Earth County,"Mankato-New Ulm-North Mankato, MN","Mankato-North Mankato, MN",,1,true
-27,103,359,31860,,mn,Nicollet County,"Mankato-New Ulm-North Mankato, MN","Mankato-North Mankato, MN",,1,true
+27,013,359,31860,,mn,Blue Earth County,"Mankato-New Ulm, MN","Mankato, MN",,1,true
+27,103,359,31860,,mn,Nicollet County,"Mankato-New Ulm, MN","Mankato, MN",,1,true
 39,139,360,31900,,oh,Richland County,"Mansfield-Ashland-Bucyrus, OH","Mansfield, OH",,1,true
 39,167,425,31930,,oh,Washington County,"Parkersburg-Marietta-Vienna, WV-OH","Marietta, OH",,2,true
-26,109,,31940,,mi,Menominee County,,"Marinette, WI-MI",,2,true
-55,075,,31940,,wi,Marinette County,,"Marinette, WI-MI",,2,true
+26,109,361,31940,,mi,Menominee County,"Marinette-Iron Mountain, WI-MI","Marinette, WI-MI",,2,true
+55,075,361,31940,,wi,Marinette County,"Marinette-Iron Mountain, WI-MI","Marinette, WI-MI",,2,true
 18,053,,31980,,in,Grant County,,"Marion, IN",,2,true
-37,111,280,32000,,nc,McDowell County,"Hickory-Lenoir, NC","Marion, NC",,2,true
+37,111,120,32000,,nc,McDowell County,"Asheville-Marion-Brevard, NC","Marion, NC",,2,true
 39,101,198,32020,,oh,Marion County,"Columbus-Marion-Zanesville, OH","Marion, OH",,2,true
 26,103,,32100,,mi,Marquette County,,"Marquette, MI",,2,true
 27,083,,32140,,mn,Lyon County,,"Marshall, MN",,2,true
 29,195,,32180,,mo,Saline County,,"Marshall, MO",,2,true
-48,203,346,32220,,tx,Harrison County,"Longview-Marshall, TX","Marshall, TX",,2,true
 19,127,,32260,,ia,Marshall County,,"Marshalltown, IA",,2,true
-47,183,362,32280,,tn,Weakley County,"Martin-Union City, TN-KY","Martin, TN",,2,true
+47,183,362,32280,,tn,Weakley County,"Martin-Union City, TN","Martin, TN",,2,true
 51,089,,32300,,va,Henry County,,"Martinsville, VA",,2,true
 51,690,,32300,,va,Martinsville city,,"Martinsville, VA",,2,true
 29,147,,32340,,mo,Nodaway County,,"Maryville, MO",,2,true
 19,033,,32380,,ia,Cerro Gordo County,,"Mason City, IA",,2,true
 19,195,,32380,,ia,Worth County,,"Mason City, IA",,2,false
 72,067,364,32420,,pr,Hormigueros Municipio,"Mayagüez-San Germán, PR","Mayagüez, PR",,1,true
+72,083,364,32420,,pr,Las Marías Municipio,"Mayagüez-San Germán, PR","Mayagüez, PR",,1,false
 72,097,364,32420,,pr,Mayagüez Municipio,"Mayagüez-San Germán, PR","Mayagüez, PR",,1,true
 21,083,424,32460,,ky,Graves County,"Paducah-Mayfield, KY-IL","Mayfield, KY",,2,true
 21,161,178,32500,,ky,Mason County,"Cincinnati-Wilmington-Maysville, OH-KY-IN","Maysville, KY",,2,true
 40,121,,32540,,ok,Pittsburg County,,"McAlester, OK",,2,true
 48,215,365,32580,,tx,Hidalgo County,"McAllen-Edinburg, TX","McAllen-Edinburg-Mission, TX",,1,true
-28,005,,32620,,ms,Amite County,,"McComb, MS",,2,false
 28,113,,32620,,ms,Pike County,,"McComb, MS",,2,true
 47,177,,32660,,tn,Warren County,,"McMinnville, TN",,2,true
 20,113,,32700,,ks,McPherson County,,"McPherson, KS",,2,true
 42,039,240,32740,,pa,Crawford County,"Erie-Meadville, PA","Meadville, PA",,2,true
 41,029,366,32780,,or,Jackson County,"Medford-Grants Pass, OR","Medford, OR",,1,true
 05,035,368,32820,,ar,Crittenden County,"Memphis-Forrest City, TN-MS-AR","Memphis, TN-MS-AR",,1,true
-28,009,368,32820,,ms,Benton County,"Memphis-Forrest City, TN-MS-AR","Memphis, TN-MS-AR",,1,false
 28,033,368,32820,,ms,DeSoto County,"Memphis-Forrest City, TN-MS-AR","Memphis, TN-MS-AR",,1,true
 28,093,368,32820,,ms,Marshall County,"Memphis-Forrest City, TN-MS-AR","Memphis, TN-MS-AR",,1,false
 28,137,368,32820,,ms,Tate County,"Memphis-Forrest City, TN-MS-AR","Memphis, TN-MS-AR",,1,false
@@ -1060,16 +1079,15 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 47,157,368,32820,,tn,Shelby County,"Memphis-Forrest City, TN-MS-AR","Memphis, TN-MS-AR",,1,true
 47,167,368,32820,,tn,Tipton County,"Memphis-Forrest City, TN-MS-AR","Memphis, TN-MS-AR",,1,false
 55,033,232,32860,,wi,Dunn County,"Eau Claire-Menomonie, WI","Menomonie, WI",,2,true
-06,047,382,32900,,ca,Merced County,"Modesto-Merced, CA","Merced, CA",,1,true
+06,047,488,32900,,ca,Merced County,"San Jose-San Francisco-Oakland, CA","Merced, CA",,1,true
 28,023,,32940,,ms,Clarke County,,"Meridian, MS",,2,false
 28,069,,32940,,ms,Kemper County,,"Meridian, MS",,2,false
 28,075,,32940,,ms,Lauderdale County,,"Meridian, MS",,2,true
-55,069,554,32980,,wi,Lincoln County,"Wausau-Stevens Point-Wisconsin Rapids, WI","Merrill, WI",,2,true
 29,007,190,33020,,mo,Audrain County,"Columbia-Moberly-Mexico, MO","Mexico, MO",,2,true
 40,115,309,33060,,ok,Ottawa County,"Joplin-Miami, MO-OK","Miami, OK",,2,true
-12,011,370,33100,22744,fl,Broward County,"Miami-Fort Lauderdale-Port St. Lucie, FL","Miami-Fort Lauderdale-West Palm Beach, FL","Fort Lauderdale-Pompano Beach-Deerfield Beach, FL",1,true
-12,086,370,33100,33124,fl,Miami-Dade County,"Miami-Fort Lauderdale-Port St. Lucie, FL","Miami-Fort Lauderdale-West Palm Beach, FL","Miami-Miami Beach-Kendall, FL",1,true
-12,099,370,33100,48424,fl,Palm Beach County,"Miami-Fort Lauderdale-Port St. Lucie, FL","Miami-Fort Lauderdale-West Palm Beach, FL","West Palm Beach-Boca Raton-Delray Beach, FL",1,true
+12,011,370,33100,22744,fl,Broward County,"Miami-Port St. Lucie-Fort Lauderdale, FL","Miami-Fort Lauderdale-Pompano Beach, FL","Fort Lauderdale-Pompano Beach-Sunrise, FL",1,true
+12,086,370,33100,33124,fl,Miami-Dade County,"Miami-Port St. Lucie-Fort Lauderdale, FL","Miami-Fort Lauderdale-Pompano Beach, FL","Miami-Miami Beach-Kendall, FL",1,true
+12,099,370,33100,48424,fl,Palm Beach County,"Miami-Port St. Lucie-Fort Lauderdale, FL","Miami-Fort Lauderdale-Pompano Beach, FL","West Palm Beach-Boca Raton-Boynton Beach, FL",1,true
 18,091,176,33140,,in,LaPorte County,"Chicago-Naperville, IL-IN-WI","Michigan City-La Porte, IN",,1,true
 21,013,,33180,,ky,Bell County,,"Middlesborough, KY",,2,true
 26,111,474,33220,,mi,Midland County,"Saginaw-Midland-Bay City, MI","Midland, MI",,1,true
@@ -1077,10 +1095,11 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 48,329,372,33260,,tx,Midland County,"Midland-Odessa, TX","Midland, TX",,1,true
 13,009,,33300,,ga,Baldwin County,,"Milledgeville, GA",,2,true
 13,141,,33300,,ga,Hancock County,,"Milledgeville, GA",,2,false
-55,079,376,33340,,wi,Milwaukee County,"Milwaukee-Racine-Waukesha, WI","Milwaukee-Waukesha-West Allis, WI",,1,true
-55,089,376,33340,,wi,Ozaukee County,"Milwaukee-Racine-Waukesha, WI","Milwaukee-Waukesha-West Allis, WI",,1,true
-55,131,376,33340,,wi,Washington County,"Milwaukee-Racine-Waukesha, WI","Milwaukee-Waukesha-West Allis, WI",,1,false
-55,133,376,33340,,wi,Waukesha County,"Milwaukee-Racine-Waukesha, WI","Milwaukee-Waukesha-West Allis, WI",,1,true
+55,079,376,33340,,wi,Milwaukee County,"Milwaukee-Racine-Waukesha, WI","Milwaukee-Waukesha, WI",,1,true
+55,089,376,33340,,wi,Ozaukee County,"Milwaukee-Racine-Waukesha, WI","Milwaukee-Waukesha, WI",,1,true
+55,131,376,33340,,wi,Washington County,"Milwaukee-Racine-Waukesha, WI","Milwaukee-Waukesha, WI",,1,false
+55,133,376,33340,,wi,Waukesha County,"Milwaukee-Racine-Waukesha, WI","Milwaukee-Waukesha, WI",,1,true
+22,119,508,33380,,la,Webster Parish,"Shreveport-Bossier City-Minden, LA","Minden, LA",,2,true
 48,363,206,33420,,tx,Palo Pinto County,"Dallas-Fort Worth, TX-OK","Mineral Wells, TX",,2,true
 27,003,378,33460,,mn,Anoka County,"Minneapolis-St. Paul, MN-WI","Minneapolis-St. Paul-Bloomington, MN-WI",,1,true
 27,019,378,33460,,mn,Carver County,"Minneapolis-St. Paul, MN-WI","Minneapolis-St. Paul-Bloomington, MN-WI",,1,true
@@ -1093,7 +1112,6 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 27,123,378,33460,,mn,Ramsey County,"Minneapolis-St. Paul, MN-WI","Minneapolis-St. Paul-Bloomington, MN-WI",,1,true
 27,139,378,33460,,mn,Scott County,"Minneapolis-St. Paul, MN-WI","Minneapolis-St. Paul-Bloomington, MN-WI",,1,true
 27,141,378,33460,,mn,Sherburne County,"Minneapolis-St. Paul, MN-WI","Minneapolis-St. Paul-Bloomington, MN-WI",,1,true
-27,143,378,33460,,mn,Sibley County,"Minneapolis-St. Paul, MN-WI","Minneapolis-St. Paul-Bloomington, MN-WI",,1,false
 27,163,378,33460,,mn,Washington County,"Minneapolis-St. Paul, MN-WI","Minneapolis-St. Paul-Bloomington, MN-WI",,1,true
 27,171,378,33460,,mn,Wright County,"Minneapolis-St. Paul, MN-WI","Minneapolis-St. Paul-Bloomington, MN-WI",,1,true
 55,093,378,33460,,wi,Pierce County,"Minneapolis-St. Paul, MN-WI","Minneapolis-St. Paul-Bloomington, MN-WI",,1,false
@@ -1106,28 +1124,34 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 46,061,,33580,,sd,Hanson County,,"Mitchell, SD",,2,false
 29,175,190,33620,,mo,Randolph County,"Columbia-Moberly-Mexico, MO","Moberly, MO",,2,true
 01,097,380,33660,,al,Mobile County,"Mobile-Daphne-Fairhope, AL","Mobile, AL",,1,true
-06,099,382,33700,,ca,Stanislaus County,"Modesto-Merced, CA","Modesto, CA",,1,true
-22,073,384,33740,,la,Ouachita Parish,"Monroe-Ruston-Bastrop, LA","Monroe, LA",,1,true
-22,111,384,33740,,la,Union Parish,"Monroe-Ruston-Bastrop, LA","Monroe, LA",,1,false
+01,129,380,33660,,al,Washington County,"Mobile-Daphne-Fairhope, AL","Mobile, AL",,1,false
+06,099,488,33700,,ca,Stanislaus County,"San Jose-San Francisco-Oakland, CA","Modesto, CA",,1,true
+22,067,384,33740,,la,Morehouse Parish,"Monroe-Ruston, LA","Monroe, LA",,1,false
+22,073,384,33740,,la,Ouachita Parish,"Monroe-Ruston, LA","Monroe, LA",,1,true
+22,111,384,33740,,la,Union Parish,"Monroe-Ruston, LA","Monroe, LA",,1,false
 26,115,220,33780,,mi,Monroe County,"Detroit-Warren-Ann Arbor, MI","Monroe, MI",,1,true
-01,001,,33860,,al,Autauga County,,"Montgomery, AL",,1,true
-01,051,,33860,,al,Elmore County,,"Montgomery, AL",,1,true
-01,085,,33860,,al,Lowndes County,,"Montgomery, AL",,1,false
-01,101,,33860,,al,Montgomery County,,"Montgomery, AL",,1,true
+01,001,388,33860,,al,Autauga County,"Montgomery-Selma-Alexander City, AL","Montgomery, AL",,1,true
+01,051,388,33860,,al,Elmore County,"Montgomery-Selma-Alexander City, AL","Montgomery, AL",,1,true
+01,085,388,33860,,al,Lowndes County,"Montgomery-Selma-Alexander City, AL","Montgomery, AL",,1,false
+01,101,388,33860,,al,Montgomery County,"Montgomery-Selma-Alexander City, AL","Montgomery, AL",,1,true
 08,085,,33940,,co,Montrose County,,"Montrose, CO",,2,true
+08,091,,33940,,co,Ouray County,,"Montrose, CO",,2,false
 37,031,404,33980,,nc,Carteret County,"New Bern-Morehead City, NC","Morehead City, NC",,2,true
 22,101,318,34020,,la,St. Mary Parish,"Lafayette-Opelousas-Morgan City, LA","Morgan City, LA",,2,true
 54,061,390,34060,,wv,Monongalia County,"Morgantown-Fairmont, WV","Morgantown, WV",,1,true
 54,077,390,34060,,wv,Preston County,"Morgantown-Fairmont, WV","Morgantown, WV",,1,false
-47,063,314,34100,,tn,Hamblen County,"Knoxville-Morristown-Sevierville, TN","Morristown, TN",,1,true
-47,089,314,34100,,tn,Jefferson County,"Knoxville-Morristown-Sevierville, TN","Morristown, TN",,1,true
+47,057,315,34100,,tn,Grainger County,"Knoxville-Morristown-Sevierville, TN","Morristown, TN",,1,false
+47,063,315,34100,,tn,Hamblen County,"Knoxville-Morristown-Sevierville, TN","Morristown, TN",,1,true
+47,089,315,34100,,tn,Jefferson County,"Knoxville-Morristown-Sevierville, TN","Morristown, TN",,1,true
 16,057,446,34140,,id,Latah County,"Pullman-Moscow, WA-ID","Moscow, ID",,2,true
 53,025,393,34180,,wa,Grant County,"Moses Lake-Othello, WA","Moses Lake, WA",,2,true
 13,071,,34220,,ga,Colquitt County,,"Moultrie, GA",,2,true
 05,005,,34260,,ar,Baxter County,,"Mountain Home, AR",,2,true
 16,039,147,34300,,id,Elmore County,"Boise City-Mountain Home-Ontario, ID-OR","Mountain Home, ID",,2,true
 37,171,268,34340,,nc,Surry County,"Greensboro--Winston-Salem--High Point, NC","Mount Airy, NC",,2,true
+54,045,170,34350,,wv,Logan County,"Charleston-Huntington-Ashland, WV-OH-KY","Mount Gay-Shamrock, WV",,2,true
 26,073,394,34380,,mi,Isabella County,"Mount Pleasant-Alma, MI","Mount Pleasant, MI",,2,true
+48,063,,34420,,tx,Camp County,,"Mount Pleasant, TX",,2,false
 48,449,,34420,,tx,Titus County,,"Mount Pleasant, TX",,2,true
 21,011,336,34460,,ky,Bath County,"Lexington-Fayette--Richmond--Frankfort, KY","Mount Sterling, KY",,2,false
 21,165,336,34460,,ky,Menifee County,"Lexington-Fayette--Richmond--Frankfort, KY","Mount Sterling, KY",,2,false
@@ -1138,18 +1162,17 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 18,035,294,34620,,in,Delaware County,"Indianapolis-Carmel-Muncie, IN","Muncie, IN",,1,true
 21,035,,34660,,ky,Calloway County,,"Murray, KY",,2,true
 19,139,209,34700,,ia,Muscatine County,"Davenport-Moline, IA-IL","Muscatine, IA",,2,true
-26,121,266,34740,,mi,Muskegon County,"Grand Rapids-Wyoming-Muskegon, MI","Muskegon, MI",,1,true
+26,121,266,34740,,mi,Muskegon County,"Grand Rapids-Kentwood-Muskegon, MI","Muskegon, MI",,1,true
 40,101,538,34780,,ok,Muskogee County,"Tulsa-Muskogee-Bartlesville, OK","Muskogee, OK",,2,true
 37,019,396,34820,,nc,Brunswick County,"Myrtle Beach-Conway, SC-NC","Myrtle Beach-Conway-North Myrtle Beach, SC-NC",,1,true
 45,051,396,34820,,sc,Horry County,"Myrtle Beach-Conway, SC-NC","Myrtle Beach-Conway-North Myrtle Beach, SC-NC",,1,true
 48,347,,34860,,tx,Nacogdoches County,,"Nacogdoches, TX",,2,true
 06,055,488,34900,,ca,Napa County,"San Jose-San Francisco-Oakland, CA","Napa, CA",,1,true
-12,021,162,34940,,fl,Collier County,"Cape Coral-Fort Myers-Naples, FL","Naples-Immokalee-Marco Island, FL",,1,true
+12,021,163,34940,,fl,Collier County,"Cape Coral-Fort Myers-Naples, FL","Naples-Marco Island, FL",,1,true
 47,015,400,34980,,tn,Cannon County,"Nashville-Davidson--Murfreesboro, TN","Nashville-Davidson--Murfreesboro--Franklin, TN",,1,false
 47,021,400,34980,,tn,Cheatham County,"Nashville-Davidson--Murfreesboro, TN","Nashville-Davidson--Murfreesboro--Franklin, TN",,1,false
 47,037,400,34980,,tn,Davidson County,"Nashville-Davidson--Murfreesboro, TN","Nashville-Davidson--Murfreesboro--Franklin, TN",,1,true
 47,043,400,34980,,tn,Dickson County,"Nashville-Davidson--Murfreesboro, TN","Nashville-Davidson--Murfreesboro--Franklin, TN",,1,false
-47,081,400,34980,,tn,Hickman County,"Nashville-Davidson--Murfreesboro, TN","Nashville-Davidson--Murfreesboro--Franklin, TN",,1,false
 47,111,400,34980,,tn,Macon County,"Nashville-Davidson--Murfreesboro, TN","Nashville-Davidson--Murfreesboro--Franklin, TN",,1,false
 47,119,400,34980,,tn,Maury County,"Nashville-Davidson--Murfreesboro, TN","Nashville-Davidson--Murfreesboro--Franklin, TN",,1,false
 47,147,400,34980,,tn,Robertson County,"Nashville-Davidson--Murfreesboro, TN","Nashville-Davidson--Murfreesboro--Franklin, TN",,1,false
@@ -1179,35 +1202,32 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 22,103,406,35380,,la,St. Tammany Parish,"New Orleans-Metairie-Hammond, LA-MS","New Orleans-Metairie, LA",,1,false
 39,157,184,35420,,oh,Tuscarawas County,"Cleveland-Akron-Canton, OH","New Philadelphia-Dover, OH",,2,true
 41,041,,35440,,or,Lincoln County,,"Newport, OR",,2,true
-47,029,314,35460,,tn,Cocke County,"Knoxville-Morristown-Sevierville, TN","Newport, TN",,2,true
-19,099,218,35500,,ia,Jasper County,"Des Moines-Ames-West Des Moines, IA","Newton, IA",,2,true
-27,015,359,35580,,mn,Brown County,"Mankato-New Ulm-North Mankato, MN","New Ulm, MN",,2,true
-36,027,408,35620,20524,ny,Dutchess County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Dutchess County-Putnam County, NY",1,false
-36,079,408,35620,20524,ny,Putnam County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Dutchess County-Putnam County, NY",1,true
+47,029,315,35460,,tn,Cocke County,"Knoxville-Morristown-Sevierville, TN","Newport, TN",,2,true
+27,015,359,35580,,mn,Brown County,"Mankato-New Ulm, MN","New Ulm, MN",,2,true
 36,059,408,35620,35004,ny,Nassau County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Nassau County-Suffolk County, NY",1,true
 36,103,408,35620,35004,ny,Suffolk County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Nassau County-Suffolk County, NY",1,true
 34,013,408,35620,35084,nj,Essex County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Newark, NJ-PA",1,true
 34,019,408,35620,35084,nj,Hunterdon County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Newark, NJ-PA",1,true
 34,027,408,35620,35084,nj,Morris County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Newark, NJ-PA",1,true
-34,035,408,35620,35084,nj,Somerset County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Newark, NJ-PA",1,true
 34,037,408,35620,35084,nj,Sussex County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Newark, NJ-PA",1,true
 34,039,408,35620,35084,nj,Union County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Newark, NJ-PA",1,true
 42,103,408,35620,35084,pa,Pike County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","Newark, NJ-PA",1,false
+34,023,408,35620,35154,nj,Middlesex County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New Brunswick-Lakewood, NJ",1,true
+34,025,408,35620,35154,nj,Monmouth County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New Brunswick-Lakewood, NJ",1,true
+34,029,408,35620,35154,nj,Ocean County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New Brunswick-Lakewood, NJ",1,true
+34,035,408,35620,35154,nj,Somerset County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New Brunswick-Lakewood, NJ",1,true
 34,003,408,35620,35614,nj,Bergen County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
 34,017,408,35620,35614,nj,Hudson County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
-34,023,408,35620,35614,nj,Middlesex County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
-34,025,408,35620,35614,nj,Monmouth County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
-34,029,408,35620,35614,nj,Ocean County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
 34,031,408,35620,35614,nj,Passaic County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
 36,005,408,35620,35614,ny,Bronx County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
 36,047,408,35620,35614,ny,Kings County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
 36,061,408,35620,35614,ny,New York County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
-36,071,408,35620,35614,ny,Orange County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,false
+36,079,408,35620,35614,ny,Putnam County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
 36,081,408,35620,35614,ny,Queens County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
 36,085,408,35620,35614,ny,Richmond County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
 36,087,408,35620,35614,ny,Rockland County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
 36,119,408,35620,35614,ny,Westchester County,"New York-Newark, NY-NJ-CT-PA","New York-Newark-Jersey City, NY-NJ-PA","New York-Jersey City-White Plains, NY-NJ",1,true
-26,021,515,35660,,mi,Berrien County,"South Bend-Elkhart-Mishawaka, IN-MI","Niles-Benton Harbor, MI",,1,true
+26,021,515,35660,,mi,Berrien County,"South Bend-Elkhart-Mishawaka, IN-MI","Niles, MI",,1,true
 04,023,536,35700,,az,Santa Cruz County,"Tucson-Nogales, AZ","Nogales, AZ",,2,true
 31,119,,35740,,ne,Madison County,,"Norfolk, NE",,2,true
 31,139,,35740,,ne,Pierce County,,"Norfolk, NE",,2,false
@@ -1220,7 +1240,7 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 18,079,294,35860,,in,Jennings County,"Indianapolis-Carmel-Muncie, IN","North Vernon, IN",,2,true
 37,193,,35900,,nc,Wilkes County,,"North Wilkesboro, NC",,2,true
 39,077,184,35940,,oh,Huron County,"Cleveland-Akron-Canton, OH","Norwalk, OH",,2,true
-09,011,278,35980,,ct,New London County,"Hartford-West Hartford, CT","Norwich-New London, CT",,1,true
+09,011,278,35980,,ct,New London County,"Hartford-East Hartford, CT","Norwich-New London, CT",,1,true
 53,029,500,36020,,wa,Island County,"Seattle-Tacoma, WA","Oak Harbor, WA",,2,true
 12,083,,36100,,fl,Marion County,,"Ocala, FL",,1,true
 34,009,428,36140,,nj,Cape May County,"Philadelphia-Reading-Camden, PA-NJ-DE-MD","Ocean City, NJ",,1,true
@@ -1231,7 +1251,7 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 49,057,482,36260,,ut,Weber County,"Salt Lake City-Provo-Orem, UT","Ogden-Clearfield, UT",,1,true
 36,089,,36300,,ny,St. Lawrence County,,"Ogdensburg-Massena, NY",,2,true
 42,121,,36340,,pa,Venango County,,"Oil City, PA",,2,true
-12,093,370,36380,,fl,Okeechobee County,"Miami-Fort Lauderdale-Port St. Lucie, FL","Okeechobee, FL",,2,true
+12,093,,36380,,fl,Okeechobee County,,"Okeechobee, FL",,2,true
 40,017,416,36420,,ok,Canadian County,"Oklahoma City-Shawnee, OK","Oklahoma City, OK",,1,true
 40,027,416,36420,,ok,Cleveland County,"Oklahoma City-Shawnee, OK","Oklahoma City, OK",,1,true
 40,051,416,36420,,ok,Grady County,"Oklahoma City-Shawnee, OK","Oklahoma City, OK",,1,false
@@ -1239,8 +1259,8 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 40,083,416,36420,,ok,Logan County,"Oklahoma City-Shawnee, OK","Oklahoma City, OK",,1,true
 40,087,416,36420,,ok,McClain County,"Oklahoma City-Shawnee, OK","Oklahoma City, OK",,1,false
 40,109,416,36420,,ok,Oklahoma County,"Oklahoma City-Shawnee, OK","Oklahoma City, OK",,1,true
-36,009,160,36460,,ny,Cattaraugus County,"Buffalo-Cheektowaga, NY","Olean, NY",,2,true
-53,067,500,36500,,wa,Thurston County,"Seattle-Tacoma, WA","Olympia-Tumwater, WA",,1,true
+36,009,160,36460,,ny,Cattaraugus County,"Buffalo-Cheektowaga-Olean, NY","Olean, NY",,2,true
+53,067,500,36500,,wa,Thurston County,"Seattle-Tacoma, WA","Olympia-Lacey-Tumwater, WA",,1,true
 19,085,420,36540,,ia,Harrison County,"Omaha-Council Bluffs-Fremont, NE-IA","Omaha-Council Bluffs, NE-IA",,1,false
 19,129,420,36540,,ia,Mills County,"Omaha-Council Bluffs-Fremont, NE-IA","Omaha-Council Bluffs, NE-IA",,1,false
 19,155,420,36540,,ia,Pottawattamie County,"Omaha-Council Bluffs-Fremont, NE-IA","Omaha-Council Bluffs, NE-IA",,1,true
@@ -1254,54 +1274,55 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 41,045,147,36620,,or,Malheur County,"Boise City-Mountain Home-Ontario, ID-OR","Ontario, OR-ID",,2,true
 22,097,318,36660,,la,St. Landry Parish,"Lafayette-Opelousas-Morgan City, LA","Opelousas, LA",,2,true
 45,075,192,36700,,sc,Orangeburg County,"Columbia-Orangeburg-Newberry, SC","Orangeburg, SC",,2,true
-12,069,422,36740,,fl,Lake County,"Orlando-Deltona-Daytona Beach, FL","Orlando-Kissimmee-Sanford, FL",,1,false
-12,095,422,36740,,fl,Orange County,"Orlando-Deltona-Daytona Beach, FL","Orlando-Kissimmee-Sanford, FL",,1,true
-12,097,422,36740,,fl,Osceola County,"Orlando-Deltona-Daytona Beach, FL","Orlando-Kissimmee-Sanford, FL",,1,false
-12,117,422,36740,,fl,Seminole County,"Orlando-Deltona-Daytona Beach, FL","Orlando-Kissimmee-Sanford, FL",,1,true
+12,069,422,36740,,fl,Lake County,"Orlando-Lakeland-Deltona, FL","Orlando-Kissimmee-Sanford, FL",,1,false
+12,095,422,36740,,fl,Orange County,"Orlando-Lakeland-Deltona, FL","Orlando-Kissimmee-Sanford, FL",,1,true
+12,097,422,36740,,fl,Osceola County,"Orlando-Lakeland-Deltona, FL","Orlando-Kissimmee-Sanford, FL",,1,false
+12,117,422,36740,,fl,Seminole County,"Orlando-Lakeland-Deltona, FL","Orlando-Kissimmee-Sanford, FL",,1,true
 55,139,118,36780,,wi,Winnebago County,"Appleton-Oshkosh-Neenah, WI","Oshkosh-Neenah, WI",,1,true
-19,123,,36820,,ia,Mahaska County,,"Oskaloosa, IA",,2,true
+19,123,218,36820,,ia,Mahaska County,"Des Moines-Ames-West Des Moines, IA","Oskaloosa, IA",,2,true
 53,001,393,36830,,wa,Adams County,"Moses Lake-Othello, WA","Othello, WA",,2,true
+17,011,176,36837,,il,Bureau County,"Chicago-Naperville, IL-IN-WI","Ottawa, IL",,2,true
+17,099,176,36837,,il,LaSalle County,"Chicago-Naperville, IL-IN-WI","Ottawa, IL",,2,true
+17,155,176,36837,,il,Putnam County,"Chicago-Naperville, IL-IN-WI","Ottawa, IL",,2,false
 20,059,312,36840,,ks,Franklin County,"Kansas City-Overland Park-Kansas City, MO-KS","Ottawa, KS",,2,true
-17,011,176,36860,,il,Bureau County,"Chicago-Naperville, IL-IN-WI","Ottawa-Peru, IL",,2,true
-17,099,176,36860,,il,LaSalle County,"Chicago-Naperville, IL-IN-WI","Ottawa-Peru, IL",,2,true
-17,155,176,36860,,il,Putnam County,"Chicago-Naperville, IL-IN-WI","Ottawa-Peru, IL",,2,false
-19,051,,36900,,ia,Davis County,,"Ottumwa, IA",,2,false
 19,179,,36900,,ia,Wapello County,,"Ottumwa, IA",,2,true
-27,147,,36940,,mn,Steele County,,"Owatonna, MN",,2,true
+27,147,378,36940,,mn,Steele County,"Minneapolis-St. Paul, MN-WI","Owatonna, MN",,2,true
 21,059,,36980,,ky,Daviess County,,"Owensboro, KY",,1,true
 21,091,,36980,,ky,Hancock County,,"Owensboro, KY",,1,false
 21,149,,36980,,ky,McLean County,,"Owensboro, KY",,1,false
-26,155,330,37020,,mi,Shiawassee County,"Lansing-East Lansing-Owosso, MI","Owosso, MI",,2,true
 28,071,,37060,,ms,Lafayette County,,"Oxford, MS",,2,true
-37,077,450,37080,,nc,Granville County,"Raleigh-Durham-Chapel Hill, NC","Oxford, NC",,2,true
 06,111,348,37100,,ca,Ventura County,"Los Angeles-Long Beach, CA","Oxnard-Thousand Oaks-Ventura, CA",,1,true
-01,045,222,37120,,al,Dale County,"Dothan-Enterprise-Ozark, AL","Ozark, AL",,2,true
+01,045,222,37120,,al,Dale County,"Dothan-Ozark, AL","Ozark, AL",,2,true
 17,127,424,37140,,il,Massac County,"Paducah-Mayfield, KY-IL","Paducah, KY-IL",,2,false
 21,007,424,37140,,ky,Ballard County,"Paducah-Mayfield, KY-IL","Paducah, KY-IL",,2,false
 21,139,424,37140,,ky,Livingston County,"Paducah-Mayfield, KY-IL","Paducah, KY-IL",,2,false
 21,145,424,37140,,ky,McCracken County,"Paducah-Mayfield, KY-IL","Paducah, KY-IL",,2,true
-32,023,332,37220,,nv,Nye County,"Las Vegas-Henderson, NV-AZ","Pahrump, NV",,2,true
+32,023,332,37220,,nv,Nye County,"Las Vegas-Henderson, NV","Pahrump, NV",,2,true
 12,107,300,37260,,fl,Putnam County,"Jacksonville-St. Marys-Palatka, FL-GA","Palatka, FL",,2,true
 48,001,,37300,,tx,Anderson County,,"Palestine, TX",,2,true
 12,009,,37340,,fl,Brevard County,,"Palm Bay-Melbourne-Titusville, FL",,1,true
-48,179,,37420,,tx,Gray County,,"Pampa, TX",,2,true
+48,179,108,37420,,tx,Gray County,"Amarillo-Pampa-Borger, TX","Pampa, TX",,2,true
+48,393,108,37420,,tx,Roberts County,"Amarillo-Pampa-Borger, TX","Pampa, TX",,2,false
 12,005,,37460,,fl,Bay County,,"Panama City, FL",,1,true
-12,045,,37460,,fl,Gulf County,,"Panama City, FL",,1,false
 05,055,308,37500,,ar,Greene County,"Jonesboro-Paragould, AR","Paragould, AR",,2,true
 47,079,,37540,,tn,Henry County,,"Paris, TN",,2,true
 48,277,,37580,,tx,Lamar County,,"Paris, TX",,2,true
 54,105,425,37620,,wv,Wirt County,"Parkersburg-Marietta-Vienna, WV-OH","Parkersburg-Vienna, WV",,1,false
 54,107,425,37620,,wv,Wood County,"Parkersburg-Marietta-Vienna, WV-OH","Parkersburg-Vienna, WV",,1,true
 20,099,,37660,,ks,Labette County,,"Parsons, KS",,2,true
-04,007,,37740,,az,Gila County,,"Payson, AZ",,2,true
+04,007,429,37740,,az,Gila County,"Phoenix-Mesa, AZ","Payson, AZ",,2,true
+48,163,484,37770,,tx,Frio County,"San Antonio-New Braunfels-Pearsall, TX","Pearsall, TX",,2,true
+48,301,,37780,,tx,Loving County,,"Pecos, TX",,2,false
 48,389,,37780,,tx,Reeves County,,"Pecos, TX",,2,true
-12,033,,37860,,fl,Escambia County,,"Pensacola-Ferry Pass-Brent, FL",,1,true
-12,113,,37860,,fl,Santa Rosa County,,"Pensacola-Ferry Pass-Brent, FL",,1,true
-17,123,426,37900,,il,Marshall County,"Peoria-Canton, IL","Peoria, IL",,1,false
-17,143,426,37900,,il,Peoria County,"Peoria-Canton, IL","Peoria, IL",,1,true
-17,175,426,37900,,il,Stark County,"Peoria-Canton, IL","Peoria, IL",,1,false
-17,179,426,37900,,il,Tazewell County,"Peoria-Canton, IL","Peoria, IL",,1,true
-17,203,426,37900,,il,Woodford County,"Peoria-Canton, IL","Peoria, IL",,1,true
+19,125,218,37800,,ia,Marion County,"Des Moines-Ames-West Des Moines, IA","Pella, IA",,2,true
+12,033,426,37860,,fl,Escambia County,"Pensacola-Ferry Pass, FL-AL","Pensacola-Ferry Pass-Brent, FL",,1,true
+12,113,426,37860,,fl,Santa Rosa County,"Pensacola-Ferry Pass, FL-AL","Pensacola-Ferry Pass-Brent, FL",,1,true
+17,057,,37900,,il,Fulton County,,"Peoria, IL",,1,false
+17,123,,37900,,il,Marshall County,,"Peoria, IL",,1,false
+17,143,,37900,,il,Peoria County,,"Peoria, IL",,1,true
+17,175,,37900,,il,Stark County,,"Peoria, IL",,1,false
+17,179,,37900,,il,Tazewell County,,"Peoria, IL",,1,true
+17,203,,37900,,il,Woodford County,,"Peoria, IL",,1,true
 18,103,316,37940,,in,Miami County,"Kokomo-Peru, IN","Peru, IN",,2,true
 34,005,428,37980,15804,nj,Burlington County,"Philadelphia-Reading-Camden, PA-NJ-DE-MD","Philadelphia-Camden-Wilmington, PA-NJ-DE-MD","Camden, NJ",1,true
 34,007,428,37980,15804,nj,Camden County,"Philadelphia-Reading-Camden, PA-NJ-DE-MD","Philadelphia-Camden-Wilmington, PA-NJ-DE-MD","Camden, NJ",1,true
@@ -1314,16 +1335,15 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 10,003,428,37980,48864,de,New Castle County,"Philadelphia-Reading-Camden, PA-NJ-DE-MD","Philadelphia-Camden-Wilmington, PA-NJ-DE-MD","Wilmington, DE-MD-NJ",1,true
 24,015,428,37980,48864,md,Cecil County,"Philadelphia-Reading-Camden, PA-NJ-DE-MD","Philadelphia-Camden-Wilmington, PA-NJ-DE-MD","Wilmington, DE-MD-NJ",1,true
 34,033,428,37980,48864,nj,Salem County,"Philadelphia-Reading-Camden, PA-NJ-DE-MD","Philadelphia-Camden-Wilmington, PA-NJ-DE-MD","Wilmington, DE-MD-NJ",1,true
-04,013,,38060,,az,Maricopa County,,"Phoenix-Mesa-Scottsdale, AZ",,1,true
-04,021,,38060,,az,Pinal County,,"Phoenix-Mesa-Scottsdale, AZ",,1,true
+04,013,429,38060,,az,Maricopa County,"Phoenix-Mesa, AZ","Phoenix-Mesa-Chandler, AZ",,1,true
+04,021,429,38060,,az,Pinal County,"Phoenix-Mesa, AZ","Phoenix-Mesa-Chandler, AZ",,1,true
 28,109,406,38100,,ms,Pearl River County,"New Orleans-Metairie-Hammond, LA-MS","Picayune, MS",,2,true
 46,065,,38180,,sd,Hughes County,,"Pierre, SD",,2,true
 46,117,,38180,,sd,Stanley County,,"Pierre, SD",,2,true
-46,119,,38180,,sd,Sully County,,"Pierre, SD",,2,false
 05,025,340,38220,,ar,Cleveland County,"Little Rock-North Little Rock, AR","Pine Bluff, AR",,1,false
 05,069,340,38220,,ar,Jefferson County,"Little Rock-North Little Rock, AR","Pine Bluff, AR",,1,true
 05,079,340,38220,,ar,Lincoln County,"Little Rock-North Little Rock, AR","Pine Bluff, AR",,1,false
-37,125,,38240,,nc,Moore County,,"Pinehurst-Southern Pines, NC",,2,true
+37,125,246,38240,,nc,Moore County,"Fayetteville-Sanford-Lumberton, NC","Pinehurst-Southern Pines, NC",,2,true
 20,037,,38260,,ks,Crawford County,,"Pittsburg, KS",,2,true
 42,003,430,38300,,pa,Allegheny County,"Pittsburgh-New Castle-Weirton, PA-OH-WV","Pittsburgh, PA",,1,true
 42,005,430,38300,,pa,Armstrong County,"Pittsburgh-New Castle-Weirton, PA-OH-WV","Pittsburgh, PA",,1,false
@@ -1333,26 +1353,24 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 42,125,430,38300,,pa,Washington County,"Pittsburgh-New Castle-Weirton, PA-OH-WV","Pittsburgh, PA",,1,true
 42,129,430,38300,,pa,Westmoreland County,"Pittsburgh-New Castle-Weirton, PA-OH-WV","Pittsburgh, PA",,1,true
 25,003,,38340,,ma,Berkshire County,,"Pittsfield, MA",,1,true
-48,189,,38380,,tx,Hale County,,"Plainview, TX",,2,true
+48,189,352,38380,,tx,Hale County,"Lubbock-Plainview-Levelland, TX","Plainview, TX",,2,true
 55,043,,38420,,wi,Grant County,,"Platteville, WI",,2,true
 36,019,,38460,,ny,Clinton County,,"Plattsburgh, NY",,2,true
 18,099,515,38500,,in,Marshall County,"South Bend-Elkhart-Mishawaka, IN-MI","Plymouth, IN",,2,true
 16,005,,38540,,id,Bannock County,,"Pocatello, ID",,1,true
-39,053,,38580,,oh,Gallia County,,"Point Pleasant, WV-OH",,2,true
-54,053,,38580,,wv,Mason County,,"Point Pleasant, WV-OH",,2,true
+16,077,,38540,,id,Power County,,"Pocatello, ID",,1,false
+39,053,170,38580,,oh,Gallia County,"Charleston-Huntington-Ashland, WV-OH-KY","Point Pleasant, WV-OH",,2,true
+54,053,170,38580,,wv,Mason County,"Charleston-Huntington-Ashland, WV-OH-KY","Point Pleasant, WV-OH",,2,true
 40,071,,38620,,ok,Kay County,,"Ponca City, OK",,2,true
-72,055,434,38660,,pr,Guánica Municipio,"Ponce-Coamo-Santa Isabel, PR","Ponce, PR",,1,false
-72,059,434,38660,,pr,Guayanilla Municipio,"Ponce-Coamo-Santa Isabel, PR","Ponce, PR",,1,false
-72,075,434,38660,,pr,Juana Díaz Municipio,"Ponce-Coamo-Santa Isabel, PR","Ponce, PR",,1,false
-72,111,434,38660,,pr,Peñuelas Municipio,"Ponce-Coamo-Santa Isabel, PR","Ponce, PR",,1,false
-72,113,434,38660,,pr,Ponce Municipio,"Ponce-Coamo-Santa Isabel, PR","Ponce, PR",,1,true
-72,149,434,38660,,pr,Villalba Municipio,"Ponce-Coamo-Santa Isabel, PR","Ponce, PR",,1,false
-72,153,434,38660,,pr,Yauco Municipio,"Ponce-Coamo-Santa Isabel, PR","Ponce, PR",,1,false
+72,001,434,38660,,pr,Adjuntas Municipio,"Ponce-Yauco-Coamo, PR","Ponce, PR",,1,false
+72,075,434,38660,,pr,Juana Díaz Municipio,"Ponce-Yauco-Coamo, PR","Ponce, PR",,1,false
+72,113,434,38660,,pr,Ponce Municipio,"Ponce-Yauco-Coamo, PR","Ponce, PR",,1,true
+72,149,434,38660,,pr,Villalba Municipio,"Ponce-Yauco-Coamo, PR","Ponce, PR",,1,false
 17,105,145,38700,,il,Livingston County,"Bloomington-Pontiac, IL","Pontiac, IL",,2,true
 29,023,,38740,,mo,Butler County,,"Poplar Bluff, MO",,2,true
+29,181,,38740,,mo,Ripley County,,"Poplar Bluff, MO",,2,false
 35,041,188,38780,,nm,Roosevelt County,"Clovis-Portales, NM","Portales, NM",,2,true
 53,009,,38820,,wa,Clallam County,,"Port Angeles, WA",,2,true
-39,123,534,38840,,oh,Ottawa County,"Toledo-Port Clinton, OH","Port Clinton, OH",,2,true
 23,005,438,38860,,me,Cumberland County,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,1,true
 23,023,438,38860,,me,Sagadahoc County,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,1,false
 23,031,438,38860,,me,York County,"Portland-Lewiston-South Portland, ME","Portland-South Portland, ME",,1,true
@@ -1364,13 +1382,15 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 53,011,440,38900,,wa,Clark County,"Portland-Vancouver-Salem, OR-WA","Portland-Vancouver-Hillsboro, OR-WA",,1,true
 53,059,440,38900,,wa,Skamania County,"Portland-Vancouver-Salem, OR-WA","Portland-Vancouver-Hillsboro, OR-WA",,1,false
 48,057,544,38920,,tx,Calhoun County,"Victoria-Port Lavaca, TX","Port Lavaca, TX",,2,true
-12,085,370,38940,,fl,Martin County,"Miami-Fort Lauderdale-Port St. Lucie, FL","Port St. Lucie, FL",,1,true
-12,111,370,38940,,fl,St. Lucie County,"Miami-Fort Lauderdale-Port St. Lucie, FL","Port St. Lucie, FL",,1,true
+12,085,370,38940,,fl,Martin County,"Miami-Port St. Lucie-Fort Lauderdale, FL","Port St. Lucie, FL",,1,true
+12,111,370,38940,,fl,St. Lucie County,"Miami-Port St. Lucie-Fort Lauderdale, FL","Port St. Lucie, FL",,1,true
 39,145,170,39020,,oh,Scioto County,"Charleston-Huntington-Ashland, WV-OH-KY","Portsmouth, OH",,2,true
 42,107,,39060,,pa,Schuylkill County,,"Pottsville, PA",,2,true
-04,025,,39140,,az,Yavapai County,,"Prescott, AZ",,1,true
+36,027,408,39100,,ny,Dutchess County,"New York-Newark, NY-NJ-CT-PA","Poughkeepsie-Newburgh-Middletown, NY",,1,true
+36,071,408,39100,,ny,Orange County,"New York-Newark, NY-NJ-CT-PA","Poughkeepsie-Newburgh-Middletown, NY",,1,true
+04,025,,39150,,az,Yavapai County,,"Prescott Valley-Prescott, AZ",,1,true
 49,007,,39220,,ut,Carbon County,,"Price, UT",,2,true
-41,013,140,39260,,or,Crook County,"Bend-Redmond-Prineville, OR","Prineville, OR",,2,true
+41,013,140,39260,,or,Crook County,"Bend-Prineville, OR","Prineville, OR",,2,true
 25,005,148,39300,,ma,Bristol County,"Boston-Worcester-Providence, MA-RI-NH-CT","Providence-Warwick, RI-MA",,1,true
 44,001,148,39300,,ri,Bristol County,"Boston-Worcester-Providence, MA-RI-NH-CT","Providence-Warwick, RI-MA",,1,true
 44,003,148,39300,,ri,Kent County,"Boston-Worcester-Providence, MA-RI-NH-CT","Providence-Warwick, RI-MA",,1,true
@@ -1385,10 +1405,9 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 17,001,448,39500,,il,Adams County,"Quincy-Hannibal, IL-MO","Quincy, IL-MO",,2,true
 29,111,448,39500,,mo,Lewis County,"Quincy-Hannibal, IL-MO","Quincy, IL-MO",,2,false
 55,101,376,39540,,wi,Racine County,"Milwaukee-Racine-Waukesha, WI","Racine, WI",,1,true
-37,069,450,39580,,nc,Franklin County,"Raleigh-Durham-Chapel Hill, NC","Raleigh, NC",,1,false
-37,101,450,39580,,nc,Johnston County,"Raleigh-Durham-Chapel Hill, NC","Raleigh, NC",,1,true
-37,183,450,39580,,nc,Wake County,"Raleigh-Durham-Chapel Hill, NC","Raleigh, NC",,1,true
-46,033,452,39660,,sd,Custer County,"Rapid City-Spearfish, SD","Rapid City, SD",,1,false
+37,069,450,39580,,nc,Franklin County,"Raleigh-Durham-Cary, NC","Raleigh-Cary, NC",,1,false
+37,101,450,39580,,nc,Johnston County,"Raleigh-Durham-Cary, NC","Raleigh-Cary, NC",,1,true
+37,183,450,39580,,nc,Wake County,"Raleigh-Durham-Cary, NC","Raleigh-Cary, NC",,1,true
 46,093,452,39660,,sd,Meade County,"Rapid City-Spearfish, SD","Rapid City, SD",,1,true
 46,103,452,39660,,sd,Pennington County,"Rapid City-Spearfish, SD","Rapid City, SD",,1,true
 48,489,154,39700,,tx,Willacy County,"Brownsville-Harlingen-Raymondville, TX","Raymondville, TX",,2,true
@@ -1402,13 +1421,13 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 16,065,292,39940,,id,Madison County,"Idaho Falls-Rexburg-Blackfoot, ID","Rexburg, ID",,2,true
 18,177,458,39980,,in,Wayne County,"Richmond-Connersville, IN","Richmond, IN",,2,true
 51,007,,40060,,va,Amelia County,,"Richmond, VA",,1,false
-51,033,,40060,,va,Caroline County,,"Richmond, VA",,1,false
 51,036,,40060,,va,Charles City County,,"Richmond, VA",,1,false
 51,041,,40060,,va,Chesterfield County,,"Richmond, VA",,1,true
 51,053,,40060,,va,Dinwiddie County,,"Richmond, VA",,1,true
 51,075,,40060,,va,Goochland County,,"Richmond, VA",,1,false
 51,085,,40060,,va,Hanover County,,"Richmond, VA",,1,true
 51,087,,40060,,va,Henrico County,,"Richmond, VA",,1,true
+51,097,,40060,,va,King and Queen County,,"Richmond, VA",,1,false
 51,101,,40060,,va,King William County,,"Richmond, VA",,1,false
 51,127,,40060,,va,New Kent County,,"Richmond, VA",,1,false
 51,145,,40060,,va,Powhatan County,,"Richmond, VA",,1,false
@@ -1418,9 +1437,9 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 51,670,,40060,,va,Hopewell city,,"Richmond, VA",,1,true
 51,730,,40060,,va,Petersburg city,,"Richmond, VA",,1,true
 51,760,,40060,,va,Richmond city,,"Richmond, VA",,1,true
+21,065,336,40080,,ky,Estill County,"Lexington-Fayette--Richmond--Frankfort, KY","Richmond-Berea, KY",,2,false
 21,151,336,40080,,ky,Madison County,"Lexington-Fayette--Richmond--Frankfort, KY","Richmond-Berea, KY",,2,true
-21,203,336,40080,,ky,Rockcastle County,"Lexington-Fayette--Richmond--Frankfort, KY","Richmond-Berea, KY",,2,false
-48,427,365,40100,,tx,Starr County,"McAllen-Edinburg, TX","Rio Grande City, TX",,2,true
+48,427,365,40100,,tx,Starr County,"McAllen-Edinburg, TX","Rio Grande City-Roma, TX",,2,true
 06,065,348,40140,,ca,Riverside County,"Los Angeles-Long Beach, CA","Riverside-San Bernardino-Ontario, CA",,1,true
 06,071,348,40140,,ca,San Bernardino County,"Los Angeles-Long Beach, CA","Riverside-San Bernardino-Ontario, CA",,1,true
 56,013,,40180,,wy,Fremont County,,"Riverton, WY",,2,true
@@ -1446,21 +1465,23 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 17,007,466,40420,,il,Boone County,"Rockford-Freeport-Rochelle, IL","Rockford, IL",,1,true
 17,201,466,40420,,il,Winnebago County,"Rockford-Freeport-Rochelle, IL","Rockford, IL",,1,true
 37,153,,40460,,nc,Richmond County,,"Rockingham, NC",,2,true
+48,007,204,40530,,tx,Aransas County,"Corpus Christi-Kingsville-Alice, TX","Rockport, TX",,2,true
 56,037,,40540,,wy,Sweetwater County,,"Rock Springs, WY",,2,true
 37,065,468,40580,,nc,Edgecombe County,"Rocky Mount-Wilson-Roanoke Rapids, NC","Rocky Mount, NC",,1,true
 37,127,468,40580,,nc,Nash County,"Rocky Mount-Wilson-Roanoke Rapids, NC","Rocky Mount, NC",,1,true
 29,161,,40620,,mo,Phelps County,,"Rolla, MO",,2,true
-13,115,470,40660,,ga,Floyd County,"Rome-Summerville, GA","Rome, GA",,1,true
+13,115,122,40660,,ga,Floyd County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Rome, GA",,1,true
 41,019,,40700,,or,Douglas County,,"Roseburg, OR",,2,true
 35,005,,40740,,nm,Chaves County,,"Roswell, NM",,2,true
+35,027,,40760,,nm,Lincoln County,,"Ruidoso, NM",,2,true
 05,115,,40780,,ar,Pope County,,"Russellville, AR",,2,true
 05,149,,40780,,ar,Yell County,,"Russellville, AR",,2,false
-22,061,384,40820,,la,Lincoln Parish,"Monroe-Ruston-Bastrop, LA","Ruston, LA",,2,true
+22,061,384,40820,,la,Lincoln Parish,"Monroe-Ruston, LA","Ruston, LA",,2,true
 50,021,,40860,,vt,Rutland County,,"Rutland, VT",,2,true
-06,017,472,40900,,ca,El Dorado County,"Sacramento-Roseville, CA","Sacramento--Roseville--Arden-Arcade, CA",,1,true
-06,061,472,40900,,ca,Placer County,"Sacramento-Roseville, CA","Sacramento--Roseville--Arden-Arcade, CA",,1,true
-06,067,472,40900,,ca,Sacramento County,"Sacramento-Roseville, CA","Sacramento--Roseville--Arden-Arcade, CA",,1,true
-06,113,472,40900,,ca,Yolo County,"Sacramento-Roseville, CA","Sacramento--Roseville--Arden-Arcade, CA",,1,false
+06,017,472,40900,,ca,El Dorado County,"Sacramento-Roseville, CA","Sacramento-Roseville-Folsom, CA",,1,true
+06,061,472,40900,,ca,Placer County,"Sacramento-Roseville, CA","Sacramento-Roseville-Folsom, CA",,1,true
+06,067,472,40900,,ca,Sacramento County,"Sacramento-Roseville, CA","Sacramento-Roseville-Folsom, CA",,1,true
+06,113,472,40900,,ca,Yolo County,"Sacramento-Roseville, CA","Sacramento-Roseville-Folsom, CA",,1,false
 04,009,,40940,,az,Graham County,,"Safford, AZ",,2,true
 26,145,474,40980,,mi,Saginaw County,"Saginaw-Midland-Bay City, MI","Saginaw, MI",,1,true
 27,009,378,41060,,mn,Benton County,"Minneapolis-St. Paul, MN-WI","St. Cloud, MN",,1,true
@@ -1486,89 +1507,91 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 29,219,476,41180,,mo,Warren County,"St. Louis-St. Charles-Farmington, MO-IL","St. Louis, MO-IL",,1,false
 29,510,476,41180,,mo,St. Louis city,"St. Louis-St. Charles-Farmington, MO-IL","St. Louis, MO-IL",,1,true
 13,039,300,41220,,ga,Camden County,"Jacksonville-St. Marys-Palatka, FL-GA","St. Marys, GA",,2,true
+42,047,,41260,,pa,Elk County,,"St. Marys, PA",,2,true
 39,029,566,41400,,oh,Columbiana County,"Youngstown-Warren, OH-PA","Salem, OH",,2,true
 41,047,440,41420,,or,Marion County,"Portland-Vancouver-Salem, OR-WA","Salem, OR",,1,true
 41,053,440,41420,,or,Polk County,"Portland-Vancouver-Salem, OR-WA","Salem, OR",,1,true
 20,143,,41460,,ks,Ottawa County,,"Salina, KS",,2,false
 20,169,,41460,,ks,Saline County,,"Salina, KS",,2,true
 06,053,,41500,,ca,Monterey County,,"Salinas, CA",,1,true
-10,005,,41540,,de,Sussex County,,"Salisbury, MD-DE",,1,true
-24,039,,41540,,md,Somerset County,,"Salisbury, MD-DE",,1,false
-24,045,,41540,,md,Wicomico County,,"Salisbury, MD-DE",,1,true
-24,047,,41540,,md,Worcester County,,"Salisbury, MD-DE",,1,false
+10,005,480,41540,,de,Sussex County,"Salisbury-Cambridge, MD-DE","Salisbury, MD-DE",,1,true
+24,039,480,41540,,md,Somerset County,"Salisbury-Cambridge, MD-DE","Salisbury, MD-DE",,1,false
+24,045,480,41540,,md,Wicomico County,"Salisbury-Cambridge, MD-DE","Salisbury, MD-DE",,1,true
+24,047,480,41540,,md,Worcester County,"Salisbury-Cambridge, MD-DE","Salisbury, MD-DE",,1,false
 49,035,482,41620,,ut,Salt Lake County,"Salt Lake City-Provo-Orem, UT","Salt Lake City, UT",,1,true
 49,045,482,41620,,ut,Tooele County,"Salt Lake City-Provo-Orem, UT","Salt Lake City, UT",,1,false
 48,235,,41660,,tx,Irion County,,"San Angelo, TX",,1,false
+48,431,,41660,,tx,Sterling County,,"San Angelo, TX",,1,false
 48,451,,41660,,tx,Tom Green County,,"San Angelo, TX",,1,true
-48,013,,41700,,tx,Atascosa County,,"San Antonio-New Braunfels, TX",,1,false
-48,019,,41700,,tx,Bandera County,,"San Antonio-New Braunfels, TX",,1,false
-48,029,,41700,,tx,Bexar County,,"San Antonio-New Braunfels, TX",,1,true
-48,091,,41700,,tx,Comal County,,"San Antonio-New Braunfels, TX",,1,true
-48,187,,41700,,tx,Guadalupe County,,"San Antonio-New Braunfels, TX",,1,true
-48,259,,41700,,tx,Kendall County,,"San Antonio-New Braunfels, TX",,1,false
-48,325,,41700,,tx,Medina County,,"San Antonio-New Braunfels, TX",,1,false
-48,493,,41700,,tx,Wilson County,,"San Antonio-New Braunfels, TX",,1,false
-06,073,,41740,,ca,San Diego County,,"San Diego-Carlsbad, CA",,1,true
+48,013,484,41700,,tx,Atascosa County,"San Antonio-New Braunfels-Pearsall, TX","San Antonio-New Braunfels, TX",,1,false
+48,019,484,41700,,tx,Bandera County,"San Antonio-New Braunfels-Pearsall, TX","San Antonio-New Braunfels, TX",,1,false
+48,029,484,41700,,tx,Bexar County,"San Antonio-New Braunfels-Pearsall, TX","San Antonio-New Braunfels, TX",,1,true
+48,091,484,41700,,tx,Comal County,"San Antonio-New Braunfels-Pearsall, TX","San Antonio-New Braunfels, TX",,1,true
+48,187,484,41700,,tx,Guadalupe County,"San Antonio-New Braunfels-Pearsall, TX","San Antonio-New Braunfels, TX",,1,true
+48,259,484,41700,,tx,Kendall County,"San Antonio-New Braunfels-Pearsall, TX","San Antonio-New Braunfels, TX",,1,false
+48,325,484,41700,,tx,Medina County,"San Antonio-New Braunfels-Pearsall, TX","San Antonio-New Braunfels, TX",,1,false
+48,493,484,41700,,tx,Wilson County,"San Antonio-New Braunfels-Pearsall, TX","San Antonio-New Braunfels, TX",,1,false
+06,073,,41740,,ca,San Diego County,,"San Diego-Chula Vista-Carlsbad, CA",,1,true
 16,017,,41760,,id,Bonner County,,"Sandpoint, ID",,2,true
 39,043,184,41780,,oh,Erie County,"Cleveland-Akron-Canton, OH","Sandusky, OH",,2,true
-37,105,450,41820,,nc,Lee County,"Raleigh-Durham-Chapel Hill, NC","Sanford, NC",,2,true
-06,001,488,41860,36084,ca,Alameda County,"San Jose-San Francisco-Oakland, CA","San Francisco-Oakland-Hayward, CA","Oakland-Hayward-Berkeley, CA",1,true
-06,013,488,41860,36084,ca,Contra Costa County,"San Jose-San Francisco-Oakland, CA","San Francisco-Oakland-Hayward, CA","Oakland-Hayward-Berkeley, CA",1,false
-06,075,488,41860,41884,ca,San Francisco County,"San Jose-San Francisco-Oakland, CA","San Francisco-Oakland-Hayward, CA","San Francisco-Redwood City-South San Francisco, CA",1,true
-06,081,488,41860,41884,ca,San Mateo County,"San Jose-San Francisco-Oakland, CA","San Francisco-Oakland-Hayward, CA","San Francisco-Redwood City-South San Francisco, CA",1,true
-06,041,488,41860,42034,ca,Marin County,"San Jose-San Francisco-Oakland, CA","San Francisco-Oakland-Hayward, CA","San Rafael, CA",1,true
+37,105,246,41820,,nc,Lee County,"Fayetteville-Sanford-Lumberton, NC","Sanford, NC",,2,true
+06,001,488,41860,36084,ca,Alameda County,"San Jose-San Francisco-Oakland, CA","San Francisco-Oakland-Berkeley, CA","Oakland-Berkeley-Livermore, CA",1,true
+06,013,488,41860,36084,ca,Contra Costa County,"San Jose-San Francisco-Oakland, CA","San Francisco-Oakland-Berkeley, CA","Oakland-Berkeley-Livermore, CA",1,false
+06,075,488,41860,41884,ca,San Francisco County,"San Jose-San Francisco-Oakland, CA","San Francisco-Oakland-Berkeley, CA","San Francisco-San Mateo-Redwood City, CA",1,true
+06,081,488,41860,41884,ca,San Mateo County,"San Jose-San Francisco-Oakland, CA","San Francisco-Oakland-Berkeley, CA","San Francisco-San Mateo-Redwood City, CA",1,true
+06,041,488,41860,42034,ca,Marin County,"San Jose-San Francisco-Oakland, CA","San Francisco-Oakland-Berkeley, CA","San Rafael, CA",1,true
 72,023,364,41900,,pr,Cabo Rojo Municipio,"Mayagüez-San Germán, PR","San Germán, PR",,1,true
 72,079,364,41900,,pr,Lajas Municipio,"Mayagüez-San Germán, PR","San Germán, PR",,1,true
 72,121,364,41900,,pr,Sabana Grande Municipio,"Mayagüez-San Germán, PR","San Germán, PR",,1,true
 72,125,364,41900,,pr,San Germán Municipio,"Mayagüez-San Germán, PR","San Germán, PR",,1,true
 06,069,488,41940,,ca,San Benito County,"San Jose-San Francisco-Oakland, CA","San Jose-Sunnyvale-Santa Clara, CA",,1,false
 06,085,488,41940,,ca,Santa Clara County,"San Jose-San Francisco-Oakland, CA","San Jose-Sunnyvale-Santa Clara, CA",,1,true
-72,007,490,41980,,pr,Aguas Buenas Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,009,490,41980,,pr,Aibonito Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,017,490,41980,,pr,Barceloneta Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,false
-72,019,490,41980,,pr,Barranquitas Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,021,490,41980,,pr,Bayamón Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,025,490,41980,,pr,Caguas Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,029,490,41980,,pr,Canóvanas Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,031,490,41980,,pr,Carolina Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,033,490,41980,,pr,Cataño Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,035,490,41980,,pr,Cayey Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,037,490,41980,,pr,Ceiba Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,false
-72,039,490,41980,,pr,Ciales Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,041,490,41980,,pr,Cidra Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,045,490,41980,,pr,Comerío Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,047,490,41980,,pr,Corozal Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,051,490,41980,,pr,Dorado Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,053,490,41980,,pr,Fajardo Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,false
-72,054,490,41980,,pr,Florida Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,false
-72,061,490,41980,,pr,Guaynabo Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,063,490,41980,,pr,Gurabo Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,069,490,41980,,pr,Humacao Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,077,490,41980,,pr,Juncos Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,085,490,41980,,pr,Las Piedras Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,087,490,41980,,pr,Loíza Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,089,490,41980,,pr,Luquillo Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,false
-72,091,490,41980,,pr,Manatí Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,095,490,41980,,pr,Maunabo Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,false
-72,101,490,41980,,pr,Morovis Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,103,490,41980,,pr,Naguabo Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,false
-72,105,490,41980,,pr,Naranjito Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,107,490,41980,,pr,Orocovis Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,119,490,41980,,pr,Río Grande Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,127,490,41980,,pr,San Juan Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,129,490,41980,,pr,San Lorenzo Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,135,490,41980,,pr,Toa Alta Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,137,490,41980,,pr,Toa Baja Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,139,490,41980,,pr,Trujillo Alto Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,143,490,41980,,pr,Vega Alta Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,145,490,41980,,pr,Vega Baja Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-72,151,490,41980,,pr,Yabucoa Municipio,"San Juan-Carolina, PR","San Juan-Carolina-Caguas, PR",,1,true
-06,079,,42020,,ca,San Luis Obispo County,,"San Luis Obispo-Paso Robles-Arroyo Grande, CA",,1,true
+72,007,490,41980,,pr,Aguas Buenas Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,009,490,41980,,pr,Aibonito Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,017,490,41980,,pr,Barceloneta Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,false
+72,019,490,41980,,pr,Barranquitas Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,021,490,41980,,pr,Bayamón Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,025,490,41980,,pr,Caguas Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,029,490,41980,,pr,Canóvanas Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,031,490,41980,,pr,Carolina Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,033,490,41980,,pr,Cataño Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,035,490,41980,,pr,Cayey Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,037,490,41980,,pr,Ceiba Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,false
+72,039,490,41980,,pr,Ciales Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,041,490,41980,,pr,Cidra Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,045,490,41980,,pr,Comerío Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,047,490,41980,,pr,Corozal Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,051,490,41980,,pr,Dorado Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,053,490,41980,,pr,Fajardo Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,false
+72,054,490,41980,,pr,Florida Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,false
+72,061,490,41980,,pr,Guaynabo Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,063,490,41980,,pr,Gurabo Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,069,490,41980,,pr,Humacao Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,077,490,41980,,pr,Juncos Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,085,490,41980,,pr,Las Piedras Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,087,490,41980,,pr,Loíza Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,089,490,41980,,pr,Luquillo Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,false
+72,091,490,41980,,pr,Manatí Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,095,490,41980,,pr,Maunabo Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,false
+72,101,490,41980,,pr,Morovis Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,103,490,41980,,pr,Naguabo Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,false
+72,105,490,41980,,pr,Naranjito Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,107,490,41980,,pr,Orocovis Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,119,490,41980,,pr,Río Grande Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,127,490,41980,,pr,San Juan Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,129,490,41980,,pr,San Lorenzo Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,135,490,41980,,pr,Toa Alta Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,137,490,41980,,pr,Toa Baja Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,139,490,41980,,pr,Trujillo Alto Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,143,490,41980,,pr,Vega Alta Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,145,490,41980,,pr,Vega Baja Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+72,151,490,41980,,pr,Yabucoa Municipio,"San Juan-Bayamón, PR","San Juan-Bayamón-Caguas, PR",,1,true
+06,079,,42020,,ca,San Luis Obispo County,,"San Luis Obispo-Paso Robles, CA",,1,true
 06,087,488,42100,,ca,Santa Cruz County,"San Jose-San Francisco-Oakland, CA","Santa Cruz-Watsonville, CA",,1,true
 35,049,106,42140,,nm,Santa Fe County,"Albuquerque-Santa Fe-Las Vegas, NM","Santa Fe, NM",,1,true
-72,133,434,42180,,pr,Santa Isabel Municipio,"Ponce-Coamo-Santa Isabel, PR","Santa Isabel, PR",,2,true
+72,133,434,42180,,pr,Santa Isabel Municipio,"Ponce-Yauco-Coamo, PR","Santa Isabel, PR",,2,true
 06,083,,42200,,ca,Santa Barbara County,,"Santa Maria-Santa Barbara, CA",,1,true
-06,097,488,42220,,ca,Sonoma County,"San Jose-San Francisco-Oakland, CA","Santa Rosa, CA",,1,true
+06,097,488,42220,,ca,Sonoma County,"San Jose-San Francisco-Oakland, CA","Santa Rosa-Petaluma, CA",,1,true
 26,033,,42300,,mi,Chippewa County,,"Sault Ste. Marie, MI",,2,true
 13,029,496,42340,,ga,Bryan County,"Savannah-Hinesville-Statesboro, GA","Savannah, GA",,1,true
 13,051,496,42340,,ga,Chatham County,"Savannah-Hinesville-Statesboro, GA","Savannah, GA",,1,true
@@ -1577,22 +1600,23 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 31,007,,42420,,ne,Banner County,,"Scottsbluff, NE",,2,false
 31,157,,42420,,ne,Scotts Bluff County,,"Scottsbluff, NE",,2,true
 31,165,,42420,,ne,Sioux County,,"Scottsbluff, NE",,2,false
-01,071,174,42460,,al,Jackson County,"Chattanooga-Cleveland-Dalton, TN-GA-AL","Scottsboro, AL",,2,true
-42,069,,42540,,pa,Lackawanna County,,"Scranton--Wilkes-Barre--Hazleton, PA",,1,true
-42,079,,42540,,pa,Luzerne County,,"Scranton--Wilkes-Barre--Hazleton, PA",,1,true
-42,131,,42540,,pa,Wyoming County,,"Scranton--Wilkes-Barre--Hazleton, PA",,1,false
+01,071,497,42460,,al,Jackson County,"Scottsboro-Fort Payne, AL","Scottsboro, AL",,2,true
+18,143,350,42500,,in,Scott County,"Louisville/Jefferson County--Elizabethtown--Bardstown, KY-IN","Scottsburg, IN",,2,true
+42,069,,42540,,pa,Lackawanna County,,"Scranton--Wilkes-Barre, PA",,1,true
+42,079,,42540,,pa,Luzerne County,,"Scranton--Wilkes-Barre, PA",,1,true
+42,131,,42540,,pa,Wyoming County,,"Scranton--Wilkes-Barre, PA",,1,false
 05,145,340,42620,,ar,White County,"Little Rock-North Little Rock, AR","Searcy, AR",,2,true
-53,033,500,42660,42644,wa,King County,"Seattle-Tacoma, WA","Seattle-Tacoma-Bellevue, WA","Seattle-Bellevue-Everett, WA",1,true
-53,061,500,42660,42644,wa,Snohomish County,"Seattle-Tacoma, WA","Seattle-Tacoma-Bellevue, WA","Seattle-Bellevue-Everett, WA",1,true
+53,033,500,42660,42644,wa,King County,"Seattle-Tacoma, WA","Seattle-Tacoma-Bellevue, WA","Seattle-Bellevue-Kent, WA",1,true
+53,061,500,42660,42644,wa,Snohomish County,"Seattle-Tacoma, WA","Seattle-Tacoma-Bellevue, WA","Seattle-Bellevue-Kent, WA",1,true
 53,053,500,42660,45104,wa,Pierce County,"Seattle-Tacoma, WA","Seattle-Tacoma-Bellevue, WA","Tacoma-Lakewood, WA",1,true
-12,061,370,42680,,fl,Indian River County,"Miami-Fort Lauderdale-Port St. Lucie, FL","Sebastian-Vero Beach, FL",,1,true
-12,055,,42700,,fl,Highlands County,,"Sebring, FL",,1,true
+12,061,370,42680,,fl,Indian River County,"Miami-Port St. Lucie-Fort Lauderdale, FL","Sebastian-Vero Beach, FL",,1,true
+12,055,,42700,,fl,Highlands County,,"Sebring-Avon Park, FL",,1,true
 29,159,,42740,,mo,Pettis County,,"Sedalia, MO",,2,true
 42,109,146,42780,,pa,Snyder County,"Bloomsburg-Berwick-Sunbury, PA","Selinsgrove, PA",,2,true
-01,047,,42820,,al,Dallas County,,"Selma, AL",,2,true
+01,047,388,42820,,al,Dallas County,"Montgomery-Selma-Alexander City, AL","Selma, AL",,2,true
 45,073,273,42860,,sc,Oconee County,"Greenville-Spartanburg-Anderson, SC","Seneca, SC",,2,true
 36,099,464,42900,,ny,Seneca County,"Rochester-Batavia-Seneca Falls, NY","Seneca Falls, NY",,2,true
-47,155,314,42940,,tn,Sevier County,"Knoxville-Morristown-Sevierville, TN","Sevierville, TN",,2,true
+47,155,315,42940,,tn,Sevier County,"Knoxville-Morristown-Sevierville, TN","Sevierville, TN",,2,true
 18,071,294,42980,,in,Jackson County,"Indianapolis-Carmel-Muncie, IN","Seymour, IN",,2,true
 55,078,267,43020,,wi,Menominee County,"Green Bay-Shawano, WI","Shawano, WI",,2,false
 55,115,267,43020,,wi,Shawano County,"Green Bay-Shawano, WI","Shawano, WI",,2,true
@@ -1604,19 +1628,17 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 56,033,,43260,,wy,Sheridan County,,"Sheridan, WY",,2,true
 48,181,206,43300,,tx,Grayson County,"Dallas-Fort Worth, TX-OK","Sherman-Denison, TX",,1,true
 04,017,,43320,,az,Navajo County,,"Show Low, AZ",,2,true
-22,015,,43340,,la,Bossier Parish,,"Shreveport-Bossier City, LA",,1,true
-22,017,,43340,,la,Caddo Parish,,"Shreveport-Bossier City, LA",,1,true
-22,031,,43340,,la,De Soto Parish,,"Shreveport-Bossier City, LA",,1,false
-22,119,,43340,,la,Webster Parish,,"Shreveport-Bossier City, LA",,1,false
-39,149,212,43380,,oh,Shelby County,"Dayton-Springfield-Sidney, OH","Sidney, OH",,2,true
+22,015,508,43340,,la,Bossier Parish,"Shreveport-Bossier City-Minden, LA","Shreveport-Bossier City, LA",,1,true
+22,017,508,43340,,la,Caddo Parish,"Shreveport-Bossier City-Minden, LA","Shreveport-Bossier City, LA",,1,true
+22,031,508,43340,,la,De Soto Parish,"Shreveport-Bossier City-Minden, LA","Shreveport-Bossier City, LA",,1,false
+39,149,212,43380,,oh,Shelby County,"Dayton-Springfield-Kettering, OH","Sidney, OH",,2,true
 04,003,,43420,,az,Cochise County,,"Sierra Vista-Douglas, AZ",,1,true
 29,201,164,43460,,mo,Scott County,"Cape Girardeau-Sikeston, MO-IL","Sikeston, MO",,2,true
 35,017,,43500,,nm,Grant County,,"Silver City, NM",,2,true
-19,149,512,43580,,ia,Plymouth County,"Sioux City-Vermillion, IA-SD-NE","Sioux City, IA-NE-SD",,1,false
-19,193,512,43580,,ia,Woodbury County,"Sioux City-Vermillion, IA-SD-NE","Sioux City, IA-NE-SD",,1,true
-31,043,512,43580,,ne,Dakota County,"Sioux City-Vermillion, IA-SD-NE","Sioux City, IA-NE-SD",,1,true
-31,051,512,43580,,ne,Dixon County,"Sioux City-Vermillion, IA-SD-NE","Sioux City, IA-NE-SD",,1,false
-46,127,512,43580,,sd,Union County,"Sioux City-Vermillion, IA-SD-NE","Sioux City, IA-NE-SD",,1,true
+19,193,,43580,,ia,Woodbury County,,"Sioux City, IA-NE-SD",,1,true
+31,043,,43580,,ne,Dakota County,,"Sioux City, IA-NE-SD",,1,true
+31,051,,43580,,ne,Dixon County,,"Sioux City, IA-NE-SD",,1,false
+46,127,,43580,,sd,Union County,,"Sioux City, IA-NE-SD",,1,true
 46,083,,43620,,sd,Lincoln County,,"Sioux Falls, SD",,1,true
 46,087,,43620,,sd,McCook County,,"Sioux Falls, SD",,1,false
 46,099,,43620,,sd,Minnehaha County,,"Sioux Falls, SD",,1,true
@@ -1628,41 +1650,41 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 18,141,515,43780,,in,St. Joseph County,"South Bend-Elkhart-Mishawaka, IN-MI","South Bend-Mishawaka, IN-MI",,1,true
 26,027,515,43780,,mi,Cass County,"South Bend-Elkhart-Mishawaka, IN-MI","South Bend-Mishawaka, IN-MI",,1,true
 45,083,273,43900,,sc,Spartanburg County,"Greenville-Spartanburg-Anderson, SC","Spartanburg, SC",,1,true
-45,087,273,43900,,sc,Union County,"Greenville-Spartanburg-Anderson, SC","Spartanburg, SC",,1,false
 46,081,452,43940,,sd,Lawrence County,"Rapid City-Spearfish, SD","Spearfish, SD",,2,true
-19,041,,43980,,ia,Clay County,,"Spencer, IA",,2,true
-19,059,,44020,,ia,Dickinson County,,"Spirit Lake, IA",,2,true
-53,051,518,44060,,wa,Pend Oreille County,"Spokane-Spokane Valley-Coeur d'Alene, WA-ID","Spokane-Spokane Valley, WA",,1,false
+19,041,517,43980,,ia,Clay County,"Spencer-Spirit Lake, IA","Spencer, IA",,2,true
+19,059,517,44020,,ia,Dickinson County,"Spencer-Spirit Lake, IA","Spirit Lake, IA",,2,true
 53,063,518,44060,,wa,Spokane County,"Spokane-Spokane Valley-Coeur d'Alene, WA-ID","Spokane-Spokane Valley, WA",,1,true
 53,065,518,44060,,wa,Stevens County,"Spokane-Spokane Valley-Coeur d'Alene, WA-ID","Spokane-Spokane Valley, WA",,1,false
 17,129,522,44100,,il,Menard County,"Springfield-Jacksonville-Lincoln, IL","Springfield, IL",,1,false
 17,167,522,44100,,il,Sangamon County,"Springfield-Jacksonville-Lincoln, IL","Springfield, IL",,1,true
-25,013,521,44140,,ma,Hampden County,"Springfield-Greenfield Town, MA","Springfield, MA",,1,true
-25,015,521,44140,,ma,Hampshire County,"Springfield-Greenfield Town, MA","Springfield, MA",,1,true
-29,043,520,44180,,mo,Christian County,"Springfield-Branson, MO","Springfield, MO",,1,true
-29,059,520,44180,,mo,Dallas County,"Springfield-Branson, MO","Springfield, MO",,1,false
-29,077,520,44180,,mo,Greene County,"Springfield-Branson, MO","Springfield, MO",,1,true
-29,167,520,44180,,mo,Polk County,"Springfield-Branson, MO","Springfield, MO",,1,false
-29,225,520,44180,,mo,Webster County,"Springfield-Branson, MO","Springfield, MO",,1,false
-39,023,212,44220,,oh,Clark County,"Dayton-Springfield-Sidney, OH","Springfield, OH",,1,true
+25,011,,44140,,ma,Franklin County,,"Springfield, MA",,1,false
+25,013,,44140,,ma,Hampden County,,"Springfield, MA",,1,true
+25,015,,44140,,ma,Hampshire County,,"Springfield, MA",,1,true
+29,043,,44180,,mo,Christian County,,"Springfield, MO",,1,true
+29,059,,44180,,mo,Dallas County,,"Springfield, MO",,1,false
+29,077,,44180,,mo,Greene County,,"Springfield, MO",,1,true
+29,167,,44180,,mo,Polk County,,"Springfield, MO",,1,false
+29,225,,44180,,mo,Webster County,,"Springfield, MO",,1,false
+39,023,212,44220,,oh,Clark County,"Dayton-Springfield-Kettering, OH","Springfield, OH",,1,true
 28,105,,44260,,ms,Oktibbeha County,,"Starkville, MS",,2,true
+28,155,,44260,,ms,Webster County,,"Starkville, MS",,2,false
 42,027,524,44300,,pa,Centre County,"State College-DuBois, PA","State College, PA",,1,true
 13,031,496,44340,,ga,Bulloch County,"Savannah-Hinesville-Statesboro, GA","Statesboro, GA",,2,true
-51,015,277,44420,,va,Augusta County,"Harrisonburg-Staunton-Waynesboro, VA","Staunton-Waynesboro, VA",,1,true
-51,790,277,44420,,va,Staunton city,"Harrisonburg-Staunton-Waynesboro, VA","Staunton-Waynesboro, VA",,1,true
-51,820,277,44420,,va,Waynesboro city,"Harrisonburg-Staunton-Waynesboro, VA","Staunton-Waynesboro, VA",,1,true
+51,015,277,44420,,va,Augusta County,"Harrisonburg-Staunton, VA","Staunton, VA",,1,true
+51,790,277,44420,,va,Staunton city,"Harrisonburg-Staunton, VA","Staunton, VA",,1,true
+51,820,277,44420,,va,Waynesboro city,"Harrisonburg-Staunton, VA","Staunton, VA",,1,true
 08,107,525,44460,,co,Routt County,"Steamboat Springs-Craig, CO","Steamboat Springs, CO",,2,true
 48,143,,44500,,tx,Erath County,,"Stephenville, TX",,2,true
 08,075,,44540,,co,Logan County,,"Sterling, CO",,2,true
 17,195,221,44580,,il,Whiteside County,"Dixon-Sterling, IL","Sterling, IL",,2,true
 55,097,554,44620,,wi,Portage County,"Wausau-Stevens Point-Wisconsin Rapids, WI","Stevens Point, WI",,2,true
 40,119,,44660,,ok,Payne County,,"Stillwater, OK",,2,true
-06,077,488,44700,,ca,San Joaquin County,"San Jose-San Francisco-Oakland, CA","Stockton-Lodi, CA",,1,true
+06,077,488,44700,,ca,San Joaquin County,"San Jose-San Francisco-Oakland, CA","Stockton, CA",,1,true
 19,021,,44740,,ia,Buena Vista County,,"Storm Lake, IA",,2,true
 26,149,310,44780,,mi,St. Joseph County,"Kalamazoo-Battle Creek-Portage, MI","Sturgis, MI",,2,true
-48,223,206,44860,,tx,Hopkins County,"Dallas-Fort Worth, TX-OK","Sulphur Springs, TX",,2,true
-13,055,470,44900,,ga,Chattooga County,"Rome-Summerville, GA","Summerville, GA",,2,true
-49,043,482,44920,,ut,Summit County,"Salt Lake City-Provo-Orem, UT","Summit Park, UT",,2,true
+48,223,,44860,,tx,Hopkins County,,"Sulphur Springs, TX",,2,true
+13,055,174,44900,,ga,Chattooga County,"Chattanooga-Cleveland-Dalton, TN-GA","Summerville, GA",,2,true
+45,027,,44940,,sc,Clarendon County,,"Sumter, SC",,1,false
 45,085,,44940,,sc,Sumter County,,"Sumter, SC",,1,true
 42,097,146,44980,,pa,Northumberland County,"Bloomsburg-Berwick-Sunbury, PA","Sunbury, PA",,2,true
 06,035,,45000,,ca,Lassen County,,"Susanville, CA",,2,true
@@ -1670,13 +1692,12 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 36,053,532,45060,,ny,Madison County,"Syracuse-Auburn, NY","Syracuse, NY",,1,false
 36,067,532,45060,,ny,Onondaga County,"Syracuse-Auburn, NY","Syracuse, NY",,1,true
 36,075,532,45060,,ny,Oswego County,"Syracuse-Auburn, NY","Syracuse, NY",,1,false
-40,021,538,45140,,ok,Cherokee County,"Tulsa-Muskogee-Bartlesville, OK","Tahlequah, OK",,2,true
-01,037,142,45180,,al,Coosa County,"Birmingham-Hoover-Talladega, AL","Talladega-Sylacauga, AL",,2,false
+40,021,,45140,,ok,Cherokee County,,"Tahlequah, OK",,2,true
 01,121,142,45180,,al,Talladega County,"Birmingham-Hoover-Talladega, AL","Talladega-Sylacauga, AL",,2,true
-12,039,533,45220,,fl,Gadsden County,"Tallahassee-Bainbridge, FL-GA","Tallahassee, FL",,1,false
-12,065,533,45220,,fl,Jefferson County,"Tallahassee-Bainbridge, FL-GA","Tallahassee, FL",,1,false
-12,073,533,45220,,fl,Leon County,"Tallahassee-Bainbridge, FL-GA","Tallahassee, FL",,1,true
-12,129,533,45220,,fl,Wakulla County,"Tallahassee-Bainbridge, FL-GA","Tallahassee, FL",,1,false
+12,039,,45220,,fl,Gadsden County,,"Tallahassee, FL",,1,false
+12,065,,45220,,fl,Jefferson County,,"Tallahassee, FL",,1,false
+12,073,,45220,,fl,Leon County,,"Tallahassee, FL",,1,true
+12,129,,45220,,fl,Wakulla County,,"Tallahassee, FL",,1,false
 12,053,,45300,,fl,Hernando County,,"Tampa-St. Petersburg-Clearwater, FL",,1,false
 12,057,,45300,,fl,Hillsborough County,,"Tampa-St. Petersburg-Clearwater, FL",,1,true
 12,101,,45300,,fl,Pasco County,,"Tampa-St. Petersburg-Clearwater, FL",,1,true
@@ -1684,6 +1705,7 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 35,055,,45340,,nm,Taos County,,"Taos, NM",,2,true
 17,021,522,45380,,il,Christian County,"Springfield-Jacksonville-Lincoln, IL","Taylorville, IL",,2,true
 18,021,,45460,,in,Clay County,,"Terre Haute, IN",,1,true
+18,121,,45460,,in,Parke County,,"Terre Haute, IN",,1,false
 18,153,,45460,,in,Sullivan County,,"Terre Haute, IN",,1,false
 18,165,,45460,,in,Vermillion County,,"Terre Haute, IN",,1,false
 18,167,,45460,,in,Vigo County,,"Terre Haute, IN",,1,true
@@ -1691,15 +1713,16 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 05,091,,45500,,ar,Miller County,,"Texarkana, TX-AR",,1,true
 48,037,,45500,,tx,Bowie County,,"Texarkana, TX-AR",,1,true
 41,065,,45520,,or,Wasco County,,"The Dalles, OR",,2,true
-12,119,422,45540,,fl,Sumter County,"Orlando-Deltona-Daytona Beach, FL","The Villages, FL",,1,true
-13,293,122,45580,,ga,Upson County,"Atlanta--Athens-Clarke County--Sandy Springs, GA","Thomaston, GA",,2,true
+12,119,422,45540,,fl,Sumter County,"Orlando-Lakeland-Deltona, FL","The Villages, FL",,1,true
+13,293,122,45580,,ga,Upson County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Thomaston, GA",,2,true
 13,275,,45620,,ga,Thomas County,,"Thomasville, GA",,2,true
-39,147,248,45660,,oh,Seneca County,"Findlay-Tiffin, OH","Tiffin, OH",,2,true
+39,147,534,45660,,oh,Seneca County,"Toledo-Findlay-Tiffin, OH","Tiffin, OH",,2,true
 13,277,,45700,,ga,Tift County,,"Tifton, GA",,2,true
-13,257,,45740,,ga,Stephens County,,"Toccoa, GA",,2,true
-39,051,534,45780,,oh,Fulton County,"Toledo-Port Clinton, OH","Toledo, OH",,1,false
-39,095,534,45780,,oh,Lucas County,"Toledo-Port Clinton, OH","Toledo, OH",,1,true
-39,173,534,45780,,oh,Wood County,"Toledo-Port Clinton, OH","Toledo, OH",,1,true
+13,257,122,45740,,ga,Stephens County,"Atlanta--Athens-Clarke County--Sandy Springs, GA-AL","Toccoa, GA",,2,true
+39,051,534,45780,,oh,Fulton County,"Toledo-Findlay-Tiffin, OH","Toledo, OH",,1,false
+39,095,534,45780,,oh,Lucas County,"Toledo-Findlay-Tiffin, OH","Toledo, OH",,1,true
+39,123,534,45780,,oh,Ottawa County,"Toledo-Findlay-Tiffin, OH","Toledo, OH",,1,false
+39,173,534,45780,,oh,Wood County,"Toledo-Findlay-Tiffin, OH","Toledo, OH",,1,true
 20,085,,45820,,ks,Jackson County,,"Topeka, KS",,1,false
 20,087,,45820,,ks,Jefferson County,,"Topeka, KS",,1,false
 20,139,,45820,,ks,Osage County,,"Topeka, KS",,1,false
@@ -1710,7 +1733,7 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 26,055,,45900,,mi,Grand Traverse County,,"Traverse City, MI",,2,true
 26,079,,45900,,mi,Kalkaska County,,"Traverse City, MI",,2,false
 26,089,,45900,,mi,Leelanau County,,"Traverse City, MI",,2,false
-34,021,408,45940,,nj,Mercer County,"New York-Newark, NY-NJ-CT-PA","Trenton, NJ",,1,true
+34,021,408,45940,,nj,Mercer County,"New York-Newark, NY-NJ-CT-PA","Trenton-Princeton, NJ",,1,true
 01,109,,45980,,al,Pike County,,"Troy, AL",,2,true
 06,057,472,46020,,ca,Nevada County,"Sacramento-Roseville, CA","Truckee-Grass Valley, CA",,2,true
 04,019,536,46060,,az,Pima County,"Tucson-Nogales, AZ","Tucson, AZ",,1,true
@@ -1724,19 +1747,21 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 40,131,538,46140,,ok,Rogers County,"Tulsa-Muskogee-Bartlesville, OK","Tulsa, OK",,1,false
 40,143,538,46140,,ok,Tulsa County,"Tulsa-Muskogee-Bartlesville, OK","Tulsa, OK",,1,true
 40,145,538,46140,,ok,Wagoner County,"Tulsa-Muskogee-Bartlesville, OK","Tulsa, OK",,1,true
-28,057,,46180,,ms,Itawamba County,,"Tupelo, MS",,2,false
-28,081,,46180,,ms,Lee County,,"Tupelo, MS",,2,true
-28,115,,46180,,ms,Pontotoc County,,"Tupelo, MS",,2,false
+28,057,539,46180,,ms,Itawamba County,"Tupelo-Corinth, MS","Tupelo, MS",,2,false
+28,081,539,46180,,ms,Lee County,"Tupelo-Corinth, MS","Tupelo, MS",,2,true
+28,115,539,46180,,ms,Pontotoc County,"Tupelo-Corinth, MS","Tupelo, MS",,2,false
+28,117,539,46180,,ms,Prentiss County,"Tupelo-Corinth, MS","Tupelo, MS",,2,false
+01,063,,46220,,al,Greene County,,"Tuscaloosa, AL",,1,false
 01,065,,46220,,al,Hale County,,"Tuscaloosa, AL",,1,false
 01,107,,46220,,al,Pickens County,,"Tuscaloosa, AL",,1,false
 01,125,,46220,,al,Tuscaloosa County,,"Tuscaloosa, AL",,1,true
-16,053,,46300,,id,Jerome County,,"Twin Falls, ID",,2,false
-16,083,,46300,,id,Twin Falls County,,"Twin Falls, ID",,2,true
+16,053,,46300,,id,Jerome County,,"Twin Falls, ID",,1,false
+16,083,,46300,,id,Twin Falls County,,"Twin Falls, ID",,1,true
 48,423,540,46340,,tx,Smith County,"Tyler-Jacksonville, TX","Tyler, TX",,1,true
 06,045,,46380,,ca,Mendocino County,,"Ukiah, CA",,2,true
-21,075,362,46460,,ky,Fulton County,"Martin-Union City, TN-KY","Union City, TN-KY",,2,false
-47,131,362,46460,,tn,Obion County,"Martin-Union City, TN-KY","Union City, TN-KY",,2,true
-39,021,212,46500,,oh,Champaign County,"Dayton-Springfield-Sidney, OH","Urbana, OH",,2,true
+45,087,273,46420,,sc,Union County,"Greenville-Spartanburg-Anderson, SC","Union, SC",,2,true
+47,131,362,46460,,tn,Obion County,"Martin-Union City, TN","Union City, TN",,2,true
+39,021,212,46500,,oh,Champaign County,"Dayton-Springfield-Kettering, OH","Urbana, OH",,2,true
 15,003,,46520,,hi,Honolulu County,,"Urban Honolulu, HI",,1,true
 36,043,,46540,,ny,Herkimer County,,"Utica-Rome, NY",,1,false
 36,065,,46540,,ny,Oneida County,,"Utica-Rome, NY",,1,true
@@ -1745,13 +1770,11 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 13,101,,46660,,ga,Echols County,,"Valdosta, GA",,1,false
 13,173,,46660,,ga,Lanier County,,"Valdosta, GA",,1,false
 13,185,,46660,,ga,Lowndes County,,"Valdosta, GA",,1,true
-06,095,488,46700,,ca,Solano County,"San Jose-San Francisco-Oakland, CA","Vallejo-Fairfield, CA",,1,true
-01,017,194,46740,,al,Chambers County,"Columbus-Auburn-Opelika, GA-AL","Valley, AL",,2,true
+06,095,488,46700,,ca,Solano County,"San Jose-San Francisco-Oakland, CA","Vallejo, CA",,1,true
 39,161,338,46780,,oh,Van Wert County,"Lima-Van Wert-Celina, OH","Van Wert, OH",,2,true
-46,027,512,46820,,sd,Clay County,"Sioux City-Vermillion, IA-SD-NE","Vermillion, SD",,2,true
+46,027,,46820,,sd,Clay County,,"Vermillion, SD",,2,true
 49,047,,46860,,ut,Uintah County,,"Vernal, UT",,2,true
 48,487,,46900,,tx,Wilbarger County,,"Vernon, TX",,2,true
-28,021,298,46980,,ms,Claiborne County,"Jackson-Vicksburg-Brookhaven, MS","Vicksburg, MS",,2,false
 28,149,298,46980,,ms,Warren County,"Jackson-Vicksburg-Brookhaven, MS","Vicksburg, MS",,2,true
 48,175,544,47020,,tx,Goliad County,"Victoria-Port Lavaca, TX","Victoria, TX",,1,false
 48,469,544,47020,,tx,Victoria County,"Victoria-Port Lavaca, TX","Victoria, TX",,1,true
@@ -1760,14 +1783,17 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 18,083,,47180,,in,Knox County,,"Vincennes, IN",,2,true
 34,011,428,47220,,nj,Cumberland County,"Philadelphia-Reading-Camden, PA-NJ-DE-MD","Vineland-Bridgeton, NJ",,1,true
 25,007,,47240,,ma,Dukes County,,"Vineyard Haven, MA",,2,true
+37,029,545,47260,,nc,Camden County,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,false
 37,053,545,47260,,nc,Currituck County,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,false
 37,073,545,47260,,nc,Gates County,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,false
 51,073,545,47260,,va,Gloucester County,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,true
 51,093,545,47260,,va,Isle of Wight County,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,false
 51,095,545,47260,,va,James City County,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,false
 51,115,545,47260,,va,Mathews County,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,false
+51,175,545,47260,,va,Southampton County,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,false
 51,199,545,47260,,va,York County,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,true
 51,550,545,47260,,va,Chesapeake city,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,true
+51,620,545,47260,,va,Franklin city,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,false
 51,650,545,47260,,va,Hampton city,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,true
 51,700,545,47260,,va,Newport News city,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,true
 51,710,545,47260,,va,Norfolk city,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,true
@@ -1776,25 +1802,23 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 51,800,545,47260,,va,Suffolk city,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,true
 51,810,545,47260,,va,Virginia Beach city,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,true
 51,830,545,47260,,va,Williamsburg city,"Virginia Beach-Norfolk, VA-NC","Virginia Beach-Norfolk-Newport News, VA-NC",,1,false
-06,107,546,47300,,ca,Tulare County,"Visalia-Porterville-Hanford, CA","Visalia-Porterville, CA",,1,true
+06,107,,47300,,ca,Tulare County,,"Visalia, CA",,1,true
 18,169,,47340,,in,Wabash County,,"Wabash, IN",,2,true
 48,145,,47380,,tx,Falls County,,"Waco, TX",,1,false
 48,309,,47380,,tx,McLennan County,,"Waco, TX",,1,true
 27,167,244,47420,,mn,Wilkin County,"Fargo-Wahpeton, ND-MN","Wahpeton, ND-MN",,2,false
 38,077,244,47420,,nd,Richland County,"Fargo-Wahpeton, ND-MN","Wahpeton, ND-MN",,2,true
-53,013,,47460,,wa,Columbia County,,"Walla Walla, WA",,1,false
-53,071,,47460,,wa,Walla Walla County,,"Walla Walla, WA",,1,true
+53,071,313,47460,,wa,Walla Walla County,"Kennewick-Richland-Walla Walla, WA","Walla Walla, WA",,1,true
 39,011,338,47540,,oh,Auglaize County,"Lima-Van Wert-Celina, OH","Wapakoneta, OH",,2,true
-13,153,356,47580,,ga,Houston County,"Macon-Warner Robins, GA","Warner Robins, GA",,1,true
-13,225,356,47580,,ga,Peach County,"Macon-Warner Robins, GA","Warner Robins, GA",,1,false
-13,235,356,47580,,ga,Pulaski County,"Macon-Warner Robins, GA","Warner Robins, GA",,1,false
+13,153,356,47580,,ga,Houston County,"Macon-Bibb County--Warner Robins, GA","Warner Robins, GA",,1,true
+13,225,356,47580,,ga,Peach County,"Macon-Bibb County--Warner Robins, GA","Warner Robins, GA",,1,false
 42,123,,47620,,pa,Warren County,,"Warren, PA",,2,true
 29,101,312,47660,,mo,Johnson County,"Kansas City-Overland Park-Kansas City, MO-KS","Warrensburg, MO",,2,true
-18,085,,47700,,in,Kosciusko County,,"Warsaw, IN",,2,true
+18,085,515,47700,,in,Kosciusko County,"South Bend-Elkhart-Mishawaka, IN-MI","Warsaw, IN",,2,true
 18,027,,47780,,in,Daviess County,,"Washington, IN",,2,true
-37,013,274,47820,,nc,Beaufort County,"Greenville-Washington, NC","Washington, NC",,2,true
-24,021,548,47900,43524,md,Frederick County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Silver Spring-Frederick-Rockville, MD",1,false
-24,031,548,47900,43524,md,Montgomery County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Silver Spring-Frederick-Rockville, MD",1,true
+37,013,272,47820,,nc,Beaufort County,"Greenville-Kinston-Washington, NC","Washington, NC",,2,true
+24,021,548,47900,23224,md,Frederick County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Frederick-Gaithersburg-Rockville, MD",1,false
+24,031,548,47900,23224,md,Montgomery County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Frederick-Gaithersburg-Rockville, MD",1,true
 11,001,548,47900,47894,dc,District of Columbia,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Washington-Arlington-Alexandria, DC-VA-MD-WV",1,true
 24,009,548,47900,47894,md,Calvert County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Washington-Arlington-Alexandria, DC-VA-MD-WV",1,false
 24,017,548,47900,47894,md,Charles County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Washington-Arlington-Alexandria, DC-VA-MD-WV",1,false
@@ -1805,6 +1829,7 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 51,059,548,47900,47894,va,Fairfax County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Washington-Arlington-Alexandria, DC-VA-MD-WV",1,true
 51,061,548,47900,47894,va,Fauquier County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Washington-Arlington-Alexandria, DC-VA-MD-WV",1,true
 51,107,548,47900,47894,va,Loudoun County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Washington-Arlington-Alexandria, DC-VA-MD-WV",1,true
+51,113,548,47900,47894,va,Madison County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Washington-Arlington-Alexandria, DC-VA-MD-WV",1,false
 51,153,548,47900,47894,va,Prince William County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Washington-Arlington-Alexandria, DC-VA-MD-WV",1,true
 51,157,548,47900,47894,va,Rappahannock County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Washington-Arlington-Alexandria, DC-VA-MD-WV",1,false
 51,177,548,47900,47894,va,Spotsylvania County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Washington-Arlington-Alexandria, DC-VA-MD-WV","Washington-Arlington-Alexandria, DC-VA-MD-WV",1,false
@@ -1822,10 +1847,12 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 19,017,,47940,,ia,Bremer County,,"Waterloo-Cedar Falls, IA",,1,false
 19,075,,47940,,ia,Grundy County,,"Waterloo-Cedar Falls, IA",,1,false
 46,029,,47980,,sd,Codington County,,"Watertown, SD",,2,true
+46,057,,47980,,sd,Hamlin County,,"Watertown, SD",,2,false
 55,055,376,48020,,wi,Jefferson County,"Milwaukee-Racine-Waukesha, WI","Watertown-Fort Atkinson, WI",,2,true
 36,045,,48060,,ny,Jefferson County,,"Watertown-Fort Drum, NY",,1,true
-12,049,,48100,,fl,Hardee County,,"Wauchula, FL",,2,true
-55,073,554,48140,,wi,Marathon County,"Wausau-Stevens Point-Wisconsin Rapids, WI","Wausau, WI",,1,true
+12,049,422,48100,,fl,Hardee County,"Orlando-Lakeland-Deltona, FL","Wauchula, FL",,2,true
+55,069,554,48140,,wi,Lincoln County,"Wausau-Stevens Point-Wisconsin Rapids, WI","Wausau-Weston, WI",,1,false
+55,073,554,48140,,wi,Marathon County,"Wausau-Stevens Point-Wisconsin Rapids, WI","Wausau-Weston, WI",,1,true
 13,229,,48180,,ga,Pierce County,,"Waycross, GA",,2,false
 13,299,,48180,,ga,Ware County,,"Waycross, GA",,2,true
 40,039,,48220,,ok,Custer County,,"Weatherford, OK",,2,true
@@ -1835,15 +1862,15 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 53,007,,48300,,wa,Chelan County,,"Wenatchee, WA",,1,true
 53,017,,48300,,wa,Douglas County,,"Wenatchee, WA",,1,true
 29,091,,48460,,mo,Howell County,,"West Plains, MO",,2,true
+28,025,200,48500,,ms,Clay County,"Columbus-West Point, MS","West Point, MS",,2,true
 39,013,,48540,,oh,Belmont County,,"Wheeling, WV-OH",,1,true
 54,051,,48540,,wv,Marshall County,,"Wheeling, WV-OH",,1,true
 54,069,,48540,,wv,Ohio County,,"Wheeling, WV-OH",,1,true
-55,127,376,48580,,wi,Walworth County,"Milwaukee-Racine-Waukesha, WI","Whitewater-Elkhorn, WI",,2,true
-20,015,556,48620,,ks,Butler County,"Wichita-Arkansas City-Winfield, KS","Wichita, KS",,1,false
-20,079,556,48620,,ks,Harvey County,"Wichita-Arkansas City-Winfield, KS","Wichita, KS",,1,false
-20,095,556,48620,,ks,Kingman County,"Wichita-Arkansas City-Winfield, KS","Wichita, KS",,1,false
-20,173,556,48620,,ks,Sedgwick County,"Wichita-Arkansas City-Winfield, KS","Wichita, KS",,1,true
-20,191,556,48620,,ks,Sumner County,"Wichita-Arkansas City-Winfield, KS","Wichita, KS",,1,false
+55,127,376,48580,,wi,Walworth County,"Milwaukee-Racine-Waukesha, WI","Whitewater, WI",,2,true
+20,015,556,48620,,ks,Butler County,"Wichita-Winfield, KS","Wichita, KS",,1,false
+20,079,556,48620,,ks,Harvey County,"Wichita-Winfield, KS","Wichita, KS",,1,false
+20,173,556,48620,,ks,Sedgwick County,"Wichita-Winfield, KS","Wichita, KS",,1,true
+20,191,556,48620,,ks,Sumner County,"Wichita-Winfield, KS","Wichita, KS",,1,false
 48,009,,48660,,tx,Archer County,,"Wichita Falls, TX",,1,false
 48,077,,48660,,tx,Clay County,,"Wichita Falls, TX",,1,false
 48,485,,48660,,tx,Wichita County,,"Wichita Falls, TX",,1,true
@@ -1857,6 +1884,7 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 51,069,548,49020,,va,Frederick County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Winchester, VA-WV",,1,true
 51,840,548,49020,,va,Winchester city,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Winchester, VA-WV",,1,true
 54,027,548,49020,,wv,Hampshire County,"Washington-Baltimore-Arlington, DC-MD-VA-WV-PA","Winchester, VA-WV",,1,false
+20,035,556,49060,,ks,Cowley County,"Wichita-Winfield, KS","Winfield, KS",,2,true
 32,013,,49080,,nv,Humboldt County,,"Winnemucca, NV",,2,true
 27,169,,49100,,mn,Winona County,,"Winona, MN",,2,true
 37,057,268,49180,,nc,Davidson County,"Greensboro--Winston-Salem--High Point, NC","Winston-Salem, NC",,1,true
@@ -1865,13 +1893,18 @@ state_code,county_code,csa_code,cbsa_code,metdiv_code,state_desc,county_desc,csa
 37,169,268,49180,,nc,Stokes County,"Greensboro--Winston-Salem--High Point, NC","Winston-Salem, NC",,1,true
 37,197,268,49180,,nc,Yadkin County,"Greensboro--Winston-Salem--High Point, NC","Winston-Salem, NC",,1,false
 55,141,554,49220,,wi,Wood County,"Wausau-Stevens Point-Wisconsin Rapids, WI","Wisconsin Rapids-Marshfield, WI",,2,true
+40,045,,49260,,ok,Ellis County,,"Woodward, OK",,2,false
 40,153,,49260,,ok,Woodward County,,"Woodward, OK",,2,true
-39,169,,49300,,oh,Wayne County,,"Wooster, OH",,2,true
+39,169,184,49300,,oh,Wayne County,"Cleveland-Akron-Canton, OH","Wooster, OH",,2,true
 09,015,148,49340,,ct,Windham County,"Boston-Worcester-Providence, MA-RI-NH-CT","Worcester, MA-CT",,1,true
 25,027,148,49340,,ma,Worcester County,"Boston-Worcester-Providence, MA-RI-NH-CT","Worcester, MA-CT",,1,true
 27,105,,49380,,mn,Nobles County,,"Worthington, MN",,2,true
 53,077,,49420,,wa,Yakima County,,"Yakima, WA",,1,true
 46,135,,49460,,sd,Yankton County,,"Yankton, SD",,2,true
+72,055,434,49500,,pr,Guánica Municipio,"Ponce-Yauco-Coamo, PR","Yauco, PR",,1,true
+72,059,434,49500,,pr,Guayanilla Municipio,"Ponce-Yauco-Coamo, PR","Yauco, PR",,1,true
+72,111,434,49500,,pr,Peñuelas Municipio,"Ponce-Yauco-Coamo, PR","Yauco, PR",,1,true
+72,153,434,49500,,pr,Yauco Municipio,"Ponce-Yauco-Coamo, PR","Yauco, PR",,1,true
 42,133,276,49620,,pa,York County,"Harrisburg-York-Lebanon, PA","York-Hanover, PA",,1,true
 39,099,566,49660,,oh,Mahoning County,"Youngstown-Warren, OH-PA","Youngstown-Warren-Boardman, OH-PA",,1,true
 39,155,566,49660,,oh,Trumbull County,"Youngstown-Warren, OH-PA","Youngstown-Warren-Boardman, OH-PA",,1,true

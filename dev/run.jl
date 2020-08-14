@@ -14,4 +14,5 @@ using SLiDE  # see src/SLiDE.jl
 
 # BUILD STREAM -- Prepare data for the calibration scheme.
 # This is where user customizations can be applied (future work).
-@time include(joinpath(SLIDE_DIR, "dev", "buildstream", "partitionbea.jl"))  #  30 seconds
+# @time include(joinpath(SLIDE_DIR, "dev", "buildstream", "partitionbea.jl"))
+@time include(joinpath(SLIDE_DIR, "dev", "buildstream", "partitionbea_function.jl"))

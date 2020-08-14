@@ -71,7 +71,7 @@ Base.occursin(x::String, y::Symbol) = occursin(x, string(y))
 """
     convert_type(::Type{T}, x::Any)
     convert_type(::Dict{Any,Any}, df::DataFrame, value_col::Symbol; kwargs...)
-Converts `x` into the specified `Type{T}`.
+Converts `x` into the specified `Type{xT}`.
 
 Consider extending [convert](https://docs.julialang.org/en/v1/base/base/#Base.convert)
 function (!!!!)
@@ -196,8 +196,12 @@ end
 
 function permute(x::NamedTuple)
     cols = keys(x)
-    xperm = eachcol(sort(DataFrame(Tuple.(permute(values(x))))))
+    xperm = eachcol(sort(DataFrame(Tuple.(ensurearray.(permute(ensurearray.(values(x))))))))
+    # length(xperm[1]) == 1 && (xperm = [xperm...;])
     return NamedTuple{Tuple(cols,)}(xperm,)
+    # cols = keys(x)
+    # xperm = eachcol(sort(DataFrame(Tuple.(permute(values(x))))))
+    # return NamedTuple{Tuple(cols,)}(xperm,)
 end
 
 function permute(x::Array)

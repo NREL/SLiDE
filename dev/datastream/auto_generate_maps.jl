@@ -160,8 +160,8 @@ y_read = [read_file(files_map[ii]) for ii in 1:length(files_map)]
 
 files_map = run_yaml(files_map)
 
-include(joinpath(SLIDE_DIR, "dev", "datastream", "adjust_maps.jl"))
-df = [read_file(joinpath(y_read[ii]["PathOut"]...)) for ii in 1:length(y_read)];
+# include(joinpath(SLIDE_DIR, "dev", "datastream", "adjust_maps.jl"))
+# df = [read_file(joinpath(y_read[ii]["PathOut"]...)) for ii in 1:length(y_read)];
 
 # ******************************************************************************************
 # EDIT MANUALLY TO CHECK:

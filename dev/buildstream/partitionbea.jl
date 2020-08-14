@@ -11,19 +11,19 @@ UNITS = "billions of us dollars (USD)"
 # ******************************************************************************************
 #   READ BLUENOTE DATA -- For benchmarking!
 # ******************************************************************************************
-BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw")
-bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
-bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(
-    read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
+# BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw")
+# bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
+# bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(
+#     read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
 
-# Add supply/use info for checking.
-BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
-[bluenote[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
-    Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
-    Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]]
+# # Add supply/use info for checking.
+# BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
+# [bluenote[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
+#     Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
+#     Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]]
 
-[bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3) # convert millions -> billions USD
-    for k in [:supply,:use]]
+# [bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3) # convert millions -> billions USD
+#     for k in [:supply,:use]]
 
 # ******************************************************************************************
 #   READ SETS AND SLiDE SUPPLY/USE DATA.
@@ -176,4 +176,4 @@ i_div = io[:a0][:,:value] .!= 0.0
 io[:ta0][i_div, :value] .= (io[:tax0][i_div,:value] - io[:sbd0][i_div,:value]) ./ io[:a0][i_div,:value]
 
 # include("partitionbea_check.jl")
-println("Done.")
+# println("Done.")

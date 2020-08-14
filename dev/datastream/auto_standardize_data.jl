@@ -7,9 +7,10 @@ using YAML
 
 using SLiDE  # see src/SLiDE.jl
 
+
 READ_DIR = joinpath("data", "readfiles")
 
-files_parse = XLSXInput("generate_yaml.xlsx", "parse", "F1:H180", "parse")
+files_parse = XLSXInput("generate_yaml.xlsx", "parse", "B1:Y180", "parse")
 
 files_parse = write_yaml(READ_DIR, files_parse)
 y_read = [read_file(files_parse[ii]) for ii in 1:length(files_parse)]
@@ -20,9 +21,12 @@ files_parse = run_yaml(files_parse)
 # ******************************************************************************************
 # EDIT MANUALLY TO CHECK:
 # ii_file = length(y_read)
+# ii_file = 1
 # y = y_read[ii_file];
 # files = [[y[k] for k in collect(keys(y))[occursin.("Input", keys(y))]]...;]
 
+
+# ii_input = 1
 # for ii_input in 1:1
 #     file = files[ii_input]
 #     println(file)
@@ -42,4 +46,4 @@ files_parse = run_yaml(files_parse)
 #     "Order"    in keys(y) && (df = edit_with(df, y["Order"]))
 # end
 
-# first(df,4)
+# # first(df,4)
