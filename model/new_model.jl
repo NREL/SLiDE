@@ -368,7 +368,8 @@ sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods, years)
 
 #commodities:
 @variable(cge, PA[(r, g, t) in sub_set_pa] >= sv, start = pvm[t]); # Regional market (input)
-@variable(cge, PY[(r, g, t) in sub_set_py] >= sv, start = pvm[t]); # Regional market (output)
+@variable(cge,PY[r in regions, g in goods, t in years]>=sv,start=pvm[t]) 
+# @variable(cge, PY[(r, g, t) in sub_set_py] >= sv, start = pvm[t]); # Regional market (output)
 @variable(cge, PD[(r, g, t) in sub_set_pd] >= sv, start = pvm[t]); # Local market price
 @variable(cge, PN[g in goods, t in years] >= sv, start = pvm[t]); # National market
 @variable(cge, PL[r in regions, t in years] >= sv, start = pvm[t]); # Wage rate
@@ -464,12 +465,12 @@ sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods, years)
         + ((haskey(RK.lookup[1], (r, s, t)) ? RK[(r, s, t)] : 1.0) / rk0) * AK[r,s,t]
         - 
 # revenue from sectoral supply (take note of r/s/g indices on ys0)                
-        sum((haskey(PY.lookup[1], (r, g, t)) ? PY[(r, g, t)] : 1.0) * ys0_p[r,s,g] for g in goods) * (1-ty_p[r,s])
+        sum(PY[r, g, t]  * ys0_p[r,s,g] for g in goods) * (1-ty_p[r,s])
 );
 
 @mapping(cge,profit_x[(r, g, t) in sub_set_x],
 # output 'cost' from aggregate supply
-        (haskey(PY.lookup[1], (r, g, t)) ? PY[(r, g, t)] : 1.0)* s0_p[r,g] 
+         PY[r, g, t] * s0_p[r,g] 
         - (
 # revenues from foreign exchange
         PFX[t] * AX[r,g,t]
@@ -516,7 +517,7 @@ sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods, years)
 );
 
 @mapping(cge,profit_i[(r, s, t) in sub_set_rst],
-        (haskey(PY.lookup[1], (r, s, t)) ? PY[(r, s, t)] : 1.0)
+         PY[r, s, t] 
         - 
         (t!=years_last ? (haskey(PK.lookup[1], (r, s, t+1)) ? PK[(r, s, t+1)] : 1.0) : PKT[r,s])
 );
@@ -551,7 +552,7 @@ sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods, years)
         )
 );
 
-@mapping(cge,market_py[(r, g, t) in sub_set_py],
+@mapping(cge,market_py[r in regions, g in goods, t in years],
 # sectoral supply
         sum((haskey(Y.lookup[1], (r, s, t)) ? Y[(r, s, t)] : 1) *ys0_p[r,s,g] for s in sectors)
 # household production (exogenous)        
@@ -661,7 +662,7 @@ sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods, years)
 # labor income        
         PL[r,t] * sum(ld0_p[r,s] for s in sectors)
 # provision of household supply          
-        + sum((haskey(PY.lookup[1], (r, g, t)) ? PY[(r, g, t)] : 1.0)*yh0_p[r,g] for g in goods)
+        + sum( PY[r, g, t] *yh0_p[r,g] for g in goods)
 # revenue or costs of foreign exchange including household adjustment   
         + PFX[t] * (bopdef0_p[r] + hhadj_p[r])
 # government and investment provision        
@@ -685,7 +686,7 @@ sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods, years)
 ####################################
 
 # For some reason I still need this 
-[fix(PY[(r,g,t)],1,force=true) for r in regions for g in goods for t in years if !(y_check[r,g]>0)]
+[fix(PY[r,g,t],1,force=true) for r in regions for g in goods for t in years if !(y_check[r,g]>0)]
 
 
 # define complementarity conditions
