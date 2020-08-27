@@ -16,3 +16,4 @@ using SLiDE  # see src/SLiDE.jl
 # This is where user customizations can be applied (future work).
 # @time include(joinpath(SLIDE_DIR, "dev", "buildstream", "partitionbea.jl"))
 @time include(joinpath(SLIDE_DIR, "dev", "buildstream", "partitionbea_function.jl"))
+@time include(joinpath(SLIDE_DIR, "dev", "buildstream", "share.jl"))

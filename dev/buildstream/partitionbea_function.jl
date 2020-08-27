@@ -8,22 +8,23 @@ using SLiDE
 
 println("\nPARTITION BEA SUPPLY/USE DATA INTO PARAMETERS:")
 UNITS = "billions of us dollars (USD)"
+include(joinpath(SLIDE_DIR, "dev", "buildstream", "build_functions.jl"))
 
 # ******************************************************************************************
 #   READ BLUENOTE DATA -- For benchmarking!
 # ******************************************************************************************
 # BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw")
 # bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
-# bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(
+# bio = Dict(Symbol(k[1:end-4]) => sort(edit_with(
 #     read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
 
 # # Add supply/use info for checking.
 # BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
-# [bluenote[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
+# [bio[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
 #     Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
 #     Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]]
 
-# [bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3) # convert millions -> billions USD
+# [bio[k][!,:value] .= round.(bio[k][:,:value]*1E-3, digits=3) # convert millions -> billions USD
 #     for k in [:supply,:use]]
 
 # ******************************************************************************************
@@ -55,26 +56,26 @@ io[:supply], io[:use] = fill_zero(io[:supply], io[:use]; permute_keys = true);
 
 # ******************************************************
 
-function filter_with(df::DataFrame, set; extrapolate::Bool = false)
-    df = copy(df)
+# function filter_with(df::DataFrame, set; extrapolate::Bool = false)
+#     df = copy(df)
 
-    cols = find_oftype(df, Not(AbstractFloat))
-    cols_sets = intersect(cols, collect(keys(set)));
-    vals_sets = [set[k] for k in cols_sets]
+#     cols = find_oftype(df, Not(AbstractFloat))
+#     cols_sets = intersect(cols, collect(keys(set)));
+#     vals_sets = [set[k] for k in cols_sets]
 
-    df_sets = DataFrame(permute(NamedTuple{Tuple(cols_sets,)}(vals_sets,)));
+#     df_sets = DataFrame(permute(NamedTuple{Tuple(cols_sets,)}(vals_sets,)));
+    
+#     # Drop values that are not in the current set.
+#     df = join(df, df_sets, on = cols_sets, kind = :inner)
 
-    # Drop values that are not in the current set.
-    df = join(df, df_sets, on = cols_sets, kind = :inner)
+#     # Fill zeros.
+#     vals_sets = [vals_sets; unique.(eachcol(df[:,setdiff(cols,cols_sets)]))]
+#     cols_sets = [cols_sets; setdiff(cols,cols_sets)]
+#     list_sets = NamedTuple{Tuple(cols_sets,)}(vals_sets,)
+#     df = fill_zero(list_sets, df);
 
-    # Fill zeros.
-    vals_sets = [vals_sets; unique.(eachcol(df[:,setdiff(cols,cols_sets)]))]
-    cols_sets = [cols_sets; setdiff(cols,cols_sets)]
-    list_sets = NamedTuple{Tuple(cols_sets,)}(vals_sets,)
-    df = fill_zero(list_sets, df);
-
-    return df
-end
+#     return df
+# end
 
 # Read from use data.
 # "Intermediate demand"
@@ -138,7 +139,7 @@ io[:ms0] = fill_zero((yr = set[:yr], i = set[:i], m = set[:m]))
 io[:ms0][io[:ms0][:,:m] .== "trd", :value] .= max.(-io[:mrg0][:,:value], 0)
 io[:ms0][io[:ms0][:,:m] .== "trn", :value] .= max.(-io[:trn0][:,:value], 0)
 
-# "Margin demand"
+# "Margin demand" !!!! should this be (yr,m,j) instead of (yr,m,i)?
 io[:md0] = fill_zero((yr = set[:yr], m = set[:m], i = set[:i]))
 io[:md0][io[:md0][:,:m] .== "trd", :value] .= max.(io[:mrg0][:,:value], 0)
 io[:md0][io[:md0][:,:m] .== "trn", :value] .= max.(io[:trn0][:,:value], 0)
@@ -171,7 +172,7 @@ i_div = io[:a0][:,:value] .!= 0.0
 io[:ta0][i_div, :value] .= (io[:tax0][i_div,:value] - io[:sbd0][i_div,:value]) ./ io[:a0][i_div,:value]
 
 # "Labor share of value added"
-# io[:va0] = unstack(edit_with(io[:va0], Drop(:units,"all","==")), :va, :value)
-# io[:lshr0] = fill_zero((yr = set[:yr], j = set[:j]))
-# io[:lshr0][!,:value] .= io[:va0][:,:compen] ./ (io[:va0][:,:compen] + io[:va0][:,:surplus])
-# io[:lshr0] = edit_with(io[:lshr0], Replace(:value, NaN, 0.0))
+io[:va0] = unstack(edit_with(io[:va0], Drop(:units,"all","==")), :va, :value)
+io[:lshr0] = fill_zero((yr = set[:yr], g = set[:g]))
+io[:lshr0][!,:value] .= io[:va0][:,:compen] ./ (io[:va0][:,:compen] + io[:va0][:,:surplus])
+io[:lshr0] = edit_with(io[:lshr0], Replace(:value, NaN, 0.0))
