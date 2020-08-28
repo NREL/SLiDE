@@ -18,17 +18,19 @@ set = Dict(Symbol(k) => sort(read_file(joinpath(y["SetPath"]..., ensurearray(v).
     for (k,v) in y["SetInput"])
 
 # Read sharing files and do some preliminary editing.
-files_share = XLSXInput("generate_yaml.xlsx", "share", "B1:F150", "share")
+files_share = XLSXInput("generate_yaml.xlsx", "share", "B1:G150", "share")
 files_share = write_yaml(READ_DIR, files_share)
 
 y = [read_file(files_share[ii]) for ii in 1:length(files_share)]
+files_share = run_yaml(files_share)
+
 shr = Dict(Symbol(y[ii]["PathOut"][end][1:end-4]) =>
     read_file(joinpath(y[ii]["PathOut"]...)) for ii in 1:length(y))
 
-shr[:pce] = filter_with(shr[:pce], set)
-shr[:utd] = filter_with(shr[:utd], set)
-shr[:gsp] = filter_with(shr[:gsp], set)
-shr[:cfs] = filter_with(shr[:cfs], set)
+shr[:pce] = sort(filter_with(shr[:pce], set))
+shr[:utd] = sort(filter_with(shr[:utd], set))
+shr[:gsp] = sort(filter_with(shr[:gsp], set))
+shr[:cfs] = sort(filter_with(shr[:cfs], set))
 
 # ******************************************************************************************
 # "`pce`: Regional shares of final consumption"
@@ -179,3 +181,30 @@ shr[:rpc] = shr[:d0][:,[:r,:g,:value]]
 shr[:rpc][ii,:value] ./= (shr[:mn0][ii,:value] + shr[:d0][ii,:value])
 
 shr[:rpc][shr[:rpc][:,:g] .== "uti",:value] .= 0.9
+
+# ******************************************************************************************
+# `sgf`: State Government Finance data.
+# D.C. is not included in the original data set, so assume its SGFs equal Maryland's.
+df_md = copy(shr[:sgf][shr[:sgf][:,:r] .== "md", :])
+shr[:sgf] = [shr[:sgf]; edit_with(df_md, Replace(:r, "md", "dc"))]
+
+# Filtering/sorting after adding DC because sorting's expensive.
+# Will eventually build extrapolating year/region into filter_with.
+shr[:sgf] = sort(filter_with(shr[:sgf], set))
+
+shr[:sgf][!,:share] .= shr[:sgf][:,:value] ./ sum_over(shr[:sgf], :r; keepkeys = true);
+
+# !!** For years: 1998, 2007, 2008, 2009, 2010, 2011, no government
+# !!** administration data is listed. In these cases, use all public
+# !!** expenditures (police, etc.).
+# !!** sgf_shr(yr,i,g)$(sum(i.local, sgf_shr(yr,i,g)) = 0) = sgf_shr(yr,i,'fdd');
+# !!!! I checked the sgf_shr BEFORE this line of code, and all shares already sum to 1.
+# If this is an issue in other places, here's how I would address it:
+ii = isnan.(shr[:sgf][:,:share])
+if sum(ii) > 0
+    println("Replacing zero sums with final demand.")
+    df_fdd = edit_with(shr[:sgf][shr[:sgf][:,:g] .== "fdd",:], Rename(:share,:fdd))[:,[:yr,:r,:fdd]]
+    shr[:sgf] = join(shr[:sgf], df_fdd, on = [:yr,:r])
+    
+    shr[:sgf][ii,:share] .= shr[:sgf][ii,:fdd]
+end

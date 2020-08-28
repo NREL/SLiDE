@@ -38,6 +38,12 @@
 | `gsp`         | `(yr,r,s)`   | *Annual gross state product*                       |
 | `region`      | `(yr,r,s)`   | *Regional shares of value added*                   |
 | `labor`       | `(yr,r,s)`   | *Share of regional value added due to labor*       |
+| `rpc`         | `(r,g)`      | *Regional purchase coefficient*                    |
+
+Intermediate values
+
+| Parameter     | Variables    | Description                                        |
+|:--------------|:-------------|:---------------------------------------------------|
 | `netval`      | `(yr,r,s)`   | *Net value added (compensation + surplus)*         |
 | `seclaborshr` | `(yr,s)`     | *Sector level average labor shares*                |
 | `avgwgshr`    | `(r,s)`      | *Average wage share*                               |
@@ -45,16 +51,3 @@
 | `mrt0`        | `(r,r,g)`    | *Interstate trade*                                 |
 | `xn0`         | `(r,g)`      | *National exports*                                 |
 | `mn0`         | `(r,g)`      | *National demand*                                  |
-| `rpc`         | `(r,g)`      | *Regional purchase coefficient*                    |
-
-Intermediate values
-
-| Parameter     | Variables  | Description                                  |
-|:--------------|:-----------|:---------------------------------------------|
-| `netval`      | `(yr,r,s)` | *Net value added (compensation + surplus)*   |
-| `seclaborshr` | `(yr,s)`   | *Sector level average labor shares*          |
-| `avgwgshr`    | `(r,s)`    | *Average wage share*                         |
-| `d0`          | `(r,g)`    | *Local supply-demand*                        |
-| `mrt0`        | `(r,r,g)`  | *Interstate trade*                           |
-| `xn0`         | `(r,g)`    | *National exports*                           |
-| `mn0`         | `(r,g)`    | *National demand*                            |

@@ -54,29 +54,6 @@ end
 
 io[:supply], io[:use] = fill_zero(io[:supply], io[:use]; permute_keys = true);
 
-# ******************************************************
-
-# function filter_with(df::DataFrame, set; extrapolate::Bool = false)
-#     df = copy(df)
-
-#     cols = find_oftype(df, Not(AbstractFloat))
-#     cols_sets = intersect(cols, collect(keys(set)));
-#     vals_sets = [set[k] for k in cols_sets]
-
-#     df_sets = DataFrame(permute(NamedTuple{Tuple(cols_sets,)}(vals_sets,)));
-    
-#     # Drop values that are not in the current set.
-#     df = join(df, df_sets, on = cols_sets, kind = :inner)
-
-#     # Fill zeros.
-#     vals_sets = [vals_sets; unique.(eachcol(df[:,setdiff(cols,cols_sets)]))]
-#     cols_sets = [cols_sets; setdiff(cols,cols_sets)]
-#     list_sets = NamedTuple{Tuple(cols_sets,)}(vals_sets,)
-#     df = fill_zero(list_sets, df);
-
-#     return df
-# end
-
 # Read from use data.
 # "Intermediate demand"
 # "Final demand"
