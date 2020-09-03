@@ -113,7 +113,7 @@ function convert_type(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Sy
     # Find and save the column containing values and that/those containing keys.
     # If no value column indicator is specified, find the first DataFrame column of floats.
     value_col == :Float && (value_col = find_oftype(df, AbstractFloat)[1])
-    key_cols = setdiff(names(df), convert_type.(Symbol, ensurearray(drop_cols)), [value_col])
+    key_cols = setdiff(propertynames(df), convert_type.(Symbol, ensurearray(drop_cols)), [value_col])
     ONEKEY = length(key_cols) == 1
 
     d = Dict((ONEKEY ? row[key_cols[1]] : (row[key_cols]...,)) => row[value_col]
@@ -136,7 +136,7 @@ convert_type(::Type{T}, x::Any) where T = T(x)
 
 convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : false
 
-# [@printf("%-8s %s\n", T, fieldnames(T)[T.types .== Any]) for T in subtypes(Edit) if Any in T.types]
+# [@printf("%-8s %s\n", T, fieldpropertynames(T)[T.types .== Any]) for T in subtypes(Edit) if Any in T.types]
 
 """
 Returns true/false if the the DataType or object is an array.
@@ -161,8 +161,8 @@ istype(df::DataFrame, T::DataType) = broadcast(<:, eltypes(dropmissing(df)), T)
     find_oftype(df::DataFrame, T::DataType)
     find_oftype(df::Dict, T::DataType)
 """
-find_oftype(df::DataFrame, T::DataType) = names(df)[istype(df, T)]
-find_oftype(df::DataFrame, T::InvertedIndex{DataType}) = names(df)[.!istype(df, T.skip)]
+find_oftype(df::DataFrame, T::DataType) = propertynames(df)[istype(df, T)]
+find_oftype(df::DataFrame, T::InvertedIndex{DataType}) = propertynames(df)[.!istype(df, T.skip)]
 
 function find_oftype(d::Dict, T::DataType)
     return Dict(k => v for (k,v) in d if any(broadcast(<:, typeof.(ensurearray(v)), T)))
@@ -181,9 +181,9 @@ This function finds all possible permutations of the input arrays.
     If `x` does not contain at least one array, there will be nothing to permute and the function will return `x`.
 """
 function permute(df::DataFrame)
-    cols = names(df)
+    cols = propertynames(df)
     df = sort(DataFrame(Tuple.(permute(unique.(eachcol(df))))))
-    return edit_with(df, Rename.(names(df), cols))
+    return edit_with(df, Rename.(propertynames(df), cols))
 end
 
 function permute(x::Tuple)

@@ -8,22 +8,38 @@ using SLiDE
 
 UNITS = "billions of us dollars (USD)"
 
+function SLiDE.sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true, keepkeys = false)
+
+    inp_keys = df[:,find_oftype(df, Not(AbstractFloat))]
+    val_cols = find_oftype(df, AbstractFloat)
+    by_cols = setdiff(propertynames(df), [col; val_cols])
+
+    gd = groupby(df, by_cols);
+    df = combine(gd, val_cols .=> sum)
+
+    # df = by(df, by_cols, Pair.(val_cols, sum))
+    df = edit_with(df, Rename.(setdiff(propertynames(df), by_cols), val_cols))
+
+    keepkeys && (df = leftjoin(inp_keys, df, on = by_cols))
+    return values_only ? df[:,val_cols[1]] : df
+end
+
 # ******************************************************************************************
 #   READ BLUENOTE DATA -- For benchmarking!
 # ******************************************************************************************
-# BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw")
-# bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
-# bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(
-#     read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
+BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw")
+bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
+bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(
+    read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
 
-# # Add supply/use info for checking.
-# BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
-# [bluenote[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
-#     Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
-#     Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]]
+# Add supply/use info for checking.
+BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
+[bluenote[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
+    Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
+    Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]]
 
-# [bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3) # convert millions -> billions USD
-#     for k in [:supply,:use]]
+[bluenote[k][!,:value] .= round.(bluenote[k][:,:value]*1E-3, digits=3) # convert millions -> billions USD
+    for k in [:supply,:use]]
 
 # ******************************************************************************************
 #   READ SETS AND SLiDE SUPPLY/USE DATA.

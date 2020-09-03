@@ -30,12 +30,15 @@ function sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true, keepk
 
     inp_keys = df[:,find_oftype(df, Not(AbstractFloat))]
     val_cols = find_oftype(df, AbstractFloat)
-    by_cols = setdiff(names(df), [col; val_cols])
+    by_cols = setdiff(propertynames(df), [col; val_cols])
 
-    df = by(df, by_cols, Pair.(val_cols, sum))
-    df = edit_with(df, Rename.(setdiff(names(df), by_cols), val_cols))
+    gd = groupby(df, by_cols);
+    df = combine(gd, val_cols .=> sum)
 
-    keepkeys && (df = join(inp_keys, df, on = by_cols, kind = :left))
+    # df = by(df, by_cols, Pair.(val_cols, sum))
+    df = edit_with(df, Rename.(setdiff(propertynames(df), by_cols), val_cols))
+
+    keepkeys && (df = leftjoin(inp_keys, df, on = by_cols))
     return values_only ? df[:,val_cols[1]] : df
 end
 

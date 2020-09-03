@@ -1,5 +1,5 @@
 function stack_by(df, col, val, input, output)
-    cols = unique(vcat(names(df), output))
+    cols = unique(vcat(propertynames(df), output))
 
     df[!,:start] = (1:size(df)[1]) .+ 1
     df_split = df[df[:,col] .== val, :]

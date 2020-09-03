@@ -1,0 +1,73 @@
+SharePath: [data, windc_output, 2c_shares]
+
+ShareInput:
+  rpc:
+    name: rpc.csv
+    col:  [yr, g, value]
+  utd:
+    name: usatrd_shr.csv
+    col:  [yr,r,s,t,value]
+  sgf:
+    name: sgf_shr.csv
+    col:  [yr,r,g,value]
+  notinc:
+    name: notinc.csv
+    col:  [s]
+  labor:
+    name: labor_shr.csv
+    col:  [yr,r,g,value]
+  region:
+    name: region_shr.csv
+    col:  [yr,r,g,value]
+  pce:
+    name: pce_shr.csv
+    col:  [yr,r,g,value]
+  hw:
+    name: hw.csv
+    col:  [r,g]
+  wg:
+    name: wg.csv
+    col:  [yr,r,g]
+  netval:
+    name: netva.csv
+    col:  [yr,r,g,gdpcat,value]
+  gsp:
+    name: gsp0.csv
+    col:  [yr,r,s,gdpcat,value]
+  gspcat:
+    name: gspcat0.csv
+    col:  [yr,r,g,gdpcat,value]
+  lshr0:
+    name: lshr0.csv
+    col:  [yr,g,value]
+  temp_labor:
+    name: temp_labor_shr.csv
+    col:  [yr,r,g,value]
+  avg_wg_shr:
+    name: avgwgshr.csv
+    col:  [r,g,value]
+  sec_labor_shr:
+    name: seclaborshr.csv
+    col:  [yr,g,value]
+  # d0, mrt0, xn0, mn0, ng, temp_d0, temp_xn0, temp_mn0
+  d0:
+    name: d0.csv
+    col:  [r,g,value]
+  ng:
+    name: ng.csv
+    col:  [g]
+  xn0:
+    name: xn0.csv
+    col:  [r,g,value]
+  mn0:
+    name: mn0.csv
+    col:  [r,g,value]
+  sgf_raw:
+    name: sgf_raw.csv
+    col:  [yr,r,ec,units,value]
+  sgf_map:
+    name: sgf_map.csv
+    col:  [yr,r,g,value]
+  temp_sgf:
+    name: temp_sgf_shr.csv
+    col:  [yr,r,g,value]

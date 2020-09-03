@@ -31,7 +31,7 @@ const IS = InfrastructureSystems
 const SLIDE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), ".."))
 export SLIDE_DIR
 
-include(joinpath("utils", "generate_structs.jl"))
+# include(joinpath("utils", "generate_structs.jl"))
 
 # EXPORTS
 export Add

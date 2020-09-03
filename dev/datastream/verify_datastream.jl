@@ -12,8 +12,8 @@ This function is specific to the verify_datastream.jl file. It makes input DataF
 uniform (same columns; should add support to standardize types)
 """
 function make_uniform(df::DataFrame, cols::Array{Symbol,1})
-    if size(names(df)) == size(cols) && (length(setdiff(cols, names(df))) > 0)
-        df = edit_with(df, Rename.(names(df), cols))[:,cols]
+    if size(propertynames(df)) == size(cols) && (length(setdiff(cols, propertynames(df))) > 0)
+        df = edit_with(df, Rename.(propertynames(df), cols))[:,cols]
     end
     df = df[:,cols]
 
@@ -23,7 +23,7 @@ function make_uniform(df::DataFrame, cols::Array{Symbol,1})
     df[!,:value] .= convert_type.(Float64, df[:,:value])
 
     df = edit_with(df, Drop(:value, 0.0, "=="));
-    return unique(sort(df, names(df)[1:end-1]));
+    return unique(sort(df, propertynames(df)[1:end-1]));
 end
 
 # ******************************************************************************************

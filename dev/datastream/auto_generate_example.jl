@@ -50,5 +50,5 @@ for ii in 1:length(KEYS)-1
 end
 
 x = y["Operate"]
-cols = [setdiff(names(df), unique([x.from; x.to; x.input; x.output]))[1:end-2]; x.output; x.from]
+cols = [setdiff(propertynames(df), unique([x.from; x.to; x.input; x.output]))[1:end-2]; x.output; x.from]
 [inp in ensurearray(x.output) ? Symbol(inp, :_0) : inp for inp in x.input]

@@ -10,13 +10,29 @@ println("\nPARTITION BEA SUPPLY/USE DATA INTO PARAMETERS:")
 UNITS = "billions of us dollars (USD)"
 include(joinpath(SLIDE_DIR, "dev", "buildstream", "build_functions.jl"))
 
+function SLiDE.sum_over(df::DataFrame, col::Array{Symbol,1}; values_only = true, keepkeys = false)
+
+    inp_keys = df[:,find_oftype(df, Not(AbstractFloat))]
+    val_cols = find_oftype(df, AbstractFloat)
+    by_cols = setdiff(propertynames(df), [col; val_cols])
+
+    gd = groupby(df, by_cols);
+    df = combine(gd, val_cols .=> sum)
+
+    # df = by(df, by_cols, Pair.(val_cols, sum))
+    df = edit_with(df, Rename.(setdiff(propertynames(df), by_cols), val_cols))
+
+    keepkeys && (df = leftjoin(inp_keys, df, on = by_cols))
+    return values_only ? df[:,val_cols[1]] : df
+end
+
 # ******************************************************************************************
 #   READ BLUENOTE DATA -- For benchmarking!
 # ******************************************************************************************
-# BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw")
-# bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
-# bio = Dict(Symbol(k[1:end-4]) => sort(edit_with(
-#     read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
+BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw")
+bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
+bio = Dict(Symbol(k[1:end-4]) => sort(edit_with(
+    read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
 
 # # Add supply/use info for checking.
 # BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")

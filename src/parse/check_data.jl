@@ -33,7 +33,7 @@ function compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol 
 
     # Join all dataframes.
     df = df_lst[1]
-    [df = join(df, df_lst[ii], on = cols, kind = :outer) for ii in 2:N]
+    [df = outerjoin(df, df_lst[ii], on = cols) for ii in 2:N]
     [df[!,ind] .= .!ismissing.(df[:,val]) for (ind, val) in zip(inds, vals)]
     
     # Are all keys equal/present in the DataFrame?

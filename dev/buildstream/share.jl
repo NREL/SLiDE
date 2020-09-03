@@ -6,7 +6,7 @@ using Query
 
 using SLiDE
 
-READ_DIR = joinpath("data", "readfiles")
+READ_DIR = joinpath("data", "readfiles");
 include(joinpath(SLIDE_DIR, "dev", "buildstream", "build_functions.jl"))
 # include(joinpath(SLIDE_DIR, "dev", "buildstream", "share_check.jl"))
 
@@ -86,7 +86,7 @@ shr[:labor][ii,:share] = shr[:gsp][ii,:cmp] ./ shr[:netval][ii,:comp]
 #! In cases where the labor share is zero (e.g. banking and finance), use national average.
 # First, join the national average from the BEA Supply/Use data, defined when partitioning
 # the BEA data. Find indices to replace, do so, and delete the IO column.
-shr[:labor] = join(shr[:labor], edit_with(io[:lshr0], Rename(:value,:io)),
+shr[:labor] = innerjoin(shr[:labor], edit_with(io[:lshr0], Rename(:value,:io)),
     on = Pair.([:yr,:g], [:yr,:g]))
 ii = .&(shr[:labor][:,:share] .== 0.0, shr[:region][:,:share] .> 0.0)
 shr[:labor][ii, :share] .= shr[:labor][ii, :io]
@@ -102,7 +102,7 @@ shr[:labor][!,:wg] .= wg
 # Pick out (region,sector) pairings with ALL wage shares greater than 1.
 # Do this by multiplying the boolean over all years. If any values are false, all will be false.
 df_temp = edit_with(by(shr[:labor], [:r,:g], :wg => prod), Rename(:wg_prod, :hw))
-shr[:labor] = join(shr[:labor], df_temp, on = [:r,:g], kind = :inner)
+shr[:labor] = innerjoin(shr[:labor], df_temp, on = [:r,:g])
 hw = shr[:labor][:,:hw]
 
 # ////begin WiNDC weirdness -- this includes high-wage (r,g) AND (r,g) that are all zeros
@@ -110,7 +110,7 @@ hw = shr[:labor][:,:hw]
 # df_temp = by(shr[:labor], [:r,:g], :wg => prod)
 # df_temp[!,:zero_prod] = by(shr[:labor], [:r,:g], :zero => prod)[:,:zero_prod]
 # df_temp[!,:hw] = Bool.(df_temp[:,:wg_prod] .+ df_temp[:,:zero_prod])
-# shr[:labor] = join(shr[:labor], df_temp[:,[:r,:g,:hw]], on = [:r,:g], kind = :inner)
+# shr[:labor] = innerjoin(shr[:labor], df_temp[:,[:r,:g,:hw]], on = [:r,:g])
 # ////end WiNDC weirdness.
 
 # Sector-level average labor shares.
@@ -204,7 +204,10 @@ ii = isnan.(shr[:sgf][:,:share])
 if sum(ii) > 0
     println("Replacing zero sums with final demand.")
     df_fdd = edit_with(shr[:sgf][shr[:sgf][:,:g] .== "fdd",:], Rename(:share,:fdd))[:,[:yr,:r,:fdd]]
-    shr[:sgf] = join(shr[:sgf], df_fdd, on = [:yr,:r])
+    shr[:sgf] = innerjoin(shr[:sgf], df_fdd, on = [:yr,:r])
     
     shr[:sgf][ii,:share] .= shr[:sgf][ii,:fdd]
 end
+
+
+# 
