@@ -177,17 +177,17 @@ penalty_nokey = 1e4
   + sum(abs(cal[:md0][m,i]) * (md0_est[m,i] / cal[:md0][m,i] - 1)^2 for m in m_set for i in i_set if haskey(cal[:md0],(m,i)) ) 
 
 +  penalty_nokey * (
-  + sum(ys0_est[j,i] for i in i_set for j in j_set if !haskey(cal[:ys0],(j,i)) )
-  + sum(id0_est[i,j]  for i in i_set for j in j_set if !haskey(cal[:id0],(i,j)) )
-  + sum(fs0_est[i]  for i in i_set if !haskey(cal[:fs0],i) )
-  + sum(ms0_est[i,m]  for i in i_set for m in m_set if !haskey(cal[:ms0],(i,m)) )
-  + sum(y0_est[i] for i in i_set if !haskey(cal[:y0],i) )
-  + sum(fd0_est[i,fd] for i in i_set for fd in fd_set if !haskey(cal[:fd0],(i,fd)) )
-  + sum(va0_est[va,j] for va in va_set for j in j_set if !haskey(cal[:va0],(va,j)) )
-  + sum(a0_est[i] for i in i_set if !haskey(cal[:a0],i) )
-  + sum(x0_est[i] for i in i_set if !haskey(cal[:x0],i) )
-  + sum(m0_est[i] for i in i_set if !haskey(cal[:m0],i) )
-  + sum(md0_est[m,i]  for m in m_set for i in i_set if !haskey(cal[:md0],(m,i)) ) 
+  + sum(ys0_est[j,i]^2 for i in i_set for j in j_set if !haskey(cal[:ys0],(j,i)) )
+  + sum(id0_est[i,j]^2  for i in i_set for j in j_set if !haskey(cal[:id0],(i,j)) )
+  + sum(fs0_est[i]^2  for i in i_set if !haskey(cal[:fs0],i) )
+  + sum(ms0_est[i,m]^2  for i in i_set for m in m_set if !haskey(cal[:ms0],(i,m)) )
+  + sum(y0_est[i]^2 for i in i_set if !haskey(cal[:y0],i) )
+  + sum(fd0_est[i,fd]^2 for i in i_set for fd in fd_set if !haskey(cal[:fd0],(i,fd)) )
+  + sum(va0_est[va,j]^2 for va in va_set for j in j_set if !haskey(cal[:va0],(va,j)) )
+  + sum(a0_est[i]^2 for i in i_set if !haskey(cal[:a0],i) )
+  + sum(x0_est[i]^2 for i in i_set if !haskey(cal[:x0],i) )
+  + sum(m0_est[i]^2 for i in i_set if !haskey(cal[:m0],i) )
+  + sum(md0_est[m,i]^2  for m in m_set for i in i_set if !haskey(cal[:md0],(m,i)) ) 
   )
 );
 
