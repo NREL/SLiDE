@@ -9,6 +9,7 @@ import CSV
 import DataFrames
 import Dates
 import DelimitedFiles
+import Ipopt
 import JSON
 import Logging
 import Printf
