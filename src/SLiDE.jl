@@ -11,7 +11,9 @@ import Dates
 import DelimitedFiles
 import Ipopt
 import JSON
+import JuMP
 import Logging
+import PowerSimulations
 import Printf
 import Query
 # import Revise
@@ -65,6 +67,7 @@ export datatype
 export isarray
 export istype
 export ensurearray
+export ensuretuple
 export permute
 export find_oftype
 

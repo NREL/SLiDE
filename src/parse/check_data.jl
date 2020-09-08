@@ -19,7 +19,7 @@ function compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol 
     # Rename columns to indicate which values go with which data set.
     val_0 = intersect(find_oftype.(df_lst, AbstractFloat)...)
     vals = [Symbol.(val_0, :_, ind) for ind in inds]
-    cols = setdiff(intersect(names.(df_lst)...), val_0)
+    cols = setdiff(intersect(propertynames.(df_lst)...), val_0)
 
     # Print warning if attempting to compare multiple values at once. We're not there yet.
     if length(val_0) > 1
@@ -35,16 +35,18 @@ function compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol 
     df = df_lst[1]
     [df = outerjoin(df, df_lst[ii], on = cols) for ii in 2:N]
     [df[!,ind] .= .!ismissing.(df[:,val]) for (ind, val) in zip(inds, vals)]
-    
+
     # Are all keys equal/present in the DataFrame?
     df[!,:equal_keys] .= prod.(eachrow(df[:,inds]))
-    
+
     # Are there discrepancies between PRESENT values (within the specified tolerance)?
     # All values in a row x will be considered "equal" if (max(x) - x_i) / mean(x) < tol
     df_comp = (maximum.(skipmissing.(eachrow(df[:,vals]))) .- df[:,vals]) ./
         Statistics.mean.(skipmissing.(eachrow(df[:,vals])))
+
     df[!,:equal_values] .= all.(skipmissing.(eachrow(df_comp .< tol)))
-    
+    df[all.(eachrow(.|(ismissing.(df[:,vals]), df[:,vals].==0))), :equal_values] .= true
+
     return sort(df[:,[cols; sort(vals); sort(inds); [:equal_keys, :equal_values]]], cols)
 end
 

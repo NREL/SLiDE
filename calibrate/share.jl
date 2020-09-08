@@ -11,12 +11,8 @@ include(joinpath(SLIDE_DIR, "dev", "buildstream", "build_functions.jl"))
 # include(joinpath(SLIDE_DIR, "dev", "buildstream", "share_check.jl"))
 
 # ******************************************************************************************
-#   READ SETS AND SLiDE SUPPLY/USE DATA.
+#   READ SHARING DATA.
 # ******************************************************************************************
-y = read_file(joinpath("dev","buildstream","setlist.yml"));
-set = Dict(Symbol(k) => sort(read_file(joinpath(y["SetPath"]..., ensurearray(v)...)))[:,1]
-    for (k,v) in y["SetInput"])
-
 # Read sharing files and do some preliminary editing.
 files_share = XLSXInput("generate_yaml.xlsx", "share", "B1:G150", "share")
 files_share = write_yaml(READ_DIR, files_share)
@@ -210,4 +206,15 @@ if sum(ii) > 0
 end
 
 
-# 
+# Save the right columns.
+for (k,df) in shr    
+    cols = propertynames(df)
+
+    global shr[k] = if :share in cols
+        edit_with(df[:, intersect(cols, [ind; :share])], Rename(:share, :value))
+    elseif :value in cols
+        df[:, intersect(cols, [ind; :value])]
+    else
+        df
+    end
+end

@@ -24,7 +24,7 @@ using Ipopt
   end
  
   function df_to_dict(df::DataFrame,remove_column::Symbol,value_column::Symbol,year::Int64,sub::Bool)
-    colnames = setdiff(names(df),[value_column,remove_column])
+    colnames = setdiff(propertynames(df),[value_column,remove_column])
     #subset on year
     df = df[df[!,:yr].==year,:]
     
@@ -105,14 +105,8 @@ m_set = ["trn","trd"];
 output_use_set = ["use","oth"];
 
 #fill_zero not working for single dimensions..
-for i in i_set
-  if haskey(cal[:ta0],i)==false
-    push!(cal[:ta0],i=>0)
-  end
-  if haskey(cal[:tm0],i)==false
-    push!(cal[:tm0],i=>0)
-  end
-end
+cal[:tm0] = fill_zero((set[:i],), cal[:tm0])
+cal[:ta0] = fill_zero((set[:i],), cal[:tm0])
 
 
 ####################

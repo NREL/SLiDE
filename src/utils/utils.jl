@@ -109,6 +109,17 @@ convert_type(::Type{T}, x::Symbol) where T<:Real = convert_type(T, convert_type(
 
 convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1}) = [DataFrame.(lst)...;]
 
+function convert_type(::Type{DataFrame}, arr::JuMP.Containers.DenseAxisArray; cols = [])
+    cols = ensurearray(cols)
+    
+    val = JuMP.value.(arr.data)
+    ind = permute(arr.axes);
+    val = collect(Iterators.flatten(val));
+
+    df = hcat(DataFrame(ensuretuple.(ind)), DataFrame([val], [:value]))
+    return edit_with(df, Rename.(propertynames(df)[1:length(cols)], cols))
+end
+
 function convert_type(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :Float)
     # Find and save the column containing values and that/those containing keys.
     # If no value column indicator is specified, find the first DataFrame column of floats.
@@ -153,6 +164,11 @@ ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
 ensurearray(x::UnitRange) = collect(x)
 ensurearray(x::Any) = [x]
 
+"""
+    ensuretuple(x::Any)
+"""
+ensuretuple(x::Tuple{Vararg{Any}}) = x
+ensuretuple(x::Any) = tuple(x)
          
 istype(df::DataFrame, T::DataType) = broadcast(<:, eltypes(dropmissing(df)), T)
 

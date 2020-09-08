@@ -148,6 +148,7 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
     for (col, col_map) in zip(x.input, temp_from)
         try
             new_type = eltypes(dropmissing(df_map[:,[col_map]]))
+            # new_type = eltype.(eachcol(dropmissing(df_map[:,[col_map]])))
             df[!,col] .= convert_type.(new_type, df[:,col])
         catch
             df_map[!,col_map] .= convert_type.(String, df_map[:,col_map])
