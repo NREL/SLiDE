@@ -66,7 +66,7 @@ function Base.download(
         tempfilename = Base.download(SLIDEDATA_URL)
         mkpath(directory)
         unzip(os, tempfilename, directory)
-        mv(joinpath(directory, "SLiDE-Data-$branch"), data, force = force)
+        mv(joinpath(directory, "SLiDEData-$branch"), data, force = force)
     end
 
     return data
