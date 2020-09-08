@@ -56,9 +56,9 @@ function Base.download(
 )
 
     if Sys.iswindows()
-        SLIDEDATA_URL = "https://github.com/sourabhdalvi/SLiDE-Data/archive/$branch.zip"
+        SLIDEDATA_URL = "https://github.com/NREL/SLiDEData/archive/$branch.zip"
     else
-        SLIDEDATA_URL = "https://github.com/sourabhdalvi/SLiDE-Data/archive/$branch.tar.gz"
+        SLIDEDATA_URL = "https://github.com/NREL/SLiDEData/archive/$branch.tar.gz"
     end
     directory = abspath(normpath(folder))
     data = joinpath(directory, "data")
