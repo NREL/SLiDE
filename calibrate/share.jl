@@ -39,8 +39,9 @@ shr[:utd][isnan.(shr[:utd][:,:share]),:share] .= (sum_over(shr[:utd], :yr; keepk
     sum_over(shr[:utd], [:yr,:r]; keepkeys = true))[isnan.(shr[:utd][:,:share])]
 shr[:utd] = shr[:utd][.!isnan.(shr[:utd][:,:share]),:]
 
-# "`notinc`: Sectors not included in USA Trade Data."
-shr[:notinc] = DataFrame(s = setdiff(set[:i], shr[:utd][:,:s]))
+# "`notrd`: Sectors not included in USA Trade Data."
+# shr[:notinc] = DataFrame(s = setdiff(set[:i], shr[:utd][:,:s]))
+set[:notrd] = setdiff(set[:i], shr[:utd][:,:s])
 
 # ******************************************************************************************
 # # "`gsp`: Calculated gross state product."
@@ -207,6 +208,7 @@ end
 
 
 # Save the right columns.
+ind = [collect(keys(set)); :t]
 for (k,df) in shr    
     cols = propertynames(df)
 

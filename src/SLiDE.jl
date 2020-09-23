@@ -76,8 +76,11 @@ export fill_zero
 export read_file
 export load_from
 export gams_to_dataframe
+export filter_with
 
 export sum_over
+export combine_over
+export transform_over
 
 export write_yaml
 export run_yaml

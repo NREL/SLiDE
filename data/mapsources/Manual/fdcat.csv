@@ -1,0 +1,5 @@
+# See windc_build/build_files/statedisagg.gms
+code,desc
+C,Household consumption
+I,Investment
+G,Government expenditures

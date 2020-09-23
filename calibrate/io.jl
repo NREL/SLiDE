@@ -11,14 +11,13 @@ UNITS = "billions of us dollars (USD)"
 include(joinpath(SLIDE_DIR, "dev", "buildstream", "build_functions.jl"))
 
 
-
 # ******************************************************************************************
 #   READ BLUENOTE DATA -- For benchmarking!
 # ******************************************************************************************
-BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw")
-bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
-bio = Dict(Symbol(k[1:end-4]) => sort(edit_with(
-    read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
+BLUE_DIR_IO = joinpath("data", "windc_output", "2a_io_national_cgeparm_raw")
+bluenote_lst_io = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR_IO)) if occursin(".csv", x)]
+io = Dict(Symbol(k[1:end-4]) => sort(edit_with(
+    read_file(joinpath(BLUE_DIR_IO, k)), Rename(:Val, :value))) for k in bluenote_lst_io)
 
 # # Add supply/use info for checking.
 # BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
@@ -161,4 +160,4 @@ io[:lshr0][!,:value] .= va0[:,:compen] ./ (va0[:,:compen] + va0[:,:surplus])
 io[:lshr0] = edit_with(io[:lshr0], Replace(:value, NaN, 0.0))
 
 # Remove columns that contain only one value.
-[io[k] = io[k][:,length.(unique.(eachcol(df))) .!= 1] for (k,df) in io]
+[io[k] = io[k][:,[length.(unique.(eachcol(df)[1:end-1])) .!= 1; true]] for (k,df) in io]

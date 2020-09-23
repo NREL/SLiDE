@@ -13,8 +13,8 @@ READ_DIR = joinpath("data", "readfiles")
 
 files_map = [
     XLSXInput("generate_yaml.xlsx", "map_parse",     "B1:Z150", "map_parse"),
-    XLSXInput("generate_yaml.xlsx", "map_scale",     "B1:Z150", "map_scale"),
-    XLSXInput("generate_yaml.xlsx", "map_bluenote",  "B1:Z150", "map_bluenote"),
+    # XLSXInput("generate_yaml.xlsx", "map_scale",     "B1:Z150", "map_scale"),
+    # XLSXInput("generate_yaml.xlsx", "map_bluenote",  "B1:Z150", "map_bluenote"),
     XLSXInput("generate_yaml.xlsx", "map_crosswalk", "B1:Z150", "map_crosswalk")
 ]
 

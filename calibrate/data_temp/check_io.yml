@@ -1,0 +1,27 @@
+Path: [data, windc_output, 2a_io_national_cgeparm_raw]
+
+Input:
+  a0:      {name: a0.csv,      col: [yr,i,value]}
+  fd0:     {name: fd0.csv,     col: [yr,i,fd,value]}
+  fs0:     {name: fs0.csv,     col: [yr,i,value]}
+  id0:     {name: id0.csv,     col: [yr,i,j,value]}
+  m0:      {name: m0.csv,      col: [yr,i,value]}
+  md0:     {name: md0.csv,     col: [yr,m,i,value]}
+  ms0:     {name: ms0.csv,     col: [yr,i,m,value]}
+  ta0:     {name: ta0.csv,     col: [yr,g,value]}     # i -> g
+  tm0:     {name: tm0.csv,     col: [yr,g,value]}     # i -> g
+  va0:     {name: va0.csv,     col: [yr,va,j,value]}
+  x0:      {name: x0.csv,      col: [yr,i,value]}
+  y0:      {name: y0.csv,      col: [yr,i,value]}
+  ys0:     {name: ys0.csv,     col: [yr,j,i,value]}
+  # bopdef0: {name: bopdef.csv,  col: [yr,value]}
+  # cif0:    {name: cif0.csv,    col: [yr,i,value]}
+  # lshr0:   {name: lshr0.csv,   col: [yr,g,value]}
+  # mrg0:    {name: mrg0.csv,    col: [yr,i,value]}
+  # s0:      {name: s0.csv,      col: [yr,j,value]}
+  # sbd0:    {name: sbd0.csv,    col: [yr,i,value]}
+  # tax0:    {name: tax0.csv,    col: [yr,i,value]}
+  # trn0:    {name: trn0.csv,    col: [yr,i,value]}
+  # ts0:     {name: ts0.csv,     col: [yr,i,j,value]}
+  # supply:  {name: supply.csv, col: [yr,i,j,value]}
+  # use:     {name: use.csv,    col: [yr,i,j,value]}

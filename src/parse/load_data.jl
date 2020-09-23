@@ -40,7 +40,7 @@ end
 
 function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
     filepath = joinpath(SLIDE_DIR, path..., file.name)
-    df = CSV.read(filepath; silencewarnings = true, ignoreemptylines = true, comment = "#",
+    df = CSV.read(filepath, DataFrame; silencewarnings = true, ignoreemptylines = true, comment = "#",
         missingstrings = ["","\xc9","..."])
     NUMTEST = min(10, size(df,1))
 
@@ -55,7 +55,7 @@ function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
         xf = xf[1:NUMTEST,:]
 
         HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf) .!= 0)))) .> 1)[2]
-        df = CSV.read(filepath, silencewarnings = true, ignoreemptylines = true,
+        df = CSV.read(filepath, DataFrame, silencewarnings = true, ignoreemptylines = true,
             missingstrings = ["","\xc9","..."]; header = HEAD)
     end
 
@@ -115,7 +115,7 @@ function read_file(file::String; colpropertynames = false)
         return y
 
     elseif occursin(".csv", file)
-        df = CSV.read(file, silencewarnings = true, ignoreemptylines=true, comment = "#",
+        df = CSV.read(file, DataFrame, silencewarnings = true, ignoreemptylines=true, comment = "#",
             missingstrings = ["","\xc9","..."])
         return df
     end
@@ -352,7 +352,10 @@ function run_yaml(filename::String)
     println("  Reading yaml file...")
 
     y = read_file(filename)
+
     if haskey(y, "Editable") && y["Editable"]
+        # Iteratively make all edits and update output data file in accordance with
+        # operations defined in the input YAML file.
         println("  Parsing and standardizing...")
         df = unique(edit_with(y))
 

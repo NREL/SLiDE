@@ -171,7 +171,7 @@ ensuretuple(x::Tuple{Vararg{Any}}) = x
 ensuretuple(x::Any) = tuple(x)
          
 istype(df::DataFrame, T::DataType) = broadcast(<:, eltypes(dropmissing(df)), T)
-
+# eltype.(eachcol(df))
 
 """
     find_oftype(df::DataFrame, T::DataType)

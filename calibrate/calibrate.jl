@@ -1,3 +1,9 @@
+using SLiDE
+using CSV
+using JuMP
+using DataFrames
+using Ipopt
+
 function national_calibration(d::Dict, set::Dict)
     # Copy the relevant input DataFrames before making any changes.
     set[:cal] = [:y0,:ys0,:fs0,:id0,:fd0,:va0,:m0,:x0,:ms0,:md0,:a0,:ta0,:tm0];
@@ -23,7 +29,9 @@ function national_calibration(year::Int, d::Dict, set::Dict)
     cal[:tm0] = fill_zero((set[:i],), cal[:tm0])
     cal[:ta0] = fill_zero((set[:i],), cal[:tm0])
 
-    calib = Model(with_optimizer(Ipopt.Optimizer, nlp_scaling_method="gradient-based"))
+    # with_optimizer(Ipopt.Optimizer, max_cpu_time=60.0)` becomes `optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time" => 60.0)
+    # calib = Model(with_optimizer(Ipopt.Optimizer, nlp_scaling_method="gradient-based"))
+    calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time" => 60.0))
 
     @variable(calib,ys0_est[j in set[:j], i in set[:i]] >= 0,start = 0);
     @variable(calib,fs0_est[i in set[:i]] >= 0,start = 0);
@@ -37,13 +45,13 @@ function national_calibration(year::Int, d::Dict, set::Dict)
     @variable(calib,m0_est[i in set[:i]] >= 0,start = 0);
     @variable(calib,md0_est[m in set[:m],i in set[:i]] >= 0,start = 0);
 
-    ```
-    mkt_py(i)..	sum(j, ys0_(j,i)) +  fs0_(i) =E= sum(m, ms0_(i,m)) + y0_(i);
-    mkt_pa(i)..	a0_(i) =E= sum(j, id0_(i,j)) + sum(fd,fd0_(i,fd));
-    mkt_pm(m)..	sum(i,ms0_(i,m)) =E= sum(i, md0_(m,i));
-    prf_y(j)..	sum(i, ys0_(j,i)) =E= sum(i, id0_(i,j)) + sum(va,va0_(va,j));
-    prf_a(i)..	a0_(i)*(1-ta0(i)) + x0_(i) =E= y0_(i) + m0_(i)*(1+tm0(i)) + sum(m, md0_(m,i));
-    ```
+    # ```
+    # mkt_py(i)..	sum(j, ys0_(j,i)) +  fs0_(i) =E= sum(m, ms0_(i,m)) + y0_(i);
+    # mkt_pa(i)..	a0_(i) =E= sum(j, id0_(i,j)) + sum(fd,fd0_(i,fd));
+    # mkt_pm(m)..	sum(i,ms0_(i,m)) =E= sum(i, md0_(m,i));
+    # prf_y(j)..	sum(i, ys0_(j,i)) =E= sum(i, id0_(i,j)) + sum(va,va0_(va,j));
+    # prf_a(i)..	a0_(i)*(1-ta0(i)) + x0_(i) =E= y0_(i) + m0_(i)*(1+tm0(i)) + sum(m, md0_(m,i));
+    # ```
 
     @constraint(calib,mkt_py[i in set[:i]],
         sum(ys0_est[j,i] for j in set[:j]) + fs0_est[i] == sum(ms0_est[i,m] for m in set[:m]) + y0_est[i]
@@ -155,6 +163,7 @@ function national_calibration(year::Int, d::Dict, set::Dict)
 
     # Populate resultant Dictionary.
     io_cal = Dict()
+    
     # Using original (i,j) notation...
     # io_cal[:ys0] = convert_type(DataFrame, ys0_est; cols=[:j,:i])
     # io_cal[:fs0] = convert_type(DataFrame, fs0_est; cols=[:i])

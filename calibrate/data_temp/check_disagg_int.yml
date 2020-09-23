@@ -1,0 +1,19 @@
+Path: [data, windc_output, 2e_disagg_int]
+
+Input:
+  va0:      {name: va0.csv,      col: [yr,r,s,value]}
+  cd0_temp: {name: cd_0.csv,     col: [yr,s,value]}
+  diff:     {name: diff.csv,     col: [yr,r,g,value]}
+  dd0max:   {name: dd0max.csv,   col: [yr,r,g,value]}
+  dd0min:   {name: dd0min.csv,   col: [yr,r,g,value]}
+  g0_temp:  {name: g_0.csv,      col: [yr,s,value]}
+  i0_temp:  {name: i_0.csv,      col: [yr,s,value]}
+  nd0max:   {name: nd0max.csv,   col: [yr,r,g,value]}
+  nd0min:   {name: nd0min.csv,   col: [yr,r,g,value]}
+  rx0_temp: {name: rx0_temp.csv, col: [yr,r,g,value]}
+  s0_temp:  {name: s0_temp.csv,  col: [yr,r,g,value]}
+  x0_temp:  {name: x0_temp.csv,  col: [yr,r,g,value]}
+  yh0_temp: {name: yh0_temp.csv, col: [yr,r,g,value]}
+  ta0_a0_rx0: {name: ta0_a0_rx0.csv,  col: [yr,r,g,value]}
+  tm0_m0_md0: {name: tm0_m0_md0.csv, col: [yr,r,g,value]}
+  md0_temp: {name: md0_sum.csv, col: [yr,r,g,value]}

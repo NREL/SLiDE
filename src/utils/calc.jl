@@ -3,6 +3,91 @@ using DataFrames
 using DelimitedFiles
 using YAML
 using Query
+using Base
+
+function _join_to_operate(df::Array{DataFrame,1})
+    N = length(df)
+
+    inp = vcat.(find_oftype.(df, AbstractFloat), find_oftype.(df, Bool))
+    out = Symbol.(:x, 1:N)
+    cols = intersect(setdiff.(propertynames.(df), inp)...)
+
+    if any(length.(inp) .!= 1)
+        error("Can only operate on DataFrames with one AbstractFloat column.")
+    else
+        inp = collect(Iterators.flatten(inp))
+    end
+
+    df_ans = edit_with(df[1], Rename(inp[1], out[1]));
+    if length(cols) == 0
+        [df_ans = crossjoin(df_ans, edit_with(df[ii], Rename(inp[ii], out[ii]))) for ii in 2:N]
+    else
+        [df_ans = outerjoin(df_ans, edit_with(df[ii], Rename(inp[ii], out[ii])),
+            on = cols) for ii in 2:N]
+    end
+    
+    df_ans = edit_with(df_ans, Replace.(out, missing, 0))
+    return df_ans
+end
+
+function Base.:/(df::Vararg{DataFrame})
+    N = length(df)
+    out = Symbol.(:x, 1:N)
+
+    N > 2 && error("Can only divide one DataFrame by another.")
+
+    df = _join_to_operate(copy.(ensurearray(df)))
+    df[!,:value] .= df[:, out[1]] ./ df[:, out[2]]
+    df[isnan.(df[:,:value]),:value] .= 0
+
+    return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
+end
+
+function Base.:+(df::Vararg{DataFrame})
+    N = length(df)
+    out = Symbol.(:x, 1:N)
+
+    df = _join_to_operate(copy.(ensurearray(df)))
+
+    df[!,:value] .= df[:, out[1]];
+    [df[!,:value] += df[:, out[ii]] for ii in 2:N]
+
+    return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
+end
+
+function Base.:-(df::Vararg{DataFrame})
+    N = length(df)
+    out = Symbol.(:x, 1:N)
+
+    df = _join_to_operate(copy.(ensurearray(df)))
+
+    df[!,:value] .= df[:, out[1]];
+    [df[!,:value] -= df[:, out[ii]] for ii in 2:N]
+
+    return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
+end
+
+function Base.:*(df::Vararg{DataFrame})
+    N = length(df)
+    out = Symbol.(:x, 1:N)
+
+    df = _join_to_operate(copy.(ensurearray(df)))
+
+    df[!,:value] .= df[:, out[1]];
+    [df[!,:value] .*= df[:, out[ii]] for ii in 2:N]
+
+    return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
+end
+
+Base.:*(x::Int, df::DataFrame) =  DataFrame(temp = convert_type(Float64, x)) * df
+Base.:+(x::Int, df::DataFrame) =  DataFrame(temp = convert_type(Float64, x)) + df
+Base.:-(x::Int, df::DataFrame) =  DataFrame(temp = convert_type(Float64, x)) - df
+Base.:/(x::Int, df::DataFrame) =  DataFrame(temp = convert_type(Float64, x)) / df
+
+Base.:*(df::DataFrame, x::Int) = x * df
+Base.:+(df::DataFrame, x::Int) = x + df
+Base.:-(df::DataFrame, x::Int) = x - df
+Base.:/(df::DataFrame, x::Int) = df / DataFrame(temp = convert_type(Float64, x))
 
 """
     sum_over(df::DataFrame, col::Array{Symbol,1}; kwargs...)
@@ -44,4 +129,36 @@ end
 
 function sum_over(df::DataFrame, col::Symbol; values_only = true, keepkeys = false)
     return sum_over(df, [col]; values_only = values_only, keepkeys = keepkeys)
+end
+
+function combine_over(df::DataFrame, col::Array{Symbol,1}; operation::Symbol = :sum)
+    inp_keys = df[:,find_oftype(df, Not(AbstractFloat))]
+    val_cols = find_oftype(df, AbstractFloat)
+    by_cols = setdiff(propertynames(df), [col; val_cols])
+
+    ans = if operation == :sum
+        combine(groupby(df, by_cols), val_cols .=> sum .=> val_cols)
+    end
+
+    return ans
+end
+
+function combine_over(df::DataFrame, col::Symbol; operation::Symbol = :sum)
+    return combine_over(df, [col]; operation = operation)
+end
+
+function transform_over(df::DataFrame, col::Array{Symbol,1}; operation::Symbol = :sum)
+    inp_keys = df[:,find_oftype(df, Not(AbstractFloat))]
+    val_cols = find_oftype(df, AbstractFloat)
+    by_cols = setdiff(propertynames(df), [col; val_cols])
+
+    ans = if operation == :sum
+        transform(groupby(df, by_cols), val_cols .=> sum .=> val_cols)
+    end
+
+    return ans
+end
+
+function transform_over(df::DataFrame, col::Symbol; operation::Symbol = :sum)
+    return transform_over(df, [col]; operation = operation)
 end

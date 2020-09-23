@@ -1,0 +1,26 @@
+Path: [data, windc_output, 2b_shr]
+
+Input:
+  rpc:    {name: rpc.csv,        col: [r,g,value]}
+  utd:    {name: usatrd_shr.csv, col: [yr,r,s,t,value]}
+  sgf:    {name: sgf_shr.csv,    col: [yr,r,s,value]}     # g -> s
+  notrd:  {name: notinc.csv,     col: [s]}
+  labor:  {name: labor_shr.csv,  col: [yr,r,s,value]}     # g -> s
+  region: {name: region_shr.csv, col: [yr,r,s,value]}     # g -> s
+  pce:    {name: pce_shr.csv,    col: [yr,r,s,value]}     # g -> s
+  # hw:     {name: hw.csv,         col: [r,g]}
+  # wg:     {name: wg.csv,         col: [yr,r,g]}
+  # netval: {name: netva.csv,      col: [yr,r,g,gdpcat,value]}
+  # gsp:    {name: gsp0.csv,       col: [yr,r,s,gdpcat,value]}
+  # gspcat: {name: gspcat0.csv,    col: [yr,r,g,gdpcat,value]}
+  # lshr0:  {name: lshr0.csv,      col: [yr,g,value]}
+  # d0:     {name: d0.csv,         col: [r,g,value]}
+  # ng:     {name: ng.csv,         col: [g]}
+  # xn0:    {name: xn0.csv,        col: [r,g,value]}
+  # xn0:    {name: mn0.csv,        col: [r,g,value]}
+  # labor_temp:    {name: temp_labor_shr.csv, col: [yr,r,g,value]}
+  # avg_wg_shr:    {name: avgwgshr.csv,       col: [r,g,value]}
+  # sec_labor_shr: {name: seclaborshr.csv,    col: [yr,g,value]}
+  # sgf_raw:       {name: sgf_raw.csv,        col: [yr,r,ec,units,value]}
+  # sgf_map:       {name: sgf_map.csv,        col: [yr,r,g,value]}
+  # sgf_temp:      {name: temp_sgf_shr.csv,   col:  [yr,r,g,value]}
