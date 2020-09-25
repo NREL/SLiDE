@@ -101,35 +101,35 @@ blueNOTE = Dict(
 )
 
 ## Creating copy without zeros
-ys0 = blueNOTE[:ys0]
-id0 = blueNOTE[:id0]
-ld0 = blueNOTE[:ld0]
-kd0 = blueNOTE[:kd0]
-ty0 = blueNOTE[:ty0]
-m0 = blueNOTE[:m0]
-x0 = blueNOTE[:x0]
-rx0 = blueNOTE[:rx0]
-md0 = blueNOTE[:md0]
-nm0 = blueNOTE[:nm0]
-dm0 = blueNOTE[:dm0]
-s0 = blueNOTE[:s0]
-a0 = blueNOTE[:a0]
-ta0 = blueNOTE[:ta0]
-tm0 = blueNOTE[:tm0]
-cd0 = blueNOTE[:cd0]
-c0 = blueNOTE[:c0]
-yh0 = blueNOTE[:yh0]
-bopdef0 = blueNOTE[:bopdef0]
-hhadj = blueNOTE[:hhadj]
-g0 = blueNOTE[:g0]
-i0 = blueNOTE[:i0]
-xn0 = blueNOTE[:xn0]
-xd0 = blueNOTE[:xd0]
-dd0 = blueNOTE[:dd0]
-nd0 = blueNOTE[:nd0]
-tm = tm0
-ta = ta0
-ty = ty0
+ys0 = deepcopy(blueNOTE[:ys0])
+id0 = deepcopy(blueNOTE[:id0])
+ld0 = deepcopy(blueNOTE[:ld0])
+kd0 = deepcopy(blueNOTE[:kd0])
+ty0 = deepcopy(blueNOTE[:ty0])
+m0 = deepcopy(blueNOTE[:m0])
+x0 = deepcopy(blueNOTE[:x0])
+rx0 = deepcopy(blueNOTE[:rx0])
+md0 = deepcopy(blueNOTE[:md0])
+nm0 = deepcopy(blueNOTE[:nm0])
+dm0 = deepcopy(blueNOTE[:dm0])
+s0 = deepcopy(blueNOTE[:s0])
+a0 = deepcopy(blueNOTE[:a0])
+ta0 =deepcopy( blueNOTE[:ta0])
+tm0 = deepcopy(blueNOTE[:tm0])
+cd0 = deepcopy(blueNOTE[:cd0])
+c0 = deepcopy(blueNOTE[:c0])
+yh0 = deepcopy(blueNOTE[:yh0])
+bopdef0 = deepcopy(blueNOTE[:bopdef0])
+hhadj = deepcopy(blueNOTE[:hhadj])
+g0 = deepcopy(blueNOTE[:g0])
+i0 = deepcopy(blueNOTE[:i0])
+xn0 = deepcopy(blueNOTE[:xn0])
+xd0 = deepcopy(blueNOTE[:xd0])
+dd0 = deepcopy(blueNOTE[:dd0])
+nd0 = deepcopy(blueNOTE[:nd0])
+tm = deepcopy(tm0)
+ta = deepcopy(ta0)
+ty = deepcopy(ty0)
 
 ###############
 # -- SETS --
@@ -256,25 +256,25 @@ end
 @NLparameter(
     cge,
     alpha_kl[r in regions, s in sectors] ==
-    (value(ld0[r, s]) + value(kd0[r, s])) / value(ld0[r, s])
+    (value(ld0_p[r, s]) + value(kd0_p[r, s])) / value(ld0_p[r, s])
 );
 @NLparameter(
     cge,
     alpha_x[r in regions, g in goods] ==
-    (value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g])
+    (value(x0_p[r, g]) - value(rx0_p[r, g])) / value(s0_p[r, g])
 );
-@NLparameter(cge, alpha_d[r in regions, g in goods] == value(xd0[r, g]) / value(s0[r, g]));
-@NLparameter(cge, alpha_n[r in regions, g in goods] == value(xn0[r, g]) / value(s0[r, g]));
+@NLparameter(cge, alpha_d[r in regions, g in goods] == value(xd0_p[r, g]) / value(s0_p[r, g]));
+@NLparameter(cge, alpha_n[r in regions, g in goods] == value(xn0_p[r, g]) / value(s0_p[r, g]));
 @NLparameter(
     cge,
     theta_n[r in regions, g in goods] ==
-    value(nd0[r, g]) / (value(nd0[r, g]) - value(dd0[r, g]))
+    value(nd0_p[r, g]) / (value(nd0_p[r, g]) - value(dd0_p[r, g]))
 );
 @NLparameter(
     cge,
     theta_m[r in regions, g in goods] ==
-    value(tm0[r, g]) * value(m0[r, g]) /
-    (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g]) * value(m0[r, g])))
+    value(tm0_p[r, g]) * value(m0_p[r, g]) /
+    (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g]) * value(m0_p[r, g])))
 );
 
 replace_nan_inf(alpha_kl)
