@@ -5,9 +5,13 @@ using YAML
 using Query
 using Base
 
+"""
+    _join_to_operate(df::Array{DataFrame,1})
+    _join_to_operate(df::Vararg{DataFrame})
+"""
 function _join_to_operate(df::Array{DataFrame,1})
     N = length(df)
-
+    
     inp = vcat.(find_oftype.(df, AbstractFloat), find_oftype.(df, Bool))
     out = Symbol.(:x, 1:N)
     cols = intersect(setdiff.(propertynames.(df), inp)...)
@@ -30,31 +34,60 @@ function _join_to_operate(df::Array{DataFrame,1})
     return df_ans
 end
 
-function Base.:/(df::Vararg{DataFrame})
-    N = length(df)
-    out = Symbol.(:x, 1:N)
+_join_to_operate(df::Vararg{DataFrame}) = _join_to_operate(ensurearray(df))
 
-    N > 2 && error("Can only divide one DataFrame by another.")
+"""
+    Base.:/(df1::DataFrame, df2::DataFrame)
+Extends / to operate on 2 DataFrames, each with one column of AbstractFloat type.
+The operation will join the DataFrames on their descriptive columns to ensure the operation
+is performed for related values. Values that are "missing" after joining are set to 0.
+"""
+function Base.:/(df1::DataFrame, df2::DataFrame)
+    out = Symbol.(:x, 1:2)
 
-    df = _join_to_operate(copy.(ensurearray(df)))
-    df[!,:value] .= df[:, out[1]] ./ df[:, out[2]]
-    df[isnan.(df[:,:value]),:value] .= 0
+    df_ans = _join_to_operate(copy.([df1, df2]))
+    df_ans[!,:value] .= df_ans[:, out[1]] ./ df[:, out[2]]
 
-    return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
+    return df_ans[:, [setdiff(propertynames(df_ans), [:value; out]); :value]]
 end
 
+# function Base.:/(df::Vararg{DataFrame})
+#     N = length(df)
+#     out = Symbol.(:x, 1:N)
+
+#     N > 2 && error("Can only divide one DataFrame by another.")
+
+#     df = _join_to_operate(copy.(ensurearray(df)))
+#     df[!,:value] .= df[:, out[1]] ./ df[:, out[2]]
+#     # df[isnan.(df[:,:value]),:value] .= 0
+
+#     return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
+# end
+
+"""
+    Base.:+(df::Vararg{DataFrame})
+Extends + to operate on 2+ DataFrames, each with one column of AbstractFloat type.
+The operation will join the DataFrames on their descriptive columns to ensure the operation
+is performed for related values. Values that are "missing" after joining are set to 0.
+"""
 function Base.:+(df::Vararg{DataFrame})
     N = length(df)
     out = Symbol.(:x, 1:N)
 
-    df = _join_to_operate(copy.(ensurearray(df)))
+    df_ans = _join_to_operate(copy.(ensurearray(df)))
 
-    df[!,:value] .= df[:, out[1]];
-    [df[!,:value] += df[:, out[ii]] for ii in 2:N]
+    df_ans[!,:value] .= df_ans[:, out[1]];
+    [df_ans[!,:value] += df_ans[:, out[ii]] for ii in 2:N]
 
-    return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
+    return df_ans[:, [setdiff(propertynames(df_ans), [:value; out]); :value]]
 end
 
+"""
+    Base.:-(df::Vararg{DataFrame})
+Extends - to operate on 2+ DataFrames, each with one column of AbstractFloat type.
+The operation will join the DataFrames on their descriptive columns to ensure the operation
+is performed for related values. Values that are "missing" after joining are set to 0.
+"""
 function Base.:-(df::Vararg{DataFrame})
     N = length(df)
     out = Symbol.(:x, 1:N)
@@ -67,6 +100,12 @@ function Base.:-(df::Vararg{DataFrame})
     return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
 end
 
+"""
+    Base.:*(df::Vararg{DataFrame})
+Extends * to operate on 2+ DataFrames, each with one column of AbstractFloat type.
+The operation will join the DataFrames on their descriptive columns to ensure the operation
+is performed for related values. Values that are "missing" after joining are set to 0.
+"""
 function Base.:*(df::Vararg{DataFrame})
     N = length(df)
     out = Symbol.(:x, 1:N)
@@ -79,15 +118,69 @@ function Base.:*(df::Vararg{DataFrame})
     return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
 end
 
-Base.:*(x::Int, df::DataFrame) =  DataFrame(temp = convert_type(Float64, x)) * df
-Base.:+(x::Int, df::DataFrame) =  DataFrame(temp = convert_type(Float64, x)) + df
-Base.:-(x::Int, df::DataFrame) =  DataFrame(temp = convert_type(Float64, x)) - df
-Base.:/(x::Int, df::DataFrame) =  DataFrame(temp = convert_type(Float64, x)) / df
+"""
+    combine_over(df::DataFrame, col::Array{Symbol,1}; operation::Function = sum)
+    combine_over(df::DataFrame, col::Symbol; operation::Function = sum)
+This function applies [`combine`](https://juliadata.github.io/DataFrames.jl/stable/lib/functions/#DataFrames.combine)
+to the input DataFrame `df` over the input column(s) `col`.
 
-Base.:*(df::DataFrame, x::Int) = x * df
-Base.:+(df::DataFrame, x::Int) = x + df
-Base.:-(df::DataFrame, x::Int) = x - df
-Base.:/(df::DataFrame, x::Int) = df / DataFrame(temp = convert_type(Float64, x))
+# Arguments:
+- `df::DataFrame`: DataFrame on which to operate.
+- `col::Symbol` or `col::Array{Symbol,1}`: column(s) over which to operate.
+
+# Keyword Arguments:
+- `operation::Function = sum`: Operation to perform over the DataFrame columns. By default,
+    the function will return a summation. Other standard summary functions include: `sum`,
+    `prod`, `minimum`, `maximum`, `mean`, `var`, `std`, `first`, `last` and `length`.
+
+# Returns:
+- `df::DataFrame` WITHOUT the specified column(s) argument. The resulting DataFrame will be
+    'shorter' than the input DataFrame.
+"""
+function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
+    cols_ans = setdiff(propertynames(df), col)
+
+    val_cols = find_oftype(df, AbstractFloat)
+    by_cols = setdiff(propertynames(df), [col; val_cols])
+    df_ans = combine(groupby(df, by_cols), val_cols .=> fun .=> val_cols)
+    return df_ans[:,cols_ans]
+end
+
+function combine_over(df::DataFrame, col::Symbol; fun::Function = sum)
+    return combine_over(df, ensurearray(col); fun = fun)
+end
+
+"""
+    transform_over(df::DataFrame, col::Array{Symbol,1}; operation::Function = sum)
+    transform_over(df::DataFrame, col::Symbol; operation::Function = sum)
+This function applies [`transform`](https://juliadata.github.io/DataFrames.jl/stable/lib/functions/#DataFrames.transform)
+to the input DataFrame `df` over the input column(s) `col`.
+
+# Arguments:
+- `df::DataFrame`: DataFrame on which to operate.
+- `col::Symbol` or `col::Array{Symbol,1}`: column(s) over which to operate.
+
+# Keyword Arguments:
+- `operation::Function = sum`: Operation to perform over the DataFrame columns. By default,
+    the function will return a summation. Other standard summary functions include: `sum`,
+    `prod`, `minimum`, `maximum`, `mean`, `var`, `std`, `first`, `last` and `length`.
+
+# Returns:
+- `df::DataFrame` WITH the specified column(s) argument. The resulting DataFrame will be
+    the same length as the input DataFrame.
+"""
+function transform_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
+    cols_ans = propertynames(df)
+
+    val_cols = find_oftype(df, AbstractFloat)
+    by_cols = setdiff(propertynames(df), [col; val_cols])
+    df_ans = transform(groupby(df, by_cols), val_cols .=> fun .=> val_cols)
+    return df_ans[:,cols_ans]
+end
+
+function transform_over(df::DataFrame, col::Symbol; fun::Function = sum)
+    return transform_over(df, ensurearray(col); fun = fun)
+end
 
 """
     sum_over(df::DataFrame, col::Array{Symbol,1}; kwargs...)
@@ -96,7 +189,7 @@ This function sums a DataFrame over the specified column(s) and returns either
 a list of values or the full DataFrame.
 
 # Arguments:
-- `df::DataFrame`: DataFrame to sum.
+- `df::DataFrame` to sum.
 - `col::Symbol` or `col::Array{Symbol,1}`: columns over which to sum.
 
 # Keyword Arguments:
@@ -129,36 +222,4 @@ end
 
 function sum_over(df::DataFrame, col::Symbol; values_only = true, keepkeys = false)
     return sum_over(df, [col]; values_only = values_only, keepkeys = keepkeys)
-end
-
-function combine_over(df::DataFrame, col::Array{Symbol,1}; operation::Symbol = :sum)
-    inp_keys = df[:,find_oftype(df, Not(AbstractFloat))]
-    val_cols = find_oftype(df, AbstractFloat)
-    by_cols = setdiff(propertynames(df), [col; val_cols])
-
-    ans = if operation == :sum
-        combine(groupby(df, by_cols), val_cols .=> sum .=> val_cols)
-    end
-
-    return ans
-end
-
-function combine_over(df::DataFrame, col::Symbol; operation::Symbol = :sum)
-    return combine_over(df, [col]; operation = operation)
-end
-
-function transform_over(df::DataFrame, col::Array{Symbol,1}; operation::Symbol = :sum)
-    inp_keys = df[:,find_oftype(df, Not(AbstractFloat))]
-    val_cols = find_oftype(df, AbstractFloat)
-    by_cols = setdiff(propertynames(df), [col; val_cols])
-
-    ans = if operation == :sum
-        transform(groupby(df, by_cols), val_cols .=> sum .=> val_cols)
-    end
-
-    return ans
-end
-
-function transform_over(df::DataFrame, col::Symbol; operation::Symbol = :sum)
-    return transform_over(df, [col]; operation = operation)
 end

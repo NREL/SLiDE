@@ -33,7 +33,7 @@ end
 #     auto_standardize_data.
 # - path_bluenote is specific to where Caroline stored WiNDC windc_datastream output.
 #     This line must be changed to be consistent with user-specific file storage organizations.
-path_slide = joinpath("data","output")
+path_slide = joinpath("data", "input")
 path_bluenote = joinpath("data","windc_output","1b_stream_windc_base")
 
 y = read_file(joinpath("dev", "verify_datastream.yml"));

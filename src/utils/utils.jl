@@ -7,16 +7,22 @@ This function evaluates an input string as a DataType if it is defined.
 Otherwise, it will return false.
 See: (thread on discourse.julialang.org)[https://discourse.julialang.org/t/parse-string-to-datatype/7118/9]
 """
-
 function datatype(str::String)
-    # type = :($(Symbol(titlecase(str))))
     type = :($(Symbol(str)))
     return isdefined(SLiDE, type) ? eval(type) : nothing
 end
 
-
+"""
+    Base.broadcastable(x::InvertedIndex{T}) where {T<:Any}
+!!!!
+"""
 Base.broadcastable(x::InvertedIndex{T}) where {T<:Any} = [x];
 
+"""
+    Base.split(x::Missing)
+    Base.split(x::Number)
+Extends `split` to ignore missing fields.
+"""
 Base.split(str::Missing) = str
 Base.split(str::Missing, splitter::Any) = str
 
@@ -68,6 +74,16 @@ Extends `occursin` to work for symbols. Potentially helpful for DataFrame column
 """
 Base.occursin(x::Symbol, y::Symbol) = occursin(string(x), y)
 Base.occursin(x::String, y::Symbol) = occursin(x, string(y))
+
+"""
+    dropzero(df::DataFrame)
+Returns a DataFrame without zero values in columns of type AbstractFloat.
+"""
+function dropzero!(df::DataFrame)
+    cols = find_oftype(df, AbstractFloat);
+    df = edit_with(df, [Drop.(cols,0.0,"=="); Drop.(cols,-0.0,"==")])
+    # df
+end
 
 """
     convert_type(::Type{T}, x::Any)
@@ -150,6 +166,7 @@ convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : 
 # [@printf("%-8s %s\n", T, fieldpropertynames(T)[T.types .== Any]) for T in subtypes(Edit) if Any in T.types]
 
 """
+    isarray(x::Any)
 Returns true/false if the the DataType or object is an array.
 """
 isarray(::Type{Array{T,1}}) where T <: Any = true
@@ -158,6 +175,7 @@ isarray(::Any) = false
 
 """
     ensurearray(x::Any)
+Returns `x` in an array.
 """
 ensurearray(x::Array{T,1}) where T <: Any = x
 ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
@@ -166,16 +184,18 @@ ensurearray(x::Any) = [x]
 
 """
     ensuretuple(x::Any)
+Returns `x` in a tuple.
 """
 ensuretuple(x::Tuple{Vararg{Any}}) = x
 ensuretuple(x::Any) = tuple(x)
          
-istype(df::DataFrame, T::DataType) = broadcast(<:, eltypes(dropmissing(df)), T)
+istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(df)), T)
 # eltype.(eachcol(df))
 
 """
     find_oftype(df::DataFrame, T::DataType)
     find_oftype(df::Dict, T::DataType)
+Returns DataFrame column names of the specified type.
 """
 find_oftype(df::DataFrame, T::DataType) = propertynames(df)[istype(df, T)]
 find_oftype(df::DataFrame, T::InvertedIndex{DataType}) = propertynames(df)[.!istype(df, T.skip)]
@@ -214,11 +234,7 @@ end
 function permute(x::NamedTuple)
     cols = keys(x)
     xperm = eachcol(sort(DataFrame(Tuple.(ensurearray.(permute(ensurearray.(values(x))))))))
-    # length(xperm[1]) == 1 && (xperm = [xperm...;])
     return NamedTuple{Tuple(cols,)}(xperm,)
-    # cols = keys(x)
-    # xperm = eachcol(sort(DataFrame(Tuple.(permute(values(x))))))
-    # return NamedTuple{Tuple(cols,)}(xperm,)
 end
 
 function permute(x::Array)

@@ -4,7 +4,7 @@ using DelimitedFiles
 using YAML
 using SLiDE
 
-DATA_DIR = joinpath("data", "output")
+DATA_DIR = joinpath("data", "input")
 MAP_DIR = joinpath("data", "coremaps")
 
 # Read DataFrames.

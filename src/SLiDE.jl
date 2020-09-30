@@ -73,10 +73,13 @@ export find_oftype
 
 export edit_with
 export fill_zero
+export fill_with
 export read_file
 export load_from
 export gams_to_dataframe
 export filter_with
+export extrapolate_region
+export extrapolate_year
 
 export sum_over
 export combine_over

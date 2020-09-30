@@ -14,6 +14,6 @@ Input:
   s0_temp:  {name: s0_temp.csv,  col: [yr,r,g,value]}
   x0_temp:  {name: x0_temp.csv,  col: [yr,r,g,value]}
   yh0_temp: {name: yh0_temp.csv, col: [yr,r,g,value]}
-  ta0_a0_rx0: {name: ta0_a0_rx0.csv,  col: [yr,r,g,value]}
-  tm0_m0_md0: {name: tm0_m0_md0.csv, col: [yr,r,g,value]}
-  md0_temp: {name: md0_sum.csv, col: [yr,r,g,value]}
+  pta0:     {name: ta0_a0_rx0.csv,  col: [yr,r,g,value]}
+  ptm0:     {name: tm0_m0_md0.csv, col: [yr,r,g,value]}
+  md0_sum:  {name: md0_sum.csv, col: [yr,r,g,value]}

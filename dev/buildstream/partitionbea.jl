@@ -49,7 +49,7 @@ set = Dict(Symbol(k) => sort(read_file(joinpath(y["SetPath"]..., ensurearray(v).
     for (k,v) in y["SetInput"])
 
 # Read supply/use data.
-DATA_DIR = joinpath("data", "output")
+DATA_DIR = joinpath("data", "input")
 io_lst = convert_type.(Symbol, ["supply", "use"])
 io = Dict(k => read_file(joinpath(DATA_DIR, string(k, ".csv"))) for k in io_lst)
 

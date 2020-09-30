@@ -1,0 +1,410 @@
+bea_code,windc_det_code,windc_sum_code,windc_det_desc
+561400,bsp_adm,adm,Business support services
+561700,dwe_adm,adm,Services to buildings and dwellings
+561300,emp_adm,adm,Employment services
+561200,fac_adm,adm,Facilities support services
+561600,inv_adm,adm,Investigation and security services
+561100,off_adm,adm,Office administrative services
+561900,oss_adm,adm,Other support services
+561500,trv_adm,adm,Travel arrangement and reservation services
+1121A0,bef_agr,agr,"Beef cattle ranching and farming, including feedlots and dual-purpose ranching and farming"
+112120,dry_agr,agr,Dairy cattle and milk production
+112300,egg_agr,agr,Poultry and egg production
+111400,flo_agr,agr,"Greenhouse, nursery, and floriculture production"
+1111B0,grn_agr,agr,Grain farming
+111300,nut_agr,agr,Fruit and tree nut farming
+1111A0,oil_agr,agr,Oilseed farming
+112A00,ota_agr,agr,"Animal production, except cattle and poultry and eggs"
+111900,oth_agr,agr,Other crop farming
+111200,veg_agr,agr,Vegetable and melon farming
+481000,air_air,air,Air transportation
+315000,app_alt,alt,Apparel manufacturing
+316000,lea_alt,alt,Leather and allied product manufacturing
+621200,dnt_amb,amb,Offices of dentists
+621600,hom_amb,amb,Home health care services
+621500,lab_amb,amb,Medical and diagnostic laboratories
+621900,oas_amb,amb,Other ambulatory health care services
+621300,ohp_amb,amb,Offices of other health practitioners
+621400,out_amb,amb,Outpatient care centers
+621100,phy_amb,amb,Offices of physicians
+721000,amd_amd,amd,Accommodation
+711A00,agt_art,art,Promoters of performing arts and sports and agents for public figures
+711500,ind_art,art,"Independent artists, writers, and performers"
+712000,mus_art,art,"Museums, historical sites, zoos, and parks"
+711100,pfm_art,art,Performing arts companies
+711200,spr_art,art,Spectator sports
+522A00,cre_bnk,bnk,Nondepository credit intermediation and related activities
+52A000,mon_bnk,bnk,Monetary authorities and depository credit intermediation
+515200,cbl_brd,brd,Cable and other subscription programming
+515100,rad_brd,brd,Radio and television broadcasting
+517A00,sat_brd,brd,"Satellite, telecommunications resellers, and all other telecommunications"
+517210,wls_brd,brd,Wireless telecommunications carriers (except satellite)
+517110,wtl_brd,brd,Wired telecommunications carriers
+334512,aec_cep,cep,Automatic environmental control manufacturing
+334516,ali_cep,cep,Analytical laboratory instrument manufacturing
+334300,aud_cep,cep,Audio and video equipment manufacturing
+334220,brd_cep,cep,Broadcast and wireless communications equipment
+334112,csd_cep,cep,Computer storage device manufacturing
+334118,ctm_cep,cep,Computer terminals and other computer peripheral equipment manufacturing
+334111,ecm_cep,cep,Electronic computer manufacturing
+334510,eea_cep,cep,Electromedical and electrotherapeutic apparatus manufacturing
+334515,els_cep,cep,Electricity and signal testing instruments manufacturing
+334513,ipv_cep,cep,Industrial process variable instruments manufacturing
+334517,irr_cep,cep,Irradiation apparatus manufacturing
+334610,mmo_cep,cep,Manufacturing and reproducing magnetic and optical media
+334290,oce_cep,cep,Other communications equipment manufacturing
+33441A,oec_cep,cep,Other electronic component manufacturing
+334418,prc_cep,cep,Printed circuit assembly (electronic assembly) manufacturing
+334511,sdn_cep,cep,"Search, detection, and navigation instruments manufacturing"
+334413,sem_cep,cep,Semiconductor and related device manufacturing
+334210,tel_cep,cep,Telephone apparatus manufacturing
+334514,tfl_cep,cep,Totalizing fluid meter and counting device manufacturing
+33451A,wcm_cep,cep,"Watch, clock, and other measuring and controlling device manufacturing"
+325520,adh_che,che,Adhesive manufacturing
+325414,bio_che,che,Biological product (except diagnostic) manufacturing
+325310,fmf_che,che,Fertilizer manufacturing
+325120,igm_che,che,Industrial gas manufacturing
+325413,inv_che,che,In-vitro diagnostic substance manufacturing
+325411,mbm_che,che,Medicinal and botanical manufacturing
+325180,obi_che,che,Other basic inorganic chemical manufacturing
+325190,obo_che,che,Other basic organic chemical manufacturing
+3259A0,och_che,che,All other chemical product and preparation manufacturing
+325320,pag_che,che,Pesticide and other agricultural chemical manufacturing
+325412,phm_che,che,Pharmaceutical preparation manufacturing
+325211,pmr_che,che,Plastics material and resin manufacturing
+325510,pnt_che,che,Paint and coating manufacturing
+325910,pri_che,che,Printing ink manufacturing
+325110,ptr_che,che,Petrochemical manufacturing
+325130,sdp_che,che,Synthetic dye and pigment manufacturing
+325610,sop_che,che,Soap and cleaning compound manufacturing
+3252A0,srf_che,che,Synthetic rubber and artificial and synthetic fibers and filaments manufacturing
+325620,toi_che,che,Toilet preparation manufacturing
+541511,cus_com,com,Custom computer programming services
+54151A,ocs_com,com,"Other computer related services, including facilities management"
+541512,sys_com,com,Computer systems design services
+233262,edu_con,con,Educational and vocational structures
+233210,hcs_con,con,Health care structures
+233230,mfs_con,con,Manufacturing structures
+233412,mrs_con,con,Multifamily residential structures
+230301,nmr_con,con,Nonresidential maintenance and repair
+2332A0,off_con,con,Office and commercial structures
+2332D0,ons_con,con,Other nonresidential structures
+2334A0,ors_con,con,Other residential structures
+233240,pwr_con,con,Power and communication structures
+230302,rmr_con,con,Residential maintenance and repair
+233411,srs_con,con,Single-family residential structures
+2332C0,trn_con,con,Transportation structures and highways and streets
+518200,dpr_dat,dat,"Data processing, hosting, and related services"
+519130,int_dat,dat,Internet publishing and broadcasting and Web search portals
+5191A0,new_dat,dat,"News syndicates, libraries, archives and all other information services"
+611B00,oes_edu,edu,Other educational services
+611100,sec_edu,edu,Elementary and secondary schools
+611A00,uni_edu,edu,"Junior colleges, colleges, universities, and professional schools"
+335991,cbn_eec,eec,Carbon and graphite product manufacturing
+335920,cme_eec,eec,Communication and energy wire and cable manufacturing
+335110,elb_eec,eec,Electric lamp bulb and part manufacturing
+335221,hca_eec,eec,Household cooking appliance manufacturing
+335224,hle_eec,eec,Household laundry equipment manufacturing
+335222,hrf_eec,eec,Household refrigerator and home freezer manufacturing
+335120,ltf_eec,eec,Lighting fixture manufacturing
+335312,mtg_eec,eec,Motor and generator manufacturing
+335999,oee_eec,eec,All other miscellaneous electrical equipment and component manufacturing
+335228,omh_eec,eec,Other major household appliance manufacturing
+335912,pbt_eec,eec,Primary battery manufacturing
+335311,pwr_eec,eec,"Power, distribution, and specialty transformer manufacturing"
+335314,ric_eec,eec,Relay and industrial control manufacturing
+335911,sbt_eec,eec,Storage battery manufacturing
+335210,sea_eec,eec,Small electrical appliance manufacturing
+335313,swt_eec,eec,Switchgear and switchboard apparatus manufacturing
+335930,wdv_eec,eec,Wiring device manufacturing
+31161A,asp_fbp,fbp,"Animal (except poultry) slaughtering, rendering, and processing"
+312120,ber_fbp,fbp,Breweries
+311810,brd_fbp,fbp,Bread and bakery product manufacturing
+311230,brk_fbp,fbp,Breakfast cereal manufacturing
+311420,can_fbp,fbp,"Fruit and vegetable canning, pickling, and drying"
+311615,chk_fbp,fbp,Poultry processing
+311513,chs_fbp,fbp,Cheese manufacturing
+312200,cig_fbp,fbp,Tobacco manufacturing
+3118A0,cok_fbp,fbp,"Cookie, cracker, pasta, and tortilla manufacturing"
+311111,dog_fbp,fbp,Dog and cat food manufacturing
+311514,dry_fbp,fbp,"Dry, condensed, and evaporated dairy product manufacturing"
+311225,fat_fbp,fbp,Fats and oils refining and blending
+311210,flr_fbp,fbp,Flour milling and malt manufacturing
+311410,fzn_fbp,fbp,Frozen food manufacturing
+311520,ice_fbp,fbp,Ice cream and frozen dessert manufacturing
+31151A,mlk_fbp,fbp,Fluid milk and butter manufacturing
+311119,oaf_fbp,fbp,Other animal food manufacturing
+311990,ofm_fbp,fbp,All other food manufacturing
+312110,pop_fbp,fbp,Soft drink and ice manufacturing
+311700,sea_fbp,fbp,Seafood product preparation and packaging
+311910,snk_fbp,fbp,Snack food manufacturing
+311224,soy_fbp,fbp,Soybean and other oilseed processing
+311940,spc_fbp,fbp,Seasoning and dressing manufacturing
+311300,sug_fbp,fbp,Sugar and confectionery product manufacturing
+311930,syr_fbp,fbp,Flavoring syrup and concentrate manufacturing
+311920,tea_fbp,fbp,Coffee and tea manufacturing
+311221,wet_fbp,fbp,Wet corn milling
+312140,why_fbp,fbp,Distilleries
+312130,wne_fbp,fbp,Wineries
+445000,fbt_fbt,fbt,Food and beverage stores
+S00500,fdd_fdd,fdd,Federal general government (defense)
+S00101,ele_fen,fen,Federal electric utilities
+S00102,ofg_fen,fen,Other federal government enterprises
+491000,pst_fen,fen,Postal service
+525000,fin_fin,fin,"Funds, trusts, and other financial vehicles"
+33299A,amn_fmt,fmt,"Ammunition, arms, ordnance, and accessories manufacturing"
+332991,bbr_fmt,fmt,Ball and roller bearing manufacturing
+332800,ceh_fmt,fmt,"Coating, engraving, heat treating and allied activities"
+332119,crn_fmt,fmt,"Metal crown, closure, and other metal stamping (except automotive)"
+332200,cut_fmt,fmt,Cutlery and handtool manufacturing
+332996,fab_fmt,fmt,Fabricated pipe and pipe fitting manufacturing
+33211A,fss_fmt,fmt,"All other forging, stamping, and sintering"
+332500,hdw_fmt,fmt,Hardware manufacturing
+332710,mch_fmt,fmt,Machine shops
+332430,mtc_fmt,fmt,"Metal can, box, and other metal container (light gauge) manufacturing"
+332420,mtt_fmt,fmt,Metal tank (heavy gauge) manufacturing
+332999,omf_fmt,fmt,Other fabricated metal manufacturing
+332320,orn_fmt,fmt,Ornamental and architectural metal products manufacturing
+332913,plb_fmt,fmt,Plumbing fixture fitting and trim manufacturing
+332310,plt_fmt,fmt,Plate work and fabricated structural product manufacturing
+332410,pwr_fmt,fmt,Power boiler and heat exchanger manufacturing
+332114,rol_fmt,fmt,Custom roll forming
+332600,spr_fmt,fmt,Spring and wire product manufacturing
+332720,tps_fmt,fmt,"Turned product and screw, nut, and bolt manufacturing"
+33291A,vlv_fmt,fmt,Valve and fittings other than plumbing
+S00600,fnd_fnd,fnd,Federal general government (nondefense)
+114000,fht_fof,fof,"Fishing, hunting and trapping"
+113000,log_fof,fof,Forestry and logging
+115000,saf_fof,fof,Support activities for agriculture and forestry
+337110,cab_fpd,fpd,Wood kitchen cabinet and countertop manufacturing
+337127,ifm_fpd,fpd,Institutional furniture manufacturing
+337122,nup_fpd,fpd,Nonupholstered wood household furniture manufacturing
+33721A,off_fpd,fpd,Office furniture and custom architectural woodwork and millwork manufacturing
+337900,ofp_fpd,fpd,Other furniture related product manufacturing
+33712N,ohn_fpd,fpd,Other household nonupholstered furniture
+337215,shv_fpd,fpd,"Showcase, partition, shelving, and locker manufacturing"
+337121,uph_fpd,fpd,Upholstered household furniture manufacturing
+452000,gmt_gmt,gmt,General merchandise stores
+485000,grd_grd,grd,Transit and ground passenger transportation
+622000,hos_hos,hos,Hospitals
+531HSO,own_hou,hou,Owner-occupied housing
+531HST,rnt_hou,hou,Tenant-occupied housing
+524200,agn_ins,ins,"Insurance agencies, brokerages, and related activities"
+5241XX,car_ins,ins,"Insurance carriers, except direct life"
+524113,dir_ins,ins,Direct life insurance carriers
+541100,leg_leg,leg,Legal services
+550000,man_man,man,Management of companies and enterprises
+333415,acn_mch,mch,"Air conditioning, refrigeration, and warm air heating equipment manufacturing"
+333912,agc_mch,mch,Air and gas compressor manufacturing
+333413,air_mch,mch,Industrial and commercial fan and blower and air purification equipment manufacturing
+333120,con_mch,mch,Construction machinery manufacturing
+33351B,cut_mch,mch,"Cutting and machine tool accessory, rolling mill, and other metalworking machinery manufacturing"
+33399B,fld_mch,mch,Fluid power process machinery
+333111,frm_mch,mch,Farm machinery and equipment manufacturing
+333414,hea_mch,mch,Heating equipment (except warm air furnaces) manufacturing
+333511,imm_mch,mch,Industrial mold manufacturing
+333994,ipf_mch,mch,Industrial process furnace and oven manufacturing
+333112,lwn_mch,mch,Lawn and garden equipment manufacturing
+333920,mat_mch,mch,Material handling equipment manufacturing
+333613,mch_mch,mch,Mechanical power transmission equipment manufacturing
+333517,mct_mch,mch,Machine tool manufacturing
+333130,min_mch,mch,Mining and oil and gas field machinery manufacturing
+333318,oci_mch,mch,Other commercial and service industry machinery manufacturing
+333618,oee_mch,mch,Other engine equipment manufacturing
+33399A,ogp_mch,mch,Other general purpose machinery manufacturing
+333314,opt_mch,mch,Optical instrument and lens manufacturing
+33329A,oti_mch,mch,Other industrial machinery manufacturing
+333316,pht_mch,mch,Photographic and photocopying equipment manufacturing
+333993,pkg_mch,mch,Packaging machinery manufacturing
+33391A,ppe_mch,mch,Pump and pumping equipment manufacturing
+333991,pwr_mch,mch,Power-driven handtool manufacturing
+333242,smc_mch,mch,Semiconductor machinery manufacturing
+333612,spd_mch,mch,"Speed changer, industrial high-speed drive, and gear manufacturing"
+333514,spt_mch,mch,"Special tool, die, jig, and fixture manufacturing"
+333611,tbn_mch,mch,Turbine and turbine generator set units manufacturing
+212100,col_min,min,Coal mining
+212230,led_min,min,"Copper, nickel, lead, and zinc mining"
+2122A0,ore_min,min,"Iron, gold, silver, and other metal ore mining"
+2123A0,oth_min,min,Other nonmetallic mineral mining and quarrying
+212310,stn_min,min,Stone mining and quarrying
+339920,ath_mmf,mmf,Sporting and athletic goods manufacturing
+339116,dlb_mmf,mmf,Dental laboratories
+339114,dnt_mmf,mmf,Dental equipment and supplies manufacturing
+339910,jwl_mmf,mmf,Jewelry and silverware manufacturing
+339940,ofm_mmf,mmf,Office supplies (except paper) manufacturing
+339990,omm_mmf,mmf,All other miscellaneous manufacturing
+339115,oph_mmf,mmf,Ophthalmic goods manufacturing
+339113,sas_mmf,mmf,Surgical appliance and supplies manufacturing
+339950,sgn_mmf,mmf,Sign manufacturing
+339112,smi_mmf,mmf,Surgical and medical instrument manufacturing
+339930,toy_mmf,mmf,"Doll, toy, and game manufacturing"
+336111,atm_mot,mot,Automobile manufacturing
+3363A0,brk_mot,mot,"Motor vehicle steering, suspension component (except spring), and brake systems manufacturing"
+336214,cam_mot,mot,Travel trailer and camper manufacturing
+336320,eee_mot,mot,Motor vehicle electrical and electronic equipment manufacturing
+336310,gas_mot,mot,Motor vehicle gasoline engine and engine parts manufacturing
+336213,hom_mot,mot,Motor home manufacturing
+336120,htr_mot,mot,Heavy duty truck manufacturing
+336112,ltr_mot,mot,Light truck and utility vehicle manufacturing
+336211,mbd_mot,mot,Motor vehicle body manufacturing
+336390,omv_mot,mot,Other motor vehicle parts manufacturing
+336370,stm_mot,mot,Motor vehicle metal stamping
+336350,tpw_mot,mot,Motor vehicle transmission and power train parts manufacturing
+336212,trl_mot,mot,Truck trailer manufacturing
+336360,trm_mot,mot,Motor vehicle seating and interior trim manufacturing
+512100,pic_mov,mov,Motion picture and video industries
+512200,snd_mov,mov,Sound recording industries
+441000,mvt_mvt,mvt,Motor vehicle and parts dealers
+327910,abr_nmp,nmp,Abrasive product manufacturing
+327100,cly_nmp,nmp,Clay product and refractory manufacturing
+327310,cmt_nmp,nmp,Cement manufacturing
+327320,cnc_nmp,nmp,Ready-mix concrete manufacturing
+327330,cpb_nmp,nmp,"Concrete pipe, brick, and block manufacturing"
+327991,cut_nmp,nmp,Cut stone and stone product manufacturing
+327200,gla_nmp,nmp,Glass and glass product manufacturing
+327400,lme_nmp,nmp,Lime and gypsum product manufacturing
+327999,mnm_nmp,nmp,Miscellaneous nonmetallic mineral products
+327390,ocp_nmp,nmp,Other concrete product manufacturing
+327992,tmn_nmp,nmp,Ground or treated mineral and earth manufacturing
+327993,wol_nmp,nmp,Mineral wool manufacturing
+623A00,ncc_nrs,nrs,Nursing and community care facilities
+623B00,res_nrs,nrs,"Residential mental health, substance abuse, and other residential care facilities"
+211000,oil_oil,oil,Oil and gas extraction
+531ORE,ore_ore,ore,Other real estate
+811100,atr_osv,osv,Automotive repair and maintenance (including car washes)
+813B00,civ_osv,osv,"Civic, social, professional, and similar organizations"
+812300,dry_osv,osv,Dry-cleaning and laundry services
+811200,eqr_osv,osv,Electronic and precision equipment repair and maintenance
+812200,fun_osv,osv,Death care services
+813A00,grt_osv,osv,"Grantmaking, giving, and social advocacy organizations"
+811400,hgr_osv,osv,Personal and household goods repair and maintenance
+811300,imr_osv,osv,Commercial and industrial machinery and equipment repair and maintenance
+812900,ops_osv,osv,Other personal services
+812100,pcs_osv,osv,Personal care services
+814000,prv_osv,osv,Private households
+813100,rel_osv,osv,Religious organizations
+336412,aen_ote,ote,Aircraft engine and engine parts manufacturing
+336411,air_ote,ote,Aircraft manufacturing
+336612,bot_ote,ote,Boat building
+336991,mcl_ote,ote,"Motorcycle, bicycle, and parts manufacturing"
+336414,mis_ote,ote,Guided missile and space vehicle manufacturing
+336992,mlt_ote,ote,"Military armored vehicle, tank, and tank component manufacturing"
+336413,oar_ote,ote,Other aircraft parts and auxiliary equipment manufacturing
+336999,otm_ote,ote,All other transportation equipment manufacturing
+33641A,pro_ote,ote,Propulsion units and parts for space vehicles and guided missiles
+336500,rrd_ote,ote,Railroad rolling stock manufacturing
+336611,shp_ote,ote,Ship building and repairing
+S00300,imp_oth,oth,Noncomparable imports
+S00900,rwa_oth,oth,Rest of the world adjustment
+492000,mes_otr,otr,Couriers and messengers
+48A000,sce_otr,otr,Scenic and sightseeing transportation and support activities
+444000,bui_ott,ott,Building material and garden equipment and supplies dealers
+448000,clo_ott,ott,Clothing and clothing accessories stores
+447000,gas_ott,ott,Gasoline stations
+446000,hea_ott,ott,Health and personal care stores
+454000,non_ott,ott,Nonstore retailers
+4B0000,oth_ott,ott,All other retail
+324190,oth_pet,pet,Other petroleum and coal products manufacturing
+324121,pav_pet,pet,Asphalt paving mixture and block manufacturing
+324110,ref_pet,pet,Petroleum refineries
+324122,shn_pet,pet,Asphalt shingle and coating materials manufacturing
+486000,pip_pip,pip,Pipeline transportation
+326160,bot_pla,pla,Plastics bottle manufacturing
+326140,fom_pla,pla,Polystyrene foam product manufacturing
+326130,lam_pla,pla,"Laminated plastics plate, sheet (except packaging), and shape manufacturing"
+326190,opm_pla,pla,Other plastics product manufacturing
+326290,orb_pla,pla,Other rubber product manufacturing
+326110,plm_pla,pla,Plastics packaging materials and unlaminated film and sheet manufacturing
+326120,ppp_pla,pla,"Plastics pipe, pipe fitting, and unlaminated profile shape manufacturing"
+326220,rbr_pla,pla,Rubber and plastics hoses and belting manufacturing
+326210,tir_pla,pla,Tire manufacturing
+326150,ure_pla,pla,Urethane and other foam product (except polystyrene) manufacturing
+331313,ala_pmt,pmt,Alumina refining and primary aluminum production
+33131B,alu_pmt,pmt,Aluminum product manufacturing from purchased aluminum
+331420,cop_pmt,pmt,"Copper rolling, drawing, extruding and alloying"
+331510,fmf_pmt,pmt,Ferrous metal foundries
+331110,irn_pmt,pmt,Iron and steel mills and ferroalloy manufacturing
+331520,nff_pmt,pmt,Nonferrous metal foundries
+331490,nfm_pmt,pmt,"Nonferrous metal (except copper and aluminum) rolling, drawing, extruding and alloying"
+331410,nms_pmt,pmt,Nonferrous metal (except aluminum) smelting and refining
+331314,sme_pmt,pmt,Secondary smelting and alloying of aluminum
+331200,stl_pmt,pmt,Steel product manufacturing from purchased steel
+322299,opp_ppd,ppd,All other converted paper product manufacturing
+322210,pbc_ppd,ppd,Paperboard container manufacturing
+322130,pbm_ppd,ppd,Paperboard mills
+322110,plp_ppd,ppd,Pulp mills
+322220,ppb_ppd,ppd,Paper bag and coated and treated paper manufacturing
+322120,ppm_ppd,ppd,Paper mills
+322230,sta_ppd,ppd,Stationery product manufacturing
+322291,toi_ppd,ppd,Sanitary paper product manufacturing
+323110,pri_pri,pri,Printing
+323120,sap_pri,pri,Support activities for printing
+511130,bok_pub,pub,Book publishers
+5111A0,mal_pub,pub,"Directory, mailing list, and other publishers"
+511110,new_pub,pub,Newspaper publishers
+511120,pdl_pub,pub,Periodical publishers
+511200,sfw_pub,pub,Software publishers
+713100,amu_rec,rec,Amusement parks and arcades
+713200,cas_rec,rec,Gambling industries (except casino hotels)
+713900,ori_rec,rec,Other amusement and recreation industries
+722110,ful_res,res,Full-service restaurants
+722211,lim_res,res,Limited-service restaurants
+722A00,ofd_res,res,All other food and drinking places
+532100,aut_rnt,rnt,Automotive equipment rental and leasing
+532A00,cmg_rnt,rnt,General and consumer goods rental
+532400,com_rnt,rnt,Commercial and industrial machinery and equipment rental and leasing
+533000,int_rnt,rnt,Lessors of nonfinancial intangible assets
+523A00,com_sec,sec,Securities and commodity contracts intermediation and brokerage
+523900,ofi_sec,sec,Other financial investment activities
+S00202,ele_sle,sle,State and local government electric utilities
+S00203,ent_sle,sle,Other state and local government enterprises
+S00201,trn_sle,sle,State and local government passenger transit
+GSLGE,edu_slg,slg,State and local government (educational services)
+GSLGH,hea_slg,slg,State and local government (hospitals and health services)
+GSLGO,oth_slg,slg,State and local government (other services)
+213111,drl_smn,smn,Drilling oil and gas wells
+21311A,oth_smn,smn,Other support activities for mining
+624A00,cmf_soc,soc,"Community food, housing, and other relief services, including vocational rehabilitation services"
+624400,day_soc,soc,Child day care services
+624100,ifs_soc,soc,Individual and family services
+313200,fml_tex,tex,Fabric mills
+313100,fyt_tex,tex,"Fiber, yarn, and thread mills"
+314120,lin_tex,tex,Curtain and linen mills
+314900,otp_tex,tex,Other textile product mills
+314110,rug_tex,tex,Carpet and rug mills
+313300,txf_tex,tex,Textile and fabric finishing and fabric coating mills
+484000,trk_trk,trk,Truck transportation
+482000,trn_trn,trn,Rail transportation
+541200,acc_tsv,tsv,"Accounting, tax preparation, bookkeeping, and payroll services"
+541800,adv_tsv,tsv,"Advertising, public relations, and related services"
+541300,arc_tsv,tsv,"Architectural, engineering, and related services"
+541400,des_tsv,tsv,Specialized design services
+5416A0,env_tsv,tsv,Environmental and other technical consulting services
+541610,mgt_tsv,tsv,Management consulting services
+5419A0,mkt_tsv,tsv,"All other miscellaneous professional, scientific, and technical services"
+541920,pht_tsv,tsv,Photographic services
+541700,sci_tsv,tsv,Scientific research and development services
+541940,vet_tsv,tsv,Veterinary services
+S00402,sec_use,use,Used and secondhand goods
+S00401,srp_use,use,Scrap
+221100,ele_uti,uti,"Electric power generation, transmission, and distribution"
+221200,gas_uti,uti,Natural gas distribution
+221300,wat_uti,uti,"Water, sewage and other systems"
+424200,dru_wht,wht,Drugs and druggists' sundries
+4200ID,dut_wht,wht,Customs duties
+425000,ele_wht,wht,Wholesale electronic markets and agents and brokers
+424400,gro_wht,wht,Grocery and related product wholesalers
+423600,hha_wht,wht,Household appliances and electrical and electronic goods
+423800,mch_wht,wht,"Machinery, equipment, and supplies"
+423100,mtv_wht,wht,Motor vehicle and motor vehicle parts and supplies
+424A00,ndg_wht,wht,Other nondurable goods merchant wholesalers
+423A00,odg_wht,wht,Other durable goods merchant wholesalers
+423400,pce_wht,wht,Professional and commercial equipment and supplies
+424700,pet_wht,wht,Petroleum and petroleum products
+321910,mil_wpd,wpd,Millwork
+3219A0,owp_wpd,wpd,All other wood product manufacturing
+321100,saw_wpd,wpd,Sawmills and wood preservation
+321200,ven_wpd,wpd,"Veneer, plywood, and engineered wood product manufacturing"
+493000,wrh_wrh,wrh,Warehousing and storage
+562000,wst_wst,wst,Waste management and remediation services
+483000,wtt_wtt,wtt,Water transportation

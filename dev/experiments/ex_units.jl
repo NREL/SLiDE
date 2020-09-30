@@ -4,7 +4,7 @@ using DelimitedFiles
 using SLiDE
 
 # QUESTION: Do we have mapping capabilities for all units?
-DATA_DIR = joinpath("data", "output")
+DATA_DIR = joinpath("data", "input")
 MAP_DIR = joinpath("data", "coremaps", "parse")
 
 # Read file names from output directory and isolate csv output files.

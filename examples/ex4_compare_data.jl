@@ -10,6 +10,9 @@ Unfortunately, this currently only works for DataFrames.
 3. compare_values() - are values consistent within a given tolerance?
 """
 
+println("\nEX 4: COMPARE DATA")
+println("  Initializing DataFrames to compare...")
+
 # Make three different DataFrames to compare.
 N = 3
 dfa = DataFrame(yr = sort(repeat(2020-(N-1):2020, outer=[2])),

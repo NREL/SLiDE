@@ -28,7 +28,8 @@ function compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol 
     end
 
     # Make all keys lowercase to focus on value comparisons.
-    df_lst = [edit_with(df, Rename.(val_0, val)) for (df, val) in zip(df_lst, vals)]
+    df_lst = [edit_with(df, [Rename.(val_0, val); Drop.(val,0.0,"==")])
+        for (df, val) in zip(df_lst, vals)]
     vals = [vals...;]
 
     # Join all dataframes.
@@ -46,8 +47,12 @@ function compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol 
 
     df[!,:equal_values] .= all.(skipmissing.(eachrow(df_comp .< tol)))
     df[all.(eachrow(.|(ismissing.(df[:,vals]), df[:,vals].==0))), :equal_values] .= true
+    df = df[:,[cols; sort(vals); sort(inds); [:equal_keys, :equal_values]]]
 
-    return sort(df[:,[cols; sort(vals); sort(inds); [:equal_keys, :equal_values]]], cols)
+    ii = df[:,:equal_keys] .* df[:,:equal_values]
+    df = df[.!ii,:]
+
+    return df
 end
 
 """

@@ -1,0 +1,453 @@
+bea_code,windc_det_code,windc_sum_code,bea_desc,category
+1111A0,oil_agr,agr,Oilseed farming,gds
+1111B0,grn_agr,agr,Grain farming,gds
+111200,veg_agr,agr,Vegetable and melon farming,gds
+111300,nut_agr,agr,Fruit and tree nut farming,gds
+111400,flo_agr,agr,"Greenhouse, nursery, and floriculture production",gds
+111900,oth_agr,agr,Other crop farming,gds
+112120,dry_agr,agr,Dairy cattle and milk production,gds
+1121A0,bef_agr,agr,"Beef cattle ranching and farming, including feedlots and dual-purpose ranching and farming",gds
+112300,egg_agr,agr,Poultry and egg production,gds
+112A00,ota_agr,agr,"Animal production, except cattle and poultry and eggs",gds
+113000,log_fof,fof,Forestry and logging,gds
+114000,fht_fof,fof,"Fishing, hunting and trapping",gds
+115000,saf_fof,fof,Support activities for agriculture and forestry,gds
+211000,oil_oil,oil,Oil and gas extraction,gds
+212100,col_min,min,Coal mining,gds
+212230,led_min,min,"Copper, nickel, lead, and zinc mining",gds
+2122A0,ore_min,min,"Iron, gold, silver, and other metal ore mining",gds
+212310,stn_min,min,Stone mining and quarrying,gds
+2123A0,oth_min,min,Other nonmetallic mineral mining and quarrying,gds
+213111,drl_smn,smn,Drilling oil and gas wells,gds
+21311A,oth_smn,smn,Other support activities for mining,gds
+221100,ele_uti,uti,"Electric power generation, transmission, and distribution",gds
+221200,gas_uti,uti,Natural gas distribution,gds
+221300,wat_uti,uti,"Water, sewage and other systems",gds
+233210,hcs_con,con,Health care structures,gds
+233262,edu_con,con,Educational and vocational structures,gds
+230301,nmr_con,con,Nonresidential maintenance and repair,gds
+230302,rmr_con,con,Residential maintenance and repair,gds
+2332A0,off_con,con,Office and commercial structures,gds
+233412,mrs_con,con,Multifamily residential structures,gds
+2334A0,ors_con,con,Other residential structures,gds
+233230,mfs_con,con,Manufacturing structures,gds
+2332D0,ons_con,con,Other nonresidential structures,gds
+233240,pwr_con,con,Power and communication structures,gds
+233411,srs_con,con,Single-family residential structures,gds
+2332C0,trn_con,con,Transportation structures and highways and streets,gds
+321100,saw_wpd,wpd,Sawmills and wood preservation,gds
+321200,ven_wpd,wpd,"Veneer, plywood, and engineered wood product manufacturing",gds
+321910,mil_wpd,wpd,Millwork,gds
+3219A0,owp_wpd,wpd,All other wood product manufacturing,gds
+327100,cly_nmp,nmp,Clay product and refractory manufacturing,gds
+327200,gla_nmp,nmp,Glass and glass product manufacturing,gds
+327310,cmt_nmp,nmp,Cement manufacturing,gds
+327320,cnc_nmp,nmp,Ready-mix concrete manufacturing,gds
+327330,cpb_nmp,nmp,"Concrete pipe, brick, and block manufacturing",gds
+327390,ocp_nmp,nmp,Other concrete product manufacturing,gds
+327400,lme_nmp,nmp,Lime and gypsum product manufacturing,gds
+327910,abr_nmp,nmp,Abrasive product manufacturing,gds
+327991,cut_nmp,nmp,Cut stone and stone product manufacturing,gds
+327992,tmn_nmp,nmp,Ground or treated mineral and earth manufacturing,gds
+327993,wol_nmp,nmp,Mineral wool manufacturing,gds
+327999,mnm_nmp,nmp,Miscellaneous nonmetallic mineral products,gds
+331110,irn_pmt,pmt,Iron and steel mills and ferroalloy manufacturing,gds
+331200,stl_pmt,pmt,Steel product manufacturing from purchased steel,gds
+331313,ala_pmt,pmt,Alumina refining and primary aluminum production,gds
+326210,tir_pla,pla,Tire manufacturing,gds
+33131B,alu_pmt,pmt,Aluminum product manufacturing from purchased aluminum,gds
+331410,nms_pmt,pmt,Nonferrous Metal (except Aluminum) Smelting and Refining,gds
+331420,cop_pmt,pmt,"Copper rolling, drawing, extruding and alloying",gds
+331490,nfm_pmt,pmt,"Nonferrous metal (except copper and aluminum) rolling, drawing, extruding and alloying",gds
+331510,fmf_pmt,pmt,Ferrous metal foundries,gds
+331520,nff_pmt,pmt,Nonferrous metal foundries,gds
+332114,rol_fmt,fmt,Custom roll forming,gds
+33211A,fss_fmt,fmt,"All other forging, stamping, and sintering",gds
+332119,crn_fmt,fmt,"Metal crown, closure, and other metal stamping (except automotive)",gds
+332200,cut_fmt,fmt,Cutlery and handtool manufacturing,gds
+332310,plt_fmt,fmt,Plate work and fabricated structural product manufacturing,gds
+332320,orn_fmt,fmt,Ornamental and architectural metal products manufacturing,gds
+332410,pwr_fmt,fmt,Power boiler and heat exchanger manufacturing,gds
+332420,mtt_fmt,fmt,Metal tank (heavy gauge) manufacturing,gds
+332430,mtc_fmt,fmt,"Metal can, box, and other metal container (light gauge) manufacturing",gds
+332500,hdw_fmt,fmt,Hardware manufacturing,gds
+332600,spr_fmt,fmt,Spring and wire product manufacturing,gds
+332710,mch_fmt,fmt,Machine shops,gds
+332720,tps_fmt,fmt,"Turned product and screw, nut, and bolt manufacturing",gds
+332800,ceh_fmt,fmt,"Coating, engraving, heat treating and allied activities",gds
+332913,plb_fmt,fmt,Plumbing fixture fitting and trim manufacturing,gds
+33291A,vlv_fmt,fmt,Valve and fittings other than plumbing,gds
+332991,bbr_fmt,fmt,Ball and roller bearing manufacturing,gds
+332996,fab_fmt,fmt,Fabricated pipe and pipe fitting manufacturing,gds
+33299A,amn_fmt,fmt,"Ammunition, arms, ordnance, and accessories manufacturing",gds
+332999,omf_fmt,fmt,Other fabricated metal manufacturing,gds
+333111,frm_mch,mch,Farm machinery and equipment manufacturing,gds
+333112,lwn_mch,mch,Lawn and garden equipment manufacturing,gds
+333120,con_mch,mch,Construction machinery manufacturing,gds
+333130,min_mch,mch,Mining and oil and gas field machinery manufacturing,gds
+333242,smc_mch,mch,Semiconductor machinery manufacturing,gds
+33329A,oti_mch,mch,Other industrial machinery manufacturing,gds
+333314,opt_mch,mch,Optical instrument and lens manufacturing,gds
+333316,pht_mch,mch,Photographic and photocopying equipment manufacturing,gds
+333318,oci_mch,mch,Other commercial and service industry machinery manufacturing,gds
+333414,hea_mch,mch,Heating equipment (except warm air furnaces) manufacturing,gds
+333415,acn_mch,mch,"Air conditioning, refrigeration, and warm air heating equipment manufacturing",gds
+333413,air_mch,mch,Industrial and commercial fan and blower and air purification equipment manufacturing,gds
+333511,imm_mch,mch,Industrial mold manufacturing,gds
+333514,spt_mch,mch,"Special tool, die, jig, and fixture manufacturing",gds
+333517,mct_mch,mch,Machine tool manufacturing,gds
+33351B,cut_mch,mch,"Cutting and machine tool accessory, rolling mill, and other metalworking machinery manufacturing",gds
+333611,tbn_mch,mch,Turbine and turbine generator set units manufacturing,gds
+333612,spd_mch,mch,"Speed changer, industrial high-speed drive, and gear manufacturing",gds
+333613,mch_mch,mch,Mechanical power transmission equipment manufacturing,gds
+333618,oee_mch,mch,Other engine equipment manufacturing,gds
+333912,agc_mch,mch,Air and gas compressor manufacturing,gds
+33391A,ppe_mch,mch,Pump and pumping equipment manufacturing,gds
+333920,mat_mch,mch,Material handling equipment manufacturing,gds
+333991,pwr_mch,mch,Power-driven handtool manufacturing,gds
+333993,pkg_mch,mch,Packaging machinery manufacturing,gds
+531HST,rnt_hou,hou,Tenant-occupied housing,gds
+333994,ipf_mch,mch,Industrial process furnace and oven manufacturing,gds
+33399A,ogp_mch,mch,Other general purpose machinery manufacturing,gds
+33399B,fld_mch,mch,Fluid power process machinery,gds
+334111,ecm_cep,cep,Electronic computer manufacturing,gds
+334112,csd_cep,cep,Computer storage device manufacturing,gds
+334118,ctm_cep,cep,Computer terminals and other computer peripheral equipment manufacturing,gds
+334210,tel_cep,cep,Telephone apparatus manufacturing,gds
+334220,brd_cep,cep,Broadcast and wireless communications equipment,gds
+334290,oce_cep,cep,Other communications equipment manufacturing,gds
+334413,sem_cep,cep,Semiconductor and related device manufacturing,gds
+334418,prc_cep,cep,Printed circuit assembly (electronic assembly) manufacturing,gds
+33441A,oec_cep,cep,Other electronic component manufacturing,gds
+334510,eea_cep,cep,Electromedical and electrotherapeutic apparatus manufacturing,gds
+334511,sdn_cep,cep,"Search, detection, and navigation instruments manufacturing",gds
+334512,aec_cep,cep,Automatic environmental control manufacturing,gds
+334513,ipv_cep,cep,Industrial process variable instruments manufacturing,gds
+334514,tfl_cep,cep,Totalizing fluid meter and counting device manufacturing,gds
+334515,els_cep,cep,Electricity and signal testing instruments manufacturing,gds
+334516,ali_cep,cep,Analytical laboratory instrument manufacturing,gds
+334517,irr_cep,cep,Irradiation apparatus manufacturing,gds
+33451A,wcm_cep,cep,"Watch, clock, and other measuring and controlling device manufacturing",gds
+334300,aud_cep,cep,Audio and video equipment manufacturing,gds
+334610,mmo_cep,cep,Manufacturing and reproducing magnetic and optical media,gds
+335110,elb_eec,eec,Electric lamp bulb and part manufacturing,gds
+335120,ltf_eec,eec,Lighting fixture manufacturing,gds
+335210,sea_eec,eec,Small electrical appliance manufacturing,gds
+335221,hca_eec,eec,Household cooking appliance manufacturing,gds
+335222,hrf_eec,eec,Household refrigerator and home freezer manufacturing,gds
+335224,hle_eec,eec,Household laundry equipment manufacturing,gds
+335228,omh_eec,eec,Other major household appliance manufacturing,gds
+335311,pwr_eec,eec,"Power, distribution, and specialty transformer manufacturing",gds
+335312,mtg_eec,eec,Motor and generator manufacturing,gds
+335313,swt_eec,eec,Switchgear and switchboard apparatus manufacturing,gds
+335314,ric_eec,eec,Relay and industrial control manufacturing,gds
+335911,sbt_eec,eec,Storage battery manufacturing,gds
+335912,pbt_eec,eec,Primary battery manufacturing,gds
+335920,cme_eec,eec,Communication and energy wire and cable manufacturing,gds
+335930,wdv_eec,eec,Wiring device manufacturing,gds
+335991,cbn_eec,eec,Carbon and graphite product manufacturing,gds
+335999,oee_eec,eec,All other miscellaneous electrical equipment and component manufacturing,gds
+336111,atm_mot,mot,Automobile manufacturing,gds
+336112,ltr_mot,mot,Light truck and utility vehicle manufacturing,gds
+336120,htr_mot,mot,Heavy duty truck manufacturing,gds
+336211,mbd_mot,mot,Motor vehicle body manufacturing,gds
+336212,trl_mot,mot,Truck trailer manufacturing,gds
+336213,hom_mot,mot,Motor home manufacturing,gds
+336214,cam_mot,mot,Travel trailer and camper manufacturing,gds
+336310,gas_mot,mot,Motor vehicle gasoline engine and engine parts manufacturing,gds
+336320,eee_mot,mot,Motor vehicle electrical and electronic equipment manufacturing,gds
+336350,tpw_mot,mot,Motor vehicle transmission and power train parts manufacturing,gds
+336360,trm_mot,mot,Motor vehicle seating and interior trim manufacturing,gds
+336370,stm_mot,mot,Motor vehicle metal stamping,gds
+336390,omv_mot,mot,Other Motor Vehicle Parts Manufacturing,gds
+3363A0,brk_mot,mot,"Motor vehicle steering, suspension component (except spring), and brake systems manufacturing",gds
+336411,air_ote,ote,Aircraft manufacturing,gds
+336412,aen_ote,ote,Aircraft engine and engine parts manufacturing,gds
+336413,oar_ote,ote,Other aircraft parts and auxiliary equipment manufacturing,gds
+336414,mis_ote,ote,Guided missile and space vehicle manufacturing,gds
+33641A,pro_ote,ote,Propulsion units and parts for space vehicles and guided missiles,gds
+336500,rrd_ote,ote,Railroad rolling stock manufacturing,gds
+336611,shp_ote,ote,Ship building and repairing,gds
+336612,bot_ote,ote,Boat building,gds
+336991,mcl_ote,ote,"Motorcycle, bicycle, and parts manufacturing",gds
+336992,mlt_ote,ote,"Military armored vehicle, tank, and tank component manufacturing",gds
+336999,otm_ote,ote,All other transportation equipment manufacturing,gds
+337110,cab_fpd,fpd,Wood kitchen cabinet and countertop manufacturing,gds
+337121,uph_fpd,fpd,Upholstered household furniture manufacturing,gds
+337122,nup_fpd,fpd,Nonupholstered wood household furniture manufacturing,gds
+337127,ifm_fpd,fpd,Institutional furniture manufacturing,gds
+33712N,ohn_fpd,fpd,Other household nonupholstered furniture,gds
+337215,shv_fpd,fpd,"Showcase, partition, shelving, and locker manufacturing",gds
+33721A,off_fpd,fpd,Office furniture and custom architectural woodwork and millwork manufacturing,gds
+337900,ofp_fpd,fpd,Other furniture related product manufacturing,gds
+339112,smi_mmf,mmf,Surgical and medical instrument manufacturing,gds
+339113,sas_mmf,mmf,Surgical appliance and supplies manufacturing,gds
+339114,dnt_mmf,mmf,Dental equipment and supplies manufacturing,gds
+339115,oph_mmf,mmf,Ophthalmic goods manufacturing,gds
+339116,dlb_mmf,mmf,Dental laboratories,gds
+339910,jwl_mmf,mmf,Jewelry and silverware manufacturing,gds
+339920,ath_mmf,mmf,Sporting and athletic goods manufacturing,gds
+339930,toy_mmf,mmf,"Doll, toy, and game manufacturing",gds
+339940,ofm_mmf,mmf,Office supplies (except paper) manufacturing,gds
+339950,sgn_mmf,mmf,Sign manufacturing,gds
+339990,omm_mmf,mmf,All other miscellaneous manufacturing,gds
+311111,dog_fbp,fbp,Dog and cat food manufacturing,gds
+311119,oaf_fbp,fbp,Other animal food manufacturing,gds
+311210,flr_fbp,fbp,Flour milling and malt manufacturing,gds
+311221,wet_fbp,fbp,Wet corn milling,gds
+311225,fat_fbp,fbp,Fats and oils refining and blending,gds
+311224,soy_fbp,fbp,Soybean and other oilseed processing,gds
+311230,brk_fbp,fbp,Breakfast cereal manufacturing,gds
+311300,sug_fbp,fbp,Sugar and confectionery product manufacturing,gds
+311410,fzn_fbp,fbp,Frozen food manufacturing,gds
+311420,can_fbp,fbp,"Fruit and vegetable canning, pickling, and drying",gds
+311513,chs_fbp,fbp,Cheese manufacturing,gds
+311514,dry_fbp,fbp,"Dry, condensed, and evaporated dairy product manufacturing",gds
+31151A,mlk_fbp,fbp,Fluid milk and butter manufacturing,gds
+311520,ice_fbp,fbp,Ice cream and frozen dessert manufacturing,gds
+311615,chk_fbp,fbp,Poultry processing,gds
+31161A,asp_fbp,fbp,"Animal (except poultry) slaughtering, rendering, and processing",gds
+311700,sea_fbp,fbp,Seafood product preparation and packaging,gds
+311810,brd_fbp,fbp,Bread and bakery product manufacturing,gds
+3118A0,cok_fbp,fbp,"Cookie, cracker, pasta, and tortilla manufacturing",gds
+311910,snk_fbp,fbp,Snack food manufacturing,gds
+311920,tea_fbp,fbp,Coffee and tea manufacturing,gds
+311930,syr_fbp,fbp,Flavoring syrup and concentrate manufacturing,gds
+311940,spc_fbp,fbp,Seasoning and dressing manufacturing,gds
+311990,ofm_fbp,fbp,All other food manufacturing,gds
+312110,pop_fbp,fbp,Soft drink and ice manufacturing,gds
+312120,ber_fbp,fbp,Breweries,gds
+312130,wne_fbp,fbp,Wineries,gds
+312140,why_fbp,fbp,Distilleries,gds
+312200,cig_fbp,fbp,Tobacco product manufacturing,gds
+313100,fyt_tex,tex,"Fiber, yarn, and thread mills",gds
+313200,fml_tex,tex,Fabric mills,gds
+313300,txf_tex,tex,Textile and fabric finishing and fabric coating mills,gds
+314110,rug_tex,tex,Carpet and rug mills,gds
+314120,lin_tex,tex,Curtain and linen mills,gds
+314900,otp_tex,tex,Other textile product mills,gds
+315000,app_alt,alt,Apparel manufacturing,gds
+316000,lea_alt,alt,Leather and allied product manufacturing,gds
+322110,plp_ppd,ppd,Pulp mills,gds
+322120,ppm_ppd,ppd,Paper mills,gds
+322130,pbm_ppd,ppd,Paperboard mills,gds
+322210,pbc_ppd,ppd,Paperboard container manufacturing,gds
+322220,ppb_ppd,ppd,Paper Bag and Coated and Treated Paper Manufacturing,gds
+322230,sta_ppd,ppd,Stationery product manufacturing,gds
+322291,toi_ppd,ppd,Sanitary paper product manufacturing,gds
+322299,opp_ppd,ppd,All other converted paper product manufacturing,gds
+323110,pri_pri,pri,Printing,gds
+323120,sap_pri,pri,Support activities for printing,gds
+324110,ref_pet,pet,Petroleum refineries,gds
+324121,pav_pet,pet,Asphalt paving mixture and block manufacturing,gds
+324122,shn_pet,pet,Asphalt shingle and coating materials manufacturing,gds
+324190,oth_pet,pet,Other petroleum and coal products manufacturing,gds
+325110,ptr_che,che,Petrochemical manufacturing,gds
+325120,igm_che,che,Industrial gas manufacturing,gds
+325130,sdp_che,che,Synthetic dye and pigment manufacturing,gds
+325180,obi_che,che,Other Basic Inorganic Chemical Manufacturing,gds
+325190,obo_che,che,Other basic organic chemical manufacturing,gds
+325211,pmr_che,che,Plastics material and resin manufacturing,gds
+3252A0,srf_che,che,Synthetic rubber and artificial and synthetic fibers and filaments manufacturing,gds
+325411,mbm_che,che,Medicinal and botanical manufacturing,gds
+325412,phm_che,che,Pharmaceutical preparation manufacturing,gds
+325413,inv_che,che,In-vitro diagnostic substance manufacturing,gds
+325414,bio_che,che,Biological product (except diagnostic) manufacturing,gds
+325310,fmf_che,che,Fertilizer manufacturing,gds
+325320,pag_che,che,Pesticide and other agricultural chemical manufacturing,gds
+325510,pnt_che,che,Paint and coating manufacturing,gds
+325520,adh_che,che,Adhesive manufacturing,gds
+325610,sop_che,che,Soap and cleaning compound manufacturing,gds
+325620,toi_che,che,Toilet preparation manufacturing,gds
+325910,pri_che,che,Printing ink manufacturing,gds
+3259A0,och_che,che,All other chemical product and preparation manufacturing,gds
+326110,plm_pla,pla,Plastics packaging materials and unlaminated film and sheet manufacturing,gds
+326120,ppp_pla,pla,"Plastics pipe, pipe fitting, and unlaminated profile shape manufacturing",gds
+326130,lam_pla,pla,"Laminated plastics plate, sheet (except packaging), and shape manufacturing",gds
+326140,fom_pla,pla,Polystyrene foam product manufacturing,gds
+326150,ure_pla,pla,Urethane and other foam product (except polystyrene) manufacturing,gds
+326160,bot_pla,pla,Plastics bottle manufacturing,gds
+326190,opm_pla,pla,Other plastics product manufacturing,gds
+326220,rbr_pla,pla,Rubber and plastics hoses and belting manufacturing,gds
+326290,orb_pla,pla,Other rubber product manufacturing,gds
+423100,mtv_wht,wht,Motor vehicle and motor vehicle parts and supplies,gds
+423400,pce_wht,wht,Professional and commercial equipment and supplies,gds
+423600,hha_wht,wht,Household appliances and electrical and electronic goods,gds
+423800,mch_wht,wht,"Machinery, equipment, and supplies",gds
+423A00,odg_wht,wht,Other durable goods merchant wholesalers,gds
+424200,dru_wht,wht,Drugs and druggists’ sundries,gds
+424400,gro_wht,wht,Grocery and related product wholesalers,gds
+424700,pet_wht,wht,Petroleum and petroleum products,gds
+424A00,ndg_wht,wht,Other nondurable goods merchant wholesalers,gds
+425000,ele_wht,wht,Wholesale electronic markets and agents and brokers,gds
+4200ID,dut_wht,wht,Customs duties,gds
+441000,mvt_mvt,mvt,Motor vehicle and parts dealers,gds
+445000,fbt_fbt,fbt,Food and beverage stores,gds
+452000,gmt_gmt,gmt,General merchandise stores,gds
+444000,bui_ott,ott,Building material and garden equipment and supplies dealers,gds
+446000,hea_ott,ott,Health and personal care stores,gds
+447000,gas_ott,ott,Gasoline stations,gds
+448000,clo_ott,ott,Clothing and clothing accessories stores,gds
+454000,non_ott,ott,Nonstore retailers,gds
+4B0000,oth_ott,ott,All other retail,gds
+481000,air_air,air,Air transportation,gds
+482000,trn_trn,trn,Rail transportation,gds
+483000,wtt_wtt,wtt,Water transportation,gds
+484000,trk_trk,trk,Truck transportation,gds
+485000,grd_grd,grd,Transit and ground passenger transportation,gds
+486000,pip_pip,pip,Pipeline transportation,gds
+48A000,sce_otr,otr,Scenic and sightseeing transportation and support activities for transportation,gds
+492000,mes_otr,otr,Couriers and messengers,gds
+493000,wrh_wrh,wrh,Warehousing and storage,gds
+511110,new_pub,pub,Newspaper publishers,gds
+511120,pdl_pub,pub,Periodical Publishers,gds
+511130,bok_pub,pub,Book publishers,gds
+5111A0,mal_pub,pub,"Directory, mailing list, and other publishers",gds
+511200,sfw_pub,pub,Software publishers,gds
+512100,pic_mov,mov,Motion picture and video industries,gds
+512200,snd_mov,mov,Sound recording industries,gds
+515100,rad_brd,brd,Radio and television broadcasting,gds
+515200,cbl_brd,brd,Cable and other subscription programming,gds
+517110,wtl_brd,brd,Wired telecommunications carriers,gds
+517210,wls_brd,brd,Wireless telecommunications carriers (except satellite),gds
+517A00,sat_brd,brd,"Satellite, telecommunications resellers, and all other telecommunications",gds
+518200,dpr_dat,dat,"Data processing, hosting, and related services",gds
+519130,int_dat,dat,Internet publishing and broadcasting and Web search portals,gds
+5191A0,new_dat,dat,"News syndicates, libraries, archives and all other information services",gds
+522A00,cre_bnk,bnk,Nondepository credit intermediation and related activities,gds
+52A000,mon_bnk,bnk,Monetary authorities and depository credit intermediation,gds
+523900,ofi_sec,sec,Other financial investment activities,gds
+523A00,com_sec,sec,Securities and commodity contracts intermediation and brokerage,gds
+524113,dir_ins,ins,Direct life insurance carriers,gds
+5241XX,car_ins,ins,"Insurance carriers, except direct life",gds
+524200,agn_ins,ins,"Insurance agencies, brokerages, and related activities",gds
+525000,fin_fin,fin,"Funds, trusts, and other financial vehicles",gds
+531HSO,own_hou,hou,Owner-occupied housing,gds
+531ORE,ore_ore,ore,Other real estate,gds
+532100,aut_rnt,rnt,Automotive equipment rental and leasing,gds
+532400,com_rnt,rnt,Commercial and industrial machinery and equipment rental and leasing,gds
+532A00,cmg_rnt,rnt,General and consumer goods rental,gds
+533000,int_rnt,rnt,Lessors of nonfinancial intangible assets,gds
+541100,leg_leg,leg,Legal services,gds
+541511,cus_com,com,Custom computer programming services,gds
+541512,sys_com,com,Computer systems design services,gds
+54151A,ocs_com,com,"Other computer related services, including facilities management",gds
+541200,acc_tsv,tsv,"Accounting, tax preparation, bookkeeping, and payroll services",gds
+541300,arc_tsv,tsv,"Architectural, engineering, and related services",gds
+541610,mgt_tsv,tsv,Management consulting services,gds
+5416A0,env_tsv,tsv,Environmental and other technical consulting services,gds
+541700,sci_tsv,tsv,Scientific research and development services,gds
+541800,adv_tsv,tsv,"Advertising, public relations, and related services",gds
+541400,des_tsv,tsv,Specialized design services,gds
+541920,pht_tsv,tsv,Photographic services,gds
+541940,vet_tsv,tsv,Veterinary services,gds
+5419A0,mkt_tsv,tsv,"All other miscellaneous professional, scientific, and technical services",gds
+550000,man_man,man,Management of companies and enterprises,gds
+561300,emp_adm,adm,Employment services,gds
+561700,dwe_adm,adm,Services to buildings and dwellings,gds
+561100,off_adm,adm,Office administrative services,gds
+561200,fac_adm,adm,Facilities support services,gds
+561400,bsp_adm,adm,Business support services,gds
+561500,trv_adm,adm,Travel arrangement and reservation services,gds
+561600,inv_adm,adm,Investigation and security services,gds
+561900,oss_adm,adm,Other support services,gds
+562000,wst_wst,wst,Waste management and remediation services,gds
+611100,sec_edu,edu,Elementary and secondary schools,gds
+611A00,uni_edu,edu,"Junior colleges, colleges, universities, and professional schools",gds
+611B00,oes_edu,edu,Other educational services,gds
+621100,phy_amb,amb,Offices of physicians,gds
+621200,dnt_amb,amb,Offices of dentists,gds
+621300,ohp_amb,amb,Offices of other health practitioners,gds
+621400,out_amb,amb,Outpatient care centers,gds
+621500,lab_amb,amb,Medical and diagnostic laboratories,gds
+621600,hom_amb,amb,Home health care services,gds
+621900,oas_amb,amb,Other ambulatory health care services,gds
+622000,hos_hos,hos,Hospitals,gds
+623A00,ncc_nrs,nrs,Nursing and community care facilities,gds
+623B00,res_nrs,nrs,"Residential mental health, substance abuse, and other residential care facilities",gds
+624100,ifs_soc,soc,Individual and family services,gds
+624400,day_soc,soc,Child day care services,gds
+624A00,cmf_soc,soc,"Community food, housing, and other relief services, including rehabilitation services",gds
+711100,pfm_art,art,Performing arts companies,gds
+711200,spr_art,art,Spectator sports,gds
+711500,ind_art,art,"Independent artists, writers, and performers",gds
+711A00,agt_art,art,Promoters of performing arts and sports and agents for public figures,gds
+712000,mus_art,art,"Museums, historical sites, zoos, and parks",gds
+713100,amu_rec,rec,Amusement parks and arcades,gds
+713200,cas_rec,rec,Gambling industries (except casino hotels),gds
+713900,ori_rec,rec,Other amusement and recreation industries,gds
+721000,amd_amd,amd,Accommodation,gds
+722110,ful_res,res,Full-service restaurants,gds
+722211,lim_res,res,Limited-service restaurants,gds
+722A00,ofd_res,res,All other food and drinking places,gds
+811100,atr_osv,osv,Automotive repair and maintenance,gds
+811200,eqr_osv,osv,Electronic and precision equipment repair and maintenance,gds
+811300,imr_osv,osv,Commercial and industrial machinery and equipment repair and maintenance,gds
+811400,hgr_osv,osv,Personal and household goods repair and maintenance,gds
+812100,pcs_osv,osv,Personal care services,gds
+812200,fun_osv,osv,Death care services,gds
+812300,dry_osv,osv,Dry-cleaning and laundry services,gds
+812900,ops_osv,osv,Other personal services,gds
+813100,rel_osv,osv,Religious organizations,gds
+813A00,grt_osv,osv,"Grantmaking, giving, and social advocacy organizations",gds
+813B00,civ_osv,osv,"Civic, social, professional, and similar organizations",gds
+814000,prv_osv,osv,Private households,gds
+S00500,fdd_fdd,fdd,Federal general government (defense),gds
+S00600,fnd_fnd,fnd,Federal general government (nondefense),gds
+491000,pst_fen,fen,Postal service,gds
+S00102,ofg_fen,fen,Other federal government enterprises,gds
+GSLGE,edu_slg,slg,State and local government educational services,gds
+GSLGH,hea_slg,slg,State and local government hospitals and health services,gds
+GSLGO,oth_slg,slg,State and local government other services,gds
+S00203,ent_sle,sle,Other state and local government enterprises,gds
+S00401,srp_use,use,Scrap,gds
+S00402,sec_use,use,Used and secondhand goods,gds
+S00300,imp_oth,oth,Noncomparable imports,gds
+S00900,rwa_oth,oth,Rest of the world adjustment,gds
+T017,totalbasic,totalbasic,Total industry supply,
+331314,sme_pmt,pmt,Secondary smelting and alloying of aluminum,gds
+MDTY,duties,duties,Import duties,
+TOP,tax,tax,Tax on products,
+SUB,subsidies,subsidies,Subsidies,
+S00101,ele_fen,fen,Federal electric utilities,gds
+S00201,trn_sle,sle,State and local government passenger transit,gds
+S00202,ele_sle,sle,State and local government electric utilities,gds
+T007,output,output,Total Commodity Output,
+MCIF,imports,imports,Imports,
+TRADE,margins,margins,Trade margins,
+MADJ,ciffob,ciffob,CIF/FOB Adjustments on Imports,
+TRANS,trncost,trncost,Transportation costs,
+T013,basicsupply,basicsupply,Total product supply (basic prices),
+T014,trdtrn,trdtrn,Total trade and transportation margins,
+T015,taxlessubsidies,taxlessubsidies,Total tax less subsidies on products,
+T016,supply,supply,Total product supply (purchaser prices),
+T005,interm,interm,Total intermediate inputs,
+V00100,compen,compen,Compensation of employees,valueadded
+T00OTOP,othtax,othtax,Other taxes on production,valueadded
+V00300,surplus,surplus,Gross operating surplus,valueadded
+VABAS,basicvalueadded,basicvalueadded,Value added (basic value),
+T018,industryoutput,industryoutput,Total industry output (basic value),
+T00TOP,taxes,taxes,Plus: Taxes on products and imports,
+T00SUB,subsidies,subsidies,Less: Subsidies,
+VAPRO,valueadded,valueadded,Value added (producer value),
+T001,totint,totint,Total Intermediate,
+F01000,pce,pce,Personal consumption expenditures,finaldemand
+F02E00,equipment,equipment,Nonresidential private fixed investment in equipment,finaldemand
+F02N00,intelprop,intelprop,Nonresidential private fixed investment in intellectual property products,finaldemand
+F02R00,residential,residential,Residential private fixed investment,finaldemand
+F02S00,structures,structures,Nonresidential private fixed investment in structures,finaldemand
+F03000,changinv,changinv,Change in private inventories,finaldemand
+F04000,exports,exports,Exports of goods and services,
+F06C00,defense,defense,Federal Government defense: Consumption expenditures,finaldemand
+F06E00,def_equipment,def_equipment,Federal national defense: Gross investment in equipment,finaldemand
+F07C00,nondefense,nondefense,Federal Government nondefense: Consumption expenditures,finaldemand
+F06N00,def_intelprop,def_intelprop,Federal national defense: Gross investment in intellectual property products,finaldemand
+F06S00,def_structures,def_structures,Federal national defense: Gross investment in structures,finaldemand
+F07E00,fed_equipment,fed_equipment,Federal nondefense: Gross investment in equipment,finaldemand
+F07S00,fed_structures,fed_structures,Federal nondefense: Gross investment in structures,finaldemand
+F07N00,fed_intelprop,fed_intelprop,Federal nondefense: Gross investment in intellectual property products,finaldemand
+F10C00,state_consume,state_consume,State and local government consumption expenditures,finaldemand
+F10E00,state_equipment,state_equipment,State and local: Gross investment in equipment,finaldemand
+F10N00,state_intelprop,state_intelprop,State and local: Gross investment in intellectual property products,finaldemand
+F10S00,state_invest,state_invest,State and local: Gross investment in structures,finaldemand
+T019,totaluse,totaluse,Total use of products,

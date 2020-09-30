@@ -1,0 +1,24 @@
+﻿code,desc
+id0,Intermediate demand
+fd0,Final demand
+va,Value added
+ts0,Taxes and subsidies
+x0,Exports of goods and services
+ys0,Sectoral supply
+m0,Imports
+mrg0,Trade margins
+trn0,Transportation costs
+cif0,CIF/FOB Adjustments on Imports
+duty0,Import duties
+tax0,Taxes on products
+sbd0,Subsidies on products
+s0,Aggregate supply
+y0,Gross output
+bopdef,Balance of payment defecit
+ms0,Margin supply
+md0,Margin demand
+fs0,Household supply
+a0,Armington supply
+tm0,Tax net subsidy rate on intermediate demand.
+ta0,Import tariff
+lshr0,Labor share of value added

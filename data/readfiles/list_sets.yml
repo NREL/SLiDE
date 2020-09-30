@@ -1,6 +1,6 @@
-SetPath: [data, coresets]
+Path: [data, coresets]
 
-SetInput:
+Input:
   yr: yr.csv
   r:  [r, state.csv]
   orig_state:  [r, state.csv]
@@ -9,8 +9,10 @@ SetInput:
   j:  [i, aggr.csv]
   g:  [i, aggr.csv]
   s:  [i, aggr.csv]
-  imrg: [i,mrg.csv]
+  imrg: [i, mrg.csv]
   m:  m.csv
   fd: fd.csv
   ts: ts.csv
   va: va.csv
+  [oth,use]: [i, oth_use.csv]
+  gdpcat:  [gdpcat.csv]

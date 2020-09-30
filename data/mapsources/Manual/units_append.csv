@@ -16,3 +16,9 @@ thousands of us dollars (USD),thousands of us dollars (USD),
 us dollars (USD),us dollars (USD),
 us dollars (USD) per million btu,us dollars (USD) per million btu,
 billions of US dollars (USD),billions of US dollars (USD),partitionbea.gms
+,,
+thousand acres, thousand acres, usgs_water
+Mgal/d, million gallons/day, usgs_water
+gallons/day, gallons/day, usgs_water
+,,
+gigawatt-hours, million kilowatthours, usgs_water

@@ -8,7 +8,7 @@
 This function edits the input DataFrame `df` and returns the resultant DataFrame.
 
 # Arguments
-- `df::DataFrame`: The DataFrame on which to perform the edit.
+- `df::DataFrame` on which to perform the edit.
 - `editor::T where T<:Edit`: DataType containing information about which edit to perform.
     The following edit options are available and detailed below. If given a dictionary of
     edits, they will be made in this order:
@@ -49,7 +49,7 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
     during development.
 
 # Returns
-- `df::DataFrame`: including edit(s)
+- `df::DataFrame` including edit(s)
 """
 function edit_with(df::DataFrame, x::Add)
     # If adding the length of a string...
@@ -467,30 +467,183 @@ function fill_zero(keys_fill::Any, d::Dict; permute_keys::Bool = true)
     return d
 end
 
+function fill_with(inp::Any, val::Any)
+    df = fill_zero(inp);
+    df = edit_with(df, Replace(:value, 0.0, val))
+    return df
+end
 
+"""
+    extrapolate_year(df::DataFrame, yr::Array{Int64,1}; kwargs...)
+    extrapolate_year(df::DataFrame, set::Dict; kwargs...)
+
+# Arguments:
+- `df::DataFrame` that might be in need of extrapolation.
+- `yr::Array{Int64,1}`: List of years overwhich extrapolation is possible (depending on the kwargs)
+- `set::Dict` containing list of years, identified by the key `:yr`.
+
+# Keyword Arguments:
+- `backward::Bool = true`: Do we extrapolate backward in time?
+- `forward::Bool = true`: Do we extrapolate forward in time?
+
+# Returns:
+- `df::DataFrame` extrapolated in time.
+"""
+function extrapolate_year(
+    df::DataFrame,
+    yr::Array{Int64,1};
+    backward::Bool = true,
+    forward::Bool = true
+)
+    yr_diff = setdiff(yr, unique(df[:,:yr]))
+    length(yr_diff) == 0 && (return df)
+    
+    cols = setdiff(propertynames(df), [:yr])
+    cols_ans = propertynames(df)
+
+    df_ext = []
+
+    if backward
+        yr_min = minimum(df[:,:yr])
+        df_min = filter_with(df, (yr = yr_min,))[:,cols]
+
+        yr_back = yr_diff[yr_diff .< yr_min]
+        df_back = crossjoin(DataFrame(yr = yr_back), df_min)[:,cols_ans]
+
+        push!(df_ext, df_back)
+    end
+
+    if forward
+        yr_max = maximum(df[:,:yr])
+        df_max = filter_with(df, (yr = yr_max,))[:,cols]
+
+        yr_forward = yr_diff[yr_diff .> yr_max]
+        df_forward = crossjoin(DataFrame(yr = yr_forward), df_max)[:,cols_ans]
+
+        push!(df_ext, df_forward)
+    end
+
+    return sort([df_ext...; df])
+end
+
+function extrapolate_year(
+    df::DataFrame,
+    set::Dict;
+    backward::Bool = true,
+    forward::Bool = true
+)
+    extrapolate_year(df, set[:yr]; forward = forward, backward = backward)
+end
+
+"""
+    extrapolate_region(df::DataFrame, yr::Array{Int64,1}; kwargs...)
+    extrapolate_year(df::DataFrame, set::Dict; kwargs...)
+
+# Arguments:
+- `df::DataFrame` that might be in need of extrapolation.
+- `r::Pair = "md" => "dc"`: `Pair` indicating a region (`r.first`) to extrapolate to another
+    region (`r.second`). A suggested regional extrapolation: MD data will be used to
+    approximate DC data in the event that it is missing.
+
+# Keyword Argument:
+- `overwrite::Bool = false`: If data in the target region `r.second` is already present,
+    should it be overwritten?
+
+# Returns:
+- `df::DataFrame` extrapolated in time.
+"""
+function extrapolate_region(df::DataFrame, r::Pair = "md" => "dc"; overwrite = false)
+    if !overwrite
+        r = r.first => setdiff(ensurearray(r.second), unique(df[:,:r]))
+        length(r.second) == 0 && (return df)
+    else
+        df = edit_with(df, Drop.(:r, r.second, "=="))
+    end
+    
+    cols = setdiff(propertynames(df), [:r])
+    df_close = crossjoin(DataFrame(r = r.second), filter_with(df, (r = r.first,))[:,cols])
+    
+    return sort([df_close; df])
+end
+
+"""
+    filter_with(df::DataFrame, set::Any; kwargs...)
+
+# Arguments:
+- `df::DataFrame` to filter.
+- `set::Dict` or `set::NamedTuple`: Values to keep in the DataFrame.
+
+# Keyword Arguments:
+- `extrapolate::Bool = false`: Add missing regions/years to the DataFrame?
+    If `extrapolate` is set to true, the following `kwargs` become relevant:
+    - When extrapolating over years,
+        - `backward::Bool = true`: Do we extrapolate backward in time?
+        - `forward::Bool = true`: Do we extrapolate forward in time?
+    - When extrapolating across regions,
+        - `r::Pair = "md" => "dc"`: `Pair` indicating a region (`r.first`) to extrapolate to
+            another region (`r.second`). A suggested regional extrapolation: MD data will be
+            used to approximate DC data in the event that it is missing.
+        - `overwrite::Bool = false`: If data in the target region `r.second` is already present,
+            should it be overwritten?
+
+# Returns:
+- `df::DataFrame` with only the desired keys.
+"""
 function filter_with(df::DataFrame, set; extrapolate::Bool = false)
-    df = copy(df)
+    df_ans = copy(df)
+    cols_ans = propertynames(df_ans)
 
     # Find keys that reference both column names in the input DataFrame df and
     # values in the set Dictionary. Then, created a DataFrame containing all permutations.
     cols = find_oftype(df, Not(AbstractFloat))
-    cols_set = intersect(cols, collect(keys(set)));
-    vals_set = [set[k] for k in cols_set]
+    cols_set = intersect(cols, collect(keys(set)))
+    vals_set = [intersect(unique(df[:,k]),set[k]) for k in cols_set]
+    # vals_set = [set[k] for k in cols_set]
 
     # Drop values that are not in the current set.
     df_set = DataFrame(permute(NamedTuple{Tuple(cols_set,)}(vals_set,)))
-    df = innerjoin(df, df_set, on = cols_set)
+    df_ans = innerjoin(df_ans, df_set, on = cols_set)
+    
+    # # Save key values that are NOT included in keys. This is relevant in the case that
+    # # there are multiple types of units in the DataFrame columns.
+    # if length(setdiff(cols, collect(keys(set)))) > 0
+    #     df_key = unique(df[:,setdiff(cols, collect(keys(set)))])
+    #     df_set = edit_with(innerjoin(edit_with(df_set, Add(:dummy,1)),
+    #         edit_with(df_key, Add(:dummy,1)), on = :dummy), Drop(:dummy,"all","=="))[:,cols]
+    # end
+    # 
+    # # Fill zeros.
+    # df = fill_zero(df_set, df; permute_keys = false)[2]
 
-    # Save key values that are NOT included in keys. This is relevant in the case that
-    # there are multiple types of units in the DataFrame columns.
-    if length(setdiff(cols, collect(keys(set)))) > 0
-        df_key = unique(df[:,setdiff(cols, collect(keys(set)))])
-        df_set = edit_with(innerjoin(edit_with(df_set, Add(:dummy,1)),
-            edit_with(df_key, Add(:dummy,1)), on = :dummy), Drop(:dummy,"all","=="))[:,cols]
-    end
-
-    # Fill zeros.
-    df = fill_zero(df_set, df; permute_keys = false)[2]
-
-    return sort(df)
+    return sort(df_ans[:,cols_ans])
 end
+
+# function filter_with(
+#     df::DataFrame,
+#     set::Any;
+#     extrapolate::Bool = false,
+#     forward::Bool = true,
+#     backward::Bool = true,
+#     r::Pair = "md" => "dc",
+#     overwrite::Bool = false
+# )
+#     df_ans = copy(df)
+#     cols_ans = propertynames(df_ans)
+
+#     # Find keys that reference both column names in the input DataFrame df and
+#     # values in the set Dictionary. Then, created a DataFrame containing all permutations.
+#     cols = find_oftype(df, Not(AbstractFloat))
+#     cols_set = intersect(cols, collect(keys(set)))
+#     vals_set = [intersect(unique(df[:,k]),set[k]) for k in cols_set]
+
+#     # Drop values that are not in the current set.
+#     df_set = DataFrame(permute(NamedTuple{Tuple(cols_set,)}(vals_set,)))
+#     df_ans = innerjoin(df_ans, df_set, on = cols_set)
+    
+#     if extrapolate
+#         :yr in cols_set && (df_ans = extrapolate_year(df_ans, set; forward = forward, backward = backward))
+#         :r in cols_set  && (df_ans = extrapolate_region(df_ans, r; overwrite = overwrite))
+#     end
+    
+#     return sort(df_ans[:,cols_ans])
+# end

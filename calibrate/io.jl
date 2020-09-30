@@ -6,158 +6,315 @@ using Query
 
 using SLiDE
 
-println("\nPARTITION BEA SUPPLY/USE DATA INTO PARAMETERS:")
-UNITS = "billions of us dollars (USD)"
-include(joinpath(SLIDE_DIR, "dev", "buildstream", "build_functions.jl"))
+"""
+    _remove_imrg(df::DataFrame, x::Pair{Symbol,Array{String,1}})
+Removes commodity taxes and subsidies on the goods which are produced solely
+for supplying retail sales margin.
+"""
+function _remove_imrg(df::DataFrame, x::Pair{Symbol,Array{String,1}})
+    df[findall(in(x.second), df[:,x.first]), :value] .= 0.0
+    return df
+end
 
+"""
+    _partition_io!(d::Dict, set::Dict)
+"""
+function _partition_io!(d::Dict, set::Dict)
+    d[:id0] = filter_with(d[:use], set)
+    d[:ys0] = filter_with(d[:supply], set)
 
-# ******************************************************************************************
-#   READ BLUENOTE DATA -- For benchmarking!
-# ******************************************************************************************
-BLUE_DIR_IO = joinpath("data", "windc_output", "2a_io_national_cgeparm_raw")
-bluenote_lst_io = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR_IO)) if occursin(".csv", x)]
-io = Dict(Symbol(k[1:end-4]) => sort(edit_with(
-    read_file(joinpath(BLUE_DIR_IO, k)), Rename(:Val, :value))) for k in bluenote_lst_io)
+    (d[:id0], d[:ys0]) = fill_zero(d[:id0], d[:ys0])
 
-# # Add supply/use info for checking.
-# BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
-# [bio[k] = sort(edit_with(read_file(joinpath(BLUE_DIR_IN, string(k, "_units.csv"))), [
-#     Rename.([:Dim1,:Dim2,:Dim3,:Dim4,:Val], [:yr,:i,:j,:units,:value]);
-#     Replace.([:i,:j], "upper", "lower")])) for k in [:supply, :use]]
+    # Treat negative inputs as outputs.
+    d[:ys0][!,:value] = d[:ys0][:,:value] - min.(0, d[:id0][:,:value])
+    d[:id0][!,:value] = max.(0, d[:id0][:,:value])
 
-# [bio[k][!,:value] .= round.(bio[k][:,:value]*1E-3, digits=3) # convert millions -> billions USD
-#     for k in [:supply,:use]]
+    dropzero
+end
 
-# ******************************************************************************************
-#   READ SETS AND SLiDE SUPPLY/USE DATA.
+"""
+    _partition_a0!(d::Dict, set::Dict)
+`a0`: Armington supply
+"""
+function _partition_a0!(d::Dict, set::Dict)
+    d[:a0] = combine_over(d[:fd0], :fd) + combine_over(d[:id0], :j)
+    d[:a0] = _remove_imrg(d[:a0], :i => set[:imrg])
+end
+
+"""
+    _partition_bopdef0!(d::Dict, set::Dict)
+`bopdef0`: Balance of payments deficit
+"""
+function _partition_bopdef0!(d::Dict, set::Dict)
+    d[:bopdef] = fill_zero((yr = set[:yr], ))
+end
+
+"""
+    _partition_cif0!(d::Dict, set::Dict)
+`cif0`: CIF/FOB Adjustments on Imports
+"""
+function _partition_cif0!(d::Dict, set::Dict)
+    d[:cif0] = filter_with(d[:supply], (i = set[:i], j = "ciffob"))[:,[:yr,:i,:value]]
+end
+
+"""
+    _partition_duty0!(d::Dict, set::Dict)
+`duty0`: Import duties
+"""
+function _partition_duty0!(d::Dict, set::Dict)
+    d[:duty0] = filter_with(d[:supply], (i = set[:i], j = "duties"))[:,[:yr,:i,:value]]
+    d[:duty0] = _remove_imrg(d[:duty0], :i => set[:imrg])
+end
+
+"""
+    _partition_fd0!(d::Dict, set::Dict)
+`fd0`: Final demand
+"""
+function _partition_fd0!(d::Dict, set::Dict)
+    d[:fd0] = filter_with(d[:use], (i = set[:i],  j = set[:fd]))
+    d[:fd0] = edit_with(d[:fd0], Rename(:j, :fd))
+end
+
+"""
+    _partition_fs0!(d::Dict)
+`fs0`: Household supply.
+Move household supply of recycled goods into the domestic output market,
+from which some may be exported.
+"""
+function _partition_fs0!(d::Dict)
+    d[:fs0] = filter_with(d[:fd0], (fd = "pce",))[:,[:yr,:i,:value]]
+    d[:fs0][!,:value] .= - min.(d[:fs0][:,:value], 0)
+end
+
+"""
+    _partition_lshr0!(d::Dict)
+`lshr0`: Labor share of value added
+"""
+function _partition_lshr0!(d::Dict, set::Dict)
+    va0 = edit_with(unstack(copy(d[:va0]), :va, :value),
+        [Rename(:j,:s); Replace.(Symbol.(set[:va]), missing, 0.0); Drop(:units,"all","==")])
+    
+    d[:lshr0]  = va0[:,[:yr,:s,:compen]]
+    d[:lshr0] /= (va0[:,[:yr,:s,:compen]] + va0[:,[:yr,:s,:surplus]])
+    dropmissing!(d[:lshr0])
+end
+
+"""
+    _partition_m0!(d::Dict, set::Dict)
+`m0`: Imports
+"""
+function _partition_m0!(d::Dict, set::Dict)
+    d[:m0]  = filter_with(d[:supply], (i = set[:i], j = "imports"))[:,[:yr,:i,:value]]
+
+    # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
+    # Insurance imports are specified as net of adjustments.
+    d[:m0] += filter_with(d[:cif0], (i = "ins",))
+    d[:m0] = _remove_imrg(d[:m0], :i => set[:imrg])
+end
+
+"""
+    _partition_md0!(d::Dict)
+`md0`: Margin demand
+"""
+function _partition_md0!(d::Dict, set::Dict)
+    d[:md0] = [edit_with(d[:mrg0], Add(:m, "trd")); edit_with(d[:trn0], Add(:m, "trn"))]
+    d[:md0] = sort(d[:md0][:,[:yr,:i,:m,:value]])
+    d[:md0] = _remove_imrg(d[:md0], :i => set[:imrg])
+
+    d[:md0][!,:value] .= max.(d[:md0][:,:value], 0)
+end
+
+"""
+    _partition_ms0!(d::Dict)
+`ms0`: Margin supply
+"""
+function _partition_ms0!(d::Dict)
+    d[:ms0] = [edit_with(d[:mrg0], Add(:m, "trd")); edit_with(d[:trn0], Add(:m, "trn"))]
+    d[:ms0] = sort(d[:ms0][:,[:yr,:i,:m,:value]])
+
+    d[:ms0][!,:value] .= max.(-d[:ms0][:,:value], 0)
+end
+
+"""
+    _partition_mrg0!(d::Dict, set::Dict)
+`mrg0`: Trade margins
+"""
+function _partition_mrg0!(d::Dict, set::Dict)
+    d[:mrg0] = filter_with(d[:supply], (i = set[:i], j = "margins"))[:,[:yr,:i,:value]]
+end
+
+"""
+    _partition_s0!(d::Dict)
+`s0`: Aggregate supply
+"""
+function _partition_s0!(d::Dict)
+    d[:s0] = combine_over(d[:ys0], :i)
+end
+
+"""
+    _partition_sbd0!(d::Dict, set::Dict)
+`sbd0`: Subsidies on products
+"""
+function _partition_sbd0!(d::Dict, set::Dict)
+    d[:sbd0] = filter_with(d[:supply], (i = set[:i], j = "subsidies"))[:,[:yr,:i,:value]]
+    d[:sbd0] = _remove_imrg(d[:sbd0], :i => set[:imrg])
+    d[:sbd0][!,:value] *= -1
+end
+
+"""
+    _partition_ta0!(d::Dict)
+`ta0`: Import tariff
+"""
+function _partition_ta0!(d::Dict)
+    d[:ta0] = dropmissing((d[:tax0] - d[:sbd0]) / d[:a0])
+    # d[:ta0] = edit_with(d[:ta0], Drop(:units,"all","=="))
+end
+
+"""
+    _partition_tax0!(d::Dict, set::Dict)
+`tax0`: Taxes on products
+"""
+function _partition_tax0!(d::Dict, set::Dict)
+    d[:tax0] = filter_with(d[:supply], (i = set[:i], j = "tax"))[:,[:yr,:i,:value]]
+    d[:tax0] = _remove_imrg(d[:tax0], :i => set[:imrg])
+end
+
+"""
+    _partition_tm0!(d::Dict)
+`tm0`: Tax net subsidy rate on intermediate demand
+"""
+function _partition_tm0!(d::Dict)
+    d[:tm0] = dropmissing(d[:duty0] / d[:m0])
+    # d[:tm0] = edit_with(d[:tm0], Drop(:units,"all","=="))
+end
+
+"""
+    _partition_trn0!(d::Dict, set::Dict)
+`trn0`: Transportation costs
+"""
+function _partition_trn0!(d::Dict, set::Dict)
+    d[:trn0]  = filter_with(d[:supply], (i = set[:i], j = "trncost"))[:,[:yr,:i,:value]]
+
+    # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
+    # Insurance imports are specified as net of adjustments.
+    d[:trn0] += edit_with(d[:cif0], Drop(:i,"ins","=="))
+end
+
+"""
+    _partition_ts0!(d::Dict, set::Dict)
+`ts0`: Taxes and subsidies
+"""
+function _partition_ts0!(d::Dict, set::Dict)
+    d[:ts0] = filter_with(d[:use], (i = set[:ts], j = set[:j]))
+    d[:ts0][d[:ts0][:,:i] .== "subsidies", :value] *= -1  # treat negative inputs as outputs    return d
+end
+
+"""
+    _partition_va0!(d::Dict, set::Dict)
+`va0`: Value added
+"""
+function _partition_va0!(d::Dict, set::Dict)
+    d[:va0] = filter_with(d[:use], (i = set[:va], j = set[:j]))
+    d[:va0] = edit_with(d[:va0], Rename(:i, :va))
+end
+
+"""
+    _partition_x0!(d::Dict, set::Dict)
+`x0`: Exports of goods and services
+"""
+function _partition_x0!(d::Dict, set::Dict)
+    d[:x0] = filter_with(d[:use], (i = set[:i], j = "exports"))[:,[:yr,:i,:value]]
+    d[:x0] = _remove_imrg(d[:x0], :i => set[:imrg])
+end
+
+"""
+    _partition_y0!(d::Dict, set::Dict)
+`y0`: Gross output
+"""
+function _partition_y0!(d::Dict, set::Dict)
+    d[:y0] = combine_over(d[:ys0], :j) + d[:fs0] - combine_over(d[:ms0], :m)
+    d[:y0] = _remove_imrg(d[:y0], :i => set[:imrg])
+end
+
+"""
+    partition!(d::Dict, set::Dict)
+"""
+function partition!(d::Dict, set::Dict)
+    [d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), [Drop(:units,"all","==")])
+        for k in [:supply, :use]]
+
+    _partition_io!(d, set)
+    _partition_fd0!(d, set)
+    _partition_ts0!(d, set)
+    _partition_va0!(d, set)
+    _partition_x0!(d, set)
+
+    _partition_cif0!(d, set)
+    _partition_duty0!(d, set)
+    _partition_mrg0!(d, set)
+    _partition_sbd0!(d, set)
+    _partition_tax0!(d, set)
+
+    _partition_m0!(d, set)   # cif0
+    _partition_trn0!(d, set) # cif0
+
+    _partition_fs0!(d)       # fd0
+    _partition_s0!(d)        # ys0
+    _partition_md0!(d, set)  # mrg0, trn0
+    _partition_ms0!(d)       # mrg0, trn0
+
+    _partition_y0!(d, set)   # ms0, fs0, ys0
+    _partition_a0!(d, set)   # fd0, id0
+
+    _partition_ta0!(d)       # a0, sbd0, tax0
+    _partition_tm0!(d)       # duty0, m0
+
+    _partition_lshr0!(d, set) # va0
+end
+
 # ******************************************************************************************
 println("  Reading sets...")
 y = read_file(joinpath("data", "readfiles", "list_sets.yml"));
-set = Dict(Symbol(k) => sort(read_file(joinpath(y["SetPath"]..., ensurearray(v)...)))[:,1]
-    for (k,v) in y["SetInput"])
+# set = Dict(Symbol(k) => sort(read_file(joinpath(y["Path"]..., ensurearray(v)...)))[:,1]
+#     for (k,v) in y["Input"])
+set = Dict((length(ensurearray(k)) == 1 ? Symbol(k) : Tuple(Symbol.(k))) =>
+    sort(read_file(joinpath(y["Path"]..., ensurearray(v)...)))[:,1] for (k,v) in y["Input"])
 
 # Read supply/use data.
 println("  Reading supply/use data...")
 DATA_DIR = joinpath("data", "input")
-io_lst = convert_type.(Symbol, ["supply", "use"])
-io = Dict(k => read_file(joinpath(DATA_DIR, string(k, ".csv"))) for k in io_lst)
+io = Dict(k => read_file(joinpath(DATA_DIR, string(k, ".csv"))) for k in [:supply, :use])
 
-# Perform some minor edits that will apply to all parameters in order to maintain
-# consistency with the data in build_national_cgeparm_raw.gdx for easier benchmarking.
+d = io;
 
-for k in keys(io)
-    global io[k] = edit_with(io[k], Drop.([:value], [0.], "=="))
-    global io[k] = io[k] |> @filter(_.yr in set[:yr]) |> DataFrame
+# partition!(io, set)
+[d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), [Drop(:units,"all","==")])
+        for k in [:supply, :use]]
 
-    # global io[k][!,:value] .= round.(io[k][:,:value]*1E-3, digits=3)
-    # global io[k][!,:units] .= UNITS
-end
+    _partition_io!(d, set)
+    _partition_fd0!(d, set)
+    _partition_ts0!(d, set)
+    _partition_va0!(d, set)
+    _partition_x0!(d, set)
 
-io[:supply], io[:use] = fill_zero(io[:supply], io[:use]; permute_keys = true);
+    _partition_cif0!(d, set)
+    _partition_duty0!(d, set)
+    _partition_mrg0!(d, set)
+    _partition_sbd0!(d, set)
+    _partition_tax0!(d, set)
 
-# Read from use data.
-# "Intermediate demand"
-# "Final demand"
-# "Value added"
-# "Taxes and subsidies"
-# "Exports of goods and services"
-println("  Extracting parameters from USE data...")
-io[:id0] = filter_with(io[:use], set)
-io[:fd0] = filter_with(io[:use], (i = set[:i],  j = set[:fd]))
-io[:va0] = filter_with(io[:use], (i = set[:va], j = set[:j]))
-io[:ts0] = filter_with(io[:use], (i = set[:ts], j = set[:j]))
-io[:x0]  = filter_with(io[:use], (i = set[:i],  j = "exports"))
+    _partition_m0!(d, set)   # cif0
+    _partition_trn0!(d, set) # cif0
 
-io[:fd0] = edit_with(io[:fd0], Rename(:j, :fd));
-io[:va0] = edit_with(io[:va0], Rename(:i, :va));
+    _partition_fs0!(d)       # fd0
+    _partition_s0!(d)        # ys0
+    _partition_md0!(d, set)  # mrg0, trn0
+    _partition_ms0!(d)       # mrg0, trn0
 
-# Read from supply data.
-# "Sectoral supply"
-# "Imports"
-# "Trade margins"
-# "Transportation costs"
-# "CIF/FOB Adjustments on Imports"
-# "Import duties"
-# "Taxes on products"
-# "Subsidies on products"
-println("  Extracting parameters from SUPPLY data...")
-io[:ys0]   = filter_with(io[:supply], set)
-io[:m0]    = filter_with(io[:supply], (i = set[:i], j = "imports"))
-io[:mrg0]  = filter_with(io[:supply], (i = set[:i], j = "margins"))
-io[:trn0]  = filter_with(io[:supply], (i = set[:i], j = "trncost"))
-io[:cif0]  = filter_with(io[:supply], (i = set[:i], j = "ciffob"))
-io[:duty0] = filter_with(io[:supply], (i = set[:i], j = "duties"))
-io[:tax0]  = filter_with(io[:supply], (i = set[:i], j = "tax"))
-io[:sbd0]  = filter_with(io[:supply], (i = set[:i], j = "subsidies"))
+    _partition_y0!(d, set)   # ms0, fs0, ys0
+    _partition_a0!(d, set)   # fd0, id0
 
-# Treat negative inputs as outputs.
-io[:ys0][!,:value] = io[:ys0][:,:value] - min.(0, io[:id0][:,:value])
-io[:id0][!,:value] = max.(0, io[:id0][:,:value])
-io[:ts0][io[:ts0][:,:i] .== "subsidies", :value] *= -1
-io[:sbd0][!,:value] *= -1
+    _partition_ta0!(d)       # a0, sbd0, tax0
+    _partition_tm0!(d)       # duty0, m0
 
-# Adjust transport margins for transport sectors according to CIF/FOB adjustments.
-# Insurance imports are specified as net of adjustments.
-i_ins = io[:cif0][:,:i] .== "ins"
-io[:trn0][.!i_ins, :value] .= io[:trn0][.!i_ins,:value] + io[:cif0][.!i_ins,:value]
-io[:m0  ][  i_ins, :value] .= io[:m0][i_ins,:value] + io[:cif0][i_ins,:value]
-io[:cif0][      !, :value] .= 0.0
-
-println("  Calculating parameters...")
-# "Aggregate supply"
-# "Gross output"
-io[:s0] = sum_over(io[:ys0], :i; values_only = false)
-io[:y0] = sum_over(io[:ys0], :j; values_only = false)
-
-# "Balance of payments deficit"
-io[:bopdef] = fill_zero((yr = set[:yr], ))
-
-# "Margin supply"
-io[:ms0] = fill_zero((yr = set[:yr], i = set[:i], m = set[:m]))
-io[:ms0][io[:ms0][:,:m] .== "trd", :value] .= max.(-io[:mrg0][:,:value], 0)
-io[:ms0][io[:ms0][:,:m] .== "trn", :value] .= max.(-io[:trn0][:,:value], 0)
-
-# "Margin demand" !!!! should this be (yr,m,j) instead of (yr,m,i)?
-io[:md0] = fill_zero((yr = set[:yr], m = set[:m], i = set[:i]))
-io[:md0][io[:md0][:,:m] .== "trd", :value] .= max.(io[:mrg0][:,:value], 0)
-io[:md0][io[:md0][:,:m] .== "trn", :value] .= max.(io[:trn0][:,:value], 0)
-
-# "Household supply"
-# Move household supply of recycled goods into the domestic output market
-# from which some may be exported. Net out margin supply from output.
-io[:fs0] = filter_with(io[:fd0], (fd = "pce",))
-io[:fs0][!,:value] .= - min.(io[:fs0][:,:value], 0)
-io[:y0][!,:value]  .= sum_over(io[:ys0], :j) + io[:fs0][:,:value] - sum_over(io[:ms0], :m)
-
-# "Armington supply"
-io[:a0] = fill_zero((yr = set[:yr], i = set[:i]))
-io[:a0][!,:value] .= sum_over(io[:fd0], :fd) + sum_over(io[:id0], :j)
-
-# Remove commodity taxes and subsidies on the goods which are produced solely
-# for supplying retail sales margin:
-# Here's how to do this: https://discourse.julialang.org/t/dataframes-obtaining-the-subset-of-rows-by-a-set-of-values/15923/10
-[io[k][findall(in(set[:imrg]), io[k][:,:i]), :value] .= 0.0
-    for k in [:y0, :a0, :tax0, :sbd0, :x0, :m0, :md0, :duty0]]
-
-# "Tax net subsidy rate on intermediate demand."
-io[:tm0] = fill_zero((yr = set[:yr], i = set[:i]))
-i_div = io[:m0][:,:value] .!= 0.0
-io[:tm0][i_div, :value] .=  io[:duty0][i_div,:value] ./ io[:m0][i_div,:value]
-
-# "Import tariff"
-io[:ta0] = fill_zero((yr = set[:yr], i = set[:i]))
-i_div = io[:a0][:,:value] .!= 0.0
-io[:ta0][i_div, :value] .= (io[:tax0][i_div,:value] - io[:sbd0][i_div,:value]) ./ io[:a0][i_div,:value]
-
-# "Labor share of value added"
-# io[:va0] = unstack(edit_with(io[:va0], Drop(:units,"all","==")), :va, :value)
-# io[:lshr0] = fill_zero((yr = set[:yr], g = set[:g]))
-# io[:lshr0][!,:value] .= io[:va0][:,:compen] ./ (io[:va0][:,:compen] + io[:va0][:,:surplus])
-# io[:lshr0] = edit_with(io[:lshr0], Replace(:value, NaN, 0.0))
-va0 = unstack(edit_with(copy(io[:va0]), Drop(:units,"all","==")), :va, :value)
-io[:lshr0] = fill_zero((yr = set[:yr], g = set[:g]))
-io[:lshr0][!,:value] .= va0[:,:compen] ./ (va0[:,:compen] + va0[:,:surplus])
-io[:lshr0] = edit_with(io[:lshr0], Replace(:value, NaN, 0.0))
-
-# Remove columns that contain only one value.
-[io[k] = io[k][:,[length.(unique.(eachcol(df)[1:end-1])) .!= 1; true]] for (k,df) in io]
+    _partition_lshr0!(d, set) # va0

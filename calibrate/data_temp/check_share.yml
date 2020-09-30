@@ -2,7 +2,7 @@ Path: [data, windc_output, 2b_shr]
 
 Input:
   rpc:    {name: rpc.csv,        col: [r,g,value]}
-  utd:    {name: usatrd_shr.csv, col: [yr,r,s,t,value]}
+  utd:    {name: usatrd_shr.csv, col: [yr,r,g,t,value]}   # s -> g
   sgf:    {name: sgf_shr.csv,    col: [yr,r,s,value]}     # g -> s
   notrd:  {name: notinc.csv,     col: [s]}
   labor:  {name: labor_shr.csv,  col: [yr,r,s,value]}     # g -> s

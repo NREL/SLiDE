@@ -167,43 +167,6 @@ disagg_check = benchmark_disagg(:rx0_temp, disagg_check, bdisagg, disagg)
 
 # ******************************************************************************************
 
-"""
-    _disagg_pta0(d::Dict)
-"""
-function _disagg_pta0(d::Dict)
-    d[:pta0] = dropmissing(((d[:yr,:r,:g] - d[:ta0]) * d[:a0]) + d[:rx0])
-    return d
-end
-
-"""
-    _disagg_ptm0(d::Dict)
-"""
-function _disagg_ptm0(d::Dict)
-    d[:ptm0] = dropmissing(((d[:yr,:r,:g] + d[:tm0]) * d[:m0]) + combine_over(d[:md0], :m))
-    return d
-end
-
-"""
-    _disagg_dc0(d::Dict)
-"""
-function _disagg_dc0(d::Dict)
-    d[:dc0] = dropmissing((d[:s0] - d[:x0] + d[:rx0]))
-    return d
-end
-
-"""
-    _disagg_pt0(d::Dict)
-"""
-function _disagg_pt0(d::Dict)
-    d[:pt0] = d[:pta0] - d[:ptm0]
-    return d
-end
-
-function _disagg_diff(d::Dict)
-    df = copy(d[:pt0])
-    df[!,:value] .= - min.(0, df[:,:value])
-end
-
 disagg[:pta0] = dropmissing(((df1[:yr,:r,:g] - disagg[:ta0]) * disagg[:a0]) + disagg[:rx0_temp])
 disagg[:ptm0] = dropmissing(((df1[:yr,:r,:g] + disagg[:tm0]) * disagg[:m0]) + combine_over(disagg[:md0], :m))
 disagg[:dc0] = dropmissing((disagg[:s0_temp] - disagg[:x0_temp] + disagg[:rx0_temp]))

@@ -405,7 +405,7 @@ function gams_to_dataframe(xf::Array{String,1}; colpropertynames = false)
     df = edit_with(df, Match(Regex("^(?<missing>\\S+)\\.(?<missing_1>[\\S^,]*)\\s*\"*(?<missing_2>[^\"]*),?"),
         :missing, [:missing, :missing_1, :missing_2]))
     ROWS, COLS = size(df)
-
+    
     # Does the DataFrame row contain a set (indicated by parentheses)?
     df_set = match.(r"^\((.*)\)", df)
     df_isset = df_set .!== nothing

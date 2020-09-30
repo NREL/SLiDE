@@ -42,3 +42,7 @@ thousands of us dollars (USD),thousands of us dollars (USD),1.0e-6,billions of u
 us dollars (USD),us dollars (USD),1.0e-9,billions of us dollars (USD)
 us dollars (USD) per million btu,us dollars (USD) per million btu,1.0,
 billions of US dollars (USD),billions of US dollars (USD),1.0,
+thousand acres,thousand acres,1.0,
+Mgal/d,million gallons/day,1.0,
+gallons/day,gallons/day,1.0,
+gigawatt-hours,million kilowatthours,1.0,
