@@ -19,11 +19,11 @@ bibliography: paper.bib
 
 # Summary
 
-
-
-# Statement of need 
+# Background
 
 Energy and the economy are deeply intertwined yet the models typically employed for energy analysis treat the energy sector in isolation while lacking the capability to robustly represent the U.S. economy.
+
+# 
 
 # Citations
 
