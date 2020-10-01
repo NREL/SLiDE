@@ -13,7 +13,7 @@ Order:
   - {col: r,      type: String}
   - {col: s,      type: String}
   - {col: gdpcat, type: String}
-  - {col: units,  type: String}
+# - {col: units,  type: String}
   - {col: value,  type: Float64}
 
 Map:
@@ -22,7 +22,7 @@ Map:
     to:     windc_code
     input:  si
     output: s
-    kind:   inner
+    kind:   left
 
 Operate:
   operation: sum

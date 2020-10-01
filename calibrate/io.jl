@@ -29,7 +29,8 @@ function _partition_io!(d::Dict, set::Dict)
     d[:ys0][!,:value] = d[:ys0][:,:value] - min.(0, d[:id0][:,:value])
     d[:id0][!,:value] = max.(0, d[:id0][:,:value])
 
-    dropzero
+    d[:id0] = dropzero(d[:id0])
+    d[:ys0] = dropzero(d[:ys0])
 end
 
 """
@@ -86,18 +87,22 @@ function _partition_fs0!(d::Dict)
     d[:fs0][!,:value] .= - min.(d[:fs0][:,:value], 0)
 end
 
-"""
-    _partition_lshr0!(d::Dict)
-`lshr0`: Labor share of value added
-"""
-function _partition_lshr0!(d::Dict, set::Dict)
-    va0 = edit_with(unstack(copy(d[:va0]), :va, :value),
-        [Rename(:j,:s); Replace.(Symbol.(set[:va]), missing, 0.0); Drop(:units,"all","==")])
+# """
+#     _partition_lshr0!(d::Dict)
+# `lshr0`: Labor share of value added
+# """
+# function _partition_lshr0!(d::Dict, set::Dict)
+#     va0 = edit_with(unstack(copy(d[:va0]), :va, :value),
+#         [Rename(:j,:s); Replace.(Symbol.(set[:va]), missing, 0.0); Drop(:units,"all","==")])
     
-    d[:lshr0]  = va0[:,[:yr,:s,:compen]]
-    d[:lshr0] /= (va0[:,[:yr,:s,:compen]] + va0[:,[:yr,:s,:surplus]])
-    dropmissing!(d[:lshr0])
-end
+#     d[:lshr0]  = va0[:,[:yr,:s,:compen]]
+#     d[:lshr0] /= (va0[:,[:yr,:s,:compen]] + va0[:,[:yr,:s,:surplus]])
+
+#     # !!!!! _partition_lshr0 needs to come after calibration.
+#     # Order is: io, calibrate, share, disagg.
+#     d[:lshr0][va0[:,:surplus] .< 0,:value] .== 1.0
+#     dropmissing!(d[:lshr0])
+# end
 
 """
     _partition_m0!(d::Dict, set::Dict)
@@ -166,7 +171,7 @@ end
 `ta0`: Import tariff
 """
 function _partition_ta0!(d::Dict)
-    d[:ta0] = dropmissing((d[:tax0] - d[:sbd0]) / d[:a0])
+    d[:ta0] = dropnan((d[:tax0] - d[:sbd0]) / d[:a0])
     # d[:ta0] = edit_with(d[:ta0], Drop(:units,"all","=="))
 end
 
@@ -184,7 +189,7 @@ end
 `tm0`: Tax net subsidy rate on intermediate demand
 """
 function _partition_tm0!(d::Dict)
-    d[:tm0] = dropmissing(d[:duty0] / d[:m0])
+    d[:tm0] = dropnan(d[:duty0] / d[:m0])
     # d[:tm0] = edit_with(d[:tm0], Drop(:units,"all","=="))
 end
 
@@ -269,52 +274,18 @@ function partition!(d::Dict, set::Dict)
     _partition_ta0!(d)       # a0, sbd0, tax0
     _partition_tm0!(d)       # duty0, m0
 
-    _partition_lshr0!(d, set) # va0
+    # _partition_lshr0!(d, set) # va0
+    return d
 end
 
-# ******************************************************************************************
-println("  Reading sets...")
-y = read_file(joinpath("data", "readfiles", "list_sets.yml"));
-# set = Dict(Symbol(k) => sort(read_file(joinpath(y["Path"]..., ensurearray(v)...)))[:,1]
-#     for (k,v) in y["Input"])
-set = Dict((length(ensurearray(k)) == 1 ? Symbol(k) : Tuple(Symbol.(k))) =>
-    sort(read_file(joinpath(y["Path"]..., ensurearray(v)...)))[:,1] for (k,v) in y["Input"])
+# # ******************************************************************************************
+# println("  Reading sets...")
+# y = read_file(joinpath("data", "readfiles", "list_sets.yml"));
+# # set = Dict(Symbol(k) => sort(read_file(joinpath(y["Path"]..., ensurearray(v)...)))[:,1]
+# #     for (k,v) in y["Input"])
+# set = Dict((length(ensurearray(k)) == 1 ? Symbol(k) : Tuple(Symbol.(k))) =>
+#     sort(read_file(joinpath(y["Path"]..., ensurearray(v)...)))[:,1] for (k,v) in y["Input"])
 
-# Read supply/use data.
-println("  Reading supply/use data...")
-DATA_DIR = joinpath("data", "input")
-io = Dict(k => read_file(joinpath(DATA_DIR, string(k, ".csv"))) for k in [:supply, :use])
 
-d = io;
 
-# partition!(io, set)
-[d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), [Drop(:units,"all","==")])
-        for k in [:supply, :use]]
-
-    _partition_io!(d, set)
-    _partition_fd0!(d, set)
-    _partition_ts0!(d, set)
-    _partition_va0!(d, set)
-    _partition_x0!(d, set)
-
-    _partition_cif0!(d, set)
-    _partition_duty0!(d, set)
-    _partition_mrg0!(d, set)
-    _partition_sbd0!(d, set)
-    _partition_tax0!(d, set)
-
-    _partition_m0!(d, set)   # cif0
-    _partition_trn0!(d, set) # cif0
-
-    _partition_fs0!(d)       # fd0
-    _partition_s0!(d)        # ys0
-    _partition_md0!(d, set)  # mrg0, trn0
-    _partition_ms0!(d)       # mrg0, trn0
-
-    _partition_y0!(d, set)   # ms0, fs0, ys0
-    _partition_a0!(d, set)   # fd0, id0
-
-    _partition_ta0!(d)       # a0, sbd0, tax0
-    _partition_tm0!(d)       # duty0, m0
-
-    _partition_lshr0!(d, set) # va0
+# partition!(nio, set)

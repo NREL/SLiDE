@@ -20,7 +20,7 @@ Map:
     to:     g
     input:  pg
     output: g
-    kind:   inner
+    kind:   left
 
 Operate:
   operation: sum

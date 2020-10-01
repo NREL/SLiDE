@@ -52,6 +52,7 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 - `df::DataFrame` including edit(s)
 """
 function edit_with(df::DataFrame, x::Add)
+    df = copy(df)
     # If adding the length of a string...
     if typeof(x.val) == String && occursin("length", x.val)
         m = match(r"(?<col>\S*) length", x.val)
@@ -72,6 +73,7 @@ function edit_with(df::DataFrame, x::Add)
 end
 
 function edit_with(df::DataFrame, x::Drop)
+    df = copy(df)
     if x.val === "all" && x.operation == "occursin"
         df = edit_with(df, Drop.(propertynames(df)[occursin.(x.col, propertynames(df))], "all", "=="))
     end
@@ -82,8 +84,8 @@ function edit_with(df::DataFrame, x::Drop)
     else  # Drop rows using an operation or based on a value.
         if x.val === missing
             dropmissing!(df, x.col)
-        elseif x.val === "unique"
-            unique!(df, x.col)
+        # elseif x.val === "unique"
+        #     unique!(df, x.col)
         else
             df[!,x.col] .= convert_type.(typeof(x.val), df[:,x.col])
             df = if x.operation == "occursin"
@@ -97,6 +99,7 @@ function edit_with(df::DataFrame, x::Drop)
 end
 
 function edit_with(df::DataFrame, x::Group)
+    df = copy(df)
     # First, add a column to the original DataFrame indicating where the data set begins.
     cols = unique([propertynames(df); x.output])
     df[!,:start] = (1:size(df)[1]) .+ 1
@@ -123,6 +126,7 @@ function edit_with(df::DataFrame, x::Group)
 end
 
 function edit_with(df::DataFrame, x::Map; kind = :left)
+    df = copy(df)
     # Save all input column propertynames, read the map file, and isolate relevant columns.
     # # This prevents duplicate columns in the final DataFrame.
     cols = unique([propertynames(df); x.output])
@@ -172,6 +176,7 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
 end
 
 function edit_with(df::DataFrame, x::Match)
+    df = copy(df)
     if x.on == r"expand range"
         ROWS, COLS = size(df)
         cols = propertynames(df)
@@ -196,6 +201,7 @@ function edit_with(df::DataFrame, x::Match)
 end
 
 function edit_with(df::DataFrame, x::Melt)
+    df = copy(df)
     on = intersect(x.on, propertynames(df))
     df = melt(df, on, variable_name = x.var, value_name = x.val)
     df[!, x.var] .= convert_type.(String, df[:, x.var])
@@ -203,6 +209,7 @@ function edit_with(df::DataFrame, x::Melt)
 end
 
 function edit_with(df::DataFrame, x::Operate)
+    df = copy(df)
     # If it is a ROW-WISE operation,
     if x.axis == :row
         df = by(df, x.input, x.output => datatype(x.operation))
@@ -235,6 +242,7 @@ function edit_with(df::DataFrame, x::Operate)
 end
 
 function edit_with(df::DataFrame, x::Order)
+    df = copy(df)
     # If not all columns are present, return the DataFrame as is. Such is the case when a
     # descriptor column must be added when appending multiple data sets in one DataFrame.
     if size(intersect(x.col, propertynames(df)))[1] < size(x.col)[1]
@@ -249,18 +257,24 @@ function edit_with(df::DataFrame, x::Order)
 end
 
 function edit_with(df::DataFrame, x::Rename)
-    x.from in propertynames(df) && (rename!(df, x.from => x.to))
+    df = copy(df)
+    x.from in propertynames(df) && (df = rename(df, x.from => x.to))
     x.to == :upper && (df = edit_with(df, Rename.(propertynames(df), uppercase.(propertynames(df)))))
     x.to == :lower && (df = edit_with(df, Rename.(propertynames(df), lowercase.(propertynames(df)))))
     return df
 end
 
 function edit_with(df::DataFrame, x::Replace)
+    df = copy(df)
     !(x.col in propertynames(df)) && (return df)
 
     if x.from === missing && Symbol(x.to) in propertynames(df)
         df[ismissing.(df[:,x.col]),x.col] .= df[ismissing.(df[:,x.col]), Symbol(x.to)]
         return df
+    end
+
+    if x.to === Not && eltype(df[:,x.col]) == Bool
+        df[!,x.col] .= .!df[:,x.col]
     end
 
     df[!,x.col] .= if x.to === "lower"  lowercase.(df[:,x.col])
@@ -274,6 +288,7 @@ function edit_with(df::DataFrame, x::Replace)
 end
 
 function edit_with(df::DataFrame, x::Stack)
+    df = copy(df)
     df = [[edit_with(df[:, occursin.(indicator, propertynames(df))],
         [Rename.(propertynames(df)[occursin.(indicator, propertynames(df))], x.col);
             Add(x.var, replace(string(indicator), "_" => " "))]
@@ -287,7 +302,7 @@ function edit_with(df::DataFrame, lst::Array{T}) where T<:Edit
 end
 
 function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
-    return edit_with(df, Add(x.col, file.descriptor))
+    return edit_with(copy(df), Add(x.col, file.descriptor))
 end
 
 function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
@@ -371,7 +386,7 @@ _expand_range(x::Missing) = x
 _expand_range(x::Int) = x
 
 """
-    fill_zero(keys_unique::NamedTuple; value_colpropertynames)
+    fill_zero(keys_unique::NamedTuple; value_colnames)
     fill_zero(keys_unique::NamedTuple, df::DataFrame)
     fill_zero(df::DataFrame...)
     fill_zero(d::Dict...)
@@ -387,7 +402,7 @@ _expand_range(x::Int) = x
 - `df::DataFrame...`: The DataFrame(s) to edit.
 
 # Keyword Arguments
-- `value_colpropertynames::Any = :value`: "value" column labels to add and set to zero when creating
+- `value_colnames::Any = :value`: "value" column labels to add and set to zero when creating
     a new DataFrame. Default is `:value`.
 
 # Usage
@@ -413,9 +428,9 @@ This function can be used to fill zeros in either a dictionary or DataFrame.
 - `d::Dict...` if input included dictionaries and/or Tuples
 - `df::DataFrame...` if input included DataFrames and/or NamedTuples
 """
-function fill_zero(keys_fill::NamedTuple; value_colpropertynames = :value)
+function fill_zero(keys_fill::NamedTuple; value_colnames = :value)
     df_fill = DataFrame(permute(keys_fill))
-    return edit_with(df_fill, Add.(convert_type.(Symbol, value_colpropertynames), 0.))
+    return edit_with(df_fill, Add.(convert_type.(Symbol, value_colnames), 0.))
 end
 
 function fill_zero(keys_fill::Tuple; permute_keys::Bool = true)
@@ -432,8 +447,9 @@ function fill_zero(d::Vararg{Dict}; permute_keys::Bool = true)
 end
 
 function fill_zero(keys_fill::NamedTuple, df::DataFrame)
+    df = copy(df)
     df_fill = fill_zero(keys_fill)
-    df = fill_zero(copy(df), df_fill)[1]
+    df = fill_zero(df, df_fill)[1]
     return df
 end
 
@@ -441,8 +457,8 @@ function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
     df = copy.(ensurearray(df))
     # Save propertynames of columns containing values to fill zeros later.
     # Find descriptor columns to permute OR make consistent across input DataFrames.
-    value_colpropertynames = find_oftype.(df, AbstractFloat)
-    cols = intersect(setdiff.(propertynames.(df), value_colpropertynames)...)
+    value_colnames = find_oftype.(df, AbstractFloat)
+    cols = intersect(setdiff.(propertynames.(df), value_colnames)...)
 
     # Find a unique list of descriptor keys in the input DataFrame(s). Permute as desired.
     df_fill = sort(unique([[x[:,cols] for x in df]...;]))
@@ -452,7 +468,7 @@ function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
     # descriptor columns shared by both DataFrames. Using a left join will add "missing"
     # where a descriptor was not already present, which will be replaced by zero.
     [df[ii] = edit_with(leftjoin(df_fill, df[ii], on = cols),
-        Replace.(value_colpropertynames[ii], missing, 0.0)) for ii in 1:length(df)]
+        Replace.(value_colnames[ii], missing, 0.0)) for ii in 1:length(df)]
     return length(df) == 1 ? df[1] : Tuple(df)
 end
 
@@ -495,6 +511,7 @@ function extrapolate_year(
     backward::Bool = true,
     forward::Bool = true
 )
+    df = copy(df)
     yr_diff = setdiff(yr, unique(df[:,:yr]))
     length(yr_diff) == 0 && (return df)
     
@@ -553,6 +570,7 @@ end
 - `df::DataFrame` extrapolated in time.
 """
 function extrapolate_region(df::DataFrame, r::Pair = "md" => "dc"; overwrite = false)
+    df = copy(df)
     if !overwrite
         r = r.first => setdiff(ensurearray(r.second), unique(df[:,:r]))
         length(r.second) == 0 && (return df)
@@ -589,7 +607,15 @@ end
 # Returns:
 - `df::DataFrame` with only the desired keys.
 """
-function filter_with(df::DataFrame, set; extrapolate::Bool = false)
+function filter_with(
+    df::DataFrame,
+    set::Any;
+    extrapolate::Bool = false,
+    forward::Bool = true,
+    backward::Bool = true,
+    r::Pair = "md" => "dc",
+    overwrite::Bool = false
+)
     df_ans = copy(df)
     cols_ans = propertynames(df_ans)
 
@@ -597,53 +623,17 @@ function filter_with(df::DataFrame, set; extrapolate::Bool = false)
     # values in the set Dictionary. Then, created a DataFrame containing all permutations.
     cols = find_oftype(df, Not(AbstractFloat))
     cols_set = intersect(cols, collect(keys(set)))
-    vals_set = [intersect(unique(df[:,k]),set[k]) for k in cols_set]
+    vals_set = [intersect(unique(df[:,k]), ensurearray(set[k])) for k in cols_set]
     # vals_set = [set[k] for k in cols_set]
 
     # Drop values that are not in the current set.
     df_set = DataFrame(permute(NamedTuple{Tuple(cols_set,)}(vals_set,)))
     df_ans = innerjoin(df_ans, df_set, on = cols_set)
     
-    # # Save key values that are NOT included in keys. This is relevant in the case that
-    # # there are multiple types of units in the DataFrame columns.
-    # if length(setdiff(cols, collect(keys(set)))) > 0
-    #     df_key = unique(df[:,setdiff(cols, collect(keys(set)))])
-    #     df_set = edit_with(innerjoin(edit_with(df_set, Add(:dummy,1)),
-    #         edit_with(df_key, Add(:dummy,1)), on = :dummy), Drop(:dummy,"all","=="))[:,cols]
-    # end
-    # 
-    # # Fill zeros.
-    # df = fill_zero(df_set, df; permute_keys = false)[2]
-
+    if extrapolate
+        :yr in cols_set && (df_ans = extrapolate_year(df_ans, set; forward = forward, backward = backward))
+        :r in cols_set  && (df_ans = extrapolate_region(df_ans, r; overwrite = overwrite))
+    end
+    
     return sort(df_ans[:,cols_ans])
 end
-
-# function filter_with(
-#     df::DataFrame,
-#     set::Any;
-#     extrapolate::Bool = false,
-#     forward::Bool = true,
-#     backward::Bool = true,
-#     r::Pair = "md" => "dc",
-#     overwrite::Bool = false
-# )
-#     df_ans = copy(df)
-#     cols_ans = propertynames(df_ans)
-
-#     # Find keys that reference both column names in the input DataFrame df and
-#     # values in the set Dictionary. Then, created a DataFrame containing all permutations.
-#     cols = find_oftype(df, Not(AbstractFloat))
-#     cols_set = intersect(cols, collect(keys(set)))
-#     vals_set = [intersect(unique(df[:,k]),set[k]) for k in cols_set]
-
-#     # Drop values that are not in the current set.
-#     df_set = DataFrame(permute(NamedTuple{Tuple(cols_set,)}(vals_set,)))
-#     df_ans = innerjoin(df_ans, df_set, on = cols_set)
-    
-#     if extrapolate
-#         :yr in cols_set && (df_ans = extrapolate_year(df_ans, set; forward = forward, backward = backward))
-#         :r in cols_set  && (df_ans = extrapolate_region(df_ans, r; overwrite = overwrite))
-#     end
-    
-#     return sort(df_ans[:,cols_ans])
-# end

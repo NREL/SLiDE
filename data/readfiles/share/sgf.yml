@@ -21,11 +21,11 @@ Map:
     to:     windc_code
     input:  ec
     output: g
-    kind:   inner
+    kind:   left
 
 Drop:
-  col: g
-  val: missing
+  col: sg
+  val: [0, 99]
   operation: "=="
 
 Operate:

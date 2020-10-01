@@ -10,11 +10,12 @@ using Base
     _join_to_operate(df::Vararg{DataFrame})
 """
 function _join_to_operate(df::Array{DataFrame,1})
+    df = copy(df)
     N = length(df)
     
     inp = vcat.(find_oftype.(df, AbstractFloat), find_oftype.(df, Bool))
     out = Symbol.(:x, 1:N)
-    cols = intersect(setdiff.(propertynames.(df), inp)...)
+    cols = setdiff.(propertynames.(df), inp)
 
     if any(length.(inp) .!= 1)
         error("Can only operate on DataFrames with one AbstractFloat column.")
@@ -22,14 +23,16 @@ function _join_to_operate(df::Array{DataFrame,1})
         inp = collect(Iterators.flatten(inp))
     end
 
-    df_ans = edit_with(df[1], Rename(inp[1], out[1]));
-    if length(cols) == 0
-        [df_ans = crossjoin(df_ans, edit_with(df[ii], Rename(inp[ii], out[ii]))) for ii in 2:N]
-    else
-        [df_ans = outerjoin(df_ans, edit_with(df[ii], Rename(inp[ii], out[ii])),
-            on = cols) for ii in 2:N]
+    df_ans = edit_with(df[1], Rename(inp[1], out[1]))
+    for ii in 2:N
+        cols[ii] = intersect(propertynames(df_ans), cols[ii])
+        df_ans = if length(cols[ii]) == 0
+            crossjoin(df_ans, edit_with(df[ii], Rename(inp[ii], out[ii])))
+        else
+            outerjoin(df_ans, edit_with(df[ii], Rename(inp[ii], out[ii])), on = cols[ii])
+        end
     end
-    
+
     df_ans = edit_with(df_ans, Replace.(out, missing, 0))
     return df_ans
 end
@@ -46,7 +49,7 @@ function Base.:/(df1::DataFrame, df2::DataFrame)
     out = Symbol.(:x, 1:2)
 
     df_ans = _join_to_operate(copy.([df1, df2]))
-    df_ans[!,:value] .= df_ans[:, out[1]] ./ df[:, out[2]]
+    df_ans[!,:value] .= df_ans[:, out[1]] ./ df_ans[:, out[2]]
 
     return df_ans[:, [setdiff(propertynames(df_ans), [:value; out]); :value]]
 end
@@ -140,9 +143,12 @@ to the input DataFrame `df` over the input column(s) `col`.
 function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
     cols_ans = setdiff(propertynames(df), col)
 
-    val_cols = find_oftype(df, AbstractFloat)
+    # val_cols = find_oftype(df, AbstractFloat)
+    val_cols = [find_oftype(df, AbstractFloat); find_oftype(df, Bool)]
     by_cols = setdiff(propertynames(df), [col; val_cols])
     df_ans = combine(groupby(df, by_cols), val_cols .=> fun .=> val_cols)
+    [df_ans[!,col] .= convert_type.(Float64, df_ans[:,col]) for col in val_cols
+        if eltype(df_ans[:,col]) == Int]
     return df_ans[:,cols_ans]
 end
 
@@ -172,9 +178,11 @@ to the input DataFrame `df` over the input column(s) `col`.
 function transform_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
     cols_ans = propertynames(df)
 
-    val_cols = find_oftype(df, AbstractFloat)
+    val_cols = [find_oftype(df, AbstractFloat); find_oftype(df, Bool)]
     by_cols = setdiff(propertynames(df), [col; val_cols])
     df_ans = transform(groupby(df, by_cols), val_cols .=> fun .=> val_cols)
+    [df_ans[!,col] .= convert_type.(Float64, df_ans[:,col]) for col in val_cols
+        if eltype(df_ans[:,col]) == Int]
     return df_ans[:,cols_ans]
 end
 

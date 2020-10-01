@@ -14,38 +14,45 @@ READ_DIR = joinpath("data", "readfiles");
 #   READ SHARING DATA.
 # ******************************************************************************************
 # Read sharing files and do some preliminary editing.
-files_share = XLSXInput("generate_yaml.xlsx", "share", "B1:G150", "share")
-files_share = write_yaml(READ_DIR, files_share)
+# files_share = XLSXInput("generate_yaml.xlsx", "share", "B1:G150", "share")
+# files_share = write_yaml(READ_DIR, files_share)
 
-y = [read_file(files_share[ii]) for ii in 1:length(files_share)]
-files_share = run_yaml(files_share)
+# y = [read_file(files_share[ii]) for ii in 1:length(files_share)]
+# files_share = run_yaml(files_share)
 
-shr = Dict(Symbol(y[ii]["PathOut"][end][1:end-4]) =>
-    read_file(joinpath(y[ii]["PathOut"]...)) for ii in 1:length(y))
+# shrin = Dict(Symbol(y[ii]["PathOut"][end][1:end-4]) =>
+#     read_file(joinpath(y[ii]["PathOut"]...)) for ii in 1:length(y))
 
-shr[:pce] = sort(filter_with(shr[:pce], set))
-shr[:utd] = sort(filter_with(shr[:utd], set))
-shr[:gsp] = sort(filter_with(shr[:gsp], set))
-shr[:cfs] = sort(filter_with(shr[:cfs], set))
+shr = Dict()
+[shr[k] = edit_with(copy(shrin[k]), Drop(:units,"all","==")) for k in keys(shrin)]
+
+shr[:pce] = fill_zero(filter_with(shr[:pce], set))
+shr[:utd] = fill_zero(filter_with(shr[:utd], set))
+shr[:gsp] = fill_zero(filter_with(shr[:gsp], set))
+shr[:cfs] = fill_zero(filter_with(shr[:cfs], set))
+
+shr_comp = Dict()
 
 # ******************************************************************************************
 # "`pce`: Regional shares of final consumption"
 shr[:pce][!,:value] .= shr[:pce][:,:value] ./ sum_over(shr[:pce], :r; keepkeys = true)
+benchmark!(shr_comp, :pce, shr, bshr)
 
 # ******************************************************************************************
 # "`utd`: Share of total trade by region."
-shr[:utd][!,:share] .= shr[:utd][:,:value] ./ sum_over(shr[:utd], :r; keepkeys = true)
-shr[:utd][isnan.(shr[:utd][:,:share]),:share] .= (sum_over(shr[:utd], :yr; keepkeys = true) ./
-    sum_over(shr[:utd], [:yr,:r]; keepkeys = true))[isnan.(shr[:utd][:,:share])]
-shr[:utd] = shr[:utd][.!isnan.(shr[:utd][:,:share]),:]
+# shr[:utd][!,:share] .= shr[:utd][:,:value] ./ transform_over(shr[:utd], :r)[:,:value]
+# shr[:utd][isnan.(shr[:utd][:,:share]),:share] .= (sum_over(shr[:utd], :yr; keepkeys = true) ./
+#     sum_over(shr[:utd], [:yr,:r]; keepkeys = true))[isnan.(shr[:utd][:,:share])]
+# shr[:utd] = shr[:utd][.!isnan.(shr[:utd][:,:share]),:]
+# benchmark!(shr_comp, :utd, shr, bshr)
 
-# "`notrd`: Sectors not included in USA Trade Data."
-# shr[:notinc] = DataFrame(s = setdiff(set[:i], shr[:utd][:,:s]))
-set[:notrd] = setdiff(set[:i], shr[:utd][:,:s])
+# # "`notrd`: Sectors not included in USA Trade Data."
+# # shr[:notinc] = DataFrame(s = setdiff(set[:i], shr[:utd][:,:s]))
+# set[:notrd] = setdiff(set[:i], shr[:utd][:,:s])
 
-# ******************************************************************************************
-# # "`gsp`: Calculated gross state product."
-# Calcuate GSP and save difference between calculate value and data.
+# # ******************************************************************************************
+# # # "`gsp`: Calculated gross state product."
+# # Calcuate GSP and save difference between calculate value and data.
 shr[:gsp] = unstack(edit_with(dropzero(shr[:gsp]), Drop(:units,"all","==")), :gdpcat, :value)
 shr[:gsp] = edit_with(shr[:gsp], Replace.(Symbol.(set[:gdpcat]),missing,0.0))
 

@@ -121,3 +121,40 @@ function compare_keys(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
     size(df,1) > 0 && @warn("Inconsistent keys:", df)
     return df
 end
+
+"""
+    benchmark!(d_summ::Dict, k::Symbol, d_bench::Dict, d_calc::Dict;
+"""
+function benchmark!(d_summ::Dict, k::Symbol, d_bench::Dict, d_calc::Dict;
+    tol = 1E-3, small = 1E-8)
+
+    !(k in collect(keys(d_bench))) && return
+
+    df_calc = copy(d_calc[k])
+    df_bench = copy(d_bench[k])
+
+    # Remove very small numbers. These might be zero or missing in the other DataFrame,
+    # and we're not splitting hairs here.
+    df_calc = df_calc[abs.(df_calc[:,:value] .> small), :]
+    df_bench = df_bench[abs.(df_bench[:,:value] .> small), :]
+
+    println("  Comparing keys and values for ", k)
+    df_comp = compare_summary([df_calc, df_bench], [:calc,:bench]; tol = tol)
+
+    k == :utd && (df_comp = edit_with(df_comp, Drop(:yr,2002,"<")))
+    k == :utd_new && (df_comp = edit_with(df_comp, Drop(:yr,2002,"<")))
+
+    # If the dataframes are in agreement, store this value as "true".
+    # Otherwise, store the comparison dataframe rows that are not in agreement.
+    d_summ[k] = size(df_comp,1) == 0 ? true : df_comp
+    return d_summ
+end
+
+"""
+    verify_over(df::DataFrame, col::Any; tol = 1E-6)
+"""
+function verify_over(df::DataFrame, col::Any; tol = 1E-6)
+    df = combine_over(df, col)
+    df = df[(df[:,:value] .- 1.0) .> tol, :]
+    return size(df,1) == 0 ? true : df
+end

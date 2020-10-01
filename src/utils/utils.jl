@@ -75,15 +75,27 @@ Extends `occursin` to work for symbols. Potentially helpful for DataFrame column
 Base.occursin(x::Symbol, y::Symbol) = occursin(string(x), y)
 Base.occursin(x::String, y::Symbol) = occursin(x, string(y))
 
+
+function dropvalue!(df::DataFrame, x::Float64)
+    cols = find_oftype(df, typeof(x));
+    if isnan(x); [filter!(row -> .!isnan.(row[col]), df) for col in cols]
+    else;        [filter!(row -> row[col] .!== x, df) for col in cols]
+    end
+    return df
+end
+
+dropvalue(df::DataFrame, x::Float64) = dropvalue!(copy(df), x)
+
 """
-    dropzero(df::DataFrame)
+    dropzero!(df::DataFrame)
 Returns a DataFrame without zero values in columns of type AbstractFloat.
 """
-function dropzero!(df::DataFrame)
-    cols = find_oftype(df, AbstractFloat);
-    df = edit_with(df, [Drop.(cols,0.0,"=="); Drop.(cols,-0.0,"==")])
-    # df
-end
+dropzero!(df::DataFrame) = dropvalue!(df, 0.0)
+dropzero(df::DataFrame) = dropzero!(copy(df))
+
+dropnan!(df::DataFrame) = dropvalue!(df, NaN)
+dropnan(df::DataFrame) = dropnan!(copy(df))
+
 
 """
     convert_type(::Type{T}, x::Any)
@@ -189,7 +201,7 @@ Returns `x` in a tuple.
 ensuretuple(x::Tuple{Vararg{Any}}) = x
 ensuretuple(x::Any) = tuple(x)
          
-istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(df)), T)
+istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(dropmissing(df))), T)
 # eltype.(eachcol(df))
 
 """
@@ -218,8 +230,9 @@ This function finds all possible permutations of the input arrays.
 """
 function permute(df::DataFrame)
     cols = propertynames(df)
-    df = sort(DataFrame(Tuple.(permute(unique.(eachcol(df))))))
-    return edit_with(df, Rename.(propertynames(df), cols))
+    df = sort(DataFrame(ensuretuple.(permute(unique.(eachcol(df))))))
+    df = edit_with(df, Rename.(propertynames(df), cols))
+    return df
 end
 
 function permute(x::Tuple)

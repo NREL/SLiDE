@@ -153,6 +153,7 @@ io[:ta0][i_div, :value] .= (io[:tax0][i_div,:value] - io[:sbd0][i_div,:value]) .
 # io[:lshr0][!,:value] .= io[:va0][:,:compen] ./ (io[:va0][:,:compen] + io[:va0][:,:surplus])
 # io[:lshr0] = edit_with(io[:lshr0], Replace(:value, NaN, 0.0))
 va0 = unstack(edit_with(copy(io[:va0]), Drop(:units,"all","==")), :va, :value)
+va0 = fill_zero((yr = set[:yr], j = set[:j]), va0)
 io[:lshr0] = fill_zero((yr = set[:yr], g = set[:g]))
 io[:lshr0][!,:value] .= va0[:,:compen] ./ (va0[:,:compen] + va0[:,:surplus])
 io[:lshr0] = edit_with(io[:lshr0], Replace(:value, NaN, 0.0))

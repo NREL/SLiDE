@@ -64,6 +64,12 @@ export File
 
 export convert_type
 export datatype
+export dropnan!
+export dropnan
+export dropzero!
+export dropzero
+export dropvalue!
+export dropvalue
 export isarray
 export istype
 export ensurearray
@@ -91,6 +97,8 @@ export run_yaml
 export compare_summary
 export compare_keys
 export compare_values
+export verify_over
+export benchmark!
 
 #################################################################################
 # INCLUDES

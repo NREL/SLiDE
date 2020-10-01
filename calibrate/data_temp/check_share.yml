@@ -8,19 +8,24 @@ Input:
   labor:  {name: labor_shr.csv,  col: [yr,r,s,value]}     # g -> s
   region: {name: region_shr.csv, col: [yr,r,s,value]}     # g -> s
   pce:    {name: pce_shr.csv,    col: [yr,r,s,value]}     # g -> s
-  # hw:     {name: hw.csv,         col: [r,g]}
-  # wg:     {name: wg.csv,         col: [yr,r,g]}
-  # netval: {name: netva.csv,      col: [yr,r,g,gdpcat,value]}
+  hw:     {name: hw.csv,         col: [r,s]}
+  wg:     {name: wg.csv,         col: [yr,r,s]}
+  netval: {name: netva.csv,      col: [yr,r,s,gdpcat,value]}
   # gsp:    {name: gsp0.csv,       col: [yr,r,s,gdpcat,value]}
-  # gspcat: {name: gspcat0.csv,    col: [yr,r,g,gdpcat,value]}
-  # lshr0:  {name: lshr0.csv,      col: [yr,g,value]}
-  # d0:     {name: d0.csv,         col: [r,g,value]}
-  # ng:     {name: ng.csv,         col: [g]}
-  # xn0:    {name: xn0.csv,        col: [r,g,value]}
-  # xn0:    {name: mn0.csv,        col: [r,g,value]}
-  # labor_temp:    {name: temp_labor_shr.csv, col: [yr,r,g,value]}
-  # avg_wg_shr:    {name: avgwgshr.csv,       col: [r,g,value]}
-  # sec_labor_shr: {name: seclaborshr.csv,    col: [yr,g,value]}
+  gspcat: {name: gspcat0.csv,    col: [yr,r,s,gdpcat,value]}
+  lshr0:  {name: lshr0.csv,      col: [yr,s,value]}
+  d0:     {name: d0.csv,         col: [r,g,value]}
+  ng:     {name: ng.csv,         col: [g]}
+  xn0:    {name: xn0.csv,        col: [r,g,value]}
+  mn0:    {name: mn0.csv,        col: [r,g,value]}
+  labor_temp: {name: temp_labor_shr.csv, col: [yr,r,s,value]}
+  avg_wg:    {name: avgwgshr.csv,       col: [r,s,value]}
+  sec_labor: {name: seclaborshr.csv,    col: [yr,s,value]}
+
+  mrt0:    {name: mrt0.csv,        col: [orig_state,dest_state,g,value]}
+  d0_temp:    {name: temp_d0.csv,        col: [r,g,value]}
+  mn0_temp:    {name: temp_mn0.csv,        col: [r,g,value]}
+  xn0_temp:    {name: temp_xn0.csv,        col: [r,g,value]}
   # sgf_raw:       {name: sgf_raw.csv,        col: [yr,r,ec,units,value]}
   # sgf_map:       {name: sgf_map.csv,        col: [yr,r,g,value]}
   # sgf_temp:      {name: temp_sgf_shr.csv,   col:  [yr,r,g,value]}
