@@ -8,8 +8,8 @@ Input:
   m0:      {name: m0.csv,      col: [yr,i,value]}
   md0:     {name: md0.csv,     col: [yr,m,i,value]}
   ms0:     {name: ms0.csv,     col: [yr,i,m,value]}
-  ta0:     {name: ta0.csv,     col: [yr,g,value]}     # i -> g
-  tm0:     {name: tm0.csv,     col: [yr,g,value]}     # i -> g
+  ta0:     {name: ta0.csv,     col: [yr,i,value]}     # i -> g
+  tm0:     {name: tm0.csv,     col: [yr,i,value]}     # i -> g
   va0:     {name: va0.csv,     col: [yr,va,j,value]}
   x0:      {name: x0.csv,      col: [yr,i,value]}
   y0:      {name: y0.csv,      col: [yr,i,value]}
