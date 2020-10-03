@@ -15,7 +15,6 @@ Order:
   - {col: t,     type: String}
 # - {col: units, type: String}
   - {col: value, type: Float64}
-  - {col: share, type: Float64}
 
 Add:
   col: share

@@ -204,6 +204,22 @@ ensuretuple(x::Any) = tuple(x)
 istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(dropmissing(df))), T)
 # eltype.(eachcol(df))
 
+function hasnames(df::DataFrame, cols::Array{Symbol,1})
+    col_in = setdiff(propertynames(df),cols)
+    col_out = setdiff(cols, propertynames(df))
+    return (length(col_in) == 0) && (length(col_out) == 0)
+end
+
+function ensurenames!(df::DataFrame, cols::Array{Symbol,1})
+    size(df,2) !== length(cols) && @error("Can only ensure column names of the data frame length")
+    col_in = setdiff(propertynames(df),cols)
+    col_out = setdiff(cols, propertynames(df))
+
+    df = edit_with(df, Rename.(col_in, col_out))
+    return df[:,cols]
+end
+ensurenames(df::DataFrame, cols::Array{Symbol,1}) = ensurenames!(copy(df), cols)
+
 """
     find_oftype(df::DataFrame, T::DataType)
     find_oftype(df::Dict, T::DataType)

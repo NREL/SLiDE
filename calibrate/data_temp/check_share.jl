@@ -21,20 +21,20 @@ println("  Reading share data...")
 bshr = read_to_check(joinpath(SLIDE_DIR,"calibrate","data_temp","check_share.yml"));
 set[:notrd] = bshr[:notrd][:,:s];
 
-# println("  Reading calibration data...")
-# bcal = read_to_check(joinpath(SLIDE_DIR,"calibrate","data_temp","check_cal.yml"));
-# if :va in propertynames(bcal[:va0])
-#     valcols = Symbol.(unique(bcal[:va0][:,:va]))
-#     bcal[:va0] = unstack(bcal[:va0], :va, :value)
-#     bcal[:va0] = edit_with(bcal[:va0], Replace.(valcols,missing,0.0))
-# end
+println("  Reading calibration data...")
+bcal = read_to_check(joinpath(SLIDE_DIR,"calibrate","data_temp","check_cal.yml"));
+if :va in propertynames(bcal[:va0])
+    valcols = Symbol.(unique(bcal[:va0][:,:va]))
+    bcal[:va0] = unstack(bcal[:va0], :va, :value)
+    bcal[:va0] = edit_with(bcal[:va0], Replace.(valcols,missing,0.0))
+end
 
-# println("  Read disaggregation intermediary data...")
-# bdisagg_int = read_to_check(joinpath(SLIDE_DIR,"calibrate","data_temp","check_disagg_int.yml"));
+println("  Read disaggregation intermediary data...")
+bdisagg_int = read_to_check(joinpath(SLIDE_DIR,"calibrate","data_temp","check_disagg_int.yml"));
 
-# println("  Read disaggregation output (this will take a minute)...")
-# bdisagg_out = read_to_check(joinpath(SLIDE_DIR,"calibrate","data_temp","check_disagg.yml"));
-# bdisagg = merge(bdisagg_int, bdisagg_out)
+println("  Read disaggregation output (this will take a minute)...")
+bdisagg_out = read_to_check(joinpath(SLIDE_DIR,"calibrate","data_temp","check_disagg.yml"));
+bdisagg = merge(bdisagg_int, bdisagg_out)
 
 # disagg_check = Dict(k => missing for k in keys(bdisagg))
 

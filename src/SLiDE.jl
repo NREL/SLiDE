@@ -76,6 +76,9 @@ export ensurearray
 export ensuretuple
 export permute
 export find_oftype
+export hasnames
+export ensurenames!
+export ensurenames
 
 export edit_with
 export fill_zero

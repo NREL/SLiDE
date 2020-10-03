@@ -126,7 +126,7 @@ end
     benchmark!(d_summ::Dict, k::Symbol, d_bench::Dict, d_calc::Dict;
 """
 function benchmark!(d_summ::Dict, k::Symbol, d_bench::Dict, d_calc::Dict;
-    tol = 1E-3, small = 1E-8)
+    tol = 1E-3, small = 1E-7)
 
     !(k in collect(keys(d_bench))) && return
 
