@@ -16,6 +16,3 @@ function share_pce!(d::Dict)
     verify_over(d[:pce],:r) !== true && @error("PCE shares don't sum to 1.")
     return d[:pce]
 end
-
-# share_pce!(d)
-# benchmark!(nshr_comp, :pce, bshr, d)

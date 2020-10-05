@@ -11,12 +11,12 @@ UNITS = "billions of us dollars (USD)"
 # ******************************************************************************************
 #   READ BLUENOTE DATA -- For benchmarking!
 # ******************************************************************************************
-BLUE2 = joinpath("data", "windc_output", "2z_build_windcdatabase")
+BLUE2 = joinpath("data", "windc_output", "2z_windcdatabase")
 b2_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE2)) if occursin(".csv", x)]
 # b2 = Dict(Symbol(k[1:end-4]) => sort(edit_with(
 #     read_file(joinpath(BLUE2, k))), Rename(:Val, :value))) for k in b2_lst)
 
-BLUE_DIR = joinpath("data", "windc_output", "2a_build_national_cgeparm_raw")
+BLUE_DIR = joinpath("data", "windc_output", "2a_io_national_cgeparm_raw")
 bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
 bluenote = Dict(Symbol(k[1:end-4]) => sort(edit_with(
     read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
@@ -33,9 +33,9 @@ BLUE_DIR_IN = joinpath("data", "windc_output", "1b_stream_windc_base")
 # ******************************************************************************************
 #   READ SETS AND SLiDE SUPPLY/USE DATA.
 # ******************************************************************************************
-y = read_file(joinpath("dev","buildstream","setlist.yml"));
-set = Dict(Symbol(k) => sort(read_file(joinpath(y["SetPath"]..., ensurearray(v)...)))[:,1]
-    for (k,v) in y["SetInput"])
+y = read_file(joinpath("data","readfiles","list_sets.yml"));
+set = Dict(Symbol(k) => sort(read_file(joinpath(y["Path"]..., ensurearray(v)...)))[:,1]
+    for (k,v) in y["Input"])
 
 # Read supply/use data.
 DATA_DIR = joinpath("data", "input")

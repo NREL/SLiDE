@@ -23,7 +23,7 @@ function share_rpc!(d::Dict, set::Dict)
     df = edit_with(df, Drop(:g,"uti","=="))
     df_uti = fill_with((r = set[:r], g = "uti"), 0.9)
 
-    d[:rpc] = sort([df; df_uti])
+    d[:rpc] = sort([dropnan(df); df_uti])
 end
 
 "`ng`: Sectors not included in the CFS."
@@ -96,14 +96,3 @@ function _avg_ng(df::DataFrame, d::Dict, set::Dict)
     df[df[:,:ng], :value] .= df[df[:,:ng], :value_ng]
     return df
 end
-
-# _share_rpc!(d, set)
-
-# benchmark!(nshr_comp, :d0_temp, bshr, d)
-# benchmark!(nshr_comp, :mn0_temp, bshr, d)
-# benchmark!(nshr_comp, :xn0_temp, bshr, d)
-# benchmark!(nshr_comp, :d0, bshr, d)
-# benchmark!(nshr_comp, :mn0, bshr, d)
-# benchmark!(nshr_comp, :xn0, bshr, d)
-# benchmark!(nshr_comp, :mrt0, bshr, d)
-# benchmark!(nshr_comp, :rpc, bshr, d)

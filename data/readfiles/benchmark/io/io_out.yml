@@ -1,7 +1,7 @@
 Path: [data, windc_output, 2a_io_national_cgeparm_raw]
 
 Input:
-  a0:      {name: a0.csv,      col: [yr,i,value]}
+  a0:      {name: a0.csv,      col: [yr,i,value]} 
   fd0:     {name: fd0.csv,     col: [yr,i,fd,value]}
   fs0:     {name: fs0.csv,     col: [yr,i,value]}
   id0:     {name: id0.csv,     col: [yr,i,j,value]}

@@ -22,9 +22,6 @@ function share_utd!(d::Dict, set::Dict)
     verify_over(filter_with(df, (t = "imports",)), :r) !== true && @error("Import shares don't sum to 1.")
     verify_over(filter_with(df, (t = "exports",)), :r) !== true && @error("Export shares don't sum to 1.")
     
-    d[:utd] = dropzero(df)
+    d[:utd] = dropnan(dropzero(df))
     set[:notrd] = setdiff(set[:s], d[:utd][:,:s])
 end
-
-# _share_utd!(d, set)
-# benchmark!(nshr_comp, :utd, bshr, d)

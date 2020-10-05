@@ -131,7 +131,7 @@ function benchmark!(d_summ::Dict, k::Symbol, d_bench::Dict, d_calc::Dict;
     !(k in collect(keys(d_bench))) && return
 
     df_calc = copy(d_calc[k])
-    df_bench = copy(d_bench[k])
+    df_bench = ensurenames(copy(d_bench[k]), propertynames(df_calc))
 
     # Remove very small numbers. These might be zero or missing in the other DataFrame,
     # and we're not splitting hairs here.

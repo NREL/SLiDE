@@ -42,7 +42,7 @@ function share_labor!(d::Dict, set::Dict)
     wg = .&(df[:,:wg], df[:,:avg_wg] .!== 0.0)
     df[wg,:value] .= df[wg,:avg_wg]
     df[df[:,:hw],:value] .= df[df[:,:hw],:sec_labor]
-    d[:labor] = df[:,cols]
+    d[:labor] = dropnan(df[:,cols])
     d[:labor_calc] = df
 end
 
@@ -66,7 +66,7 @@ function share_region!(d::Dict, set::Dict)
 
     df_s = crossjoin(DataFrame(s = set[:oth,:use]), df_s)
 
-    d[:region] = dropmissing(sort([df; df_s]))
+    d[:region] = dropnan(dropmissing(sort([df; df_s])))
     verify_over(d[:region],:r) !== true && @error("Regional shares don't sum to 1.")
     return d[:region]
 end
@@ -91,7 +91,7 @@ end
 "`lshr0`: Labor share of value added"
 function _share_lshr0!(d::Dict, set::Dict)
     va0 = edit_with(unstack(copy(d[:va0]), :va, :value),
-        [Rename(:j,:s); Replace.(Symbol.(set[:va]), missing, 0.0); Drop(:units,"all","==")])
+        [Replace.(Symbol.(set[:va]), missing, 0.0); Drop(:units,"all","==")])
     
     d[:lshr0]  = va0[:,[:yr,:s,:compen]]
     d[:lshr0] /= (va0[:,[:yr,:s,:compen]] + va0[:,[:yr,:s,:surplus]])
@@ -148,15 +148,3 @@ function _share_sec_labor!(d::Dict)
     d[:sec_labor] = combine_over(df, :r) / combine_over(not_wg, :r)
     return transform_over(df, :r) / transform_over(not_wg, :r)
 end
-
-# share_region!(d, set)
-# share_labor!(d, set)
-
-# benchmark!(nshr_comp, :lshr0, bshr, d)
-# benchmark!(nshr_comp, :region, bshr, d)
-# benchmark!(nshr_comp, :labor_temp, bshr, d)
-# benchmark!(nshr_comp, :sec_labor, bshr, d)
-# benchmark!(nshr_comp, :avg_wg, bshr, d)
-# benchmark!(nshr_comp, :labor, bshr, d)
-
-# # 

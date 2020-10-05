@@ -7,29 +7,13 @@ using Query
 using SLiDE
 
 READ_DIR = joinpath("data", "readfiles");
-# include("data_temp/check_share.jl")
 
-# bio[:ta0] = edit_with(bio[:ta0], Rename(:g,:i))
-# bio[:tm0] = edit_with(bio[:tm0], Rename(:g,:i))
-
-# bshr[:utd] = edit_with(bshr[:utd], Rename(:g,:s))
-# bshr[:pce] = edit_with(bshr[:pce], Rename(:s,:g))
-# bshr[:sgf] = edit_with(bshr[:sgf], Rename(:s,:g))
-
-include("io.jl")
-include("share_cfs.jl")
-include("share_gsp.jl")
-include("share_pce.jl")
-include("share_sgf.jl")
-include("share_utd.jl")
-
-# ******************************************************************************************
-#   READ SETS
-# ******************************************************************************************
-# Read sharing files and do some preliminary editing.
-y = read_file(joinpath("data", "readfiles", "list_sets.yml"));
-set = Dict((length(ensurearray(k)) == 1 ? Symbol(k) : Tuple(Symbol.(k))) =>
-sort(read_file(joinpath(y["Path"]..., ensurearray(v)...)))[:,1] for (k,v) in y["Input"])
+# include("io.jl")
+# include("share_cfs.jl")
+# include("share_gsp.jl")
+# include("share_pce.jl")
+# include("share_sgf.jl")
+# include("share_utd.jl")
 
 # ******************************************************************************************
 #   READ SUPPLY/USE DATA

@@ -1,46 +1,26 @@
 # SLiDE
 
-```@meta
-CurrentModule = SLiDE
-DocTestSetup  = quote
-    using SLiDE
-end
+## Build
+
+### Partition
+```@autodocs
+Modules = [SLiDE]
+Pages = ["build/partition.jl"]
 ```
 
-```@docs
-SLiDE
+### Share
+```@autodocs
+Modules = [SLiDE]
+Pages = [
+    "build/share_cfs.jl",
+    "build/share_gsp.jl",
+    "build/share_pce.jl",
+    "build/share_sgf.jl",
+    "build/share_utd.jl"]
 ```
 
-## DataStream
-
-### Types
-
-```@docs
-SLiDE.Add
-SLiDE.Drop
-SLiDE.Describe
-SLiDE.Group
-SLiDE.Map
-SLiDE.Match
-SLiDE.Melt
-SLiDE.Operate
-SLiDE.Order
-SLiDE.Rename
-SLiDE.Replace
-```
-
-```@docs
-SLiDE.CSVInput
-SLiDE.XLSXInput
-```
-
-### Functions
-
-```@docs
-SLiDE.edit_with
-SLiDE.load_from
-SLiDE.read_file
-SLiDE.write_yaml
-SLiDE.run_yaml
-SLiDE.gams_to_dataframe
+### Disaggregate
+```@autodocs
+Modules = [SLiDE]
+Pages = ["build/disagg.jl"]
 ```

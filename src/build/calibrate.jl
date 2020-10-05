@@ -4,26 +4,32 @@ using JuMP
 using DataFrames
 using Ipopt
 
-function national_calibration(d::Dict, set::Dict)
+function calibrate(d::Dict, set::Dict)
     # Copy the relevant input DataFrames before making any changes.
-    set[:cal] = [:y0,:ys0,:fs0,:id0,:fd0,:va0,:m0,:x0,:ms0,:md0,:a0,:ta0,:tm0];
+    set[:cal] = [:a0,:fd0,:fs0,:id0,:m0,:md0,:ms0,:ta0,:tm0,:va0,:x0,:y0,:ys0]
     d = Dict(k => copy(d[k]) for k in set[:cal])
     
     # Set all values to be at least zero for final demand and tax rates.
     [d[k][d[k][:,:value] .< 0, :value] .= 0 for k in [:fd0, :ta0, :tm0]]
 
     # Initialize a DataFrame to contain results.
-    io_cal = Dict(k => DataFrame() for k in setdiff(set[:cal], [:ta0,:tm0]))
+    # io_cal = Dict(k => DataFrame() for k in setdiff(set[:cal], [:ta0,:tm0]))
+    io_cal = Dict(k => DataFrame() for k in set[:cal])
 
     for year in set[:yr]
-        io_cal_temp = national_calibration(year, d, set)
+        io_cal_temp = calibrate(year, d, set)
         [io_cal[k] = [io_cal[k]; io_cal_temp[k]] for k in keys(io_cal)]
     end
     return io_cal
 end
 
-function national_calibration(year::Int, d::Dict, set::Dict)
-    
+function calibrate(year::Int, d::Dict, set::Dict)
+    println("  Calibrating $year data")
+
+    # Initialize resultant DataFrame.
+    io_cal = Dict(k => edit_with(filter_with(copy(d[k]), (yr = year,)),
+        Rename(:i,:g)) for k in [:ta0,:tm0])
+
     cal = Dict(k => convert_type(Dict, edit_with(filter_with(d[k],
         (yr = year,)), Drop.([:yr,:value], ["all", 0.0], "=="))) for k in set[:cal])
     cal[:tm0] = fill_zero((set[:i],), cal[:tm0])
@@ -157,12 +163,12 @@ function national_calibration(year::Int, d::Dict, set::Dict)
     # [fix(fd0_est[i,fd],cal[:fd0][i,fd],force=true) for i in set[:i] for fd in fd_temp if haskey(cal[:fd0],(i,fd))]
     # [fix(fd0_est[i,fd],0,force=true) for i in set[:i] for fd in fd_temp if !haskey(cal[:fd0],(i,fd))]
 
-    [fix(ys0_est[j,i], 0, force=true) for j in set[:oth_use] for i in set[:i]]
+    [fix(ys0_est[j,i], 0, force=true) for j in set[:oth,:use] for i in set[:i]]
 
     JuMP.optimize!(calib)
 
     # Populate resultant Dictionary.
-    io_cal = Dict()
+    # io_cal = Dict()
     
     # Using original (i,j) notation...
     # io_cal[:ys0] = convert_type(DataFrame, ys0_est; cols=[:j,:i])
@@ -194,13 +200,3 @@ function national_calibration(year::Int, d::Dict, set::Dict)
         for (k, df) in io_cal]
     return io_cal
 end
-
-# READ BLUENOTE DATA FOR BENCHMARKING.
-# BLUE_DIR = joinpath("data", "windc_output", "2b_build_nationaldata")
-# bluenote_lst = [x for x in readdir(joinpath(SLIDE_DIR, BLUE_DIR)) if occursin(".csv", x)]
-# bcal = Dict(Symbol(k[1:end-4]) => sort(edit_with(
-#     read_file(joinpath(BLUE_DIR, k)), Rename(:Val, :value))) for k in bluenote_lst)
-
-io[:fd0][ .&(io[:fd0][:,:fd] .== "pce", io[:fd0][:,:value] .< 0), :value] .= 0
-
-cal = national_calibration(io, set);

@@ -20,6 +20,7 @@ end
     _partition_io!(d::Dict, set::Dict)
 """
 function _partition_io!(d::Dict, set::Dict)
+    println("  Partitioning id0 and ys0, supply/demand data.")
     d[:id0] = filter_with(d[:use], set)
     d[:ys0] = filter_with(d[:supply], set)
 
@@ -38,6 +39,7 @@ end
 `a0`: Armington supply
 """
 function _partition_a0!(d::Dict, set::Dict)
+    println("  Partitioning a0, Armington supply")
     d[:a0] = combine_over(d[:fd0], :fd) + combine_over(d[:id0], :j)
     d[:a0] = _remove_imrg(d[:a0], :i => set[:imrg])
 end
@@ -47,6 +49,7 @@ end
 `bopdef0`: Balance of payments deficit
 """
 function _partition_bopdef0!(d::Dict, set::Dict)
+    println("  Partitioning bopdef0, balance of payments deficit")
     d[:bopdef] = fill_zero((yr = set[:yr], ))
 end
 
@@ -55,6 +58,7 @@ end
 `cif0`: CIF/FOB Adjustments on Imports
 """
 function _partition_cif0!(d::Dict, set::Dict)
+    println("  Partitioning CIF/FOB adjustments on imports")
     d[:cif0] = filter_with(d[:supply], (i = set[:i], j = "ciffob"))[:,[:yr,:i,:value]]
 end
 
@@ -63,6 +67,7 @@ end
 `duty0`: Import duties
 """
 function _partition_duty0!(d::Dict, set::Dict)
+    println("  Partitioning duty0, import duties")
     d[:duty0] = filter_with(d[:supply], (i = set[:i], j = "duties"))[:,[:yr,:i,:value]]
     d[:duty0] = _remove_imrg(d[:duty0], :i => set[:imrg])
 end
@@ -72,6 +77,7 @@ end
 `fd0`: Final demand
 """
 function _partition_fd0!(d::Dict, set::Dict)
+    println("  Partitioning fd0, final demand")
     d[:fd0] = filter_with(d[:use], (i = set[:i],  j = set[:fd]))
     d[:fd0] = edit_with(d[:fd0], Rename(:j, :fd))
 end
@@ -83,6 +89,7 @@ Move household supply of recycled goods into the domestic output market,
 from which some may be exported.
 """
 function _partition_fs0!(d::Dict)
+    println("  Partitioning fs0, household supply")
     d[:fs0] = filter_with(d[:fd0], (fd = "pce",))[:,[:yr,:i,:value]]
     d[:fs0][!,:value] .= - min.(d[:fs0][:,:value], 0)
 end
@@ -109,6 +116,7 @@ end
 `m0`: Imports
 """
 function _partition_m0!(d::Dict, set::Dict)
+    println("  Partitioning m0, imports")
     d[:m0]  = filter_with(d[:supply], (i = set[:i], j = "imports"))[:,[:yr,:i,:value]]
 
     # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
@@ -122,6 +130,7 @@ end
 `md0`: Margin demand
 """
 function _partition_md0!(d::Dict, set::Dict)
+    println("  Partitioning md0, margin demand")
     d[:md0] = [edit_with(d[:mrg0], Add(:m, "trd")); edit_with(d[:trn0], Add(:m, "trn"))]
     d[:md0] = sort(d[:md0][:,[:yr,:i,:m,:value]])
     d[:md0] = _remove_imrg(d[:md0], :i => set[:imrg])
@@ -134,6 +143,7 @@ end
 `ms0`: Margin supply
 """
 function _partition_ms0!(d::Dict)
+    println("  Partitioning ms0, margin supply")
     d[:ms0] = [edit_with(d[:mrg0], Add(:m, "trd")); edit_with(d[:trn0], Add(:m, "trn"))]
     d[:ms0] = sort(d[:ms0][:,[:yr,:i,:m,:value]])
 
@@ -145,6 +155,7 @@ end
 `mrg0`: Trade margins
 """
 function _partition_mrg0!(d::Dict, set::Dict)
+    println("  Partitioning mrg0, trade margins")
     d[:mrg0] = filter_with(d[:supply], (i = set[:i], j = "margins"))[:,[:yr,:i,:value]]
 end
 
@@ -153,6 +164,7 @@ end
 `s0`: Aggregate supply
 """
 function _partition_s0!(d::Dict)
+    println("  Partitioning s0, aggregate supply")
     d[:s0] = combine_over(d[:ys0], :i)
 end
 
@@ -161,6 +173,7 @@ end
 `sbd0`: Subsidies on products
 """
 function _partition_sbd0!(d::Dict, set::Dict)
+    println("  Partitioning sbd0, subsidies on products")
     d[:sbd0] = filter_with(d[:supply], (i = set[:i], j = "subsidies"))[:,[:yr,:i,:value]]
     d[:sbd0] = _remove_imrg(d[:sbd0], :i => set[:imrg])
     d[:sbd0][!,:value] *= -1
@@ -171,6 +184,7 @@ end
 `ta0`: Import tariff
 """
 function _partition_ta0!(d::Dict)
+    println("  Partitioning ta0, import tariffs")
     d[:ta0] = dropnan((d[:tax0] - d[:sbd0]) / d[:a0])
     # d[:ta0] = edit_with(d[:ta0], Drop(:units,"all","=="))
 end
@@ -180,6 +194,7 @@ end
 `tax0`: Taxes on products
 """
 function _partition_tax0!(d::Dict, set::Dict)
+    println("  Partitioning tax0, taxes on products")
     d[:tax0] = filter_with(d[:supply], (i = set[:i], j = "tax"))[:,[:yr,:i,:value]]
     d[:tax0] = _remove_imrg(d[:tax0], :i => set[:imrg])
 end
@@ -189,6 +204,7 @@ end
 `tm0`: Tax net subsidy rate on intermediate demand
 """
 function _partition_tm0!(d::Dict)
+    println("  Partitioning tm0, tax net subsidy rate on intermediate demand")
     d[:tm0] = dropnan(d[:duty0] / d[:m0])
     # d[:tm0] = edit_with(d[:tm0], Drop(:units,"all","=="))
 end
@@ -198,6 +214,7 @@ end
 `trn0`: Transportation costs
 """
 function _partition_trn0!(d::Dict, set::Dict)
+    println("  Partitioning trn0, transportation costs")
     d[:trn0]  = filter_with(d[:supply], (i = set[:i], j = "trncost"))[:,[:yr,:i,:value]]
 
     # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
@@ -210,6 +227,7 @@ end
 `ts0`: Taxes and subsidies
 """
 function _partition_ts0!(d::Dict, set::Dict)
+    println("  Partitioning ts0, taxes and subsidies")
     d[:ts0] = filter_with(d[:use], (i = set[:ts], j = set[:j]))
     d[:ts0][d[:ts0][:,:i] .== "subsidies", :value] *= -1  # treat negative inputs as outputs    return d
 end
@@ -219,6 +237,7 @@ end
 `va0`: Value added
 """
 function _partition_va0!(d::Dict, set::Dict)
+    println("  Partitioning va0, value added")
     d[:va0] = filter_with(d[:use], (i = set[:va], j = set[:j]))
     d[:va0] = edit_with(d[:va0], Rename(:i, :va))
 end
@@ -228,6 +247,7 @@ end
 `x0`: Exports of goods and services
 """
 function _partition_x0!(d::Dict, set::Dict)
+    println("  Partitioning x0, exports of goods and services")
     d[:x0] = filter_with(d[:use], (i = set[:i], j = "exports"))[:,[:yr,:i,:value]]
     d[:x0] = _remove_imrg(d[:x0], :i => set[:imrg])
 end
@@ -237,6 +257,7 @@ end
 `y0`: Gross output
 """
 function _partition_y0!(d::Dict, set::Dict)
+    println("  Partitioning y0, gross output")
     d[:y0] = combine_over(d[:ys0], :j) + d[:fs0] - combine_over(d[:ms0], :m)
     d[:y0] = _remove_imrg(d[:y0], :i => set[:imrg])
 end
@@ -245,6 +266,7 @@ end
     partition!(d::Dict, set::Dict)
 """
 function partition!(d::Dict, set::Dict)
+
     [d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), [Drop(:units,"all","==")])
         for k in [:supply, :use]]
 
@@ -275,17 +297,5 @@ function partition!(d::Dict, set::Dict)
     _partition_tm0!(d)       # duty0, m0
 
     # _partition_lshr0!(d, set) # va0
-    return d
+    return (d, set)
 end
-
-# # ******************************************************************************************
-# println("  Reading sets...")
-# y = read_file(joinpath("data", "readfiles", "list_sets.yml"));
-# # set = Dict(Symbol(k) => sort(read_file(joinpath(y["Path"]..., ensurearray(v)...)))[:,1]
-# #     for (k,v) in y["Input"])
-# set = Dict((length(ensurearray(k)) == 1 ? Symbol(k) : Tuple(Symbol.(k))) =>
-#     sort(read_file(joinpath(y["Path"]..., ensurearray(v)...)))[:,1] for (k,v) in y["Input"])
-
-
-
-# partition!(nio, set)

@@ -26,6 +26,7 @@ Interest on debt,Total Expenditure - Direct Expenditure - Interest on Debt,INTRS
 Exhibit: Salaries and wages,Total Expenditure - Exhibit: Salaries and Wages,SALARY,thousands of us dollars (USD)
 Total expenditure,Total Expenditure,TOTEXP,thousands of us dollars (USD)
 General expenditure,Total Expenditure - General Expenditure,GENEXP,thousands of us dollars (USD)
+Direct expenditure,Total Expenditure - General Expenditure - Direct General Expenditure,DIRGEX,thousands of us dollars (USD)
 "General expenditure, by function:","General Expenditure, by Function:",,thousands of us dollars (USD)
 Education,"General Expenditure, by Function: - Education",EDUCAT,thousands of us dollars (USD)
 Public welfare,"General Expenditure, by Function: - Public Welfare",PUBWEL,thousands of us dollars (USD)
@@ -50,6 +51,7 @@ Cash and security holdings,Cash and Security Holdings,CASHSH,thousands of us dol
 "Population (thousands, July 1, 1999)",Population,,thousand
 "Personal income (millions, calendar year 1998)",Personal income,,millions of us dollars (USD)
 Liquor store revenue,Total Revenue - Liquor Stores Revenue,LIQREV,thousands of us dollars (USD)
+Intergovernmental expenditure,Total Expenditure - General Expenditure - Intergovernmental General Expenditure,,thousands of us dollars (USD)
 "General expenditures, by function","General Expenditure, by Function:",,thousands of us dollars (USD)
 Government administration,"General Expenditure, by Function: - Governmental Administration",GOVADM,thousands of us dollars (USD)
 Liquor store expenditure,Liquor Stores Expenditure,LIQEXP,thousands of us dollars (USD)

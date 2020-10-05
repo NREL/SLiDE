@@ -212,10 +212,10 @@ end
 
 function ensurenames!(df::DataFrame, cols::Array{Symbol,1})
     size(df,2) !== length(cols) && @error("Can only ensure column names of the data frame length")
-    col_in = setdiff(propertynames(df),cols)
-    col_out = setdiff(cols, propertynames(df))
+    cols_in = setdiff(propertynames(df),cols)
+    cols_out = setdiff(cols, propertynames(df))
 
-    df = edit_with(df, Rename.(col_in, col_out))
+    [rename!(df, col_in => col_out) for (col_in,col_out) in zip(cols_in,cols_out)]
     return df[:,cols]
 end
 ensurenames(df::DataFrame, cols::Array{Symbol,1}) = ensurenames!(copy(df), cols)
