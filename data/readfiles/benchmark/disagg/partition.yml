@@ -1,5 +1,0 @@
-Path: [data, windc_output, 2a_io_national_cgeparm_raw]
-
-Input:
-  ta0: {name: ta0.csv, col: [yr,g,value]}
-  tm0: {name: tm0.csv, col: [yr,g,value]}
