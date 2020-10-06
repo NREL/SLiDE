@@ -21,9 +21,10 @@ makedocs(clean = true,
         "Home" => "index.md",
         "Data" => Any[
             "blueNOTE Data Set" => "lib/data.md",
-            "Data Stream" => "lib/datastream.md",
+            # "Data Stream" => "lib/datastream.md",
             "Build Stream" => "lib/buildstream.md",
-            "Scaling" => "lib/scaling.md"
+            "Scaling" => "lib/scaling.md",
+            "Parameters" => "lib/parameters.md"
         ],
         "Model" => "api/model.md",
         "Functions" => "SLiDE.md"

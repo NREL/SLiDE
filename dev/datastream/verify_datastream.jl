@@ -12,8 +12,8 @@ This function is specific to the verify_datastream.jl file. It makes input DataF
 uniform (same columns; should add support to standardize types)
 """
 function make_uniform(df::DataFrame, cols::Array{Symbol,1})
-    if size(names(df)) == size(cols) && (length(setdiff(cols, names(df))) > 0)
-        df = edit_with(df, Rename.(names(df), cols))[:,cols]
+    if size(propertynames(df)) == size(cols) && (length(setdiff(cols, propertynames(df))) > 0)
+        df = edit_with(df, Rename.(propertynames(df), cols))[:,cols]
     end
     df = df[:,cols]
 
@@ -23,7 +23,7 @@ function make_uniform(df::DataFrame, cols::Array{Symbol,1})
     df[!,:value] .= convert_type.(Float64, df[:,:value])
 
     df = edit_with(df, Drop(:value, 0.0, "=="));
-    return unique(sort(df, names(df)[1:end-1]));
+    return unique(sort(df, propertynames(df)[1:end-1]));
 end
 
 # ******************************************************************************************
@@ -33,7 +33,7 @@ end
 #     auto_standardize_data.
 # - path_bluenote is specific to where Caroline stored WiNDC windc_datastream output.
 #     This line must be changed to be consistent with user-specific file storage organizations.
-path_slide = joinpath("data","output")
+path_slide = joinpath("data", "input")
 path_bluenote = joinpath("data","windc_output","1b_stream_windc_base")
 
 y = read_file(joinpath("dev", "verify_datastream.yml"));
