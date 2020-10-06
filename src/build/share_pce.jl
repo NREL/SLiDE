@@ -4,8 +4,6 @@ using DelimitedFiles
 using YAML
 using Query
 
-using SLiDE
-
 """
     share_pce!(d::Dict)
 `pce`: Regional shares of final consumption

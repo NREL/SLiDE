@@ -4,8 +4,6 @@ using DelimitedFiles
 using YAML
 using Query
 
-using SLiDE
-
 """
     share_utd!(d::Dict, set::Dict)
 `utd`: Share of total trade by region.

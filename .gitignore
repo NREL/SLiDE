@@ -69,9 +69,6 @@ Manifest.toml
 
 model/data_temp/*.csv
 
-src/parse/generated_check/
-src/parse/generated_edit/
-src/parse/generated_load/
 src/parse/scratch/
 src/parse/utils/generate_structs.jl
 
