@@ -1,7 +1,7 @@
 """
 Generate structures using the `generate_structs()` function from InfrastructureSystems.
 """
-
+# SRC_DIR = abspath(dirname(Base.find_package("SLiDE")))
 SRC_DIR = joinpath(SLIDE_DIR, "src")
 
 descriptor_file = joinpath(SRC_DIR, "descriptors", "check_data_structs.json")

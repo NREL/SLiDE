@@ -22,7 +22,7 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
     - [`SLiDE.Melt`](@ref): Normalize the dataframe by 'melting' columns into rows, 
         lengthening the dataframe by duplicating values in the column `on` into new rows and
         defining 2 new columns:
-        1. `var` with header propertynames from the original dataframe.
+        1. `var` with header names from the original dataframe.
         2. `val` with column values from the original dataframe.
     - [`SLiDE.Add`](@ref): Add new column `col` filled with `val`.
     - [`SLiDE.Map`](@ref): Define an `output` column containing values based on those in an
@@ -41,7 +41,7 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 - `files::Array{T} where T <: File`: List of data files.
 - `y::Dict{Any,Any}`: Dictionary containing all editing structures among other values read
     from the yaml file. Dictionary keys must correspond EXACTLY with SLiDE.Edit DataType
-    propertynames, or the edits will not be made.
+    names, or the edits will not be made.
 
 # Keywords
 - `shorten::Bool = false` or `shorten::Int`: if an integer length is specified, the
@@ -330,7 +330,7 @@ function edit_with(files::Array{T}, y::Dict{Any,Any}; shorten = false) where T<:
 end
 
 function edit_with(y::Dict{Any,Any}; shorten = false)
-    # Find all dictionary keys corresponding to file propertynames and save these in a list.
+    # Find all dictionary keys corresponding to file names and save these in a list.
     file = convert_type(Array, find_oftype(y, File))
     df = edit_with(file, y; shorten = shorten)
     # return _sort_datastream(df)

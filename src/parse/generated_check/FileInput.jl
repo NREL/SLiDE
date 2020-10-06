@@ -29,6 +29,7 @@ function FileInput(; f1, f2, colnames, )
     FileInput(f1, f2, colnames, )
 end
 
+<<<<<<< HEAD
 """Get [`FileInput`](@ref) `f1`."""
 get_f1(value::FileInput) = value.f1
 """Get [`FileInput`](@ref) `f2`."""
@@ -42,3 +43,11 @@ set_f1!(value::FileInput, val) = value.f1 = val
 set_f2!(value::FileInput, val) = value.f2 = val
 """Set [`FileInput`](@ref) `colnames`."""
 set_colnames!(value::FileInput, val) = value.colnames = val
+=======
+"""Get FileInput f1."""
+get_f1(value::FileInput) = value.f1
+"""Get FileInput f2."""
+get_f2(value::FileInput) = value.f2
+"""Get FileInput colnames."""
+get_colnames(value::FileInput) = value.colnames
+>>>>>>> dev

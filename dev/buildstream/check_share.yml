@@ -1,0 +1,24 @@
+SharePath: [data, windc_output, 2c_shares]
+
+ShareInput:
+  rpc:
+    name: rpc.csv
+    col:  [yr, g, value]
+  utd:
+    name: usatrd_shr.csv
+    col:  [yr,r,s,t,value]
+  sgf:
+    name: sgf_shr.csv
+    col:  [yr,r,g,value]
+  notinc:
+    name: notinc.csv
+    col:  [s]
+  labor:
+    name: labor_shr.csv
+    col:  [yr,r,g,value]
+  region:
+    name: region_shr.csv
+    col:  [yr,r,g,value]
+  pce:
+    name: pce_shr.csv
+    col:  [yr,r,g,value]

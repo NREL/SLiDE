@@ -34,14 +34,13 @@ the `data/coremaps` directory. It returns a .csv file.
 function read_file(path::Array{String,1}, file::GAMSInput; shorten = false)
     filepath = joinpath(SLIDE_DIR, path..., file.name)
     xf = readlines(filepath)
-    df = gams_to_dataframe(xf; colpropertynames = file.col)
+    df = gams_to_dataframe(xf; colnames = file.col)
     return df
 end
 
 function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
     filepath = joinpath(SLIDE_DIR, path..., file.name)
-    df = CSV.read(filepath, DataFrame; silencewarnings = true, ignoreemptylines = true, comment = "#",
-        missingstrings = ["","\xc9","..."])
+    df = CSV.read(filepath, DataFrame; silencewarnings = true, ignoreemptylines = true, comment = "#", missingstrings = ["","\xc9","..."])
     NUMTEST = min(10, size(df,1))
 
     # A column name containing the word "Column" indicates that the input csv file was
@@ -97,11 +96,11 @@ function read_file(editor::T) where T <: Edit
     return df
 end
 
-function read_file(file::String; colpropertynames = false)
+function read_file(file::String; colnames = false)
     file = joinpath(SLIDE_DIR, file)
 
     if occursin(".map", file) | occursin(".set", file)
-        return gams_to_dataframe(readlines(file); colpropertynames = colpropertynames)
+        return gams_to_dataframe(readlines(file); colnames = colnames)
     end
 
     if occursin(".yml", file) | occursin(".yaml", file)
@@ -127,7 +126,7 @@ Load a DataFrame `df` into a structure of type T.
 
 !!! note
 
-    This requires that all structure fieldnames are also DataFrame column propertynames.
+    This requires that all structure fieldnames are also DataFrame column names.
     Extra dataframe columns are acceptable, although that information will not be used.
 
 # Arguments
