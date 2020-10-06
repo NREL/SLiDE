@@ -1,5 +1,6 @@
 using DataFrames
 using Dates
+using Base
 
 """
     function datatype(str::String)
@@ -76,89 +77,7 @@ Base.occursin(x::Symbol, y::Symbol) = occursin(string(x), y)
 Base.occursin(x::String, y::Symbol) = occursin(x, string(y))
 
 """
-    Base.titlecase(x::Symbol)
-Extends `titlecase` to handle other data types.
 """
-Base.titlecase(x::Int) = x
-Base.titlecase(x::Symbol) = Symbol(titlecase(string(x)))
-Base.titlecase(x::Missing) = missing
-
-"""
-    Base.uppercase(x::Symbol)
-Extends `uppercase` to handle other data types.
-"""
-Base.uppercase(x::Int) = x
-Base.uppercase(x::Symbol) = Symbol(uppercase(string(x)))
-Base.uppercase(x::Missing) = missing
-
-"""
-    Base.uppercasefirst(x::Symbol)
-Extends `uppercasefirst` to handle other data types.
-"""
-Base.uppercasefirst(x::Int) = x
-Base.uppercasefirst(x::Symbol) = Symbol(uppercasefirst(string(x)))
-Base.uppercasefirst(x::Missing) = missing
-
-"""
-    Base.occursin(x::Symbol, y::Symbol)
-    Base.occursin(x::String, y::Symbol)
-Extends `occursin` to work for symbols. Potentially helpful for DataFrame columns.
-"""
-Base.occursin(x::Symbol, y::Symbol) = occursin(string(x), y)
-Base.occursin(x::String, y::Symbol) = occursin(x, string(y))
-
-"""
-    convert_type(::Type{T}, x::Any)
-    convert_type(::Dict{Any,Any}, df::DataFrame, value_col::Symbol; kwargs...)
-Converts `x` into the specified `Type{T}`.
-
-Consider extending [convert](https://docs.julialang.org/en/v1/base/base/#Base.convert)
-function (!!!!)
-
-# Arguments
-- `::Type{T}`: target DataType.
-- `x<:Any`: value to convert.
-
-# Keyword Arguments
-Options available when converting a DataFrame into a dictionary of keys pointing to a value:
-- `drop_cols = []`: Columns not to include in
-    the keys. By default, no columns are dropped.
-- `value_col::Symbol = :end`: If converting
-
-# Returns
-Data in specified type
-"""
-convert_type(::Type{T}, x::Any) where T<:AbstractString = string(x)
-convert_type(::Type{T}, x::Date) where T<:Integer = Dates.year(x)
-
-convert_type(::Type{Map}, x::Group) = Map(x.file, [x.from], x.to, [x.input], x.output, :inner)
-
-convert_type(::Type{T}, x::AbstractString) where T<:AbstractString = string(strip(x))
-
-function convert_type(::Type{T}, x::AbstractString) where T<:Integer
-    return convert_type(T, convert_type(Float64, x))
-end
-
-function convert_type(::Type{T}, x::AbstractString) where T<:Real
-    return parse(T, reduce(replace, ["," => "", "\"" => ""], init = x))
-end
-
-convert_type(::Type{T}, x::Symbol) where T<:Real = convert_type(T, convert_type(String, x))
-
-convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1}) = [DataFrame.(lst)...;]
-
-function convert_type(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :Float)
-    # Find and save the column containing values and that/those containing keys.
-    # If no value column indicator is specified, find the first DataFrame column of floats.
-    value_col == :Float && (value_col = find_oftype(df, AbstractFloat)[1])
-    key_cols = setdiff(names(df), convert_type.(Symbol, ensurearray(drop_cols)), [value_col])
-    ONEKEY = length(key_cols) == 1
-
-    d = Dict((ONEKEY ? row[key_cols[1]] : (row[key_cols]...,)) => row[value_col]
-        for row in eachrow(df))
-    return d
-end
-
 function dropvalue!(df::DataFrame, x::Float64)
     cols = find_oftype(df, typeof(x));
     if isnan(x); [filter!(row -> .!isnan.(row[col]), df) for col in cols]
@@ -282,7 +201,9 @@ Returns `x` in a tuple.
 """
 ensuretuple(x::Tuple{Vararg{Any}}) = x
 ensuretuple(x::Any) = tuple(x)
-         
+
+"""
+"""
 istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(dropmissing(df))), T)
 # eltype.(eachcol(df))
 

@@ -16,6 +16,7 @@ calibrate/old_io.jl
 calibrate/old_share.jl
 calibrate/scratch.jl
 
+data/
 data/output_example/
 data/Edit.jl
 data/scratch*.jl
@@ -69,9 +70,9 @@ Manifest.toml
 
 model/data_temp/*.csv
 
-src/parse/generated_check/
-src/parse/generated_edit/
-src/parse/generated_load/
+# src/parse/generated_check/
+# src/parse/generated_edit/
+# src/parse/generated_load/
 src/parse/scratch/
 src/parse/utils/generate_structs.jl
 

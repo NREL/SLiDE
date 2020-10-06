@@ -151,14 +151,14 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
     # DataFrame are used since all values in each column should be of the same type.
     for (col, col_map) in zip(x.input, temp_from)
         try
-            new_type = eltypes(dropmissing(df_map[:,[col_map]]))
-            # new_type = eltype.(eachcol(dropmissing(df_map[:,[col_map]])))
+            # new_type =  eltypes(dropmissing(df_map[:,[col_map]]))
+            new_type = eltype.(eachcol(dropmissing(df_map[:,[col_map]])))
             df[!,col] .= convert_type.(new_type, df[:,col])
         catch
             df_map[!,col_map] .= convert_type.(String, df_map[:,col_map])
         end
     end
-
+    
     join_cols = Pair.(x.input, temp_from)
     
     x.kind == :inner && (df = innerjoin(df, df_map, on = join_cols; makeunique = true))

@@ -4,7 +4,54 @@ using DelimitedFiles
 using YAML
 using Query
 
-using SLiDE
+
+"""
+    partition!(d::Dict, set::Dict; kwargs...)
+"""
+function partition!(d::Dict, set::Dict; save = true, overwrite = false)
+
+    d_read = read_build("partition"; save = save, overwrite = overwrite);
+    if !isempty(d_read)
+        [d[k] = v for (k,v) in d_read]
+        return d
+    end
+
+    [d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), [Drop(:units,"all","==")])
+        for k in [:supply, :use]]
+
+    _partition_io!(d, set)
+    _partition_fd0!(d, set)
+    _partition_ts0!(d, set)
+    _partition_va0!(d, set)
+    _partition_x0!(d, set)
+
+    _partition_cif0!(d, set)
+    _partition_duty0!(d, set)
+    _partition_mrg0!(d, set)
+    _partition_sbd0!(d, set)
+    _partition_tax0!(d, set)
+
+    _partition_m0!(d, set)   # cif0
+    _partition_trn0!(d, set) # cif0
+
+    _partition_fs0!(d)       # fd0
+    _partition_s0!(d)        # ys0
+    _partition_md0!(d, set)  # mrg0, trn0
+    _partition_ms0!(d)       # mrg0, trn0
+
+    _partition_y0!(d, set)   # ms0, fs0, ys0
+    _partition_a0!(d, set)   # fd0, id0
+
+    _partition_ta0!(d)       # a0, sbd0, tax0
+    _partition_tm0!(d)       # duty0, m0
+
+    # _partition_lshr0!(d, set) # va0
+
+    d_save = delete!(delete!(copy(d), :supply), :use)
+    write_build("partition", d_save; save = save)
+
+    return d
+end
 
 """
     _remove_imrg(df::DataFrame, x::Pair{Symbol,Array{String,1}})
@@ -260,42 +307,4 @@ function _partition_y0!(d::Dict, set::Dict)
     println("  Partitioning y0, gross output")
     d[:y0] = combine_over(d[:ys0], :j) + d[:fs0] - combine_over(d[:ms0], :m)
     d[:y0] = _remove_imrg(d[:y0], :i => set[:imrg])
-end
-
-"""
-    partition!(d::Dict, set::Dict)
-"""
-function partition!(d::Dict, set::Dict)
-
-    [d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), [Drop(:units,"all","==")])
-        for k in [:supply, :use]]
-
-    _partition_io!(d, set)
-    _partition_fd0!(d, set)
-    _partition_ts0!(d, set)
-    _partition_va0!(d, set)
-    _partition_x0!(d, set)
-
-    _partition_cif0!(d, set)
-    _partition_duty0!(d, set)
-    _partition_mrg0!(d, set)
-    _partition_sbd0!(d, set)
-    _partition_tax0!(d, set)
-
-    _partition_m0!(d, set)   # cif0
-    _partition_trn0!(d, set) # cif0
-
-    _partition_fs0!(d)       # fd0
-    _partition_s0!(d)        # ys0
-    _partition_md0!(d, set)  # mrg0, trn0
-    _partition_ms0!(d)       # mrg0, trn0
-
-    _partition_y0!(d, set)   # ms0, fs0, ys0
-    _partition_a0!(d, set)   # fd0, id0
-
-    _partition_ta0!(d)       # a0, sbd0, tax0
-    _partition_tm0!(d)       # duty0, m0
-
-    # _partition_lshr0!(d, set) # va0
-    return (d, set)
 end

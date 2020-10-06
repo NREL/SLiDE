@@ -111,6 +111,7 @@ export benchmark!
 export build_data
 export partition!
 export calibrate
+export share!
 export share_labor!
 export share_pce!
 export share_region!
@@ -154,6 +155,8 @@ include(joinpath("parse", "check_data.jl"))
 include(joinpath("build","build.jl"))
 include(joinpath("build","partition.jl"))
 include(joinpath("build","calibrate.jl"))
+
+include(joinpath("build","share.jl"))
 include(joinpath("build","share_cfs.jl"))
 include(joinpath("build","share_gsp.jl"))
 include(joinpath("build","share_pce.jl"))
