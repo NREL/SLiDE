@@ -26,3 +26,7 @@ This must be downloaded from the WiNDC Data Stream [datasources.zip](https://win
     * State Energy Data System ([SEDS](https://www.eia.gov/state/seds))
 
 **`readfiles`** contains a file for each output file produced by the datastream.
+
+# Accessing Original Data Files
+
+## 

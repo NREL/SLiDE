@@ -9,8 +9,11 @@ import CSV
 import DataFrames
 import Dates
 import DelimitedFiles
+import Ipopt
 import JSON
+import JuMP
 import Logging
+import PowerSimulations
 import Printf
 import Query
 # import Revise
@@ -31,7 +34,7 @@ const IS = InfrastructureSystems
 const SLIDE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), ".."))
 export SLIDE_DIR
 
-include(joinpath("utils", "generate_structs.jl"))
+# include(joinpath("utils", "generate_structs.jl"))
 
 # EXPORTS
 export Add
@@ -59,28 +62,63 @@ export Check
 export Edit
 export File
 
+# UTILITIES
 export convert_type
 export datatype
+export dropnan!
+export dropnan
+export dropzero!
+export dropzero
+export dropvalue!
+export dropvalue
+export ensurearray
+export ensurenames!
+export ensurenames
+export ensuretuple
+export find_oftype
+export hasnames
 export isarray
 export istype
-export ensurearray
 export permute
-export find_oftype
 
+# EDIT
 export edit_with
 export fill_zero
-export read_file
-export load_from
+export fill_with
+export extrapolate_region
+export extrapolate_year
+export filter_with
 export gams_to_dataframe
 
-export sum_over
+# CALCULATE
+export combine_over
+export transform_over
 
+# READ
+export read_file
+export load_from
 export write_yaml
 export run_yaml
 
+# CHECK
 export compare_summary
 export compare_keys
 export compare_values
+export verify_over
+export benchmark!
+
+# BUILD
+export build_data
+export partition!
+export calibrate
+export share!
+export share_labor!
+export share_pce!
+export share_region!
+export share_rpc!
+export share_sgf!
+export share_utd!
+export disagg!
 
 #################################################################################
 # INCLUDES
@@ -113,6 +151,18 @@ include(joinpath("utils", "calc.jl"))
 include(joinpath("parse", "load_data.jl"))
 include(joinpath("parse", "edit_data.jl"))
 include(joinpath("parse", "check_data.jl"))
+
+include(joinpath("build","build.jl"))
+include(joinpath("build","partition.jl"))
+include(joinpath("build","calibrate.jl"))
+
+include(joinpath("build","share.jl"))
+include(joinpath("build","share_cfs.jl"))
+include(joinpath("build","share_gsp.jl"))
+include(joinpath("build","share_pce.jl"))
+include(joinpath("build","share_sgf.jl"))
+include(joinpath("build","share_utd.jl"))
+include(joinpath("build","disagg.jl"))
 
 function __init__()
     # See: http://pages.cs.wisc.edu/~ferris/path/LICENSE
