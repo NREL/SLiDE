@@ -4,8 +4,6 @@ using DelimitedFiles
 using YAML
 using Query
 
-using SLiDE
-
 """
     share_rpc!(d::Dict, set::Dict)
 """

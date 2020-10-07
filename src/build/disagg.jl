@@ -3,14 +3,18 @@ using DataFrames
 using DelimitedFiles
 using YAML
 using Query
-
-using SLiDE
 using Base
 
 """
     function disagg!(d_shr::Dict, d_cal::Dict)
 """
-function disagg!(d::Dict, set::Dict)
+function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
+    
+    d_read = read_build("disagg"; save = save, overwrite = overwrite);
+    if !isempty(d_read)
+        [d[k] = v for (k,v) in d_read]
+        return d
+    end
     
     # d = merge(d, Dict(
     #     :r => fill_with((r = set[:r],), 1.0),
@@ -64,7 +68,37 @@ function disagg!(d::Dict, set::Dict)
     d[:xn0] = _disagg_xn0!(d)
 
     d[:hhadj] = _disagg_hhadj!(d)
-    return (d, set)
+
+    d_save = Dict()
+    d_save[:a0]  = ensurenames(d[:a0], [:yr, :r, :g, :value])
+    d_save[:bopdef0] = ensurenames(d[:bopdef0], [:yr, :r, :value])
+    d_save[:c0]  = ensurenames(d[:c0], [:yr, :r, :value])
+    d_save[:cd0] = ensurenames(d[:cd0], [:yr, :r, :s, :value])
+    d_save[:dd0] = ensurenames(d[:dd0], [:yr, :r, :g, :value])
+    d_save[:dm0] = ensurenames(d[:dm0], [:yr, :r, :g, :m, :value])
+    d_save[:g0]  = ensurenames(d[:g0], [:yr, :r, :s, :value])
+    d_save[:hhadj] = ensurenames(d[:hhadj], [:yr, :r, :value])
+    d_save[:i0]  = ensurenames(d[:i0], [:yr, :r, :s, :value])
+    d_save[:id0] = ensurenames(d[:id0], [:yr, :r, :g, :s, :value])
+    d_save[:kd0] = ensurenames(d[:kd0], [:yr, :r, :s, :value])
+    d_save[:ld0] = ensurenames(d[:ld0], [:yr, :r, :s, :value])
+    d_save[:m0]  = ensurenames(d[:m0], [:yr, :r, :g, :value])
+    d_save[:md0] = ensurenames(d[:md0], [:yr, :r, :m, :g, :value])
+    d_save[:nd0] = ensurenames(d[:nd0], [:yr, :r, :g, :value])
+    d_save[:nm0] = ensurenames(d[:nm0], [:yr, :r, :g, :m, :value])
+    d_save[:rx0] = ensurenames(d[:rx0], [:yr, :r, :g, :value])
+    d_save[:s0]  = ensurenames(d[:s0], [:yr, :r, :g, :value])
+    d_save[:ta0] = ensurenames(d[:ta0], [:yr, :r, :g, :value])
+    d_save[:tm0] = ensurenames(d[:tm0], [:yr, :r, :g, :value])
+    d_save[:ty0] = ensurenames(d[:ty0], [:yr, :r, :s, :value])
+    d_save[:x0]  = ensurenames(d[:x0], [:yr, :r, :g, :value])
+    d_save[:xd0] = ensurenames(d[:xd0], [:yr, :r, :g, :value])
+    d_save[:xn0] = ensurenames(d[:xn0], [:yr, :r, :g, :value])
+    d_save[:yh0] = ensurenames(d[:yh0], [:yr, :r, :s, :value])
+    d_save[:ys0] = ensurenames(d[:ys0], [:yr, :r, :s, :g, :value])
+    
+    write_build("disagg", d_save; save = save)
+    return d_save
 end
 
 "`ys0(yr,r,s,g)`: Regional sectoral output"
@@ -212,6 +246,10 @@ function _disagg_x0!(d::Dict, set::Dict)
     println("  Disaggregating x0(yr,r,g), foreign exports")
     if !(:diff in keys(d))
         cols = [:yr,:r,:g,:value]
+
+        set[:notrd] = :s in propertynames(d[:utd]) ? setdiff(set[:s], d[:utd][:,:s]) :
+            setdiff(set[:g], d[:utd][:,:g])
+        
         df_exports = edit_with(filter_with(copy(d[:utd]), (t = "exports",)),
             [Drop.([:t,:units],"all","=="); Rename(:s,:g)])
         df_region = filter_with(ensurenames(d[:region], cols), (g = set[:notrd],))

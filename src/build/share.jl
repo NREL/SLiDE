@@ -1,25 +1,42 @@
+using CSV
+using DataFrames
+using DelimitedFiles
+using YAML
+using Query
 
+using Base
 
-function share!(cal::Dict, set::Dict)
+function share!(d::Dict, set::Dict; save = true, overwrite = false)
 
-    # Adjust input data to share.
-    files_share = write_yaml(READ_DIR, XLSXInput("generate_yaml.xlsx", "share", "B1:G150", "share"))
-    y = [read_file(files_share[ii]) for ii in 1:length(files_share)]
-    files_share = run_yaml(ensurearray(files_share))
-    shr_read = Dict(Symbol(y[ii]["PathOut"][end][1:end-4]) =>
-        read_file(joinpath(y[ii]["PathOut"]...)) for ii in 1:length(y))
+    # If there is already sharing data, read it and return.
+    d_read = read_build("share"; save = save, overwrite = overwrite);
+    if !isempty(d_read)
+        [d[k] = v for (k,v) in d_read]
+        set[:notrd] = setdiff(set[:s], d[:utd][:,:s])
+        return d
+    end
 
-    # Filter data and extrapolate values as appropriate.
-    shr = copy(shr_read)
-    shr = Dict(k => sort(filter_with(df, set; extrapolate = true)) for (k, df) in shr)
-    shr[:va0] = edit_with(cal[:va0], Rename(:j,:s))
+    # READ SHARING DATA.
+    d_read = read_build("share_i"; save = save, overwrite = overwrite);
+    if isempty(d_read)
+        y = read_from(joinpath("src","readfiles","build","shareinp.yml"))
+        d_read = Dict(k => edit_with(v) for (k,v) in y)
+        d_read = Dict(k => sort(filter_with(df, set; extrapolate = true)) for (k, df) in d_read)
 
-    share_pce!(shr)
-    share_sgf!(shr)
-    share_utd!(shr, set)
-    share_region!(shr, set)
-    share_labor!(shr, set)
-    share_rpc!(shr, set)
+        write_build("share_i", d_read; save = save)
+    end
+    [d[k] = v for (k,v) in d_read]
 
-    return (shr, set)
+    # Do the sharing.
+    share_pce!(d)
+    share_sgf!(d)
+    share_utd!(d, set)
+    share_region!(d, set)
+    share_labor!(d, set)
+    share_rpc!(d, set)
+
+    d_save = Dict(k => d[k] for k in [:gsp,:labor,:pce,:rpc,:region,:sgf,:utd])
+    write_build("share", d_save; save = save)
+
+    return d
 end
