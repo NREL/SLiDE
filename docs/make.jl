@@ -1,10 +1,5 @@
 import Pkg; Pkg.add("InfrastructureSystems")
 
-push!(LOAD_PATH, joinpath("..","src"))
-push!(LOAD_PATH, joinpath("..","src","parse"))
-push!(LOAD_PATH, joinpath("..","dev"))
-push!(LOAD_PATH, joinpath("..","dev","buildstream"))
-
 using DelimitedFiles
 using Documenter
 
@@ -20,16 +15,21 @@ makedocs(clean = true,
     pages=[
         "Home" => "index.md",
         "Data" => Any[
-            "blueNOTE Data Set" => "lib/data.md",
-            # "Data Stream" => "lib/datastream.md",
-            "Build Stream" => "lib/buildstream.md",
-            "Scaling" => "lib/scaling.md",
-            "Parameters" => "lib/parameters.md"
+            "blueNOTE Data Set" => "man/data.md",
+            "Build Stream" => "man/build.md",
+            "Scaling" => "man/scaling.md",
+            "Parameters" => "man/parameters.md"
         ],
         "Model" => "api/model.md",
-        "Functions" => "SLiDE.md"
+        "Functions" => "api/functions.md"
     ]
 )
+
+# "API" => Any[
+#             "Types" => "lib/types.md",
+#             "Functions" => "lib/functions.md",
+#             "Indexing" => "lib/indexing.md",
+#             hide("Internals" => "lib/internals.md"),
 
 
 # pages = [

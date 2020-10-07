@@ -9,7 +9,7 @@ Pages = ["build/partition.jl"]
 ```
 
 ### Share
-```@autodocs
+```@autodocsn
 Modules = [SLiDE]
 Pages = [
     "build/share_cfs.jl",
