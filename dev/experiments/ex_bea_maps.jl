@@ -35,11 +35,7 @@ df_windc = [edit_with(df[ii][:,cols_windc],
     Rename.(cols_windc[2:end], Symbol.(cols_windc[2:end], :_, ind[ii]))) for ii in 1:2]
 cols_windc = sort(unique([names.(df_windc)...;]))
 
-<<<<<<< HEAD
 df_windc = outerjoin(df_windc[1], df_windc[2], on = :bea_code)
-=======
-df_windc = join(df_windc[1], df_windc[2], on = :bea_code, kind = :outer)
->>>>>>> dev
 df_windc = df_windc[:,cols_windc]
 
 df_windc_miss = df_windc[ismissing.(df_windc[:,2]), :]

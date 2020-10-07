@@ -1,0 +1,5 @@
+Path: [data, input]
+
+Input:
+  supply: supply.csv
+  use:    use.csv

@@ -1,17 +1,20 @@
-using SLiDE
 using CSV
 using JuMP
 using DataFrames
 using Ipopt
 
-function calibrate(d::Dict, set::Dict)
+function calibrate(d::Dict, set::Dict; save = true, overwrite = false)
+
+    io_cal = read_build("calibrate"; save = save, overwrite = overwrite)
+    !isempty(io_cal) && (return io_cal)
+
     # Copy the relevant input DataFrames before making any changes.
     set[:cal] = [:a0,:fd0,:fs0,:id0,:m0,:md0,:ms0,:ta0,:tm0,:va0,:x0,:y0,:ys0]
     d = Dict(k => copy(d[k]) for k in set[:cal])
     
     # Set all values to be at least zero for final demand and tax rates.
     [d[k][d[k][:,:value] .< 0, :value] .= 0 for k in [:fd0, :ta0, :tm0]]
-
+        
     # Initialize a DataFrame to contain results.
     # io_cal = Dict(k => DataFrame() for k in setdiff(set[:cal], [:ta0,:tm0]))
     io_cal = Dict(k => DataFrame() for k in set[:cal])
@@ -20,6 +23,9 @@ function calibrate(d::Dict, set::Dict)
         io_cal_temp = calibrate(year, d, set)
         [io_cal[k] = [io_cal[k]; io_cal_temp[k]] for k in keys(io_cal)]
     end
+
+    write_build("calibrate", io_cal; save = save)
+
     return io_cal
 end
 
