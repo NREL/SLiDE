@@ -1,9 +1,39 @@
-# Build Stream
+# Build
 
-*Overview of how BuildStream works to build the national model.*
-There are four steps required to build the cleaned input data for use in the model.
+There are four steps required to build the cleaned input data for use in the model:
+1. Partition
+2. Calibrate
+3. Share
+4. Disaggregate
 
-1. **Partition**. Divide BEA supply/use data into parameters.
-2. **Calibrate**.
-3. **Share**. Divide data into regional component. This will guide how to break the national data into regional components by state or county.
-4. **Disaggregate**.
+```@docs
+build_data
+```
+
+# Partition
+
+Divide BEA supply/use data into parameters.
+
+```@docs
+partition!
+```
+
+# Calibrate
+
+```@docs
+calibrate
+```
+
+# Share
+
+Divide data into regional component. This will guide how to break the national data into regional components by state or county.
+
+```@docs
+share!
+```
+
+# Disaggregate
+
+```@docs
+disagg!
+```

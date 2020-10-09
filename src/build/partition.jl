@@ -1,12 +1,17 @@
-using CSV
-using DataFrames
-using DelimitedFiles
-using YAML
-using Query
-
-
 """
     partition!(d::Dict, set::Dict; kwargs...)
+
+# Arguments
+- `d::Dict` of DataFrames containing the model data.
+- `set::Dict` of Arrays describing region, sector, final demand, etc.
+
+# Keywords
+- `save = true`
+- `overwrite = false`
+See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
+
+# Returns
+- `d::Dict` of DataFrames containing the model data at the
 """
 function partition!(d::Dict, set::Dict; save = true, overwrite = false)
 
@@ -92,10 +97,10 @@ function _partition_a0!(d::Dict, set::Dict)
 end
 
 """
-    _partition_bopdef0!(d::Dict, set::Dict)
+    _partition_bop!(d::Dict, set::Dict)
 `bopdef0`: Balance of payments deficit
 """
-function _partition_bopdef0!(d::Dict, set::Dict)
+function _partition_bop!(d::Dict, set::Dict)
     println("  Partitioning bopdef0, balance of payments deficit")
     d[:bopdef] = fill_zero((yr = set[:yr], ))
 end

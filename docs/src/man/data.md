@@ -1,19 +1,24 @@
+# Data
+
 # blueNOTE Data Set
 
-This is the SLiDE version of the blueNOTE data and build streams.
-The data necessary to execute the SLiDE datastream is stored in the following structure:
+This is the SLiDE version of the blueNOTE dataset developed by the [Wisconsin National Data
+Consortium (WiNDC)](https://windc.wisc.edu). The SLiDE datastream is built on the groundwork laid by
+Thomas F. Rutherford, Andrew Schreiber, Gökçe Akin-Olçum, and Christoph Böhringer.
+
+The data necessary to execute the SLiDE buildstream is stored in the following structure:
 
 ```
 data/
 ├── coremaps/
-└── datasources/
-└── readfiles/
+└── coremaps/
+└── input/
 ```
 
-**`coremaps`** contains .csv files that standardize DataFrame values for consistency. For example, `regions.csv` maps `CO, Colo., Colorado, COLORADO, colorado -> co`. Many files are from the WiNDC Data Stream, but some have been edited for simplicity.
+# Data Sources
 
-**`datasources`** stores the original input data.
-This must be downloaded from the WiNDC Data Stream [datasources.zip](https://windc.wisc.edu/datasources.zip) file. This includes:
+The blueNOTE dataset is compiled of the following data:
+
 * Bureau of Economic Analysis
     * Supply and Use Tables ([BEA](https://www.bea.gov/industry/io_annual.htm))
     * Gross State Product ([GSP](https://www.bea.gov/newsreleases/regional/gdp_state/qgsp_newsrelease.htm))
@@ -24,9 +29,3 @@ This must be downloaded from the WiNDC Data Stream [datasources.zip](https://win
     * State Exports/Imports ([UTD](https://usatrade.census.gov))
 * Energy Information Administration
     * State Energy Data System ([SEDS](https://www.eia.gov/state/seds))
-
-**`readfiles`** contains a file for each output file produced by the datastream.
-
-# Accessing Original Data Files
-
-## 

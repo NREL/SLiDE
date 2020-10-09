@@ -1,12 +1,17 @@
-using CSV
-using DataFrames
-using DelimitedFiles
-using YAML
-using Query
-using Base
-
 """
-    function disagg!(d_shr::Dict, d_cal::Dict)
+    function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
+
+# Arguments
+- `d::Dict` of DataFrames containing the model data.
+- `set::Dict` of Arrays describing region, sector, final demand, etc.
+
+# Keywords
+- `save = true`
+- `overwrite = false`
+See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
+
+# Returns
+- `d::Dict` of DataFrames containing the model data at the disaggregation step
 """
 function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
     
@@ -54,7 +59,7 @@ function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
     d[:s0] = _disagg_s0!(d)
     d[:x0] = _disagg_x0!(d, set)
     d[:yh0] = _disagg_yh0!(d)
-    d[:bopdef0] = _disagg_bopdef0!(d)
+    d[:bopdef0] = _disagg_bop!(d)
 
     d[:pt0] = _disagg_pt0!(d)
     d[:dc0] = _disagg_dc0!(d)
@@ -165,6 +170,11 @@ end
 "`kd0`: Capital demand"
 _disagg_kd0(d::Dict) = d[:va0] - d[:ld0]
 
+"""
+    _disagg_fdcat!(d::Dict)
+Aggregate final demand categories into national consumption (`C`), government (`G`), and
+investment (`I`) demand.
+"""
 function _disagg_fdcat!(d::Dict)
     # !!!! check if this has been edited.
     x = Map(joinpath("crosswalk","fd.csv"), [:fd], [:fdcat], [:fd], [:fdcat], :inner)
@@ -276,7 +286,13 @@ function _disagg_s0!(d::Dict)
     return d[:s0]
 end
 
-"`a0(yr,r,g)`: Domestic absorption"
+"""
+Calculate `a0(yr,r,g)`, domestic absorption
+
+```math
+a_{yr,r,g} = \\bar{cd}_{yr,r,g} + \\bar{g}_{yr,r,g} + \\bar{i}_{yr,r,g} + \\sum_{s}\\bar{id}_{yr,r,g}
+```
+"""
 function _disagg_a0!(d::Dict)
     cols = [:yr,:r,:g,:value]
     println("  Disaggregating a0(yr,r,g), domestic absorption")
@@ -365,7 +381,7 @@ function _disagg_diff!(d::Dict)
 end
 
 "`bopdef0(yr,r)`: Balance of payments (closure parameter)"
-function _disagg_bopdef0!(d::Dict)
+function _disagg_bop!(d::Dict)
     println("  Disaggregating bopdef0(yr,r), balance of payments (closure parameter)")
     cols = [:yr,:r,:value]
     d[:bopdef0] = combine_over((d[:m0] - d[:x0]), :g)

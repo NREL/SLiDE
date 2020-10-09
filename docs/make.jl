@@ -11,37 +11,26 @@ makedocs(clean = true,
     modules = [SLiDE],
     format = Documenter.HTML(prettyurls = false),
     sitename="SLiDE",
-    authors="Maxwell Brown, Caroline Hughes",
+    authors="Maxwell Brown, Caroline L. Hughes",
     pages=[
         "Home" => "index.md",
-        "Data" => Any[
-            "blueNOTE Data Set" => "man/data.md",
-            "Build Stream" => "man/build.md",
+        "Introduction" => Any[
+            "Data" => "man/data.md",
+            "Build" => "man/build.md",
             "Scaling" => "man/scaling.md",
             "Parameters" => "man/parameters.md"
         ],
+        "API" => [
+            "Types" => map(
+                s -> "api/types/$(s)",
+                sort(readdir(joinpath(@__DIR__, "src/api/types")))),
+            "Functions" => map(
+                s -> "api/functions/$(s)",
+                sort(readdir(joinpath(@__DIR__, "src/api/functions")))),
+            "Internals" => map(
+                s -> "api/internals/$(s)",
+                sort(readdir(joinpath(@__DIR__, "src/api/internals"))))
+            ],
         "Model" => "api/model.md",
-        "Functions" => "api/functions.md"
     ]
 )
-
-# "API" => Any[
-#             "Types" => "lib/types.md",
-#             "Functions" => "lib/functions.md",
-#             "Indexing" => "lib/indexing.md",
-#             hide("Internals" => "lib/internals.md"),
-
-
-# pages = [
-#         "Home" => "index.md",
-#         "Manual" => Any[
-#             "Guide" => "man/guide.md",
-#             "man/examples.md",
-#             "man/syntax.md",
-#             "man/doctests.md",
-#             "man/latex.md",
-#             hide("man/hosting.md", [
-#                 "man/hosting/walkthrough.md"
-#             ]),
-#             "man/other-formats.md",
-#         ],

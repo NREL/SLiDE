@@ -5,13 +5,13 @@
 Clone this repo to your local machine.
 
 ```
-% git clone https://github.com/NREL/SLiDE.git
+> git clone https://github.com/NREL/SLiDE.git
 ```
 
 From the SLiDE directory, open Julia using
 
-```julia
->julia --project
+```
+> julia --project
 ```
 
 Build the SLiDE package from the Pkg REPL. Type `]` to enter the Pkg REPL and run:
@@ -29,11 +29,20 @@ Build the model input data by running:
 ```
 
 Where `d` is a dictionary of DataFrames containing the model data and `s` is a dictionary of sets describing region, sector, final demand, etc.
-By default, this will save data to a directory in `SLiDE/data/<date>/build/`, where `<date>` is the date on which the data is built.
+By default, this will save data to a directory in `SLiDE/data/default/build/`:
+
+```
+data/default/build/
+├── partition/
+└── calibrate/
+└── share/
+└── disagg/
+```
+
 If data already exists in this directory, running `build_data()` will read it.
 
 Adding keyword arguments to `build_data()` can customize `build_data()`:
-  - `save::String = path/to/file`: Replace `<date>` in the built data path.
+  - `save::String = path/to/file`: Replace `default` in the built data path.
   - `overwrite = false`: If data exists, do not read it. Rebuild the data from scratch.
 
 ## License

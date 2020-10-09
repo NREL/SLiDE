@@ -1,10 +1,18 @@
-## Partition
+# Build
+```@autodocs
+Modules = [SLiDE]
+Pages = ["build/build.jl"]
+Public = false
+```
+
+# Partition
 ```@autodocs
 Modules = [SLiDE]
 Pages = ["build/partition.jl"]
+Public = false
 ```
 
-## Share
+# Share
 ```@autodocs
 Modules = [SLiDE]
 Pages = [
@@ -13,10 +21,12 @@ Pages = [
     "build/share_pce.jl",
     "build/share_sgf.jl",
     "build/share_utd.jl"]
+Public = false
 ```
 
-## Disaggregate
+# Disaggregate
 ```@autodocs
 Modules = [SLiDE]
 Pages = ["build/disagg.jl"]
+Public = false
 ```
