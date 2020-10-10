@@ -16,7 +16,10 @@ makedocs(clean = true,
         "Home" => "index.md",
         "Introduction" => Any[
             "Data" => "man/data.md",
-            "Build" => "man/build.md",
+            "Build" => Any[
+                "Overview" => "man/build/overview.md",
+                "Disaggregate" => "man/build/disagg.md",
+            ],
             "Scaling" => "man/scaling.md",
             "Parameters" => "man/parameters.md"
         ],

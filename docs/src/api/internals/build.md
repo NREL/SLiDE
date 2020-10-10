@@ -13,6 +13,7 @@ Public = false
 ```
 
 # Share
+
 ```@autodocs
 Modules = [SLiDE]
 Pages = [
@@ -25,8 +26,8 @@ Public = false
 ```
 
 # Disaggregate
-```@autodocs
+<!-- ```@autodocs
 Modules = [SLiDE]
 Pages = ["build/disagg.jl"]
 Public = false
-```
+``` -->
