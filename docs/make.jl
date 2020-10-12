@@ -6,13 +6,22 @@ using Documenter
 # Include SLiDE modules.
 using SLiDE
 
+if haskey(ENV, "DOCSARGS")
+    for arg in split(ENV["DOCSARGS"])
+        (arg in ARGS) || push!(ARGS, arg)
+    end
+end
+
 # Now, generate the documentation.
 makedocs(clean = true,
     modules = [SLiDE],
-    format = Documenter.HTML(prettyurls = false),
-    sitename="SLiDE",
-    authors="Maxwell Brown, Caroline L. Hughes",
-    pages=[
+    format = Documenter.HTML(
+        mathengine = Documenter.MathJax(),
+        prettyurls = get(ENV, "CI", nothing) == "true",
+    ),
+    sitename = "SLiDE.jl",
+    authors = "Maxwell Brown, Caroline L. Hughes",
+    pages = [
         "Home" => "index.md",
         "Introduction" => Any[
             "Data" => "man/data.md",
@@ -36,4 +45,13 @@ makedocs(clean = true,
             ],
         "Model" => "api/model.md",
     ]
+)
+
+deploydocs(
+    repo = "https://github.com/NREL/SLiDE.git",
+    target = "build",
+    branch = "gh-pages",
+    devbranch = "docs",
+    devurl = "dev",
+    versions = ["stable" => "v^", "v#.#"],
 )
