@@ -5,13 +5,6 @@ Pages = ["build/build.jl"]
 Public = false
 ```
 
-# Partition
-```@autodocs
-Modules = [SLiDE]
-Pages = ["build/partition.jl"]
-Public = false
-```
-
 # Share
 
 ```@autodocs

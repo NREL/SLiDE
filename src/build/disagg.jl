@@ -490,7 +490,7 @@ end
 ```math
 \\begin{aligned}
 \\bar{pt}_{yr,r,g} = &\\left(1 - \\bar{ta}_{yr,r,g} \\right) \\bar{a}_{yr,r,g} + \\bar{rx}_{yr,r,g}
-                   - &\\left(1 + \\bar{tm}_{yr,r,g} \\right) \\bar{m}_{yr,r,g} - \\sum_{m} \\bar{md}_{yr,r,m,g}
+\\\\               - &\\left(1 + \\bar{tm}_{yr,r,g} \\right) \\bar{m}_{yr,r,g} - \\sum_{m} \\bar{md}_{yr,r,m,g}
 \\end{aligned}
 ```
 """
@@ -545,7 +545,7 @@ end
 `dd0max(yr,r,g)`, maximum regional demand from local market
 
 ```math
-\\hat{dd}_{yr,r,g} = \\min\\left{\\bar{pt}_{yr,r,g}, \\bar{dc}_{yr,r,g} \\right}
+\\hat{dd}_{yr,r,g} = \\min\\left\\{\\bar{pt}_{yr,r,g}, \\bar{dc}_{yr,r,g} \\right\\}
 ```
 """
 function _disagg_dd0max(d::Dict)
@@ -648,8 +648,8 @@ end
 `dm0(yr,r,g,m)`, margin supply from the local market
 
 ```math
-\\bar{dm}_{yr,r,g,m} = \\min\\left{ \\rho_{r,g}^{cfs}\\hat{ms}_{yr,r,g,m},
-    \\beta_{yr,r,m,g}^{mar} \\left(\\bar{dc}_{yr,r,g} - \\bar{dd}_{yr,r,g}\\right) \\right}
+\\bar{dm}_{yr,r,g,m} = \\min\\left\\{ \\rho_{r,g}^{cfs}\\hat{ms}_{yr,r,g,m},
+    \\beta_{yr,r,m,g}^{mar} \\left(\\bar{dc}_{yr,r,g} - \\bar{dd}_{yr,r,g}\\right) \\right\\}
 ```
 """
 function _disagg_dm0!(d::Dict)
@@ -712,9 +712,9 @@ end
 ```math
 \\begin{aligned}
 \\bar{adj^{hh}}_{yr,r} = &\\bar{c}_{yr,r}
-    &- \\sum_{s}\\left( \\bar{ld}_{yr,r,s} + \\bar{kd}_{yr,r,s} + \\bar{yh}_{yr,r,s} \\right) - \\bar{bop}_{yr,r}
-    &- \\sum_{s}\\left( \\bar{ta}_{yr,r,s}\\bar{a0}_{yr,r,s} + \\bar{tm}_{yr,r,s}\\bar{m}_{yr,r,s} + \\bar{ty}_{yr,r,s}\\sum_{g}\\bar{ys}_{yr,r,s,g} \\right)
-    &+ \\sum_{s}\\left( \\bar{g}_{yr,r,s} + \\bar{i}_{yr,r,s} \\right)
+\\\\ &- \\sum_{s}\\left( \\bar{ld}_{yr,r,s} + \\bar{kd}_{yr,r,s} + \\bar{yh}_{yr,r,s} \\right) - \\bar{bop}_{yr,r}
+\\\\ &- \\sum_{s}\\left( \\bar{ta}_{yr,r,s}\\bar{a0}_{yr,r,s} + \\bar{tm}_{yr,r,s}\\bar{m}_{yr,r,s} + \\bar{ty}_{yr,r,s}\\sum_{g}\\bar{ys}_{yr,r,s,g} \\right)
+\\\\ &+ \\sum_{s}\\left( \\bar{g}_{yr,r,s} + \\bar{i}_{yr,r,s} \\right)
 \\end{aligned}
 ```
 """

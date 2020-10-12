@@ -27,6 +27,7 @@ makedocs(clean = true,
             "Data" => "man/data.md",
             "Build" => Any[
                 "Overview" => "man/build/overview.md",
+                "Partition" => "man/build/partition.md",
                 "Disaggregate" => "man/build/disagg.md",
             ],
             "Scaling" => "man/scaling.md",
