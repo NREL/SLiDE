@@ -52,8 +52,6 @@ function partition!(d::Dict, set::Dict; save = true, overwrite = false)
     # _partition_duty0!(d, set)
     _partition_tm0!(d, set)       # duty0, m0
 
-    # _partition_lshr0!(d, set) # va0
-
     d_save = delete!(delete!(copy(d), :supply), :use)
     write_build("partition", d_save; save = save)
 
@@ -112,7 +110,7 @@ function _partition_io!(d::Dict, set::Dict)
 end
 
 """
-`a0(yr,g)`, Armington supply
+`a(yr,g)`, Armington supply
 
 ```math
 \\tilde{a}_{yr,g} = \\sum_{fd}\\tilde{fd}_{yr,g,fd} + \\sum_{s}\\tilde{id}_{yr,g,s}
@@ -125,7 +123,12 @@ function _partition_a0!(d::Dict, set::Dict)
 end
 
 """
-`bopdef0`, balance of payments
+`bopdef(yr)`, balance of payments
+
+```math
+\\tilde{bop}_{yr} = 0
+\\;\\forall\\; yr
+```
 """
 function _partition_bop!(d::Dict, set::Dict)
     println("  Partitioning bopdef0, balance of payments deficit")
@@ -133,7 +136,7 @@ function _partition_bop!(d::Dict, set::Dict)
 end
 
 """
-`cif`, CIF/FOB Adjustments on Imports
+`cif(yr,g)`, CIF/FOB Adjustments on Imports
 
 ```math
 \\tilde{cif}_{yr,g} = \\left\\{{supply}\\left(yr,i,j\\right)
@@ -191,32 +194,15 @@ function _partition_fs0!(d::Dict)
     d[:fs0][!,:value] .= - min.(d[:fs0][:,:value], 0)
 end
 
-# """
-#     _partition_lshr0!(d::Dict)
-# `lshr0`: Labor share of value added
-# """
-# function _partition_lshr0!(d::Dict, set::Dict)
-#     va0 = edit_with(unstack(copy(d[:va0]), :va, :value),
-#         [Rename(:j,:s); Replace.(Symbol.(set[:va]), missing, 0.0); Drop(:units,"all","==")])
-    
-#     d[:lshr0]  = va0[:,[:yr,:s,:compen]]
-#     d[:lshr0] /= (va0[:,[:yr,:s,:compen]] + va0[:,[:yr,:s,:surplus]])
-
-#     # !!!!! _partition_lshr0 needs to come after calibration.
-#     # Order is: io, calibrate, share, disagg.
-#     d[:lshr0][va0[:,:surplus] .< 0,:value] .== 1.0
-#     dropmissing!(d[:lshr0])
-# end
-
 """
-`m0(yr,g)`, imports
+`m(yr,g)`, imports
 
 ```math
 \\tilde{m}_{yr,g} = \\left\\{{supply}\\left(yr,i,j\\right)
 \\;\\vert\\; yr,\\, g \\in i,\\, j = imports \\right\\}
 ```
 
-Specify insurance imports as net of adjustments:
+Adjust transport margins according to CIF/FOB adjustments:
 
 ```math
 \\tilde{m}_{yr,g} = \\tilde{m}_{yr,g} + \\tilde{cif}_{yr,g}
@@ -235,6 +221,18 @@ end
 
 """
 `md(yr,m,g)`, margin demand
+
+```math
+\\begin{aligned}
+\\tilde{md}_{yr,m,g} &= 
+\\begin{cases}
+\\tilde{mrg}_{yr,g}  & m = trd   \\\\
+\\tilde{trn}_{yr,g}  & m = trn
+\\end{cases}
+\\\\
+\\tilde{md}_{yr,m,g} &= \\max\\left\\{0, \\tilde{md}_{yr,m,g} \\right\\}
+\\end{aligned}
+```
 """
 function _partition_md0!(d::Dict, set::Dict)
     println("  Partitioning md0, margin demand")
@@ -243,11 +241,22 @@ function _partition_md0!(d::Dict, set::Dict)
     d[:md0] = _remove_imrg(d[:md0], :i => set[:imrg])
 
     d[:md0][!,:value] .= max.(d[:md0][:,:value], 0)
-    
 end
 
 """
 `ms(yr,g,m)`, margin supply
+
+```math
+\\begin{aligned}
+\\tilde{ms}_{yr,g,m} &= 
+\\begin{cases}
+\\tilde{mrg}_{yr,g}  & m = trd   \\\\
+\\tilde{trn}_{yr,g}  & m = trn
+\\end{cases}
+\\\\
+\\tilde{ms}_{yr,g,m} &= \\max\\left\\{0, -\\tilde{ms}_{yr,g,m} \\right\\}
+\\end{aligned}
+```
 """
 function _partition_ms0!(d::Dict)
     println("  Partitioning ms0, margin supply")
@@ -258,7 +267,7 @@ function _partition_ms0!(d::Dict)
 end
 
 """
-`mrg0(yr,g)`, trade margins
+`mrg(yr,g)`, trade margins
 
 ```math
 \\tilde{mrg}_{yr,g} = \\left\\{{supply}\\left(yr,i,j\\right)
@@ -271,7 +280,7 @@ function _partition_mrg0!(d::Dict, set::Dict)
 end
 
 """
-`s0(yr,s)`, aggregate supply
+`s(yr,s)`, aggregate supply
 
 ```math
 \\tilde{s}_{yr,s} = \\sum_{g}\\tilde{ys}_{yr,s,g}
@@ -360,6 +369,12 @@ end
 \\tilde{trn}_{yr,g} = \\left\\{{supply}\\left(yr,i,j\\right)
 \\;\\vert\\; yr,\\, g \\in i,\\, j = trncost \\right\\}
 ```
+
+```math
+\\tilde{trn}_{yr,g} = \\tilde{m}_{yr,g} + \\tilde{cif}_{yr,g}
+\\;\\forall\\; g \\neq ins
+```
+
 """
 function _partition_trn0!(d::Dict, set::Dict)
     println("  Partitioning trn0, transportation costs")
@@ -421,7 +436,7 @@ function _partition_x0!(d::Dict, set::Dict)
 end
 
 """
-`y0(yr,g)`, gross output
+`y(yr,g)`, gross output
 
 ```math
 \\tilde{y}_{yr,g} = \\sum_{s}\\tilde{ys}_{yr,s,g} - \\sum_{m}\\tilde{ms}_{yr,g,m}

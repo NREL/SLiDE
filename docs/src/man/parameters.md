@@ -17,10 +17,10 @@
 | `id`    | `(yr,r,g,s)` | *Intermediate demand*                           | [`SLiDE._partition_io!`](@ref) [`SLiDE._disagg_id0!`](@ref) |
 | `ld`    | `(yr,r,s)`   | *Labor demand*                                  | [`SLiDE._disagg_ld0!`](@ref) |
 | `kd`    | `(yr,r,s)`   | *Capital demand*                                | [`SLiDE._disagg_kd0`](@ref) |
-| `cd`    | `(yr,r,s)`   | *Final demand*                                  | [`SLiDE._disagg_cd0!`](@ref) |
-| `yh`    | `(yr,r,s)`   | *Household production*                          | [`SLiDE._disagg_yh0!`](@ref) |
-| `g`     | `(yr,r)`     | *Government demand*                             | [`SLiDE._disagg_g0!`](@ref) |
-| `i`     | `(yr,r,s)`   | *Investment demand*                             | [`SLiDE._disagg_i0!`](@ref) |
+| `cd`    | `(yr,r,g)`   | *Final demand*                                  | [`SLiDE._disagg_cd0!`](@ref) |
+| `yh`    | `(yr,r,g)`   | *Household production*                          | [`SLiDE._disagg_yh0!`](@ref) |
+| `g`     | `(yr,r,g)`   | *Government demand*                             | [`SLiDE._disagg_g0!`](@ref) |
+| `i`     | `(yr,r,g)`   | *Investment demand*                             | [`SLiDE._disagg_i0!`](@ref) |
 | `s`     | `(yr,r,g)`   | *Aggregate supply*                              | [`SLiDE._disagg_s0!`](@ref) |
 | `xn`    | `(yr,r,g)`   | *National supply*                               | [`SLiDE._disagg_xn0!`](@ref) |
 | `xd`    | `(yr,r,g)`   | *National demand*                               | [`SLiDE._disagg_xd0!`](@ref) |
@@ -37,5 +37,5 @@
 | `dm`    | `(yr,r,g,m)` | *State-level margin supply*                     | [`SLiDE._disagg_dm0!`](@ref) |
 | `c`     | `(yr,r)`     |                                                 | [`SLiDE._disagg_c0!`](@ref) |
 | `rx`    | `(yr,r,g)`   |                                                 | [`SLiDE._disagg_rx0!`](@ref) |
-| `ty`    | `(yr,r,s)`   |                                                 | [`SLiDE._disagg_ty0`](@ref) |
+| `ty`    | `(yr,r,g)`   |                                                 | [`SLiDE._disagg_ty0`](@ref) |
 | `hhadj` | `(yr,r)`     |                                                 | [`SLiDE._disagg_hhadj!`](@ref) |

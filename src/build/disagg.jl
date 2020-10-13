@@ -28,7 +28,7 @@ function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
 
     d[:ys0] = _disagg_ys0!(d)
     d[:id0] = _disagg_id0!(d)
-    d[:ty0] = _disagg_ty0(d, set)
+    d[:ty0] = _disagg_ty0(d, set)   # not in state model
     d[:va0] = _disagg_va0!(d, set)
     d[:ld0] = _disagg_ld0!(d)
     d[:kd0] = _disagg_kd0(d)
@@ -75,31 +75,31 @@ function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
     d[:hhadj] = _disagg_hhadj!(d)
 
     d_save = Dict()
-    d_save[:a0]  = ensurenames(d[:a0], [:yr, :r, :g, :value])
+    d_save[:a0]  = ensurenames(d[:a0],  [:yr, :r, :g, :value])
     d_save[:bopdef0] = ensurenames(d[:bopdef0], [:yr, :r, :value])
-    d_save[:c0]  = ensurenames(d[:c0], [:yr, :r, :value])
-    d_save[:cd0] = ensurenames(d[:cd0], [:yr, :r, :s, :value])
+    d_save[:c0]  = ensurenames(d[:c0],  [:yr, :r, :value])
+    d_save[:cd0] = ensurenames(d[:cd0], [:yr, :r, :g, :value])
     d_save[:dd0] = ensurenames(d[:dd0], [:yr, :r, :g, :value])
     d_save[:dm0] = ensurenames(d[:dm0], [:yr, :r, :g, :m, :value])
-    d_save[:g0]  = ensurenames(d[:g0], [:yr, :r, :s, :value])
+    d_save[:g0]  = ensurenames(d[:g0],  [:yr, :r, :g, :value])
     d_save[:hhadj] = ensurenames(d[:hhadj], [:yr, :r, :value])
-    d_save[:i0]  = ensurenames(d[:i0], [:yr, :r, :s, :value])
+    d_save[:i0]  = ensurenames(d[:i0],  [:yr, :r, :g, :value])
     d_save[:id0] = ensurenames(d[:id0], [:yr, :r, :g, :s, :value])
     d_save[:kd0] = ensurenames(d[:kd0], [:yr, :r, :s, :value])
     d_save[:ld0] = ensurenames(d[:ld0], [:yr, :r, :s, :value])
-    d_save[:m0]  = ensurenames(d[:m0], [:yr, :r, :g, :value])
+    d_save[:m0]  = ensurenames(d[:m0],  [:yr, :r, :g, :value])
     d_save[:md0] = ensurenames(d[:md0], [:yr, :r, :m, :g, :value])
     d_save[:nd0] = ensurenames(d[:nd0], [:yr, :r, :g, :value])
     d_save[:nm0] = ensurenames(d[:nm0], [:yr, :r, :g, :m, :value])
     d_save[:rx0] = ensurenames(d[:rx0], [:yr, :r, :g, :value])
-    d_save[:s0]  = ensurenames(d[:s0], [:yr, :r, :g, :value])
+    d_save[:s0]  = ensurenames(d[:s0],  [:yr, :r, :g, :value])
     d_save[:ta0] = ensurenames(d[:ta0], [:yr, :r, :g, :value])
     d_save[:tm0] = ensurenames(d[:tm0], [:yr, :r, :g, :value])
-    d_save[:ty0] = ensurenames(d[:ty0], [:yr, :r, :s, :value])
-    d_save[:x0]  = ensurenames(d[:x0], [:yr, :r, :g, :value])
+    d_save[:ty0] = ensurenames(d[:ty0], [:yr, :r, :g, :value])
+    d_save[:x0]  = ensurenames(d[:x0],  [:yr, :r, :g, :value])
     d_save[:xd0] = ensurenames(d[:xd0], [:yr, :r, :g, :value])
     d_save[:xn0] = ensurenames(d[:xn0], [:yr, :r, :g, :value])
-    d_save[:yh0] = ensurenames(d[:yh0], [:yr, :r, :s, :value])
+    d_save[:yh0] = ensurenames(d[:yh0], [:yr, :r, :g, :value])
     d_save[:ys0] = ensurenames(d[:ys0], [:yr, :r, :s, :g, :value])
     
     write_build("disagg", d_save; save = save)
@@ -107,7 +107,7 @@ function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
 end
 
 """
-`ys0(yr,r,s,g)`: Regional sectoral output
+`ys(yr,r,s,g)`, regional sectoral output
 
 ```math
 \\bar{ys}_{yr,r,s,g} = \\alpha_{yr,r,s}^{gsp} \\tilde{ys}_{yr,s,g}
@@ -122,7 +122,7 @@ function _disagg_ys0!(d::Dict)
 end
 
 """
-`id0(yr,r,g,s)`, regional intermediate demand
+`id(yr,r,g,s)`, regional intermediate demand
 
 ```math
 \\bar{id}_{yr,r,g,s} = \\alpha_{yr,r,s}^{gsp} \\tilde{id}_{yr,g,s}
@@ -145,7 +145,16 @@ end
 #     d[:region] * d[:va0][:,[:yr,:s,:othtax]]
 # end
 
-"`ty0(yr,r,s)`: Production tax rate"
+"""
+`ty(yr,r,s)`, production tax rate
+
+```math
+\\begin{aligned}
+\\bar{ty}_{yr,r,s}^{rev} &= \\alpha_{yr,r,s}^{gsp} \\tilde{va}_{yr,va,s} \\;\\forall\\; va = othtax \\\\
+\\bar{ty}_{yr,r,s} &= \\frac{\\tilde{ty}_{yr,r,s}}{\\sum_{g} \\bar{ys}_{yr,r,s,g}}
+\\end{aligned}
+```
+"""
 function _disagg_ty0(d::Dict, set::Dict)
     println("  Disaggregating ty0(yr,r,s), production tax rate")
     # !!!! test that returns error if va0 has already been edited.
@@ -160,7 +169,7 @@ function _disagg_ty0(d::Dict, set::Dict)
 end
 
 """
-`va0`, regional value added
+`va(yr,va,s)`, regional value added
 
 ```math
 \\bar{va}_{yr,r,s} = \\alpha_{yr,r,s}^{gsp} \\sum_{va = compen,surplus} \\tilde{va}_{yr,va,s}
@@ -171,11 +180,10 @@ function _disagg_va0!(d::Dict, set::Dict)
     # If va0 has already been edited, don't edit it again.
     :r in propertynames(d[:va0]) && (return d[:va0])
 
+    # If va has not already been unstacked, do so here.
     if :va in propertynames(d[:va0])
         d[:va0] = edit_with(unstack(copy(d[:va0]), :va, :value), Replace.(Symbol.(set[:va]), missing, 0.0))
     end
-
-    # !(:compen in propertynames(d[:va0])) && return d[:va0]
 
     df = d[:va0][:,[:yr,:s,:compen]] + d[:va0][:,[:yr,:s,:surplus]]
     d[:va0] = d[:region] * df
