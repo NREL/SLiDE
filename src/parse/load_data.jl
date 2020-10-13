@@ -383,21 +383,21 @@ function run_yaml(filenames::Array{String,1})
 end
 
 """
-    gams_to_dataframe(xf::Array{String,1}; colpropertynames = false)
+    gams_to_dataframe(xf::Array{String,1}; colnames = false)
 This function converts a GAMS map or set to a DataFrame, expanding sets into multiple rows.
 
 # Arguments
 - `xf::Array{String,1}`: A list of rows of text from a .map or a .set input file.
 
 # Keywords
-- `colpropertynames = false`: A user has the option to specify the column propertynames of the output
+- `colnames = false`: A user has the option to specify the column propertynames of the output
     DataFrame. If none are specified, a default of `[missing, missing_1, ...]` will be used,
     consistent with the default column headers for `CSV.read()` if column propertynames are missing.
 
 # Returns
 - `df::DataFrame`: A dataframe representation of the GAMS map or set.
 """
-function gams_to_dataframe(xf::Array{String,1}; colpropertynames = false)
+function gams_to_dataframe(xf::Array{String,1}; colnames = false)
     # Convert the input array into a DataFrame and use SLiDE editing capabilities to split
     # each rows into columns, based on the syntax.
     df = DataFrame(missing = xf)
@@ -416,6 +416,6 @@ function gams_to_dataframe(xf::Array{String,1}; colpropertynames = false)
     
     # If the user specified column propertynames, apply those here and
     # return a DataFrame sorted based on the mapping values.
-    colpropertynames != false && (df = edit_with(df, Rename.(propertynames(df), colpropertynames)))
+    colnames != false && (df = edit_with(df, Rename.(propertynames(df), colnames)))
     return COLS > 1 ? sort(df, reverse(propertynames(df)[1:2])) : sort(df)
 end
