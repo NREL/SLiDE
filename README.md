@@ -1,5 +1,9 @@
 # Scalable Linked Integrated Dynamic Equilibrium Model
 
+| **Documentation**                       | **License**                     |
+|:---------------------------------------:|:-------------------------------:|
+| [![][docs-stable-img]][docs-stable-url] | [![][license-img]][license-url] |
+
 ## Installation
 
 Clone this repo to your local machine.
@@ -45,5 +49,11 @@ Adding keyword arguments to `build_data()` can customize `build_data()`:
   - `save::String = path/to/file`: Replace `default` in the built data path.
   - `overwrite = false`: If data exists, do not read it. Rebuild the data from scratch.
 
-## License
-NREL/SLiDE is licensed under the BSD 3-Clause "New" or "Revised" [License](https://github.com/NREL/SLiDE/blob/master/LICENSE)
+[license-img]: https://img.shields.io/badge/license-BDS%203--Clause-lightgrey.svg
+[license-url]: https://github.com/NREL/SLiDE/blob/master/LICENSE
+
+[docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
+[docs-dev-url]: https://NREL.github.io/SLiDE
+
+[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
+[docs-stable-url]: https://NREL.github.io/SLiDE

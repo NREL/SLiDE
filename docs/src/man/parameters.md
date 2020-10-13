@@ -11,7 +11,7 @@
 
 # Model Input
 
-| Parameter | Variable | Description | References |
+| Parameter | Indices | Description | References |
 |--------:|:-------------|:------------------------------------------------|:--|
 | `ys`    | `(yr,r,s,g)` | *Sectoral supply (with byproducts)*             | [`SLiDE._partition_io!`](@ref) [`SLiDE._disagg_ys0!`](@ref) |
 | `id`    | `(yr,r,g,s)` | *Intermediate demand*                           | [`SLiDE._partition_io!`](@ref) [`SLiDE._disagg_id0!`](@ref) |

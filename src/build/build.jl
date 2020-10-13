@@ -6,7 +6,7 @@
 - `save = true` (default) or `save::String = "path/to/version"`: Save data in each build
 step in the path returned by [`SLiDE.build_path`](@ref).
 - `save = false`: the files at each step will not be saved.
-- `overwrite = false`: If data exists, do not read it. Rebuild the data from scratch.
+- `overwrite = false`: If data exists, do not read it. Build the data from scratch.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data.
