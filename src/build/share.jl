@@ -1,11 +1,18 @@
-using CSV
-using DataFrames
-using DelimitedFiles
-using YAML
-using Query
+"""
+    share!(d::Dict, set::Dict; save = true, overwrite = false)
 
-using Base
+# Arguments
+- `d::Dict` of DataFrames containing the model data.
+- `set::Dict` of Arrays describing region, sector, final demand, etc.
 
+# Keywords
+- `save = true`
+- `overwrite = false`
+See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
+
+# Returns
+- `d::Dict` of DataFrames containing the model data at the sharing step.
+"""
 function share!(d::Dict, set::Dict; save = true, overwrite = false)
 
     # If there is already sharing data, read it and return.
