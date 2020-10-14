@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-using CSV
-using DataFrames
-using DelimitedFiles
-using YAML
-using Query
-
-=======
->>>>>>> origin/dev
 """
     share_pce!(d::Dict)
 `pce`: Regional shares of final consumption

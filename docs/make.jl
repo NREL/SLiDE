@@ -23,14 +23,6 @@ makedocs(clean = true,
     authors = "Maxwell Brown, Caroline L. Hughes",
     pages = [
         "Home" => "index.md",
-<<<<<<< HEAD
-        "Data" => Any[
-            "blueNOTE Data Set" => "lib/data.md",
-            # "Data Stream" => "lib/datastream.md",
-            "Build Stream" => "lib/buildstream.md",
-            "Scaling" => "lib/scaling.md",
-            "Parameters" => "lib/parameters.md"
-=======
         "Introduction" => Any[
             "Data" => "man/data.md",
             "Build" => Any[
@@ -40,7 +32,6 @@ makedocs(clean = true,
             ],
             "Scaling" => "man/scaling.md",
             "Parameters" => "man/parameters.md"
->>>>>>> origin/dev
         ],
         "API" => [
             "Types" => map(
