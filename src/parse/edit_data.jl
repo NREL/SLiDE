@@ -158,7 +158,6 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
             df_map[!,col_map] .= convert_type.(String, df_map[:,col_map])
         end
     end
-    
     join_cols = Pair.(x.input, temp_from)
     
     x.kind == :inner && (df = innerjoin(df, df_map, on = join_cols; makeunique = true))

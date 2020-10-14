@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SLiDE
 
 ## Build
@@ -24,3 +25,5 @@ Pages = [
 Modules = [SLiDE]
 Pages = ["build/disagg.jl"]
 ```
+=======
+>>>>>>> origin/dev
