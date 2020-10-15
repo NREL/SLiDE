@@ -1,8 +1,20 @@
-using CSV
-using JuMP
-using DataFrames
-using Ipopt
+"""
+    calibrate(d::Dict, set::Dict; save = true, overwrite = false)
+    calibrate(year::Int, d::Dict, set::Dict)
 
+# Arguments
+- `d::Dict` of DataFrames containing the model data.
+- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `year::Int`: year for which to perform calibration
+
+# Keywords
+- `save = true`
+- `overwrite = false`
+See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
+
+# Returns
+- `d::Dict` of DataFrames containing the model data at the calibration step.
+"""
 function calibrate(d::Dict, set::Dict; save = true, overwrite = false)
 
     io_cal = read_build("calibrate"; save = save, overwrite = overwrite)

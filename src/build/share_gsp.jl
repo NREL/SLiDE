@@ -1,9 +1,3 @@
-using CSV
-using DataFrames
-using DelimitedFiles
-using YAML
-using Query
-
 """
     share_labor!(d::Dict, set::Dict)
 """

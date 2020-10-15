@@ -1,47 +1,63 @@
 import Pkg; Pkg.add("InfrastructureSystems")
 
-push!(LOAD_PATH, joinpath("..","src"))
-push!(LOAD_PATH, joinpath("..","src","parse"))
-push!(LOAD_PATH, joinpath("..","dev"))
-push!(LOAD_PATH, joinpath("..","dev","buildstream"))
-
 using DelimitedFiles
 using Documenter
 
 # Include SLiDE modules.
 using SLiDE
 
+if haskey(ENV, "DOCSARGS")
+    for arg in split(ENV["DOCSARGS"])
+        (arg in ARGS) || push!(ARGS, arg)
+    end
+end
+
+DocMeta.setdocmeta!(SLiDE, :DocTestSetup, :(using SLiDE); recursive=true)
+
 # Now, generate the documentation.
 makedocs(clean = true,
     modules = [SLiDE],
-    format = Documenter.HTML(prettyurls = false),
-    sitename="SLiDE",
-    authors="Maxwell Brown, Caroline Hughes",
-    pages=[
+    format = Documenter.HTML(
+        mathengine = Documenter.MathJax(),
+        prettyurls = get(ENV, "CI", nothing) == "true",
+    ),
+    sitename = "SLiDE.jl",
+    authors = "Maxwell Brown, Caroline L. Hughes",
+    pages = [
         "Home" => "index.md",
-        "Data" => Any[
-            "blueNOTE Data Set" => "lib/data.md",
-            # "Data Stream" => "lib/datastream.md",
-            "Build Stream" => "lib/buildstream.md",
-            "Scaling" => "lib/scaling.md",
-            "Parameters" => "lib/parameters.md"
+        "Introduction" => Any[
+            "Data" => Any[
+                "Overview" => "man/data/overview.md",
+                "Preparation" => "man/data/preparation.md",
+            ],
+            "Build" => Any[
+                "Overview" => "man/build/overview.md",
+                "Partition" => "man/build/partition.md",
+                "Disaggregate" => "man/build/disagg.md",
+            ],
+            "Scaling" => "man/scaling.md",
+            "Parameters" => "man/parameters.md"
         ],
+        "API" => [
+            "Types" => map(
+                s -> "api/types/$(s)",
+                sort(readdir(joinpath(@__DIR__, "src/api/types")))),
+            "Functions" => map(
+                s -> "api/functions/$(s)",
+                sort(readdir(joinpath(@__DIR__, "src/api/functions")))),
+            "Internals" => map(
+                s -> "api/internals/$(s)",
+                sort(readdir(joinpath(@__DIR__, "src/api/internals"))))
+            ],
         "Model" => "api/model.md",
-        "Functions" => "SLiDE.md"
     ]
 )
 
-
-# pages = [
-#         "Home" => "index.md",
-#         "Manual" => Any[
-#             "Guide" => "man/guide.md",
-#             "man/examples.md",
-#             "man/syntax.md",
-#             "man/doctests.md",
-#             "man/latex.md",
-#             hide("man/hosting.md", [
-#                 "man/hosting/walkthrough.md"
-#             ]),
-#             "man/other-formats.md",
-#         ],
+deploydocs(
+    repo = "https://github.com/NREL/SLiDE.git",
+    target = "build",
+    branch = "gh-pages",
+    devbranch = "docs",
+    devurl = "dev",
+    versions = ["stable" => "v^", "v#.#"],
+)

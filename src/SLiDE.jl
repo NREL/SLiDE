@@ -1,3 +1,5 @@
+isdefined(Base, :__precompile__) && __precompile__()
+
 """
 Module for constructing SLiDE objects.
 """
@@ -6,19 +8,20 @@ module SLiDE
 #################################################################################
 # IMPORTS
 import CSV
-import DataFrames
-import Dates
-import DelimitedFiles
-import Ipopt
-import JSON
-import JuMP
-import Logging
-import PowerSimulations
-import Printf
-import Query
+# import InvertedIndices
+import DataFrames;          using DataFrames
+import Dates;               using Dates
+import DelimitedFiles;      using DelimitedFiles
+import Ipopt;               using Ipopt
+import JSON;                using JSON
+import JuMP;                using JuMP
+import Logging;             using Logging
+# import PowerSimulations;
+# import Printf
+# import Query;               using Query
 # import Revise
-import Statistics
-import Test
+import Statistics;          using Statistics
+# import Test;
 import XLSX
 import YAML
 
@@ -112,12 +115,12 @@ export build_data
 export partition!
 export calibrate
 export share!
-export share_labor!
-export share_pce!
-export share_region!
-export share_rpc!
-export share_sgf!
-export share_utd!
+# export share_labor!
+# export share_pce!
+# export share_region!
+# export share_rpc!
+# export share_sgf!
+# export share_utd!
 export disagg!
 
 #################################################################################

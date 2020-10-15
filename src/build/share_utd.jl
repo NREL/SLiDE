@@ -1,9 +1,3 @@
-using CSV
-using DataFrames
-using DelimitedFiles
-using YAML
-using Query
-
 """
     share_utd!(d::Dict, set::Dict)
 `utd`: Share of total trade by region.
