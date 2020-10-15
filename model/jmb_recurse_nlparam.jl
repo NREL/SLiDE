@@ -1081,3 +1081,34 @@ ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH
 
 # solve the model
 status = solveMCP(cge)
+
+
+### set_start_value not supported for complementarity.jl/PATHsolver
+# Update parameters for next period
+#=
+for r in regions, s in sectors
+#update capital endowments
+    set_value(ks_s[r,s], (1-value(delta)) * (value(ks_s[r,s]) + value(ks_n[r,s])));
+    set_value(ks_x[r,s], (1-value(delta)) * value(ks_x[r,s]));
+    set_value(ks_n[r,s], (value(rho) + value(delta)) * value(i0_p[r,s]));
+
+#update labor endowments
+    set_value(ld0_p[r,s], (1 + value(eta)) * value(ld0_p[r,s]));
+end
+
+set_start_value.(all_variables(cge), value.(all_variables(cge)))
+
+for r in regions
+    set_start_value(C[r], value(C[r])*(1 + value(eta)));
+end
+
+for r in regions, s in sectors
+    set_start_value(YX[r,s], value(YX[r,s])*(1 - value(delta)));
+    set_start_value(YM[r,s], value(C[r]) - value(YX[r,s]));
+    set_start_value(A[r,s], value(A[r,s]) * (1 + value(eta)));
+end
+
+# solve next period
+status = solveMCP(cge)
+
+=#
