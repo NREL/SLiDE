@@ -130,16 +130,16 @@ end
 This function applies [`combine`](https://juliadata.github.io/DataFrames.jl/stable/lib/functions/#DataFrames.combine)
 to the input DataFrame `df` over the input column(s) `col`.
 
-# Arguments:
+# Arguments
 - `df::DataFrame`: DataFrame on which to operate.
 - `col::Symbol` or `col::Array{Symbol,1}`: column(s) over which to operate.
 
-# Keyword Arguments:
+# Keyword Arguments
 - `operation::Function = sum`: Operation to perform over the DataFrame columns. By default,
     the function will return a summation. Other standard summary functions include: `sum`,
     `prod`, `minimum`, `maximum`, `mean`, `var`, `std`, `first`, `last` and `length`.
 
-# Returns:
+# Returns
 - `df::DataFrame` WITHOUT the specified column(s) argument. The resulting DataFrame will be
     'shorter' than the input DataFrame.
 """
@@ -165,16 +165,16 @@ end
 This function applies [`transform`](https://juliadata.github.io/DataFrames.jl/stable/lib/functions/#DataFrames.transform)
 to the input DataFrame `df` over the input column(s) `col`.
 
-# Arguments:
+# Arguments
 - `df::DataFrame`: DataFrame on which to operate.
 - `col::Symbol` or `col::Array{Symbol,1}`: column(s) over which to operate.
 
-# Keyword Arguments:
+# Keyword Arguments
 - `operation::Function = sum`: Operation to perform over the DataFrame columns. By default,
     the function will return a summation. Other standard summary functions include: `sum`,
     `prod`, `minimum`, `maximum`, `mean`, `var`, `std`, `first`, `last` and `length`.
 
-# Returns:
+# Returns
 - `df::DataFrame` WITH the specified column(s) argument. The resulting DataFrame will be
     the same length as the input DataFrame.
 """

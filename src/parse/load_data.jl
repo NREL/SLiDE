@@ -31,17 +31,19 @@ the `data/coremaps` directory. It returns a .csv file.
     dictionary. All keys that correspond with SLiDE DataStream DataTypes will be converted
     to (lists of) those types.
 """
-function read_file(path::Array{String,1}, file::GAMSInput; shorten = false)
-    filepath = joinpath(SLIDE_DIR, path..., file.name)
+function read_file(path::Array{String,1}, file::GAMSInput; shorten=false)
+    # filepath = joinpath(SLIDE_DIR, path..., file.name)
+    filepath = joinpath(path..., file.name)
     xf = readlines(filepath)
-    df = gams_to_dataframe(xf; colnames = file.col)
+    df = gams_to_dataframe(xf; colnames=file.col)
     return df
 end
 
-function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
-    filepath = joinpath(SLIDE_DIR, path..., file.name)
-    df = CSV.read(filepath, DataFrame; silencewarnings = true, ignoreemptylines = true, comment = "#", missingstrings = ["","\xc9","..."])
-    NUMTEST = min(10, size(df,1))
+function read_file(path::Array{String,1}, file::CSVInput; shorten=false)
+    # filepath = joinpath(SLIDE_DIR, path..., file.name)
+    filepath = joinpath(path..., file.name)
+    df = CSV.read(filepath, DataFrame; silencewarnings=true, ignoreemptylines=true, comment="#", missingstrings=["","\xc9","..."])
+    NUMTEST = min(10, size(df, 1))
 
     # A column name containing the word "Column" indicates that the input csv file was
     # missing a column header. Multiple (more than 2?) columns with missing header suggests
@@ -54,15 +56,15 @@ function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
         xf = xf[1:NUMTEST,:]
 
         HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf) .!= 0)))) .> 1)[2]
-        df = CSV.read(filepath, DataFrame, silencewarnings = true, ignoreemptylines = true,
-            missingstrings = ["","\xc9","..."]; header = HEAD)
+        df = CSV.read(filepath, DataFrame, silencewarnings=true, ignoreemptylines=true,
+            missingstrings=["","\xc9","..."]; header=HEAD)
     end
 
     # Remove footer rows. These are identified by rows at the bottom of the sheet that are
     # empty with the exception of the first column.
     if all(ismissing.(values(df[end,2:end])))
-        x = sum.([Int.(ismissing.(values(row))) for row in eachrow(df[end-NUMTEST:end,:])])
-        FOOT = size(df)[1] - (length(x) - (findmax(x)[2]-1))
+        x = sum.([Int.(ismissing.(values(row))) for row in eachrow(df[end - NUMTEST:end,:])])
+        FOOT = size(df)[1] - (length(x) - (findmax(x)[2] - 1))
         df = df[1:FOOT,:]
     end
 
@@ -70,23 +72,23 @@ function read_file(path::Array{String,1}, file::CSVInput; shorten = false)
     return unique(df)
 end
 
-function read_file(path::Array{String,1}, file::XLSXInput; shorten = false)
-    filepath = joinpath(SLIDE_DIR, path..., file.name)
+function read_file(path::Array{String,1}, file::XLSXInput; shorten=false)
+    # filepath = joinpath(SLIDE_DIR, path..., file.name)
+    filepath = joinpath(path..., file.name)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
     
     # Delete rows containing only missing values.
     xf = xf[[!all(row) for row in eachrow(ismissing.(xf))],:]
-    df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique = true)
+    df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique=true)
 
     shorten != false && (df = df[1:shorten,:])
     return df
 end
 
-function read_file(path::String, file::T; shorten = false) where T <: File
-    return read_file([path], file; shorten = shorten)
+function read_file(path::String, file::T; shorten=false) where T <: File
+    return read_file([path], file; shorten=shorten)
 end
 
-# !!!! Is this method too niche?
 function read_file(editor::T) where T <: Edit
     # !!!! Should we avoid including specific paths within functions?
     # !!!! Need to throw error if this is called when "file" is not a field.
@@ -96,11 +98,12 @@ function read_file(editor::T) where T <: Edit
     return df
 end
 
-function read_file(file::String; colnames = false)
-    file = joinpath(SLIDE_DIR, file)
+function read_file(file::String; colnames=false)
+    # file = joinpath(SLIDE_DIR, file)
+    file = joinpath(file)
 
     if occursin(".map", file) | occursin(".set", file)
-        return gams_to_dataframe(readlines(file); colnames = colnames)
+        return gams_to_dataframe(readlines(file); colnames=colnames)
     end
 
     if occursin(".yml", file) | occursin(".yaml", file)
@@ -114,8 +117,8 @@ function read_file(file::String; colnames = false)
         return y
 
     elseif occursin(".csv", file)
-        df = CSV.read(file, DataFrame, silencewarnings = true, ignoreemptylines=true, comment = "#",
-            missingstrings = ["","\xc9","..."])
+        df = CSV.read(file, DataFrame, silencewarnings=true, ignoreemptylines=true, comment="#",
+            missingstrings=["","\xc9","..."])
         return df
     end
 end
@@ -164,7 +167,7 @@ function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
     if any(isarray.(types)) && !all(isarray.(types))
         # Restructure data into a list of inputs in the order and type required when
         # creating the datatype. Ensure that all array entries should, in fact, be arrays.
-        inps = [_load_as_type(T, d[f], t) for (f,t) in zip(fields, types)]
+        inps = [_load_as_type(T, d[f], t) for (f, t) in zip(fields, types)]
         inpscorrect = isarray.(inps) .== isarray.(types)
 
         # If all inputs are of the correct structure, fill the data type.
@@ -200,12 +203,12 @@ function load_from(::Type{T}, df::DataFrame) where T <: Any
     # If one of the struct fields is an ARRAY, we here assume that it is the length of the
     # entire DataFrame, and all other fields are duplicates.
     if any(isarray.(T.types))
-        inps = [_load_as_type(T, df[:, f], t) for (f,t) in zip(fields, types)]
+        inps = [_load_as_type(T, df[:, f], t) for (f, t) in zip(fields, types)]
         lst = [T(inps...)]
     # If each row in the input df fills one and only one struct,
     # create a list of structures from each DataFrame row.
     else
-        lst = [T((_load_as_type(T, row[f], t) for (f,t) in zip(fields, types))...)
+        lst = [T((_load_as_type(T, row[f], t) for (f, t) in zip(fields, types))...)
             for row in eachrow(df)]
     end
     return size(lst)[1] == 1 ? lst[1] : lst
@@ -220,7 +223,7 @@ function _load_path(d::Dict)
     for (k, lst) in d
         if typeof(lst) .== Array{String,1}
             ii_file = [any(occursin.(FILES, x)) for x in lst]
-            (ii_file[end] && .!any(ii_file[1:end-1])) && (d[k] = joinpath(lst...))
+            (ii_file[end] && .!any(ii_file[1:end - 1])) && (d[k] = joinpath(lst...))
         end
     end
     return d
@@ -236,7 +239,7 @@ function _load_as_type(entry, type::DataType)
     return entry
 end
 
-_load_as_type(::Type{T}, entry, type::DataType) where T<:Any = _load_as_type(entry, type)
+_load_as_type(::Type{T}, entry, type::DataType) where T <: Any = _load_as_type(entry, type)
 _load_as_type(::Type{Drop},    entry, type::Type{Any})    = _load_as_type(_load_case(entry), type)
 _load_as_type(::Type{Rename},  entry, type::Type{Symbol}) = _load_as_type(_load_case(entry), type)
 _load_as_type(::Type{Replace}, entry, type::Type{Any})    = _load_as_type(_load_case(entry), type)
@@ -290,7 +293,7 @@ column's first row.
 - `filenames::Array{String,1}`: List of yaml files
 
 """
-function write_yaml(path, file::XLSXInput)
+function write_yaml(path, file::XLSXInput; overwrite::Bool=true)
     println("\nGENERATE YAML FILES FROM ", file.name)
 
     # List all key words in the yaml file and use to add (purely aesthetic) spacing.
@@ -299,37 +302,59 @@ function write_yaml(path, file::XLSXInput)
     # Read the XLSX file, identify relevant (not "missing"), and generate list of resultant
     # yaml file propertynames.
     println("  Reading ", file.name)
-    df_all = read_file(path, file)
-    df_all = df_all[:, .!occursin.(:missing, propertynames(df_all))]
+    df = read_file(path, file)
+    df = df[:, .!occursin.(:missing, propertynames(df))]
 
     # Make sure the path exists and save the propertynames of yaml propertynames to generaate.
-    path = joinpath(SLIDE_DIR, path, file.sheet)
+    # path = joinpath(SLIDE_DIR, path, file.sheet)
+    path = joinpath(path, file.sheet)
     !isdir(path) && mkpath(path)
-    filenames = joinpath.(path, string.(propertynames(df_all), ".yml"))
+    # filenames = joinpath.(path, string.(propertynames(df_all), ".yml"))
 
+    files = Dict(k => joinpath(path, "$k.yml") for k in propertynames(df))
+    
     # Iterate through columns. For each column, create a new yaml file and fill it with
     # the column text. Mark the yaml file as "Autogenerated" and ensure one space only
     # between each input file element that corresponds with a SLiDE Datastream subtype.
-    for COL in 1:size(df_all,2)
-        println("  Generating ", filenames[COL])
-        
-        # Remove all lines that do not contain text.
-        lines = dropmissing(df_all, COL)[:,COL]
-        lines = lines[match.(r"\S.*", lines) .!= nothing]
+    for k in keys(files)
 
-        open(filenames[COL], "w") do f
-            println(f, string("# Autogenerated from ", file.name))
-            for line in lines
-                any(occursin.(KEYS, line)) && (println(f, ""))
-                println(f, line)
+        if overwrite == false && isfile(files[k])
+            println("  Skipping overwrite. Found: ", files[k])
+        else
+            println("  Generating ", files[k])
+
+            lines = dropmissing(df, k)[:,k]
+            lines = lines[match.(r"\S.*", lines) .!== nothing]
+
+            open(files[k], "w") do f
+                println(f, string("# Autogenerated from ", file.name))
+                for line in lines
+                    any(occursin.(KEYS, line)) && (println(f, ""))
+                    println(f, line)
+                end
             end
         end
     end
-    return filenames
+    return files
 end
 
-write_yaml(path::Array{String,1}, file::XLSXInput) = write_yaml(joinpath(path...), file)
-write_yaml(path, files::Array{XLSXInput,1}) = vcat([write_yaml(path, f) for f in files]...)
+function write_yaml(path::Array{String,1}, file::XLSXInput; overwrite::Bool=true)
+    write_yaml(joinpath(path...), file; overwrite=overwrite)
+end
+
+function write_yaml(path, files::Dict{Symbol,XLSXInput}; overwrite::Bool=true)
+    files = Dict(k => write_yaml(path, file; overwrite=overwrite) for (k, file) in files)
+    return files
+end
+
+function write_yaml(path, files::Array{XLSXInput,1}; overwrite::Bool=true)
+    if length(unique(get_descriptor.(files))) < length(files)
+        @error("Input XLSX files must have unique descriptors.")
+    end
+    files = Dict(Symbol(file.descriptor) => file for file in files)
+    files = write_yaml(path, files; overwrite=overwrite)
+    return files
+end
 
 """
     run_yaml(filename::String)
@@ -345,8 +370,7 @@ A file might not be "editable" if SLiDE functionality cannot make all of the spe
 - `filename::String` or `filenames::Array{String,1}`: yaml file name (or list of propertynames) that
     was/were not ran by the function because they were annotated with `Editable: false`
 """
-function run_yaml(filename::String)
-
+function run_yaml(filename::String; save::Bool = true)
     println("\n", filename)
     println("  Reading yaml file...")
 
@@ -357,18 +381,30 @@ function run_yaml(filename::String)
         # operations defined in the input YAML file.
         println("  Parsing and standardizing...")
         df = unique(edit_with(y))
-
-        # Create the path where the output file will go if it doesn't already exist.
-        path = joinpath(SLIDE_DIR, ensurearray(y["PathOut"])[1:end-1]...)
-        !isdir(path) && mkpath(path)
         
-        println("  Writing to ", joinpath(ensurearray(y["PathOut"])...))
-        CSV.write(joinpath(SLIDE_DIR, ensurearray(y["PathOut"])...), df)
-        return nothing
+        # Create the path where the output file will go if it doesn't already exist.
+        if save !== false
+            save_path = save == true ? "" : save
+
+            # path = joinpath(SLIDE_DIR, save_path, ensurearray(y["PathOut"])...)
+            path = joinpath(save_path, ensurearray(y["PathOut"])...)
+            file = joinpath(path, y["FileOut"])
+            !isdir(path) && mkpath(path)
+
+            println("  Writing to $file")
+            CSV.write(file, df)
+            show(first(df, 3))
+        end
+        return df
     else
         println("  Skipping... (not editable)")
         return filename
     end
+end
+
+function run_yaml(d::Dict; save::Bool = false)
+    d_ans = Dict(k => run_yaml(d[k]; save=save) for k in keys(d))
+    return d_ans
 end
 
 function run_yaml(filenames::Array{String,1})
@@ -383,24 +419,24 @@ function run_yaml(filenames::Array{String,1})
 end
 
 """
-    gams_to_dataframe(xf::Array{String,1}; colpropertynames = false)
+    gams_to_dataframe(xf::Array{String,1}; colnames = false)
 This function converts a GAMS map or set to a DataFrame, expanding sets into multiple rows.
 
 # Arguments
 - `xf::Array{String,1}`: A list of rows of text from a .map or a .set input file.
 
 # Keywords
-- `colpropertynames = false`: A user has the option to specify the column propertynames of the output
+- `colnames = false`: A user has the option to specify the column propertynames of the output
     DataFrame. If none are specified, a default of `[missing, missing_1, ...]` will be used,
     consistent with the default column headers for `CSV.read()` if column propertynames are missing.
 
 # Returns
 - `df::DataFrame`: A dataframe representation of the GAMS map or set.
 """
-function gams_to_dataframe(xf::Array{String,1}; colpropertynames = false)
+function gams_to_dataframe(xf::Array{String,1}; colnames=false)
     # Convert the input array into a DataFrame and use SLiDE editing capabilities to split
     # each rows into columns, based on the syntax.
-    df = DataFrame(missing = xf)
+    df = DataFrame(missing=xf)
     df = edit_with(df, Match(Regex("^(?<missing>\\S+)\\.(?<missing_1>[\\S^,]*)\\s*\"*(?<missing_2>[^\"]*),?"),
         :missing, [:missing, :missing_1, :missing_2]))
     ROWS, COLS = size(df)
@@ -416,6 +452,6 @@ function gams_to_dataframe(xf::Array{String,1}; colpropertynames = false)
     
     # If the user specified column propertynames, apply those here and
     # return a DataFrame sorted based on the mapping values.
-    colpropertynames != false && (df = edit_with(df, Rename.(propertynames(df), colpropertynames)))
+    colnames != false && (df = edit_with(df, Rename.(propertynames(df), colnames)))
     return COLS > 1 ? sort(df, reverse(propertynames(df)[1:2])) : sort(df)
 end

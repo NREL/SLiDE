@@ -151,14 +151,12 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
     # DataFrame are used since all values in each column should be of the same type.
     for (col, col_map) in zip(x.input, temp_from)
         try
-            new_type = eltypes(dropmissing(df_map[:,[col_map]]))
-            # new_type = eltype.(eachcol(dropmissing(df_map[:,[col_map]])))
+            new_type = eltype.(eachcol(dropmissing(df_map[:,[col_map]])))
             df[!,col] .= convert_type.(new_type, df[:,col])
         catch
             df_map[!,col_map] .= convert_type.(String, df_map[:,col_map])
         end
     end
-
     join_cols = Pair.(x.input, temp_from)
     
     x.kind == :inner && (df = innerjoin(df, df_map, on = join_cols; makeunique = true))
@@ -194,7 +192,7 @@ function edit_with(df::DataFrame, x::Match)
         # Where there is a match, fill empty cells. If values in the input column,
         # leave cells without a match unchanged.
         df = edit_with(df, Add.(setdiff(x.output, propertynames(df)), ""))
-        [m[ii] != nothing && ([df[ii,out] = m[ii][out] for out in x.output])
+        [m[ii] !== nothing && ([df[ii,out] = m[ii][out] for out in x.output])
             for ii in 1:length(m)]
     end
     return df
@@ -392,22 +390,8 @@ _expand_range(x::Int) = x
     fill_zero(d::Dict...)
     fill_zero(keys_unique, d::Dict)
 
-# Arguments
-- `keys_unique::Tuple`: A list of arrays whose permutations should be included in the
-    resultant dictionary.
-- `keys_unique::NamedTuple`: A list of arrays whose permutations should be included in the
-    resultant dictionary. The NamedTuple's keys correspond to the DataFrame columns where
-    they will be stored.
-- `d::Dict...`: The dictionary/ies to edit.
-- `df::DataFrame...`: The DataFrame(s) to edit.
-
-# Keyword Arguments
-- `value_colnames::Any = :value`: "value" column labels to add and set to zero when creating
-    a new DataFrame. Default is `:value`.
-
-# Usage
 This function can be used to fill zeros in either a dictionary or DataFrame.
-- Options for DataFrame editing:
+- Options for dictionary editing:
     - If only (a) dictionary/ies is/are input, the dictionaries will be edited such that
         they all contain all permutations of their key values. All dictionaries in a
         resultant list of dictionaries will be the same length.
@@ -423,6 +407,19 @@ This function can be used to fill zeros in either a dictionary or DataFrame.
         includes all permutations of the NamedTuple's values.
     - If only a NamedTuple is input, a new DataFrame will be created, containing all key
         permutations with values initialized to zero.
+
+# Arguments
+- `keys_unique::Tuple`: A list of arrays whose permutations should be included in the
+    resultant dictionary.
+- `keys_unique::NamedTuple`: A list of arrays whose permutations should be included in the
+    resultant dictionary. The NamedTuple's keys correspond to the DataFrame columns where
+    they will be stored.
+- `d::Dict...`: The dictionary/ies to edit.
+- `df::DataFrame...`: The DataFrame(s) to edit.
+
+# Keyword Arguments
+- `value_colnames::Any = :value`: "value" column labels to add and set to zero when creating
+    a new DataFrame. Default is `:value`.
 
 # Returns
 - `d::Dict...` if input included dictionaries and/or Tuples
@@ -483,27 +480,74 @@ function fill_zero(keys_fill::Any, d::Dict; permute_keys::Bool = true)
     return d
 end
 
-function fill_with(inp::Any, val::Any)
-    df = fill_zero(inp);
-    df = edit_with(df, Replace(:value, 0.0, val))
+
+"""
+    fill_with(keys_unique::NamedTuple, value::Any; kwargs)
+
+Initializes a new DataFrame and fills it with the specified input value.
+"""
+function fill_with(keys_fill::NamedTuple, value::Any; value_colnames = :value)
+    df = fill_zero(keys_fill; value_colnames = value_colnames)
+    df = edit_with(df, Replace.(value_colnames, 0.0, value))
     return df
 end
 
 """
     extrapolate_year(df::DataFrame, yr::Array{Int64,1}; kwargs...)
-    extrapolate_year(df::DataFrame, set::Dict; kwargs...)
+    extrapolate_year(df::DataFrame, set::Any; kwargs...)
 
-# Arguments:
+# Arguments
 - `df::DataFrame` that might be in need of extrapolation.
 - `yr::Array{Int64,1}`: List of years overwhich extrapolation is possible (depending on the kwargs)
-- `set::Dict` containing list of years, identified by the key `:yr`.
+- `set::Dict` or `set::NamedTuple` containing list of years, identified by the key `:yr`.
 
-# Keyword Arguments:
+# Keyword Arguments
 - `backward::Bool = true`: Do we extrapolate backward in time?
 - `forward::Bool = true`: Do we extrapolate forward in time?
 
-# Returns:
+# Returns
 - `df::DataFrame` extrapolated in time.
+
+# Example
+Continuing with the DataFrame from [`SLiDE.filter_with`](@ref),
+
+```jldoctest extrapolate_year; setup = :(df = filter_with(read_file(joinpath(SLIDE_DIR,"docs","src","assets","data","filter_use.csv")), (i = ["agr","fbp"], j = ["agr","fbp"])))
+julia> df
+8×4 DataFrame
+│ Row │ yr    │ i      │ j      │ value   │
+│     │ Int64 │ String │ String │ Float64 │
+├─────┼───────┼────────┼────────┼─────────┤
+│ 1   │ 2015  │ agr    │ agr    │ 69.42   │
+│ 2   │ 2015  │ agr    │ fbp    │ 277.179 │
+│ 3   │ 2015  │ fbp    │ agr    │ 49.132  │
+│ 4   │ 2015  │ fbp    │ fbp    │ 210.998 │
+│ 5   │ 2016  │ agr    │ agr    │ 60.197  │
+│ 6   │ 2016  │ agr    │ fbp    │ 264.173 │
+│ 7   │ 2016  │ fbp    │ agr    │ 47.739  │
+│ 8   │ 2016  │ fbp    │ fbp    │ 205.21  │
+
+julia> extrapolate_year(df, Dict(:yr => 2014:2017))
+16×4 DataFrame
+│ Row │ yr    │ i      │ j      │ value   │
+│     │ Int64 │ String │ String │ Float64 │
+├─────┼───────┼────────┼────────┼─────────┤
+│ 1   │ 2014  │ agr    │ agr    │ 69.42   │
+│ 2   │ 2014  │ agr    │ fbp    │ 277.179 │
+│ 3   │ 2014  │ fbp    │ agr    │ 49.132  │
+│ 4   │ 2014  │ fbp    │ fbp    │ 210.998 │
+│ 5   │ 2015  │ agr    │ agr    │ 69.42   │
+│ 6   │ 2015  │ agr    │ fbp    │ 277.179 │
+│ 7   │ 2015  │ fbp    │ agr    │ 49.132  │
+│ 8   │ 2015  │ fbp    │ fbp    │ 210.998 │
+│ 9   │ 2016  │ agr    │ agr    │ 60.197  │
+│ 10  │ 2016  │ agr    │ fbp    │ 264.173 │
+│ 11  │ 2016  │ fbp    │ agr    │ 47.739  │
+│ 12  │ 2016  │ fbp    │ fbp    │ 205.21  │
+│ 13  │ 2017  │ agr    │ agr    │ 60.197  │
+│ 14  │ 2017  │ agr    │ fbp    │ 264.173 │
+│ 15  │ 2017  │ fbp    │ agr    │ 47.739  │
+│ 16  │ 2017  │ fbp    │ fbp    │ 205.21  │
+```
 """
 function extrapolate_year(
     df::DataFrame,
@@ -545,29 +589,101 @@ end
 
 function extrapolate_year(
     df::DataFrame,
-    set::Dict;
+    set;
     backward::Bool = true,
     forward::Bool = true
 )
     extrapolate_year(df, set[:yr]; forward = forward, backward = backward)
 end
 
-"""
-    extrapolate_region(df::DataFrame, yr::Array{Int64,1}; kwargs...)
-    extrapolate_year(df::DataFrame, set::Dict; kwargs...)
+function extrapolate_year(
+    df::DataFrame,
+    yr::UnitRange{Int64};
+    backward::Bool = true,
+    forward::Bool = true
+)
+    extrapolate_year(df, ensurearray(yr); forward = forward, backward = backward)
+end
 
-# Arguments:
+"""
+    extrapolate_region(df::DataFrame; kwargs...)
+    extrapolate_region(df::DataFrame, r::Pair; kwargs...)
+
+Fills in missing data in the input DataFrame `df` by filling it with existing information in
+`df`. Here, "extrapolate" makes a direct copy of the data.
+
+# Arguments
 - `df::DataFrame` that might be in need of extrapolation.
 - `r::Pair = "md" => "dc"`: `Pair` indicating a region (`r.first`) to extrapolate to another
     region (`r.second`). A suggested regional extrapolation: MD data will be used to
-    approximate DC data in the event that it is missing.
+    approximate DC data in the event that it is missing. To fill multiple regions with data,
+    use "md" => ["dc","va"].
 
 # Keyword Argument:
 - `overwrite::Bool = false`: If data in the target region `r.second` is already present,
     should it be overwritten?
 
-# Returns:
-- `df::DataFrame` extrapolated in time.
+# Returns
+- `df::DataFrame` extrapolated in region.
+
+# Example
+
+```jldoctest extrapolate_region
+julia> df = read_file(joinpath(SLIDE_DIR,"docs","src","assets","data","filter_utd.csv"))
+8×5 DataFrame
+│ Row │ yr    │ r      │ s      │ t       │ value     │
+│     │ Int64 │ String │ String │ String  │ Float64   │
+├─────┼───────┼────────┼────────┼─────────┼───────────┤
+│ 1   │ 2015  │ md     │ agr    │ exports │ 0.0390152 │
+│ 2   │ 2015  │ md     │ agr    │ imports │ 0.778159  │
+│ 3   │ 2015  │ va     │ agr    │ exports │ 1.11601   │
+│ 4   │ 2015  │ va     │ agr    │ imports │ 0.88253   │
+│ 5   │ 2016  │ md     │ agr    │ exports │ 0.0330508 │
+│ 6   │ 2016  │ md     │ agr    │ imports │ 0.762089  │
+│ 7   │ 2016  │ va     │ agr    │ exports │ 1.16253   │
+│ 8   │ 2016  │ va     │ agr    │ imports │ 0.86741   │
+
+julia> extrapolate_region(df)
+12×5 DataFrame
+│ Row │ r      │ yr    │ s      │ t       │ value     │
+│     │ String │ Int64 │ String │ String  │ Float64   │
+├─────┼────────┼───────┼────────┼─────────┼───────────┤
+│ 1   │ dc     │ 2015  │ agr    │ exports │ 0.0390152 │
+│ 2   │ dc     │ 2015  │ agr    │ imports │ 0.778159  │
+│ 3   │ dc     │ 2016  │ agr    │ exports │ 0.0330508 │
+│ 4   │ dc     │ 2016  │ agr    │ imports │ 0.762089  │
+│ 5   │ md     │ 2015  │ agr    │ exports │ 0.0390152 │
+│ 6   │ md     │ 2015  │ agr    │ imports │ 0.778159  │
+│ 7   │ md     │ 2016  │ agr    │ exports │ 0.0330508 │
+│ 8   │ md     │ 2016  │ agr    │ imports │ 0.762089  │
+│ 9   │ va     │ 2015  │ agr    │ exports │ 1.11601   │
+│ 10  │ va     │ 2015  │ agr    │ imports │ 0.88253   │
+│ 11  │ va     │ 2016  │ agr    │ exports │ 1.16253   │
+│ 12  │ va     │ 2016  │ agr    │ imports │ 0.86741   │
+```
+
+If we instead want to copy VA data into DC, specify:
+
+```jldoctest extrapolate_region
+julia> extrapolate_region(df, "va" => "dc")
+12×5 DataFrame
+│ Row │ r      │ yr    │ s      │ t       │ value     │
+│     │ String │ Int64 │ String │ String  │ Float64   │
+├─────┼────────┼───────┼────────┼─────────┼───────────┤
+│ 1   │ dc     │ 2015  │ agr    │ exports │ 1.11601   │
+│ 2   │ dc     │ 2015  │ agr    │ imports │ 0.88253   │
+│ 3   │ dc     │ 2016  │ agr    │ exports │ 1.16253   │
+│ 4   │ dc     │ 2016  │ agr    │ imports │ 0.86741   │
+│ 5   │ md     │ 2015  │ agr    │ exports │ 0.0390152 │
+│ 6   │ md     │ 2015  │ agr    │ imports │ 0.778159  │
+│ 7   │ md     │ 2016  │ agr    │ exports │ 0.0330508 │
+│ 8   │ md     │ 2016  │ agr    │ imports │ 0.762089  │
+│ 9   │ va     │ 2015  │ agr    │ exports │ 1.11601   │
+│ 10  │ va     │ 2015  │ agr    │ imports │ 0.88253   │
+│ 11  │ va     │ 2016  │ agr    │ exports │ 1.16253   │
+│ 12  │ va     │ 2016  │ agr    │ imports │ 0.86741   │
+```
+
 """
 function extrapolate_region(df::DataFrame, r::Pair = "md" => "dc"; overwrite = false)
     df = copy(df)
@@ -585,18 +701,19 @@ function extrapolate_region(df::DataFrame, r::Pair = "md" => "dc"; overwrite = f
 end
 
 """
-    filter_with(df::DataFrame, set::Any; kwargs...)
+filter_with(df::DataFrame, set::Any; kwargs...)
 
-# Arguments:
+# Arguments
 - `df::DataFrame` to filter.
 - `set::Dict` or `set::NamedTuple`: Values to keep in the DataFrame.
 
-# Keyword Arguments:
+# Keyword Arguments
 - `extrapolate::Bool = false`: Add missing regions/years to the DataFrame?
     If `extrapolate` is set to true, the following `kwargs` become relevant:
     - When extrapolating over years,
         - `backward::Bool = true`: Do we extrapolate backward in time?
         - `forward::Bool = true`: Do we extrapolate forward in time?
+        Currently, "extrapolating" means copying the closest 
     - When extrapolating across regions,
         - `r::Pair = "md" => "dc"`: `Pair` indicating a region (`r.first`) to extrapolate to
             another region (`r.second`). A suggested regional extrapolation: MD data will be
@@ -604,36 +721,93 @@ end
         - `overwrite::Bool = false`: If data in the target region `r.second` is already present,
             should it be overwritten?
 
-# Returns:
+# Returns
 - `df::DataFrame` with only the desired keys.
+
+# Examples
+
+```jldoctest filter_with
+julia> df = read_file(joinpath(SLIDE_DIR,"docs","src","assets","data","filter_use.csv"))
+14×4 DataFrame
+│ Row │ yr    │ i      │ j      │ value   │
+│     │ Int64 │ String │ String │ Float64 │
+├─────┼───────┼────────┼────────┼─────────┤
+│ 1   │ 2015  │ agr    │ agr    │ 69.42   │
+│ 2   │ 2015  │ agr    │ fbp    │ 277.179 │
+│ 3   │ 2015  │ fbp    │ agr    │ 49.132  │
+│ 4   │ 2015  │ fbp    │ fbp    │ 210.998 │
+│ 5   │ 2015  │ uti    │ agr    │ 4.846   │
+│ 6   │ 2015  │ uti    │ fbp    │ 10.102  │
+│ 7   │ 2015  │ uti    │ uti    │ 35.093  │
+│ 8   │ 2016  │ agr    │ agr    │ 60.197  │
+│ 9   │ 2016  │ agr    │ fbp    │ 264.173 │
+│ 10  │ 2016  │ fbp    │ agr    │ 47.739  │
+│ 11  │ 2016  │ fbp    │ fbp    │ 205.21  │
+│ 12  │ 2016  │ uti    │ agr    │ 4.548   │
+│ 13  │ 2016  │ uti    │ fbp    │ 9.152   │
+│ 14  │ 2016  │ uti    │ uti    │ 27.47   │
+
+julia> df = filter_with(df, (i = ["agr","fbp"], j = ["agr","fbp"]))
+8×4 DataFrame
+│ Row │ yr    │ i      │ j      │ value   │
+│     │ Int64 │ String │ String │ Float64 │
+├─────┼───────┼────────┼────────┼─────────┤
+│ 1   │ 2015  │ agr    │ agr    │ 69.42   │
+│ 2   │ 2015  │ agr    │ fbp    │ 277.179 │
+│ 3   │ 2015  │ fbp    │ agr    │ 49.132  │
+│ 4   │ 2015  │ fbp    │ fbp    │ 210.998 │
+│ 5   │ 2016  │ agr    │ agr    │ 60.197  │
+│ 6   │ 2016  │ agr    │ fbp    │ 264.173 │
+│ 7   │ 2016  │ fbp    │ agr    │ 47.739  │
+│ 8   │ 2016  │ fbp    │ fbp    │ 205.21  │
+
+julia> filter_with(df, (yr = 2016,); drop = true)
+4×3 DataFrame
+│ Row │ i      │ j      │ value   │
+│     │ String │ String │ Float64 │
+├─────┼────────┼────────┼─────────┤
+│ 1   │ agr    │ agr    │ 60.197  │
+│ 2   │ agr    │ fbp    │ 264.173 │
+│ 3   │ fbp    │ agr    │ 47.739  │
+│ 4   │ fbp    │ fbp    │ 205.21  │
+```
 """
 function filter_with(
     df::DataFrame,
     set::Any;
+    drop::Bool = false,
     extrapolate::Bool = false,
     forward::Bool = true,
     backward::Bool = true,
     r::Pair = "md" => "dc",
     overwrite::Bool = false
 )
-    df_ans = copy(df)
-    cols_ans = propertynames(df_ans)
+    cols = propertynames(df)
 
     # Find keys that reference both column names in the input DataFrame df and
     # values in the set Dictionary. Then, created a DataFrame containing all permutations.
-    cols = find_oftype(df, Not(AbstractFloat))
-    cols_set = intersect(cols, collect(keys(set)))
+    cols_key = find_oftype(df, Not(AbstractFloat))
+    cols_set = intersect(cols_key, collect(keys(set)))
     vals_set = [intersect(unique(df[:,k]), ensurearray(set[k])) for k in cols_set]
-    # vals_set = [set[k] for k in cols_set]
+    
+    if any(length.(vals_set) .== 0)
+        cols_err = cols_set[length.(vals_set) .== 0]
+        error("Cannot filter DataFrame. No overlap with input set. 
+            - Check set key(s): $cols_empty
+            - Use extrapolate_year() or extrapolate_region() to extend the dataset")
+    end
 
     # Drop values that are not in the current set.
     df_set = DataFrame(permute(NamedTuple{Tuple(cols_set,)}(vals_set,)))
-    df_ans = innerjoin(df_ans, df_set, on = cols_set)
+    df = innerjoin(df, df_set, on = cols_set)
     
     if extrapolate
-        :yr in cols_set && (df_ans = extrapolate_year(df_ans, set; forward = forward, backward = backward))
-        :r in cols_set  && (df_ans = extrapolate_region(df_ans, r; overwrite = overwrite))
+        :yr in cols_set && (df = extrapolate_year(df, set; forward = forward, backward = backward))
+        :r in cols_set  && (df = extrapolate_region(df, r; overwrite = overwrite))
     end
-    
-    return sort(df_ans[:,cols_ans])
+
+    # If one of the filtered DataFrame columns contains only one unique value, drop it.
+    drop && setdiff!(cols, cols_set[length.(unique.(eachcol(df[:,cols_set]))) .=== 1])
+
+    return sort(df[:,cols])
 end

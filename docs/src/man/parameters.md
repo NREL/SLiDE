@@ -1,41 +1,53 @@
-# Sets
+# Parameters
 
-| Item | Description |
-|:-----|:------------|
-| `yr`    | *Years* -- 1997-2016 |
-| `r`     | *Regions* -- currently includes 50 U.S. states and Washington, D.C. |
-| `s`,`g` | *Sectors/Goods* -- 71 sets from BEA summary data |
-| `m`     | *Margin type* for trade and transport adjustments |
-| `va`    | *Value added components*, including 
-| `fd`    | *Final demand accounts* related to personal consumption expenditures. These are aggregated into consumption (`C`), government (`G`), and investment (`I`) demand in [`SLiDE._disagg_fdcat!`](@ref) |
+## BEA Supply/Use
 
-# Model Input
+| Parameter | Variables   | Description                                   |
+|:----------|:------------|:----------------------------------------------|
+| `id0`     | `(yr,i,j)`  | *Intermediate demand*                         |
+| `fd0`     | `(yr,i,fd)` | *Final demand*                                |
+| `va0`     | `(yr,va,j)` | *Value added*                                 |
+| `ts0`     | `(yr,ts,j)` | *Taxes and subsidies*                         |
+| `x0`      | `(yr,i)`    | *Exports of goods and services*               |
+| `ys0`     | `(yr,i,j)`  | *Sectoral supply*                             |
+| `m0`      | `(yr,i)`    | *Imports*                                     |
+| `mrg0`    | `(yr,i)`    | *Trade margins*                               |
+| `trn0`    | `(yr,i)`    | *Transportation costs*                        |
+| `cif0`    | `(yr,i)`    | *CIF/FOB Adjustments on Imports*              |
+| `duty0`   | `(yr,i)`    | *Import duties*                               |
+| `tax0`    | `(yr,i)`    | *Taxes on products*                           |
+| `sbd0`    | `(yr,i)`    | *Subsidies on products*                       |
+| `s0`      | `(yr,j)`    | *Aggregate supply*                            |
+| `y0`      | `(yr,i)`    | *Gross output*                                |
+| `bopdef0` | `(yr)`      | *Balance of payments deficit*                 |
+| `ms0`     | `(yr,i,m)`  | *Margin supply*                               |
+| `md0`     | `(yr,m,i)`  | *Margin demand*                               |
+| `fs0`     | `(yr,i,fd)` | *Household supply*                            |
+| `a0`      | `(yr,i)`    | *Armington supply*                            |
+| `tm0`     | `(yr,i)`    | *Tax net subsidy rate on intermediate demand* |
+| `ta0`     | `(yr,i)`    | *Import tariff*                               |
+| `lshr0`   | `(yr,g)`    | *Labor share of value added*                  |
 
-| Parameter | Indices | Description | References |
-|--------:|:-------------|:------------------------------------------------|:--|
-| `ys`    | `(yr,r,s,g)` | *Sectoral supply (with byproducts)*             | [`SLiDE._partition_io!`](@ref) [`SLiDE._disagg_ys0!`](@ref) |
-| `id`    | `(yr,r,g,s)` | *Intermediate demand*                           | [`SLiDE._partition_io!`](@ref) [`SLiDE._disagg_id0!`](@ref) |
-| `ld`    | `(yr,r,s)`   | *Labor demand*                                  | [`SLiDE._disagg_ld0!`](@ref) |
-| `kd`    | `(yr,r,s)`   | *Capital demand*                                | [`SLiDE._disagg_kd0`](@ref) |
-| `cd`    | `(yr,r,g)`   | *Final demand*                                  | [`SLiDE._disagg_cd0!`](@ref) |
-| `yh`    | `(yr,r,g)`   | *Household production*                          | [`SLiDE._disagg_yh0!`](@ref) |
-| `g`     | `(yr,r,g)`   | *Government demand*                             | [`SLiDE._disagg_g0!`](@ref) |
-| `i`     | `(yr,r,g)`   | *Investment demand*                             | [`SLiDE._disagg_i0!`](@ref) |
-| `s`     | `(yr,r,g)`   | *Aggregate supply*                              | [`SLiDE._disagg_s0!`](@ref) |
-| `xn`    | `(yr,r,g)`   | *National supply*                               | [`SLiDE._disagg_xn0!`](@ref) |
-| `xd`    | `(yr,r,g)`   | *National demand*                               | [`SLiDE._disagg_xd0!`](@ref) |
-| `x`     | `(yr,r,g)`   | *Foreign exports*                               | [`SLiDE._partition_x0!`](@ref) [`SLiDE._disagg_x0!`](@ref) |
-| `a`     | `(yr,r,g)`   | *Armington supply*                              | [`SLiDE._partition_a0!`](@ref) [`SLiDE._disagg_a0!`](@ref) |
-| `m`     | `(yr,r,g)`   | *Imports*                                       | [`SLiDE._partition_m0!`](@ref) [`SLiDE._disagg_x0!`](@ref) |
-| `nd`    | `(yr,r,g)`   | *National demand*                               | [`SLiDE._disagg_nd0!`](@ref) |
-| `dd`    | `(yr,r,g)`   | *State-level demand*                            | [`SLiDE._disagg_dd0!`](@ref) |
-| `bop`   | `(yr,r)`     | *Balance of payments*                           | [`SLiDE._partition_bop!`](@ref) [`SLiDE._disagg_bop!`](@ref) |
-| `ta`    | `(yr,r,g)`   | *Tax (net subsidy) rate on intermediate demand* | [`SLiDE._partition_ta0!`](@ref) [`SLiDE._disagg_ta0!`](@ref) |
-| `tm`    | `(yr,r,g)`   | *Import tariff*                                 | [`SLiDE._partition_tm0!`](@ref) [`SLiDE._disagg_tm0!`](@ref) |
-| `md`    | `(yr,r,m,g)` | *Margin demand*                                 | [`SLiDE._partition_md0!`](@ref) [`SLiDE._disagg_md0!`](@ref) |
-| `nm`    | `(yr,r,g,m)` | *National margin supply*                        | [`SLiDE._disagg_nm0!`](@ref) |
-| `dm`    | `(yr,r,g,m)` | *State-level margin supply*                     | [`SLiDE._disagg_dm0!`](@ref) |
-| `c`     | `(yr,r)`     |                                                 | [`SLiDE._disagg_c0!`](@ref) |
-| `rx`    | `(yr,r,g)`   |                                                 | [`SLiDE._disagg_rx0!`](@ref) |
-| `ty`    | `(yr,r,g)`   |                                                 | [`SLiDE._disagg_ty0`](@ref) |
-| `hhadj` | `(yr,r)`     |                                                 | [`SLiDE._disagg_hhadj!`](@ref) |
+
+## Sharing
+
+| Parameter     | Variables    | Description                                        |
+|:--------------|:-------------|:---------------------------------------------------|
+| `pce`         | `(yr,r,g)`   | *Regional shares of final consumption*             |
+| `utd`         | `(yr,r,s,t)` | *Share of total trade by region*                   |
+| `gsp`         | `(yr,r,s)`   | *Annual gross state product*                       |
+| `region`      | `(yr,r,s)`   | *Regional shares of value added*                   |
+| `labor`       | `(yr,r,s)`   | *Share of regional value added due to labor*       |
+| `rpc`         | `(r,g)`      | *Regional purchase coefficient*                    |
+
+Intermediate values
+
+| Parameter     | Variables    | Description                                        |
+|:--------------|:-------------|:---------------------------------------------------|
+| `netval`      | `(yr,r,s)`   | *Net value added (compensation + surplus)*         |
+| `seclaborshr` | `(yr,s)`     | *Sector level average labor shares*                |
+| `avgwgshr`    | `(r,s)`      | *Average wage share*                               |
+| `d0`          | `(r,g)`      | *Local supply-demand*                              |
+| `mrt0`        | `(r,r,g)`    | *Interstate trade*                                 |
+| `xn0`         | `(r,g)`      | *National exports*                                 |
+| `mn0`         | `(r,g)`      | *National demand*                                  |
