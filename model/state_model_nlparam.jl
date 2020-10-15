@@ -1,3 +1,4 @@
+
 ################################################
 #
 # Replication of the state-level blueNOTE model
@@ -10,10 +11,38 @@ using JuMP
 using Complementarity
 using DataFrames
 
+# Note - using the comlementarity package until the native JuMP implementation 
+#        of complementarity constraints allows for exponents neq 0/1/2
+#               --- most recently tested on May 11, 2020 --- 
+
 
 #################
 # -- FUNCTIONS --
 #################
+
+#replace here with "collect"
+function key_to_vec(d::Dict,index_num::Int64)
+  return [k[index_num] for k in keys(d)]
+end
+
+function fill_zero(source::Dict,tofill::Dict)
+  for k in keys(source)
+      if !haskey(tofill,k)
+          push!(tofill,k=>0)
+      end
+  end
+end
+
+function fill_zero(source::Tuple, tofill::Dict)
+# Assume all possible permutations of keys should be present
+# and determine which are missing.
+  allkeys = vcat(collect(Base.Iterators.product(source...))...)
+  missingkeys = setdiff(allkeys, collect(keys(tofill)))
+
+# Add
+  [push!(tofill, fill=>0) for fill in missingkeys]
+  return tofill
+end
 
 #function here simplifies the loading and subsequent subsetting of the dataframes
 function read_data_temp(file::String,year::Int64,dir::String,desc::String)
@@ -22,45 +51,22 @@ function read_data_temp(file::String,year::Int64,dir::String,desc::String)
   return df
 end
 
-#Old version
-# function df_to_dict(df::DataFrame,remove_columns::Vector{Symbol},value_column::Symbol)
-#   colnames = setdiff(names(df),[remove_columns; value_column])
-#   return Dict(tuple(row[colnames]...)=>row[:Val] for row in eachrow(df))
-# end
-
-#News version
 function df_to_dict(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :Float)
         # Find and save the column containing values and that/those containing keys.
         # If no value column indicator is specified, find the first DataFrame column of floats.
         value_col == :Float && (value_col = find_oftype(df, AbstractFloat)[1])
         key_cols = setdiff(propertynames(df), convert_type.(Symbol, ensurearray(drop_cols)), [value_col])
-#        ONEKEY = length(key_cols) == 1
     
         d = Dict((row[key_cols]...,) => row[value_col]
             for row in eachrow(df))
         return d
 end
 
-#Can now filter and convert dataframe to dictionary using (for example):
-#d = convert_type(Dict, filter_with(df, (yr = 2016,); drop = true))
-#where df::DataFrame and d::Dict
+
 
 function combvec(set_a...)
     return vec(collect(Iterators.product(set_a...)))
 end
-
-# Replaces nan's for denseaxisarray - used for NLparameters in model
-function replace_nan_inf(
-    cont::T,
-) where {T <: JuMP.Containers.DenseAxisArray{NonlinearParameter}}
-    for param in cont
-        if isnan(value(param)) || value(param) == Inf
-            set_value(param, 0.0)
-        end
-    end
-    return
-end
-
 
 ############
 # LOAD DATA
@@ -102,6 +108,7 @@ blueNOTE = Dict(
     :nd0 => df_to_dict(Dict, read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"); drop_cols = [:yr], value_col = :Val)
 )
 
+
 ## Creating copy without zeros
 ys0 = deepcopy(blueNOTE[:ys0])
 id0 = deepcopy(blueNOTE[:id0])
@@ -132,7 +139,6 @@ nd0 = deepcopy(blueNOTE[:nd0])
 tm = deepcopy(tm0)
 ta = deepcopy(ta0)
 ty = deepcopy(ty0)
-
 
 ###############
 # -- SETS --
