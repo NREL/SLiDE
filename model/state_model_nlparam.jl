@@ -11,38 +11,10 @@ using JuMP
 using Complementarity
 using DataFrames
 
-# Note - using the comlementarity package until the native JuMP implementation 
-#        of complementarity constraints allows for exponents neq 0/1/2
-#               --- most recently tested on May 11, 2020 --- 
-
 
 #################
 # -- FUNCTIONS --
 #################
-
-#replace here with "collect"
-function key_to_vec(d::Dict,index_num::Int64)
-  return [k[index_num] for k in keys(d)]
-end
-
-function fill_zero(source::Dict,tofill::Dict)
-  for k in keys(source)
-      if !haskey(tofill,k)
-          push!(tofill,k=>0)
-      end
-  end
-end
-
-function fill_zero(source::Tuple, tofill::Dict)
-# Assume all possible permutations of keys should be present
-# and determine which are missing.
-  allkeys = vcat(collect(Base.Iterators.product(source...))...)
-  missingkeys = setdiff(allkeys, collect(keys(tofill)))
-
-# Add
-  [push!(tofill, fill=>0) for fill in missingkeys]
-  return tofill
-end
 
 #function here simplifies the loading and subsequent subsetting of the dataframes
 function read_data_temp(file::String,year::Int64,dir::String,desc::String)
@@ -51,21 +23,20 @@ function read_data_temp(file::String,year::Int64,dir::String,desc::String)
   return df
 end
 
-function df_to_dict(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :Float)
-        # Find and save the column containing values and that/those containing keys.
-        # If no value column indicator is specified, find the first DataFrame column of floats.
-        value_col == :Float && (value_col = find_oftype(df, AbstractFloat)[1])
-        key_cols = setdiff(propertynames(df), convert_type.(Symbol, ensurearray(drop_cols)), [value_col])
-    
-        d = Dict((row[key_cols]...,) => row[value_col]
-            for row in eachrow(df))
-        return d
-end
-
-
-
 function combvec(set_a...)
     return vec(collect(Iterators.product(set_a...)))
+end
+
+# Replaces nan's for denseaxisarray - used for NLparameters in model
+function replace_nan_inf(
+    cont::T,
+) where {T <: JuMP.Containers.DenseAxisArray{NonlinearParameter}}
+    for param in cont
+        if isnan(value(param)) || value(param) == Inf
+            set_value(param, 0.0)
+        end
+    end
+    return
 end
 
 ############
@@ -80,32 +51,32 @@ data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "mod
 
 #blueNOTE contains a dictionary of the parameters needed to specify the model
 blueNOTE = Dict(
-    :ys0 => df_to_dict(Dict, read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"); drop_cols = [:yr], value_col = :Val),
-    :id0 => df_to_dict(Dict, read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"); drop_cols = [:yr], value_col = :Val),
-    :ld0 => df_to_dict(Dict, read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"); drop_cols = [:yr], value_col = :Val),
-    :kd0 => df_to_dict(Dict, read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"); drop_cols = [:yr], value_col = :Val),
-    :ty0 => df_to_dict(Dict, read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"); drop_cols = [:yr], value_col = :Val),
-    :m0 => df_to_dict(Dict, read_data_temp("m0",mod_year,data_temp_dir,"Imports"); drop_cols = [:yr], value_col = :Val),
-    :x0 => df_to_dict(Dict, read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"); drop_cols = [:yr], value_col = :Val),
-    :rx0 => df_to_dict(Dict, read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"); drop_cols = [:yr], value_col = :Val),
-    :md0 => df_to_dict(Dict, read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"); drop_cols = [:yr], value_col = :Val),
-    :nm0 => df_to_dict(Dict, read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"); drop_cols = [:yr], value_col = :Val),
-    :dm0 => df_to_dict(Dict, read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"); drop_cols = [:yr], value_col = :Val),
-    :s0 => df_to_dict(Dict, read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"); drop_cols = [:yr], value_col = :Val),
-    :a0 => df_to_dict(Dict, read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"); drop_cols = [:yr], value_col = :Val),
-    :ta0 => df_to_dict(Dict, read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"); drop_cols = [:yr], value_col = :Val),
-    :tm0 => df_to_dict(Dict, read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"); drop_cols = [:yr], value_col = :Val),
-    :cd0 => df_to_dict(Dict, read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"); drop_cols = [:yr], value_col = :Val),
-    :c0 => df_to_dict(Dict, read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"); drop_cols = [:yr], value_col = :Val),
-    :yh0 => df_to_dict(Dict, read_data_temp("yh0",mod_year,data_temp_dir,"Household production"); drop_cols = [:yr], value_col = :Val),
-    :bopdef0 => df_to_dict(Dict, read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"); drop_cols = [:yr], value_col = :Val),
-    :hhadj => df_to_dict(Dict, read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"); drop_cols = [:yr], value_col = :Val),
-    :g0 => df_to_dict(Dict, read_data_temp("g0",mod_year,data_temp_dir,"Government demand"); drop_cols = [:yr], value_col = :Val),
-    :i0 => df_to_dict(Dict, read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"); drop_cols = [:yr], value_col = :Val),
-    :xn0 => df_to_dict(Dict, read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"); drop_cols = [:yr], value_col = :Val),
-    :xd0 => df_to_dict(Dict, read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"); drop_cols = [:yr], value_col = :Val),
-    :dd0 => df_to_dict(Dict, read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"); drop_cols = [:yr], value_col = :Val),
-    :nd0 => df_to_dict(Dict, read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"); drop_cols = [:yr], value_col = :Val)
+    :ys0 => convert_type(Dict, read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"); drop_cols = [:yr], value_col = :Val),
+    :id0 => convert_type(Dict, read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"); drop_cols = [:yr], value_col = :Val),
+    :ld0 => convert_type(Dict, read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"); drop_cols = [:yr], value_col = :Val),
+    :kd0 => convert_type(Dict, read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"); drop_cols = [:yr], value_col = :Val),
+    :ty0 => convert_type(Dict, read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"); drop_cols = [:yr], value_col = :Val),
+    :m0 => convert_type(Dict, read_data_temp("m0",mod_year,data_temp_dir,"Imports"); drop_cols = [:yr], value_col = :Val),
+    :x0 => convert_type(Dict, read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"); drop_cols = [:yr], value_col = :Val),
+    :rx0 => convert_type(Dict, read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"); drop_cols = [:yr], value_col = :Val),
+    :md0 => convert_type(Dict, read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"); drop_cols = [:yr], value_col = :Val),
+    :nm0 => convert_type(Dict, read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"); drop_cols = [:yr], value_col = :Val),
+    :dm0 => convert_type(Dict, read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"); drop_cols = [:yr], value_col = :Val),
+    :s0 => convert_type(Dict, read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"); drop_cols = [:yr], value_col = :Val),
+    :a0 => convert_type(Dict, read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"); drop_cols = [:yr], value_col = :Val),
+    :ta0 => convert_type(Dict, read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"); drop_cols = [:yr], value_col = :Val),
+    :tm0 => convert_type(Dict, read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"); drop_cols = [:yr], value_col = :Val),
+    :cd0 => convert_type(Dict, read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"); drop_cols = [:yr], value_col = :Val),
+    :c0 => convert_type(Dict, read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"); drop_cols = [:yr], value_col = :Val),
+    :yh0 => convert_type(Dict, read_data_temp("yh0",mod_year,data_temp_dir,"Household production"); drop_cols = [:yr], value_col = :Val),
+    :bopdef0 => convert_type(Dict, read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"); drop_cols = [:yr], value_col = :Val),
+    :hhadj => convert_type(Dict, read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"); drop_cols = [:yr], value_col = :Val),
+    :g0 => convert_type(Dict, read_data_temp("g0",mod_year,data_temp_dir,"Government demand"); drop_cols = [:yr], value_col = :Val),
+    :i0 => convert_type(Dict, read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"); drop_cols = [:yr], value_col = :Val),
+    :xn0 => convert_type(Dict, read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"); drop_cols = [:yr], value_col = :Val),
+    :xd0 => convert_type(Dict, read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"); drop_cols = [:yr], value_col = :Val),
+    :dd0 => convert_type(Dict, read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"); drop_cols = [:yr], value_col = :Val),
+    :nd0 => convert_type(Dict, read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"); drop_cols = [:yr], value_col = :Val)
 )
 
 
@@ -199,10 +170,10 @@ cge = MCPModel();
 @NLparameter(cge, tm0_p[r in regions, g in goods] == get(tm0, (r, g), 0.0));
 @NLparameter(cge, tm_p[r in regions, g in goods] == get(tm, (r, g), 0.0));
 @NLparameter(cge, cd0_p[r in regions, g in goods] == get(cd0, (r, g), 0.0));
-@NLparameter(cge, c0_p[r in regions] == get(c0, (r,), 0.0));
+@NLparameter(cge, c0_p[r in regions] == get(c0, r, 0.0));
 @NLparameter(cge, yh0_p[r in regions, g in goods] == get(yh0, (r, g), 0.0));
-@NLparameter(cge, bopdef0_p[r in regions] == get(bopdef0, (r,), 0.0));
-@NLparameter(cge, hhadj_p[r in regions] == get(hhadj, (r,), 0.0));
+@NLparameter(cge, bopdef0_p[r in regions] == get(bopdef0, r, 0.0));
+@NLparameter(cge, hhadj_p[r in regions] == get(hhadj, r, 0.0));
 @NLparameter(cge, g0_p[r in regions, g in goods] == get(g0, (r, g), 0.0));
 @NLparameter(cge, xn0_p[r in regions, g in goods] == get(xn0, (r, g), 0.0));
 @NLparameter(cge, xd0_p[r in regions, g in goods] == get(xd0, (r, g), 0.0));
