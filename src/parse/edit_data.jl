@@ -490,12 +490,12 @@ end
 
 """
     extrapolate_year(df::DataFrame, yr::Array{Int64,1}; kwargs...)
-    extrapolate_year(df::DataFrame, set::Dict; kwargs...)
+    extrapolate_year(df::DataFrame, set::Any; kwargs...)
 
 # Arguments:
 - `df::DataFrame` that might be in need of extrapolation.
 - `yr::Array{Int64,1}`: List of years overwhich extrapolation is possible (depending on the kwargs)
-- `set::Dict` containing list of years, identified by the key `:yr`.
+- `set::Dict` or `set::NamedTuple` containing list of years, identified by the key `:yr`.
 
 # Keyword Arguments:
 - `backward::Bool = true`: Do we extrapolate backward in time?
@@ -544,7 +544,7 @@ end
 
 function extrapolate_year(
     df::DataFrame,
-    set::Dict;
+    set;
     backward::Bool = true,
     forward::Bool = true
 )
@@ -591,6 +591,8 @@ end
 - `set::Dict` or `set::NamedTuple`: Values to keep in the DataFrame.
 
 # Keyword Arguments:
+- `drop::Bool = false`: If one of the filtered DataFrame columns contains only one unique
+    value, drop it.
 - `extrapolate::Bool = false`: Add missing regions/years to the DataFrame?
     If `extrapolate` is set to true, the following `kwargs` become relevant:
     - When extrapolating over years,
@@ -603,36 +605,40 @@ end
         - `overwrite::Bool = false`: If data in the target region `r.second` is already present,
             should it be overwritten?
 
+
+
 # Returns:
 - `df::DataFrame` with only the desired keys.
 """
 function filter_with(
     df::DataFrame,
     set::Any;
+    drop::Bool = false,
     extrapolate::Bool = false,
     forward::Bool = true,
     backward::Bool = true,
     r::Pair = "md" => "dc",
     overwrite::Bool = false
 )
-    df_ans = copy(df)
-    cols_ans = propertynames(df_ans)
+    cols = propertynames(df)
 
     # Find keys that reference both column names in the input DataFrame df and
     # values in the set Dictionary. Then, created a DataFrame containing all permutations.
-    cols = find_oftype(df, Not(AbstractFloat))
-    cols_set = intersect(cols, collect(keys(set)))
+    cols_key = find_oftype(df, Not(AbstractFloat))
+    cols_set = intersect(cols_key, collect(keys(set)))
     vals_set = [intersect(unique(df[:,k]), ensurearray(set[k])) for k in cols_set]
-    # vals_set = [set[k] for k in cols_set]
 
     # Drop values that are not in the current set.
     df_set = DataFrame(permute(NamedTuple{Tuple(cols_set,)}(vals_set,)))
-    df_ans = innerjoin(df_ans, df_set, on = cols_set)
+    df = innerjoin(df, df_set, on = cols_set)
     
     if extrapolate
-        :yr in cols_set && (df_ans = extrapolate_year(df_ans, set; forward = forward, backward = backward))
-        :r in cols_set  && (df_ans = extrapolate_region(df_ans, r; overwrite = overwrite))
+        :yr in cols_set && (df = extrapolate_year(df, set; forward = forward, backward = backward))
+        :r in cols_set  && (df = extrapolate_region(df, r; overwrite = overwrite))
     end
-    
-    return sort(df_ans[:,cols_ans])
+
+    # If one of the filtered DataFrame columns contains only one unique value, drop it.
+    drop && setdiff!(cols, cols_set[length.(unique.(eachcol(df[:,cols_set]))) .=== 1])
+
+    return sort(df[:,cols])
 end
