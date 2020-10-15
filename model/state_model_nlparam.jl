@@ -22,10 +22,26 @@ function read_data_temp(file::String,year::Int64,dir::String,desc::String)
   return df
 end
 
-function df_to_dict(df::DataFrame,remove_columns::Vector{Symbol},value_column::Symbol)
-  colnames = setdiff(names(df),[remove_columns; value_column])
-  return Dict(tuple(row[colnames]...)=>row[:Val] for row in eachrow(df))
+# function df_to_dict(df::DataFrame,remove_columns::Vector{Symbol},value_column::Symbol)
+#   colnames = setdiff(names(df),[remove_columns; value_column])
+#   return Dict(tuple(row[colnames]...)=>row[:Val] for row in eachrow(df))
+# end
+
+function df_to_dict(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :Float)
+        # Find and save the column containing values and that/those containing keys.
+        # If no value column indicator is specified, find the first DataFrame column of floats.
+        value_col == :Float && (value_col = find_oftype(df, AbstractFloat)[1])
+        key_cols = setdiff(propertynames(df), convert_type.(Symbol, ensurearray(drop_cols)), [value_col])
+#        ONEKEY = length(key_cols) == 1
+    
+        d = Dict((row[key_cols]...,) => row[value_col]
+            for row in eachrow(df))
+        return d
 end
+
+#Can now filter an convert dataframe to dictionary using (for example):
+#d = convert_type(Dict, filter_with(df, (yr = 2016,); drop = true))
+#where df::DataFrame and d::Dict
 
 function combvec(set_a...)
     return vec(collect(Iterators.product(set_a...)))
@@ -54,34 +70,37 @@ mod_year = 2016
 #specify the path where the dumped csv files are stored
 data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
 
+#This works as alternative to df_to_dict
+#:ys0 => convert_type(Dict, read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"); drop_cols=[:yr], value_col = :Val)
+
 #blueNOTE contains a dictionary of the parameters needed to specify the model
 blueNOTE = Dict(
-    :ys0 => df_to_dict(read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"),[:yr],:Val),
-    :id0 => df_to_dict(read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"),[:yr],:Val),
-    :ld0 => df_to_dict(read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"),[:yr],:Val),
-    :kd0 => df_to_dict(read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"),[:yr],:Val),
-    :ty0 => df_to_dict(read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"),[:yr],:Val),
-    :m0 => df_to_dict(read_data_temp("m0",mod_year,data_temp_dir,"Imports"),[:yr],:Val),
-    :x0 => df_to_dict(read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"),[:yr],:Val),
-    :rx0 => df_to_dict(read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"),[:yr],:Val),
-    :md0 => df_to_dict(read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"),[:yr],:Val),
-    :nm0 => df_to_dict(read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"),[:yr],:Val),
-    :dm0 => df_to_dict(read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"),[:yr],:Val),
-    :s0 => df_to_dict(read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"),[:yr],:Val),
-    :a0 => df_to_dict(read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"),[:yr],:Val),
-    :ta0 => df_to_dict(read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"),[:yr],:Val),
-    :tm0 => df_to_dict(read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"),[:yr],:Val),
-    :cd0 => df_to_dict(read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"),[:yr],:Val),
-    :c0 => df_to_dict(read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"),[:yr],:Val),
-    :yh0 => df_to_dict(read_data_temp("yh0",mod_year,data_temp_dir,"Household production"),[:yr],:Val),
-    :bopdef0 => df_to_dict(read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"),[:yr],:Val),
-    :hhadj => df_to_dict(read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"),[:yr],:Val),
-    :g0 => df_to_dict(read_data_temp("g0",mod_year,data_temp_dir,"Government demand"),[:yr],:Val),
-    :i0 => df_to_dict(read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"),[:yr],:Val),
-    :xn0 => df_to_dict(read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"),[:yr],:Val),
-    :xd0 => df_to_dict(read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"),[:yr],:Val),
-    :dd0 => df_to_dict(read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"),[:yr],:Val),
-    :nd0 => df_to_dict(read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"),[:yr],:Val)
+    :ys0 => df_to_dict(Dict, read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"); drop_cols = [:yr], value_col = :Val),
+    :id0 => df_to_dict(Dict, read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"); drop_cols = [:yr], value_col = :Val),
+    :ld0 => df_to_dict(Dict, read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"); drop_cols = [:yr], value_col = :Val),
+    :kd0 => df_to_dict(Dict, read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"); drop_cols = [:yr], value_col = :Val),
+    :ty0 => df_to_dict(Dict, read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"); drop_cols = [:yr], value_col = :Val),
+    :m0 => df_to_dict(Dict, read_data_temp("m0",mod_year,data_temp_dir,"Imports"); drop_cols = [:yr], value_col = :Val),
+    :x0 => df_to_dict(Dict, read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"); drop_cols = [:yr], value_col = :Val),
+    :rx0 => df_to_dict(Dict, read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"); drop_cols = [:yr], value_col = :Val),
+    :md0 => df_to_dict(Dict, read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"); drop_cols = [:yr], value_col = :Val),
+    :nm0 => df_to_dict(Dict, read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"); drop_cols = [:yr], value_col = :Val),
+    :dm0 => df_to_dict(Dict, read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"); drop_cols = [:yr], value_col = :Val),
+    :s0 => df_to_dict(Dict, read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"); drop_cols = [:yr], value_col = :Val),
+    :a0 => df_to_dict(Dict, read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"); drop_cols = [:yr], value_col = :Val),
+    :ta0 => df_to_dict(Dict, read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"); drop_cols = [:yr], value_col = :Val),
+    :tm0 => df_to_dict(Dict, read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"); drop_cols = [:yr], value_col = :Val),
+    :cd0 => df_to_dict(Dict, read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"); drop_cols = [:yr], value_col = :Val),
+    :c0 => df_to_dict(Dict, read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"); drop_cols = [:yr], value_col = :Val),
+    :yh0 => df_to_dict(Dict, read_data_temp("yh0",mod_year,data_temp_dir,"Household production"); drop_cols = [:yr], value_col = :Val),
+    :bopdef0 => df_to_dict(Dict, read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"); drop_cols = [:yr], value_col = :Val),
+    :hhadj => df_to_dict(Dict, read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"); drop_cols = [:yr], value_col = :Val),
+    :g0 => df_to_dict(Dict, read_data_temp("g0",mod_year,data_temp_dir,"Government demand"); drop_cols = [:yr], value_col = :Val),
+    :i0 => df_to_dict(Dict, read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"); drop_cols = [:yr], value_col = :Val),
+    :xn0 => df_to_dict(Dict, read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"); drop_cols = [:yr], value_col = :Val),
+    :xd0 => df_to_dict(Dict, read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"); drop_cols = [:yr], value_col = :Val),
+    :dd0 => df_to_dict(Dict, read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"); drop_cols = [:yr], value_col = :Val),
+    :nd0 => df_to_dict(Dict, read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"); drop_cols = [:yr], value_col = :Val)
 )
 
 ## Creating copy without zeros
@@ -129,11 +148,11 @@ ty = deepcopy(ty0)
 # margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
 # goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
 
-regions = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_r.csv"))[!,:Dim1])
-sectors = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_s.csv"))[!,:Dim1])
+regions = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_r.csv"),DataFrame)[!,:Dim1])
+sectors = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_s.csv"),DataFrame)[!,:Dim1])
 goods = sectors;
-margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_m.csv"))[!,:Dim1])
-goods_margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_gm.csv"))[!,:g])
+margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_m.csv"),DataFrame)[!,:Dim1])
+goods_margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_gm.csv"),DataFrame)[!,:g])
 
 
 #following subsets are used to limit the size of the model
@@ -236,7 +255,7 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 @variable(cge, PFX >= sv, start = 1); # Foreign exchange
 
 #consumer:
-@variable(cge,RA[r in regions]>=sv,start = c0[(r,)]) 
+@variable(cge,RA[r in regions]>=sv,start = value(c0_p[r])) ;
 
 
 ###############################
