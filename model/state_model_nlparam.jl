@@ -22,11 +22,13 @@ function read_data_temp(file::String,year::Int64,dir::String,desc::String)
   return df
 end
 
+#Old version
 # function df_to_dict(df::DataFrame,remove_columns::Vector{Symbol},value_column::Symbol)
 #   colnames = setdiff(names(df),[remove_columns; value_column])
 #   return Dict(tuple(row[colnames]...)=>row[:Val] for row in eachrow(df))
 # end
 
+#News version
 function df_to_dict(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :Float)
         # Find and save the column containing values and that/those containing keys.
         # If no value column indicator is specified, find the first DataFrame column of floats.
@@ -39,7 +41,7 @@ function df_to_dict(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symb
         return d
 end
 
-#Can now filter an convert dataframe to dictionary using (for example):
+#Can now filter and convert dataframe to dictionary using (for example):
 #d = convert_type(Dict, filter_with(df, (yr = 2016,); drop = true))
 #where df::DataFrame and d::Dict
 
@@ -69,9 +71,6 @@ mod_year = 2016
 
 #specify the path where the dumped csv files are stored
 data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
-
-#This works as alternative to df_to_dict
-#:ys0 => convert_type(Dict, read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"); drop_cols=[:yr], value_col = :Val)
 
 #blueNOTE contains a dictionary of the parameters needed to specify the model
 blueNOTE = Dict(
