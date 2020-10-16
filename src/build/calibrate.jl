@@ -26,7 +26,7 @@ function calibrate(d::Dict, set::Dict; save = true, overwrite = false)
     
     # Set all values to be at least zero for final demand and tax rates.
     [d[k][d[k][:,:value] .< 0, :value] .= 0 for k in [:fd0, :ta0, :tm0]]
-        
+    
     # Initialize a DataFrame to contain results.
     # io_cal = Dict(k => DataFrame() for k in setdiff(set[:cal], [:ta0,:tm0]))
     io_cal = Dict(k => DataFrame() for k in set[:cal])
@@ -200,7 +200,7 @@ function calibrate(year::Int, d::Dict, set::Dict)
     # io_cal[:x0]  = convert_type(DataFrame, x0_est;  cols=[:i])
     # io_cal[:m0]  = convert_type(DataFrame, m0_est;  cols=[:i])
     # io_cal[:md0] = convert_type(DataFrame, md0_est; cols=[:m,:i])
-
+    
     # Using (g,s) notation...
     io_cal[:ys0] = convert_type(DataFrame, ys0_est; cols=[:s,:g])
     io_cal[:fs0] = convert_type(DataFrame, fs0_est; cols=[:g])

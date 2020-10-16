@@ -32,7 +32,7 @@ function _join_to_operate(df::Array{DataFrame,1}; colnames = missing)
             outerjoin(df_ans, edit_with(df[ii], Rename(inp[ii], out[ii])), on = cols[ii])
         end
     end
-
+    
     df_ans = edit_with(df_ans, Replace.(out, missing, 0))
     (colnames !== missing) && (df_ans = edit_with(df_ans, Rename.(out, colnames)))
     return df_ans
@@ -57,18 +57,6 @@ function Base.:/(df1::DataFrame, df2::DataFrame)
     return df_ans[:, [setdiff(propertynames(df_ans), [:value; out]); :value]]
 end
 
-# function Base.:/(df::Vararg{DataFrame})
-#     N = length(df)
-#     out = Symbol.(:x, 1:N)
-
-#     N > 2 && error("Can only divide one DataFrame by another.")
-
-#     df = _join_to_operate(copy.(ensurearray(df)))
-#     df[!,:value] .= df[:, out[1]] ./ df[:, out[2]]
-#     # df[isnan.(df[:,:value]),:value] .= 0
-
-#     return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
-# end
 
 """
     Base.:+(df::Vararg{DataFrame})

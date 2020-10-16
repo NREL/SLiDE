@@ -111,7 +111,8 @@ function read_file(file::String; colnames=false)
         # Here, we first list all sub-subtypes of DataStream (DataTypes that are used in
         # editing datasource files). Then, we find where they overlap with keys in the
         # dictionary read from the YAML file.
-        TYPES = string.([IU.subtypes.(IU.subtypes(DataStream))...;])
+        # TYPES = string.([IU.subtypes.(IU.subtypes(DataStream))...;])
+        TYPES = string.([IU.subtypes.(IU.subtypes(DataStream))...; IU.subtypes(CGE)])
         KEYS = intersect(TYPES, collect(keys(y)))
         [y[k] = load_from(datatype(k), y[k]) for k in KEYS]
         return y
