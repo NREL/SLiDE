@@ -1082,7 +1082,9 @@ ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH
 # solve the model
 
 status = solveMCP(cge)
-#=
+
+#Do I need to update value shares as well?
+
 ### set_start_value not supported for complementarity.jl/PATHsolver
 # Update parameters for next period
 for r in regions, s in sectors
@@ -1095,16 +1097,36 @@ for r in regions, s in sectors
     set_value(ld0_p[r,s], (1 + value(eta)) * value(ld0_p[r,s]));
 end
 
-for r in regions
-    setvalue(C[r], value(C[r])*(1 + value(eta)));
-end
+# for r in regions
+#     set_start_value(C[r], result_value(C[r])*(1 + value(eta)));
+# end
 
-for r in regions, s in sectors
-    setvalue(YX[r,s], value(YX[r,s])*(1 - value(delta)));
-    setvalue(YM[r,s], value(C[r]) - value(YX[r,s]));
-    setvalue(A[r,s], value(A[r,s]) * (1 + value(eta)));
-end
+# for k in sub_set_y
+#     set_start_value(YX[k], result_value(YX[k])*(1-value(delta)));
+# #    set_start_value(YM[k], result_value(YM[k])*(1-value(delta)));
+#     set_start_value(YM[k], (1 + value(eta)) - result_value(YX[k]));
+# end
+
+# for k in sub_set_a
+#     set_start_value(A[k], result_value(A[k]) * (1 + value(eta)));
+# end
+
+# for r in regions, s in sectors
+#     if y_check[r,s] > 0
+#         set_start_value(YX[r,s], result_value(YX[r,s])*(1 - value(delta)));
+#         set_start_value(YM[r,s], result_value(C[r]) - result_value(YX[r,s]));
+#     end
+#     if a_set[r,s] > 0
+#         set_start_value(A[r,s], result_value(A[r,s]) * (1 + value(eta)));
+#     end
+# end
+
+#set up the options for the path solver
+PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=100000)
+
+# export the path license string to the environment
+# this is now done in the SLiDE initiation steps 
+ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
 
 # solve next period
 status = solveMCP(cge)
-=#
