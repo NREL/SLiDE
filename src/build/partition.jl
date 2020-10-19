@@ -378,7 +378,7 @@ end
 function _partition_trn0!(d::Dict, set::Dict)
     println("  Partitioning trn0, transportation costs")
     d[:trn0]  = filter_with(d[:supply], (i = set[:i], j = "trncost"))[:,[:yr,:i,:value]]
-
+    
     # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
     # Insurance imports are specified as net of adjustments.
     d[:trn0] += edit_with(d[:cif0], Drop(:i,"ins","=="))

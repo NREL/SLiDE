@@ -565,7 +565,7 @@ function _disagg_dd0max(d::Dict)
     return d[:dd0max]
 end
 
-"`nd0max(yr,r,g)`, naximum regional demand from national market"
+"`nd0max(yr,r,g)`, maximum regional demand from national market"
 function _disagg_nd0max(d::Dict)
     println("  Disaggregating nd0max(yr,r,g), maximum regional demand from national market")
     cols = [:yr,:r,:g,:value]
@@ -626,7 +626,7 @@ function _disagg_mrgshr(d::Dict)
 end
 
 """
-`totmrgsupply(yr,r,m,g)`, designate total supply of margins
+`ms0tot(yr,r,m,g)`, designate total supply of margins
 
 ```math
 \\hat{ms}_{yr,r,m,g} = \\alpha_{yr,r,m}^{md} \\bar{ms}_{yr,g,m}
@@ -639,10 +639,10 @@ function _disagg_ms0tot!(d::Dict)
 end
 
 """
-`shrtrd(yr,r,m,g)`, share of margin total by margin type
+`shrtrd(yr,r,g,m)`, share of margin total by margin type
 
 ```math
-\\beta_{yr,r,g,m}^{mar} - \\frac{\\hat{ms}_{yr,r,g,m}}{\\sum_{m}\\hat{ms}_{yr,r,g,m}}
+\\beta_{yr,r,g,m}^{mar} = \\frac{\\hat{ms}_{yr,r,g,m}}{\\sum_{m}\\hat{ms}_{yr,r,g,m}}
 ```
 """
 function _disagg_shrtrd!(d::Dict)
