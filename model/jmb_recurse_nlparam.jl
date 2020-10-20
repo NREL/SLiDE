@@ -305,7 +305,7 @@ end
 # -- Major Assumptions -- 
 
 @NLparameter(cge, rho == 0.05); # interest rate
-@NLparameter(cge, eta == 0.02); # growth rate
+@NLparameter(cge, eta == 0); # growth rate
 @NLparameter(cge, delta == 0.07); # capital depreciation rate
 @NLparameter(cge, thetax == 0.75); # extant production share
 @NLparameter(cge, beta[t in years] == (1/(1 + value(rho)))^(t-mod_year)); #discount factor or present value multiplier
