@@ -535,8 +535,9 @@ check_valz2(kshrv)
 @NLparameter(
     cge,
     alpha_kl[r in regions, s in sectors] ==
-    (value(ld0_p[r, s]) + value(kd0_p[r, s])) / value(ld0_p[r, s])
+    value(ld0_p[r, s]) / (value(ld0_p[r, s]) + value(kd0_p[r, s])) 
 );
+
 @NLparameter(
     cge,
     alpha_x[r in regions, g in goods] ==
@@ -547,13 +548,13 @@ check_valz2(kshrv)
 @NLparameter(
     cge,
     theta_n[r in regions, g in goods] ==
-    value(nd0_p[r, g]) / (value(nd0_p[r, g]) - value(dd0_p[r, g]))
+    value(nd0_p[r, g]) / (value(nd0_p[r, g]) + value(dd0_p[r, g]))
 );
 @NLparameter(
     cge,
     theta_m[r in regions, g in goods] ==
-    value(tm0_p[r, g]) * value(m0_p[r, g]) /
-    (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g]) * value(m0_p[r, g])))
+    (1+value(tm0_p[r, g])) * value(m0_p[r, g]) /
+    (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g])) * value(m0_p[r, g]))
 );
 
 replace_nan_inf(alpha_kl)
@@ -1091,11 +1092,15 @@ for r in regions, s in sectors
 #update capital endowments
     set_value(ks_s[r,s], (1-value(delta)) * (value(ks_s[r,s]) + value(ks_n[r,s])));
     set_value(ks_x[r,s], (1-value(delta)) * value(ks_x[r,s]));
-    set_value(ks_n[r,s], (value(rho) + value(delta)) * value(i0_p[r,s]));
-
+#    set_value(ks_n[r,s], (value(rho) + value(delta)) * value(i0_p[r,s]));
+    set_value(ks_n[r,s],  value(ks_n[r,s]));
 #update labor endowments
-    set_value(ld0_p[r,s], (1 + value(eta)) * value(ld0_p[r,s]));
+#    set_value(ld0_p[r,s], (1 + value(eta)) * value(ld0_p[r,s]));
 end
+
+# Recalculate value shares?
+#set_value(alpha_kl[r,s], value(ld0_p[r,s]) /(value(ld0_p[r,s]) + value(kd0_p[r,s])));
+
 
 # for r in regions
 #     set_start_value(C[r], result_value(C[r])*(1 + value(eta)));

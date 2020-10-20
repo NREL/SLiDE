@@ -183,12 +183,12 @@ cge = MCPModel();
 
 
 # benchmark value share parameters
-@NLparameter(cge, alpha_kl[r in regions, s in sectors] == (value(ld0_p[r, s]) + value(kd0_p[r, s])) / value(ld0_p[r, s]));
+@NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0_p[r, s]) / (value(ld0_p[r, s]) + value(kd0_p[r, s])));
 @NLparameter(cge, alpha_x[r in regions, g in goods] == (value(x0_p[r, g]) - value(rx0_p[r, g])) / value(s0_p[r, g]));
 @NLparameter(cge, alpha_d[r in regions, g in goods] == value(xd0_p[r, g]) / value(s0_p[r, g]));
 @NLparameter(cge, alpha_n[r in regions, g in goods] == value(xn0_p[r, g]) / value(s0_p[r, g]));
 @NLparameter(cge, theta_n[r in regions, g in goods] == value(nd0_p[r, g]) / (value(nd0_p[r, g]) - value(dd0_p[r, g])));
-@NLparameter(cge, theta_m[r in regions, g in goods] == value(tm0_p[r, g]) * value(m0_p[r, g]) / (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g]) * value(m0_p[r, g]))));
+@NLparameter(cge, theta_m[r in regions, g in goods] == (1+value(tm0_p[r, g])) * value(m0_p[r, g]) / (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g])) * value(m0_p[r, g])));
 
 replace_nan_inf(alpha_kl)
 replace_nan_inf(alpha_x)

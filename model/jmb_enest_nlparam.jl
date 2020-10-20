@@ -294,8 +294,8 @@ end
 @NLparameter(
     cge,
     theta_m[r in regions, g in goods] ==
-    value(tm0_p[r, g]) * value(m0_p[r, g]) /
-    (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g]) * value(m0_p[r, g])))
+    (1 + value(tm0_p[r, g])) * value(m0_p[r, g]) /
+    (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g])) * value(m0_p[r, g]))
 );
 
 # Energy nesting parameters
