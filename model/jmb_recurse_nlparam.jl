@@ -993,8 +993,8 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 # labor income        
         PL[r] * sum(ld0_p[r,s] for s in sectors)
 # capital income        
-            +sum((haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) * (ks_n[r,s]+ks_s[r,s]) for s in sectors)
-            +sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in sectors)
+            +sum((haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) * (ks_n[r,s]+ks_s[r,s]) for s in sectors if (blueNOTE[:kd0][r,s]!=0))
+            +sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in sectors if (blueNOTE[:kd0][r,s]!=0))
         #+ sum((haskey(PK.lookup[1], (r, s)) ? PK[(r,s)] : 1.0) * kd0_p[r,s] for s in sectors)
 # provision of household supply          
         + sum( (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * yh0_p[r,g] for g in goods)
@@ -1046,6 +1046,8 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 # define complementarity conditions
 # note the pattern of ZPC -> primal variable  &  MCC -> dual variable (price)
 #@complementarity(cge,profit_y,Y);
+@complementarity(cge,profit_ym,YM);
+@complementarity(cge,profit_yx,YX);
 @complementarity(cge,profit_x,X);
 @complementarity(cge,profit_a,A);
 @complementarity(cge,profit_c,C);
@@ -1056,6 +1058,8 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 @complementarity(cge,market_pn,PN);
 @complementarity(cge,market_pl,PL);
 #@complementarity(cge,market_pk,PK);
+@complementarity(cge,market_rk,RK);
+@complementarity(cge,market_rkx,RKX);
 @complementarity(cge,market_pm,PM);
 @complementarity(cge,market_pc,PC);
 @complementarity(cge,market_pfx,PFX);
@@ -1063,10 +1067,6 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 
 #----------
 #Recursive Dynamics
-@complementarity(cge,profit_ym,YM);
-@complementarity(cge,profit_yx,YX);
-@complementarity(cge,market_rk,RK);
-@complementarity(cge,market_rkx,RKX);
 
 
 ####################
@@ -1074,7 +1074,7 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 ####################
 
 #set up the options for the path solver
-PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
+PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
 
 # export the path license string to the environment
 # this is now done in the SLiDE initiation steps 
