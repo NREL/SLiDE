@@ -227,18 +227,9 @@ cge = MCPModel();
 @NLparameter(cge, m0_p[r in regions, g in goods] == get(m0, (r, g), 0.0));
 @NLparameter(cge, x0_p[r in regions, g in goods] == get(x0, (r, g), 0.0));
 @NLparameter(cge, rx0_p[r in regions, g in goods] == get(rx0, (r, g), 0.0));
-@NLparameter(
-    cge,
-    md0_p[r in regions, m in margins, g in goods] == get(md0, (r, m, g), 0.0)
-);
-@NLparameter(
-    cge,
-    nm0_p[r in regions, g in goods, m in margins] == get(nm0, (r, g, m), 0.0)
-);
-@NLparameter(
-    cge,
-    dm0_p[r in regions, g in goods, m in margins] == get(dm0, (r, g, m), 0.0)
-);
+@NLparameter(cge, md0_p[r in regions, m in margins, g in goods] == get(md0, (r, m, g), 0.0));
+@NLparameter(cge, nm0_p[r in regions, g in goods, m in margins] == get(nm0, (r, g, m), 0.0));
+@NLparameter(cge, dm0_p[r in regions, g in goods, m in margins] == get(dm0, (r, g, m), 0.0));
 @NLparameter(cge, s0_p[r in regions, g in goods] == get(s0, (r, g), 0.0));
 @NLparameter(cge, a0_p[r in regions, g in goods] == get(a0, (r, g), 0.0));
 @NLparameter(cge, ta0_p[r in regions, g in goods] == get(ta0, (r, g), 0.0));
@@ -305,257 +296,35 @@ end
 # -- Major Assumptions -- 
 
 @NLparameter(cge, rho == 0.05); # interest rate
-@NLparameter(cge, eta == 0); # growth rate
+@NLparameter(cge, eta == 0.02); # growth rate --- try sector and regions specific
 @NLparameter(cge, delta == 0.07); # capital depreciation rate
 @NLparameter(cge, thetax == 0.75); # extant production share
 @NLparameter(cge, beta[t in years] == (1/(1 + value(rho)))^(t-mod_year)); #discount factor or present value multiplier
-#@NLparameter(cge, rk0 == 1/(rho+delta));
 
-#=
-# --- Rutherford recursive method example for steady-state calibration ---
-@NLparameter(cge, invest[r in regions] == sum(value(i0_p[r, g]) for g in goods)); # Regional investment
-@NLparameter(cge, capital[r in regions] == value(invest[r]) / (value(eta) + value(delta))); # Regional capital stocks
-@NLparameter(cge, earnings[r in regions] == value(capital[r]) * (value(rho) + value(delta))); # Calibrated capital earnings
-
-capchk = Dict() # Ratio of calibrated earnings to benchmark
-# [capchk[r] = value(earnings[r]) / sum(value(kd0_p[r, s]) for s in sectors) for r in regions];
-# capchk
-for r in regions
-    val = value(earnings[r]) / sum(value(kd0_p[r, s]) for s in sectors);
-    if isnan(val)
-        val = 0
-    end
-    push!(capchk, r=>val)
-end
-
-    
-
-# Store value added prior to rescaling
-@NLparameter(cge, va_bar[r in regions, s in sectors] == value(ld0_p[r, s]) + value(kd0_p[r, s]));
-
-# Rescale capital according to capchk 
-for r in regions, s in sectors
-    set_value(kd0_p[r, s], value(kd0_p[r, s]) * capchk[r]);
-end
-
-# Adjust labor to ensure total value-added remains unchanged
-for r in regions, s in sectors
-    set_value(ld0_p[r, s], value(va_bar[r, s]) - value(kd0_p[r, s]));
-end
-=#
-
-# --- simplified method for SS calibration, not sure which way best ---
-# @NLparameter(cge, VK0[r in regions] == sum(value(kd0_p[r, s]) for s in sectors));
-# @NLparameter(cge, KS0[r in regions] == VK0[r in regions] / (value(delta) + value(rho));
-# @NLparameter(cge, INV0[r in regions] == value(VK0[r]) * (value(delta)+value(eta)) / (value(delta)+value(rho)));
-
-#alternatively - rebalancing/scaling benchmark labor/capital not required in this case
-#inherit future investment - is it really necessary to assume a steady-state in benchmark year?
-# @NLparameter(cge, VK0[r in regions, s in sectors] == value(kd0_p[r, s]));
-# @NLparameter(cge, KS0[r in regions, s in sectors] == value(VK0[r, s]) / (value(delta) + value(rho));
-# @NLparameter(cge, INV0[r in regions, s in sectors] == value(VK0[r, s]) * (value(delta)+value(eta)) / (value(delta)+value(rho)));
-# @NLparameter(cge, ks_n[r in regions, s in sectors] == value(INV0[r,s]);
-# @NLparameter(cge, ks_s[r in regions, s in sectors] == value(KS0[r,s]) * (1-value(thetax)));
-# @NLparameter(cge, ks_x[r in regions, s in sectors] == value(KS0[r,s]) * value(thetax));
-
-
-# //////////////////// SCRATCH ////////////////////
-# i0[r,s] has way more missing values than kd0[r,s]
-# sum and redistribute investment according to earnings
-
-#=
-@NLparameter(cge, INVR[r in regions] ==
-             sum(value(i0_p[r, g]) for g in goods)
-             );
-
-@NLparameter(cge, KSHR[r in regions, s in sectors] ==
-             value(kd0_p[r,s]) / sum(value(kd0_p[r,ss]) for ss in sectors)
-             );
-
-replace_nan_inf(KSHR);
-kshrv = Dict()
-[kshrv[r,s] = value(KSHR[r,s]) for r in regions for s in sectors];
-
-@NLparameter(cge, INV0[r in regions, s in sectors] ==
-             value(INVR[r]) * value(KSHR[r,s])
-             );
-
-@NLparameter(cge, KS0[r in regions, s in sectors] ==
-             value(INV0[r, s]) / (value(delta) + value(eta))
-             );
-
-@NLparameter(cge, VK0[r in regions, s in sectors] ==
-             value(KS0[r, s]) * (value(rho) + value(delta))
-             );
-
-@NLparameter(cge, ks0_n[r in regions, s in sectors] ==
-             value(INV0[r, s]) / (1 + value(eta))
-#             value(INV0[r, s])
-             );
-
-@NLparameter(cge, ks0_s[r in regions, s in sectors] ==
-             value(VK0[r, s]) * (1 - value(thetax)) - value(ks0_n[r, s])
-             );
-
-@NLparameter(cge, ks0_x[r in regions, s in sectors] ==
-             value(VK0[r, s]) * (value(thetax))
-             );
-
-chkvk = Dict();
-[chkvk[r,s] = value(VK0[r,s]) - (value(ks0_n[r,s]) + value(ks0_s[r,s]) + value(ks0_x[r,s])) for r in regions for s in sectors];
-chkvk
-
-@NLparameter(cge, theta_ksn[r in regions, s in sectors] ==
-             value(ks0_n[r,s]) / value(VK0[r,s])
-             );
-
-@NLparameter(cge, theta_kss[r in regions, s in sectors] ==
-             value(ks0_s[r,s]) / value(VK0[r,s])
-             );
-
-@NLparameter(cge, theta_ksx[r in regions, s in sectors] ==
-             value(ks0_x[r,s]) / value(VK0[r,s])
-             );
-
-
-=#
-
-# @NLparameter(cge, ks_n[r in regions, s in sectors] ==
-#              value(kd0_p[r,s]) * value(theta_ksn[r,s])
-#              );
-                                                
-# @NLparameter(cge, ks_s[r in regions, s in sectors] ==
-#              value(kd0_p[r,s]) * value(theta_kss[r,s])
-#              );
-
-# @NLparameter(cge, ks_x[r in regions, s in sectors] ==
-#              value(kd0_p[r,s]) * value(theta_ksx[r,s])
-#              );
-
-#=
-chkthtaks = Dict();
-[chkthtaks[r,s] = value(theta_ksn[r,s]) + value(theta_kss[r,s]) + value(theta_ksx[r,s]) for r in regions, s in sectors]
-
-function check_valz(d::Dict)
-        counter=0
-for k in keys(d)
-        if (d[k] < 0.99 && d[k] > 1.01)
-                counter+=1
-        end
-end
-return counter
-end
-check_valz(chkthtaks)
-
-function check_valz2(d::Dict)
-        counter=0
-for k in keys(d)
-        if (d[k] == 0)
-#                println(k,"==>",d[k])
-                counter+=1
-        end
-end
-return counter
-end
-check_valz2(blueNOTE[:kd0])
-check_valz2(blueNOTE[:i0])
-
-i0r = Dict();
-[i0r[r] = value(INVR[r]) for r in regions]
-
-i0rs = Dict();
-[i0rs[r,s] = value(INV0[r,s]) for r in regions for s in sectors]
-
-check_valz2(i0r)
-check_valz2(i0rs)
-check_valz2(kshrv)
-
-=#
-
-# invchk = Dict()
-# [invchk[r] = value(INV0[r]) / value(invest[r]) for r in regions];
-# invchk
-# INV0 corresponds to ks_n, but kd0 is prescaled in rutherford's model
-# instead assume that earnings are given by VK0 initially
-# KS0 and INV0 can be calculated, but then what to do with benchmark investment demand i0[r,g]
-# scale = KS0*delta / (sum(g, i0[r,g])*(delta+rho))
-# ks_n = scale * sum(g,i0[r,g]) * (delta+rho);
-# ks_n = KS0*(delta+eta) = VK0(delta+eta)/(delta+rho)
-# ks_n = INV.L * (delta+rho)
-
-# //////////////////// SCRATCH ////////////////////
-
-# New vintage capital
-# @NLparameter(cge, ks_n[r in regions] ==
-#              sum(value(kd0_p[r, s]) for s in sectors) * (value(delta)+value(eta)) / (1 + value(eta))
-#              );
-
+#new capital
 @NLparameter(cge, ks_n[r in regions, s in sectors] ==
-             value(kd0_p[r, s])  * (value(delta)+value(eta)) / (1 + value(eta))
-             );
+             value(kd0_p[r, s])  * (value(delta)+value(eta)) / (1 + value(eta)) );
 
 
-# Sunk capital (flexible coefficient)
-# @NLparameter(cge, ks_s[r in regions] ==
-#              sum(value(kd0_p[r, s]) for s in sectors) * (1 - value(thetax)) - value(ks_n[r])
-#              );
-
+# mutable old capital
 @NLparameter(cge, ks_s[r in regions, s in sectors] ==
-             value(kd0_p[r, s]) * (1 - value(thetax)) - value(ks_n[r,s])
-             );
+             value(kd0_p[r, s]) * (1 - value(thetax)) - value(ks_n[r,s]) );
 
 
 # Extant capital
 @NLparameter(cge, ks_x[r in regions, s in sectors] ==
-             value(kd0_p[r, s]) * value(thetax)
-             );
+             value(kd0_p[r, s]) * value(thetax) );
 
-# Regional shares of investment in solution
-# @NLparameter(cge, thetai[r in regions] ==
-#              value(invest[r]) / sum(value(invest[rr]) for rr in regions)
-#              );
-
-# replace_nan_inf(thetai);
-
-# Regional share of new capital in solution
-# @NLparameter(cge, thetakn[r in regions, s in sectors] ==
-#              value(ks_n[r,s]) / sum(value(ks_n[rr,s]) for rr in regions)
-#              );
-
-# testks = Dict();
-# [testks[r,s] = (value(ks_n[r,s]) + value(ks_s[r,s])) / value(kd0_p[r,s]) for r in regions for s in sectors];
-# testks
-
-# testksx = Dict();
-# [testksx[r,s] = (value(ks_x[r,s])) / value(kd0_p[r,s]) for r in regions for s in sectors];
-# testksx
 
 # --- end recursive dynamic preproc ---
 
-@NLparameter(
-    cge,
-    alpha_kl[r in regions, s in sectors] ==
-    value(ld0_p[r, s]) / (value(ld0_p[r, s]) + value(kd0_p[r, s])) 
-);
-
-@NLparameter(
-    cge,
-    alpha_x[r in regions, g in goods] ==
-    (value(x0_p[r, g]) - value(rx0_p[r, g])) / value(s0_p[r, g])
-);
+@NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0_p[r, s]) / (value(ld0_p[r, s]) + value(kd0_p[r, s])));
+@NLparameter(cge, alpha_x[r in regions, g in goods] == (value(x0_p[r, g]) - value(rx0_p[r, g])) / value(s0_p[r, g]));
 @NLparameter(cge, alpha_d[r in regions, g in goods] == value(xd0_p[r, g]) / value(s0_p[r, g]));
 @NLparameter(cge, alpha_n[r in regions, g in goods] == value(xn0_p[r, g]) / value(s0_p[r, g]));
-@NLparameter(
-    cge,
-    theta_n[r in regions, g in goods] ==
-    value(nd0_p[r, g]) / (value(nd0_p[r, g]) + value(dd0_p[r, g]))
-);
-@NLparameter(
-    cge,
-    theta_m[r in regions, g in goods] ==
-    (1+value(tm0_p[r, g])) * value(m0_p[r, g]) /
-    (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g])) * value(m0_p[r, g]))
-);
+@NLparameter(cge, theta_n[r in regions, g in goods] == value(nd0_p[r, g]) / (value(nd0_p[r, g]) + value(dd0_p[r, g])));
+@NLparameter(cge, theta_m[r in regions, g in goods] == (1+value(tm0_p[r, g])) * value(m0_p[r, g])
+             / (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g])) * value(m0_p[r, g])));
 
 replace_nan_inf(alpha_kl)
 replace_nan_inf(alpha_x)
@@ -569,7 +338,7 @@ replace_nan_inf(theta_m)
 # VARIABLES
 ################
 
-sv = 0.00
+sv = 0.001
 sub_set_y = filter(x -> y_check[x] != 0.0, combvec(regions, sectors));
 sub_set_x = filter(x -> haskey(s0, x), combvec(regions, goods));
 sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods));
@@ -590,7 +359,6 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 
 #commodities:
 @variable(cge, PA[(r, g) in sub_set_pa] >= sv, start = 1); # Regional market (input)
-# @variable(cge,PY[r in regions, g in goods]>=sv,start=1) 
 @variable(cge, PY[(r, g) in sub_set_py] >= sv, start = 1); # Regional market (output)
 @variable(cge, PD[(r, g) in sub_set_pd] >= sv, start = 1); # Local market price
 @variable(cge, PN[g in goods] >= sv, start =1); # National market
@@ -599,42 +367,17 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 @variable(cge, PM[r in regions, m in margins] >= sv, start =1); # Margin price
 @variable(cge, PC[r in regions] >= sv, start = 1); # Consumer price index #####
 @variable(cge, PFX >= sv, start = 1); # Foreign exchange
+
 #consumer:
 @variable(cge,RA[r in regions]>=sv,start = blueNOTE[:c0][(r,)]) ;
 
 
 #--- recursive dynamic variable declaration ---
-#--- not properly declared for equation filtering
 @variable(cge,YM[(r,s) in sub_set_y] >= sv, start = (1-value(thetax))); #Mutable production index - replaces Y
 @variable(cge,YX[(r,s) in sub_set_y] >= sv, start = value(thetax)); #Extant production index
 
-# @variable(cge,KN[r in regions] >= sv, start = ks_n[r]); # New-vintage capital allocation 
-# @variable(cge,INV[r in regions] >=sv, start = 1); # Investment (total US?) --- maybe try with an "r" index
-
 @variable(cge,RKX[(r,s) in sub_set_pk] >= sv, start = 1); # Return to extant capital
 @variable(cge,RK[(r,s) in sub_set_pk] >= sv, start = 1); #Return to regional capital
-
-# @variable(cge,RKN >= sv, start = 1); # Return to new vintage capital -- indexing just seems random in rutherford
-# @variable(cge,PINV[r in regions] >= sv, start = 1); # Investment cost
-
-#-- new zpf
-#profit_ym(r,s)
-#profit_yx(r,s)
-#profit_kn(r)
-#profit_INV(r)
-
-#-- new mkt
-#market_py(r,g)
-#market_rkn
-#market_rkx(r,s)
-#market_rk(r)
-#market_pinv(r)
-
-#-- new nlexpressions
-#CVAym
-#CVAyx
-#ALym
-#AKym
 
 
 ###############################
@@ -649,11 +392,6 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
               PL[r]^alpha_kl[r,s] * (haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) ^(1-alpha_kl[r,s])
               );
 
-#Fixed proportions for extant 
-# @NLexpression(cge, CVAyx[r in regions, s in sectors],
-#               alpha_kl[r,s]*PL[r] + (1-alpha_kl[r,s])*RKX[r,s]
-#               );
-
 #demand for labor in VA
 @NLexpression(cge,ALym[r in regions, s in sectors],
               ld0_p[r,s] * CVAym[r,s] / PL[r]
@@ -666,19 +404,6 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 
 ###
 #----------
-
-#cobb-douglas function for value added (VA)
-# @NLexpression(cge,CVA[r in regions,s in sectors],
-#   PL[r]^alpha_kl[r,s] * (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0) ^ (1-alpha_kl[r,s]) );
-
-#demand for labor in VA
-# @NLexpression(cge,AL[r in regions, s in sectors], ld0_p[r,s] * CVA[r,s] / PL[r] ); # 
-
-#demand for capital in VA
-# @NLexpression(cge,AK[r in regions,s in sectors],
-#   kd0_p[r,s] * CVA[r,s] / (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0) );
-
-  ###
 
 #CES function for output demand - including
 # exports (absent of re-exports) times the price for foreign exchange, 
@@ -705,9 +430,8 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 
 # CES function for tradeoff between domestic consumption and foreign exports
 # recall tm in the import tariff thus tm / tm0 is the relative change in import tariff rates
-@NLexpression(cge,CDM[r in regions,g in goods], ((1-theta_m[r,g])*CDN[r,g]^(1-4)+theta_m[r,g]*
-  (PFX*(1+tm_p[r,g])/(1+tm0_p[r,g]))^(1-4))^(1/(1-4)) 
-  );
+@NLexpression(cge,CDM[r in regions,g in goods],
+  ((1-theta_m[r,g])*CDN[r,g]^(1-4)+theta_m[r,g]*(PFX*(1+tm_p[r,g])/(1+tm0_p[r,g]))^(1-4))^(1/(1-4)) );
 
 # regions demand from the national market <- note nesting of CDN in CDM
 @NLexpression(cge,DN[r in regions,g in goods],
@@ -738,7 +462,6 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 # cost of labor inputs
         + PL[r] * ALym[r,s]
 # cost of capital inputs 
-#        + (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0)* AK[r,s]
         + (haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) * AKym[r,s]
         - 
 # revenue from sectoral supply (take note of r/s/g indices on ys0)                
@@ -751,7 +474,6 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 # cost of labor inputs
         + PL[r] * ld0_p[r,s]
 # cost of capital inputs 
-#        + (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0)* AK[r,s]
         + (haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * kd0_p[r,s]
         - 
 # revenue from sectoral supply (take note of r/s/g indices on ys0)                
@@ -889,32 +611,6 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 #----------
 
 
-
-# @mapping(cge,market_pa[(r, g) in sub_set_pa],
-# # absorption or supply
-#         (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0_p[r,g] 
-#         - ( 
-# # government demand (exogenous)       
-#         g0_p[r,g] 
-# # demand for investment (exogenous)
-#         + i0_p[r,g]
-# # final demand        
-#         + C[r] * CD[r,g]
-# # intermediate demand        
-#         + sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) * id0_p[r,g,s] for s in sectors if (y_check[r,s] > 0))
-#         )
-# );
-
-# @mapping(cge,market_py[(r, g) in sub_set_py],
-# # sectoral supply
-#         sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) *ys0_p[r,s,g] for s in sectors)
-# # household production (exogenous)        
-#         + yh0_p[r,g]
-#         - 
-# # aggregate supply (akin to market demand)                
-#        (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1) * s0_p[r,g]
-# );
-
 @mapping(cge,market_pd[(r, g) in sub_set_pd],
 # aggregate supply
         (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1)  * AD[r,g] 
@@ -937,28 +633,13 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
         )
 );
 
-# @mapping(cge,market_pl[r in regions],
-# # supply of labor
-#         sum(ld0_p[r,s] for s in sectors)
-#         - 
-# # demand for labor in all sectors        
-#         sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) * AL[r,s] for s in sectors)
-# );
-
-
-# @mapping(cge,market_pk[(r, s) in sub_set_pk],
-#         kd0_p[r,s]
-#         - 
-# #current year's capital capital        
-#        (haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1.) * AK[r,s]
-# );
 
 @mapping(cge,market_pm[r in regions, m in margins],
 # margin supply 
         MS[r,m] * sum(md0_p[r,m,gm] for gm in goods_margins)
         - 
 # margin demand        
-        sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * md0_p[r,m,g] for g in goods)
+        sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * md0_p[r,m,g] for g in goods)
 );
 
 @mapping(cge,market_pc[r in regions],
@@ -974,12 +655,12 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 # balance of payments (exogenous)
         sum(bopdef0_p[r] for r in regions)
 # supply of exports     
-        + sum((haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1)  * AX[r,g] for r in regions for g in goods)
+        + sum((haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1.0)  * AX[r,g] for r in regions for g in goods)
 # supply of re-exports        
-        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * rx0_p[r,g] for r in regions for g in goods if (a_set[r,g] != 0))
+        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * rx0_p[r,g] for r in regions for g in goods if (a_set[r,g] != 0))
         - 
 # import demand                
-        sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * MD[r,g] for r in regions for g in goods if (a_set[r,g] != 0))
+        sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] for r in regions for g in goods if (a_set[r,g] != 0))
 );
 
 
@@ -1013,30 +694,6 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 );
 
 #----------
-
-# @mapping(cge,income_ra[r in regions],
-# # consumption/utility
-#         RA[r] 
-#         - 
-#         (
-# # labor income        
-#         PL[r] * sum(ld0_p[r,s] for s in sectors)
-# # capital income        
-#         + sum((haskey(PK.lookup[1], (r, s)) ? PK[(r,s)] : 1.0) * kd0_p[r,s] for s in sectors)
-# # provision of household supply          
-#         + sum( (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * yh0_p[r,g] for g in goods)
-# # revenue or costs of foreign exchange including household adjustment   
-#         + PFX * (bopdef0_p[r] + hhadj_p[r])
-# # government and investment provision        
-#         - sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * (g0_p[r,g] + i0_p[r,g]) for g in goods)
-# # import taxes - assumes lumpsum recycling
-#         + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * MD[r,g] * PFX * tm_p[r,g] for g in goods if (a_set[r,g] != 0))
-# # taxes on intermediate demand - assumes lumpsum recycling
-#         + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0_p[r,g]*(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)*ta_p[r,g] for g in goods if (a_set[r,g] != 0) )
-# # production taxes - assumes lumpsum recycling  
-#         + sum( (haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) * ys0_p[r,s,g] * ty_p[r,s] for s in sectors, g in goods)
-#         )
-# );
 
 
 ####################################
@@ -1084,50 +741,54 @@ ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH
 
 status = solveMCP(cge)
 
-#Do I need to update value shares as well?
 
-### set_start_value not supported for complementarity.jl/PATHsolver
+#scale(r,s,t) = (1-delta)*(ks_n(r,s,"%bmkyr%")+ks_s(r,s,"%bmkyr%")+ks_x(r,s,"%bmkyr%")) / (i0(r,s)*(rho+delta));
+#ks_n(r,s,t) = scale(r,s,t)*i0(r,s))*I.l(r,s)*(rho+delta);
+#total_cap = ks_n+ks_s+ks_x
+
 # Update parameters for next period
 for r in regions, s in sectors
 #update capital endowments
     set_value(ks_s[r,s], (1-value(delta)) * (value(ks_s[r,s]) + value(ks_n[r,s])));
     set_value(ks_x[r,s], (1-value(delta)) * value(ks_x[r,s]));
-#    set_value(ks_n[r,s], (value(rho) + value(delta)) * value(i0_p[r,s]));
-    set_value(ks_n[r,s],  value(ks_n[r,s]));
-#update labor endowments
-#    set_value(ld0_p[r,s], (1 + value(eta)) * value(ld0_p[r,s]));
+    set_value(ks_n[r,s], (value(rho) + value(delta)) * value(i0_p[r,s]));
+
+#update labor endowments --- I think I need separate parameters for labor endowments versus demand
+    set_value(ld0_p[r,s], (1 + value(eta)) * value(ld0_p[r,s]));
+
+#update investment
+#    set_value(i0_p[r,s], (1 + value(eta)) * value(i0_p[r,s]));
+
+#update value share
+    set_value(alpha_kl[r,s], value(ld0_p[r,s])/(value(ld0_p[r,s]) + value(kd0_p[r,s])));
 end
 
-# Recalculate value shares?
-#set_value(alpha_kl[r,s], value(ld0_p[r,s]) /(value(ld0_p[r,s]) + value(kd0_p[r,s])));
-
+for r in regions, g in goods
+#update value shares
+    set_value(alpha_x[r,g], (value(x0_p[r, g]) - value(rx0_p[r, g])) / value(s0_p[r, g]));
+    set_value(alpha_d[r,g], (value(xd0_p[r,g])) / value(s0_p[r, g]));
+    set_value(alpha_n[r,g], value(xn0_p[r,g]) / (s0_p[r, g]));
+    set_value(theta_n[r,g], value(nd0_p[r, g]) / (value(nd0_p[r, g]) + value(dd0_p[r, g])));
+    set_value(theta_m[r,g], (1+value(tm0_p[r, g])) * value(m0_p[r, g])
+              / (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g])) * value(m0_p[r, g])));
+end
 
 # for r in regions
-#     set_start_value(C[r], result_value(C[r])*(1 + value(eta)));
+# set_value(bopdef0_p[r], (1 + value(eta)) * value(bopdef0_p[r]));
 # end
 
-# for k in sub_set_y
-#     set_start_value(YX[k], result_value(YX[k])*(1-value(delta)));
-# #    set_start_value(YM[k], result_value(YM[k])*(1-value(delta)));
-#     set_start_value(YM[k], (1 + value(eta)) - result_value(YX[k]));
-# end
+set_start_value.(all_variables(cge), result_value.(all_variables(cge)));
 
-# for k in sub_set_a
-#     set_start_value(A[k], result_value(A[k]) * (1 + value(eta)));
-# end
 
-# for r in regions, s in sectors
-#     if y_check[r,s] > 0
-#         set_start_value(YX[r,s], result_value(YX[r,s])*(1 - value(delta)));
-#         set_start_value(YM[r,s], result_value(C[r]) - result_value(YX[r,s]));
-#     end
-#     if a_set[r,s] > 0
-#         set_start_value(A[r,s], result_value(A[r,s]) * (1 + value(eta)));
-#     end
-# end
 
 #set up the options for the path solver
 PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=100000)
+#=,
+crash_iteration_limit=50, merit_function=:fischer, crash_method=:pnewton, crash_minimum_dimension=1, crash_nbchange_limit=1,
+crash_perturb=1, crash_searchtype=:line, minor_iteration_limit=1000, nms=1, nms_searchtype=:line, nms_maximimum_watchdogs=5,
+preprocess=1, proximal_perturbation=0, chen_lambda=0.8, factorization_method=:lusol, gradient_searchtype=:arc, gradient_step_limit=10,
+interrupt_limit=10, lemke_rank_deficiency_iterations=10, lemke_start=:automatic, lemke_start_type=:slack)
+=#
 
 # export the path license string to the environment
 # this is now done in the SLiDE initiation steps 
