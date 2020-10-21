@@ -1,6 +1,8 @@
 # Partition
 
-Filter supply and use data for sectors and goods.
+The first step in the build stream involves partitioning BEA supply and use data, by
+filtering this data based on sectors and goods. Generally, BEA input (`i`) maps to goods
+(`g`), and BEA output (`j`) maps to sectors (`s`).
 
 ```@docs
 SLiDE._partition_io!

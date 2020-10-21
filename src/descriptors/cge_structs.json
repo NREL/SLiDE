@@ -1,0 +1,29 @@
+[
+    {
+        "struct_name": "Parameter",
+        "docstring": "Information about CGE parameters used in the model.",
+        "fields": [
+            {
+                "name": "parameter",
+                "comment": "parameter variable abbreviation",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "name",
+                "comment": "parameter description",
+                "data_type": "String"
+            },
+            {
+                "name": "index",
+                "comment": "Sets on which the parameter depends",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "units",
+                "comment": "parameter units",
+                "data_type": "String"
+            }
+        ],
+        "supertype": "CGE"
+    }
+]

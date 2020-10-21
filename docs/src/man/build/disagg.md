@@ -3,10 +3,10 @@
 ```@docs
 SLiDE._disagg_ys0!
 SLiDE._disagg_id0!
-SLiDE._disagg_ty0
+SLiDE._disagg_ty0!
 SLiDE._disagg_va0!
 SLiDE._disagg_ld0!
-SLiDE._disagg_kd0
+SLiDE._disagg_kd0!
 ```
 
 ```@docs
@@ -33,7 +33,7 @@ SLiDE._disagg_bop!
 
 SLiDE._disagg_pt0!
 SLiDE._disagg_dc0!
-SLiDE._disagg_dd0max
+SLiDE._disagg_dd0max!
 SLiDE._disagg_dd0!
 SLiDE._disagg_nd0!
 

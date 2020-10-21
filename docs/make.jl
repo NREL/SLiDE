@@ -12,6 +12,8 @@ if haskey(ENV, "DOCSARGS")
     end
 end
 
+DocMeta.setdocmeta!(SLiDE, :DocTestSetup, :(using SLiDE); recursive=true)
+
 # Now, generate the documentation.
 makedocs(clean = true,
     modules = [SLiDE],
@@ -24,7 +26,10 @@ makedocs(clean = true,
     pages = [
         "Home" => "index.md",
         "Introduction" => Any[
-            "Data" => "man/data.md",
+            "Data" => Any[
+                "Overview" => "man/data/overview.md",
+                "Preparation" => "man/data/preparation.md",
+            ],
             "Build" => Any[
                 "Overview" => "man/build/overview.md",
                 "Partition" => "man/build/partition.md",

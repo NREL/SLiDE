@@ -1,12 +1,5 @@
 # Parse
 
-# Edit
-```@autodocs
-Modules = [SLiDE]
-Pages = ["parse/edit_data.jl"]
-Private = false
-```
-
 # Load
 ```@autodocs
 Modules = [SLiDE]
