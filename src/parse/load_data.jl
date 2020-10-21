@@ -3,7 +3,7 @@
     read_file(path::Array{String,1}, file<:File; kwargs...)
     read_file(path::Array{String,1}, file::XLSXInput)
     read_file(path::String, x::T) where T<:File
-    read_from(editor::T) where T<:Edit
+    read_file(editor::T) where T<:Edit
 This method to reads .csv mapping files required for editing. These files must be stored in
 the `data/coremaps` directory. It returns a .csv file.
 
@@ -20,18 +20,13 @@ the `data/coremaps` directory. It returns a .csv file.
     - [`SLiDE.Group`](@ref)
     - [`SLiDE.Map`](@ref)
 
-# Keywords
-- `shorten::Bool = false` or `shorten::Int`: if an integer length is specified, the
-    DataFrame will be shortened to the input value. This is meant to aid troubleshooting
-    during development.
-
 # Returns
 - `df::DataFrame`: If the input is a csv or xlsx file, this method will return a DataFrame.
 - `yml::Dict{Any,Any}`: If the input file is a yaml file, this method will return a
     dictionary. All keys that correspond with SLiDE DataStream DataTypes will be converted
     to (lists of) those types.
 """
-function read_file(path::Array{String,1}, file::GAMSInput; shorten=false)
+function read_file(path::Array{String,1}, file::GAMSInput)
     # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
     xf = readlines(filepath)
@@ -39,10 +34,14 @@ function read_file(path::Array{String,1}, file::GAMSInput; shorten=false)
     return df
 end
 
-function read_file(path::Array{String,1}, file::CSVInput; shorten=false)
+function read_file(path::Array{String,1}, file::CSVInput)
     # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
     df = CSV.read(filepath, DataFrame; silencewarnings=true, ignoreemptylines=true, comment="#", missingstrings=["","\xc9","..."])
+
+    # If there is only one column, don't check for headers, footers, etc. Just return it.
+    size(df,2) == 1 && (return df)
+
     NUMTEST = min(10, size(df, 1))
 
     # A column name containing the word "Column" indicates that the input csv file was
@@ -67,12 +66,10 @@ function read_file(path::Array{String,1}, file::CSVInput; shorten=false)
         FOOT = size(df)[1] - (length(x) - (findmax(x)[2] - 1))
         df = df[1:FOOT,:]
     end
-
-    shorten != false && (df = df[1:shorten,:])
     return unique(df)
 end
 
-function read_file(path::Array{String,1}, file::XLSXInput; shorten=false)
+function read_file(path::Array{String,1}, file::XLSXInput)
     # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
@@ -80,17 +77,30 @@ function read_file(path::Array{String,1}, file::XLSXInput; shorten=false)
     # Delete rows containing only missing values.
     xf = xf[[!all(row) for row in eachrow(ismissing.(xf))],:]
     df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique=true)
-
-    shorten != false && (df = df[1:shorten,:])
     return df
 end
 
-function read_file(path::String, file::T; shorten=false) where T <: File
-    return read_file([path], file; shorten=shorten)
+function read_file(path::Array{String,1}, file::DataInput)
+    # filepath = joinpath(SLIDE_DIR, path..., file.name)
+    df = read_file(path, convert_type(CSVInput, file))
+    df = edit_with(df, Rename.(propertynames(df), file.col))
+
+    (:value in propertynames(df)) && (df[!,:value] .= convert_type.(Float64, df[:,:value]))
+    return df
+end
+
+function read_file(path::Array{String,1}, file::SetInput)
+    # filepath = joinpath(SLIDE_DIR, path..., file.name)
+    df = read_file(path, convert_type(CSVInput, file))
+    return sort(df[:,1])
+end
+
+function read_file(path::String, file::T) where T <: File
+    return read_file([path], file)
 end
 
 function read_file(editor::T) where T <: Edit
-    # !!!! Should we avoid including specific paths within functions?
+    # !!!! Should we avoid including specific paths within functions? -- Definitely make more general.
     # !!!! Need to throw error if this is called when "file" is not a field.
     # DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "coremaps"))
     DIR = joinpath("data", "coremaps")

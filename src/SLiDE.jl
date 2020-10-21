@@ -53,9 +53,11 @@ export Rename
 export Replace
 export Stack
 
+export SetInput
 export CSVInput
 export GAMSInput
 export XLSXInput
+export DataInput
 
 export FileInput
 
@@ -78,13 +80,13 @@ export dropzero
 export dropvalue!
 export dropvalue
 export ensurearray
-export ensurenames!
-export ensurenames
+# export ensurenames!
+# export ensurenames
 export ensuretuple
 export find_oftype
-export hasnames
-export isarray
-export istype
+# export hasnames
+# export isarray
+# export istype
 export permute
 export findindex
 export findvalue

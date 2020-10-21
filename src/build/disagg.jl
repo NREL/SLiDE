@@ -65,12 +65,12 @@ function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
     _disagg_xd0!(d)
     _disagg_xn0!(d)
     _disagg_hhadj!(d)
-
+    
     # Read parameters and order DataFrame columns accordingly.
-    param = read_parameter(joinpath("src","build","parameters","regional_parameters.yml"));
+    param = read_from(joinpath("src","build","parameters","regional_parameters.yml"));
     [select!(d[k], param[k]) for k in intersect(keys(d), keys(param))]
 
-    write_build("disagg", d; save = save)
+    write_build!("disagg", d; save = save)
     return d
 end
 

@@ -1,6 +1,10 @@
 """
 Generate structures using the `generate_structs()` function from InfrastructureSystems.
 """
+
+import InfrastructureSystems
+const IS = InfrastructureSystems
+
 SRC_DIR = joinpath(SLIDE_DIR, "src")
 
 # DataStream

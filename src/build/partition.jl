@@ -50,12 +50,12 @@ function partition!(d::Dict, set::Dict; save = true, overwrite = false)
     _partition_tm0!(d, set)  # duty0, m0
     
     # Read parameters and order DataFrame columns accordingly.
-    param = read_parameter(joinpath("src","build","parameters","national_parameters.yml"))
+    param = read_from(joinpath("src","build","parameters","national_parameters.yml"))
     [select!(d[k], param[k]) for k in intersect(keys(d), keys(param))]
 
     # Save all calculated parameters except for supply and use.
-    d_save = delete!(delete!(copy(d), :supply), :use)
-    write_build("partition", d_save; save = save)
+    # d_save = delete!(delete!(copy(d), :supply), :use)
+    write_build!("partition", d; save = save)
 
     return d
 end

@@ -1,0 +1,7 @@
+Path: [src,build,parameters]
+
+SetInput:
+  - {descriptor: partition, name: list_cal.csv}
+  - {descriptor: calibrate, name: list_cal.csv}
+  - {descriptor: share,     name: list_shr.csv}
+  - {descriptor: disagg,    name: list_disagg.csv}
