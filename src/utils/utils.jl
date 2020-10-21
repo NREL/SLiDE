@@ -17,7 +17,7 @@ end
     Base.broadcastable(x::InvertedIndex{T}) where {T<:Any}
 !!!!
 """
-Base.broadcastable(x::InvertedIndex{T}) where {T<:Any} = [x];
+Base.broadcastable(x::InvertedIndex{T}) where {T <: Any} = [x];
 
 """
     Base.split(x::Missing)
@@ -92,7 +92,7 @@ dropvalue(df::DataFrame, x::Float64) = dropvalue!(copy(df), x)
     dropzero!(df::DataFrame)
 Returns a DataFrame without zero values in columns of type AbstractFloat.
 """
-dropzero!(df::DataFrame) = dropvalue!(df, 0.0)
+dropzero!(df::DataFrame) = dropvalue!(dropvalue!(df, 0.0), -0.0)
 dropzero(df::DataFrame) = dropzero!(copy(df))
 
 dropnan!(df::DataFrame) = dropvalue!(df, NaN)
@@ -120,26 +120,26 @@ Options available when converting a DataFrame into a dictionary of keys pointing
 # Returns
 Data in specified type
 """
-convert_type(::Type{T}, x::Any) where T<:AbstractString = string(x)
-convert_type(::Type{T}, x::Dates.Date) where T<:Integer = Dates.year(x)
+convert_type(::Type{T}, x::Any) where T <: AbstractString = string(x)
+convert_type(::Type{T}, x::Dates.Date) where T <: Integer = Dates.year(x)
 
 convert_type(::Type{Map}, x::Group) = Map(x.file, [x.from], x.to, [x.input], x.output, :inner)
 
-convert_type(::Type{T}, x::AbstractString) where T<:AbstractString = string(strip(x))
+convert_type(::Type{T}, x::AbstractString) where T <: AbstractString = string(strip(x))
 
-function convert_type(::Type{T}, x::AbstractString) where T<:Integer
+function convert_type(::Type{T}, x::AbstractString) where T <: Integer
     return convert_type(T, convert_type(Float64, x))
 end
 
-function convert_type(::Type{T}, x::AbstractString) where T<:Real
-    return parse(T, reduce(replace, ["," => "", "\"" => ""], init = x))
+function convert_type(::Type{T}, x::AbstractString) where T <: Real
+    return parse(T, reduce(replace, ["," => "", "\"" => ""], init=x))
 end
 
-convert_type(::Type{T}, x::Symbol) where T<:Real = convert_type(T, convert_type(String, x))
+convert_type(::Type{T}, x::Symbol) where T <: Real = convert_type(T, convert_type(String, x))
 
 convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1}) = [DataFrame.(lst)...;]
 
-function convert_type(::Type{DataFrame}, arr::JuMP.Containers.DenseAxisArray; cols = [])
+function convert_type(::Type{DataFrame}, arr::JuMP.Containers.DenseAxisArray; cols=[])
     cols = ensurearray(cols)
     
     val = JuMP.value.(arr.data)
@@ -150,7 +150,7 @@ function convert_type(::Type{DataFrame}, arr::JuMP.Containers.DenseAxisArray; co
     return edit_with(df, Rename.(propertynames(df)[1:length(cols)], cols))
 end
 
-function convert_type(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :Float)
+function convert_type(::Type{Dict}, df::DataFrame; drop_cols=[], value_col::Symbol=:Float)
     # Find and save the column containing values and that/those containing keys.
     # If no value column indicator is specified, find the first DataFrame column of floats.
     value_col == :Float && (value_col = find_oftype(df, AbstractFloat)[1])
@@ -164,12 +164,12 @@ end
 
 convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
 
-convert_type(::Type{Array{T}}, x::Any) where T<:Any = convert_type.(T, x)
-convert_type(::Type{Array{T,1}}, x::Any) where T<:Any = convert_type.(T, x)
+convert_type(::Type{Array{T}}, x::Any) where T <: Any = convert_type.(T, x)
+convert_type(::Type{Array{T,1}}, x::Any) where T <: Any = convert_type.(T, x)
 convert_type(::Type{Array}, d::Dict) = [collect(values(d))...;]
 
-convert_type(::Type{T}, x::Missing) where T<:Real = x;
-convert_type(::Type{T}, x::Missing) where T<:AbstractString = x
+convert_type(::Type{T}, x::Missing) where T <: Real = x;
+convert_type(::Type{T}, x::Missing) where T <: AbstractString = x
 convert_type(::Type{Any}, x::AbstractString) = "missing" == lowercase(x) ? missing : x
 convert_type(::Type{Any}, x::Any) = x
 
@@ -208,17 +208,22 @@ istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(dropmissing(d
 # eltype.(eachcol(df))
 
 function hasnames(df::DataFrame, cols::Array{Symbol,1})
-    col_in = setdiff(propertynames(df),cols)
+    col_in = setdiff(propertynames(df), cols)
     col_out = setdiff(cols, propertynames(df))
     return (length(col_in) == 0) && (length(col_out) == 0)
 end
 
+
+"""
+"""
+DataFrames.select!(df::DataFrame, x::Parameter) = select!(df, [x.index; :value])
+
 function ensurenames!(df::DataFrame, cols::Array{Symbol,1})
-    size(df,2) !== length(cols) && @error("Can only ensure column names of the data frame length")
-    cols_in = setdiff(propertynames(df),cols)
+    size(df, 2) !== length(cols) && @error("Can only ensure column names of the data frame length")
+    cols_in = setdiff(propertynames(df), cols)
     cols_out = setdiff(cols, propertynames(df))
 
-    [rename!(df, col_in => col_out) for (col_in,col_out) in zip(cols_in,cols_out)]
+    [rename!(df, col_in => col_out) for (col_in, col_out) in zip(cols_in, cols_out)]
     return df[:,cols]
 end
 ensurenames(df::DataFrame, cols::Array{Symbol,1}) = ensurenames!(copy(df), cols)
@@ -232,7 +237,7 @@ find_oftype(df::DataFrame, T::DataType) = propertynames(df)[istype(df, T)]
 find_oftype(df::DataFrame, T::InvertedIndex{DataType}) = propertynames(df)[.!istype(df, T.skip)]
 
 function find_oftype(d::Dict, T::DataType)
-    return Dict(k => v for (k,v) in d if any(broadcast(<:, typeof.(ensurearray(v)), T)))
+    return Dict(k => v for (k, v) in d if any(broadcast(<:, typeof.(ensurearray(v)), T)))
 end
 
 """
@@ -249,24 +254,24 @@ This function finds all possible permutations of the input arrays.
 """
 function permute(df::DataFrame)
     cols = propertynames(df)
-    df = sort(DataFrame(ensuretuple.(permute(unique.(eachcol(df))))))
+    df = DataFrame(ensuretuple.(permute(unique.(eachcol(df)))))
     df = edit_with(df, Rename.(propertynames(df), cols))
     return df
 end
 
 function permute(x::Tuple)
     xperm = if length(x) == 1
-        sort(unique(x[1]))
+        unique(x[1])
     else
-        [collect(Base.Iterators.product(sort.(unique.(ensurearray.(x)))...))...;]
+        [collect(Base.Iterators.product(unique.(ensurearray.(x))...))...;]
     end
     return xperm
 end
 
 function permute(x::NamedTuple)
     cols = keys(x)
-    xperm = eachcol(sort(DataFrame(Tuple.(ensurearray.(permute(ensurearray.(values(x))))))))
-    return NamedTuple{Tuple(cols,)}(xperm,)
+    xperm = eachcol(DataFrame(Tuple.(ensurearray.(permute(ensurearray.(values(x)))))))
+    return NamedTuple{Tuple(cols, )}(xperm, )
 end
 
 function permute(x::Array)
@@ -275,7 +280,77 @@ function permute(x::Array)
     elseif length(unique(length.(x))) .== 1 && all(length.(x) .> 1)
         permute(unique.(eachcol(DataFrame(x))))
     else
-        sort(unique(x))
+        unique(x)
     end
     return xperm
+end
+
+
+findvalue(df::DataFrame) = [find_oftype(df, AbstractFloat); find_oftype(df, Bool)]
+findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
+
+"""
+    indexjoin(df::DataFrame...; kwargs)
+    indexjoin(df::Array{DataFrame,1}; kwargs)
+
+This function joins input DataFrames on their index columns (ones that are not filled with 
+`AbstractFloat` or `Bool` DataTypes)
+
+# Argument
+- `df::DataFrame...` to joins
+
+# Keywords
+- `valnames::Array{Symbol,1}`: names of output value columns.
+- `indicator::Array{Any,1}`: prefix to add to DataFrame value names.
+"""
+function indexjoin(df::Array{DataFrame,1};
+    indicator = missing,
+    valnames = missing,
+    fillmissing = 0.0
+)
+    # df = copy.(ensurearray(df))
+    N = length(df)
+
+    val = findvalue.(df)
+    idx = findindex.(df)
+
+    if valnames === missing
+        indicator === missing && (indicator = Symbol.(:df, 1:N))
+        valnames = broadcast.(Symbol, Symbol.(indicator, :_), val)
+    end
+
+    valnames = ensurearray.(valnames)
+    df = [edit_with(df[ii], Rename.(val[ii], valnames[ii])) for ii in 1:N]
+    df_ans = copy(df[1])
+
+    for ii in 2:N
+        cols = intersect(propertynames(df_ans), idx[ii])
+
+        df_ans = if length(cols) == 0
+            crossjoin(df_ans, df[ii])
+        else
+            outerjoin(df_ans, df[ii], on=cols)
+        end
+    end
+
+    idx = unique(collect(Iterators.flatten(idx)))
+    valnames = collect(Iterators.flatten(valnames))
+    
+    # Handle missing keys.
+    if fillmissing !== false
+        df_ans = edit_with(df_ans, Replace.(valnames, missing, fillmissing))
+    end
+    return df_ans[:, [idx; valnames]]
+end
+
+function indexjoin(df::Vararg{DataFrame};
+    indicator = missing,
+    valnames = missing,
+    fillmissing = 0.0
+)
+    return indexjoin(ensurearray(df);
+        indicator = indicator,
+        valnames = valnames,
+        fillmissing = fillmissing
+    )
 end

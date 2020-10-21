@@ -59,7 +59,7 @@ function partition!(d::Dict, set::Dict; save = true, overwrite = false)
     [select!(d[k], param[k]) for k in intersect(keys(d), keys(param))]
 
     d_save = delete!(delete!(copy(d), :supply), :use)
-
+    
     write_build("partition", d_save; save = save)
 
     return d

@@ -78,8 +78,8 @@ export dropzero
 export dropvalue!
 export dropvalue
 export ensurearray
-export ensurenames!
-export ensurenames
+# export ensurenames!
+# export ensurenames
 export ensuretuple
 export find_oftype
 export hasnames

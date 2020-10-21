@@ -27,6 +27,8 @@ function share!(d::Dict, set::Dict; save = true, overwrite = false)
     d_read = read_build("share_i"; save = save, overwrite = overwrite);
     if isempty(d_read)
         y = read_from(joinpath("src","readfiles","build","shareinp.yml"))
+        # Here, we're not using read yaml/run yaml because the location we're saving in
+        # depends on 
         d_read = Dict(k => edit_with(v) for (k,v) in y)
         d_read = Dict(k => sort(filter_with(df, set; extrapolate = true)) for (k, df) in d_read)
 

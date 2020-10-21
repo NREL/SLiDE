@@ -88,6 +88,16 @@ function read_set(path::String)
     return d
 end
 
+
+"""
+"""
+function read_parameter(path::String)
+    d = read_file(path)
+    d = Dict(v.parameter => v for v in d["Parameter"])
+    return d
+end
+
+
 """
     write_build(build_step::String, d::Dict; kwargs...)
 This function writes intermediary build files if desired by the user.

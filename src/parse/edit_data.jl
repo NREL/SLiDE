@@ -774,7 +774,7 @@ julia> filter_with(df, (yr = 2016,); drop = true)
 """
 function filter_with(
     df::DataFrame,
-    set::Any;
+    set::Dict;
     drop::Bool = false,
     extrapolate::Bool = false,
     forward::Bool = true,
@@ -811,3 +811,22 @@ function filter_with(
 
     return sort(df[:,cols])
 end
+
+# function filter_with(
+#     df::DataFrame,
+#     set::NamedTuple;
+#     drop::Bool = false,
+#     extrapolate::Bool = false,
+#     forward::Bool = true,
+#     backward::Bool = true,
+#     r::Pair = "md" => "dc",
+#     overwrite::Bool = false
+# )
+#     if any(typeof.(collect(values(set))) .<: Pair)
+#         x = [Rename.(set[k].first, k) for k in keys(set) if typeof(set[k]) <: Pair]
+#         df = edit_with(df, x)
+#     end
+    
+#     set = Dict(k => (typeof(set[k]) <: Pair) ? set[k].second : set[k] for k in keys(set))
+#     return filter_with(df, set; drop = drop, extrapolate = extrapolate, forward = forward, backward = backward, r = r, overwrite = overwrite)
+# end

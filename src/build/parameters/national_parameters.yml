@@ -1,4 +1,6 @@
 Parameter:
+  - {parameter: supply, index: [yr,g,s], name: Supply data, units: billions of us dollars (USD)}
+  - {parameter: use,    index: [yr,g,s], name: Use data, units: billions of us dollars (USD)}
   - {parameter: ys0, index: [yr,s,g],  name: Sectoral supply (with byproducts), units: billions of us dollars (USD)}
   - {parameter: y0,  index: [yr,s],    name: Gross output (net margin supply), units: billions of us dollars (USD)}
   - {parameter: fs0, index: [yr,g],    name: Household production, units: billions of us dollars (USD)}
