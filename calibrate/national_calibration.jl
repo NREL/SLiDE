@@ -89,7 +89,7 @@ end
 
 
 
-i_set = unique(io[:y0][!,:i]);
+i_set = unique(io[:ys0][!,:i]);
 j_set = copy(i_set);
 
 fd_set = ["pce","equipment","intelprop","residential","changinv","structures","def_equipment","defense",

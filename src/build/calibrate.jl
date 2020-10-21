@@ -16,7 +16,6 @@ See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
 - `d::Dict` of DataFrames containing the model data at the calibration step.
 """
 function calibrate(d::Dict, set::Dict; save = true, overwrite = false)
-
     io_cal = read_build("calibrate"; save = save, overwrite = overwrite)
     !isempty(io_cal) && (return io_cal)
 
@@ -33,7 +32,7 @@ function calibrate(d::Dict, set::Dict; save = true, overwrite = false)
         [io_cal[k] = [io_cal[k]; io_cal_temp[k]] for k in set[:cal]]
     end
 
-    write_build("calibrate", io_cal; save = save)
+    write_build!("calibrate", io_cal; save = save)
     return io_cal
 end
 
@@ -41,8 +40,11 @@ end
 function calibrate(year::Int, io::Dict, set::Dict)
     @info("Calibrating $year data")
 
-    set_temp = copy(set)
-    [set[k] = setdiff(set[k], set[:imrg]) for k in [:i,:j,:s,:g]]
+    # (!!!!) This is necessary to make the calibrate function consistent with
+    # calibrate/national_calibration.jl, which defines i_set = unique(y0(:,i)).
+    # y0(i = imrg, value) = 0 when partitioning, so i_set doesn't include imrg.
+    # set_temp = copy(set)
+    # [set[k] = setdiff(set[k], set[:imrg]) for k in [:i,:j,:s,:g]]
 
     # Prepare the data and initialize the model.
     (cal, idx) = _calibration_input(year, io, set);
@@ -172,7 +174,9 @@ function calibrate(year::Int, io::Dict, set::Dict)
     
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     JuMP.optimize!(calib)
-    
+
+    @isdefined(set_temp) && (set = copy(set_temp)) # (!!!!) delete if unnecessary
+
     # Populate resultant Dictionary.
     io_cal = Dict(k => filter_with(io[k], (yr = year,); drop = true) for k in [:ta0,:tm0])
     io_cal[:ys0] = convert_type(DataFrame, ys0_est; cols=idx[:ys0])

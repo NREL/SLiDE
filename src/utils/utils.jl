@@ -1,7 +1,3 @@
-# using DataFrames
-# using Dates
-# using Base
-
 """
     function datatype(str::String)
 This function evaluates an input string as a DataType if it is defined.
@@ -15,7 +11,7 @@ end
 
 """
     Base.broadcastable(x::InvertedIndex{T}) where {T<:Any}
-!!!!
+(!!!!) add docs here.
 """
 Base.broadcastable(x::InvertedIndex{T}) where {T <: Any} = [x];
 
@@ -26,6 +22,7 @@ Extends `split` to ignore missing fields.
 """
 Base.split(str::Missing) = str
 Base.split(str::Missing, splitter::Any) = str
+Base.split(x::Symbol) = Symbol.(split(string(x)))
 
 """
     Base.strip(x::Missing)
@@ -124,6 +121,8 @@ convert_type(::Type{T}, x::Any) where T <: AbstractString = string(x)
 convert_type(::Type{T}, x::Dates.Date) where T <: Integer = Dates.year(x)
 
 convert_type(::Type{Map}, x::Group) = Map(x.file, [x.from], x.to, [x.input], x.output, :inner)
+convert_type(::Type{CSVInput}, x::DataInput) = CSVInput(x.name, x.descriptor)
+convert_type(::Type{CSVInput}, x::SetInput) = CSVInput(x.name, "set")
 
 convert_type(::Type{T}, x::AbstractString) where T <: AbstractString = string(strip(x))
 
@@ -202,6 +201,7 @@ Returns `x` in a tuple.
 ensuretuple(x::Tuple{Vararg{Any}}) = x
 ensuretuple(x::Any) = tuple(x)
 
+
 """
 """
 istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(dropmissing(df))), T)
@@ -218,7 +218,9 @@ end
 """
 DataFrames.select!(df::DataFrame, x::Parameter) = select!(df, [x.index; :value])
 
+
 function ensurenames!(df::DataFrame, cols::Array{Symbol,1})
+    # (!!!!) delete this function. It could result in misnaming.
     size(df, 2) !== length(cols) && @error("Can only ensure column names of the data frame length")
     cols_in = setdiff(propertynames(df), cols)
     cols_out = setdiff(cols, propertynames(df))
@@ -227,6 +229,7 @@ function ensurenames!(df::DataFrame, cols::Array{Symbol,1})
     return df[:,cols]
 end
 ensurenames(df::DataFrame, cols::Array{Symbol,1}) = ensurenames!(copy(df), cols)
+
 
 """
     find_oftype(df::DataFrame, T::DataType)
@@ -240,17 +243,21 @@ function find_oftype(d::Dict, T::DataType)
     return Dict(k => v for (k, v) in d if any(broadcast(<:, typeof.(ensurearray(v)), T)))
 end
 
+
 """
-    permute(x::Any)
-This function finds all possible permutations of the input arrays.
+    permute(df::DataFrame)
+    permute(x::Tuple)
+    permute(x::NamedTuple)
+    permute(x::Array)
+This function finds all possible permutations of the input data.
 
 # Arguments
-- `x::Tuple` or `x::NamedTuple{}` or `x::Array`: list of arrays to permute.
-    If `x` is a NamedTuple, its values will be permuted.
+- `x::Any`: data to permute.
 
 # Returns
-- `x::Array{Tuple,1}`: list of all possible permutations of the input values.
-    If `x` does not contain at least one array, there will be nothing to permute and the function will return `x`.
+- `x::Any`: all possible permutations of the input values. If `x` does not contain
+    at least one array, there will be nothing to permute and the function will return `x`.
+    The values in x are unsorted.
 """
 function permute(df::DataFrame)
     cols = propertynames(df)
@@ -285,9 +292,6 @@ function permute(x::Array)
     return xperm
 end
 
-
-findvalue(df::DataFrame) = [find_oftype(df, AbstractFloat); find_oftype(df, Bool)]
-findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
 
 """
     indexjoin(df::DataFrame...; kwargs)
@@ -354,3 +358,19 @@ function indexjoin(df::Vararg{DataFrame};
         fillmissing = fillmissing
     )
 end
+
+
+"""
+# Returns
+- `val::Array{Symbol,1}` of input DataFrame propertynames indicating values, which are
+    defined as columns that DO contain `AbstractFloat` or `Bool` DataTypes.
+"""
+findvalue(df::DataFrame) = [find_oftype(df, AbstractFloat); find_oftype(df, Bool)]
+
+
+"""
+# Returns
+- `idx::Array{Symbol,1}` of input DataFrame propertynames indicating indices, which are
+    defined as columns that do NOT contain `AbstractFloat` or `Bool` DataTypes.
+"""
+findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
