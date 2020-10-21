@@ -14,7 +14,7 @@ See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
 - `d::Dict` of DataFrames containing the model data at the
 """
 function partition!(d::Dict, set::Dict; save = true, overwrite = false)
-
+    
     d_read = read_build("partition"; save = save, overwrite = overwrite);
     if !isempty(d_read)
         [d[k] = v for (k,v) in d_read]
@@ -25,7 +25,6 @@ function partition!(d::Dict, set::Dict; save = true, overwrite = false)
     x = [Rename(:i,:g), Rename(:j,:s), Drop(:units, "all", "==")]
     [d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), x) for k in [:supply, :use]]
 
-    # 
     _partition_io!(d, set)
     
     _partition_fd0!(d, set)
@@ -47,19 +46,15 @@ function partition!(d::Dict, set::Dict; save = true, overwrite = false)
     _partition_y0!(d, set)   # ms0, fs0, ys0
     _partition_a0!(d, set)   # fd0, id0
     
-    # _partition_sbd0!(d, set)
-    # _partition_tax0!(d, set)
-    _partition_ta0!(d, set)       # a0, sbd0, tax0
+    _partition_ta0!(d, set)  # a0, sbd0, tax0
+    _partition_tm0!(d, set)  # duty0, m0
     
-    # _partition_duty0!(d, set)
-    _partition_tm0!(d, set)       # duty0, m0
-    
-    # Read parameters and order accordingly.
+    # Read parameters and order DataFrame columns accordingly.
     param = read_parameter(joinpath("src","build","parameters","national_parameters.yml"))
     [select!(d[k], param[k]) for k in intersect(keys(d), keys(param))]
 
+    # Save all calculated parameters except for supply and use.
     d_save = delete!(delete!(copy(d), :supply), :use)
-
     write_build("partition", d_save; save = save)
 
     return d
@@ -114,8 +109,9 @@ function _partition_io!(d::Dict, set::Dict)
     d[:ys0][!,:value] = d[:ys0][:,:value] - min.(0, d[:id0][:,:value])
     d[:id0][!,:value] = max.(0, d[:id0][:,:value])
 
-    d[:id0] = dropzero(d[:id0])
-    d[:ys0] = dropzero(d[:ys0])
+    # d[:id0] = dropzero(d[:id0])
+    # d[:ys0] = dropzero(d[:ys0])
+    [dropzero!(d[k]) for k in keys(d)]
     return d
 end
 
@@ -203,6 +199,7 @@ function _partition_fs0!(d::Dict)
     println("  Partitioning fs0, household supply")
     d[:fs0] = filter_with(d[:fd0], (fd = "pce",); drop = true)
     d[:fs0][!,:value] .= - min.(d[:fs0][:,:value], 0)
+    return dropzero!(d[:fs0])
 end
 
 """
@@ -335,11 +332,11 @@ end
 ```
 """
 function _partition_ta0!(d::Dict, set::Dict)
-    println("  Partitioning ta0, import tariffs")
-    df_tax = _partition_tax0!(d, set)
-    df_sbd = _partition_sbd0!(d, set)
+    println("  Partitioning ta0(yr,g), import tariffs")
+    !(:tax0 in keys(d)) && _partition_tax0!(d, set)
+    !(:sbd0 in keys(d)) && _partition_sbd0!(d, set)
 
-    d[:ta0] = dropnan((df_tax - df_sbd) / d[:a0])
+    d[:ta0] = dropnan((d[:tax0] - d[:sbd0]) / d[:a0])
     # d[:ta0] = edit_with(d[:ta0], Drop(:units,"all","=="))
 end
 
@@ -367,9 +364,8 @@ end
 """
 function _partition_tm0!(d::Dict, set::Dict)
     println("  Partitioning tm0, tax net subsidy rate on intermediate demand")
-    df_duty = _partition_duty0!(d, set);
-
-    d[:tm0] = dropnan(df_duty / d[:m0])
+    !(:duty0 in keys(d)) && _partition_duty0!(d, set)
+    d[:tm0] = dropnan(d[:duty0] / d[:m0])
     # d[:tm0] = edit_with(d[:tm0], Drop(:units,"all","=="))
 end
 
@@ -414,7 +410,8 @@ Treat negative inputs as outputs:
 function _partition_ts0!(d::Dict, set::Dict)
     println("  Partitioning ts0, taxes and subsidies")
     d[:ts0] = filter_with(d[:use], (g = set[:ts], s = set[:s]))
-    d[:ts0][d[:ts0][:,:g] .== "subsidies", :value] *= -1  # treat negative inputs as outputs
+    d[:ts0] = edit_with(d[:ts0], Rename(:g, :ts))
+    d[:ts0][d[:ts0][:,:ts] .== "subsidies", :value] *= -1  # treat negative inputs as outputs
     return d[:ts0]
 end
 
@@ -428,7 +425,7 @@ end
 """
 function _partition_va0!(d::Dict, set::Dict)
     println("  Partitioning va0, value added")
-    d[:va0] = filter_with(d[:use], (g => set[:va], s = set[:s]))
+    d[:va0] = filter_with(d[:use], (g = set[:va], s = set[:s]))
     d[:va0] = edit_with(d[:va0], Rename(:g, :va))
 end
 

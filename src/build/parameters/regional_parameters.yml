@@ -24,11 +24,11 @@ Parameter:
   - {parameter: hhadj, index: [yr,r],   name: Household adjustment, units: billions of us dollars (USD)}
 # Unsaved.
   # - {parameter: fd0, index: [yr,s,fdcat]}
-  - {parameter: ty0, index: [yr,r,g], name: Production tax rate, units: USD/USD}
+  - {parameter: ty0, index: [yr,r,s], name: Production tax rate, units: USD/USD}
   - {parameter: va0, index: [yr,r,s], name: Regional value added, units: billions of us dollars (USD)}
-  - {parameter: c0,  index: [yr,r],   name: Total final household consumption, units: }
+  - {parameter: c0,  index: [yr,r],   name: Total final household consumption, units: billions of us dollars (USD)}
   - {parameter: pt0, index: [yr,r,g], name: "", units: billions of us dollars (USD)}
-  - {parameter: dc0, inex: [yr,r,g],  name: "", units: billions of us dollars (USD)}
+  - {parameter: dc0, index: [yr,r,g],  name: "", units: billions of us dollars (USD)}
   - {parameter: thetaa, index: [yr,r,g], name: Share of regional absorption, units: USD/USD}
   - {parameter: dd0max, index: [yr,r,g], name: Maximum regional demand from local market, units: billions of us dollars (USD)}
   - {parameter: nd0max, index: [yr,r,g], name: Maximum regional demand from national market, units: billions of us dollars (USD)}

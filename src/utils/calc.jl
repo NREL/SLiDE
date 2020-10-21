@@ -51,10 +51,11 @@ is performed for related values. Values that are "missing" after joining are set
 function Base.:/(df1::DataFrame, df2::DataFrame)
     out = Symbol.(:x, 1:2)
 
-    df_ans = _join_to_operate(copy.([df1, df2]))
-    df_ans[!,:value] .= df_ans[:, out[1]] ./ df_ans[:, out[2]]
+    df = indexjoin(copy.([df1,df2]); valnames = out)
 
-    return df_ans[:, [setdiff(propertynames(df_ans), [:value; out]); :value]]
+    df[!,:value] .= df[:, out[1]] ./ df[:, out[2]]
+
+    return df[:, setdiff(propertynames(df),out)]
 end
 
 
@@ -68,12 +69,16 @@ function Base.:+(df::Vararg{DataFrame})
     N = length(df)
     out = Symbol.(:x, 1:N)
 
-    df_ans = _join_to_operate(copy.(ensurearray(df)))
+    if length(findvalue.(df)) > N
+        @error("Can only add DataFrames with one value column EACH.")
+    end
 
-    df_ans[!,:value] .= df_ans[:, out[1]];
-    [df_ans[!,:value] += df_ans[:, out[ii]] for ii in 2:N]
+    df = indexjoin(ensurearray(df); valnames = out)
 
-    return df_ans[:, [setdiff(propertynames(df_ans), [:value; out]); :value]]
+    df[!,:value] .= df[:, out[1]];
+    [df[!,:value] += df[:, out[ii]] for ii in 2:N]
+
+    return df[:, setdiff(propertynames(df),out)]
 end
 
 """
@@ -86,12 +91,16 @@ function Base.:-(df::Vararg{DataFrame})
     N = length(df)
     out = Symbol.(:x, 1:N)
 
-    df = _join_to_operate(copy.(ensurearray(df)))
+    if length(findvalue.(df)) > N
+        @error("Can only subtract DataFrames with one value column EACH.")
+    end
+
+    df = indexjoin(ensurearray(df); valnames = out)
 
     df[!,:value] .= df[:, out[1]];
     [df[!,:value] -= df[:, out[ii]] for ii in 2:N]
 
-    return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
+    return df[:, setdiff(propertynames(df),out)]
 end
 
 """
@@ -104,13 +113,18 @@ function Base.:*(df::Vararg{DataFrame})
     N = length(df)
     out = Symbol.(:x, 1:N)
 
-    df = _join_to_operate(copy.(ensurearray(df)))
+    if length(findvalue.(df)) > N
+        @error("Can only multiply DataFrames with one value column EACH.")
+    end
+
+    df = indexjoin(ensurearray(df); valnames = out)
 
     df[!,:value] .= df[:, out[1]];
     [df[!,:value] .*= df[:, out[ii]] for ii in 2:N]
 
-    return df[:, [setdiff(propertynames(df), [:value; out]); :value]]
+    return df[:, setdiff(propertynames(df),out)]
 end
+
 
 """
     combine_over(df::DataFrame, col::Array{Symbol,1}; operation::Function = sum)

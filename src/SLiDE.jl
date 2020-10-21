@@ -78,14 +78,17 @@ export dropzero
 export dropvalue!
 export dropvalue
 export ensurearray
-# export ensurenames!
-# export ensurenames
+export ensurenames!
+export ensurenames
 export ensuretuple
 export find_oftype
 export hasnames
 export isarray
 export istype
 export permute
+export findindex
+export findvalue
+export indexjoin
 
 # EDIT
 export edit_with

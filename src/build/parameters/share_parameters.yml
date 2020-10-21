@@ -1,0 +1,7 @@
+Parameter:
+  - {parameter: region, index: [:yr,:r,:s], name: "", units: ""}
+  - {parameter: labor,  index: [:yr,:r,:s], name: "", units: ""}
+  - {parameter: pce,    index: [:yr,:r,:g], name: "", units: ""}
+  - {parameter: sgf,    index: [:yr,:r,:g], name: "", units: ""}
+  - {parameter: rpc,    index: [:yr,:r,:g], name: "", units: ""}
+  - {parameter: utd,    index: [:yr,:r,:g], name: "", units: ""}

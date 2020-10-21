@@ -2,7 +2,7 @@ Parameter:
   - {parameter: supply, index: [yr,g,s], name: Supply data, units: billions of us dollars (USD)}
   - {parameter: use,    index: [yr,g,s], name: Use data, units: billions of us dollars (USD)}
   - {parameter: ys0, index: [yr,s,g],  name: Sectoral supply (with byproducts), units: billions of us dollars (USD)}
-  - {parameter: y0,  index: [yr,s],    name: Gross output (net margin supply), units: billions of us dollars (USD)}
+  - {parameter: y0,  index: [yr,g],    name: Gross output (net margin supply), units: billions of us dollars (USD)}
   - {parameter: fs0, index: [yr,g],    name: Household production, units: billions of us dollars (USD)}
   - {parameter: id0, index: [yr,g,s],  name: Intermediate demand, units: billions of us dollars (USD)}
   - {parameter: va0, index: [yr,va,s], name: Value added factor demand, units: billions of us dollars (USD)}
@@ -14,7 +14,7 @@ Parameter:
   - {parameter: ta0, index: [yr,g],    name: Tax net subsidy rate on intermediate demand, units: USD/USD}
   - {parameter: tm0, index: [yr,g],    name: Import tariff, units: USD/USD}
   - {parameter: fd0, index: [yr,g,fd], name: Final demand payments, units: billions of us dollars (USD)}
-  - {parameter: bopdef0, index: [yr,r], name: Balance of payments, units: billions of us dollars (USD)}
+  - {parameter: bopdef0, index: [yr],  name: Balance of payments, units: billions of us dollars (USD)}
 # Unused.
   - {parameter: ts0, index: [yr,ts,s], name: Taxes and subsidiex, units: billions of us dollars (USD)}
   - {parameter: s0,  index: [yr,s],    name: Aggregate supply, units: billions of us dollars (USD)}

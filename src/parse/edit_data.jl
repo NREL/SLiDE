@@ -774,7 +774,7 @@ julia> filter_with(df, (yr = 2016,); drop = true)
 """
 function filter_with(
     df::DataFrame,
-    set::Dict;
+    set::Any;
     drop::Bool = false,
     extrapolate::Bool = false,
     forward::Bool = true,
