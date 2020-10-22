@@ -7,7 +7,7 @@ Manifest.toml
 
 admin/
 
-calibrate/data_temp/
+calibrate/data_temp/*.csv
 calibrate/disagg_working.jl
 calibrate/old_disagg.jl
 calibrate/old_io.jl
@@ -15,7 +15,6 @@ calibrate/old_share.jl
 calibrate/scratch.jl
 
 data*/
-*/data*/
 
 docs/build/
 docs/src/man/parameter_list.xlsx

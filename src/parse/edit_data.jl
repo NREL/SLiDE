@@ -294,8 +294,8 @@ function edit_with(df::DataFrame, lst::Array{T}) where T<:Edit
     return df
 end
 
-function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
-    return edit_with(copy(df), Add(x.col, file.descriptor))
+function SLiDE.edit_with(df::DataFrame, x::Describe, file::T) where T<:File
+    return select!(edit_with(df, Add(x.col, file.descriptor)), [x.col; propertynames(df)])
 end
 
 function edit_with(df::DataFrame, y::Dict{Any,Any})

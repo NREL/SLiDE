@@ -23,6 +23,7 @@ makedocs(clean = true,
     ),
     sitename = "SLiDE.jl",
     authors = "Maxwell Brown, Caroline L. Hughes",
+    workdir = "../",
     pages = [
         "Home" => "index.md",
         "Introduction" => Any[

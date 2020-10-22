@@ -64,40 +64,64 @@ end
 """
     read_from(path::String)
 """
-function read_from(path::String)
-    # Will update to make read_from(::Type, path), so the output is not a mystery.
-    y = read_file(path)
-    if "Path" in keys(y)
-        path = y["Path"]
-        inp = "Input" in keys(y) ? y["Input"] : collect(values(find_oftype(y, File)))[1]
-
-        d = _read_from(path, inp)
-        [d[k] = edit_with(d[k], y) for k in keys(d) if typeof(d[k]) == DataFrame]
+function read_from(path::String; ext = ".csv")
+    # Should update to make read_from(::Type, path), so the output is not a mystery.
+    d = if any(occursin.([".yml",".yaml"], path))
+        _read_from_yaml(path)
+    elseif isdir(path)
+        _read_from_dir(path)
     else
-        inp = ensurearray(collect(values(find_oftype(y, CGE)))[1])
-        d = _read_from(inp)
+        @error("Cannot read from $path. Please enter an existing directory or yaml file name.")
     end
     return d
 end
 
+
 """
 """
-function _read_from(path::Array{String,1}, file::Dict)
+function _read_from_dir(path::String; ext = ".csv")
+    @info("Reading $ext files from $path")
+    files = readdir(path)
+    d = Dict(Symbol(f[1:end-length(ext)]) => read_file(joinpath(path,f))
+        for f in files if occursin(ext, f))
+    return d
+end
+
+
+"""
+    _read_from_yaml(path::String)
+"""
+function _read_from_yaml(path::String)
+    y = read_file(path)
+
+    if "Path" in keys(y)
+        path = y["Path"]
+        inp = "Input" in keys(y) ? y["Input"] : collect(values(find_oftype(y, File)))[1]
+
+        d = _read_from_yaml(path, inp)
+        [d[k] = edit_with(d[k], y) for k in keys(d) if typeof(d[k]) == DataFrame]
+    else
+        inp = ensurearray(collect(values(find_oftype(y, CGE)))[1])
+        d = _read_from_yaml(inp)
+    end
+    return d
+end
+
+function _read_from_yaml(path::Array{String,1}, file::Dict)
     path = joinpath(SLIDE_DIR, path...)
     return Dict(_inp_key(k) => read_file(joinpath(path, f)) for (k,f) in file)
 end
 
-function _read_from(path::Array{String,1}, file::Array{T,1}) where {T <: File}
+function _read_from_yaml(path::Array{String,1}, file::Array{T,1}) where {T <: File}
     path = joinpath(SLIDE_DIR, path...)
     return Dict(_inp_key(f) => read_file(path, f) for f in file)
 end
 
-_read_from(path::String, file::Any) = _read_from(ensurearray(path), file)
-_read_from(lst::Array{Parameter,1}) = Dict(_inp_key(x) => x for x in lst)
+_read_from_yaml(path::String, file::Any) = _read_from_yaml(ensurearray(path), file)
+_read_from_yaml(lst::Array{Parameter,1}) = Dict(_inp_key(x) => x for x in lst)
 
 
 """
-
 """
 _inp_key(x::SetInput) = length(split(x.descriptor)) > 1 ? Tuple(split(x.descriptor)) : x.descriptor
 _inp_key(x::T) where {T <: File} = Symbol(x.descriptor)
@@ -116,7 +140,6 @@ function write_build!(build_step::String, d::Dict; save = false)
         param_save = Symbol.(param[Symbol(build_step)])
         param_delete = setdiff(keys(d), param_save)
         [delete!(d, k) for k in param_delete]
-        # d = Dict(k => d[k] for k in param_save)
     end
 
     if save !== false

@@ -404,7 +404,6 @@ function run_yaml(filename::String; save::Bool = true)
 
             println("  Writing to $file")
             CSV.write(file, df)
-            show(first(df, 3))
         end
         return df
     else
