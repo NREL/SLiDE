@@ -11,11 +11,6 @@ using JuMP
 using Complementarity
 using DataFrames
 
-# Note - using the comlementarity package until the native JuMP implementation 
-#        of complementarity constraints allows for exponents neq 0/1/2
-#               --- most recently tested on May 11, 2020 --- 
-
-
 #################
 # -- FUNCTIONS --
 #################
@@ -61,7 +56,6 @@ function df_to_dict(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symb
             for row in eachrow(df))
         return d
 end
-
 
 
 function combvec(set_a...)
@@ -212,14 +206,8 @@ cge = MCPModel();
 ##############
 # PARAMETERS
 ##############
-@NLparameter(
-    cge,
-    ys0_p[r in regions, s in sectors, g in goods] == get(ys0, (r, s, g), 0.0)
-);
-@NLparameter(
-    cge,
-    id0_p[r in regions, s in sectors, g in goods] == get(id0, (r, s, g), 0.0)
-);
+@NLparameter(cge, ys0_p[r in regions, s in sectors, g in goods] == get(ys0, (r, s, g), 0.0));
+@NLparameter(cge, id0_p[r in regions, s in sectors, g in goods] == get(id0, (r, s, g), 0.0));
 @NLparameter(cge, ld0_p[r in regions, s in sectors] == get(ld0, (r, s), 0.0));
 @NLparameter(cge, kd0_p[r in regions, s in sectors] == get(kd0, (r, s), 0.0));
 @NLparameter(cge, ty0_p[r in regions, s in sectors] == get(ty0, (r, s), 0.0));
@@ -301,19 +289,24 @@ end
 @NLparameter(cge, thetax == 0.75); # extant production share
 @NLparameter(cge, beta[t in years] == (1/(1 + value(rho)))^(t-mod_year)); #discount factor or present value multiplier
 
-#new capital
+#new capital endowment
 @NLparameter(cge, ks_n[r in regions, s in sectors] ==
              value(kd0_p[r, s])  * (value(delta)+value(eta)) / (1 + value(eta)) );
 
 
-# mutable old capital
+# mutable old capital endowment
 @NLparameter(cge, ks_s[r in regions, s in sectors] ==
              value(kd0_p[r, s]) * (1 - value(thetax)) - value(ks_n[r,s]) );
 
 
-# Extant capital
+# Extant capital endowment
 @NLparameter(cge, ks_x[r in regions, s in sectors] ==
              value(kd0_p[r, s]) * value(thetax) );
+
+# Labor endowment
+@NLparameter(cge, le0[r in regions, s in sectors] == value(ld0_p[r,s]));
+
+
 
 
 # --- end recursive dynamic preproc ---
@@ -672,10 +665,10 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
         - 
         (
 # labor income        
-        PL[r] * sum(ld0_p[r,s] for s in sectors)
+        PL[r] * sum(le0[r,s] for s in sectors)
 # capital income        
-            +sum((haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) * (ks_n[r,s]+ks_s[r,s]) for s in sectors if (blueNOTE[:kd0][r,s]!=0))
-            +sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in sectors if (blueNOTE[:kd0][r,s]!=0))
+            +sum((haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) * (ks_n[r,s]+ks_s[r,s]) for s in sectors)
+            +sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in sectors)
         #+ sum((haskey(PK.lookup[1], (r, s)) ? PK[(r,s)] : 1.0) * kd0_p[r,s] for s in sectors)
 # provision of household supply          
         + sum( (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * yh0_p[r,g] for g in goods)
@@ -742,24 +735,71 @@ ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH
 status = solveMCP(cge)
 
 
+#Save for later when making investment better
 #scale(r,s,t) = (1-delta)*(ks_n(r,s,"%bmkyr%")+ks_s(r,s,"%bmkyr%")+ks_x(r,s,"%bmkyr%")) / (i0(r,s)*(rho+delta));
 #ks_n(r,s,t) = scale(r,s,t)*i0(r,s))*I.l(r,s)*(rho+delta);
 #total_cap = ks_n+ks_s+ks_x
+
+total_cap = Dict()
+[total_cap[r,s]=value(ks_n[r,s])+value(ks_s[r,s])+value(ks_x[r,s]) for r in regions, s in sectors]
+
+scalecap=Dict()
+[scalecap[r,s]=(value(delta))*total_cap[r,s]/(value(i0_p[r,s])*(value(rho)+value(delta))) for r in regions, s in sectors]
+# get(scalecap, (r,s), 0.0)
 
 # Update parameters for next period
 for r in regions, s in sectors
 #update capital endowments
     set_value(ks_s[r,s], (1-value(delta)) * (value(ks_s[r,s]) + value(ks_n[r,s])));
     set_value(ks_x[r,s], (1-value(delta)) * value(ks_x[r,s]));
-    set_value(ks_n[r,s], (value(rho) + value(delta)) * value(i0_p[r,s]));
+#    set_value(ks_n[r,s], (value(rho) + value(delta)) * value(i0_p[r,s]) );
+    set_value(ks_n[r,s], value(delta)*get(total_cap,(r,s),0.0));
+end
 
+#steady-state investment assumption test
+testk=Dict()
+[testk[r,s]=value(kd0_p[r,s])-(value(ks_n[r,s])+value(ks_s[r,s])+value(ks_x[r,s])) for r in regions, s in sectors]
+
+for r in regions, s in sectors
 #update labor endowments --- I think I need separate parameters for labor endowments versus demand
-    set_value(ld0_p[r,s], (1 + value(eta)) * value(ld0_p[r,s]));
+    set_value(le0[r,s], (1 + value(eta)) * value(le0[r,s]));
+end
 
-#update investment
-#    set_value(i0_p[r,s], (1 + value(eta)) * value(i0_p[r,s]));
+for r in regions
+    set_value(bopdef0_p[r], (1 + value(eta)) * value(bopdef0_p[r]));
+end
 
-#update value share
+for r in regions, g in goods
+    set_value(g0_p[r,g], (1 + value(eta)) * value(g0_p[r,g]));
+    set_value(i0_p[r,g], (1 + value(eta)) * value(i0_p[r,g]));
+end
+
+set_start_value.(all_variables(cge), result_value.(all_variables(cge)));
+
+for r in regions
+    set_start_value(C[r], result_value(C[r])*(1+value(eta)));
+end
+
+for (r,g) in sub_set_x
+    set_start_value(X[(r,g)], result_value(X[(r,g)])*(1+value(eta)));
+end
+
+for (r,g) in sub_set_a    
+    set_start_value(A[(r,g)], result_value(A[(r,g)])*(1+value(eta)));
+end
+
+for r in regions, m in margins
+    set_start_value(MS[r,m], result_value(MS[r,m])*(1+value(eta)));
+end
+
+for (r,s) in sub_set_y
+    set_start_value(YX[(r,s)], result_value(YX[(r,s)])*(1-value(delta)));
+    set_start_value(YM[(r,s)], result_value(YM[(r,s)])*(1+value(eta)));
+end
+
+
+for r in regions, s in sectors
+#update value shares
     set_value(alpha_kl[r,s], value(ld0_p[r,s])/(value(ld0_p[r,s]) + value(kd0_p[r,s])));
 end
 
@@ -767,17 +807,20 @@ for r in regions, g in goods
 #update value shares
     set_value(alpha_x[r,g], (value(x0_p[r, g]) - value(rx0_p[r, g])) / value(s0_p[r, g]));
     set_value(alpha_d[r,g], (value(xd0_p[r,g])) / value(s0_p[r, g]));
-    set_value(alpha_n[r,g], value(xn0_p[r,g]) / (s0_p[r, g]));
+    set_value(alpha_n[r,g], value(xn0_p[r,g]) / (value(s0_p[r, g])));
     set_value(theta_n[r,g], value(nd0_p[r, g]) / (value(nd0_p[r, g]) + value(dd0_p[r, g])));
-    set_value(theta_m[r,g], (1+value(tm0_p[r, g])) * value(m0_p[r, g])
-              / (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g])) * value(m0_p[r, g])));
+    set_value(theta_m[r,g], (1+value(tm0_p[r, g])) * value(m0_p[r, g]) / (value(nd0_p[r, g]) + value(dd0_p[r, g]) + (1 + value(tm0_p[r, g])) * value(m0_p[r, g])));
 end
 
-# for r in regions
-# set_value(bopdef0_p[r], (1 + value(eta)) * value(bopdef0_p[r]));
-# end
+replace_nan_inf(alpha_kl)
+replace_nan_inf(alpha_x)
+replace_nan_inf(alpha_d)
+replace_nan_inf(alpha_n)
+replace_nan_inf(theta_n)
+replace_nan_inf(theta_m)
 
-set_start_value.(all_variables(cge), result_value.(all_variables(cge)));
+
+
 
 
 
