@@ -289,10 +289,16 @@ end
 @NLparameter(cge, thetax == 0.75); # extant production share
 @NLparameter(cge, beta[t in years] == (1/(1 + value(rho)))^(t-mod_year)); #discount factor or present value multiplier
 
+etars_d = Dict()
+[etars_d[r,s]=0.0 for r in regions, s in sectors]
+
+#@NLparameter(cge, etars[r in regions, s in sectors] == get(etars_d,(r,s),0.0));
+@NLparameter(cge, etars[r in regions, s in sectors] == 0.0);
+set_value(etars["ca","uti"], 0.03);
+
 #new capital endowment
 @NLparameter(cge, ks_n[r in regions, s in sectors] ==
-             value(kd0_p[r, s])  * (value(delta)+value(eta)) / (1 + value(eta)) );
-
+             value(kd0_p[r, s])  * (value(delta)+value(eta)+value(etars[r,s])) / (1 + value(eta)) );
 
 # mutable old capital endowment
 @NLparameter(cge, ks_s[r in regions, s in sectors] ==
@@ -592,7 +598,7 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 
 @mapping(cge,market_pl[r in regions],
 # supply of labor
-        sum(ld0_p[r,s] for s in sectors)
+        sum(le0[r,s] for s in sectors)
         - 
 # demand for labor in all sectors        
 #        sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) * AL[r,s] for s in sectors)
@@ -753,7 +759,8 @@ for r in regions, s in sectors
     set_value(ks_s[r,s], (1-value(delta)) * (value(ks_s[r,s]) + value(ks_n[r,s])));
     set_value(ks_x[r,s], (1-value(delta)) * value(ks_x[r,s]));
 #    set_value(ks_n[r,s], (value(rho) + value(delta)) * value(i0_p[r,s]) );
-    set_value(ks_n[r,s], value(delta)*get(total_cap,(r,s),0.0));
+    set_value(ks_n[r,s], value(delta)*(1 + value(eta) + value(etars[r,s]))*get(total_cap,(r,s),0.0));
+#    set_value(ks_n[r,s], value(delta)*get(total_cap,(r,s),0.0));
 end
 
 #steady-state investment assumption test
@@ -762,7 +769,7 @@ testk=Dict()
 
 for r in regions, s in sectors
 #update labor endowments --- I think I need separate parameters for labor endowments versus demand
-    set_value(le0[r,s], (1 + value(eta)) * value(le0[r,s]));
+    set_value(le0[r,s], (1 + value(eta)+value(etars[r,s])) * value(le0[r,s]));
 end
 
 for r in regions
@@ -770,8 +777,8 @@ for r in regions
 end
 
 for r in regions, g in goods
-    set_value(g0_p[r,g], (1 + value(eta)) * value(g0_p[r,g]));
-    set_value(i0_p[r,g], (1 + value(eta)) * value(i0_p[r,g]));
+    set_value(g0_p[r,g], (1 + value(eta)+value(etars[r,g])) * value(g0_p[r,g]));
+    set_value(i0_p[r,g], (1 + value(eta)+value(etars[r,g])) * value(i0_p[r,g]));
 end
 
 set_start_value.(all_variables(cge), result_value.(all_variables(cge)));
@@ -781,11 +788,12 @@ for r in regions
 end
 
 for (r,g) in sub_set_x
-    set_start_value(X[(r,g)], result_value(X[(r,g)])*(1+value(eta)));
+    set_start_value(X[(r,g)], result_value(X[(r,g)])*(1+value(eta)+value(etars[r,g])));
 end
 
+
 for (r,g) in sub_set_a    
-    set_start_value(A[(r,g)], result_value(A[(r,g)])*(1+value(eta)));
+    set_start_value(A[(r,g)], result_value(A[(r,g)])*(1+value(eta)+value(etars[r,g])));
 end
 
 for r in regions, m in margins
@@ -794,7 +802,7 @@ end
 
 for (r,s) in sub_set_y
     set_start_value(YX[(r,s)], result_value(YX[(r,s)])*(1-value(delta)));
-    set_start_value(YM[(r,s)], result_value(YM[(r,s)])*(1+value(eta)));
+    set_start_value(YM[(r,s)], result_value(YM[(r,s)])*(1+value(eta)+value(etars[r,s])));
 end
 
 

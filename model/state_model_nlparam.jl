@@ -78,7 +78,20 @@ blueNOTE = Dict(
     :dd0 => convert_type(Dict, read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"); drop_cols = [:yr], value_col = :Val),
     :nd0 => convert_type(Dict, read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"); drop_cols = [:yr], value_col = :Val)
 )
+#=
+x = convert_type(Dict, filter_with(df, (yr=2016,); drop=true));
+function test(df::DataFrame)
+        x = convert_type(Dict, filter_with(df, (yr=2016,); drop=true));
+        return x
+end
 
+bn = Dict()
+for k in keys(d)
+        bn[k] = test(d[k])
+end
+
+[d[k]=test(d[k]) for k in keys(d)]
+=#
 
 ## Creating copy without zeros
 ys0 = deepcopy(blueNOTE[:ys0])
