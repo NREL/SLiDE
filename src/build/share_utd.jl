@@ -15,5 +15,11 @@ function share_utd!(d::Dict, set::Dict)
     verify_over(filter_with(df, (t = "exports",)), :r) !== true && @error("Export shares don't sum to 1.")
     
     d[:utd] = dropnan(dropzero(df))
-    set[:notrd] = setdiff(set[:s], d[:utd][:,:s])
+    set[:notrd] = _share_notrd!(d, set)
+    return d[:utd]
+end
+
+function _share_notrd!(d::Dict, set::Dict)
+    set[:notrd] = setdiff(set[:g], d[:utd][:,:g])
+    return set[:notrd]
 end

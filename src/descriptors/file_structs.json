@@ -1,5 +1,44 @@
 [
     {
+        "struct_name": "SetInput",
+        "docstring": "Read .csv file with specific column names",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "input file name",
+                "data_type": "String"
+            },
+            {
+                "name": "descriptor",
+                "comment": "file descriptor",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "File"
+    },
+    {
+        "struct_name": "DataInput",
+        "docstring": "Read .csv file with specific column names",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "input file name",
+                "data_type": "String"
+            },
+            {
+                "name": "descriptor",
+                "comment": "file descriptor",
+                "data_type": "String"
+            },
+            {
+                "name": "col",
+                "comment": "data column names",
+                "data_type": "Array{Symbol,1}"
+            }
+        ],
+        "supertype": "File"
+    },
+    {
         "struct_name": "CSVInput",
         "docstring": "Read .csv file",
         "fields": [

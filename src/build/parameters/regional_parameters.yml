@@ -1,0 +1,39 @@
+Parameter:
+  - {parameter: ys0, index: [yr,r,s,g], name: Sectoral supply (with byproducts), units: billions of us dollars (USD)}
+  - {parameter: id0, index: [yr,r,g,s], name: Intermediate demand, units: billions of us dollars (USD)}
+  - {parameter: ld0, index: [yr,r,s],   name: Labor demand, units: billions of us dollars (USD)}
+  - {parameter: kd0, index: [yr,r,s],   name: Capital demand, units: billions of us dollars (USD)}
+  - {parameter: cd0, index: [yr,r,g],   name: Final demand, units: billions of us dollars (USD)}
+  - {parameter: yh0, index: [yr,r,g],   name: Household production, units: billions of us dollars (USD)}
+  - {parameter: g0,  index: [yr,r,g],   name: Government demand, units: billions of us dollars (USD)}
+  - {parameter: i0,  index: [yr,r,g],   name: Investment demand, units: billions of us dollars (USD)}
+  - {parameter: s0,  index: [yr,r,g],   name: Aggregate supply, units: billions of us dollars (USD)}
+  - {parameter: xn0, index: [yr,r,g],   name: National supply, units: billions of us dollars (USD)}
+  - {parameter: xd0, index: [yr,r,g],   name: State level supply, units: billions of us dollars (USD)}
+  - {parameter: x0,  index: [yr,r,g],   name: Foreign exports, units: billions of us dollars (USD)}
+  - {parameter: a0,  index: [yr,r,g],   name: Armington supply, units: billions of us dollars (USD)}
+  - {parameter: m0,  index: [yr,r,g],   name: Imports, units: billions of us dollars (USD)}
+  - {parameter: nd0, index: [yr,r,g],   name: National demand, units: billions of us dollars (USD)}
+  - {parameter: dd0, index: [yr,r,g],   name: State level demand, units: billions of us dollars (USD)}
+  - {parameter: bopdef0, index: [yr,r], name: Balance of payments, units: billions of us dollars (USD)}
+  - {parameter: ta0, index: [yr,r,g],   name: Tax net subsidy rate on intermediate demand, units: USD/USD}
+  - {parameter: tm0, index: [yr,r,g],   name: Import tariff, units: USD/USD}
+  - {parameter: md0, index: [yr,r,m,g], name: Margin demand, units: billions of us dollars (USD)}
+  - {parameter: nm0, index: [yr,r,g,m], name: National margin supply, units: billions of us dollars (USD)}
+  - {parameter: dm0, index: [yr,r,g,m], name: State level margin supply, units: billions of us dollars (USD)}
+  - {parameter: hhadj, index: [yr,r],   name: Household adjustment, units: billions of us dollars (USD)}
+# Unsaved.
+  # - {parameter: fd0, index: [yr,s,fdcat]}
+  - {parameter: ty0, index: [yr,r,s], name: Production tax rate, units: USD/USD}
+  - {parameter: va0, index: [yr,r,s], name: Regional value added, units: billions of us dollars (USD)}
+  - {parameter: c0,  index: [yr,r],   name: Total final household consumption, units: billions of us dollars (USD)}
+  - {parameter: pt0, index: [yr,r,g], name: "", units: billions of us dollars (USD)}
+  - {parameter: dc0, index: [yr,r,g],  name: "", units: billions of us dollars (USD)}
+  - {parameter: thetaa, index: [yr,r,g], name: Share of regional absorption, units: USD/USD}
+  - {parameter: dd0max, index: [yr,r,g], name: Maximum regional demand from local market, units: billions of us dollars (USD)}
+  - {parameter: nd0max, index: [yr,r,g], name: Maximum regional demand from national market, units: billions of us dollars (USD)}
+  - {parameter: dd0min, index: [yr,r,g], name: Minimum regional demand from local market, units: billions of us dollars (USD)}
+  - {parameter: nd0min, index: [yr,r,g], name: Minimum regional demand from national market, units: billions of us dollars (USD)}
+  - {parameter: mrgshr, index: [yr,r,m], name: Share of margin demand by region, units: USD/USD, tex: "\\alpha_{yr,r,m}^{md}"}
+  - {parameter: ms0tot, index: [yr,r,g,m], name: Designate total supply of margins, units: billions of us dollars (USD), tex: "\\hat{ms}_{yr,r,m,g}"}
+  - {parameter: shrtrd, index: [yr,r,g,m], name: Share of margin total by margin type, units: USD/USD, tex: "\\beta_{yr,r,g,m}^{mar}"}

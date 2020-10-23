@@ -43,11 +43,6 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
     from the yaml file. Dictionary keys must correspond EXACTLY with SLiDE.Edit DataType
     names, or the edits will not be made.
 
-# Keywords
-- `shorten::Bool = false` or `shorten::Int`: if an integer length is specified, the
-    DataFrame will be shortened to the input value. This is meant to aid troubleshooting
-    during development.
-
 # Returns
 - `df::DataFrame` including edit(s)
 """
@@ -299,21 +294,26 @@ function edit_with(df::DataFrame, lst::Array{T}) where T<:Edit
     return df
 end
 
-function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
-    return edit_with(copy(df), Add(x.col, file.descriptor))
+function SLiDE.edit_with(df::DataFrame, x::Describe, file::T) where T<:File
+    return select!(edit_with(df, Add(x.col, file.descriptor)), [x.col; propertynames(df)])
 end
 
-function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
-    df = read_file(y["PathIn"], file; shorten = shorten)
+function edit_with(df::DataFrame, y::Dict{Any,Any})
     # Specify the order in which edits must occur. "Drop" is included twice, once at the
     # beginning and once at the end. First, drop entire columns. Last, drop specific values.
-    EDITS = ["Rename", "Group", "Stack", "Match", "Melt", "Add", "Map", "Replace", "Drop", "Operate"]
+    EDITS = ["Rename", "Group", "Stack", "Match", "Melt", "Add", "Map", "Replace", "Drop", "Operate", "Order"]
 
     # Find which of thyese edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, collect(keys(y)))
     "Drop" in KEYS && pushfirst!(KEYS, "Drop")
     
     [df = edit_with(df, y[k]) for k in KEYS]
+    return df
+end
+
+function edit_with(file::T, y::Dict{Any,Any}) where T<:File
+    df = read_file(y["PathIn"], file)
+    df = edit_with(df, y)
     
     # Add a descriptor to identify the data from the file that was just added.
     # Then, reorder the columns and set them to the correct types.
@@ -323,14 +323,14 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
     return df
 end
 
-function edit_with(files::Array{T}, y::Dict{Any,Any}; shorten = false) where T<:File
-    return [[edit_with(file, y; shorten = shorten) for file in files]...;]
+function edit_with(files::Array{T}, y::Dict{Any,Any}) where T<:File
+    return [[edit_with(file, y) for file in files]...;]
 end
 
-function edit_with(y::Dict{Any,Any}; shorten = false)
+function edit_with(y::Dict{Any,Any})
     # Find all dictionary keys corresponding to file names and save these in a list.
     file = convert_type(Array, find_oftype(y, File))
-    df = edit_with(file, y; shorten = shorten)
+    df = edit_with(file, y)
     # return _sort_datastream(df)
 end
 
@@ -342,7 +342,7 @@ some time for users.
 """
 function _sort_datastream(df::DataFrame)
     colidx = 1:size(df,2)
-    isvalue = istype(df, AbstractFloat)
+    isvalue = istype(df, AbstractFloat) # user a different function!
     ii = colidx[.!isvalue]
 
     # If it's a mapping dataframe...s
@@ -811,3 +811,22 @@ function filter_with(
 
     return sort(df[:,cols])
 end
+
+# function filter_with(
+#     df::DataFrame,
+#     set::NamedTuple;
+#     drop::Bool = false,
+#     extrapolate::Bool = false,
+#     forward::Bool = true,
+#     backward::Bool = true,
+#     r::Pair = "md" => "dc",
+#     overwrite::Bool = false
+# )
+#     if any(typeof.(collect(values(set))) .<: Pair)
+#         x = [Rename.(set[k].first, k) for k in keys(set) if typeof(set[k]) <: Pair]
+#         df = edit_with(df, x)
+#     end
+    
+#     set = Dict(k => (typeof(set[k]) <: Pair) ? set[k].second : set[k] for k in keys(set))
+#     return filter_with(df, set; drop = drop, extrapolate = extrapolate, forward = forward, backward = backward, r = r, overwrite = overwrite)
+# end
