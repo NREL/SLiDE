@@ -37,6 +37,9 @@ const IS = InfrastructureSystems
 const SLIDE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), ".."))
 export SLIDE_DIR
 
+const DEFAULT_TOL = 1e-6
+const DEFAULT_SMALL = missing
+
 # include(joinpath("utils", "generate_structs.jl"))
 
 # EXPORTS
@@ -116,7 +119,7 @@ export compare_summary
 export compare_keys
 export compare_values
 export verify_over
-export benchmark!
+export benchmark_against
 
 # BUILD
 export build_data
