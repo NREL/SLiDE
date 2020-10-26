@@ -10,13 +10,17 @@ CSVInput:
   descriptor: state
 
 Order:
-  - {col: orig_state, type: String}
-  - {col: dest_state, type: String}
-# - {col: n,          type: String}
-# - {col: sg,         type: Any}
-  - {col: g,          type: String}
-# - {col: units,      type: String}
-  - {col: value,      type: Float64}
+  - {col: orig,  type: String}
+  - {col: dest,  type: String}
+# - {col: n,     type: String}
+# - {col: sg,    type: Any}
+  - {col: g,     type: String}
+# - {col: units, type: String}
+  - {col: value, type: Float64}
+
+Rename:
+  - {from: orig_state, to: orig}
+  - {from: dest_state, to: dest}
 
 Map:
   - file:   [crosswalk, sctg.csv]
@@ -36,5 +40,5 @@ Operate:
   axis:   row
   from:   nothing
   to:     nothing
-  input:  [orig_state, dest_state, g, units]
+  input:  [orig, dest, g, units]
   output: value

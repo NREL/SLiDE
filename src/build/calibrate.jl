@@ -1,5 +1,5 @@
 """
-    calibrate(d::Dict, set::Dict; save = true, overwrite = false)
+    calibrate(d::Dict, set::Dict; save_build = true, overwrite = false)
     calibrate(year::Int, d::Dict, set::Dict)
 
 # Arguments
@@ -8,43 +8,49 @@
 - `year::Int`: year for which to perform calibration
 
 # Keywords
-- `save = true`
+- `save_build = true`
 - `overwrite = false`
 See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data at the calibration step.
 """
-function calibrate(d::Dict, set::Dict; save = true, overwrite = false)
-    io_cal = read_build("calibrate"; save = save, overwrite = overwrite)
-    !isempty(io_cal) && (return io_cal)
+function calibrate(
+    dataset::String,
+    d::Dict,
+    set::Dict;
+    save_build::Bool = DEFAULT_SAVE_BUILD,
+    overwrite::Bool = DEFAULT_OVERWRITE
+    )
+    CURR_STEP = "calibrate"
 
+    # If there is already calibration data, read it and return.
+    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
+    !(isempty(d_read)) && (return d_read)
+    
     # Copy the relevant input DataFrames before making any changes.
-    set[:cal] = [:a0,:fd0,:fs0,:id0,:m0,:md0,:ms0,:ta0,:tm0,:va0,:x0,:y0,:ys0]
+    set[:cal] = Symbol.(read_file([SLIDE_DIR,"src","build","parameters"],
+        SetInput("list_calibrate.csv", :cal)))
     d = Dict(k => copy(d[k]) for k in set[:cal])
     
-    # Initialize a DataFrame to contain results.
-    # io_cal = Dict(k => DataFrame() for k in setdiff(set[:cal], [:ta0,:tm0]))
-    io_cal = Dict(k => DataFrame() for k in set[:cal])
+    # Initialize a DataFrame to contain results and do the calibration iteratively.
+    cal = Dict(k => DataFrame() for k in set[:cal])
 
     for year in set[:yr]
-        io_cal_temp = calibrate(year, d, set)
-        [io_cal[k] = [io_cal[k]; io_cal_temp[k]] for k in set[:cal]]
+        cal_yr = calibrate(year, d, set)
+        [cal[k] = [cal[k]; cal_yr[k]] for k in set[:cal]]
     end
 
-    write_build!("calibrate", io_cal; save = save)
-    return io_cal
+    write_build!(dataset, CURR_STEP, cal; save_build = save_build)
+    return cal
 end
 
 
 function calibrate(year::Int, io::Dict, set::Dict)
     @info("Calibrating $year data")
 
-    # (!!!!) This is necessary to make the calibrate function consistent with
-    # calibrate/national_calibration.jl, which defines i_set = unique(y0(:,i)).
-    # y0(i = imrg, value) = 0 when partitioning, so i_set doesn't include imrg.
-    # set_temp = copy(set)
-    # [set[k] = setdiff(set[k], set[:imrg]) for k in [:i,:j,:s,:g]]
+    set[:i] = set[:g]   # (!!!!) should just replace in usage.
+    set[:j] = set[:s]
 
     # Prepare the data and initialize the model.
     (cal, idx) = _calibration_input(year, io, set);
@@ -178,23 +184,23 @@ function calibrate(year::Int, io::Dict, set::Dict)
     @isdefined(set_temp) && (set = copy(set_temp)) # (!!!!) delete if unnecessary
 
     # Populate resultant Dictionary.
-    io_cal = Dict(k => filter_with(io[k], (yr = year,); drop = true) for k in [:ta0,:tm0])
-    io_cal[:ys0] = convert_type(DataFrame, ys0_est; cols=idx[:ys0])
-    io_cal[:fs0] = convert_type(DataFrame, fs0_est; cols=idx[:fs0])
-    io_cal[:ms0] = convert_type(DataFrame, ms0_est; cols=idx[:ms0])
-    io_cal[:y0]  = convert_type(DataFrame, y0_est;  cols=idx[:y0])
-    io_cal[:id0] = convert_type(DataFrame, id0_est; cols=idx[:id0])
-    io_cal[:fd0] = convert_type(DataFrame, fd0_est; cols=idx[:fd0])
-    io_cal[:va0] = convert_type(DataFrame, va0_est; cols=idx[:va0])
-    io_cal[:a0]  = convert_type(DataFrame, a0_est;  cols=idx[:a0])
-    io_cal[:x0]  = convert_type(DataFrame, x0_est;  cols=idx[:x0])
-    io_cal[:m0]  = convert_type(DataFrame, m0_est;  cols=idx[:m0])
-    io_cal[:md0] = convert_type(DataFrame, md0_est; cols=idx[:md0])
+    cal = Dict(k => filter_with(io[k], (yr = year,); drop = true) for k in [:ta0,:tm0])
+    cal[:ys0] = convert_type(DataFrame, ys0_est; cols=idx[:ys0])
+    cal[:fs0] = convert_type(DataFrame, fs0_est; cols=idx[:fs0])
+    cal[:ms0] = convert_type(DataFrame, ms0_est; cols=idx[:ms0])
+    cal[:y0]  = convert_type(DataFrame, y0_est;  cols=idx[:y0])
+    cal[:id0] = convert_type(DataFrame, id0_est; cols=idx[:id0])
+    cal[:fd0] = convert_type(DataFrame, fd0_est; cols=idx[:fd0])
+    cal[:va0] = convert_type(DataFrame, va0_est; cols=idx[:va0])
+    cal[:a0]  = convert_type(DataFrame, a0_est;  cols=idx[:a0])
+    cal[:x0]  = convert_type(DataFrame, x0_est;  cols=idx[:x0])
+    cal[:m0]  = convert_type(DataFrame, m0_est;  cols=idx[:m0])
+    cal[:md0] = convert_type(DataFrame, md0_est; cols=idx[:md0])
 
     # Add the year back to the DataFrame and return.
     x = Add(:yr, year)
-    [io_cal[k] = edit_with(df, x)[:, [:yr; idx[k]; :value]] for (k, df) in io_cal]
-    return io_cal
+    [cal[k] = edit_with(df, x)[:, [:yr; idx[k]; :value]] for (k, df) in cal]
+    return cal
 end
 
 

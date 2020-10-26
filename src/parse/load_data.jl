@@ -14,6 +14,9 @@ the `data/coremaps` directory. It returns a .csv file.
 - `file<:File`: A SLiDE DataType used to store information about a file. Options include:
     - [`SLiDE.CSVInput`](@ref)
     - [`SLiDE.XLSXInput`](@ref)
+    - [`SLiDE.GAMSInput`](@ref)
+    - [`SLiDE.SetInput`](@ref)
+    - [`SLiDE.DataInput`](@ref)
 - `editor<:Edit`: A SLiDE DataType used to store information about an edit to make in a
     DataFrame. Specifically, this function might be called for edit types that include the
     field `file` in reference to 
@@ -34,10 +37,12 @@ function read_file(path::Array{String,1}, file::GAMSInput)
     return df
 end
 
+
 function read_file(path::Array{String,1}, file::CSVInput)
     # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
-    df = CSV.read(filepath, DataFrame; silencewarnings=true, ignoreemptylines=true, comment="#", missingstrings=["","\xc9","..."])
+    df = CSV.read(filepath, DataFrame; silencewarnings=true, ignoreemptylines=true,
+        comment="#", missingstrings=["","\xc9","..."])
 
     # If there is only one column, don't check for headers, footers, etc. Just return it.
     size(df,2) == 1 && (return df)
@@ -69,6 +74,7 @@ function read_file(path::Array{String,1}, file::CSVInput)
     return unique(df)
 end
 
+
 function read_file(path::Array{String,1}, file::XLSXInput)
     # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
@@ -80,6 +86,7 @@ function read_file(path::Array{String,1}, file::XLSXInput)
     return df
 end
 
+
 function read_file(path::Array{String,1}, file::DataInput)
     # filepath = joinpath(SLIDE_DIR, path..., file.name)
     df = read_file(path, convert_type(CSVInput, file))
@@ -89,24 +96,27 @@ function read_file(path::Array{String,1}, file::DataInput)
     return df
 end
 
+
 function read_file(path::Array{String,1}, file::SetInput)
     # filepath = joinpath(SLIDE_DIR, path..., file.name)
     df = read_file(path, convert_type(CSVInput, file))
     return sort(df[:,1])
 end
 
+
 function read_file(path::String, file::T) where T <: File
     return read_file([path], file)
 end
 
+
 function read_file(editor::T) where T <: Edit
     # !!!! Should we avoid including specific paths within functions? -- Definitely make more general.
     # !!!! Need to throw error if this is called when "file" is not a field.
-    # DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "data", "coremaps"))
     DIR = joinpath("data", "coremaps")
     df = read_file(joinpath(DIR, editor.file))
     return df
 end
+
 
 function read_file(file::String; colnames=false)
     # file = joinpath(SLIDE_DIR, file)
@@ -121,7 +131,6 @@ function read_file(file::String; colnames=false)
         # Here, we first list all sub-subtypes of DataStream (DataTypes that are used in
         # editing datasource files). Then, we find where they overlap with keys in the
         # dictionary read from the YAML file.
-        # TYPES = string.([IU.subtypes.(IU.subtypes(DataStream))...;])
         TYPES = string.([IU.subtypes.(IU.subtypes(DataStream))...; IU.subtypes(CGE)])
         KEYS = intersect(TYPES, collect(keys(y)))
         [y[k] = load_from(datatype(k), y[k]) for k in KEYS]
@@ -133,6 +142,7 @@ function read_file(file::String; colnames=false)
         return df
     end
 end
+
 
 """
     load_from(::Type{T}, df::DataFrame) where T <: Any
@@ -168,14 +178,15 @@ function load_from(::Type{T}, d::Array{Dict{Any,Any},1}) where T <: Any
     return size(lst)[1] == 1 ? lst[1] : lst
 end
 
+
 function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
     # Fill the datatype with the values in the dictionary keys, ensuring correct t.
     (fields, types) = (string.(fieldnames(T)), T.types)
     d = _load_path(d)
 
     # Fill the datatype with the input.
-    # if length(unique(isarray.(types))) == 2
-    if any(isarray.(types)) && !all(isarray.(types))
+    # if any(isarray.(types)) && !all(isarray.(types))
+    if any(isarray.(types))
         # Restructure data into a list of inputs in the order and type required when
         # creating the datatype. Ensure that all array entries should, in fact, be arrays.
         inps = [_load_as_type(T, d[f], t) for (f, t) in zip(fields, types)]
@@ -201,29 +212,33 @@ function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
     return size(lst)[1] == 1 ? lst[1] : lst
 end
 
+
 function load_from(::Type{T}, df::DataFrame) where T <: Any
     (fields, types) = (fieldnames(T), T.types)
 
     # Print warning if DataFrame is missing required columns.
     missing_fields = setdiff(fields, propertynames(df))
     if length(missing_fields) > 0
-        @warn(string("DataFrame columns missing required fields to fill DataType ", Rename),
-            missing_fields)
+        @warn("DataFrame columns missing fields required to fill DataType $T" * missing_fields)
     end
 
-    # If one of the struct fields is an ARRAY, we here assume that it is the length of the
-    # entire DataFrame, and all other fields are duplicates.
-    if any(isarray.(T.types))
+    df = df[:, ensurearray(fields)]
+    # If all of the struct fields are arrays, we assume all DataFrame rows should be saved.
+    if all(isarray.(T.types))
         inps = [_load_as_type(T, df[:, f], t) for (f, t) in zip(fields, types)]
         lst = [T(inps...)]
-    # If each row in the input df fills one and only one struct,
-    # create a list of structures from each DataFrame row.
     else
         lst = [T((_load_as_type(T, row[f], t) for (f, t) in zip(fields, types))...)
             for row in eachrow(df)]
     end
     return size(lst)[1] == 1 ? lst[1] : lst
 end
+
+
+function load_from(::Type{Dict{T}}, df::DataFrame) where T <: Any
+    return Dict(_inp_key(x) => x for x in load_from(T, df))
+end
+
 
 """
     _load_path(d::Dict)
@@ -240,6 +255,7 @@ function _load_path(d::Dict)
     return d
 end
 
+
 """
     _load_as_type(::Type{Any}, entry, type::DataType)
 Converts an entry to the required DataType
@@ -255,7 +271,8 @@ _load_as_type(::Type{Drop},    entry, type::Type{Any})    = _load_as_type(_load_
 _load_as_type(::Type{Rename},  entry, type::Type{Symbol}) = _load_as_type(_load_case(entry), type)
 _load_as_type(::Type{Replace}, entry, type::Type{Any})    = _load_as_type(_load_case(entry), type)
 _load_as_type(::Type{Operate}, entry, type::Type{Symbol}) = _load_as_type(_load_axis(entry), type)
-
+_load_as_type(::Type{Parameter}, entry, type::Type{Array{Symbol,1}}) = _load_as_type(_load_index(entry), type)
+_load_as_type(::Type{T}, entry::Missing, type::Type{String}) where T <: Any = _load_as_type(T, "", type)        # if we're reading in dataframe with missing values
 
 """
     _load_case(entry::AbstractString)
@@ -276,6 +293,7 @@ end
 
 _load_case(entry::Any) = entry
 
+
 """
     _load_axis(entry::Any)
 """
@@ -287,6 +305,17 @@ function _load_axis(entry::AbstractString)
 end
 
 _load_axis(entry::Any) = _load_axis(convert_type.(String, entry))
+
+
+"""
+"""
+function _load_index(entry::String)
+    m = match(r"^[\[|\(](?<idx>.*)[\]|\)]$", entry)
+    m !== nothing && (entry = m[:idx])
+    return string.(split(entry, ","))
+end
+_load_index(entry::Any) = entry
+
 
 """
     write_yaml(path, file::XLSXInput)
@@ -302,43 +331,43 @@ column's first row.
 
 # Returns
 - `filenames::Array{String,1}`: List of yaml files
-
 """
-function write_yaml(path, file::XLSXInput; overwrite::Bool=true)
-    println("\nGENERATE YAML FILES FROM ", file.name)
+function write_yaml(path, file::XLSXInput; overwrite::Bool = true)
+    @info("Generating yaml files from " * file.name * "\n\tSheet: " * file.sheet)
 
-    # List all key words in the yaml file and use to add (purely aesthetic) spacing.
+    # Aesthetics: Define a message to print at the top of the YAML file and
+    # list all key words in the yaml file and use to add (purely aesthetic) spacing.
+    HEADER = "# Autogenerated from " * joinpath(path, file.name) * ", sheet: " * file.sheet
     KEYS = string.([IU.subtypes.(IU.subtypes(DataStream))...; "PathIn"], ":")
     
-    # Read the XLSX file, identify relevant (not "missing"), and generate list of resultant
-    # yaml file propertynames.
+    # Read the XLSX file, identify relevant (not "missing") columns,
+    # and generate list of resultant yaml file propertynames.
     println("  Reading ", file.name)
     df = read_file(path, file)
     df = df[:, .!occursin.(:missing, propertynames(df))]
 
-    # Make sure the path exists and save the propertynames of yaml propertynames to generaate.
+    # Make sure the path exists and save the names of yaml files to generaate.
     # path = joinpath(SLIDE_DIR, path, file.sheet)
     path = joinpath(path, file.sheet)
     !isdir(path) && mkpath(path)
-    # filenames = joinpath.(path, string.(propertynames(df_all), ".yml"))
 
-    files = Dict(k => joinpath(path, "$k.yml") for k in propertynames(df))
+    files = [joinpath(path, "$k.yml") for k in propertynames(df)]
     
     # Iterate through columns. For each column, create a new yaml file and fill it with
     # the column text. Mark the yaml file as "Autogenerated" and ensure one space only
     # between each input file element that corresponds with a SLiDE Datastream subtype.
-    for k in keys(files)
+    for (col, yamlfile) in zip(propertynames(df), files)
 
-        if overwrite == false && isfile(files[k])
-            println("  Skipping overwrite. Found: ", files[k])
+        if overwrite == false && isfile(yamlfile)
+            println("  Skipping overwrite. Found: $yamlfile")
         else
-            println("  Generating ", files[k])
+            println("  Generating $yamlfile")
 
-            lines = dropmissing(df, k)[:,k]
+            lines = dropmissing(df, col)[:,col]
             lines = lines[match.(r"\S.*", lines) .!== nothing]
 
-            open(files[k], "w") do f
-                println(f, string("# Autogenerated from ", file.name))
+            open(yamlfile, "w") do f
+                println(f, HEADER)
                 for line in lines
                     any(occursin.(KEYS, line)) && (println(f, ""))
                     println(f, line)
@@ -349,23 +378,21 @@ function write_yaml(path, file::XLSXInput; overwrite::Bool=true)
     return files
 end
 
+
 function write_yaml(path::Array{String,1}, file::XLSXInput; overwrite::Bool=true)
     write_yaml(joinpath(path...), file; overwrite=overwrite)
 end
 
-function write_yaml(path, files::Dict{Symbol,XLSXInput}; overwrite::Bool=true)
-    files = Dict(k => write_yaml(path, file; overwrite=overwrite) for (k, file) in files)
-    return files
-end
 
 function write_yaml(path, files::Array{XLSXInput,1}; overwrite::Bool=true)
     if length(unique(get_descriptor.(files))) < length(files)
         @error("Input XLSX files must have unique descriptors.")
     end
-    files = Dict(Symbol(file.descriptor) => file for file in files)
-    files = write_yaml(path, files; overwrite=overwrite)
+    files = Dict(_inp_key(file) => file for file in files)
+    files = Dict(k => write_yaml(path, file; overwrite=overwrite) for (k,file) in files)
     return files
 end
+
 
 """
     run_yaml(filename::String)
@@ -381,8 +408,8 @@ A file might not be "editable" if SLiDE functionality cannot make all of the spe
 - `filename::String` or `filenames::Array{String,1}`: yaml file name (or list of propertynames) that
     was/were not ran by the function because they were annotated with `Editable: false`
 """
-function run_yaml(filename::String; save::Bool = true)
-    println("\n", filename)
+function run_yaml(filename::String; save::Bool=true)
+    println("\n$filename")
     println("  Reading yaml file...")
 
     y = read_file(filename)
@@ -412,21 +439,24 @@ function run_yaml(filename::String; save::Bool = true)
     end
 end
 
-function run_yaml(d::Dict; save::Bool = false)
-    d_ans = Dict(k => run_yaml(d[k]; save=save) for k in keys(d))
+
+function run_yaml(d::Dict; save::Bool=true)
+    d_ans = Dict(k => run_yaml(d[k]; save = save) for k in keys(d))
     return d_ans
 end
 
-function run_yaml(filenames::Array{String,1})
-    println("\nSTANDARDIZE DATA FILES:")
-    filenames = [run_yaml(f) for f in filenames]
-    filenames = filenames[filenames .!== nothing]
-    if length(filenames) > 0
-        @warn(string("run_yaml() generated no output for:", string.("\n  ", filenames)...,
+
+function run_yaml(files::Array{String,1}; save::Bool=true)
+    @info("Standardize data files.")
+    files = Dict(_inp_key(f, ".yml") => run_yaml(f) for f in files)
+    unedited = [f for f in values(files) if typeof(f) == String]
+    if length(unedited) > 0
+        @warn(string("run_yaml() generated no output for:", string.("\n  ", unedited)...,
             "\nAdd \"Editable: true\" to yaml file to run automatically."))
     end
-    return filenames
+    return files
 end
+
 
 """
     gams_to_dataframe(xf::Array{String,1}; colnames = false)

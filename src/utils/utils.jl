@@ -312,7 +312,7 @@ function indexjoin(df::Array{DataFrame,1};
     valnames = missing,
     fillmissing = 0.0
 )
-    # df = copy.(ensurearray(df))
+    df = df[.!isempty.(df)]
     N = length(df)
 
     val = findvalue.(df)
