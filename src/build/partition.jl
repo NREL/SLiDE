@@ -6,20 +6,25 @@
 - `set::Dict` of Arrays describing region, sector, final demand, etc.
 
 # Keywords
-- `save = true`
+- `save_build = true`
 - `overwrite = false`
 See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data at the
 """
-function partition!(d::Dict, set::Dict; save = true, overwrite = false)
+function partition(
+    dataset::String,
+    d::Dict,
+    set::Dict;
+    save_build::Bool = DEFAULT_SAVE_BUILD,
+    overwrite::Bool = DEFAULT_OVERWRITE
+    )
+    CURR_STEP = "partition"
     
-    d_read = read_build("partition"; save = save, overwrite = overwrite);
-    if !isempty(d_read)
-        [d[k] = v for (k,v) in d_read]
-        return d
-    end
+    # If there is already partition data, read it and return.
+    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
+    !(isempty(d_read)) && (return d_read)
     
     # Renaming i -> g and j -> s first, in supply/use data.
     x = [Rename(:i,:g), Rename(:j,:s), Drop(:units, "all", "==")]
@@ -50,13 +55,10 @@ function partition!(d::Dict, set::Dict; save = true, overwrite = false)
     _partition_tm0!(d, set)  # duty0, m0
     
     # Read parameters and order DataFrame columns accordingly.
-    param = read_from(joinpath("src","build","parameters","national_parameters.yml"))
-    [select!(d[k], param[k]) for k in intersect(keys(d), keys(param))]
-
-    # Save all calculated parameters except for supply and use.
-    # d_save = delete!(delete!(copy(d), :supply), :use)
-    write_build!("partition", d; save = save)
-
+    # param = read_from(joinpath("src","build","parameters","national_parameters.yml"))
+    # [select!(d[k], param[k]) for k in intersect(keys(d), keys(param))]
+    
+    write_build!(dataset, CURR_STEP, d; save_build = save_build)
     return d
 end
 

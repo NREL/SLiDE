@@ -3,10 +3,10 @@ Path: [data, coresets]
 SetInput:
   - {descriptor: yr,         name: yr.csv}
   - {descriptor: r,          name: [r, state.csv]}
-  - {descriptor: orig_state, name: [r, state.csv]}
-  - {descriptor: dest_state, name: [r, state.csv]}
-  - {descriptor: i,          name: [i, aggr.csv]}
-  - {descriptor: j,          name: [i, aggr.csv]}
+  # - {descriptor: orig, name: [r, state.csv]}
+  # - {descriptor: dest, name: [r, state.csv]}
+  # - {descriptor: i,          name: [i, aggr.csv]}
+  # - {descriptor: j,          name: [i, aggr.csv]}
   - {descriptor: s,          name: [i, aggr.csv]}
   - {descriptor: g,          name: [i, aggr.csv]}
   - {descriptor: imrg,       name: [i, mrg.csv]}

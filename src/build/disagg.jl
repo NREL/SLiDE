@@ -1,25 +1,37 @@
 """
-    function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
+    function disagg!(d::Dict, set::Dict; save_build = true, overwrite = false)
 
 # Arguments
 - `d::Dict` of DataFrames containing the model data.
 - `set::Dict` of Arrays describing region, sector, final demand, etc.
 
 # Keywords
-- `save = true`
+- `save_build = true`
 - `overwrite = false`
 See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data at the disaggregation step
 """
-function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
+function disagg(
+    dataset::String,
+    d::Dict,
+    set::Dict;
+    save_build::Bool = DEFAULT_SAVE_BUILD,
+    overwrite::Bool = DEFAULT_OVERWRITE
+    )
+    CURR_STEP = "disagg"
+
+    d = merge(d, Dict(
+        :r => fill_with((r = set[:r],), 1.0),
+        (:yr,:r,:g) => fill_with((yr = set[:yr], r = set[:r], g = set[:g]), 1.0)))
+
+    # If there is already disaggregation data, read it and return.
+    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
+    !(isempty(d_read)) && (return (d_read, set))
     
-    d_read = read_build("disagg"; save = save, overwrite = overwrite);
-    if !isempty(d_read)
-        [d[k] = v for (k,v) in d_read]
-        return d
-    end
+    # Run all disaggregation calculations.
+    _set_gm!(d, set)
     
     d[:region] = edit_with(d[:region], Rename(:g,:s))
     _disagg_ys0!(d)
@@ -66,12 +78,9 @@ function disagg!(d::Dict, set::Dict; save = true, overwrite = false)
     _disagg_xn0!(d)
     _disagg_hhadj!(d)
     
-    # Read parameters and order DataFrame columns accordingly.
-    param = read_from(joinpath("src","build","parameters","regional_parameters.yml"));
-    [select!(d[k], param[k]) for k in intersect(keys(d), keys(param))]
-
-    write_build!("disagg", d; save = save)
-    return d
+    write_build!(dataset, CURR_STEP, d; save_build = save_build)
+    write_build!(dataset, SET_DIR, Dict(k => set[k] for k in [:gm]))
+    return (d, set)
 end
 
 
@@ -496,7 +505,7 @@ end
 
 
 "`gm`: Commodities employed in margin supply"
-function _disagg_gm!(d::Dict, set::Dict)
+function _set_gm!(d::Dict, set::Dict)
     ms0_sum = combine_over(d[:ms0], [:yr,:m])
     md0_sum = combine_over(d[:md0], [:yr,:m])
 

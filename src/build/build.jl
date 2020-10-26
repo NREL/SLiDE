@@ -1,63 +1,90 @@
+const DEFAULT_SAVE_BUILD = true
+const DEFAULT_OVERWRITE = false
+const DEFAULT_DATASET = "default"
+const BUILD_STEPS = ["partition", "share", "share_i", "calibrate", "disagg"];
+const PARAM_DIR = "parameters"
+const SET_DIR = "sets"
+
+
 """
     build_data(; kwargs...)
 
 # Keywords
-- `save = true`:
-- `save = true` (default) or `save::String = "path/to/version"`: Save data in each build
-step in the path returned by [`SLiDE.build_path`](@ref).
-- `save = false`: the files at each step will not be saved.
+- `save_build = true`:
+    - `save_build = true` (default) or `save_build::String = "path/to/version"`: save_build data in each build
+        step in the path returned by [`SLiDE.build_path`](@ref).
+    - `save_build = false`: the files at each step will not be saved.
 - `overwrite = false`: If data exists, do not read it. Build the data from scratch.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data.
 - `set::Dict` of Arrays describing region, sector, final demand, etc.
 """
-function build_data(; save = true, overwrite = false)
-    # (!!!!) Add option to save final, but not intermediates.
-    set = read_from(joinpath("src","readfiles","setlist.yml"))
+function build_data(
+    dataset::String = DEFAULT_DATASET;
+    save_build::Bool = DEFAULT_SAVE_BUILD,
+    overwrite::Bool = DEFAULT_OVERWRITE
+    )
 
-    disagg = read_build("disagg"; save = save, overwrite = overwrite);
-    !isempty(disagg) && (return (disagg, set))
-    
-    io = read_from(joinpath("src","readfiles","build","partitioninp.yml"))
+    d = read_build(dataset, PARAM_DIR; overwrite = overwrite)
+    set = read_build(dataset, SET_DIR; overwrite = overwrite)
 
-    io = partition!(io, set; save = save, overwrite = overwrite)
-    cal = calibrate(copy(io), set; save = save, overwrite = overwrite)
+    if |(isempty(d), isempty(set), overwrite)
+        if isempty(set)
+            set = read_from(joinpath("src","readfiles","setlist.yml"))
+            write_build(dataset, SET_DIR, set)
+        end
 
-    shr = Dict(:va0 => cal[:va0])
-    shr = share!(shr, set; save = save, overwrite = overwrite)
+        io = read_from(joinpath("src","readfiles","build","partitioninp.yml"))
 
-    disagg = merge(copy(shr),copy(cal),Dict(
-        :r => fill_with((r = set[:r],), 1.0),
-        (:yr,:r,:g) => fill_with((yr = set[:yr], r = set[:r], g = set[:g]), 1.0)))
+        io = partition(dataset, io, set; save_build = save_build, overwrite = overwrite)
+        cal = calibrate(dataset, io, set; save_build = save_build, overwrite = overwrite)
+        
+        (shr, set) = share(dataset, Dict(:va0 => cal[:va0]), set;
+            save_build = save_build, overwrite = overwrite)
 
-    disagg = disagg!(disagg, set; save = save, overwrite = overwrite)
-    return (disagg, set)
+        (d, set) = disagg(dataset, merge(cal, shr), set;
+            save_build = save_build, overwrite = overwrite)
+
+        # Ensure all sets have been calculated. This is necessary if, for some reason, a
+        # buildstream is half-complete, such that some quantities were read and the steps to
+        # find these sets were skipped.
+        # !(:notrd in keys(set)) && _set_notrd!(shr, set)
+        # !(:gm in keys(set)) && _set_gm!(cal, set)
+
+        write_build!(dataset, PARAM_DIR, d)
+        # write_build!(dataset, SET_DIR, set)
+    end
+    return (d, set)
 end
 
 
 """
-    build_path(build_step::String; kwargs...)
+    build_path(subset::String; kwargs...)
 
 # Arguments
-- `build_step::String`: Internally-passed parameter indicating the build step. For the four
+- `subset::String`: Internally-passed parameter indicating the build step. For the four
     build steps, these are: partition, calibrate, share, and build.
 
 # Keyword Arguments
-- `save`: Will this data be saved? If so, where?
-    - `save = true` (default): Save data in each build step ([`SLiDE.partition!`](@ref),
+- `save_build`: Will this data be saved? If so, where?
+    - `save_build = true` (default): save data in each build step ([`SLiDE.partition!`](@ref),
         [`SLiDE.calibrate`](@ref), [`SLiDE.share!`](@ref), [`SLiDE.disagg!`](@ref))
         to a directory in `SLiDE/data/default/build/`.
-    - `save = path/to/version`: Build data will be saved in `SLiDE/data/path/to/version/build/`.
+    - `save_build = path/to/version`: Build data will be saved in `SLiDE/data/path/to/version/build/`.
 
 # Returns
 - `path::String`: standardized location indicating where to save intermediate files.
 """
-function build_path(build_step::String; save = true)
-    save == false && (return false)
-    path = save == true ? "default" : save
-    path = joinpath(SLIDE_DIR, "data", path, "build", build_step)
-    return path
+function sub_path(dataset::String, subset::String)
+    path = data_path(dataset)
+    (subset in BUILD_STEPS) && (path = joinpath(path, "build"))
+    return joinpath(path, subset)
+end
+
+
+function data_path(dataset::String)
+    joinpath(SLIDE_DIR, "data", dataset)
 end
 
 
@@ -80,9 +107,9 @@ end
 """
 """
 function _read_from_dir(path::String; ext = ".csv")
-    @info("Reading $ext files from $path")
+    @info("Reading $ext files from $path.")
     files = readdir(path)
-    d = Dict(Symbol(f[1:end-length(ext)]) => read_file(joinpath(path,f))
+    d = Dict(_inp_key(f, ext) => read_file(joinpath(path,f))
         for f in files if occursin(ext, f))
     return d
 end
@@ -94,11 +121,11 @@ end
 function _read_from_yaml(path::String)
     y = read_file(path)
 
+    # If the yaml file includes the key "Path", this indicates that the yaml file 
     if "Path" in keys(y)
-        path = y["Path"]
         inp = "Input" in keys(y) ? y["Input"] : collect(values(find_oftype(y, File)))[1]
+        d = _read_from_yaml(y["Path"], inp)
 
-        d = _read_from_yaml(path, inp)
         [d[k] = edit_with(d[k], y) for k in keys(d) if typeof(d[k]) == DataFrame]
     else
         inp = ensurearray(collect(values(find_oftype(y, CGE)))[1])
@@ -127,58 +154,110 @@ _inp_key(x::SetInput) = length(split(x.descriptor)) > 1 ? Tuple(split(x.descript
 _inp_key(x::T) where {T <: File} = Symbol(x.descriptor)
 _inp_key(x::Parameter) = Symbol(x.parameter)
 _inp_key(x::String) = Symbol(x)
+_inp_key(x::String, ext::String) = Symbol(splitpath(x)[end][1:end-length(ext)])
 
 
 """
-    write_build(build_step::String, d::Dict; kwargs...)
+    write_build(subset::String, d::Dict; kwargs...)
 This function writes intermediary build files if desired by the user.
 """
-function write_build!(build_step::String, d::Dict; save = false)
-    # For the defined build steps, only save parameters specified as necessary.
-    param = read_from(joinpath(SLIDE_DIR,"src","readfiles","parameterlist.yml"))
-    if Symbol(build_step) in keys(param)
-        param_save = Symbol.(param[Symbol(build_step)])
-        param_delete = setdiff(keys(d), param_save)
-        [delete!(d, k) for k in param_delete]
-    end
-
-    if save !== false
-        save_path = build_path(build_step; save = save)
-
-        !isdir(save_path) && mkpath(save_path)
-        @info("Saving $build_step in $save_path")
+function write_build!(dataset::String,
+    subset::String,
+    d::Dict;
+    save_build::Bool = DEFAULT_SAVE_BUILD
+    )
+    
+    typeof(d) <: Dict{Symbol,DataFrame} && [sort!(dropzero!(d[k])) for k in keys(d)]
+    d_write = filter_build!(subset, d)
+    
+    if isempty(d_write)
+        @warn("Skipping writing empty Dictionary")
+    elseif (subset in BUILD_STEPS && save_build) || !(subset in BUILD_STEPS)
+        path = sub_path(dataset, subset)
         
-        for k in keys(d)
-            println("  Saving $k")
-            CSV.write(joinpath(save_path, "$k.csv"), sort!(dropzero!(d[k])))
+        !isdir(path) && mkpath(path)
+        @info("Saving $subset in $path")
+        
+        for k in keys(d_write)
+            println("  Writing $k")
+            CSV.write(joinpath(path, "$k.csv"), d_write[k])
         end
     end
+    return d
+end
+
+function write_build(
+    dataset::String,
+    subset::String,
+    d::Dict;
+    save_build::Bool = DEFAULT_SAVE_BUILD
+    )
+    write_build!(dataset, subset, copy(d); save_build = save_build)
 end
 
 
 """
-    read_build(build_step::String; kwargs...)
+    read_build(subset::String; kwargs...)
 This function reads intermediary build files if they have previously been saved by the user.
 
 # Returns
 - `d::Dict` of DataFrames
 """
-function read_build(build_step::String; save = true, overwrite::Bool = false)
+function read_build(dataset::String, subset::String; overwrite::Bool = DEFAULT_OVERWRITE)
 
-    if overwrite == true || save == false
-        overwrite == true && @info("Skipping read. Overwriting $build_step to rebuild data.")
-        save == false     && @info("No data save path specified.")
-        d = Dict()
+    path = sub_path(dataset, subset)
+
+    if overwrite == true && isdir(path)
+        @info("Deleting $path to overwrite data.")
+        rm(path; recursive = true)
+        return Dict()
+    end
+
+    if !isdir(path)
+        @info("$path not found.")
+        return Dict()
     else
-        save_path = build_path(build_step; save = save)
-        if !isdir(save_path)
-            @info("$save_path not found.")
-            d = Dict()
-        else
-            @info("Reading $build_step data from $save_path")
-            files = readdir(save_path)
-            d = Dict(Symbol(file[1:end-4]) => read_file(joinpath(save_path,file)) for file in files)
-        end
+        return read_from(path)
+    end
+end
+
+
+function filter_build!(subset::String, d::Dict{T,DataFrame}) where T <: Any
+    df = read_file(joinpath(SLIDE_DIR,"src","build","parameters","parameter_define.csv"))
+
+    lst_param = read_from(joinpath(SLIDE_DIR,"src","readfiles","parameterlist.yml"))
+    lst_param = (Symbol(subset) in keys(lst_param)) ? lst_param[Symbol(subset)] : DataFrame()
+
+    type_param = read_file(joinpath(SLIDE_DIR,"src","build","parameters","parameter_scope.csv"))
+    type_param = type_param[type_param[:,:subset] .== subset,:]
+
+    df = indexjoin(lst_param, type_param, df)
+    dropmissing!(df, intersect(propertynames(df),[:subset,:index]))
+    
+    if !isempty(df)
+        param = load_from(Dict{Parameter}, df);
+
+        save_keys = intersect(keys(d), keys(param))
+        delete_keys = setdiff(keys(d), save_keys)
+
+        [delete!(d, k) for k in delete_keys]
+        [select!(d[k], param[k]) for k in save_keys]
     end
     return d
+end
+
+
+function filter_build!(subset::String, d::Dict)
+    if subset == SET_DIR
+        lst_index = Symbol.(read_file(joinpath(SLIDE_DIR,"src","build","parameters"),
+            SetInput("list_index.csv", :index)))
+
+        save_keys = intersect(keys(d), intersect(lst_index))
+        delete_keys = setdiff(keys(d), save_keys)
+
+        [delete!(d, k) for k in delete_keys]
+        return Dict(k => DataFrame([d[k]], [k]) for k in save_keys)
+    else
+        return d
+    end
 end

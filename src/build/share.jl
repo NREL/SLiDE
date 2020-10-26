@@ -1,51 +1,55 @@
 """
-    share!(d::Dict, set::Dict; save = true, overwrite = false)
+    share!(d::Dict, set::Dict; save_build = true, overwrite = false)
 
 # Arguments
 - `d::Dict` of DataFrames containing the model data.
 - `set::Dict` of Arrays describing region, sector, final demand, etc.
 
 # Keywords
-- `save = true`
+- `save_build = true`
 - `overwrite = false`
 See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data at the sharing step.
 """
-function share!(d::Dict, set::Dict; save = true, overwrite = false)
+function share(
+    dataset::String,
+    d::Dict,
+    set::Dict;
+    save_build::Bool = DEFAULT_SAVE_BUILD,
+    overwrite::Bool = DEFAULT_OVERWRITE
+    )
+    CURR_STEP = "share"
+    STEP_INP = CURR_STEP * "_i"
 
     # If there is already sharing data, read it and return.
-    d_read = read_build("share"; save = save, overwrite = overwrite);
-    if !isempty(d_read)
-        [d[k] = v for (k,v) in d_read]
-        set[:notrd] = _share_notrd!(d, set)
-        return d
-    end
+    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
+    !(isempty(d_read)) && (return d_read, set)
 
-    # READ SHARING DATA.
-    d_read = read_build("share_i"; save = save, overwrite = overwrite);
+    # Read sharing input data.
+    d_read = read_build(dataset, STEP_INP; overwrite = overwrite)
     if isempty(d_read)
         y = read_from(joinpath("src","readfiles","build","shareinp.yml"))
         # Here, we're not using read yaml/run yaml because the location we're saving in
         # depends on the "save" path specified in this function input.
+        [set[k] = set[:r] for k in [:orig,:dest]]
         d_read = Dict(k => edit_with(v) for (k,v) in y)
         d_read = Dict(k => sort(filter_with(df, set; extrapolate = true)) for (k, df) in d_read)
-
-        write_build!("share_i", d_read; save = save)
+        write_build!(dataset, STEP_INP, d_read; save_build = save_build)
     end
-    [d[k] = v for (k,v) in d_read]
     
-    # Do the sharing.
+    merge!(d, d_read)
+
     share_pce!(d)
     share_sgf!(d)
     share_utd!(d, set)
     share_region!(d, set)
     share_labor!(d, set)
     share_rpc!(d, set)
+    
+    write_build!(dataset, CURR_STEP, d; save_build = save_build)
+    write_build!(dataset, SET_DIR, Dict(k => set[k] for k in [:notrd,:ng]))
 
-    # d_save = Dict(k => d[k] for k in [:gsp,:labor,:pce,:rpc,:region,:sgf,:utd])
-    write_build!("share", d; save = save)
-
-    return d
+    return (d, set)
 end

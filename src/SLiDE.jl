@@ -120,16 +120,16 @@ export benchmark!
 
 # BUILD
 export build_data
-export partition!
+export partition
 export calibrate
-export share!
+export share
 # export share_labor!
 # export share_pce!
 # export share_region!
 # export share_rpc!
 # export share_sgf!
 # export share_utd!
-export disagg!
+export disagg
 
 #################################################################################
 # INCLUDES
