@@ -44,85 +44,118 @@ end
 ############
 
 # year for the model to be based off of
-mod_year = 2016
+ # mod_year = 2016
 
 #specify the path where the dumped csv files are stored
-data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
+ data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
+
 
 #blueNOTE contains a dictionary of the parameters needed to specify the model
-blueNOTE = Dict(
-    :ys0 => convert_type(Dict, read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"); drop_cols = [:yr], value_col = :Val),
-    :id0 => convert_type(Dict, read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"); drop_cols = [:yr], value_col = :Val),
-    :ld0 => convert_type(Dict, read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"); drop_cols = [:yr], value_col = :Val),
-    :kd0 => convert_type(Dict, read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"); drop_cols = [:yr], value_col = :Val),
-    :ty0 => convert_type(Dict, read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"); drop_cols = [:yr], value_col = :Val),
-    :m0 => convert_type(Dict, read_data_temp("m0",mod_year,data_temp_dir,"Imports"); drop_cols = [:yr], value_col = :Val),
-    :x0 => convert_type(Dict, read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"); drop_cols = [:yr], value_col = :Val),
-    :rx0 => convert_type(Dict, read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"); drop_cols = [:yr], value_col = :Val),
-    :md0 => convert_type(Dict, read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"); drop_cols = [:yr], value_col = :Val),
-    :nm0 => convert_type(Dict, read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"); drop_cols = [:yr], value_col = :Val),
-    :dm0 => convert_type(Dict, read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"); drop_cols = [:yr], value_col = :Val),
-    :s0 => convert_type(Dict, read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"); drop_cols = [:yr], value_col = :Val),
-    :a0 => convert_type(Dict, read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"); drop_cols = [:yr], value_col = :Val),
-    :ta0 => convert_type(Dict, read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"); drop_cols = [:yr], value_col = :Val),
-    :tm0 => convert_type(Dict, read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"); drop_cols = [:yr], value_col = :Val),
-    :cd0 => convert_type(Dict, read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"); drop_cols = [:yr], value_col = :Val),
-    :c0 => convert_type(Dict, read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"); drop_cols = [:yr], value_col = :Val),
-    :yh0 => convert_type(Dict, read_data_temp("yh0",mod_year,data_temp_dir,"Household production"); drop_cols = [:yr], value_col = :Val),
-    :bopdef0 => convert_type(Dict, read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"); drop_cols = [:yr], value_col = :Val),
-    :hhadj => convert_type(Dict, read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"); drop_cols = [:yr], value_col = :Val),
-    :g0 => convert_type(Dict, read_data_temp("g0",mod_year,data_temp_dir,"Government demand"); drop_cols = [:yr], value_col = :Val),
-    :i0 => convert_type(Dict, read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"); drop_cols = [:yr], value_col = :Val),
-    :xn0 => convert_type(Dict, read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"); drop_cols = [:yr], value_col = :Val),
-    :xd0 => convert_type(Dict, read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"); drop_cols = [:yr], value_col = :Val),
-    :dd0 => convert_type(Dict, read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"); drop_cols = [:yr], value_col = :Val),
-    :nd0 => convert_type(Dict, read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"); drop_cols = [:yr], value_col = :Val)
-)
-#=
-x = convert_type(Dict, filter_with(df, (yr=2016,); drop=true));
-function test(df::DataFrame)
-        x = convert_type(Dict, filter_with(df, (yr=2016,); drop=true));
-        return x
+# blueNOTE = Dict(
+#     :ys0 => convert_type(Dict, read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"); drop_cols = [:yr], value_col = :Val),
+#     :id0 => convert_type(Dict, read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"); drop_cols = [:yr], value_col = :Val),
+#     :ld0 => convert_type(Dict, read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"); drop_cols = [:yr], value_col = :Val),
+#     :kd0 => convert_type(Dict, read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"); drop_cols = [:yr], value_col = :Val),
+#     :ty0 => convert_type(Dict, read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"); drop_cols = [:yr], value_col = :Val),
+#     :m0 => convert_type(Dict, read_data_temp("m0",mod_year,data_temp_dir,"Imports"); drop_cols = [:yr], value_col = :Val),
+#     :x0 => convert_type(Dict, read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"); drop_cols = [:yr], value_col = :Val),
+#     :rx0 => convert_type(Dict, read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"); drop_cols = [:yr], value_col = :Val),
+#     :md0 => convert_type(Dict, read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"); drop_cols = [:yr], value_col = :Val),
+#     :nm0 => convert_type(Dict, read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"); drop_cols = [:yr], value_col = :Val),
+#     :dm0 => convert_type(Dict, read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"); drop_cols = [:yr], value_col = :Val),
+#     :s0 => convert_type(Dict, read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"); drop_cols = [:yr], value_col = :Val),
+#     :a0 => convert_type(Dict, read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"); drop_cols = [:yr], value_col = :Val),
+#     :ta0 => convert_type(Dict, read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"); drop_cols = [:yr], value_col = :Val),
+#     :tm0 => convert_type(Dict, read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"); drop_cols = [:yr], value_col = :Val),
+#     :cd0 => convert_type(Dict, read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"); drop_cols = [:yr], value_col = :Val),
+#     :c0 => convert_type(Dict, read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"); drop_cols = [:yr], value_col = :Val),
+#     :yh0 => convert_type(Dict, read_data_temp("yh0",mod_year,data_temp_dir,"Household production"); drop_cols = [:yr], value_col = :Val),
+#     :bopdef0 => convert_type(Dict, read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"); drop_cols = [:yr], value_col = :Val),
+#     :hhadj => convert_type(Dict, read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"); drop_cols = [:yr], value_col = :Val),
+#     :g0 => convert_type(Dict, read_data_temp("g0",mod_year,data_temp_dir,"Government demand"); drop_cols = [:yr], value_col = :Val),
+#     :i0 => convert_type(Dict, read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"); drop_cols = [:yr], value_col = :Val),
+#     :xn0 => convert_type(Dict, read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"); drop_cols = [:yr], value_col = :Val),
+#     :xd0 => convert_type(Dict, read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"); drop_cols = [:yr], value_col = :Val),
+#     :dd0 => convert_type(Dict, read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"); drop_cols = [:yr], value_col = :Val),
+#     :nd0 => convert_type(Dict, read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"); drop_cols = [:yr], value_col = :Val)
+# )
+
+(d, set) = build_data()
+
+bmkyr=2016
+
+bn = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true))) for k in keys(d))
+
+# test for filtering logic
+for s in keys(bn)
+        for k in keys(bn[s])
+                if bn[s][k] < 1e-5
+                        delete!(bn[s],k)
+                end
+        end
 end
 
-bn = Dict()
-for k in keys(d)
-        bn[k] = test(d[k])
-end
-
-[d[k]=test(d[k]) for k in keys(d)]
-=#
-
-## Creating copy without zeros
-ys0 = deepcopy(blueNOTE[:ys0])
-id0 = deepcopy(blueNOTE[:id0])
-ld0 = deepcopy(blueNOTE[:ld0])
-kd0 = deepcopy(blueNOTE[:kd0])
-ty0 = deepcopy(blueNOTE[:ty0])
-m0 = deepcopy(blueNOTE[:m0])
-x0 = deepcopy(blueNOTE[:x0])
-rx0 = deepcopy(blueNOTE[:rx0])
-md0 = deepcopy(blueNOTE[:md0])
-nm0 = deepcopy(blueNOTE[:nm0])
-dm0 = deepcopy(blueNOTE[:dm0])
-s0 = deepcopy(blueNOTE[:s0])
-a0 = deepcopy(blueNOTE[:a0])
-ta0 =deepcopy( blueNOTE[:ta0])
-tm0 = deepcopy(blueNOTE[:tm0])
-cd0 = deepcopy(blueNOTE[:cd0])
-c0 = deepcopy(blueNOTE[:c0])
-yh0 = deepcopy(blueNOTE[:yh0])
-bopdef0 = deepcopy(blueNOTE[:bopdef0])
-hhadj = deepcopy(blueNOTE[:hhadj])
-g0 = deepcopy(blueNOTE[:g0])
-i0 = deepcopy(blueNOTE[:i0])
-xn0 = deepcopy(blueNOTE[:xn0])
-xd0 = deepcopy(blueNOTE[:xd0])
-dd0 = deepcopy(blueNOTE[:dd0])
-nd0 = deepcopy(blueNOTE[:nd0])
+#Creating copy without zeros
+ys0 = deepcopy(bn[:ys0])
+id0 = deepcopy(bn[:id0])
+ld0 = deepcopy(bn[:ld0])
+kd0 = deepcopy(bn[:kd0])
+ty0 = deepcopy(bn[:ty0])
+m0 = deepcopy(bn[:m0])
+x0 = deepcopy(bn[:x0])
+rx0 = deepcopy(bn[:rx0])
+md0 = deepcopy(bn[:md0])
+nm0 = deepcopy(bn[:nm0])
+dm0 = deepcopy(bn[:dm0])
+s0 = deepcopy(bn[:s0])
+a0 = deepcopy(bn[:a0])
+ta0 =deepcopy( bn[:ta0])
+tm0 = deepcopy(bn[:tm0])
+cd0 = deepcopy(bn[:cd0])
+c0 = deepcopy(bn[:c0])
+yh0 = deepcopy(bn[:yh0])
+bopdef0 = deepcopy(bn[:bopdef0])
+hhadj = deepcopy(bn[:hhadj])
+g0 = deepcopy(bn[:g0])
+i0 = deepcopy(bn[:i0])
+xn0 = deepcopy(bn[:xn0])
+xd0 = deepcopy(bn[:xd0])
+dd0 = deepcopy(bn[:dd0])
+nd0 = deepcopy(bn[:nd0])
 tm = deepcopy(tm0)
 ta = deepcopy(ta0)
 ty = deepcopy(ty0)
+
+# ys0 = deepcopy(blueNOTE[:ys0])
+# id0 = deepcopy(blueNOTE[:id0])
+# ld0 = deepcopy(blueNOTE[:ld0])
+# kd0 = deepcopy(blueNOTE[:kd0])
+# ty0 = deepcopy(blueNOTE[:ty0])
+# m0 = deepcopy(blueNOTE[:m0])
+# x0 = deepcopy(blueNOTE[:x0])
+# rx0 = deepcopy(blueNOTE[:rx0])
+# md0 = deepcopy(blueNOTE[:md0])
+# nm0 = deepcopy(blueNOTE[:nm0])
+# dm0 = deepcopy(blueNOTE[:dm0])
+# s0 = deepcopy(blueNOTE[:s0])
+# a0 = deepcopy(blueNOTE[:a0])
+# ta0 =deepcopy( blueNOTE[:ta0])
+# tm0 = deepcopy(blueNOTE[:tm0])
+# cd0 = deepcopy(blueNOTE[:cd0])
+# c0 = deepcopy(blueNOTE[:c0])
+# yh0 = deepcopy(blueNOTE[:yh0])
+# bopdef0 = deepcopy(blueNOTE[:bopdef0])
+# hhadj = deepcopy(blueNOTE[:hhadj])
+# g0 = deepcopy(blueNOTE[:g0])
+# i0 = deepcopy(blueNOTE[:i0])
+# xn0 = deepcopy(blueNOTE[:xn0])
+# xd0 = deepcopy(blueNOTE[:xd0])
+# dd0 = deepcopy(blueNOTE[:dd0])
+# nd0 = deepcopy(blueNOTE[:nd0])
+# tm = deepcopy(tm0)
+# ta = deepcopy(ta0)
+# ty = deepcopy(ty0)
+
 
 ###############
 # -- SETS --
@@ -137,11 +170,18 @@ ty = deepcopy(ty0)
 # margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
 # goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
 
-regions = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_r.csv"),DataFrame)[!,:Dim1])
-sectors = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_s.csv"),DataFrame)[!,:Dim1])
-goods = sectors;
-margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_m.csv"),DataFrame)[!,:Dim1])
+# regions = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_r.csv"),DataFrame)[!,:Dim1])
+# sectors = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_s.csv"),DataFrame)[!,:Dim1])
+# goods = sectors;
+# margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_m.csv"),DataFrame)[!,:Dim1])
 goods_margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_gm.csv"),DataFrame)[!,:g])
+
+regions = set[:r]
+sectors = set[:s]
+goods = set[:g]
+margins = set[:m]
+
+
 
 
 #following subsets are used to limit the size of the model
