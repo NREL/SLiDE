@@ -42,6 +42,7 @@ pce,"[yr,r,g]",,,,share
 pt0,"[yr,r,g]",,billions of us dollars (USD),,regional
 region,"[yr,r,s]",,,,share
 rpc,"[r,g]",,,,share
+rx0,"[yr,r,g]",,,,regional
 s0,"[yr,s]",Aggregate supply,billions of us dollars (USD),,national
 s0,"[yr,r,g]",Aggregate supply,billions of us dollars (USD),,regional
 sbd0,"[yr,g]",Subsidies on products,billions of us dollars (USD),,national
