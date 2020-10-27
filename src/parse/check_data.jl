@@ -2,15 +2,25 @@
     compare_summary(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; kwargs...)
 
 # Arguments
-- df_lst::Array{DataFrame,1}: List of DataFrames to compare.
+- `df::Array{DataFrame,1}`: List of DataFrames to compare.
     These must all share the same column names.
-- `inds::Array{Symbol,1}`: List of indicators that describe each DataFrame and track which
+- `d::Array{Dict,1}`: Array of dictonaries of DataFrames to compare.
+- `indicator::Array{Symbol,1}`: List of indicators that describe each DataFrame and track which
     values/keys are present in each DataFrame. There must be an equal number of input
     DataFrames and indicators.
 
-# Keyword Argument
+# Keywords
 - `tol::Float64 = 1E-6`: Tolerance used when determining whether values are equal.
     Default values is `1E-6`.
+- `complete_summary::Bool = false`: Should we include the full summary DataFrame or only the
+    problematic rows (i.e., ones where either `equal_keys = false` or `equal_values = false`)?
+
+# Returns
+- `df::DataFrame`: Summary DataFrame including the index columns and values from the original
+    `df`, marked to indicate which input DataFrame they came from, the `reldiff` between
+    the values, and booleans `equal_key` (are values for the index present in both DataFrames?)
+    and `equal_value` (are the values the same within the given `tol`?)
+- `d::Dict`: Dictionary of summary DataFrames
 """
 function compare_summary(
     df::Array{DataFrame,1},
@@ -37,15 +47,26 @@ function compare_summary(
     df[!,:equal_values] .= df[:,:reldiff] .<= tol
 
     # What if some zeros were include but not others?
-    df[all.(eachrow(.|(ismissing.(df[:,vals]), df[:,vals].==0))), :equal_values] .= true
+    # df[all.(eachrow(.|(ismissing.(df[:,vals]), df[:,vals].==0))), :equal_values] .= true
     select!(df, [idx; vals; :reldiff; :equal_keys; :equal_values])
-
+    
     if !complete_summary
         ii = df[:,:equal_keys] .* df[:,:equal_values]
         df = df[.!ii,:]
     end
-
     return df
+end
+
+function compare_summary(
+    d::Array{Dict,1},
+    indicator::Array{Symbol,1};
+    tol::Float64=DEFAULT_TOL,
+    complete_summary::Bool=false
+)
+    keys_comp = intersect(collect.(keys.(d))...)
+    d = Dict(k => compare_summary([d[m][k] for m in keys(d)], indicator;
+        tol=tol, complete_summary=complete_summary) for k in keys(dis))
+    return d
 end
 
 
@@ -119,10 +140,14 @@ end
 
 
 """
-    benchmark!(d_summ::Dict, k::Symbol, d_bench::Dict, d_calc::Dict;
+    benchmark_against(d_summ::Dict, k::Symbol, d_bench::Dict, d_calc::Dict;
 """
-function benchmark_against(df_calc::DataFrame, df_bench::DataFrame;
-    key = missing, tol = DEFAULT_TOL, small = DEFAULT_SMALL)
+function benchmark_against(
+    df_calc::DataFrame,
+    df_bench::DataFrame;
+    key = missing,
+    tol = DEFAULT_TOL,
+    small = DEFAULT_SMALL)
 
     # Remove very small numbers. These might be zero or missing in the other DataFrame,
     # and we're not splitting hairs here.
