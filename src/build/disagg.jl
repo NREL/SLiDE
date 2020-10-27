@@ -77,6 +77,8 @@ function disagg(
     _disagg_xd0!(d)
     _disagg_xn0!(d)
     _disagg_hhadj!(d)
+
+    d[:xn0][d[:xn0][:,:value] .< 1e-8,:value] .= 0;
     
     write_build!(dataset, CURR_STEP, d; save_build = save_build)
     write_build!(dataset, SET_DIR, Dict(k => set[k] for k in [:gm]))
@@ -307,7 +309,7 @@ end
 function _disagg_x0!(d::Dict, set::Dict)
     println("  Disaggregating x0(yr,r,g), foreign exports")
     if !(:diff in keys(d))
-        !(:notrd in keys(set)) && _share_notrd!(d, set)
+        !(:notrd in keys(set)) && _set_notrd!(d, set)
 
         df_exports = filter_with(d[:utd], (t = "exports",); drop = true)
         df_region = filter_with(d[:region], (g = set[:notrd],))

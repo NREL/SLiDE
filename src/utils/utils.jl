@@ -319,10 +319,10 @@ function indexjoin(df::Array{DataFrame,1};
     idx = findindex.(df)
 
     if valnames === missing
-        indicator === missing && (indicator = Symbol.(:df, 1:N))
+        indicator === missing && (indicator = _generate_indicator(N))
         valnames = broadcast.(Symbol, Symbol.(indicator, :_), val)
     end
-
+    
     valnames = ensurearray.(valnames)
     df = [edit_with(df[ii], Rename.(val[ii], valnames[ii])) for ii in 1:N]
     df_ans = copy(df[1])
@@ -374,3 +374,6 @@ findvalue(df::DataFrame) = [find_oftype(df, AbstractFloat); find_oftype(df, Bool
     defined as columns that do NOT contain `AbstractFloat` or `Bool` DataTypes.
 """
 findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
+
+
+_generate_indicator(N::Int) = Symbol.(:df, 1:N)

@@ -167,7 +167,7 @@ function write_build!(dataset::String,
     save_build::Bool = DEFAULT_SAVE_BUILD
     )
     
-    typeof(d) <: Dict{Symbol,DataFrame} && [sort!(dropzero!(d[k])) for k in keys(d)]
+    [sort!(dropzero!(d[k])) for k in keys(d) if typeof(d[k]) == DataFrame]
     d_write = filter_build!(subset, d)
     
     if isempty(d_write)
