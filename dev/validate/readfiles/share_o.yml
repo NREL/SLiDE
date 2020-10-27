@@ -1,0 +1,9 @@
+Path: [dev, validate, windc_1.0, 4_share_out]
+
+DataInput:
+  - {descriptor: region, name: region_shr.csv, col: [yr,r,s,value]}
+  - {descriptor: labor,  name: labor_shr.csv,  col: [yr,r,s,value]}
+  - {descriptor: pce,    name: pce_shr.csv,    col: [yr,r,g,value]}
+  - {descriptor: sgf,    name: sgf_shr.csv,    col: [yr,r,g,value]}
+  - {descriptor: rpc,    name: rpc.csv,        col: [r,g,value]}
+  - {descriptor: utd,    name: usatrd_shr.csv, col: [yr,r,g,t,value]}
