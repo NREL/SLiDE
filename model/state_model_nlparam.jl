@@ -44,7 +44,7 @@ end
 ############
 
 # year for the model to be based off of
- # mod_year = 2016
+ mod_year = 2016
 
 #specify the path where the dumped csv files are stored
  data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
@@ -80,20 +80,24 @@ end
 #     :nd0 => convert_type(Dict, read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"); drop_cols = [:yr], value_col = :Val)
 # )
 
-(d, set) = build_data()
+(d, set) = build_data(overwrite=true)
+#d[:xn0][d[:xn0][:,:value] .> 1e-8,:value] .= 0;
 
 bmkyr=2016
 
 bn = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true))) for k in keys(d))
+# bn = Dict(k => convert_type(Dict, filter_with(d[k], (yr = bmkyr,); drop = true)) for k in keys(d))
 
-# test for filtering logic
-for s in keys(bn)
-        for k in keys(bn[s])
-                if bn[s][k] < 1e-5
-                        delete!(bn[s],k)
-                end
-        end
-end
+
+
+# # test for filtering logic
+# for s in keys(bn)
+#         for k in keys(bn[s])
+#                 if bn[s][k] < 1e-5
+#                         delete!(bn[s],k)
+#                 end
+#         end
+# end
 
 #Creating copy without zeros
 ys0 = deepcopy(bn[:ys0])
@@ -174,13 +178,13 @@ ty = deepcopy(ty0)
 # sectors = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_s.csv"),DataFrame)[!,:Dim1])
 # goods = sectors;
 # margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_m.csv"),DataFrame)[!,:Dim1])
-goods_margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_gm.csv"),DataFrame)[!,:g])
+#goods_margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_gm.csv"),DataFrame)[!,:g])
 
 regions = set[:r]
 sectors = set[:s]
 goods = set[:g]
 margins = set[:m]
-
+goods_margins = set[:gm]
 
 
 
@@ -195,8 +199,16 @@ a_set = Dict()
 y_check = Dict()
 [y_check[r,s] = sum(get(ys0, (r,s,g), 0.0) for g in goods) for r in regions for s in sectors]
 
+sub_set_y = filter(x -> y_check[x] != 0.0, combvec(regions, sectors));
+sub_set_x = filter(x -> haskey(s0, x), combvec(regions, goods));
+sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods));
+sub_set_pa = filter(x -> haskey(a0, (x[1], x[2])), combvec(regions, goods));
+sub_set_pd = filter(x -> haskey(xd0, (x[1], x[2])), combvec(regions, goods));
+sub_set_pk = filter(x -> haskey(kd0, (x[1], x[2])), combvec(regions, sectors));
+sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 ########## Model ##########
 cge = MCPModel();
+
 
 
 ##############
@@ -256,14 +268,8 @@ replace_nan_inf(theta_m)
 ################
 
 # Filters for putting equations and variables under control
-sv = 0.00
-sub_set_y = filter(x -> y_check[x] != 0.0, combvec(regions, sectors));
-sub_set_x = filter(x -> haskey(s0, x), combvec(regions, goods));
-sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods));
-sub_set_pa = filter(x -> haskey(a0, (x[1], x[2])), combvec(regions, goods));
-sub_set_pd = filter(x -> haskey(xd0, (x[1], x[2])), combvec(regions, goods));
-sub_set_pk = filter(x -> haskey(kd0, (x[1], x[2])), combvec(regions, sectors));
-sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
+sv = 0.001
+
 
 #sectors
 @variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1);
@@ -562,7 +568,7 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
 ####################
 
 #set up the options for the path solver
-PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
+PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=10000)
 
 # export the path license string to the environment
 # this is now done in the SLiDE initiation steps 
