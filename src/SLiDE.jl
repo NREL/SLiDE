@@ -110,6 +110,7 @@ export transform_over
 
 # READ
 export read_file
+export read_from
 export load_from
 export write_yaml
 export run_yaml

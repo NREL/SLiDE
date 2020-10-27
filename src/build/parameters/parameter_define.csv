@@ -15,6 +15,7 @@ dm0,"[yr,r,g,m]",State level margin supply,billions of us dollars (USD),,regiona
 duty0,"[yr,g]",Import duties,billions of us dollars (USD),,national
 fd0,"[yr,s,fdcat]",,,,regional
 fd0,"[yr,g,fd]",Final demand payments,billions of us dollars (USD),,national
+fe0,"[yr,r]",Total factor demand,billions of us dollars (USD),,regional
 fs0,"[yr,g]",Household production,billions of us dollars (USD),,national
 g0,"[yr,r,g]",Government demand,billions of us dollars (USD),,regional
 hhadj,"[yr,r]",Household adjustment,billions of us dollars (USD),,regional
@@ -64,7 +65,7 @@ x0,"[yr,r,g]",Foreign exports,billions of us dollars (USD),,regional
 x0,"[yr,g]",Foreign exports,billions of us dollars (USD),,national
 xd0,"[yr,r,g]",State level supply,billions of us dollars (USD),,regional
 xn0,"[yr,r,g]",National supply,billions of us dollars (USD),,regional
-xn0,"[r,g]",,,,share
+xn0,"[r,g]",National supply,,,share
 y0,"[yr,g]",Gross output (net margin supply),billions of us dollars (USD),,national
 yh0,"[yr,r,g]",Household production,billions of us dollars (USD),,regional
 ys0,"[yr,s,g]",Sectoral supply (with byproducts),billions of us dollars (USD),,national

@@ -46,12 +46,6 @@ function build_data(
         (d, set) = disagg(dataset, merge(cal, shr), set;
             save_build = save_build, overwrite = overwrite)
 
-        # Ensure all sets have been calculated. This is necessary if, for some reason, a
-        # buildstream is half-complete, such that some quantities were read and the steps to
-        # find these sets were skipped.
-        # !(:notrd in keys(set)) && _set_notrd!(shr, set)
-        # !(:gm in keys(set)) && _set_gm!(cal, set)
-
         write_build!(dataset, PARAM_DIR, d)
         # write_build!(dataset, SET_DIR, set)
     end
@@ -96,7 +90,7 @@ function read_from(path::String; ext = ".csv")
     d = if any(occursin.([".yml",".yaml"], path))
         _read_from_yaml(path)
     elseif isdir(path)
-        _read_from_dir(path)
+        _read_from_dir(path; ext = ext)
     else
         @error("Cannot read from $path. Please enter an existing directory or yaml file name.")
     end
