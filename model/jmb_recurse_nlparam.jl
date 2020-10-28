@@ -141,17 +141,11 @@ ty = deepcopy(ty0)
 # read sets from their dumped CSVs
 # these are converted to a vector of strings such that we can use them to populate variable indices
 # and to use them as as conditionals (e.g. see the use of goods_margins)
-#regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
-#sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
-#goods = sectors;
-#margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
-#goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
-
-regions = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_r.csv"))[!,:Dim1])
-sectors = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_s.csv"))[!,:Dim1])
+regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
+sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
 goods = sectors;
-margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_m.csv"))[!,:Dim1])
-goods_margins = convert(Vector{String},CSV.read(string(data_temp_dir,"/set_gm.csv"))[!,:g])
+margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
+goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
 
 # need to fill in zeros to avoid missing keys
 fill_zero(tuple(regions,sectors,goods),blueNOTE[:ys0])
@@ -289,12 +283,12 @@ end
 @NLparameter(cge, thetax == 0.75); # extant production share
 @NLparameter(cge, beta[t in years] == (1/(1 + value(rho)))^(t-mod_year)); #discount factor or present value multiplier
 
-etars_d = Dict()
-[etars_d[r,s]=0.0 for r in regions, s in sectors]
+# etars_d = Dict()
+# [etars_d[r,s]=0.0 for r in regions, s in sectors]
 
 #@NLparameter(cge, etars[r in regions, s in sectors] == get(etars_d,(r,s),0.0));
 @NLparameter(cge, etars[r in regions, s in sectors] == 0.0);
-set_value(etars["ca","uti"], 0.03);
+# set_value(etars["ca","uti"], 0.03);
 
 #new capital endowment
 @NLparameter(cge, ks_n[r in regions, s in sectors] ==
@@ -534,7 +528,6 @@ sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
         PC[r] * c0_p[r]
 );
 
-
 @mapping(cge,profit_ms[r in regions, m in margins],
 # provision of margins to national market
         sum(PN[gm]   * nm0_p[r,gm,m] for gm in goods_margins)
@@ -740,6 +733,7 @@ ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH
 
 status = solveMCP(cge)
 
+for t in 1:5
 
 #Save for later when making investment better
 #scale(r,s,t) = (1-delta)*(ks_n(r,s,"%bmkyr%")+ks_s(r,s,"%bmkyr%")+ks_x(r,s,"%bmkyr%")) / (i0(r,s)*(rho+delta));
@@ -829,9 +823,6 @@ replace_nan_inf(theta_m)
 
 
 
-
-
-
 #set up the options for the path solver
 PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=100000)
 #=,
@@ -847,3 +838,4 @@ ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH
 
 # solve next period
 status = solveMCP(cge)
+end
