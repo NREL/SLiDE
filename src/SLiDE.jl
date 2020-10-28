@@ -162,6 +162,7 @@ include(joinpath("model", "generated_cge", "includes.jl"))
 # UTILITIES
 include(joinpath("utils", "utils.jl"))
 include(joinpath("utils", "calc.jl"))
+include(joinpath("utils", "indexjoin.jl"))
 
 include(joinpath("parse", "load_data.jl"))
 include(joinpath("parse", "edit_data.jl"))
