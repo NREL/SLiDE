@@ -1,11 +1,3 @@
-const DEFAULT_SAVE_BUILD = true
-const DEFAULT_OVERWRITE = false
-const DEFAULT_DATASET = "default"
-const BUILD_STEPS = ["partition", "share", "share_i", "calibrate", "disagg"];
-const PARAM_DIR = "parameters"
-const SET_DIR = "sets"
-
-
 """
     build_data(; kwargs...)
 
@@ -85,12 +77,12 @@ end
 """
     read_from(path::String)
 """
-function read_from(path::String; ext = ".csv")
+function read_from(path::String; ext = ".csv", run_bash::Bool = false)
     # Should update to make read_from(::Type, path), so the output is not a mystery.
     d = if any(occursin.([".yml",".yaml"], path))
-        _read_from_yaml(path)
+        _read_from_yaml(path; run_bash = run_bash)
     elseif isdir(path)
-        _read_from_dir(path; ext = ext)
+        _read_from_dir(path; ext = ext, run_bash = run_bash)
     else
         @error("Cannot read from $path. Please enter an existing directory or yaml file name.")
     end
@@ -100,26 +92,58 @@ end
 
 """
 """
-function _read_from_dir(path::String; ext = ".csv")
-    @info("Reading $ext files from $path.")
-    files = readdir(path)
-    d = Dict(_inp_key(f, ext) => read_file(joinpath(path,f))
-        for f in files if occursin(ext, f))
+function _read_from_dir(dir::String; ext = ".csv", run_bash::Bool = false)
+    files = readdir(dir)
+
+    # If the path contains both a .gdx file and a bash shell script, assume that the script
+    # is there to execute "gdxdump" on the shell files.
+    run_bash && _run_bash(dir, files)
+    # (any(occursin.(".sh", files)) && any(occursin.(".gdx", files))) && _run_bash(dir, files)
+
+    @info("Reading $ext files from $dir.")
+    files = Dict(_inp_key(f, ext) => f for f in files if occursin(ext, f))
+    d = Dict(k => read_file(joinpath(dir,f)) for (k,f) in files)
+
+    # If the file is empty, If there's only one column containing values, rename it to value.
+    # This is consistent with SLiDE naming convention.
+    _delete_empty!(d)
+    [d[k] = edit_with(df, Rename.(findvalue(df), :value)) for (k,df) in d
+        if length(findvalue(df)) == 1]
     return d
 end
 
 
 """
+"""
+function _delete_empty!(d::Dict)
+    for k in keys(d)
+        if isempty(d[k])
+            @warn("Removing empty entry with key $k from the dictionary.")
+            delete!(d, k)
+        end
+    end
+end
+_delete_empty!(d::Any) = nothing
+
+
+"""
     _read_from_yaml(path::String)
 """
-function _read_from_yaml(path::String)
+function _read_from_yaml(path::String; run_bash::Bool = false)
     y = read_file(path)
 
     # If the yaml file includes the key "Path", this indicates that the yaml file 
     if "Path" in keys(y)
+
+        # Look for shell scripts in this path, and run them if they are there.
+        # If none are found, nothing will happen.
+        run_bash && _run_bash(joinpath(SLIDE_DIR, ensurearray(y["Path"])...))
+        
         inp = "Input" in keys(y) ? y["Input"] : collect(values(find_oftype(y, File)))[1]
         d = _read_from_yaml(y["Path"], inp)
-
+        
+        # 
+        _delete_empty!(d)
         [d[k] = edit_with(d[k], y) for k in keys(d) if typeof(d[k]) == DataFrame]
     else
         inp = ensurearray(collect(values(find_oftype(y, CGE)))[1])
@@ -255,3 +279,37 @@ function filter_build!(subset::String, d::Dict)
         return d
     end
 end
+
+
+"""
+"""
+function _run_bash(dir::String, files::Array{String,1})
+    scripts = files[occursin.(".sh", files)]
+    isempty(scripts) && return
+    
+    # Save the current directory so we can return to it later. Enter the directory
+    # containing the bash file(s), run it/them, and return to the original directory.
+    # We default to iterating over a loop of an array of files, even if that array contains
+    # only one file, to minimize changing directories.
+    curr_dir = pwd()
+    cd(dir)
+    for s in scripts
+        @info("Running bash script $s in $dir.")
+        run(`bash $s`)
+    end
+    cd(curr_dir)
+end
+
+function _run_bash(path::String)
+    if isdir(path)
+        _run_bash(path, readdir(path))
+    elseif isfile(path) && (path[end-2:end] == ".sh")
+        dir = joinpath(splitpath(path)[1:end-1]...)
+        file = splitpath(path)[end]
+        _run_bash(dir, file)
+    # else
+    #     @warn("$path is not a valid bash file nor is it a directory that contains one.")
+    end
+end
+
+_run_bash(dir::String, file::String) = _run_bash(dir, ensurearray(file))

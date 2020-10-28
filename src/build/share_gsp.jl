@@ -22,9 +22,10 @@ function share_labor!(d::Dict, set::Dict)
     df[ii,:value] .= df[ii,:lshr0]
     df = fill_zero(df)
 
-    # Save labor to input in functions to calculate annual and regional average wage shares.
-    d[:labor] = df[:,cols]
     # d[:labor_temp] = copy(d[:labor])
+    # Save labor to input in functions to calculate annual and regional average wage shares.
+    df[!,:labor_shr_pre_avg] .= df[:,:value]
+    d[:labor] = df[:,cols]
 
     df[!,:wg] .= _share_wg!(d, set)[:,:value]
     df[!,:hw] .= _share_hw!(d, set)[:,:value]
@@ -35,6 +36,7 @@ function share_labor!(d::Dict, set::Dict)
     df[wg,:value] .= df[wg,:avg_wg]
     df[df[:,:hw],:value] .= df[df[:,:hw],:sec_labor]
     d[:labor] = dropnan(df[:, cols])
+    d[:labor_calc] = df
     return d[:labor]
 end
 
@@ -116,6 +118,8 @@ end
 
 "`hw(r,s)`: (region,sector) pairings with ALL wage shares > 1"
 function _share_hw!(d::Dict, set::Dict)
+    # (!!!!) When WiNDC calculates this, years with all wage shares = 0 are included.
+    # So I'm ok with this difference.
     !(:wg in collect(keys(d))) && _share_wg!(d, set)
 
     df = copy(d[:wg])

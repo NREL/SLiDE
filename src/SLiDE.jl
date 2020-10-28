@@ -37,11 +37,6 @@ const IS = InfrastructureSystems
 const SLIDE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), ".."))
 export SLIDE_DIR
 
-const DEFAULT_TOL = 1e-6
-const DEFAULT_SMALL = missing
-
-# include(joinpath("utils", "generate_structs.jl"))
-
 # EXPORTS
 export Add
 export Describe
@@ -153,6 +148,9 @@ abstract type File <: DataStream end
 abstract type Check <: DataStream end
 
 abstract type CGE <: EconomicSystemsType end
+
+# CONSTANTS
+include("definitions.jl")
 
 # TYPES
 include(joinpath("parse", "generated_check", "includes.jl"))

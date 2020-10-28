@@ -67,6 +67,7 @@ function edit_with(df::DataFrame, x::Add)
     return df
 end
 
+
 function edit_with(df::DataFrame, x::Drop)
     df = copy(df)
     if x.val === "all" && x.operation == "occursin"
@@ -294,7 +295,7 @@ function edit_with(df::DataFrame, lst::Array{T}) where T<:Edit
     return df
 end
 
-function SLiDE.edit_with(df::DataFrame, x::Describe, file::T) where T<:File
+function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
     return select!(edit_with(df, Add(x.col, file.descriptor)), [x.col; propertynames(df)])
 end
 
@@ -329,7 +330,8 @@ end
 
 function edit_with(y::Dict{Any,Any})
     # Find all dictionary keys corresponding to file names and save these in a list.
-    file = convert_type(Array, find_oftype(y, File))
+    # file = convert_type(Array, find_oftype(y, File))
+    file = ensurearray(values(find_oftype(y, File)))
     df = edit_with(file, y)
     # return _sort_datastream(df)
 end

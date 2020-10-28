@@ -20,7 +20,8 @@ function calibrate(
     d::Dict,
     set::Dict;
     save_build::Bool = DEFAULT_SAVE_BUILD,
-    overwrite::Bool = DEFAULT_OVERWRITE
+    overwrite::Bool = DEFAULT_OVERWRITE,
+    penalty_nokey = DEFAULT_PENALTY_NOKEY
     )
     CURR_STEP = "calibrate"
 
@@ -37,7 +38,7 @@ function calibrate(
     cal = Dict(k => DataFrame() for k in set[:cal])
 
     for year in set[:yr]
-        cal_yr = calibrate(year, d, set)
+        cal_yr = calibrate(year, d, set; penalty_nokey = penalty_nokey)
         [cal[k] = [cal[k]; cal_yr[k]] for k in set[:cal]]
     end
 
@@ -46,7 +47,7 @@ function calibrate(
 end
 
 
-function calibrate(year::Int, io::Dict, set::Dict)
+function calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = DEFAULT_PENALTY_NOKEY)
     @info("Calibrating $year data")
 
     set[:i] = set[:g]   # (!!!!) should just replace in usage.
@@ -90,8 +91,6 @@ function calibrate(year::Int, io::Dict, set::Dict)
     );
 
     # --- DEFINE OBJECTIVE -----------------------------------------------------------------
-    penalty_nokey = 1e4
-
     @objective(calib,Min,
         + sum(abs(cal[:ys0][j,i]) * (ys0_est[j,i] / cal[:ys0][j,i] - 1)^2 for i in set[:i] for j in set[:j] if haskey(cal[:ys0], (j, i)))
         + sum(abs(cal[:id0][i,j]) * (id0_est[i,j] / cal[:id0][i,j] - 1)^2 for i in set[:i] for j in set[:j] if haskey(cal[:id0], (i, j)))
@@ -180,8 +179,6 @@ function calibrate(year::Int, io::Dict, set::Dict)
     
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     JuMP.optimize!(calib)
-
-    @isdefined(set_temp) && (set = copy(set_temp)) # (!!!!) delete if unnecessary
 
     # Populate resultant Dictionary.
     cal = Dict(k => filter_with(io[k], (yr = year,); drop = true) for k in [:ta0,:tm0])

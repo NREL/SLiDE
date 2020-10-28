@@ -28,44 +28,53 @@ function compare_summary(
     tol::Float64 = DEFAULT_TOL,
     complete_summary::Bool = false
     )
-    df = indexjoin(df; indicator = indicator, fillmissing = false)
-    idx = findindex(df)
-    vals = findvalue(df)
 
-    # Add a column named after each indicator to reflect whether the keys were present in the
-    # input DataFrame. Then, mark rows where all keys are equal.
-    [df[!,ind] .= .!ismissing.(df[:,val]) for (ind, val) in zip(indicator, vals)]
+    rel = length(df) == 1 ? :reldiff : :maxreldiff
+
+    # Do some checks on the indices before comparing.
+    idx = findindex.(df)
+    length(unique(sort.(idx))) > 1 && @error("Cannot compare DataFrames with different indices.")
+    length(unique(idx)) > 1 && @warn("Comparing DataFrames with different index orders.")
+
+    df = indexjoin(df; indicator = [:slide,:bluenote], mark_source = true, fillmissing = false)
+    idx = findindex(df)
+    val = setdiff(findvalue(df), indicator)
+
+    # Are all of the keys here?
     df[!,:equal_keys] .= prod.(eachrow(df[:,indicator]))
 
-    # Are there discrepancies between PRESENT values (within the specified tolerance)?
-    # All values in a row x will be considered "equal" if (max(x) - x_i) / mean(x) < tol
-    df_comp = abs.(df[:,vals])
-    df_comp = (maximum.(skipmissing.(eachrow(df_comp))) .- df_comp) ./
-        Statistics.mean.(skipmissing.(eachrow(df_comp)))
+    if !isempty(val)
+        # Are there discrepancies between PRESENT values (within the specified tolerance)?
+        # All values in a row x will be considered "equal" if (max(x) - x_i) / mean(x) < tol
+        df_comp = abs.(df[:,val])
+        df_comp = (maximum.(skipmissing.(eachrow(df_comp))) .- df_comp) ./
+            Statistics.mean.(skipmissing.(eachrow(df_comp)))
 
-    df[!,:reldiff] .= maximum.(skipmissing.(eachrow(df_comp)))
-    df[!,:equal_values] .= df[:,:reldiff] .<= tol
+        df[!,rel] .= maximum.(skipmissing.(eachrow(df_comp)))
+        df[!,:equal_values] .= df[:,rel] .<= tol
 
-    # What if some zeros were include but not others?
-    # df[all.(eachrow(.|(ismissing.(df[:,vals]), df[:,vals].==0))), :equal_values] .= true
-    select!(df, [idx; vals; :reldiff; :equal_keys; :equal_values])
-    
-    if !complete_summary
+        # What if some zeros were include but not others?
+        # df[all.(eachrow(.|(ismissing.(df[:,val]), df[:,val].==0))), :equal_values] .= true
+        select!(df, [idx; val; indicator; rel; :equal_keys; :equal_values])
         ii = df[:,:equal_keys] .* df[:,:equal_values]
-        df = df[.!ii,:]
+    else
+        select!(df, [idx; indicator; :equal_keys])
+        ii = df[:,:equal_keys]
     end
+
+    !complete_summary && (df = df[.!ii,:])
     return df
 end
 
 function compare_summary(
-    d::Array{Dict,1},
+    d::Array{Dict{Symbol,DataFrame},1},
     indicator::Array{Symbol,1};
-    tol::Float64=DEFAULT_TOL,
+    tol::Float64=SLiDE.DEFAULT_TOL,
     complete_summary::Bool=false
 )
     keys_comp = intersect(collect.(keys.(d))...)
     d = Dict(k => compare_summary([d[m][k] for m in keys(d)], indicator;
-        tol=tol, complete_summary=complete_summary) for k in keys(dis))
+        tol=tol, complete_summary=complete_summary) for k in keys_comp)
     return d
 end
 

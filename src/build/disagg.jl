@@ -1,5 +1,3 @@
-const DEFAULT_ROUND_DIGITS = 10
-
 """
     function disagg!(d::Dict, set::Dict; save_build = true, overwrite = false)
 
@@ -168,7 +166,7 @@ end
 """
 function _disagg_ld0!(d::Dict)
     println("  Disaggregating ld0(yr,r,s), labor demand")
-    !(:r in propertynames(d[:va0])) && _disagg_va0!(d)
+    !(:r in propertynames(d[:va0])) && _disagg_va0!(d, set)
     d[:ld0] = d[:labor] * d[:va0]
     return d[:ld0]
 end
