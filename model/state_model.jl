@@ -59,41 +59,55 @@ end
 ############
 
 # year for the model to be based off of
-mod_year = 2016
+# mod_year = 2016
+
+#specify the path where the dumped csv files are stored
+# data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
+
+#blueNOTE contains a dictionary of the parameters needed to specify the model
+# blueNOTE = Dict(
+#     :ys0 => df_to_dict(read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"),[:yr],:Val),
+#     :id0 => df_to_dict(read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"),[:yr],:Val),
+#     :ld0 => df_to_dict(read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"),[:yr],:Val),
+#     :kd0 => df_to_dict(read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"),[:yr],:Val),
+#     :ty0 => df_to_dict(read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"),[:yr],:Val),
+#     :m0 => df_to_dict(read_data_temp("m0",mod_year,data_temp_dir,"Imports"),[:yr],:Val),
+#     :x0 => df_to_dict(read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"),[:yr],:Val),
+#     :rx0 => df_to_dict(read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"),[:yr],:Val),
+#     :md0 => df_to_dict(read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"),[:yr],:Val),
+#     :nm0 => df_to_dict(read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"),[:yr],:Val),
+#     :dm0 => df_to_dict(read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"),[:yr],:Val),
+#     :s0 => df_to_dict(read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"),[:yr],:Val),
+#     :a0 => df_to_dict(read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"),[:yr],:Val),
+#     :ta0 => df_to_dict(read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"),[:yr],:Val),
+#     :tm0 => df_to_dict(read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"),[:yr],:Val),
+#     :cd0 => df_to_dict(read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"),[:yr],:Val),
+#     :c0 => df_to_dict(read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"),[:yr],:Val),
+#     :yh0 => df_to_dict(read_data_temp("yh0",mod_year,data_temp_dir,"Household production"),[:yr],:Val),
+#     :bopdef0 => df_to_dict(read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"),[:yr],:Val),
+#     :hhadj => df_to_dict(read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"),[:yr],:Val),
+#     :g0 => df_to_dict(read_data_temp("g0",mod_year,data_temp_dir,"Government demand"),[:yr],:Val),
+#     :i0 => df_to_dict(read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"),[:yr],:Val),
+#     :xn0 => df_to_dict(read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"),[:yr],:Val),
+#     :xd0 => df_to_dict(read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"),[:yr],:Val),
+#     :dd0 => df_to_dict(read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"),[:yr],:Val),
+#     :nd0 => df_to_dict(read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"),[:yr],:Val)
+# )
+
+# year for the model to be based off of
+ # mod_year = 2016
 
 #specify the path where the dumped csv files are stored
 data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
 
-#blueNOTE contains a dictionary of the parameters needed to specify the model
-blueNOTE = Dict(
-    :ys0 => df_to_dict(read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"),[:yr],:Val),
-    :id0 => df_to_dict(read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"),[:yr],:Val),
-    :ld0 => df_to_dict(read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"),[:yr],:Val),
-    :kd0 => df_to_dict(read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"),[:yr],:Val),
-    :ty0 => df_to_dict(read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"),[:yr],:Val),
-    :m0 => df_to_dict(read_data_temp("m0",mod_year,data_temp_dir,"Imports"),[:yr],:Val),
-    :x0 => df_to_dict(read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"),[:yr],:Val),
-    :rx0 => df_to_dict(read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"),[:yr],:Val),
-    :md0 => df_to_dict(read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"),[:yr],:Val),
-    :nm0 => df_to_dict(read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"),[:yr],:Val),
-    :dm0 => df_to_dict(read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"),[:yr],:Val),
-    :s0 => df_to_dict(read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"),[:yr],:Val),
-    :a0 => df_to_dict(read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"),[:yr],:Val),
-    :ta0 => df_to_dict(read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"),[:yr],:Val),
-    :tm0 => df_to_dict(read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"),[:yr],:Val),
-    :cd0 => df_to_dict(read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"),[:yr],:Val),
-    :c0 => df_to_dict(read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"),[:yr],:Val),
-    :yh0 => df_to_dict(read_data_temp("yh0",mod_year,data_temp_dir,"Household production"),[:yr],:Val),
-    :bopdef0 => df_to_dict(read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"),[:yr],:Val),
-    :hhadj => df_to_dict(read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"),[:yr],:Val),
-    :g0 => df_to_dict(read_data_temp("g0",mod_year,data_temp_dir,"Government demand"),[:yr],:Val),
-    :i0 => df_to_dict(read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"),[:yr],:Val),
-    :xn0 => df_to_dict(read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"),[:yr],:Val),
-    :xd0 => df_to_dict(read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"),[:yr],:Val),
-    :dd0 => df_to_dict(read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"),[:yr],:Val),
-    :nd0 => df_to_dict(read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"),[:yr],:Val)
-)
+(d, set) = build_data(overwrite=true)
+#(d, set) = build_data()
 
+
+bmkyr=2016
+
+# blueNOTE = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true))) for k in keys(d))
+blueNOTE = Dict(k => convert_type(Dict, filter_with(d[k], (yr = bmkyr,); drop = true)) for k in keys(d))
 ###############
 # -- SETS --
 ###############
@@ -101,11 +115,17 @@ blueNOTE = Dict(
 # read sets from their dumped CSVs
 # these are converted to a vector of strings such that we can use them to populate variable indices
 # and to use them as as conditionals (e.g. see the use of goods_margins)
-regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
-sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
-goods = sectors;
-margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
-goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
+# regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
+# sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
+# goods = sectors;
+# margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
+# goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
+
+regions = set[:r]
+sectors = set[:s]
+goods = set[:g]
+margins = set[:m]
+goods_margins = set[:gm]
 
 # need to fill in zeros to avoid missing keys
 fill_zero(tuple(regions,sectors,goods),blueNOTE[:ys0])
@@ -124,10 +144,10 @@ fill_zero(tuple(regions,goods),blueNOTE[:a0])
 fill_zero(tuple(regions,goods),blueNOTE[:ta0])
 fill_zero(tuple(regions,goods),blueNOTE[:tm0])
 fill_zero(tuple(regions,goods),blueNOTE[:cd0])
-fill_zero(tuple(regions),blueNOTE[:c0])
+#fill_zero(tuple(regions),blueNOTE[:c0])
 fill_zero(tuple(regions,goods),blueNOTE[:yh0])
-fill_zero(tuple(regions),blueNOTE[:bopdef0])
-fill_zero(tuple(regions),blueNOTE[:hhadj])
+#fill_zero(tuple(regions),blueNOTE[:bopdef0])
+#fill_zero(tuple(regions),blueNOTE[:hhadj])
 fill_zero(tuple(regions,goods),blueNOTE[:g0])
 fill_zero(tuple(regions,goods),blueNOTE[:i0])
 fill_zero(tuple(regions,goods),blueNOTE[:xn0])
@@ -135,11 +155,21 @@ fill_zero(tuple(regions,goods),blueNOTE[:xd0])
 fill_zero(tuple(regions,goods),blueNOTE[:dd0])
 fill_zero(tuple(regions,goods),blueNOTE[:nd0])
 
+# for s in keys(blueNOTE)
+#   for k in keys(blueNOTE[s])
+#     if blueNOTE[s][k] < 1e-5
+#       blueNOTE[s][k] = 0.0
+#     end
+#   end
+# end
+
 a_set = Dict()
 [a_set[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
+
 # y_check is used to make sure the r/s combination is a valid output
 y_check = Dict()
 [y_check[r,s] = sum(blueNOTE[:ys0][r,s,g] for g in goods) for r in regions for s in sectors]
+#[y_check[r,s] = sum(bn[:ys0][r,g,s] for g in goods) for r in regions for s in sectors]
 
 
 ##############
@@ -192,7 +222,7 @@ cge = MCPModel();
 
 # small value that acts as a lower limit to variable values
 # default is zero
-sv = 0.00
+sv = 0.001
 
 #sectors
 @variable(cge,Y[r in regions,s in sectors]>=sv,start=1)
@@ -213,7 +243,7 @@ sv = 0.00
 @variable(cge,PFX>=sv,start=1) # Foreign exchange
 
 #consumer:
-@variable(cge,RA[r in regions]>=sv,start=blueNOTE[:c0][(r,)]) # Representative agent
+@variable(cge,RA[r in regions]>=sv,start=blueNOTE[:c0][r]) # Representative agent
 
 ###############################
 # -- PLACEHOLDER VARIABLES --
@@ -303,7 +333,7 @@ sv = 0.00
 @mapping(cge,profit_c[r in regions],
                   sum(PA[r,g] * CD[r,g] for g in goods)
                   - 
-                  PC[r] * blueNOTE[:c0][(r,)]
+                  PC[r] * blueNOTE[:c0][r]
 );
 
 
@@ -373,12 +403,12 @@ sv = 0.00
 ));
 
 @mapping(cge,market_pc[r in regions],
-        C[r] * blueNOTE[:c0][(r,)] - ( RA[r] / PC[r]
+        C[r] * blueNOTE[:c0][r] - ( RA[r] / PC[r]
 ));
 
 
 @mapping(cge,market_pfx,
-        sum(blueNOTE[:bopdef0][(r,)] for r in regions)
+        sum(blueNOTE[:bopdef0][r] for r in regions)
         + sum(X[r,g] * AX[r,g] for r in regions for g in goods)
 # add a set here        
         + sum(A[r,g] * blueNOTE[:rx0][r,g] for r in regions for g in goods if (a_set[r,g] != 0))
@@ -390,7 +420,7 @@ sv = 0.00
         RA[r] - ( 
         sum(PY[r,g]*blueNOTE[:yh0][r,g] for g in goods)
 #will fix reference here...        
-        + PFX * (blueNOTE[:bopdef0][(r,)] + blueNOTE[:hhadj][(r,)])
+        + PFX * (blueNOTE[:bopdef0][r] + blueNOTE[:hhadj][r])
         - sum(PA[r,g] * (blueNOTE[:g0][r,g] + blueNOTE[:i0][r,g]) for g in goods)
         + PL[r] * sum(blueNOTE[:ld0][r,s] for s in sectors)
         + sum(PK[r,s] * blueNOTE[:kd0][r,s] for s in sectors)
@@ -445,7 +475,7 @@ sv = 0.00
 ####################
 
 #set up the options for the path solver
-PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
+PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
 
 # export the path license string to the environment
 # this is now done in the SLiDE initiation steps 
