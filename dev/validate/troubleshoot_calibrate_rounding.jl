@@ -67,15 +67,20 @@ end
 include(joinpath(SLIDE_DIR,"dev","validate","validation_functions.jl"))
 
 # ------------------------------------------------------------------------------------------
+default_dataset = "default"
 dataset = "default"
+# dataset = "prezero_negatives"
 
 VALIDATE_DIR = joinpath(SLIDE_DIR, "dev", "validate", "readfiles")
 f_partition_out = joinpath(VALIDATE_DIR, "partition_o.yml")
 f_calibrate_out = joinpath(VALIDATE_DIR, "cal_o.yml")
 
-set = SLiDE.read_build(dataset, "sets")
-io = SLiDE.read_build(dataset, "partition")
-cal = SLiDE.read_build(dataset, "calibrate")
+# set = SLiDE.read_build(dataset, "sets")
+set = read_from(joinpath(SLIDE_DIR,"src","readfiles","setlist.yml"))
+
+io = SLiDE.read_build(default_dataset, "partition")
+cal = calibrate(dataset, copy(io), set; overwrite = false)
+
 cal_bluenote = read_from(f_calibrate_out)
 
 d_cal_comp = benchmark_against(cal, cal_bluenote; tol = 1E-6)
@@ -106,20 +111,25 @@ display(cal_constraints_keys)
 # Here, it's interesting that the missing keys in each constraint are imrg and oth/use.
 @info("Missing keys: SLiDE constraints")
 cal_constraints_missing = missing_indices(cal_constraints_keys)
-# 
-# 
+
 # The zero/small value discrepancy for id0 is the same as for each constraint.
 # For prf_y: note that this sets the sum of ys0 over i/g = RHS. We fix the output of ys0 = 0
-# for j/s = [oth,use]. So the sum over these values will = 0. I think this *could* explain
-@info("Missing keys: id0")
-display(d_cal_missing[:id0])
+# for j/s = [oth,use]. So the sum over these values will = 0.
+if :id0 in keys(d_cal_missing)
+    @info("Missing keys: id0")
+    display(d_cal_missing[:id0])
+end
 
 # Fixing fd0 (with the exception of fd = pce) is commented in blueNOTE and SLiDE.
 # What's up with this?
-@info("Missing keys: fd0")
-display(d_cal_missing[:fd0])
+if :fd0 in keys(d_cal_missing)
+    @info("Missing keys: fd0")
+    display(d_cal_missing[:fd0])
+end
 
 # ------------------------------------------------------------------------------------------
+# Check that we're fixing things correctly...
+# 
 # Fix ys0 = 0 for j/s = [oth,use]. This is working how it should be, since (oth,use) are not
 # in cal[:ys0]'s set when zeros are dropped.
 setdiff(["oth","use"], unique(dropzero(cal[:ys0])[:,:s]))
@@ -128,3 +138,15 @@ setdiff(["oth","use"], unique(dropzero(cal[:ys0])[:,:s]))
 # criteria. The others are close-ish, but not quite there.
 check_fixed = Dict(k => compare_summary([io[k], cal[k]], [:partition, :cal])
     for k in [:va0,:fs0,:m0])
+
+# Look at io vs. bluenote calibration.
+@info("blueNOTE: zero -> value?... value -> zero?")
+d_io_bn = compare_summary([io, cal_bluenote], [:io,:cal_bn]; complete_summary = true);
+[println("$k\t",any(ismissing.(df[:,:io_value])), "\t", any(ismissing.(df[:,:cal_bn_value]))) for (k,df) in d_io_bn]
+
+@info("SLiDE: zero -> value?... value -> zero?")
+d_io = compare_summary([io, cal], [:io,:cal]; complete_summary = true);
+[println("$k\t", any(ismissing.(df[:,:io_value])), "\t", any(ismissing.(df[:,:cal_value]))) for (k,df) in d_io]
+
+
+d_io_bn[:fd0][ismissing.(d_io_bn[:fd0][:,:cal_bn_value]),:]
