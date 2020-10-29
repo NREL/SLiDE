@@ -26,7 +26,7 @@ function build_data(
             set = read_from(joinpath("src","readfiles","setlist.yml"))
             write_build(dataset, SET_DIR, set)
         end
-
+        
         io = read_from(joinpath("src","readfiles","build","partitioninp.yml"))
 
         io = partition(dataset, io, set; save_build = save_build, overwrite = overwrite)
@@ -235,7 +235,9 @@ function read_build(dataset::String, subset::String; overwrite::Bool = DEFAULT_O
         @info("$path not found.")
         return Dict()
     else
-        return read_from(path)
+        d = read_from(path)
+        (subset == SET_DIR) && (d = Dict(k => df[:,1] for (k,df) in d))
+        return d
     end
 end
 

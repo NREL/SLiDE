@@ -28,9 +28,24 @@ function SLiDE.compare_keys(d::Dict)
     d = copy(d)
     [d[k] = any(.!df[:,:equal_keys]) ? df[.!df[:,:equal_keys],:] : true
         for (k,df) in d if df !== true]
-    d_max = Dict(k => maximum(df[:,:calc_value]) for (k,df) in d if df !== true)
+
+    d_max = Dict{Symbol,Any}()
+    for (k,df) in d
+        df == true && continue
+        val = setdiff(find_oftype(df, AbstractFloat), [:reldiff, :maxreldiff])
+        save_val = val[.!any.(eachcol(ismissing.(df[:,val])))][1]
+        d_max[k] = maximum(df[:,save_val])
+    end
     return (d, d_max)
 end
+
+# function SLiDE.compare_keys(d::Dict)
+#     d = copy(d)
+#     [d[k] = any(.!df[:,:equal_keys]) ? df[.!df[:,:equal_keys],:] : true
+#         for (k,df) in d if df !== true]
+#     d_max = Dict(k => maximum(df[:,:calc_value]) for (k,df) in d if df !== true)
+#     return (d, d_max)
+# end
 
 """
 This function returns a DataFrame comparing the minimum values in each input DataFrame.

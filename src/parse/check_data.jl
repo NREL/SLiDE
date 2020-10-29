@@ -29,14 +29,14 @@ function compare_summary(
     complete_summary::Bool = false
     )
 
-    rel = length(df) == 1 ? :reldiff : :maxreldiff
+    rel = length(df) == 2 ? :reldiff : :maxreldiff
 
     # Do some checks on the indices before comparing.
     idx = findindex.(df)
     length(unique(sort.(idx))) > 1 && @error("Cannot compare DataFrames with different indices.")
     length(unique(idx)) > 1 && @warn("Comparing DataFrames with different index orders.")
 
-    df = indexjoin(df; indicator = [:slide,:bluenote], mark_source = true, fillmissing = false)
+    df = indexjoin(df; indicator = indicator, mark_source = true, fillmissing = false)
     idx = findindex(df)
     val = setdiff(findvalue(df), indicator)
 
