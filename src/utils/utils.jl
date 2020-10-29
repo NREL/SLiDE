@@ -165,6 +165,8 @@ convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
 
 convert_type(::Type{Array{T}}, x::Any) where T <: Any = convert_type.(T, x)
 convert_type(::Type{Array{T,1}}, x::Any) where T <: Any = convert_type.(T, x)
+
+# WARNING: DEPRECIATED.
 convert_type(::Type{Array}, d::Dict) = [collect(values(d))...;]
 
 convert_type(::Type{T}, x::Missing) where T <: Real = x;
@@ -192,6 +194,7 @@ isarray(::Any) = false
 ensurearray(x::Array{T,1}) where T <: Any = x
 ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
 ensurearray(x::UnitRange) = collect(x)
+ensurearray(x::Base.ValueIterator) = [collect(x)...;]
 ensurearray(x::Any) = [x]
 
 """
@@ -205,30 +208,11 @@ ensuretuple(x::Any) = tuple(x)
 """
 """
 istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(dropmissing(df))), T)
-# eltype.(eachcol(df))
-
-function hasnames(df::DataFrame, cols::Array{Symbol,1})
-    col_in = setdiff(propertynames(df), cols)
-    col_out = setdiff(cols, propertynames(df))
-    return (length(col_in) == 0) && (length(col_out) == 0)
-end
 
 
 """
 """
 DataFrames.select!(df::DataFrame, x::Parameter) = select!(df, [x.index; :value])
-
-
-function ensurenames!(df::DataFrame, cols::Array{Symbol,1})
-    # (!!!!) delete this function. It could result in misnaming.
-    size(df, 2) !== length(cols) && @error("Can only ensure column names of the data frame length")
-    cols_in = setdiff(propertynames(df), cols)
-    cols_out = setdiff(cols, propertynames(df))
-
-    [rename!(df, col_in => col_out) for (col_in, col_out) in zip(cols_in, cols_out)]
-    return df[:,cols]
-end
-ensurenames(df::DataFrame, cols::Array{Symbol,1}) = ensurenames!(copy(df), cols)
 
 
 """
@@ -294,73 +278,6 @@ end
 
 
 """
-    indexjoin(df::DataFrame...; kwargs)
-    indexjoin(df::Array{DataFrame,1}; kwargs)
-
-This function joins input DataFrames on their index columns (ones that are not filled with 
-`AbstractFloat` or `Bool` DataTypes)
-
-# Argument
-- `df::DataFrame...` to joins
-
-# Keywords
-- `valnames::Array{Symbol,1}`: names of output value columns.
-- `indicator::Array{Any,1}`: prefix to add to DataFrame value names.
-"""
-function indexjoin(df::Array{DataFrame,1};
-    indicator = missing,
-    valnames = missing,
-    fillmissing = 0.0
-)
-    df = df[.!isempty.(df)]
-    N = length(df)
-
-    val = findvalue.(df)
-    idx = findindex.(df)
-
-    if valnames === missing
-        indicator === missing && (indicator = _generate_indicator(N))
-        valnames = broadcast.(Symbol, Symbol.(indicator, :_), val)
-    end
-    
-    valnames = ensurearray.(valnames)
-    df = [edit_with(df[ii], Rename.(val[ii], valnames[ii])) for ii in 1:N]
-    df_ans = copy(df[1])
-
-    for ii in 2:N
-        cols = intersect(propertynames(df_ans), idx[ii])
-
-        df_ans = if length(cols) == 0
-            crossjoin(df_ans, df[ii])
-        else
-            outerjoin(df_ans, df[ii], on=cols)
-        end
-    end
-
-    idx = unique(collect(Iterators.flatten(idx)))
-    valnames = collect(Iterators.flatten(valnames))
-    
-    # Handle missing keys.
-    if fillmissing !== false
-        df_ans = edit_with(df_ans, Replace.(valnames, missing, fillmissing))
-    end
-    return df_ans[:, [idx; valnames]]
-end
-
-function indexjoin(df::Vararg{DataFrame};
-    indicator = missing,
-    valnames = missing,
-    fillmissing = 0.0
-)
-    return indexjoin(ensurearray(df);
-        indicator = indicator,
-        valnames = valnames,
-        fillmissing = fillmissing
-    )
-end
-
-
-"""
 # Returns
 - `val::Array{Symbol,1}` of input DataFrame propertynames indicating values, which are
     defined as columns that DO contain `AbstractFloat` or `Bool` DataTypes.
@@ -374,6 +291,3 @@ findvalue(df::DataFrame) = [find_oftype(df, AbstractFloat); find_oftype(df, Bool
     defined as columns that do NOT contain `AbstractFloat` or `Bool` DataTypes.
 """
 findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
-
-
-_generate_indicator(N::Int) = Symbol.(:df, 1:N)

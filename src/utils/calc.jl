@@ -150,3 +150,12 @@ end
 function transform_over(df::DataFrame, col::Symbol; fun::Function = sum)
     return transform_over(df, ensurearray(col); fun = fun)
 end
+
+
+function round!(df::DataFrame; digits = false)
+    if digits !== false
+        val = find_oftype(df, AbstractFloat)
+        df[!,val] .= round.(df[:,val]; digits = digits)
+    end
+    return df
+end

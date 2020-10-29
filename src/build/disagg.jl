@@ -63,7 +63,7 @@ function disagg(
     d[:rx0_temp] = _disagg_rx0!(d)
 
     _disagg_diff!(d)
-    _apply_diff!(d)
+    _apply_diff!(d, set)
 
     _disagg_bop!(d)
     _disagg_pt0!(d)
@@ -166,7 +166,7 @@ end
 """
 function _disagg_ld0!(d::Dict)
     println("  Disaggregating ld0(yr,r,s), labor demand")
-    !(:r in propertynames(d[:va0])) && _disagg_va0!(d)
+    !(:r in propertynames(d[:va0])) && _disagg_va0!(d, set)
     d[:ld0] = d[:labor] * d[:va0]
     return d[:ld0]
 end
@@ -274,14 +274,14 @@ end
 ```
 """
 function _disagg_yh0!(d::Dict)
-    println("  Disaggregating yh0(yr,r,g), household production")
-
     if !(:diff in keys(d))
+        println("  Disaggregating yh0(yr,r,g), household production")
         d[:yh0] = d[:region] * d[:fs0]
     else
-        d[:yh0] = dropmissing(d[:yh0] + d[:diff])
+        println("  Applying difference to yh0(yr,r,g), household production")
+        d[:yh0] = d[:yh0] + d[:diff]
     end
-    return d[:yh0]
+    return dropmissing!(d[:yh0])
 end
 
 
@@ -307,8 +307,8 @@ end
 ```
 """
 function _disagg_x0!(d::Dict, set::Dict)
-    println("  Disaggregating x0(yr,r,g), foreign exports")
     if !(:diff in keys(d))
+        println("  Disaggregating x0(yr,r,g), foreign exports")
         !(:notrd in keys(set)) && _set_notrd!(d, set)
 
         df_exports = filter_with(d[:utd], (t = "exports",); drop = true)
@@ -319,10 +319,11 @@ function _disagg_x0!(d::Dict, set::Dict)
 
         d[:x0] = [df_trd; df_notrd]
     else
-        d[:x0] = dropmissing(d[:x0] + d[:diff])
+        println("  Applying difference to x0(yr,r,g), foreign exports")
+        d[:x0] = d[:x0] + d[:diff]
     end
 
-    return d[:x0]
+    return dropmissing!(d[:x0])
 end
 
 
@@ -334,13 +335,14 @@ end
 ```
 """
 function _disagg_s0!(d::Dict)
-    println("  Disaggregating s0(yr,r,g), total supply")
     if !(:diff in keys(d))
+        println("  Disaggregating s0(yr,r,g), total supply")
         d[:s0] = combine_over(d[:ys0], :s) + d[:yh0]
     else
-        d[:s0] = dropmissing(d[:s0] + d[:diff])
+        println("  Applying difference to s0(yr,r,g), total supply")
+        d[:s0] = d[:s0] + d[:diff]
     end
-    return d[:s0]
+    return dropmissing!(d[:s0])
 end
 
 
@@ -424,12 +426,16 @@ end
 \\bar{rx}_{yr,r,g} = \\bar{x}_{yr,r,g} - \\bar{s}_{yr,r,g}
 ```
 """
-function _disagg_rx0!(d::Dict)
-    println("  Disaggregating rx0(yr,r,g), re-exports")
+function _disagg_rx0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
     if !(:diff in keys(d))
+        println("  Disaggregating rx0(yr,r,g), re-exports")
         d[:rx0] = d[:x0] - d[:s0]
-        d[:rx0][round.(d[:rx0][:,:value]; digits = 10) .< 0, :value] .= 0.0
+
+        if round_digits !== false
+            d[:rx0][round.(d[:rx0][:,:value]; digits = round_digits) .< 0, :value] .= 0.0
+        end
     else
+        println("  Applying difference to rx0(yr,r,g), re-exports")
         d[:rx0] = d[:rx0] + d[:diff]
     end
 
@@ -444,10 +450,14 @@ end
 \\bar{dc}_{yr,r,g} = \\bar{s}_{yr,r,g} - \\bar{x}_{yr,r,g} + \\bar{rx}_{yr,r,g}
 ```
 """
-function _disagg_dc0!(d::Dict)
+function _disagg_dc0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
     # (!!!!) name for this?
     d[:dc0] = dropmissing((d[:s0] - d[:x0] + d[:rx0]))
-    d[:dc0][!,:value] .= round.(d[:dc0][:,:value]; digits = 10)
+
+    if round_digits !== false
+        d[:dc0][!,:value] .= round.(d[:dc0][:,:value]; digits = round_digits)
+    end
+
     return d[:dc0]
 end
 
@@ -462,33 +472,40 @@ end
 \\end{aligned}
 ```
 """
-function _disagg_pt0!(d::Dict)
+function _disagg_pt0(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
     df_pta0 = dropmissing(((d[:yr,:r,:g] - d[:ta0]) * d[:a0]) + d[:rx0])
     df_ptm0 = dropmissing(((d[:yr,:r,:g] + d[:tm0]) * d[:m0]) + combine_over(d[:md0], :m))
 
-    d[:pt0] = df_pta0 - df_ptm0
-    d[:pt0][!,:value] .= round.(d[:pt0][:,:value]; digits = 10)
+    df = df_pta0 - df_ptm0
+    (round_digits !== false) && (df[!,:value] .= round.(df[:,:value]; digits = round_digits))
+    return df
+end
+
+
+function _disagg_pt0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
+    d[:pt0] = _disagg_pt0(d, round_digits = round_digits)
     return d[:pt0]
 end
 
 
 "`diff`:"
-function _disagg_diff!(d::Dict)
-    df = _disagg_pt0!(d)
+function _disagg_diff!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
+    # df = _disagg_pt0!(d)
+    df = _disagg_pt0(d; round_digits = DEFAULT_ROUND_DIGITS)
 
     df[!,:value] .= - min.(0, df[:,:value])
-    d[:diff] = edit_with(df, Drop(:value,0.0,"=="))
+    d[:diff] = dropzero!(df)
 end
 
 
 """
 Add an adjustment to `rx_{yr,r,g}`, `s_{yr,r,g}`, `x_{yr,r,g}`, and `yh_{yr,r,g}`.
 """
-function _apply_diff!(d::Dict)
-    d[:rx0] += d[:diff]
-    d[:s0]  += d[:diff]
-    d[:x0]  += d[:diff]
-    d[:yh0] += d[:diff]
+function _apply_diff!(d::Dict, set::Dict)
+    _disagg_rx0!(d)
+    _disagg_s0!(d)
+    _disagg_x0!(d, set)
+    _disagg_yh0!(d)
 end
 
 
@@ -579,10 +596,12 @@ end
 \\bar{nd}_{yr,r,g} = \\bar{pt}_{yr,r,g} - \\bar{dd}_{yr,r,g}
 ```
 """
-function _disagg_nd0!(d::Dict)
+function _disagg_nd0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
     println("  Disaggregating nd(yr,r,g), regional demand from national market")
-    d[:nd0] = d[:pt0] - d[:dd0]
-    d[:nd0][!,:value] .= round.(d[:nd0][:,:value]; digits = 10)
+    df_pt0 = _disagg_pt0(d; round_digits = false)
+
+    d[:nd0] = df_pt0 - d[:dd0]
+    (round_digits !== false) && (d[:nd0][!,:value] .= round.(d[:nd0][:,:value]; digits = round_digits))
     return d[:nd0]
 end
 

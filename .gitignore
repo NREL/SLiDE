@@ -16,6 +16,8 @@ calibrate/scratch.jl
 
 data*/
 
+dev/validate/windc_1.0/*/*.csv
+
 docs/build/
 docs/src/man/parameter_list.xlsx
 

@@ -37,11 +37,6 @@ const IS = InfrastructureSystems
 const SLIDE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), ".."))
 export SLIDE_DIR
 
-const DEFAULT_TOL = 1e-6
-const DEFAULT_SMALL = missing
-
-# include(joinpath("utils", "generate_structs.jl"))
-
 # EXPORTS
 export Add
 export Describe
@@ -83,11 +78,8 @@ export dropzero
 export dropvalue!
 export dropvalue
 export ensurearray
-# export ensurenames!
-# export ensurenames
 export ensuretuple
 export find_oftype
-# export hasnames
 # export isarray
 # export istype
 export permute
@@ -110,6 +102,7 @@ export transform_over
 
 # READ
 export read_file
+export read_from
 export load_from
 export write_yaml
 export run_yaml
@@ -153,6 +146,9 @@ abstract type Check <: DataStream end
 
 abstract type CGE <: EconomicSystemsType end
 
+# CONSTANTS
+include("definitions.jl")
+
 # TYPES
 include(joinpath("parse", "generated_check", "includes.jl"))
 include(joinpath("parse", "generated_edit", "includes.jl"))
@@ -163,6 +159,7 @@ include(joinpath("model", "generated_cge", "includes.jl"))
 # UTILITIES
 include(joinpath("utils", "utils.jl"))
 include(joinpath("utils", "calc.jl"))
+include(joinpath("utils", "indexjoin.jl"))
 
 include(joinpath("parse", "load_data.jl"))
 include(joinpath("parse", "edit_data.jl"))
