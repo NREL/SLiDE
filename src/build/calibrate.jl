@@ -167,7 +167,7 @@ function calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = DEFAULT_PENAL
     [fix(m0_est[i],     cal[:m0][i],     force=true) for i in set[:i]                    if haskey(cal[:m0], i)];
     
     [fix(ys0_est[j,i], 0, force = true) for j in set[:oth,:use] for i in set[:i]]
-    
+
     # fd_temp = setdiff(set[:fd],["pce"])
     # [fix(fd0_est[i,fd], 0, force=true) for i in set[:i] for fd in set[:fd] if !haskey(cal[:fd0],(i,fd))]
     # [fix(fs0_est[i],    0, force=true) for i in set[:i]                    if !haskey(cal[:fs0], i)];
@@ -223,7 +223,8 @@ function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
     param[:var] = setdiff(param[:cal], param[:tax])
 
     # Isolate the current year.
-    d = Dict(k => filter_with(d[k], (yr = year,); drop = true) for k in set[:cal])
+    d = Dict(k => fill_zero(set, filter_with(d[k], (yr = year,); drop = true))
+        for k in set[:cal])
 
     # Save the DataFrame indices in correct order. This will be used to convert the
     # calibration output back into DataFrames.
