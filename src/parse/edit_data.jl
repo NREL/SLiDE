@@ -452,6 +452,13 @@ function fill_zero(keys_fill::NamedTuple, df::DataFrame)
     return df
 end
 
+function fill_zero(set::Dict, df::DataFrame)
+    idx = findindex(df)
+    idx = intersect(idx, collect(keys(set)))
+    val = [set[k] for k in idx]
+    return fill_zero(NamedTuple{Tuple(idx,)}(val,), df)
+end
+
 function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
     df = copy.(ensurearray(df))
     # Save propertynames of columns containing values to fill zeros later.
