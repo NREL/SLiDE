@@ -40,8 +40,9 @@ end
 # LOAD DATA
 ############
 
-#if SLiDE data needs to be built
-#(d, set) = build_data("cal_zero")
+#SLiDE data needs to be built or point to pre-existing build directory
+#can pass a name (d, set) = build_data("name_of_build_directory")
+(d, set) = build_data("state_model")
 
 bmkyr=2016
 
@@ -122,7 +123,6 @@ cge = MCPModel();
 @NLparameter(cge, nd0[r in regions, g in goods] == get(sld[:nd0], (r, g), 0.0));
 @NLparameter(cge, i0[r in regions, g in goods] == get(sld[:i0], (r, g), 0.0));
 
-
 # benchmark value share parameters
 @NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s])));
 @NLparameter(cge, alpha_x[r in regions, g in goods] == (value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g]));
@@ -145,12 +145,8 @@ replace_nan_inf(theta_m)
 @NLparameter(cge, et_x[r in regions, g in goods] == 4); # Disposition, distribute regional supply to local, national, export - transformation elasticity
 @NLparameter(cge, es_a[r in regions, g in goods] == 0); # Top-level A nest for aggregate demand (Margins, goods) - substitution elasticity
 @NLparameter(cge, es_mar[r in regions, g in goods] == 0); # Margin supply - substitution elasticity
-####
-#es_d and es_f are swapped in windc code, versus nesting diagrams (using nesting diagram version here)
-#only in mpsge version though, not algebraic version - using algebraic version
 @NLparameter(cge, es_d[r in regions, g in goods] == 2); # Domestic demand aggregation nest (intranational) - substitution elasticity
 @NLparameter(cge, es_f[r in regions, g in goods] == 4); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
-####
 
 
 ################
@@ -180,10 +176,6 @@ sv = 0.001
 
 #consumer:
 @variable(cge,RA[r in regions]>=sv,start = value(c0[r])) ;
-
-
-
-
 
 
 ###############################
@@ -260,7 +252,6 @@ sv = 0.001
         sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in goods) * (1-ty[r,s])
 );
 
-
 @mapping(cge,profit_x[(r, g) in sub_set_x],
 # output 'cost' from aggregate supply
          (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * s0[r,g] 
@@ -273,7 +264,6 @@ sv = 0.001
         + (haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) * AD[r,g]
         )
 );
-
 
 @mapping(cge,profit_a[(r, g) in sub_set_a],
 # costs from national market
@@ -299,7 +289,6 @@ sv = 0.001
 # revenues/benefit computed as CPI * reference consumption                  
         PC[r] * c0[r]
 );
-
 
 @mapping(cge,profit_ms[r in regions, m in margins],
 # provision of margins to national market
@@ -371,7 +360,6 @@ sv = 0.001
         sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) * AL[r,s] for s in sectors)
 );
 
-
 @mapping(cge,market_pk[(r, s) in sub_set_pk],
         kd0[r,s]
         - 
@@ -394,7 +382,6 @@ sv = 0.001
 # consumption / utiltiy        
         RA[r] / PC[r]
 );
-
 
 @mapping(cge,market_pfx,
 # balance of payments (exogenous)
