@@ -41,7 +41,7 @@ end
 ############
 
 #if SLiDE data needs to be built
-#(d, set) = build_data(overwrite=true)
+#(d, set) = build_data("cal_zero")
 
 bmkyr=2016
 
@@ -74,11 +74,11 @@ y_check = Dict()
 #Could use greater than zero to filter instead of haskey (more general)
 #- would require _set or _check type dicts or loading in without dropzero
 sub_set_y = filter(x -> y_check[x] != 0.0, combvec(regions, sectors));
-sub_set_x = filter(x -> haskey(s0, x), combvec(regions, goods));
+sub_set_x = filter(x -> haskey(sld[:s0], x), combvec(regions, goods));
 sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods));
-sub_set_pa = filter(x -> haskey(a0, (x[1], x[2])), combvec(regions, goods));
-sub_set_pd = filter(x -> haskey(xd0, (x[1], x[2])), combvec(regions, goods));
-sub_set_pk = filter(x -> haskey(kd0, (x[1], x[2])), combvec(regions, sectors));
+sub_set_pa = filter(x -> haskey(sld[:a0], (x[1], x[2])), combvec(regions, goods));
+sub_set_pd = filter(x -> haskey(sld[:xd0], (x[1], x[2])), combvec(regions, goods));
+sub_set_pk = filter(x -> haskey(sld[:kd0], (x[1], x[2])), combvec(regions, sectors));
 sub_set_py = filter(x -> y_check[x[1], x[2]] > 0, combvec(regions, goods));
 
 
@@ -137,6 +137,19 @@ replace_nan_inf(alpha_n)
 replace_nan_inf(theta_n)
 replace_nan_inf(theta_m)
 
+#Substitution and transformation elasticities
+@NLparameter(cge, es_va[r in regions, s in sectors] == 1); # value-added nest - substitution elasticity
+@NLparameter(cge, es_y[r in regions, s in sectors] == 0); # Top-level Y nest (VA,M) - substitution elasticity
+@NLparameter(cge, es_m[r in regions, s in sectors] == 0); # Materials nest - substitution elasticity
+@NLparameter(cge, et_x[r in regions, g in goods] == 4); # Disposition, distribute regional supply to local, national, export - transformation elasticity
+@NLparameter(cge, es_a[r in regions, g in goods] == 0); # Top-level A nest for aggregate demand (Margins, goods) - substitution elasticity
+@NLparameter(cge, es_mar[r in regions, g in goods] == 0); # Margin supply - substitution elasticity
+####
+#es_d and es_f are swapped in windc code, versus nesting diagrams (using nesting diagram version here)
+@NLparameter(cge, es_d[r in regions, g in goods] == 2); # Domestic demand aggregation nest (intranational) - substitution elasticity
+@NLparameter(cge, es_f[r in regions, g in goods] == 4); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
+####
+
 
 ################
 # VARIABLES
@@ -167,6 +180,10 @@ sv = 0.001
 @variable(cge,RA[r in regions]>=sv,start = value(c0[r])) ;
 
 
+
+
+
+
 ###############################
 # -- PLACEHOLDER VARIABLES --
 ###############################
@@ -187,38 +204,38 @@ sv = 0.001
 # region's supply to national market times the national market price
 # regional supply to local market times domestic price
 @NLexpression(cge,RX[r in regions,g in goods],
-  (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0)^5)^(1/5) );
+  (alpha_x[r,g]*PFX^(1 + et_x[r,g])+alpha_n[r,g]*PN[g]^(1 + et_x[r,g])+alpha_d[r,g]*(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0)^(1 + et_x[r,g]))^(1/(1 + et_x[r,g])) );
 
 #demand for exports via demand function
-@NLexpression(cge,AX[r in regions,g in goods], (x0[r,g] - rx0[r,g])*(PFX/RX[r,g])^4 );
+@NLexpression(cge,AX[r in regions,g in goods], (x0[r,g] - rx0[r,g])*(PFX/RX[r,g])^et_x[r,g] );
 
 #demand for contribution to national market 
-@NLexpression(cge,AN[r in regions,g in goods], xn0[r,g]*(PN[g]/(RX[r,g]))^4 );
+@NLexpression(cge,AN[r in regions,g in goods], xn0[r,g]*(PN[g]/(RX[r,g]))^et_x[r,g] );
 
 #demand for regionals supply to local market
 @NLexpression(cge,AD[r in regions,g in goods],
-  xd0[r,g] * ((haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) / (RX[r,g]))^4 );
+  xd0[r,g] * ((haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) / (RX[r,g]))^et_x[r,g] );
 
 # CES function for tradeoff between national and domestic market
 @NLexpression(cge,CDN[r in regions,g in goods],
-  (theta_n[r,g]*PN[g]^(1-2)+(1-theta_n[r,g])*(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0)^(1-2))^(1/(1-2)) );
+  (theta_n[r,g]*PN[g]^(1-es_d[r,g])+(1-theta_n[r,g])*(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0)^(1-es_d[r,g]))^(1/(1-es_d[r,g])) );
 
 # CES function for tradeoff between domestic consumption and foreign exports
 # recall tm in the import tariff thus tm / tm0 is the relative change in import tariff rates
 @NLexpression(cge,CDM[r in regions,g in goods],
-  ((1-theta_m[r,g])*CDN[r,g]^(1-4)+theta_m[r,g]*(PFX*(1+tm[r,g])/(1+tm0[r,g]))^(1-4))^(1/(1-4)) );
+  ((1-theta_m[r,g])*CDN[r,g]^(1-es_f[r,g])+theta_m[r,g]*(PFX*(1+tm[r,g])/(1+tm0[r,g]))^(1-es_f[r,g]))^(1/(1-es_f[r,g])) );
 
 # regions demand from the national market <- note nesting of CDN in CDM
 @NLexpression(cge,DN[r in regions,g in goods],
-  nd0[r,g]*(CDN[r,g]/PN[g])^2*(CDM[r,g]/CDN[r,g])^4 );
+  nd0[r,g]*(CDN[r,g]/PN[g])^es_d[r,g]*(CDM[r,g]/CDN[r,g])^es_f[r,g] );
 
 # region demand from local market <- note nesting of CDN in CDM
 @NLexpression(cge,DD[r in regions,g in goods],
-  dd0[r,g]*(CDN[r,g]/(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0))^2*(CDM[r,g]/CDN[r,g])^4 );
+  dd0[r,g]*(CDN[r,g]/(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0))^es_d[r,g]*(CDM[r,g]/CDN[r,g])^es_f[r,g] );
 
 # import demand
 @NLexpression(cge,MD[r in regions,g in goods],
-  m0[r,g]*(CDM[r,g]*(1+tm[r,g])/(PFX*(1+tm0[r,g])))^4 );
+  m0[r,g]*(CDM[r,g]*(1+tm[r,g])/(PFX*(1+tm0[r,g])))^es_f[r,g] );
 
 # final demand
 @NLexpression(cge,CD[r in regions,g in goods],
@@ -401,7 +418,7 @@ sv = 0.001
 # provision of household supply          
         + sum( (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * yh0[r,g] for g in goods)
 # revenue or costs of foreign exchange including household adjustment   
-        + PFX * (bopdef0[r] + hhadj_p[r])
+        + PFX * (bopdef0[r] + hhadj[r])
 # government and investment provision        
         - sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * (g0[r,g] + i0[r,g]) for g in goods)
 # import taxes - assumes lumpsum recycling
