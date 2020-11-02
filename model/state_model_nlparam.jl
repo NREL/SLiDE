@@ -154,7 +154,7 @@ replace_nan_inf(theta_m)
 # VARIABLES
 ################
 
-# Filters for putting equations and variables under control
+# Set lower bound
 sv = 0.001
 
 #sectors
