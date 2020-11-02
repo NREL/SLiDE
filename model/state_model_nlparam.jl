@@ -16,7 +16,7 @@ using DataFrames
 # -- FUNCTIONS --
 #################
 
-#Convert create all combinations of different sets (regions, sectors, etc) as tuples
+#Convert/create all combinations of different sets (regions, sectors, etc) as tuples
 #Then reshape array of tuples as a one dimensional column vector
 #Used in parameter definition
 function combvec(set_a...)
@@ -44,6 +44,7 @@ end
 #can pass a name (d, set) = build_data("name_of_build_directory")
 (d, set) = build_data("state_model")
 
+#set benchmark year
 bmkyr=2016
 
 #sld is the slide dictionary of benchmark values filtered for benchmark year
