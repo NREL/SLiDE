@@ -71,15 +71,16 @@ a_set = Dict()
 y_check = Dict()
 [y_check[r,s] = sum(get(sld[:ys0], (r,s,g), 0.0) for g in goods) for r in regions for s in sectors]
 
-#Could use greater than zero to filter instead of haskey (more general)
-#- would require _set or _check type dicts or loading in without dropzero
+
+#subsets for model equation controls
 sub_set_y = filter(x -> y_check[x] != 0.0, combvec(regions, sectors));
-sub_set_x = filter(x -> haskey(sld[:s0], x), combvec(regions, goods));
 sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods));
-sub_set_pa = filter(x -> haskey(sld[:a0], (x[1], x[2])), combvec(regions, goods));
-sub_set_pd = filter(x -> haskey(sld[:xd0], (x[1], x[2])), combvec(regions, goods));
-sub_set_pk = filter(x -> haskey(sld[:kd0], (x[1], x[2])), combvec(regions, sectors));
-sub_set_py = filter(x -> y_check[x[1], x[2]] > 0, combvec(regions, goods));
+sub_set_x = filter(x -> get(sld[:s0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
+sub_set_pa = filter(x -> get(sld[:a0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
+sub_set_pd = filter(x -> get(sld[:xd0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
+sub_set_pk = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
+sub_set_py = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
+sub_set_py = filter(x -> y_check[x[1], x[2]] != 0, combvec(regions, goods));
 
 
 ########## Model ##########
