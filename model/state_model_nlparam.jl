@@ -146,6 +146,7 @@ replace_nan_inf(theta_m)
 @NLparameter(cge, es_mar[r in regions, g in goods] == 0); # Margin supply - substitution elasticity
 ####
 #es_d and es_f are swapped in windc code, versus nesting diagrams (using nesting diagram version here)
+#only in mpsge version though, not algebraic version - using algebraic version
 @NLparameter(cge, es_d[r in regions, g in goods] == 2); # Domestic demand aggregation nest (intranational) - substitution elasticity
 @NLparameter(cge, es_f[r in regions, g in goods] == 4); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
 ####
