@@ -15,3 +15,15 @@ DEFAULT_UPPER_BOUND = 5
 const DEFAULT_TOL = 1e-6
 const DEFAULT_SMALL = missing
 const DEFAULT_ROUND_DIGITS = 10
+
+# STATE MODEL
+const SUB_ELAST = Dict()
+SUB_ELAST[:va] = 1
+SUB_ELAST[:y] = 0
+SUB_ELAST[:m] = 0
+SUB_ELAST[:a] = 0
+SUB_ELAST[:mar] = 0
+SUB_ELAST[:d] = 2
+SUB_ELAST[:f] = 4
+
+const TRANS_ELAST = Dict(:x => 4)
