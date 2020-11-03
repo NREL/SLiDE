@@ -56,7 +56,7 @@ function calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = DEFAULT_PENAL
     # Prepare the data and initialize the model.
     (cal, idx) = _calibration_input(year, io, set);
     calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time" => 60.0))
-
+    
     @variable(calib, ys0_est[j in set[:j], i in set[:i]]   >= 0, start = 0);
     @variable(calib, fs0_est[i in set[:i]]                 >= 0, start = 0);
     @variable(calib, ms0_est[i in set[:i], m in set[:m]]   >= 0, start = 0);
