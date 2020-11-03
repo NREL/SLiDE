@@ -260,6 +260,25 @@ permute(x::Vararg{Any}) = vec(collect(Iterators.product(x...)))
 
 
 """
+    add_permutation!(set, x)
+
+This adds a permutation of existing set keys to the input dictionary.
+
+# Arguments
+- `set::Dict` dictionary to update with permutations
+- `x::Tuple{Symbol,1}`: set keys to permute
+"""
+function add_permutation!(set::Dict, x::Tuple)
+    missing_keys = setdiff(ensurearray(x), keys(set))
+    if !isempty(missing_keys)
+        @error("Cannot create a composite $x. Key(s) $missing_keys missing from set")
+    end
+    set[x] = permute([[set[k] for k in x]...,])
+    return set[x]
+end
+
+
+"""
 # Returns
 - `val::Array{Symbol,1}` of input DataFrame propertynames indicating values, which are
     defined as columns that DO contain `AbstractFloat` or `Bool` DataTypes.

@@ -83,6 +83,7 @@ export find_oftype
 # export isarray
 # export istype
 export permute
+export add_permutation!
 export findindex
 export findvalue
 export indexjoin
