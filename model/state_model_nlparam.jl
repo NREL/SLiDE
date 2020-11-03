@@ -79,8 +79,8 @@ y_check = Dict()
 #subsets for model equation controls
 sub_set_y = filter(x -> y_check[x] != 0.0, permute(regions, sectors));
 sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, permute(regions, goods));
-sub_set_x = filter(x -> get(sld[:s0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
-sub_set_pa = filter(x -> get(sld[:a0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
+sub_set_x = filter(x -> get(sld[:s0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));      # empty
+sub_set_pa = filter(x -> get(sld[:a0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));     # same as sub_set_a
 sub_set_pd = filter(x -> get(sld[:xd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
 sub_set_pk = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
 sub_set_py = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
@@ -95,8 +95,8 @@ cge = MCPModel();
 # PARAMETERS
 ##############
 
-add_permutation!(set, (:r,:s,:g))
-@NLparameter(cge, ys0[(r,s,g) in set[:r,:s,:g]] == get(sld[:ys0], (r, s, g), 0.0));
+# add_permutation!(set, (:r,:s,:g))
+# @NLparameter(cge, ys0[(r,s,g) in set[:r,:s,:g]] == get(sld[:ys0], (r, s, g), 0.0));
 
 #benchmark values
 @NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == get(sld[:ys0], (r, s, g), 0.0));
@@ -222,7 +222,7 @@ sv = 0.001
 
 # CES function for tradeoff between domestic consumption and foreign exports
 # recall tm in the import tariff thus tm / tm0 is the relative change in import tariff rates
-@NLexpression(cge,CDM[r in regions,g in goods],
+@NLexpression(cge,CDM[r in regions, g in goods],
   ((1-theta_m[r,g])*CDN[r,g]^(1-es_f[r,g])+theta_m[r,g]*(PFX*(1+tm[r,g])/(1+tm0[r,g]))^(1-es_f[r,g]))^(1/(1-es_f[r,g])) );
 
 # regions demand from the national market <- note nesting of CDN in CDM
@@ -458,7 +458,7 @@ PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cum
 
 # export the path license string to the environment
 # this is now done in the SLiDE initiation steps 
-ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
+# ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
 
 # solve the model
 status = solveMCP(cge)
