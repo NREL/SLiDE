@@ -49,6 +49,8 @@ bmkyr=2016
 
 #sld is the slide dictionary of benchmark values filtered for benchmark year
 sld = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true))) for k in keys(d))
+# zld = Dict(k => convert_type(Dict, fill_zero(set,
+#     filter_with(df, (yr = bmkyr,); drop = true))) for (k,df) in d)
 
 ###############
 # -- SETS --
@@ -75,14 +77,14 @@ y_check = Dict()
 
 
 #subsets for model equation controls
-sub_set_y = filter(x -> y_check[x] != 0.0, combvec(regions, sectors));
-sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods));
-sub_set_x = filter(x -> get(sld[:s0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
-sub_set_pa = filter(x -> get(sld[:a0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
-sub_set_pd = filter(x -> get(sld[:xd0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
-sub_set_pk = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
-sub_set_py = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
-sub_set_py = filter(x -> y_check[x[1], x[2]] != 0, combvec(regions, goods));
+sub_set_y = filter(x -> y_check[x] != 0.0, permute(regions, sectors));
+sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, permute(regions, goods));
+sub_set_x = filter(x -> get(sld[:s0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
+sub_set_pa = filter(x -> get(sld[:a0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
+sub_set_pd = filter(x -> get(sld[:xd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
+sub_set_pk = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
+sub_set_py = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
+sub_set_py = filter(x -> y_check[x[1], x[2]] != 0, permute(regions, goods));
 
 
 ########## Model ##########
@@ -92,6 +94,9 @@ cge = MCPModel();
 ##############
 # PARAMETERS
 ##############
+
+add_permutation!(set, (:r,:s,:g))
+@NLparameter(cge, ys0[(r,s,g) in set[:r,:s,:g]] == get(sld[:ys0], (r, s, g), 0.0));
 
 #benchmark values
 @NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == get(sld[:ys0], (r, s, g), 0.0));
@@ -140,14 +145,14 @@ replace_nan_inf(theta_n)
 replace_nan_inf(theta_m)
 
 #Substitution and transformation elasticities
-@NLparameter(cge, es_va[r in regions, s in sectors] == 1); # value-added nest - substitution elasticity
-@NLparameter(cge, es_y[r in regions, s in sectors] == 0); # Top-level Y nest (VA,M) - substitution elasticity
-@NLparameter(cge, es_m[r in regions, s in sectors] == 0); # Materials nest - substitution elasticity
-@NLparameter(cge, et_x[r in regions, g in goods] == 4); # Disposition, distribute regional supply to local, national, export - transformation elasticity
-@NLparameter(cge, es_a[r in regions, g in goods] == 0); # Top-level A nest for aggregate demand (Margins, goods) - substitution elasticity
-@NLparameter(cge, es_mar[r in regions, g in goods] == 0); # Margin supply - substitution elasticity
-@NLparameter(cge, es_d[r in regions, g in goods] == 2); # Domestic demand aggregation nest (intranational) - substitution elasticity
-@NLparameter(cge, es_f[r in regions, g in goods] == 4); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
+@NLparameter(cge, es_va[r in regions, s in sectors] == SUB_ELAST[:va]); # value-added nest - substitution elasticity
+@NLparameter(cge, es_y[r in regions, s in sectors]  == SUB_ELAST[:y]); # Top-level Y nest (VA,M) - substitution elasticity
+@NLparameter(cge, es_m[r in regions, s in sectors]  == SUB_ELAST[:m]); # Materials nest - substitution elasticity
+@NLparameter(cge, et_x[r in regions, g in goods]    == TRANS_ELAST[:x]); # Disposition, distribute regional supply to local, national, export - transformation elasticity
+@NLparameter(cge, es_a[r in regions, g in goods]    == SUB_ELAST[:a]); # Top-level A nest for aggregate demand (Margins, goods) - substitution elasticity
+@NLparameter(cge, es_mar[r in regions, g in goods]  == SUB_ELAST[:mar]); # Margin supply - substitution elasticity
+@NLparameter(cge, es_d[r in regions, g in goods]    == SUB_ELAST[:d]); # Domestic demand aggregation nest (intranational) - substitution elasticity
+@NLparameter(cge, es_f[r in regions, g in goods]    == SUB_ELAST[:f]); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
 
 
 ################
