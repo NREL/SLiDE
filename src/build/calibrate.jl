@@ -19,44 +19,42 @@ function calibrate(
     dataset::String,
     d::Dict,
     set::Dict;
-    save_build::Bool = DEFAULT_SAVE_BUILD,
-    overwrite::Bool = DEFAULT_OVERWRITE,
-    penalty_nokey = DEFAULT_PENALTY_NOKEY
+    save_build::Bool = SLiDE.DEFAULT_SAVE_BUILD,
+    overwrite::Bool = SLiDE.DEFAULT_OVERWRITE,
+    penalty_nokey = SLiDE.DEFAULT_PENALTY_NOKEY
     )
     CURR_STEP = "calibrate"
-
+    @info("changes made!")
+    
     # If there is already calibration data, read it and return.
-    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
+    d_read = SLiDE.read_build(dataset, CURR_STEP; overwrite = overwrite)
     !(isempty(d_read)) && (return d_read)
     
     # Copy the relevant input DataFrames before making any changes.
-    set[:cal] = Symbol.(read_file([SLIDE_DIR,"src","build","parameters"],
-        SetInput("list_calibrate.csv", :cal)))
+    SLiDE._calibration_set!(set)
     d = Dict(k => copy(d[k]) for k in set[:cal])
     
     # Initialize a DataFrame to contain results and do the calibration iteratively.
     cal = Dict(k => DataFrame() for k in set[:cal])
 
     for year in set[:yr]
-        cal_yr = calibrate(year, d, set; penalty_nokey = penalty_nokey)
+        cal_yr = SLiDE.calibrate(year, d, set; penalty_nokey = penalty_nokey)
         [cal[k] = [cal[k]; cal_yr[k]] for k in set[:cal]]
     end
 
-    write_build!(dataset, CURR_STEP, cal; save_build = save_build)
+    SLiDE.write_build!(dataset, CURR_STEP, cal; save_build = save_build)
     return cal
 end
 
 
-function calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = DEFAULT_PENALTY_NOKEY)
+function SLiDE.calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = SLiDE.DEFAULT_PENALTY_NOKEY)
     @info("Calibrating $year data")
 
-    set[:i] = set[:g]   # (!!!!) should just replace in usage.
-    set[:j] = set[:s]
-
     # Prepare the data and initialize the model.
-    (cal, idx) = _calibration_input(year, io, set);
+    SLiDE._calibration_set!(set)
+    (cal, idx) = SLiDE._calibration_input(year, io, set);
     calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time" => 60.0))
-    
+
     @variable(calib, ys0_est[j in set[:j], i in set[:i]]   >= 0, start = 0);
     @variable(calib, fs0_est[i in set[:i]]                 >= 0, start = 0);
     @variable(calib, ms0_est[i in set[:i], m in set[:m]]   >= 0, start = 0);
@@ -71,101 +69,106 @@ function calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = DEFAULT_PENAL
 
     # --- DEFINE CONSTRAINTS ---------------------------------------------------------------
     @constraint(calib,mkt_py[i in set[:i]],
-        sum(ys0_est[j,i] for j in set[:j]) + fs0_est[i] == sum(ms0_est[i,m] for m in set[:m]) + y0_est[i]
+        sum(ys0_est[j,i] for j in set[:j]) + fs0_est[i] ==
+        sum(ms0_est[i,m] for m in set[:m]) + y0_est[i]
     );
 
     @constraint(calib,mkt_pa[i in set[:i]],
-        a0_est[i] == sum(id0_est[i,j] for j in set[:j]) + sum(fd0_est[i,fd] for fd in set[:fd])
+        a0_est[i] ==
+        sum(id0_est[i,j] for j in set[:j]) + sum(fd0_est[i,fd] for fd in set[:fd])
     );
 
     @constraint(calib,mkt_pm[m in set[:m]],
-        sum(ms0_est[i,m] for i in set[:i]) == sum(md0_est[m,i] for i in set[:i])
+        sum(ms0_est[i,m] for i in set[:i]) ==
+        sum(md0_est[m,i] for i in set[:i])
     );
 
     @constraint(calib,prf_y[j in set[:j]],
-        sum(ys0_est[j,i] for i in set[:i]) == sum(id0_est[i,j] for i in set[:i]) + sum(va0_est[va,j] for va in set[:va])
+        sum(ys0_est[j,i] for i in set[:i]) ==
+        sum(id0_est[i,j] for i in set[:i]) + sum(va0_est[va,j] for va in set[:va])
     );
 
     @constraint(calib,prf_a[i in set[:i]],
-        a0_est[i] * (1 - cal[:ta0][i]) + x0_est[i] == y0_est[i] + m0_est[i] * (1 + cal[:tm0][i]) + sum(md0_est[m,i] for m in set[:m])
+        a0_est[i] * (1 - cal[:ta0][i]) + x0_est[i] ==
+        y0_est[i] + m0_est[i] * (1 + cal[:tm0][i]) + sum(md0_est[m,i] for m in set[:m])
     );
 
     # --- DEFINE OBJECTIVE -----------------------------------------------------------------
     @objective(calib,Min,
-        + sum(abs(cal[:ys0][j,i]) * (ys0_est[j,i] / cal[:ys0][j,i]   - 1)^2 for i in set[:i] for j in set[:j]   if cal[:ys0][j,i] != 0)
-        + sum(abs(cal[:id0][i,j]) * (id0_est[i,j] / cal[:id0][i,j]   - 1)^2 for i in set[:i] for j in set[:j]   if cal[:id0][i,j] != 0) 
-        + sum(abs(cal[:fs0][i])   * (fs0_est[i]/ cal[:fs0][i]        - 1)^2 for i in set[:i]                    if cal[:fs0][i] != 0) 
-        + sum(abs(cal[:ms0][i,m]) * (ms0_est[i,m]/ cal[:ms0][i,m]    - 1)^2 for i in set[:i] for m in set[:m]   if cal[:ms0][i,m] != 0) 
-        + sum(abs(cal[:y0][i])    * (y0_est[i]/ cal[:y0][i]          - 1)^2 for i in set[:i]                    if cal[:y0][i] != 0)
-        + sum(abs(cal[:fd0][i,fd])* (fd0_est[i,fd] / cal[:fd0][i,fd] - 1)^2 for i in set[:i] for fd in set[:fd] if cal[:fd0][i,fd] != 0)
-        + sum(abs(cal[:va0][va,j])* (va0_est[va,j] / cal[:va0][va,j] - 1)^2 for va in set[:va] for j in set[:j] if cal[:va0][va,j] != 0)
-        + sum(abs(cal[:a0][i])    * (a0_est[i] / cal[:a0][i]         - 1)^2 for i in set[:i]                    if cal[:a0][i] != 0)
-        + sum(abs(cal[:x0][i])    * (x0_est[i] / cal[:x0][i]         - 1)^2 for i in set[:i]                    if cal[:x0][i] != 0)
-        + sum(abs(cal[:m0][i])    * (m0_est[i] / cal[:m0][i]         - 1)^2 for i in set[:i]                    if cal[:m0][i] != 0)
-        + sum(abs(cal[:md0][m,i]) * (md0_est[m,i] / cal[:md0][m,i]   - 1)^2 for m in set[:m] for i in set[:i]   if cal[:md0][m,i] != 0)
+        + sum(abs(cal[:ys0][j,i]) * (ys0_est[j,i] / cal[:ys0][j,i]   - 1)^2 for (j,i)  in set[:j,:i]  if cal[:ys0][j,i]  != 0)
+        + sum(abs(cal[:id0][i,j]) * (id0_est[i,j] / cal[:id0][i,j]   - 1)^2 for (i,j)  in set[:i,:j]  if cal[:id0][i,j]  != 0)
+        + sum(abs(cal[:fs0][i])   * (fs0_est[i]/ cal[:fs0][i]        - 1)^2 for  i     in set[:i]     if cal[:fs0][i]    != 0)
+        + sum(abs(cal[:ms0][i,m]) * (ms0_est[i,m]/ cal[:ms0][i,m]    - 1)^2 for (i,m)  in set[:i,:m]  if cal[:ms0][i,m]  != 0)
+        + sum(abs(cal[:y0][i])    * (y0_est[i]/ cal[:y0][i]          - 1)^2 for  i     in set[:i]     if cal[:y0][i]     != 0)
+        + sum(abs(cal[:fd0][i,fd])* (fd0_est[i,fd] / cal[:fd0][i,fd] - 1)^2 for (i,fd) in set[:i,:fd] if cal[:fd0][i,fd] != 0)
+        + sum(abs(cal[:va0][va,j])* (va0_est[va,j] / cal[:va0][va,j] - 1)^2 for (va,j) in set[:va,:j] if cal[:va0][va,j] != 0)
+        + sum(abs(cal[:a0][i])    * (a0_est[i] / cal[:a0][i]         - 1)^2 for  i     in set[:i]     if cal[:a0][i]     != 0)
+        + sum(abs(cal[:x0][i])    * (x0_est[i] / cal[:x0][i]         - 1)^2 for  i     in set[:i]     if cal[:x0][i]     != 0)
+        + sum(abs(cal[:m0][i])    * (m0_est[i] / cal[:m0][i]         - 1)^2 for  i     in set[:i]     if cal[:m0][i]     != 0)
+        + sum(abs(cal[:md0][m,i]) * (md0_est[m,i] / cal[:md0][m,i]   - 1)^2 for (m,i)  in set[:m,:i]  if cal[:md0][m,i]  != 0)
 
     + penalty_nokey * (
-        + sum(ys0_est[j,i]  for i in set[:i] for j in set[:j]   if cal[:ys0][j,i] == 0)
-        + sum(id0_est[i,j]  for i in set[:i] for j in set[:j]   if cal[:id0][i,j] == 0) 
-        + sum(fs0_est[i]    for i in set[:i]                    if cal[:fs0][i] == 0) 
-        + sum(ms0_est[i,m]  for i in set[:i] for m in set[:m]   if cal[:ms0][i,m] == 0) 
-        + sum(y0_est[i]     for i in set[:i]                    if cal[:y0][i] == 0)
-        + sum(fd0_est[i,fd] for i in set[:i] for fd in set[:fd] if cal[:fd0][i,fd] == 0)
-        + sum(va0_est[va,j] for va in set[:va] for j in set[:j] if cal[:va0][va,j] == 0)
-        + sum(a0_est[i]     for i in set[:i]                    if cal[:a0][i] == 0)
-        + sum(x0_est[i]     for i in set[:i]                    if cal[:x0][i] == 0)
-        + sum(m0_est[i]     for i in set[:i]                    if cal[:m0][i] == 0)
-        + sum(md0_est[m,i]  for m in set[:m] for i in set[:i]   if cal[:md0][m,i] == 0)
+        + sum(ys0_est[j,i]  for (j,i)  in set[:j,:i]  if cal[:ys0][j,i]  == 0)
+        + sum(id0_est[i,j]  for (i,j)  in set[:i,:j]  if cal[:id0][i,j]  == 0)
+        + sum(fs0_est[i]    for  i     in set[:i]     if cal[:fs0][i]    == 0)
+        + sum(ms0_est[i,m]  for (i,m)  in set[:i,:m]  if cal[:ms0][i,m]  == 0)
+        + sum(y0_est[i]     for  i     in set[:i]     if cal[:y0][i]     == 0)
+        + sum(fd0_est[i,fd] for (i,fd) in set[:i,:fd] if cal[:fd0][i,fd] == 0)
+        + sum(va0_est[va,j] for (va,j) in set[:va,:j] if cal[:va0][va,j] == 0)
+        + sum(a0_est[i]     for  i     in set[:i]     if cal[:a0][i]     == 0)
+        + sum(x0_est[i]     for  i     in set[:i]     if cal[:x0][i]     == 0)
+        + sum(m0_est[i]     for  i     in set[:i]     if cal[:m0][i]     == 0)
+        + sum(md0_est[m,i]  for (m,i)  in set[:m,:i]  if cal[:md0][m,i]  == 0)
         )
     );
 
     # --- SET START VALUE ------------------------------------------------------------------
-    [set_start_value(ys0_est[j,i], cal[:ys0][j,i])  for i in set[:i] for j in set[:j]   ];
-    [set_start_value(id0_est[i,j], cal[:id0][i,j])  for i in set[:i] for j in set[:j]   ];
-    [set_start_value(fs0_est[i],   cal[:fs0][i])    for i in set[:i]                    ];
-    [set_start_value(ms0_est[i,m], cal[:ms0][i,m])  for i in set[:i] for m in set[:m]   ];
-    [set_start_value(y0_est[i],    cal[:y0][i])     for i in set[:i]                    ];
-    [set_start_value(fd0_est[i,fd],cal[:fd0][i,fd]) for i in set[:i] for fd in set[:fd] ];
-    [set_start_value(va0_est[va,j],cal[:va0][va,j]) for va in set[:va] for j in set[:j] ];
-    [set_start_value(a0_est[i],    cal[:a0][i])     for i in set[:i]                    ];
-    [set_start_value(x0_est[i],    cal[:x0][i])     for i in set[:i]                    ];
-    [set_start_value(m0_est[i],    cal[:m0][i])     for i in set[:i]                    ];
-    [set_start_value(md0_est[m,i], cal[:md0][m,i])  for m in set[:m] for i in set[:i]   ];
+    [set_start_value(ys0_est[j,i], cal[:ys0][j,i])  for (j,i)  in set[:j,:i]  ]
+    [set_start_value(id0_est[i,j], cal[:id0][i,j])  for (i,j)  in set[:i,:j]  ]
+    [set_start_value(fs0_est[i],   cal[:fs0][i])    for  i     in set[:i]     ]
+    [set_start_value(ms0_est[i,m], cal[:ms0][i,m])  for (i,m)  in set[:i,:m]  ]
+    [set_start_value(y0_est[i],    cal[:y0][i])     for  i     in set[:i]     ]
+    [set_start_value(fd0_est[i,fd],cal[:fd0][i,fd]) for (i,fd) in set[:i,:fd] ]
+    [set_start_value(va0_est[va,j],cal[:va0][va,j]) for (va,j) in set[:va,:j] ]
+    [set_start_value(a0_est[i],    cal[:a0][i])     for  i     in set[:i]     ]
+    [set_start_value(x0_est[i],    cal[:x0][i])     for  i     in set[:i]     ]
+    [set_start_value(m0_est[i],    cal[:m0][i])     for  i     in set[:i]     ]
+    [set_start_value(md0_est[m,i], cal[:md0][m,i])  for (m,i)  in set[:m,:i]  ]
 
     # --- SET BOUNDS -----------------------------------------------------------------------
     # multipliers for lower and upper bound relative
     # to each respective variables reference parameter
-    lb = DEFAULT_CALIBRATE_LOWER_BOUND
-    ub = DEFAULT_CALIBRATE_UPPER_BOUND
+    lb = SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND
+    ub = SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND
 
-    [set_lower_bound(ys0_est[j,i], max(0, lb * cal[:ys0][j,i]))  for i in set[:i] for j in set[:j]   ];
-    [set_lower_bound(id0_est[i,j], max(0, lb * cal[:id0][i,j]))  for i in set[:i] for j in set[:j]   ];
-    [set_lower_bound(fs0_est[i],   max(0, lb * cal[:fs0][i]))    for i in set[:i]                    ];
-    [set_lower_bound(ms0_est[i,m], max(0, lb * cal[:ms0][i,m]))  for i in set[:i] for m in set[:m]   ];
-    [set_lower_bound(y0_est[i],    max(0, lb * cal[:y0][i]))     for i in set[:i]                    ];
-    [set_lower_bound(fd0_est[i,fd],max(0, lb * cal[:fd0][i,fd])) for i in set[:i] for fd in set[:fd] ];
-    [set_lower_bound(va0_est[va,j],max(0, lb * cal[:va0][va,j])) for va in set[:va] for j in set[:j] ];
-    [set_lower_bound(a0_est[i],    max(0, lb * cal[:a0][i]))     for i in set[:i]                    ];
-    [set_lower_bound(x0_est[i],    max(0, lb * cal[:x0][i]))     for i in set[:i]                    ];
-    [set_lower_bound(m0_est[i],    max(0, lb * cal[:m0][i]))     for i in set[:i]                    ];
-    [set_lower_bound(md0_est[m,i], max(0, lb * cal[:md0][m,i]))  for m in set[:m] for i in set[:i]   ];
+    [set_lower_bound(ys0_est[j,i], max(0, lb * cal[:ys0][j,i]))  for (j,i)  in set[:j,:i]  ]
+    [set_lower_bound(id0_est[i,j], max(0, lb * cal[:id0][i,j]))  for (i,j)  in set[:i,:j]  ]
+    [set_lower_bound(fs0_est[i],   max(0, lb * cal[:fs0][i]))    for  i     in set[:i]     ]
+    [set_lower_bound(ms0_est[i,m], max(0, lb * cal[:ms0][i,m]))  for (i,m)  in set[:i,:m]  ]
+    [set_lower_bound(y0_est[i],    max(0, lb * cal[:y0][i]))     for  i     in set[:i]     ]
+    [set_lower_bound(fd0_est[i,fd],max(0, lb * cal[:fd0][i,fd])) for (i,fd) in set[:i,:fd] ]
+    [set_lower_bound(va0_est[va,j],max(0, lb * cal[:va0][va,j])) for (va,j) in set[:va,:j] ]
+    [set_lower_bound(a0_est[i],    max(0, lb * cal[:a0][i]))     for  i     in set[:i]     ]
+    [set_lower_bound(x0_est[i],    max(0, lb * cal[:x0][i]))     for  i     in set[:i]     ]
+    [set_lower_bound(m0_est[i],    max(0, lb * cal[:m0][i]))     for  i     in set[:i]     ]
+    [set_lower_bound(md0_est[m,i], max(0, lb * cal[:md0][m,i]))  for (m,i)  in set[:m,:i]  ]
 
-    [set_upper_bound(ys0_est[j,i], abs(ub * cal[:ys0][j,i]))  for i in set[:i] for j in set[:j]   ];
-    [set_upper_bound(id0_est[i,j], abs(ub * cal[:id0][i,j]))  for i in set[:i] for j in set[:j]   ];
-    [set_upper_bound(fs0_est[i],   abs(ub * cal[:fs0][i]))    for i in set[:i]                    ];
-    [set_upper_bound(ms0_est[i,m], abs(ub * cal[:ms0][i,m]))  for i in set[:i] for m in set[:m]   ];
-    [set_upper_bound(y0_est[i],    abs(ub * cal[:y0][i]))     for i in set[:i]                    ];
-    [set_upper_bound(fd0_est[i,fd],abs(ub * cal[:fd0][i,fd])) for i in set[:i] for fd in set[:fd] ];
-    [set_upper_bound(va0_est[va,j],abs(ub * cal[:va0][va,j])) for va in set[:va] for j in set[:j] ];
-    [set_upper_bound(a0_est[i],    abs(ub * cal[:a0][i]))     for i in set[:i]                    ];
-    [set_upper_bound(x0_est[i],    abs(ub * cal[:x0][i]))     for i in set[:i]                    ];
-    [set_upper_bound(m0_est[i],    abs(ub * cal[:m0][i]))     for i in set[:i]                    ];
-    [set_upper_bound(md0_est[m,i], abs(ub * cal[:md0][m,i]))  for m in set[:m] for i in set[:i]   ];
+    [set_upper_bound(ys0_est[j,i], abs(ub * cal[:ys0][j,i]))  for (i,j)  in set[:i,:j]  ]
+    [set_upper_bound(id0_est[i,j], abs(ub * cal[:id0][i,j]))  for (i,j)  in set[:i,:j]  ]
+    [set_upper_bound(fs0_est[i],   abs(ub * cal[:fs0][i]))    for  i     in set[:i]     ]
+    [set_upper_bound(ms0_est[i,m], abs(ub * cal[:ms0][i,m]))  for (i,m)  in set[:i,:m]  ]
+    [set_upper_bound(y0_est[i],    abs(ub * cal[:y0][i]))     for  i     in set[:i]     ]
+    [set_upper_bound(fd0_est[i,fd],abs(ub * cal[:fd0][i,fd])) for (i,fd) in set[:i,:fd] ]
+    [set_upper_bound(va0_est[va,j],abs(ub * cal[:va0][va,j])) for (va,j) in set[:va,:j] ]
+    [set_upper_bound(a0_est[i],    abs(ub * cal[:a0][i]))     for  i     in set[:i]     ]
+    [set_upper_bound(x0_est[i],    abs(ub * cal[:x0][i]))     for  i     in set[:i]     ]
+    [set_upper_bound(m0_est[i],    abs(ub * cal[:m0][i]))     for  i     in set[:i]     ]
+    [set_upper_bound(md0_est[m,i], abs(ub * cal[:md0][m,i]))  for (m,i)  in set[:m,:i]  ]
 
     # Fix "certain parameters" to their original values: fs0, va0, m0.
-    [fix(fs0_est[i],    cal[:fs0][i],    force=true) for i in set[:i]                    ];
-    [fix(va0_est[va,j], cal[:va0][va,j], force=true) for va in set[:va] for j in set[:j] ];
-    [fix(m0_est[i],     cal[:m0][i],     force=true) for i in set[:i]                    ];
+    [fix(fs0_est[i],    cal[:fs0][i],    force=true) for  i     in set[:i]     ]
+    [fix(va0_est[va,j], cal[:va0][va,j], force=true) for (va,j) in set[:va,:j] ]
+    [fix(m0_est[i],     cal[:m0][i],     force=true) for  i     in set[:i]     ]
     
     # Fix other/use sector output to zero.
     [fix(ys0_est[j,i], 0, force = true) for j in set[:oth,:use] for i in set[:i]]
@@ -195,7 +198,7 @@ end
 
 
 """
-    _calibration_input(year::Int, d::Dict, set::Dict)
+    SLiDE._calibration_input(year::Int, d::Dict, set::Dict)
 This function prepares the input for the calibration routine:
     1. Select parameters relevant to the calibration routine.
     2. For all parameters except taxes (ta0, tm0), set negative values to zero.
@@ -214,12 +217,7 @@ This function prepares the input for the calibration routine:
 function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
     param = Dict()
 
-    param[:cal] = if :cal in keys(set)
-        set[:cal]
-    else
-        Symbol.(read_file([SLIDE_DIR,"src","build","parameters"],
-            SetInput("list_calibrate.csv", :cal)))
-    end
+    param[:cal] = set[:cal]
     param[:tax] = [:ta0, :tm0]
     param[:var] = setdiff(param[:cal], param[:tax])
 
@@ -239,4 +237,23 @@ function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
     # Convert the calibration input into DataFrames. Fill zeros for taxes; drop otherwise. 
     cal = Dict(k => convert_type(Dict, d[k]) for k in param[:cal])
     return (cal, idx)
+end
+
+function _calibration_set!(set)
+    # (!!!!) should just replace in usage.
+    !(:i in keys(set)) && (set[:i] = set[:g])
+    !(:j in keys(set)) && (set[:j] = set[:s])
+
+    !((:i,:j)  in keys(set)) && add_permutation!(set, (:i,:j))
+    !((:j,:i)  in keys(set)) && add_permutation!(set, (:j,:i))
+    !((:i,:m)  in keys(set)) && add_permutation!(set, (:i,:m))
+    !((:m,:i)  in keys(set)) && add_permutation!(set, (:m,:i))
+    !((:i,:fd) in keys(set)) && add_permutation!(set, (:i,:fd))
+    !((:va,:j) in keys(set)) && add_permutation!(set, (:va,:j))
+
+    if !(:cal in keys(set))
+        set[:cal] = Symbol.(read_file([SLIDE_DIR,"src","build","parameters"],
+            SetInput("list_calibrate.csv", :cal)))
+    end
+    return set
 end
