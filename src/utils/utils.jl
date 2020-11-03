@@ -251,7 +251,7 @@ end
 
 function permute(x::NamedTuple)
     idx = keys(x)
-    val = eachcol(DataFrame(Tuple.(permute(values(x)))))
+    val = eachcol(DataFrame(ensuretuple.(permute(values(x)))))
     return NamedTuple{Tuple(idx, )}(val, )
 end
 
@@ -269,11 +269,13 @@ This adds a permutation of existing set keys to the input dictionary.
 - `x::Tuple{Symbol,1}`: set keys to permute
 """
 function add_permutation!(set::Dict, x::Tuple)
-    missing_keys = setdiff(ensurearray(x), keys(set))
-    if !isempty(missing_keys)
-        @error("Cannot create a composite $x. Key(s) $missing_keys missing from set")
-    end
-    set[x] = permute([[set[k] for k in x]...,])
+    if !(x in keys(set))
+        missing_keys = setdiff(ensurearray(x), keys(set))
+        if !isempty(missing_keys)
+            @error("Cannot create a composite $x. Key(s) $missing_keys missing from set.")
+        end
+        set[x] = sort(permute([[set[k] for k in x]...,]))
+        end
     return set[x]
 end
 
