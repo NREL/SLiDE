@@ -102,7 +102,7 @@ function _read_from_dir(dir::String; ext = ".csv", run_bash::Bool = false)
 
     @info("Reading $ext files from $dir.")
     files = Dict(SLiDE._inp_key(f, ext) => f for f in files if occursin(ext, f))
-    d = Dict{Any,Any}(k => read_file(joinpath(dir,f)) for (k,f) in files)
+    d = Dict(k => read_file(joinpath(dir,f)) for (k,f) in files)
 
     # If the file is empty, If there's only one column containing values, rename it to value.
     # This is consistent with SLiDE naming convention.
@@ -221,9 +221,9 @@ This function reads intermediary build files if they have previously been saved 
 # Returns
 - `d::Dict` of DataFrames
 """
-function read_build(dataset::String, subset::String; overwrite::Bool = DEFAULT_OVERWRITE)
+function read_build(dataset::String, subset::String; overwrite::Bool = SLiDE.DEFAULT_OVERWRITE)
 
-    path = sub_path(dataset, subset)
+    path = SLiDE.sub_path(dataset, subset)
 
     if overwrite == true && isdir(path)
         @info("Deleting $path to overwrite data.")
@@ -236,8 +236,7 @@ function read_build(dataset::String, subset::String; overwrite::Bool = DEFAULT_O
         return Dict()
     else
         d = read_from(path)
-        (subset == SET_DIR) && [d[k] = df[:,1] for (k,df) in d]
-        # (d = Dict{Any,Array}(k => df[:,1] for (k,df) in d))
+        subset == SET_DIR && (d = Dict{Any,Array{T,1} where T}(k => df[:,1] for (k,df) in d))
         return d
     end
 end
