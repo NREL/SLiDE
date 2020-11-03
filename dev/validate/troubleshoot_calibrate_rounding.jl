@@ -68,7 +68,7 @@ include(joinpath(SLIDE_DIR,"dev","validate","validation_functions.jl"))
 
 # ------------------------------------------------------------------------------------------
 default_dataset = "default"
-dataset = "default"
+dataset = "cal_zero_fd_pce_only"
 # dataset = "prezero_negatives"
 
 VALIDATE_DIR = joinpath(SLIDE_DIR, "dev", "validate", "readfiles")
@@ -91,41 +91,41 @@ d_cal_comp = benchmark_against(cal, cal_bluenote; tol = 1E-6)
 display(d_cal_keys)
 d_cal_missing = missing_indices(d_cal_keys)
 
-# SUSPICION: The mkt_pa(i) accounting constraint is the only constraint that does not equate
-# two sums. I wonder if one side is more strictly enforced because it is/isn't a function?
-# Let's see what's up with this constraint...
-check_constraints!(cal, set)
-check_constraints!(cal_bluenote, set)
+# # SUSPICION: The mkt_pa(i) accounting constraint is the only constraint that does not equate
+# # two sums. I wonder if one side is more strictly enforced because it is/isn't a function?
+# # Let's see what's up with this constraint...
+# check_constraints!(cal, set)
+# check_constraints!(cal_bluenote, set)
 
-(cal_constraints_keys, cal_constraints_max) = compare_constraints(cal)
-(cal_bluenote_constraints_keys, cal_bluenote_constraints_max) = compare_constraints(cal_bluenote)
+# (cal_constraints_keys, cal_constraints_max) = compare_constraints(cal)
+# (cal_bluenote_constraints_keys, cal_bluenote_constraints_max) = compare_constraints(cal_bluenote)
 
-# LIKE WE THOUGHT! blueNOTE constraints don't have any key discrepancies.
-# So this has gotta be where the cutoff happens in GAMS, right?
-@info("blueNOTE constraint comparison")
-display(cal_bluenote_constraints_keys)
+# # LIKE WE THOUGHT! blueNOTE constraints don't have any key discrepancies.
+# # So this has gotta be where the cutoff happens in GAMS, right?
+# @info("blueNOTE constraint comparison")
+# display(cal_bluenote_constraints_keys)
 
-@info("SLiDE constraint comparison")
-display(cal_constraints_keys)
+# @info("SLiDE constraint comparison")
+# display(cal_constraints_keys)
 
-# Here, it's interesting that the missing keys in each constraint are imrg and oth/use.
-@info("Missing keys: SLiDE constraints")
-cal_constraints_missing = missing_indices(cal_constraints_keys)
+# # Here, it's interesting that the missing keys in each constraint are imrg and oth/use.
+# @info("Missing keys: SLiDE constraints")
+# cal_constraints_missing = missing_indices(cal_constraints_keys)
 
-# The zero/small value discrepancy for id0 is the same as for each constraint.
-# For prf_y: note that this sets the sum of ys0 over i/g = RHS. We fix the output of ys0 = 0
-# for j/s = [oth,use]. So the sum over these values will = 0.
-if :id0 in keys(d_cal_missing)
-    @info("Missing keys: id0")
-    display(d_cal_missing[:id0])
-end
+# # The zero/small value discrepancy for id0 is the same as for each constraint.
+# # For prf_y: note that this sets the sum of ys0 over i/g = RHS. We fix the output of ys0 = 0
+# # for j/s = [oth,use]. So the sum over these values will = 0.
+# if :id0 in keys(d_cal_missing)
+#     @info("Missing keys: id0")
+#     display(d_cal_missing[:id0])
+# end
 
-# Fixing fd0 (with the exception of fd = pce) is commented in blueNOTE and SLiDE.
-# What's up with this?
-if :fd0 in keys(d_cal_missing)
-    @info("Missing keys: fd0")
-    display(d_cal_missing[:fd0])
-end
+# # Fixing fd0 (with the exception of fd = pce) is commented in blueNOTE and SLiDE.
+# # What's up with this?
+# if :fd0 in keys(d_cal_missing)
+#     @info("Missing keys: fd0")
+#     display(d_cal_missing[:fd0])
+# end
 
 # ------------------------------------------------------------------------------------------
 # Check that we're fixing things correctly...
@@ -139,14 +139,14 @@ setdiff(["oth","use"], unique(dropzero(cal[:ys0])[:,:s]))
 check_fixed = Dict(k => compare_summary([io[k], cal[k]], [:partition, :cal])
     for k in [:va0,:fs0,:m0])
 
-# Look at io vs. bluenote calibration.
-@info("blueNOTE: zero -> value?... value -> zero?")
-d_io_bn = compare_summary([io, cal_bluenote], [:io,:cal_bn]; complete_summary = true);
-[println("$k\t",any(ismissing.(df[:,:io_value])), "\t", any(ismissing.(df[:,:cal_bn_value]))) for (k,df) in d_io_bn]
+# # Look at io vs. bluenote calibration.
+# @info("blueNOTE: zero -> value?... value -> zero?")
+# d_io_bn = compare_summary([io, cal_bluenote], [:io,:cal_bn]; complete_summary = true);
+# [println("$k\t",any(ismissing.(df[:,:io_value])), "\t", any(ismissing.(df[:,:cal_bn_value]))) for (k,df) in d_io_bn]
 
-@info("SLiDE: zero -> value?... value -> zero?")
-d_io = compare_summary([io, cal], [:io,:cal]; complete_summary = true);
-[println("$k\t", any(ismissing.(df[:,:io_value])), "\t", any(ismissing.(df[:,:cal_value]))) for (k,df) in d_io]
+# @info("SLiDE: zero -> value?... value -> zero?")
+# d_io = compare_summary([io, cal], [:io,:cal]; complete_summary = true);
+# [println("$k\t", any(ismissing.(df[:,:io_value])), "\t", any(ismissing.(df[:,:cal_value]))) for (k,df) in d_io]
 
 
-d_io_bn[:fd0][ismissing.(d_io_bn[:fd0][:,:cal_bn_value]),:]
+# d_io_bn[:fd0][ismissing.(d_io_bn[:fd0][:,:cal_bn_value]),:]

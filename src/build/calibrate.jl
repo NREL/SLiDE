@@ -135,8 +135,8 @@ function calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = DEFAULT_PENAL
     # --- SET BOUNDS -----------------------------------------------------------------------
     # multipliers for lower and upper bound relative
     # to each respective variables reference parameter
-    lb = 0.1
-    ub = 5
+    lb = DEFAULT_CALIBRATE_LOWER_BOUND
+    ub = DEFAULT_CALIBRATE_UPPER_BOUND
 
     [set_lower_bound(ys0_est[j,i], max(0, lb * cal[:ys0][j,i]))  for i in set[:i] for j in set[:j]   ];
     [set_lower_bound(id0_est[i,j], max(0, lb * cal[:id0][i,j]))  for i in set[:i] for j in set[:j]   ];
@@ -162,24 +162,13 @@ function calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = DEFAULT_PENAL
     [set_upper_bound(m0_est[i],    abs(ub * cal[:m0][i]))     for i in set[:i]                    ];
     [set_upper_bound(md0_est[m,i], abs(ub * cal[:md0][m,i]))  for m in set[:m] for i in set[:i]   ];
 
+    # Fix "certain parameters" to their original values: fs0, va0, m0.
     [fix(fs0_est[i],    cal[:fs0][i],    force=true) for i in set[:i]                    ];
     [fix(va0_est[va,j], cal[:va0][va,j], force=true) for va in set[:va] for j in set[:j] ];
     [fix(m0_est[i],     cal[:m0][i],     force=true) for i in set[:i]                    ];
     
+    # Fix other/use sector output to zero.
     [fix(ys0_est[j,i], 0, force = true) for j in set[:oth,:use] for i in set[:i]]
-
-    # fd_temp = setdiff(set[:fd],["pce"])
-    # [fix(fd0_est[i,fd], 0, force=true) for i in set[:i] for fd in set[:fd] if !haskey(cal[:fd0],(i,fd))]
-    # [fix(fs0_est[i],    0, force=true) for i in set[:i]                    if !haskey(cal[:fs0], i)];
-    # [fix(va0_est[va,j], 0, force=true) for va in set[:va] for j in set[:j] if !haskey(cal[:va0],(va,j))]
-    # [fix(m0_est[i],     0, force=true) for i in set[:i]                    if !haskey(cal[:m0],  i)];
-    # [fix(id0_est[i,j],  0, force=true) for i in set[:i] for j in set[:j]   if !haskey(cal[:id0],(i,j))]
-
-    # [fix(fd_est[i], 0, force=true) for i in set[:i] if !haskey(cal[:m0], i)];
-
-    # fd_temp = filter!(x->x≠"pce",set[:fd])
-    # [fix(fd0_est[i,fd],cal[:fd0][i,fd],force=true) for i in set[:i] for fd in fd_temp if haskey(cal[:fd0],(i,fd))]
-
     
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     JuMP.optimize!(calib)
@@ -207,7 +196,13 @@ end
 
 """
     _calibration_input(year::Int, d::Dict, set::Dict)
-This function prepares the input for the calibration routine.
+This function prepares the input for the calibration routine:
+    1. Select parameters relevant to the calibration routine.
+    2. For all parameters except taxes (ta0, tm0), set negative values to zero.
+        In the case of final demand, only set negative values to zero for
+        `fd = pce`.
+    3. Fill all "missing" values with zeros to generate a complete dataset. This is relevant
+        to how the penalty for missing keys is applied in the objective function.
 
 # Arguments
 - `yr::Int`
@@ -218,13 +213,19 @@ This function prepares the input for the calibration routine.
 """
 function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
     param = Dict()
-    param[:cal] = set[:cal]
+
+    param[:cal] = if :cal in keys(set)
+        set[:cal]
+    else
+        Symbol.(read_file([SLIDE_DIR,"src","build","parameters"],
+            SetInput("list_calibrate.csv", :cal)))
+    end
     param[:tax] = [:ta0, :tm0]
     param[:var] = setdiff(param[:cal], param[:tax])
 
     # Isolate the current year.
     d = Dict(k => fill_zero(set, filter_with(d[k], (yr = year,); drop = true))
-        for k in set[:cal])
+        for k in param[:cal])
 
     # Save the DataFrame indices in correct order. This will be used to convert the
     # calibration output back into DataFrames.
@@ -232,13 +233,10 @@ function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
 
     # Set negative values to zero. In the case of final demand,
     # only set negative values to zero for fd = pce.
-    #  d[:fd0][.&(d[:fd0][:,:fd] .== "pce", d[:fd0][:,:value] .< 0),:value] .= 0.0
-    # [d[k][d[k][:,:value] .< 0, :value] .= 0.0 for k in param[:var] if k !== :fd0]
-    [d[k][d[k][:,:value] .< 0, :value] .= 0.0 for k in param[:var]]
+     d[:fd0][.&(d[:fd0][:,:fd] .== "pce", d[:fd0][:,:value] .< 0),:value] .= 0.0
+    [d[k][d[k][:,:value] .< 0, :value] .= 0.0 for k in param[:var] if k !== :fd0]
 
     # Convert the calibration input into DataFrames. Fill zeros for taxes; drop otherwise. 
-    cal = Dict{Symbol,Dict}()
-    [cal[k] = convert_type(Dict, d[k]) for k in param[:var]]
-    [cal[k] = fill_zero((set[:g],), convert_type(Dict, d[k])) for k in param[:tax]]
+    cal = Dict(k => convert_type(Dict, d[k]) for k in param[:cal])
     return (cal, idx)
 end

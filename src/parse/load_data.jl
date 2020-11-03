@@ -214,6 +214,8 @@ end
 
 
 function load_from(::Type{T}, df::DataFrame) where T <: Any
+    isempty(df) && @error("Cannot load datatype $T from an empty DataFrame.")
+
     (fields, types) = (fieldnames(T), T.types)
 
     # Print warning if DataFrame is missing required columns.
