@@ -244,37 +244,19 @@ This function finds all possible permutations of the input data.
     The values in x are unsorted.
 """
 function permute(df::DataFrame)
-    cols = propertynames(df)
-    df = DataFrame(ensuretuple.(permute(unique.(eachcol(df)))))
-    df = edit_with(df, Rename.(propertynames(df), cols))
-    return df
-end
-
-function permute(x::Tuple)
-    xperm = if length(x) == 1
-        unique(x[1])
-    else
-        [collect(Base.Iterators.product(unique.(ensurearray.(x))...))...;]
-    end
-    return xperm
+    idx = propertynames(df)
+    val = DataFrame(permute(unique.(eachcol(df))))
+    return edit_with(val, Rename.(propertynames(val), idx))
 end
 
 function permute(x::NamedTuple)
-    cols = keys(x)
-    xperm = eachcol(DataFrame(Tuple.(ensurearray.(permute(ensurearray.(values(x)))))))
-    return NamedTuple{Tuple(cols, )}(xperm, )
+    idx = keys(x)
+    val = eachcol(DataFrame(Tuple.(permute(values(x)))))
+    return NamedTuple{Tuple(idx, )}(val, )
 end
 
-function permute(x::Array)
-    xperm = if any(isarray.(x))
-        permute(Tuple(x))
-    elseif length(unique(length.(x))) .== 1 && all(length.(x) .> 1)
-        permute(unique.(eachcol(DataFrame(x))))
-    else
-        unique(x)
-    end
-    return xperm
-end
+permute(x::Any) = any(isarray.(x)) ? permute(x...) : x
+permute(x::Vararg{Any}) = vec(collect(Iterators.product(x...)))
 
 
 """
