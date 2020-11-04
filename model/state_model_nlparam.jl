@@ -19,9 +19,9 @@ using DataFrames
 #Convert/create all combinations of different sets (regions, sectors, etc) as tuples
 #Then reshape array of tuples as a one dimensional column vector
 #Used in parameter definition
-# function combvec(set_a...) 
-#     return vec(collect(Iterators.product(set_a...)))
-# end
+function combvec(set_a...)
+    return vec(collect(Iterators.product(set_a...)))
+end
 
 # Replaces nan's for denseaxisarray
 # Used mainly for value shares w/ zero denominator
@@ -156,13 +156,13 @@ replace_nan_inf(theta_m)
 ################
 
 # Set lower bound
-sv = 0.001 
+sv = 0.001                                                                          # (note)
 
 #sectors
-@variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1); 
+@variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1);                            # (note)
 @variable(cge, X[(r, g) in sub_set_x] >= sv, start = 1);
 @variable(cge, A[(r, g) in sub_set_a] >= sv, start = 1);
-@variable(cge, C[r in regions] >= sv, start = 1); 
+@variable(cge, C[r in regions] >= sv, start = 1);                                   # (note)
 @variable(cge, MS[r in regions, m in margins] >= sv, start = 1);
 
 #commodities:
@@ -185,8 +185,8 @@ sv = 0.001
 ###############################
 
 #cobb-douglas function for value added (VA)
-@NLexpression(cge,CVA[r in regions,s in sectors],
-  PL[r]^alpha_kl[r,s] * (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0) ^ (1-alpha_kl[r,s]) ); 
+@NLexpression(cge,CVA[r in regions,s in sectors],                                   # (note)
+  PL[r]^alpha_kl[r,s] * (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0) ^ (1-alpha_kl[r,s]) );
 
 #demand for labor in VA
 @NLexpression(cge,AL[r in regions, s in sectors], ld0[r,s] * CVA[r,s] / PL[r] );
@@ -308,8 +308,8 @@ sv = 0.001
 ###################################
 
 @mapping(cge,market_pa[(r, g) in sub_set_pa],
-# absorption or supply 
-        (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g] 
+# absorption or supply
+        (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g]
         - ( 
 # government demand (exogenous)       
         g0[r,g] 
