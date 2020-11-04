@@ -48,7 +48,8 @@ end
 bmkyr=2016
 
 #sld is the slide dictionary of benchmark values filtered for benchmark year
-sld = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true))) for k in keys(d))
+sld = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true)))
+    for k in keys(d))
 
 ###############
 # -- SETS --
@@ -75,14 +76,14 @@ y_check = Dict()
 
 
 #subsets for model equation controls
-sub_set_y = filter(x -> y_check[x] != 0.0, combvec(regions, sectors));
-sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods));
-sub_set_x = filter(x -> get(sld[:s0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
-sub_set_pa = filter(x -> get(sld[:a0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
-sub_set_pd = filter(x -> get(sld[:xd0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
-sub_set_pk = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
-sub_set_py = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, combvec(regions, goods));
-sub_set_py = filter(x -> y_check[x[1], x[2]] != 0, combvec(regions, goods));
+sub_set_y = filter(x -> y_check[x] != 0.0, permute(regions, sectors));
+sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, permute(regions, goods));
+sub_set_x = filter(x -> get(sld[:s0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));      # empty
+sub_set_pa = filter(x -> get(sld[:a0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));     # same as sub_set_a
+sub_set_pd = filter(x -> get(sld[:xd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
+sub_set_pk = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
+sub_set_py = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
+sub_set_py = filter(x -> y_check[x[1], x[2]] != 0, permute(regions, goods));
 
 
 ########## Model ##########
@@ -94,7 +95,7 @@ cge = MCPModel();
 ##############
 
 #benchmark values
-@NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == get(sld[:ys0], (r, s, g), 0.0));
+@NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == get(sld[:ys0], (r, s, g), 0.0)); 
 @NLparameter(cge, id0[r in regions, s in sectors, g in goods] == get(sld[:id0], (r, s, g), 0.0));
 @NLparameter(cge, ld0[r in regions, s in sectors] == get(sld[:ld0], (r, s), 0.0));
 @NLparameter(cge, kd0[r in regions, s in sectors] == get(sld[:kd0], (r, s), 0.0));
@@ -125,14 +126,14 @@ cge = MCPModel();
 @NLparameter(cge, i0[r in regions, g in goods] == get(sld[:i0], (r, g), 0.0));
 
 # benchmark value share parameters
-@NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s])));
+@NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s]))); 
 @NLparameter(cge, alpha_x[r in regions, g in goods] == (value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g]));
 @NLparameter(cge, alpha_d[r in regions, g in goods] == value(xd0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, alpha_n[r in regions, g in goods] == value(xn0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, theta_n[r in regions, g in goods] == value(nd0[r, g]) / (value(nd0[r, g]) - value(dd0[r, g])));
 @NLparameter(cge, theta_m[r in regions, g in goods] == (1+value(tm0[r, g])) * value(m0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g])));
 
-replace_nan_inf(alpha_kl)
+replace_nan_inf(alpha_kl) 
 replace_nan_inf(alpha_x)
 replace_nan_inf(alpha_d)
 replace_nan_inf(alpha_n)
@@ -140,14 +141,14 @@ replace_nan_inf(theta_n)
 replace_nan_inf(theta_m)
 
 #Substitution and transformation elasticities
-@NLparameter(cge, es_va[r in regions, s in sectors] == 1); # value-added nest - substitution elasticity
-@NLparameter(cge, es_y[r in regions, s in sectors] == 0); # Top-level Y nest (VA,M) - substitution elasticity
-@NLparameter(cge, es_m[r in regions, s in sectors] == 0); # Materials nest - substitution elasticity
-@NLparameter(cge, et_x[r in regions, g in goods] == 4); # Disposition, distribute regional supply to local, national, export - transformation elasticity
-@NLparameter(cge, es_a[r in regions, g in goods] == 0); # Top-level A nest for aggregate demand (Margins, goods) - substitution elasticity
-@NLparameter(cge, es_mar[r in regions, g in goods] == 0); # Margin supply - substitution elasticity
-@NLparameter(cge, es_d[r in regions, g in goods] == 2); # Domestic demand aggregation nest (intranational) - substitution elasticity
-@NLparameter(cge, es_f[r in regions, g in goods] == 4); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
+@NLparameter(cge, es_va[r in regions, s in sectors] == SUB_ELAST[:va]); # value-added nest - substitution elasticity
+@NLparameter(cge, es_y[r in regions, s in sectors]  == SUB_ELAST[:y]); # Top-level Y nest (VA,M) - substitution elasticity
+@NLparameter(cge, es_m[r in regions, s in sectors]  == SUB_ELAST[:m]); # Materials nest - substitution elasticity
+@NLparameter(cge, et_x[r in regions, g in goods]    == TRANS_ELAST[:x]); # Disposition, distribute regional supply to local, national, export - transformation elasticity
+@NLparameter(cge, es_a[r in regions, g in goods]    == SUB_ELAST[:a]); # Top-level A nest for aggregate demand (Margins, goods) - substitution elasticity
+@NLparameter(cge, es_mar[r in regions, g in goods]  == SUB_ELAST[:mar]); # Margin supply - substitution elasticity
+@NLparameter(cge, es_d[r in regions, g in goods]    == SUB_ELAST[:d]); # Domestic demand aggregation nest (intranational) - substitution elasticity
+@NLparameter(cge, es_f[r in regions, g in goods]    == SUB_ELAST[:f]); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
 
 
 ################
@@ -155,13 +156,13 @@ replace_nan_inf(theta_m)
 ################
 
 # Set lower bound
-sv = 0.001
+sv = 0.001                                                                          # (note)
 
 #sectors
-@variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1);
+@variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1);                            # (note)
 @variable(cge, X[(r, g) in sub_set_x] >= sv, start = 1);
 @variable(cge, A[(r, g) in sub_set_a] >= sv, start = 1);
-@variable(cge, C[r in regions] >= sv, start = 1);
+@variable(cge, C[r in regions] >= sv, start = 1);                                   # (note)
 @variable(cge, MS[r in regions, m in margins] >= sv, start = 1);
 
 #commodities:
@@ -184,7 +185,7 @@ sv = 0.001
 ###############################
 
 #cobb-douglas function for value added (VA)
-@NLexpression(cge,CVA[r in regions,s in sectors],
+@NLexpression(cge,CVA[r in regions,s in sectors],                                   # (note)
   PL[r]^alpha_kl[r,s] * (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0) ^ (1-alpha_kl[r,s]) );
 
 #demand for labor in VA
@@ -308,7 +309,7 @@ sv = 0.001
 
 @mapping(cge,market_pa[(r, g) in sub_set_pa],
 # absorption or supply
-        (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g] 
+        (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g]
         - ( 
 # government demand (exogenous)       
         g0[r,g] 
@@ -450,10 +451,6 @@ sv = 0.001
 
 #set up the options for the path solver
 PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
-
-# export the path license string to the environment
-# this is now done in the SLiDE initiation steps 
-ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
 
 # solve the model
 status = solveMCP(cge)

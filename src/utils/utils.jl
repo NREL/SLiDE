@@ -229,51 +229,56 @@ end
 
 
 """
-    permute(df::DataFrame)
-    permute(x::Tuple)
-    permute(x::NamedTuple)
-    permute(x::Array)
-This function finds all possible permutations of the input data.
+    permute(x::Any)
+    permute(x...)
 
 # Arguments
-- `x::Any`: data to permute.
+- `x::Any`: input data to permute
 
 # Returns
-- `x::Any`: all possible permutations of the input values. If `x` does not contain
-    at least one array, there will be nothing to permute and the function will return `x`.
-    The values in x are unsorted.
+All possible permutations of the input values. 
+    - `x::DataFrame` or `x::NamedTuple`: Input type and key/column names will be preserved.
+    - Given any other input `x`,
+        - `x::Array{Tuple,1}` of the possible combinations of the input data.
+            Each tuple will be ordered in the same way the input data was ordered.
+        - `x::Any`: If `x` does not contain multiple sets to permute, `permute` will return
+            `x`, unchanged.
 """
 function permute(df::DataFrame)
-    cols = propertynames(df)
-    df = DataFrame(ensuretuple.(permute(unique.(eachcol(df)))))
-    df = edit_with(df, Rename.(propertynames(df), cols))
-    return df
-end
-
-function permute(x::Tuple)
-    xperm = if length(x) == 1
-        unique(x[1])
-    else
-        [collect(Base.Iterators.product(unique.(ensurearray.(x))...))...;]
-    end
-    return xperm
+    idx = propertynames(df)
+    val = DataFrame(permute(unique.(eachcol(df))))
+    return edit_with(val, Rename.(propertynames(val), idx))
 end
 
 function permute(x::NamedTuple)
-    cols = keys(x)
-    xperm = eachcol(DataFrame(Tuple.(ensurearray.(permute(ensurearray.(values(x)))))))
-    return NamedTuple{Tuple(cols, )}(xperm, )
+    idx = keys(x)
+    val = eachcol(DataFrame(ensuretuple.(permute(values(x)))))
+    return NamedTuple{Tuple(idx, )}(val, )
 end
 
-function permute(x::Array)
-    xperm = if any(isarray.(x))
-        permute(Tuple(x))
-    elseif length(unique(length.(x))) .== 1 && all(length.(x) .> 1)
-        permute(unique.(eachcol(DataFrame(x))))
-    else
-        unique(x)
-    end
-    return xperm
+permute(x::Any) = any(isarray.(x)) ? permute(x...) : x
+permute(x::Vararg{Any}) = vec(collect(Iterators.product(x...)))
+
+
+"""
+    add_permutation!(set, x)
+This function adds a permutation of existing set keys to the input dictionary.
+If the dictionary does not contiain all of the sets specified in `x`,
+the function will produce an error.
+
+# Arguments
+- `set::Dict` dictionary to update with permutations
+- `x::Tuple{Symbol,1}`: set keys to permute
+"""
+function add_permutation!(set::Dict, x::Tuple)
+    if !(x in keys(set))
+        missing_keys = setdiff(ensurearray(x), keys(set))
+        if !isempty(missing_keys)
+            @error("Cannot create a composite $x. Key(s) $missing_keys missing from set.")
+        end
+        set[x] = sort(permute([[set[k] for k in x]...,]))
+        end
+    return set[x]
 end
 
 

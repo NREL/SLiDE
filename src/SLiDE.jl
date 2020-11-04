@@ -83,6 +83,7 @@ export find_oftype
 # export isarray
 # export istype
 export permute
+export add_permutation!
 export findindex
 export findvalue
 export indexjoin
@@ -148,6 +149,8 @@ abstract type CGE <: EconomicSystemsType end
 
 # CONSTANTS
 include("definitions.jl")
+export SUB_ELAST
+export TRANS_ELAST
 
 # TYPES
 include(joinpath("parse", "generated_check", "includes.jl"))

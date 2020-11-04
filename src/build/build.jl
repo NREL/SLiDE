@@ -236,27 +236,16 @@ function read_build(dataset::String, subset::String; overwrite::Bool = DEFAULT_O
         return Dict()
     else
         d = read_from(path)
-        (subset == SET_DIR) && (d = Dict(k => df[:,1] for (k,df) in d))
+        subset == SET_DIR && (d = Dict{Any,Array{T,1} where T}(k => df[:,1] for (k,df) in d))
         return d
     end
 end
 
 
 function filter_build!(subset::String, d::Dict{T,DataFrame}) where T <: Any
-    df = read_file(joinpath(SLIDE_DIR,"src","build","parameters","parameter_define.csv"))
-
-    lst_param = read_from(joinpath(SLIDE_DIR,"src","readfiles","parameterlist.yml"))
-    lst_param = (Symbol(subset) in keys(lst_param)) ? lst_param[Symbol(subset)] : DataFrame()
-
-    type_param = read_file(joinpath(SLIDE_DIR,"src","build","parameters","parameter_scope.csv"))
-    type_param = type_param[type_param[:,:subset] .== subset,:]
-
-    df = indexjoin(lst_param, type_param, df)
-    dropmissing!(df, intersect(propertynames(df),[:subset,:index]))
+    param = build_parameters(subset)
     
-    if !isempty(df)
-        param = load_from(Dict{Parameter}, df);
-
+    if param !== nothing
         save_keys = intersect(keys(d), keys(param))
         delete_keys = setdiff(keys(d), save_keys)
 
@@ -280,6 +269,25 @@ function filter_build!(subset::String, d::Dict)
     else
         return d
     end
+end
+
+
+"""
+"""
+function build_parameters(subset::String)
+
+    df = read_file(joinpath(SLIDE_DIR,"src","build","parameters","parameter_define.csv"))
+
+    lst_param = read_from(joinpath(SLIDE_DIR,"src","readfiles","parameterlist.yml"))
+    lst_param = (Symbol(subset) in keys(lst_param)) ? lst_param[Symbol(subset)] : DataFrame()
+
+    type_param = read_file(joinpath(SLIDE_DIR,"src","build","parameters","parameter_scope.csv"))
+    type_param = type_param[type_param[:,:subset] .== subset,:]
+
+    df = indexjoin(lst_param, type_param, df)
+    dropmissing!(df, intersect(propertynames(df),[:subset,:index]))
+    
+    return !isempty(df) ? load_from(Dict{Parameter}, df) : nothing
 end
 
 
