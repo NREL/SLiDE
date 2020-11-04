@@ -16,13 +16,6 @@ using DataFrames
 # -- FUNCTIONS --
 #################
 
-#Convert/create all combinations of different sets (regions, sectors, etc) as tuples
-#Then reshape array of tuples as a one dimensional column vector
-#Used in parameter definition
-function combvec(set_a...)
-    return vec(collect(Iterators.product(set_a...)))
-end
-
 # Replaces nan's for denseaxisarray
 # Used mainly for value shares w/ zero denominator
 function replace_nan_inf(
@@ -78,12 +71,11 @@ y_check = Dict()
 #subsets for model equation controls
 sub_set_y = filter(x -> y_check[x] != 0.0, permute(regions, sectors));
 sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, permute(regions, goods));
-sub_set_x = filter(x -> get(sld[:s0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));      # empty
+sub_set_x = filter(x -> get(sld[:s0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));      # same as (regions,goods)
 sub_set_pa = filter(x -> get(sld[:a0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));     # same as sub_set_a
 sub_set_pd = filter(x -> get(sld[:xd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
-sub_set_pk = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
-sub_set_py = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
-sub_set_py = filter(x -> y_check[x[1], x[2]] != 0, permute(regions, goods));
+sub_set_pk = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));    # same as sub_set_y
+sub_set_py = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));    # same as sub_set_y
 
 
 ########## Model ##########
@@ -95,7 +87,7 @@ cge = MCPModel();
 ##############
 
 #benchmark values
-@NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == get(sld[:ys0], (r, s, g), 0.0)); 
+@NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == get(sld[:ys0], (r, s, g), 0.0));
 @NLparameter(cge, id0[r in regions, s in sectors, g in goods] == get(sld[:id0], (r, s, g), 0.0));
 @NLparameter(cge, ld0[r in regions, s in sectors] == get(sld[:ld0], (r, s), 0.0));
 @NLparameter(cge, kd0[r in regions, s in sectors] == get(sld[:kd0], (r, s), 0.0));
@@ -125,15 +117,15 @@ cge = MCPModel();
 @NLparameter(cge, nd0[r in regions, g in goods] == get(sld[:nd0], (r, g), 0.0));
 @NLparameter(cge, i0[r in regions, g in goods] == get(sld[:i0], (r, g), 0.0));
 
-# benchmark value share parameters
-@NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s]))); 
+# benchmark value share parameters                                                  # (note)
+@NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s])));
 @NLparameter(cge, alpha_x[r in regions, g in goods] == (value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g]));
 @NLparameter(cge, alpha_d[r in regions, g in goods] == value(xd0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, alpha_n[r in regions, g in goods] == value(xn0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, theta_n[r in regions, g in goods] == value(nd0[r, g]) / (value(nd0[r, g]) - value(dd0[r, g])));
 @NLparameter(cge, theta_m[r in regions, g in goods] == (1+value(tm0[r, g])) * value(m0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g])));
 
-replace_nan_inf(alpha_kl) 
+replace_nan_inf(alpha_kl)                                                           # (note)
 replace_nan_inf(alpha_x)
 replace_nan_inf(alpha_d)
 replace_nan_inf(alpha_n)
@@ -163,7 +155,7 @@ sv = 0.001                                                                      
 @variable(cge, X[(r, g) in sub_set_x] >= sv, start = 1);
 @variable(cge, A[(r, g) in sub_set_a] >= sv, start = 1);
 @variable(cge, C[r in regions] >= sv, start = 1);                                   # (note)
-@variable(cge, MS[r in regions, m in margins] >= sv, start = 1);
+@variable(cge, MS[r in regions, m in margins] >= sv, start = 1);                    # (note)
 
 #commodities:
 @variable(cge, PA[(r, g) in sub_set_pa] >= sv, start = 1); # Regional market (input)
@@ -242,7 +234,7 @@ sv = 0.001                                                                      
 # -- Zero Profit Conditions --
 ###############################
 
-@mapping(cge,profit_y[(r, s) in sub_set_y],
+@mapping(cge,profit_y[(r, s) in sub_set_y],                                         # (note)
 # cost of intermediate demand
         sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in goods) 
 # cost of labor inputs
@@ -309,7 +301,7 @@ sv = 0.001                                                                      
 
 @mapping(cge,market_pa[(r, g) in sub_set_pa],
 # absorption or supply
-        (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g]
+        (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g] 
         - ( 
 # government demand (exogenous)       
         g0[r,g] 
