@@ -19,9 +19,9 @@ using DataFrames
 #Convert/create all combinations of different sets (regions, sectors, etc) as tuples
 #Then reshape array of tuples as a one dimensional column vector
 #Used in parameter definition
-function combvec(set_a...)
-    return vec(collect(Iterators.product(set_a...)))
-end
+# function combvec(set_a...) 
+#     return vec(collect(Iterators.product(set_a...)))
+# end
 
 # Replaces nan's for denseaxisarray
 # Used mainly for value shares w/ zero denominator
@@ -48,9 +48,8 @@ end
 bmkyr=2016
 
 #sld is the slide dictionary of benchmark values filtered for benchmark year
-sld = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true))) for k in keys(d))
-# zld = Dict(k => convert_type(Dict, fill_zero(set,
-#     filter_with(df, (yr = bmkyr,); drop = true))) for (k,df) in d)
+sld = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true)))
+    for k in keys(d))
 
 ###############
 # -- SETS --
@@ -95,11 +94,8 @@ cge = MCPModel();
 # PARAMETERS
 ##############
 
-# add_permutation!(set, (:r,:s,:g))
-# @NLparameter(cge, ys0[(r,s,g) in set[:r,:s,:g]] == get(sld[:ys0], (r, s, g), 0.0));
-
 #benchmark values
-@NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == get(sld[:ys0], (r, s, g), 0.0));
+@NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == get(sld[:ys0], (r, s, g), 0.0)); 
 @NLparameter(cge, id0[r in regions, s in sectors, g in goods] == get(sld[:id0], (r, s, g), 0.0));
 @NLparameter(cge, ld0[r in regions, s in sectors] == get(sld[:ld0], (r, s), 0.0));
 @NLparameter(cge, kd0[r in regions, s in sectors] == get(sld[:kd0], (r, s), 0.0));
@@ -130,14 +126,14 @@ cge = MCPModel();
 @NLparameter(cge, i0[r in regions, g in goods] == get(sld[:i0], (r, g), 0.0));
 
 # benchmark value share parameters
-@NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s])));
+@NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s]))); 
 @NLparameter(cge, alpha_x[r in regions, g in goods] == (value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g]));
 @NLparameter(cge, alpha_d[r in regions, g in goods] == value(xd0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, alpha_n[r in regions, g in goods] == value(xn0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, theta_n[r in regions, g in goods] == value(nd0[r, g]) / (value(nd0[r, g]) - value(dd0[r, g])));
 @NLparameter(cge, theta_m[r in regions, g in goods] == (1+value(tm0[r, g])) * value(m0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g])));
 
-replace_nan_inf(alpha_kl)
+replace_nan_inf(alpha_kl) 
 replace_nan_inf(alpha_x)
 replace_nan_inf(alpha_d)
 replace_nan_inf(alpha_n)
@@ -160,13 +156,13 @@ replace_nan_inf(theta_m)
 ################
 
 # Set lower bound
-sv = 0.001
+sv = 0.001 
 
 #sectors
-@variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1);
+@variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1); 
 @variable(cge, X[(r, g) in sub_set_x] >= sv, start = 1);
 @variable(cge, A[(r, g) in sub_set_a] >= sv, start = 1);
-@variable(cge, C[r in regions] >= sv, start = 1);
+@variable(cge, C[r in regions] >= sv, start = 1); 
 @variable(cge, MS[r in regions, m in margins] >= sv, start = 1);
 
 #commodities:
@@ -190,7 +186,7 @@ sv = 0.001
 
 #cobb-douglas function for value added (VA)
 @NLexpression(cge,CVA[r in regions,s in sectors],
-  PL[r]^alpha_kl[r,s] * (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0) ^ (1-alpha_kl[r,s]) );
+  PL[r]^alpha_kl[r,s] * (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0) ^ (1-alpha_kl[r,s]) ); 
 
 #demand for labor in VA
 @NLexpression(cge,AL[r in regions, s in sectors], ld0[r,s] * CVA[r,s] / PL[r] );
@@ -222,7 +218,7 @@ sv = 0.001
 
 # CES function for tradeoff between domestic consumption and foreign exports
 # recall tm in the import tariff thus tm / tm0 is the relative change in import tariff rates
-@NLexpression(cge,CDM[r in regions, g in goods],
+@NLexpression(cge,CDM[r in regions,g in goods],
   ((1-theta_m[r,g])*CDN[r,g]^(1-es_f[r,g])+theta_m[r,g]*(PFX*(1+tm[r,g])/(1+tm0[r,g]))^(1-es_f[r,g]))^(1/(1-es_f[r,g])) );
 
 # regions demand from the national market <- note nesting of CDN in CDM
@@ -312,7 +308,7 @@ sv = 0.001
 ###################################
 
 @mapping(cge,market_pa[(r, g) in sub_set_pa],
-# absorption or supply
+# absorption or supply 
         (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g] 
         - ( 
 # government demand (exogenous)       
@@ -455,10 +451,6 @@ sv = 0.001
 
 #set up the options for the path solver
 PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
-
-# export the path license string to the environment
-# this is now done in the SLiDE initiation steps 
-# ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
 
 # solve the model
 status = solveMCP(cge)

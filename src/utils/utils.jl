@@ -261,8 +261,7 @@ permute(x::Vararg{Any}) = vec(collect(Iterators.product(x...)))
 
 """
     add_permutation!(set, x)
-
-This adds a permutation of existing set keys to the input dictionary.
+This function adds a permutation of existing set keys to the input dictionary.
 
 # Arguments
 - `set::Dict` dictionary to update with permutations

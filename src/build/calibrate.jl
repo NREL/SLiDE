@@ -19,40 +19,40 @@ function calibrate(
     dataset::String,
     d::Dict,
     set::Dict;
-    save_build::Bool = SLiDE.DEFAULT_SAVE_BUILD,
-    overwrite::Bool = SLiDE.DEFAULT_OVERWRITE,
-    penalty_nokey = SLiDE.DEFAULT_PENALTY_NOKEY
+    save_build::Bool = DEFAULT_SAVE_BUILD,
+    overwrite::Bool = DEFAULT_OVERWRITE,
+    penalty_nokey = DEFAULT_PENALTY_NOKEY
     )
     CURR_STEP = "calibrate"
     @info("changes made!")
-    
+
     # If there is already calibration data, read it and return.
-    d_read = SLiDE.read_build(dataset, CURR_STEP; overwrite = overwrite)
+    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
     !(isempty(d_read)) && (return d_read)
     
     # Copy the relevant input DataFrames before making any changes.
-    SLiDE._calibration_set!(set)
+    _calibration_set!(set)
     d = Dict(k => copy(d[k]) for k in set[:cal])
     
     # Initialize a DataFrame to contain results and do the calibration iteratively.
     cal = Dict(k => DataFrame() for k in set[:cal])
 
     for year in set[:yr]
-        cal_yr = SLiDE.calibrate(year, d, set; penalty_nokey = penalty_nokey)
+        cal_yr = calibrate(year, d, set; penalty_nokey = penalty_nokey)
         [cal[k] = [cal[k]; cal_yr[k]] for k in set[:cal]]
     end
 
-    SLiDE.write_build!(dataset, CURR_STEP, cal; save_build = save_build)
+    write_build!(dataset, CURR_STEP, cal; save_build = save_build)
     return cal
 end
 
 
-function SLiDE.calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = SLiDE.DEFAULT_PENALTY_NOKEY)
+function calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = DEFAULT_PENALTY_NOKEY)
     @info("Calibrating $year data")
 
     # Prepare the data and initialize the model.
-    SLiDE._calibration_set!(set)
-    (cal, idx) = SLiDE._calibration_input(year, io, set);
+    _calibration_set!(set)
+    (cal, idx) = _calibration_input(year, io, set);
     calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time" => 60.0))
 
     @variable(calib, ys0_est[j in set[:j], i in set[:i]]   >= 0, start = 0);
@@ -138,8 +138,8 @@ function SLiDE.calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = SLiDE.D
     # --- SET BOUNDS -----------------------------------------------------------------------
     # multipliers for lower and upper bound relative
     # to each respective variables reference parameter
-    lb = SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND
-    ub = SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND
+    lb = DEFAULT_CALIBRATE_LOWER_BOUND
+    ub = DEFAULT_CALIBRATE_UPPER_BOUND
 
     [set_lower_bound(ys0_est[j,i], max(0, lb * cal[:ys0][j,i]))  for (j,i)  in set[:j,:i]  ]
     [set_lower_bound(id0_est[i,j], max(0, lb * cal[:id0][i,j]))  for (i,j)  in set[:i,:j]  ]
@@ -198,7 +198,7 @@ end
 
 
 """
-    SLiDE._calibration_input(year::Int, d::Dict, set::Dict)
+    _calibration_input(year::Int, d::Dict, set::Dict)
 This function prepares the input for the calibration routine:
     1. Select parameters relevant to the calibration routine.
     2. For all parameters except taxes (ta0, tm0), set negative values to zero.

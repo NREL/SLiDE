@@ -101,12 +101,12 @@ function _read_from_dir(dir::String; ext = ".csv", run_bash::Bool = false)
     # (any(occursin.(".sh", files)) && any(occursin.(".gdx", files))) && _run_bash(dir, files)
 
     @info("Reading $ext files from $dir.")
-    files = Dict(SLiDE._inp_key(f, ext) => f for f in files if occursin(ext, f))
+    files = Dict(_inp_key(f, ext) => f for f in files if occursin(ext, f))
     d = Dict(k => read_file(joinpath(dir,f)) for (k,f) in files)
 
     # If the file is empty, If there's only one column containing values, rename it to value.
     # This is consistent with SLiDE naming convention.
-    SLiDE._delete_empty!(d)
+    _delete_empty!(d)
     [d[k] = edit_with(df, Rename.(findvalue(df), :value)) for (k,df) in d
         if length(findvalue(df)) == 1]
     return d
@@ -221,9 +221,9 @@ This function reads intermediary build files if they have previously been saved 
 # Returns
 - `d::Dict` of DataFrames
 """
-function read_build(dataset::String, subset::String; overwrite::Bool = SLiDE.DEFAULT_OVERWRITE)
+function read_build(dataset::String, subset::String; overwrite::Bool = DEFAULT_OVERWRITE)
 
-    path = SLiDE.sub_path(dataset, subset)
+    path = sub_path(dataset, subset)
 
     if overwrite == true && isdir(path)
         @info("Deleting $path to overwrite data.")
