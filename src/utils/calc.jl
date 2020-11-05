@@ -92,7 +92,7 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `df::DataFrame`: DataFrame on which to operate.
 - `col::Symbol` or `col::Array{Symbol,1}`: column(s) over which to operate.
 
-# Keyword Arguments
+# Keywords
 - `operation::Function = sum`: Operation to perform over the DataFrame columns. By default,
     the function will return a summation. Other standard summary functions include: `sum`,
     `prod`, `minimum`, `maximum`, `mean`, `var`, `std`, `first`, `last` and `length`.
@@ -127,7 +127,7 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `df::DataFrame`: DataFrame on which to operate.
 - `col::Symbol` or `col::Array{Symbol,1}`: column(s) over which to operate.
 
-# Keyword Arguments
+# Keywords
 - `operation::Function = sum`: Operation to perform over the DataFrame columns. By default,
     the function will return a summation. Other standard summary functions include: `sum`,
     `prod`, `minimum`, `maximum`, `mean`, `var`, `std`, `first`, `last` and `length`.

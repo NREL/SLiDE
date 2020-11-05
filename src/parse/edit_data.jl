@@ -419,7 +419,7 @@ This function can be used to fill zeros in either a dictionary or DataFrame.
 - `d::Dict...`: The dictionary/ies to edit.
 - `df::DataFrame...`: The DataFrame(s) to edit.
 
-# Keyword Arguments
+# Keywords
 - `value_colnames::Any = :value`: "value" column labels to add and set to zero when creating
     a new DataFrame. Default is `:value`.
 
@@ -514,7 +514,7 @@ end
 - `yr::Array{Int64,1}`: List of years overwhich extrapolation is possible (depending on the kwargs)
 - `set::Dict` or `set::NamedTuple` containing list of years, identified by the key `:yr`.
 
-# Keyword Arguments
+# Keywords
 - `backward::Bool = true`: Do we extrapolate backward in time?
 - `forward::Bool = true`: Do we extrapolate forward in time?
 
@@ -720,7 +720,7 @@ filter_with(df::DataFrame, set::Any; kwargs...)
 - `df::DataFrame` to filter.
 - `set::Dict` or `set::NamedTuple`: Values to keep in the DataFrame.
 
-# Keyword Arguments
+# Keywords
 - `extrapolate::Bool = false`: Add missing regions/years to the DataFrame?
     If `extrapolate` is set to true, the following `kwargs` become relevant:
     - When extrapolating over years,

@@ -108,7 +108,7 @@ function (!!!!)
 - `::Type{T}`: target DataType.
 - `x<:Any`: value to convert.
 
-# Keyword Arguments
+# Keywords
 Options available when converting a DataFrame into a dictionary of keys pointing to a value:
 - `drop_cols = []`: Columns not to include in
     the keys. By default, no columns are dropped.

@@ -1,4 +1,4 @@
-Path: [dev, validate, windc_1.0, 5_disagg_out]
+Path: [dev, windc_1.0, 5_disagg_out]
 
 DataInput:
   - {descriptor: ys0,     name: ys0.csv,     col: [yr,r,s,g,value]}

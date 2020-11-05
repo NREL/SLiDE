@@ -1,0 +1,15 @@
+# Path: [dev, windc_1.0, 2_partition_out]
+
+# DataInput:
+#   - {descriptor: ys0, name: ys0.csv, col: [yr,s,g,value]}
+#   - {descriptor: y0,  name: y0.csv,  col: [yr,g,value]}
+#   - {descriptor: fs0, name: fs0.csv, col: [yr,g,value]}
+  
+Path: [dev, windc_1.0, 6_seds_out]
+
+DataInput:
+  - {descriptor: elegen,         name: elegen.csv,         col: [r,src,yr,value]}
+  - {descriptor: sedsco2compare, name: sedsco2compare.csv, col: [co2dim,yr,data_source,value]}
+  - {descriptor: sedsenergy,     name: sedsenergy.csv,     col: [r,pq,e,sec,yr,value]}
+  - {descriptor: sedsother,      name: sedsother.csv,      col: [r,gdpcat,yr,value]}
+  - {descriptor: co2emis,        name: co2emis.csv,        col: [r,yr,co2dim_e,sec,data_source,value]}

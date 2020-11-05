@@ -28,14 +28,4 @@ The blueNOTE dataset is compiled of the following data:
     * State Government Finance ([SGF](https://www.census.gov/programs-surveys/state/data/tables.All.html))
     * State Exports/Imports ([UTD](https://usatrade.census.gov))
 * Energy Information Administration
-<<<<<<< HEAD:docs/src/lib/data.md
     * State Energy Data System ([SEDS](https://www.eia.gov/state/seds))
-
-**`readfiles`** contains a file for each output file produced by the datastream.
-
-# Accessing Original Data Files
-
-## 
-=======
-    * State Energy Data System ([SEDS](https://www.eia.gov/state/seds))
->>>>>>> origin/dev:docs/src/man/data.md
