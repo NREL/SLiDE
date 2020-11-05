@@ -118,14 +118,18 @@ cge = MCPModel();
 @NLparameter(cge, i0[r in regions, g in goods] == get(sld[:i0], (r, g), 0.0));
 
 # benchmark value share parameters                                                  # (note)
+# ensurefinite(x::Float64) = (x in [Inf,NaN]) ? 0.0 : x
+# @NLparameter(cge, alpha_kl[r in regions, s in sectors] == ensurefinite(value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s]))));
+
 @NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s])));
 @NLparameter(cge, alpha_x[r in regions, g in goods] == (value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g]));
 @NLparameter(cge, alpha_d[r in regions, g in goods] == value(xd0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, alpha_n[r in regions, g in goods] == value(xn0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, theta_n[r in regions, g in goods] == value(nd0[r, g]) / (value(nd0[r, g]) - value(dd0[r, g])));
-@NLparameter(cge, theta_m[r in regions, g in goods] == (1+value(tm0[r, g])) * value(m0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g])));
+@NLparameter(cge, theta_m[r in regions, g in goods] == (1+value(tm0[r, g])) * value(m0[r, g])
+    / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g])));
 
-replace_nan_inf(alpha_kl)                                                           # (note)
+replace_nan_inf(alpha_kl)
 replace_nan_inf(alpha_x)
 replace_nan_inf(alpha_d)
 replace_nan_inf(alpha_n)
@@ -144,18 +148,18 @@ replace_nan_inf(theta_m)
 
 
 ################
-# VARIABLES
+# VARIABLES                                                                         # (note)
 ################
 
 # Set lower bound
-sv = 0.001                                                                          # (note)
+sv = 0.001
 
 #sectors
-@variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1);                            # (note)
+@variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1);
 @variable(cge, X[(r, g) in sub_set_x] >= sv, start = 1);
 @variable(cge, A[(r, g) in sub_set_a] >= sv, start = 1);
-@variable(cge, C[r in regions] >= sv, start = 1);                                   # (note)
-@variable(cge, MS[r in regions, m in margins] >= sv, start = 1);                    # (note)
+@variable(cge, C[r in regions] >= sv, start = 1);
+@variable(cge, MS[r in regions, m in margins] >= sv, start = 1);
 
 #commodities:
 @variable(cge, PA[(r, g) in sub_set_pa] >= sv, start = 1); # Regional market (input)
@@ -173,11 +177,11 @@ sv = 0.001                                                                      
 
 
 ###############################
-# -- PLACEHOLDER VARIABLES --
+# -- PLACEHOLDER VARIABLES --                                                       # (note)
 ###############################
 
 #cobb-douglas function for value added (VA)
-@NLexpression(cge,CVA[r in regions,s in sectors],                                   # (note)
+@NLexpression(cge,CVA[r in regions,s in sectors],
   PL[r]^alpha_kl[r,s] * (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0) ^ (1-alpha_kl[r,s]) );
 
 #demand for labor in VA
@@ -234,7 +238,7 @@ sv = 0.001                                                                      
 # -- Zero Profit Conditions --
 ###############################
 
-@mapping(cge,profit_y[(r, s) in sub_set_y],                                         # (note)
+@mapping(cge,profit_y[(r, s) in sub_set_y],
 # cost of intermediate demand
         sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in goods) 
 # cost of labor inputs
