@@ -202,6 +202,7 @@ ensurearray(x::Any) = [x]
 Returns `x` in a tuple.
 """
 ensuretuple(x::Tuple{Vararg{Any}}) = x
+ensuretuple(x::DataFrameRow) = Tuple(x)
 ensuretuple(x::Any) = tuple(x)
 
 
