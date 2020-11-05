@@ -40,9 +40,8 @@ end
 #set benchmark year
 bmkyr=2016
 
-#sld is the slide dictionary of benchmark values filtered for benchmark year
-sld = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true)))
-    for k in keys(d))
+#sld is the slide dictionary of benchmark values filtered for benchmark year        * note *
+sld = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true))) for k in keys(d))
 
 ###############
 # -- SETS --
@@ -117,17 +116,13 @@ cge = MCPModel();
 @NLparameter(cge, nd0[r in regions, g in goods] == get(sld[:nd0], (r, g), 0.0));
 @NLparameter(cge, i0[r in regions, g in goods] == get(sld[:i0], (r, g), 0.0));
 
-# benchmark value share parameters                                                  # (note)
-# ensurefinite(x::Float64) = (x in [Inf,NaN]) ? 0.0 : x
-# @NLparameter(cge, alpha_kl[r in regions, s in sectors] == ensurefinite(value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s]))));
-
+# benchmark value share parameters                                                  * note *
 @NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s])));
 @NLparameter(cge, alpha_x[r in regions, g in goods] == (value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g]));
 @NLparameter(cge, alpha_d[r in regions, g in goods] == value(xd0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, alpha_n[r in regions, g in goods] == value(xn0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, theta_n[r in regions, g in goods] == value(nd0[r, g]) / (value(nd0[r, g]) - value(dd0[r, g])));
-@NLparameter(cge, theta_m[r in regions, g in goods] == (1+value(tm0[r, g])) * value(m0[r, g])
-    / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g])));
+@NLparameter(cge, theta_m[r in regions, g in goods] == (1+value(tm0[r, g])) * value(m0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g])));
 
 replace_nan_inf(alpha_kl)
 replace_nan_inf(alpha_x)
@@ -148,7 +143,7 @@ replace_nan_inf(theta_m)
 
 
 ################
-# VARIABLES                                                                         # (note)
+# VARIABLES                                                                         * note *
 ################
 
 # Set lower bound
@@ -177,7 +172,7 @@ sv = 0.001
 
 
 ###############################
-# -- PLACEHOLDER VARIABLES --                                                       # (note)
+# -- PLACEHOLDER VARIABLES --                                                       * note *
 ###############################
 
 #cobb-douglas function for value added (VA)
