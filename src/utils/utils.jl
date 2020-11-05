@@ -1,7 +1,3 @@
-using DataFrames
-using Dates
-using Base
-
 """
     function datatype(str::String)
 This function evaluates an input string as a DataType if it is defined.
@@ -15,9 +11,9 @@ end
 
 """
     Base.broadcastable(x::InvertedIndex{T}) where {T<:Any}
-!!!!
+(!!!!) add docs here.
 """
-Base.broadcastable(x::InvertedIndex{T}) where {T<:Any} = [x];
+Base.broadcastable(x::InvertedIndex{T}) where {T <: Any} = [x];
 
 """
     Base.split(x::Missing)
@@ -26,6 +22,7 @@ Extends `split` to ignore missing fields.
 """
 Base.split(str::Missing) = str
 Base.split(str::Missing, splitter::Any) = str
+Base.split(x::Symbol) = Symbol.(split(string(x)))
 
 """
     Base.strip(x::Missing)
@@ -92,7 +89,7 @@ dropvalue(df::DataFrame, x::Float64) = dropvalue!(copy(df), x)
     dropzero!(df::DataFrame)
 Returns a DataFrame without zero values in columns of type AbstractFloat.
 """
-dropzero!(df::DataFrame) = dropvalue!(df, 0.0)
+dropzero!(df::DataFrame) = dropvalue!(dropvalue!(df, 0.0), -0.0)
 dropzero(df::DataFrame) = dropzero!(copy(df))
 
 dropnan!(df::DataFrame) = dropvalue!(df, NaN)
@@ -120,26 +117,28 @@ Options available when converting a DataFrame into a dictionary of keys pointing
 # Returns
 Data in specified type
 """
-convert_type(::Type{T}, x::Any) where T<:AbstractString = string(x)
-convert_type(::Type{T}, x::Date) where T<:Integer = Dates.year(x)
+convert_type(::Type{T}, x::Any) where T <: AbstractString = string(x)
+convert_type(::Type{T}, x::Dates.Date) where T <: Integer = Dates.year(x)
 
 convert_type(::Type{Map}, x::Group) = Map(x.file, [x.from], x.to, [x.input], x.output, :inner)
+convert_type(::Type{CSVInput}, x::DataInput) = CSVInput(x.name, x.descriptor)
+convert_type(::Type{CSVInput}, x::SetInput) = CSVInput(x.name, "set")
 
-convert_type(::Type{T}, x::AbstractString) where T<:AbstractString = string(strip(x))
+convert_type(::Type{T}, x::AbstractString) where T <: AbstractString = string(strip(x))
 
-function convert_type(::Type{T}, x::AbstractString) where T<:Integer
+function convert_type(::Type{T}, x::AbstractString) where T <: Integer
     return convert_type(T, convert_type(Float64, x))
 end
 
-function convert_type(::Type{T}, x::AbstractString) where T<:Real
-    return parse(T, reduce(replace, ["," => "", "\"" => ""], init = x))
+function convert_type(::Type{T}, x::AbstractString) where T <: Real
+    return parse(T, reduce(replace, ["," => "", "\"" => ""], init=x))
 end
 
-convert_type(::Type{T}, x::Symbol) where T<:Real = convert_type(T, convert_type(String, x))
+convert_type(::Type{T}, x::Symbol) where T <: Real = convert_type(T, convert_type(String, x))
 
 convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1}) = [DataFrame.(lst)...;]
 
-function convert_type(::Type{DataFrame}, arr::JuMP.Containers.DenseAxisArray; cols = [])
+function convert_type(::Type{DataFrame}, arr::JuMP.Containers.DenseAxisArray; cols=[])
     cols = ensurearray(cols)
     
     val = JuMP.value.(arr.data)
@@ -150,7 +149,7 @@ function convert_type(::Type{DataFrame}, arr::JuMP.Containers.DenseAxisArray; co
     return edit_with(df, Rename.(propertynames(df)[1:length(cols)], cols))
 end
 
-function convert_type(::Type{Dict}, df::DataFrame; drop_cols = [], value_col::Symbol = :Float)
+function convert_type(::Type{Dict}, df::DataFrame; drop_cols=[], value_col::Symbol=:Float)
     # Find and save the column containing values and that/those containing keys.
     # If no value column indicator is specified, find the first DataFrame column of floats.
     value_col == :Float && (value_col = find_oftype(df, AbstractFloat)[1])
@@ -164,12 +163,14 @@ end
 
 convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
 
-convert_type(::Type{Array{T}}, x::Any) where T<:Any = convert_type.(T, x)
-convert_type(::Type{Array{T,1}}, x::Any) where T<:Any = convert_type.(T, x)
+convert_type(::Type{Array{T}}, x::Any) where T <: Any = convert_type.(T, x)
+convert_type(::Type{Array{T,1}}, x::Any) where T <: Any = convert_type.(T, x)
+
+# WARNING: DEPRECIATED.
 convert_type(::Type{Array}, d::Dict) = [collect(values(d))...;]
 
-convert_type(::Type{T}, x::Missing) where T<:Real = x;
-convert_type(::Type{T}, x::Missing) where T<:AbstractString = x
+convert_type(::Type{T}, x::Missing) where T <: Real = x;
+convert_type(::Type{T}, x::Missing) where T <: AbstractString = x
 convert_type(::Type{Any}, x::AbstractString) = "missing" == lowercase(x) ? missing : x
 convert_type(::Type{Any}, x::Any) = x
 
@@ -193,6 +194,7 @@ isarray(::Any) = false
 ensurearray(x::Array{T,1}) where T <: Any = x
 ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
 ensurearray(x::UnitRange) = collect(x)
+ensurearray(x::Base.ValueIterator) = [collect(x)...;]
 ensurearray(x::Any) = [x]
 
 """
@@ -202,26 +204,16 @@ Returns `x` in a tuple.
 ensuretuple(x::Tuple{Vararg{Any}}) = x
 ensuretuple(x::Any) = tuple(x)
 
+
 """
 """
 istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(dropmissing(df))), T)
-# eltype.(eachcol(df))
 
-function hasnames(df::DataFrame, cols::Array{Symbol,1})
-    col_in = setdiff(propertynames(df),cols)
-    col_out = setdiff(cols, propertynames(df))
-    return (length(col_in) == 0) && (length(col_out) == 0)
-end
 
-function ensurenames!(df::DataFrame, cols::Array{Symbol,1})
-    size(df,2) !== length(cols) && @error("Can only ensure column names of the data frame length")
-    cols_in = setdiff(propertynames(df),cols)
-    cols_out = setdiff(cols, propertynames(df))
+"""
+"""
+DataFrames.select!(df::DataFrame, x::Parameter) = select!(df, [x.index; :value])
 
-    [rename!(df, col_in => col_out) for (col_in,col_out) in zip(cols_in,cols_out)]
-    return df[:,cols]
-end
-ensurenames(df::DataFrame, cols::Array{Symbol,1}) = ensurenames!(copy(df), cols)
 
 """
     find_oftype(df::DataFrame, T::DataType)
@@ -232,50 +224,75 @@ find_oftype(df::DataFrame, T::DataType) = propertynames(df)[istype(df, T)]
 find_oftype(df::DataFrame, T::InvertedIndex{DataType}) = propertynames(df)[.!istype(df, T.skip)]
 
 function find_oftype(d::Dict, T::DataType)
-    return Dict(k => v for (k,v) in d if any(broadcast(<:, typeof.(ensurearray(v)), T)))
+    return Dict(k => v for (k, v) in d if any(broadcast(<:, typeof.(ensurearray(v)), T)))
 end
+
 
 """
     permute(x::Any)
-This function finds all possible permutations of the input arrays.
+    permute(x...)
 
 # Arguments
-- `x::Tuple` or `x::NamedTuple{}` or `x::Array`: list of arrays to permute.
-    If `x` is a NamedTuple, its values will be permuted.
+- `x::Any`: input data to permute
 
 # Returns
-- `x::Array{Tuple,1}`: list of all possible permutations of the input values.
-    If `x` does not contain at least one array, there will be nothing to permute and the function will return `x`.
+All possible permutations of the input values. 
+    - `x::DataFrame` or `x::NamedTuple`: Input type and key/column names will be preserved.
+    - Given any other input `x`,
+        - `x::Array{Tuple,1}` of the possible combinations of the input data.
+            Each tuple will be ordered in the same way the input data was ordered.
+        - `x::Any`: If `x` does not contain multiple sets to permute, `permute` will return
+            `x`, unchanged.
 """
 function permute(df::DataFrame)
-    cols = propertynames(df)
-    df = sort(DataFrame(ensuretuple.(permute(unique.(eachcol(df))))))
-    df = edit_with(df, Rename.(propertynames(df), cols))
-    return df
-end
-
-function permute(x::Tuple)
-    xperm = if length(x) == 1
-        sort(unique(x[1]))
-    else
-        [collect(Base.Iterators.product(sort.(unique.(ensurearray.(x)))...))...;]
-    end
-    return xperm
+    idx = propertynames(df)
+    val = DataFrame(permute(unique.(eachcol(df))))
+    return edit_with(val, Rename.(propertynames(val), idx))
 end
 
 function permute(x::NamedTuple)
-    cols = keys(x)
-    xperm = eachcol(sort(DataFrame(Tuple.(ensurearray.(permute(ensurearray.(values(x))))))))
-    return NamedTuple{Tuple(cols,)}(xperm,)
+    idx = keys(x)
+    val = eachcol(DataFrame(ensuretuple.(permute(values(x)))))
+    return NamedTuple{Tuple(idx, )}(val, )
 end
 
-function permute(x::Array)
-    xperm = if any(isarray.(x))
-        permute(Tuple(x))
-    elseif length(unique(length.(x))) .== 1 && all(length.(x) .> 1)
-        permute(unique.(eachcol(DataFrame(x))))
-    else
-        sort(unique(x))
-    end
-    return xperm
+permute(x::Any) = any(isarray.(x)) ? permute(x...) : x
+permute(x::Vararg{Any}) = vec(collect(Iterators.product(x...)))
+
+
+"""
+    add_permutation!(set, x)
+This function adds a permutation of existing set keys to the input dictionary.
+If the dictionary does not contiain all of the sets specified in `x`,
+the function will produce an error.
+
+# Arguments
+- `set::Dict` dictionary to update with permutations
+- `x::Tuple{Symbol,1}`: set keys to permute
+"""
+function add_permutation!(set::Dict, x::Tuple)
+    if !(x in keys(set))
+        missing_keys = setdiff(ensurearray(x), keys(set))
+        if !isempty(missing_keys)
+            @error("Cannot create a composite $x. Key(s) $missing_keys missing from set.")
+        end
+        set[x] = sort(permute([[set[k] for k in x]...,]))
+        end
+    return set[x]
 end
+
+
+"""
+# Returns
+- `val::Array{Symbol,1}` of input DataFrame propertynames indicating values, which are
+    defined as columns that DO contain `AbstractFloat` or `Bool` DataTypes.
+"""
+findvalue(df::DataFrame) = [find_oftype(df, AbstractFloat); find_oftype(df, Bool)]
+
+
+"""
+# Returns
+- `idx::Array{Symbol,1}` of input DataFrame propertynames indicating indices, which are
+    defined as columns that do NOT contain `AbstractFloat` or `Bool` DataTypes.
+"""
+findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))

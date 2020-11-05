@@ -90,16 +90,8 @@ df[!,:MAPPED_cbsa_code_0] .= df[:,:MAPPED_cbsa_code]
 # #     joincols = Symbol.(uppercase(key),:_,joincols0);
 
 # #     df_temp = edit_with(df_temp, Rename.(joincols0, joincols));
-
-
 # #     global df = leftjoin(df, df_temp, on = :ma)
 # # end
-
-
-
-
-
-
 
 
 # # # df_metro_area = sort(unique(df_metro[:,[:orig_ma,:dest_ma]]));
@@ -124,5 +116,3 @@ df[!,:MAPPED_cbsa_code_0] .= df[:,:MAPPED_cbsa_code]
 
 # # # df_metro_area[!,:found_csa] .= sum.(eachrow(ismissing.(df_metro_area[:,occursin.(:csa, propertynames(df_metro_area))])))
 # # # df_metro_area[!,:found_cbsa] .= sum.(eachrow(ismissing.(df_metro_area[:,occursin.(:cbsa, propertynames(df_metro_area))])))
-
-
