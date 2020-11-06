@@ -76,6 +76,8 @@ end
 - `idx::Dict` of parameter indices.
 """
 function _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
+    @info("Preparing model data for $year.")
+    
     d = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
 
     isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d))
