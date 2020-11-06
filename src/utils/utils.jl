@@ -169,6 +169,7 @@ convert_type(::Type{Array{T,1}}, x::Any) where T <: Any = convert_type.(T, x)
 # WARNING: DEPRECIATED.
 convert_type(::Type{Array}, d::Dict) = [collect(values(d))...;]
 
+convert_type(::Type{Array{Tuple}}, df::DataFrame) = ensuretuple.(eachrow(df))
 convert_type(::Type{T}, x::Missing) where T <: Real = x;
 convert_type(::Type{T}, x::Missing) where T <: AbstractString = x
 convert_type(::Type{Any}, x::AbstractString) = "missing" == lowercase(x) ? missing : x

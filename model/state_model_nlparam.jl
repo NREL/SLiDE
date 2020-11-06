@@ -41,6 +41,7 @@ function vSet(
 end
 
 
+"This function replaces `NaN` or `Inf` values with `0.0`."
 ensurefinite(x::Float64) = (isnan(x) || x==Inf) ? 0.0 : x
 
 
@@ -113,9 +114,6 @@ function _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
     return (set, idx)
 end
 
-
-
-
 ############
 # LOAD DATA
 ############
@@ -140,7 +138,6 @@ goods = set[:g]
 margins = set[:m]
 goods_margins = set[:gm]
 
-
 ########## Model ##########
 cge = MCPModel();
 
@@ -151,7 +148,7 @@ register(cge,:vSet, 2, vSet, autodiff=true)
 ##############
 
 #benchmark values
-@NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == get(sld[:ys0], (r, s, g), 0.0));
+@NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == get(sld[:ys0], (r, s, g), 0.0)); 
 @NLparameter(cge, id0[r in regions, s in sectors, g in goods] == get(sld[:id0], (r, s, g), 0.0));
 @NLparameter(cge, ld0[r in regions, s in sectors] == get(sld[:ld0], (r, s), 0.0));
 @NLparameter(cge, kd0[r in regions, s in sectors] == get(sld[:kd0], (r, s), 0.0));
@@ -181,8 +178,8 @@ register(cge,:vSet, 2, vSet, autodiff=true)
 @NLparameter(cge, nd0[r in regions, g in goods] == get(sld[:nd0], (r, g), 0.0));
 @NLparameter(cge, i0[r in regions, g in goods] == get(sld[:i0], (r, g), 0.0));
 
-# benchmark value share parameters                                                  * note *
-@NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s])));
+# benchmark value share parameters
+@NLparameter(cge, alpha_kl[r in regions, s in sectors] == value(ld0[r, s]) / (value(ld0[r, s]) + value(kd0[r, s]))); 
 @NLparameter(cge, alpha_x[r in regions, g in goods] == (value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g]));
 @NLparameter(cge, alpha_d[r in regions, g in goods] == value(xd0[r, g]) / value(s0[r, g]));
 @NLparameter(cge, alpha_n[r in regions, g in goods] == value(xn0[r, g]) / value(s0[r, g]));
@@ -208,7 +205,7 @@ replace_nan_inf(theta_m)
 
 
 ################
-# VARIABLES                                                                         * note *
+# VARIABLES
 ################
 
 # Set lower bound
@@ -237,7 +234,7 @@ sv = 0.001
 
 
 ###############################
-# -- PLACEHOLDER VARIABLES --                                                       * note *
+# -- PLACEHOLDER VARIABLES --
 ###############################
 
 #cobb-douglas function for value added (VA)
@@ -447,10 +444,10 @@ sv = 0.001
 # supply of exports     
         + sum((haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1.0)  * AX[r,g] for r in regions for g in goods)
 # supply of re-exports        
-        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * rx0[r,g] for r in regions for g in goods if (r,s) in set[:A])
+        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * rx0[r,g] for r in regions for g in goods if (r,g) in set[:A])
         - 
 # import demand                
-        sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] for r in regions for g in goods if (r,s) in set[:A])
+        sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] for r in regions for g in goods if (r,g) in set[:A])
 );
 
 @mapping(cge,income_ra[r in regions],
@@ -469,9 +466,9 @@ sv = 0.001
 # government and investment provision        
         - sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * (g0[r,g] + i0[r,g]) for g in goods)
 # import taxes - assumes lumpsum recycling
-        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] * PFX * tm[r,g] for g in goods if (r,s) in set[:A])
+        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] * PFX * tm[r,g] for g in goods if (r,g) in set[:A])
 # taxes on intermediate demand - assumes lumpsum recycling
-        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * a0[r,g]*(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)*ta[r,g] for g in goods if (r,s) in set[:A])
+        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * a0[r,g]*(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)*ta[r,g] for g in goods if (r,g) in set[:A])
 # production taxes - assumes lumpsum recycling  
         + sum( (haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1.0) * ys0[r,s,g] * ty[r,s] for s in sectors, g in goods)
         )
