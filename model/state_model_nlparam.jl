@@ -16,13 +16,6 @@ using DataFrames
 # -- FUNCTIONS --
 #################
 
-#Convert/create all combinations of different sets (regions, sectors, etc) as tuples
-#Then reshape array of tuples as a one dimensional column vector
-#Used in parameter definition
-function combvec(set_a...)
-    return vec(collect(Iterators.product(set_a...)))
-end
-
 # Replaces nan's for denseaxisarray
 # Used mainly for value shares w/ zero denominator
 function replace_nan_inf(
@@ -48,6 +41,80 @@ function vSet(
 end
 
 
+"This function replaces `NaN` or `Inf` values with `0.0`."
+ensurefinite(x::Float64) = (isnan(x) || x==Inf) ? 0.0 : x
+
+
+"""
+    nonzero_subset(df::DataFrame)
+
+# Returns
+- `x::Array{Tuple,1}` of all parameter indices corresponding with non-zero values
+- `idx::Array{Symbol,1}` of parameter indices in `df`
+"""
+function nonzero_subset(df::DataFrame)
+    idx = findindex(df)
+    val = convert_type(Array{Tuple}, dropzero(df)[:,idx])
+    return (val, idx)
+end
+
+
+"""
+    _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
+
+# Arguments
+- `year::Int`: year for which to perform calibration
+- `d::Dict{Symbol,DataFrame}` of DataFrames containing the model data.
+- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `idx::Dict` of parameter indices
+
+# Returns
+- `d::Dict{Symbol,Dict}` of model data with all zeros filled
+- `set::Dict` of model indices, with added arrays of tuples indicating which (region,sector)
+    or (region,good) combinations are relevant to the zero-profit and market-clearing
+    conditions.
+- `idx::Dict` of parameter indices.
+"""
+function _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
+    @info("Preparing model data for $year.")
+    
+    d = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
+
+    isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d))
+    (set, idx) = _model_set!(d, set, idx)
+
+    d = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d)
+    return (d, set, idx)
+end
+
+
+"""
+    _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
+This function returns subsets intended to limit the size of the model by including only
+non-zero values when mapping zero-profit and market-clearing conditions.
+
+# Arguments
+- `d::Dict{Symbol,DataFrame}` of DataFrames containing the model data.
+- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `idx::Dict` of parameter indices
+
+# Returns
+- `d::Dict{Symbol,Dict}` of model data with all zeros filled
+- `set::Dict` of model indices, with added arrays of tuples indicating which (region,sector)
+    or (region,good) combinations are relevant to the zero-profit and market-clearing
+    conditions.
+- `idx::Dict` of indices, updated to include those used to define the newly-added sets.
+"""
+function _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
+    (set[:A], idx[:A]) = nonzero_subset(d[:a0] + d[:rx0])
+    (set[:Y], idx[:Y]) = nonzero_subset(combine_over(d[:ys0], :g))
+    (set[:X], idx[:X]) = nonzero_subset(d[:s0])
+    (set[:PA], idx[:PA]) = (set[:A], idx[:A])
+    (set[:PD], idx[:PA]) = nonzero_subset(d[:xd0])
+    (set[:PK], idx[:PK]) = nonzero_subset(d[:kd0])
+    (set[:PY], idx[:PY]) = (set[:PK], idx[:PK])
+    return (set, idx)
+end
 
 ############
 # LOAD DATA
@@ -55,14 +122,12 @@ end
 
 #SLiDE data needs to be built or point to pre-existing build directory
 #can pass a name (d, set) = build_data("name_of_build_directory")
-(d, set) = build_data("state_model")
+!(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build_data("state_model"))
+d = copy(d_in)
+set = copy(set_in)
 
-#set benchmark year
-bmkyr=2016
-
-#sld is the slide dictionary of benchmark values filtered for benchmark year
-sld = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true)))
-    for k in keys(d))
+bmkyr = 2016
+(sld, set, idx) = _model_input(bmkyr, d, set)
 
 ###############
 # -- SETS --
@@ -74,30 +139,6 @@ sectors = set[:s]
 goods = set[:g]
 margins = set[:m]
 goods_margins = set[:gm]
-
-
-#following subsets are used to limit the size of the model
-# the a_set restricits the A variables indices to those
-# with positive armington supply or re-exports
-a_set = Dict()
-[a_set[r,g] = get(sld[:a0], (r,g), 0.0) + get(sld[:rx0], (r,g), 0.0) for r in regions for g in goods]
-
-# y_check is used to make sure the r/s combination 
-# has a reference amount of sectoral supply
-y_check = Dict()
-[y_check[r,s] = sum(get(sld[:ys0], (r,s,g), 0.0) for g in goods) for r in regions for s in sectors]
-
-
-#subsets for model equation controls
-sub_set_y = filter(x -> y_check[x] != 0.0, permute(regions, sectors));
-sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, permute(regions, goods));
-sub_set_x = filter(x -> get(sld[:s0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));      # empty
-sub_set_pa = filter(x -> get(sld[:a0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));     # same as sub_set_a
-sub_set_pd = filter(x -> get(sld[:xd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
-sub_set_pk = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
-sub_set_py = filter(x -> get(sld[:kd0], (x[1], x[2]), 0.0) != 0.0, permute(regions, goods));
-sub_set_py = filter(x -> y_check[x[1], x[2]] != 0, permute(regions, goods));
-
 
 ########## Model ##########
 cge = MCPModel();
@@ -147,7 +188,7 @@ register(cge,:vSet, 2, vSet, autodiff=true)
 @NLparameter(cge, theta_n[r in regions, g in goods] == value(nd0[r, g]) / (value(nd0[r, g]) - value(dd0[r, g])));
 @NLparameter(cge, theta_m[r in regions, g in goods] == (1+value(tm0[r, g])) * value(m0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g])));
 
-replace_nan_inf(alpha_kl) 
+replace_nan_inf(alpha_kl)
 replace_nan_inf(alpha_x)
 replace_nan_inf(alpha_d)
 replace_nan_inf(alpha_n)
@@ -170,22 +211,22 @@ replace_nan_inf(theta_m)
 ################
 
 # Set lower bound
-sv = 0.001                                                                          # (note)
+sv = 0.001
 
 #sectors
-@variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1);                            # (note)
-@variable(cge, X[(r, g) in sub_set_x] >= sv, start = 1);
-@variable(cge, A[(r, g) in sub_set_a] >= sv, start = 1);
-@variable(cge, C[r in regions] >= sv, start = 1);                                   # (note)
+@variable(cge, Y[(r, s) in set[:Y]] >= sv, start = 1);
+@variable(cge, X[(r, g) in set[:X]] >= sv, start = 1);
+@variable(cge, A[(r, g) in set[:A]] >= sv, start = 1);
+@variable(cge, C[r in regions] >= sv, start = 1);
 @variable(cge, MS[r in regions, m in margins] >= sv, start = 1);
 
 #commodities:
-@variable(cge, PA[(r, g) in sub_set_pa] >= sv, start = 1); # Regional market (input)
-@variable(cge, PY[(r, g) in sub_set_py] >= sv, start = 1); # Regional market (output)
-@variable(cge, PD[(r, g) in sub_set_pd] >= sv, start = 1); # Local market price
+@variable(cge, PA[(r, g) in set[:PA]] >= sv, start = 1); # Regional market (input)
+@variable(cge, PY[(r, g) in set[:PY]] >= sv, start = 1); # Regional market (output)
+@variable(cge, PD[(r, g) in set[:PD]] >= sv, start = 1); # Local market price
 @variable(cge, PN[g in goods] >= sv, start =1); # National market
 @variable(cge, PL[r in regions] >= sv, start = 1); # Wage rate
-@variable(cge, PK[(r, s) in sub_set_pk] >= sv, start =1); # Rental rate of capital ###
+@variable(cge, PK[(r, s) in set[:PK]] >= sv, start =1); # Rental rate of capital ###
 @variable(cge, PM[r in regions, m in margins] >= sv, start =1); # Margin price
 @variable(cge, PC[r in regions] >= sv, start = 1); # Consumer price index #####
 @variable(cge, PFX >= sv, start = 1); # Foreign exchange
@@ -199,7 +240,7 @@ sv = 0.001                                                                      
 ###############################
 
 #cobb-douglas function for value added (VA)
-@NLexpression(cge,CVA[r in regions,s in sectors],                                   # (note)
+@NLexpression(cge,CVA[r in regions,s in sectors],
   PL[r]^alpha_kl[r,s] * (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0) ^ (1-alpha_kl[r,s]) );
 
 #demand for labor in VA
@@ -256,7 +297,7 @@ sv = 0.001                                                                      
 # -- Zero Profit Conditions --
 ###############################
 
-@mapping(cge,profit_y[(r, s) in sub_set_y],
+@mapping(cge,profit_y[(r, s) in set[:Y]],
 # cost of intermediate demand
         sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in goods) 
 # cost of labor inputs
@@ -268,7 +309,7 @@ sv = 0.001                                                                      
         sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in goods) * (1-ty[r,s])
 );
 
-@mapping(cge,profit_x[(r, g) in sub_set_x],
+@mapping(cge,profit_x[(r, g) in set[:X]],
 # output 'cost' from aggregate supply
          (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * s0[r,g] 
         - (
@@ -281,7 +322,7 @@ sv = 0.001                                                                      
         )
 );
 
-@mapping(cge,profit_a[(r, g) in sub_set_a],
+@mapping(cge,profit_a[(r, g) in set[:A]],
 # costs from national market
         PN[g] * DN[r,g] 
 # costs from domestic market                  
@@ -321,10 +362,9 @@ sv = 0.001                                                                      
 # -- Market Clearing Conditions -- 
 ###################################
 
-@mapping(cge,market_pa[(r, g) in sub_set_pa],
+@mapping(cge,market_pa[(r, g) in set[:PA]],
 # absorption or supply
-        (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * a0[r,g] 
-#        (vSet(A,(r,g)))*a0[r,g]
+        (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g] 
         - ( 
 # government demand (exogenous)       
         g0[r,g] 
@@ -333,11 +373,11 @@ sv = 0.001                                                                      
 # final demand        
         + C[r] * CD[r,g]
 # intermediate demand        
-        + sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1.0) * id0[r,g,s] for s in sectors if (y_check[r,s] > 0))
+        + sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1.0) * id0[r,g,s] for s in sectors if (r,s) in set[:Y])
         )
 );
 
-@mapping(cge,market_py[(r, g) in sub_set_py],
+@mapping(cge,market_py[(r, g) in set[:PY]],
 # sectoral supply
         sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1.0) *ys0[r,s,g] for s in sectors)
 # household production (exogenous)        
@@ -347,7 +387,7 @@ sv = 0.001                                                                      
        (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1.0) * s0[r,g]
 );
 
-@mapping(cge,market_pd[(r, g) in sub_set_pd],
+@mapping(cge,market_pd[(r, g) in set[:PD]],
 # aggregate supply
         (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1.0)  * AD[r,g] 
         - ( 
@@ -377,7 +417,7 @@ sv = 0.001                                                                      
         sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1.0) * AL[r,s] for s in sectors)
 );
 
-@mapping(cge,market_pk[(r, s) in sub_set_pk],
+@mapping(cge,market_pk[(r, s) in set[:PK]],
         kd0[r,s]
         - 
 #current year's capital 
@@ -406,10 +446,10 @@ sv = 0.001                                                                      
 # supply of exports     
         + sum((haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1.0)  * AX[r,g] for r in regions for g in goods)
 # supply of re-exports        
-        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * rx0[r,g] for r in regions for g in goods if (a_set[r,g] != 0))
+        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * rx0[r,g] for r in regions for g in goods if (r,g) in set[:A])
         - 
 # import demand                
-        sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] for r in regions for g in goods if (a_set[r,g] != 0))
+        sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] for r in regions for g in goods if (r,g) in set[:A])
 );
 
 @mapping(cge,income_ra[r in regions],
@@ -428,9 +468,9 @@ sv = 0.001                                                                      
 # government and investment provision        
         - sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * (g0[r,g] + i0[r,g]) for g in goods)
 # import taxes - assumes lumpsum recycling
-        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] * PFX * tm[r,g] for g in goods if (a_set[r,g] != 0))
+        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] * PFX * tm[r,g] for g in goods if (r,g) in set[:A])
 # taxes on intermediate demand - assumes lumpsum recycling
-        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * a0[r,g]*(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)*ta[r,g] for g in goods if (a_set[r,g] != 0) )
+        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * a0[r,g]*(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)*ta[r,g] for g in goods if (r,g) in set[:A])
 # production taxes - assumes lumpsum recycling  
         + sum( (haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1.0) * ys0[r,s,g] * ty[r,s] for s in sectors, g in goods)
         )
