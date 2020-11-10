@@ -39,6 +39,7 @@ export SLIDE_DIR
 
 # EXPORTS
 export Add
+export Combine
 export Describe
 export Drop
 export Group
@@ -49,6 +50,7 @@ export Order
 export Match
 export Rename
 export Replace
+export Deselect
 export Stack
 
 export SetInput
