@@ -2,6 +2,8 @@
 #
 # Extension of Canonical blueNOTE 
 #    model to include dynamics
+# Extension of SLiDE model to include
+#       dynamics and perfect foresight
 #
 ####################################
 
@@ -11,9 +13,6 @@ using JuMP
 using Complementarity
 using DataFrames
 
-# Note - using the comlementarity package until the native JuMP implementation 
-#        of complementarity constraints allows for exponents neq 0/1/2
-#               --- most recently tested on May 11, 2020 --- 
 
 #################
 # -- FUNCTIONS --
@@ -78,215 +77,196 @@ end
 #steady state rental rate of capital is interest plus depreciation
 rk0 = i + delta
 
-##################
+
+#################
 # -- FUNCTIONS --
-##################
+#################
 
-#replace here with "collect"
-function key_to_vec(d::Dict,index_num::Int64)
-  return [k[index_num] for k in keys(d)]
+"This function replaces `NaN` or `Inf` values with `0.0`."
+ensurefinite(x::Float64) = (isnan(x) || x==Inf) ? 0.0 : x
+
+
+"""
+    nonzero_subset(df::DataFrame)
+
+# Returns
+- `x::Array{Tuple,1}` of all parameter indices corresponding with non-zero values
+- `idx::Array{Symbol,1}` of parameter indices in `df`
+"""
+function nonzero_subset(df::DataFrame)
+    idx = findindex(df)
+    val = convert_type(Array{Tuple}, dropzero(df)[:,idx])
+    return (val, idx)
 end
 
-function fill_zero(source::Dict,tofill::Dict)
-  for k in keys(source)
-      if !haskey(tofill,k)
-          push!(tofill,k=>0)
-      end
-  end
+    
+
+"""
+    _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
+
+# Arguments
+- `year::Int`: year for which to perform calibration
+- `d::Dict{Symbol,DataFrame}` of DataFrames containing the model data.
+- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `idx::Dict` of parameter indices
+
+# Returns
+- `d::Dict{Symbol,Dict}` of model data with all zeros filled
+- `set::Dict` of model indices, with added arrays of tuples indicating which (region,sector)
+    or (region,good) combinations are relevant to the zero-profit and market-clearing
+    conditions.
+- `idx::Dict` of parameter indices.
+"""
+function _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
+    @info("Preparing model data for $year.")
+    
+    d = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
+
+    isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d))
+    (set, idx) = _model_set!(d, set, idx)
+
+    d = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d)
+    return (d, set, idx)
 end
 
-function fill_zero(source::Tuple, tofill::Dict)
-# Assume all possible permutations of keys should be present
-# and determine which are missing.
-  allkeys = vcat(collect(Base.Iterators.product(source...))...)
-  missingkeys = setdiff(allkeys, collect(keys(tofill)))
+function _model_input(year::Array{Int,1}, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
+        @info("Preparing model data for $year.")
+        
+        d2 = Dict(k => filter_with(df, (yr = year,); extrapolate = true, drop = false) for (k,df) in d)
+    
+        isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d2))
+        (set, idx) = _model_set!(d2, set, idx)
 
-  [push!(tofill, fill=>0) for fill in missingkeys]
-  return tofill
+        d1 = Dict(k => filter_with(df, (yr = year,); extrapolate = false, drop = true) for (k,df) in d)
+        d1 = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d1)
+        return (d, set, idx)
 end
 
-#function here simplifies the loading and subsequent subsetting of the dataframes
-function read_data_temp(file::String,year::Int64,dir::String,desc::String)
-  df = SLiDE.read_file(dir,CSVInput(name=string(file,".csv"),descriptor=desc))
-  df = df[df[!,:yr].==year,:]
-  return df
+function _model_input(year::UnitRange{Int64}, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
+        return _model_input(ensurearray(year), d, set, idx)
 end
 
-function df_to_dict(df::DataFrame,remove_columns::Vector{Symbol},value_column::Symbol)
-  colnames = setdiff(names(df),[remove_columns; value_column])
-  return Dict(tuple(row[colnames]...)=>row[:Val] for row in eachrow(df))
-end
+"""
+    _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
+This function returns subsets intended to limit the size of the model by including only
+non-zero values when mapping zero-profit and market-clearing conditions.
 
+# Arguments
+- `d::Dict{Symbol,DataFrame}` of DataFrames containing the model data.
+- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `idx::Dict` of parameter indices
+
+# Returns
+- `d::Dict{Symbol,Dict}` of model data with all zeros filled
+- `set::Dict` of model indices, with added arrays of tuples indicating which (region,sector)
+    or (region,good) combinations are relevant to the zero-profit and market-clearing
+    conditions.
+- `idx::Dict` of indices, updated to include those used to define the newly-added sets.
+"""
+function _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
+    (set[:A], idx[:A]) = nonzero_subset(d[:a0] + d[:rx0])
+    (set[:Y], idx[:Y]) = nonzero_subset(combine_over(d[:ys0], :g))
+    (set[:X], idx[:X]) = nonzero_subset(d[:s0])
+    (set[:PA], idx[:PA]) = (set[:A], idx[:A])
+    (set[:PD], idx[:PA]) = nonzero_subset(d[:xd0])
+    (set[:PK], idx[:PK]) = nonzero_subset(d[:kd0])
+    (set[:PY], idx[:PY]) = (set[:PK], idx[:PK])
+    return (set, idx)
+end
 
 ############
 # LOAD DATA
 ############
 
-#specify the path where the dumped csv files are stored
-data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
+#SLiDE data needs to be built or point to pre-existing build directory
+#can pass a name (d, set) = build_data("name_of_build_directory")
+!(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build_data("state_model"))
+d = copy(d_in)
+set = copy(set_in)
 
-#blueNOTE contains a dictionary of the parameters needed to specify the model
-blueNOTE = Dict(
-    :ys0 => df_to_dict(read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"),[:yr],:Val),
-    :id0 => df_to_dict(read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"),[:yr],:Val),
-    :ld0 => df_to_dict(read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"),[:yr],:Val),
-    :kd0 => df_to_dict(read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"),[:yr],:Val),
-    :ty0 => df_to_dict(read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"),[:yr],:Val),
-    :m0 => df_to_dict(read_data_temp("m0",mod_year,data_temp_dir,"Imports"),[:yr],:Val),
-    :x0 => df_to_dict(read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"),[:yr],:Val),
-    :rx0 => df_to_dict(read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"),[:yr],:Val),
-    :md0 => df_to_dict(read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"),[:yr],:Val),
-    :nm0 => df_to_dict(read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"),[:yr],:Val),
-    :dm0 => df_to_dict(read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"),[:yr],:Val),
-    :s0 => df_to_dict(read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"),[:yr],:Val),
-    :a0 => df_to_dict(read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"),[:yr],:Val),
-    :ta0 => df_to_dict(read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"),[:yr],:Val),
-    :tm0 => df_to_dict(read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"),[:yr],:Val),
-    :cd0 => df_to_dict(read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"),[:yr],:Val),
-    :c0 => df_to_dict(read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"),[:yr],:Val),
-    :yh0 => df_to_dict(read_data_temp("yh0",mod_year,data_temp_dir,"Household production"),[:yr],:Val),
-    :bopdef0 => df_to_dict(read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"),[:yr],:Val),
-    :hhadj => df_to_dict(read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"),[:yr],:Val),
-    :g0 => df_to_dict(read_data_temp("g0",mod_year,data_temp_dir,"Government demand"),[:yr],:Val),
-    :i0 => df_to_dict(read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"),[:yr],:Val),
-    :xn0 => df_to_dict(read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"),[:yr],:Val),
-    :xd0 => df_to_dict(read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"),[:yr],:Val),
-    :dd0 => df_to_dict(read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"),[:yr],:Val),
-    :nd0 => df_to_dict(read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"),[:yr],:Val)
-)
+bmkyr = 2016
+(sld, set, idx) = _model_input(years, d, set)
+
 
 
 ###############
 # -- SETS --
 ###############
 
-# read sets from their dumped CSVs
-# these are converted to a vector of strings such that we can use them to populate variable indices
-# and to use them as as conditionals (e.g. see the use of goods_margins)
-regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
-sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
-goods = sectors;
-margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
-goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
-
-# need to fill in zeros to avoid missing keys
-fill_zero(tuple(regions,sectors,goods),blueNOTE[:ys0])
-fill_zero(tuple(regions,goods,sectors),blueNOTE[:id0])
-fill_zero(tuple(regions,sectors),blueNOTE[:ld0])
-fill_zero(tuple(regions,sectors),blueNOTE[:kd0])
-fill_zero(tuple(regions,sectors),blueNOTE[:ty0])
-fill_zero(tuple(regions,goods),blueNOTE[:m0])
-fill_zero(tuple(regions,goods),blueNOTE[:x0])
-fill_zero(tuple(regions,goods),blueNOTE[:rx0])
-fill_zero(tuple(regions,margins,goods),blueNOTE[:md0])
-fill_zero(tuple(regions,goods,margins),blueNOTE[:nm0])
-fill_zero(tuple(regions,goods,margins),blueNOTE[:dm0])
-fill_zero(tuple(regions,goods),blueNOTE[:s0])
-fill_zero(tuple(regions,goods),blueNOTE[:a0])
-fill_zero(tuple(regions,goods),blueNOTE[:ta0])
-fill_zero(tuple(regions,goods),blueNOTE[:tm0])
-fill_zero(tuple(regions,goods),blueNOTE[:cd0])
-fill_zero(tuple(regions),blueNOTE[:c0])
-fill_zero(tuple(regions,goods),blueNOTE[:yh0])
-fill_zero(tuple(regions),blueNOTE[:bopdef0])
-fill_zero(tuple(regions),blueNOTE[:hhadj])
-fill_zero(tuple(regions,goods),blueNOTE[:g0])
-fill_zero(tuple(regions,goods),blueNOTE[:i0])
-fill_zero(tuple(regions,goods),blueNOTE[:xn0])
-fill_zero(tuple(regions,goods),blueNOTE[:xd0])
-fill_zero(tuple(regions,goods),blueNOTE[:dd0])
-fill_zero(tuple(regions,goods),blueNOTE[:nd0])
-
-#need to have both benchmark and counterfactual tax rates
-#more important here is the distinction between tm and tm0
-#since the ratio of the two is used in the calculation of 
-#the value share - good to be clear on ta as well though
-blueNOTE[:tm] = blueNOTE[:tm0]
-blueNOTE[:ta] = blueNOTE[:ta0]
-blueNOTE[:ty] = blueNOTE[:ty0]
+#Read sets from SLiDE build dictionary
+regions = set[:r]
+sectors = set[:s]
+goods = set[:g]
+margins = set[:m]
+goods_margins = set[:gm]
 
 
-#following subsets are used to limit the size of the model
-# the a_set restricts the A and PA variables indices to those
-# with positive armington supply or re-exports
-a_set = Dict()
-[a_set[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
-
-# y_check is used to make sure the r/s combination 
-# has a reference amount of sectoral supply
-y_check = Dict()
-[y_check[r,s] = sum(blueNOTE[:ys0][r,s,g] for g in goods) for r in regions for s in sectors]
-
+########## Model ##########
+cge = MCPModel();
 
 ##############
 # PARAMETERS
 ##############
 
-alpha_kl = Dict() #value share of labor in the K/L nest for regions and sectors
-alpha_x  = Dict() #export value share
-alpha_d  = Dict() #local/domestic supply share
-alpha_n  = Dict() #national supply share
-theta_n  = Dict() #national share of domestic Absorption
-theta_m  = Dict() #domestic share of absorption
+#benchmark values
+@NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == sld[:ys0][r,s,g]); 
+@NLparameter(cge, id0[r in regions, s in sectors, g in goods] == sld[:id0][r,s,g]);
+@NLparameter(cge, ld0[r in regions, s in sectors] == sld[:ld0][r,s]);
+@NLparameter(cge, kd0[r in regions, s in sectors] == sld[:kd0][r,s]);
+@NLparameter(cge, ty0[r in regions, s in sectors] == sld[:ty0][r,s]);
+@NLparameter(cge, ty[r in regions, s in sectors] == sld[:ty0][r,s]);
+@NLparameter(cge, m0[r in regions, g in goods] == sld[:m0][r,g]);
+@NLparameter(cge, x0[r in regions, g in goods] == sld[:x0][r,g]);
+@NLparameter(cge, rx0[r in regions, g in goods] == sld[:rx0][r,g]);
+@NLparameter(cge, md0[r in regions, m in margins, g in goods] == sld[:md0][r,m,g]);
+@NLparameter(cge, nm0[r in regions, g in goods, m in margins] == sld[:nm0][r,g,m]);
+@NLparameter(cge, dm0[r in regions, g in goods, m in margins] == sld[:dm0][r,g,m]);
+@NLparameter(cge, s0[r in regions, g in goods] == sld[:s0][r,g]);
+@NLparameter(cge, a0[r in regions, g in goods] == sld[:a0][r,g]);
+@NLparameter(cge, ta0[r in regions, g in goods] == sld[:ta0][r,g]);
+@NLparameter(cge, ta[r in regions, g in goods] == sld[:ta0][r,g]);
+@NLparameter(cge, tm0[r in regions, g in goods] == sld[:tm0][r,g]);
+@NLparameter(cge, tm[r in regions, g in goods] == sld[:tm0][r,g]);
+@NLparameter(cge, cd0[r in regions, g in goods] == sld[:cd0][r,g]);
+@NLparameter(cge, c0[r in regions] == sld[:c0][r]);
+@NLparameter(cge, yh0[r in regions, g in goods] == sld[:yh0][r,g]);
+@NLparameter(cge, bopdef0[r in regions] == sld[:bopdef0][r]);
+@NLparameter(cge, hhadj[r in regions] == sld[:hhadj][r]);
+@NLparameter(cge, g0[r in regions, g in goods] == sld[:g0][r,g]);
+@NLparameter(cge, xn0[r in regions, g in goods] == sld[:xn0][r,g]);
+@NLparameter(cge, xd0[r in regions, g in goods] == sld[:xd0][r,g]);
+@NLparameter(cge, dd0[r in regions, g in goods] == sld[:dd0][r,g]);
+@NLparameter(cge, nd0[r in regions, g in goods] == sld[:nd0][r,g]);
+@NLparameter(cge, i0[r in regions, g in goods] == sld[:i0][r,g]);
 
-for k in keys(blueNOTE[:ld0])
-    val = blueNOTE[:ld0][k] / (blueNOTE[:kd0][k] + blueNOTE[:ld0][k])
-    if isnan(val)
-      val = 0
-    end
-    push!(alpha_kl,k=>val)
-end
+# benchmark value share parameters
+@NLparameter(cge, alpha_kl[r in regions, s in sectors] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s])))); 
+@NLparameter(cge, alpha_x[r in regions, g in goods] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
+@NLparameter(cge, alpha_d[r in regions, g in goods] == ensurefinite(value(xd0[r,g]) / value(s0[r,g])));
+@NLparameter(cge, alpha_n[r in regions, g in goods] == ensurefinite(value(xn0[r,g]) / value(s0[r,g])));
+@NLparameter(cge, theta_n[r in regions, g in goods] == ensurefinite(value(nd0[r,g]) / (value(nd0[r,g]) - value(dd0[r,g]))));
+@NLparameter(cge, theta_m[r in regions, g in goods] == ensurefinite((1+value(tm0[r,g])) * value(m0[r,g]) / (value(nd0[r,g]) + value(dd0[r,g]) + (1 + value(tm0[r,g])) * value(m0[r,g]))));
 
-for k in keys(blueNOTE[:x0])
-    val = (blueNOTE[:x0][k] - blueNOTE[:rx0][k]) / blueNOTE[:s0][k]   
-    if isnan(val)
-      val = 0
-    end
-    push!(alpha_x,k=>val)
-end
-
-for k in keys(blueNOTE[:xd0])
-    val = blueNOTE[:xd0][k] / blueNOTE[:s0][k]
-    if isnan(val)
-      val = 0
-    end
-    push!(alpha_d,k=>val)
-end
-
-for k in keys(blueNOTE[:xn0])
-    val = blueNOTE[:xn0][k] / blueNOTE[:s0][k]
-    if isnan(val)
-      val = 0
-    end
-    push!(alpha_n,k=>val)
-end
-
-for k in keys(blueNOTE[:nd0])
-    val = blueNOTE[:nd0][k] / (blueNOTE[:nd0][k] + blueNOTE[:dd0][k])
-    if isnan(val)
-      val = 0
-    end
-    push!(theta_n,k=>val)
-end
-
-for k in keys(blueNOTE[:tm0])
-    val = (1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k] / (blueNOTE[:nd0][k]+blueNOTE[:dd0][k]+(1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k])
-    if isnan(val)
-      val = 0
-    end
-    push!(theta_m,k=>val)
-end
+#Substitution and transformation elasticities
+@NLparameter(cge, es_va[r in regions, s in sectors] == SUB_ELAST[:va]); # value-added nest - substitution elasticity
+@NLparameter(cge, es_y[r in regions, s in sectors]  == SUB_ELAST[:y]); # Top-level Y nest (VA,M) - substitution elasticity
+@NLparameter(cge, es_m[r in regions, s in sectors]  == SUB_ELAST[:m]); # Materials nest - substitution elasticity
+@NLparameter(cge, et_x[r in regions, g in goods]    == TRANS_ELAST[:x]); # Disposition, distribute regional supply to local, national, export - transformation elasticity
+@NLparameter(cge, es_a[r in regions, g in goods]    == SUB_ELAST[:a]); # Top-level A nest for aggregate demand (Margins, goods) - substitution elasticity
+@NLparameter(cge, es_mar[r in regions, g in goods]  == SUB_ELAST[:mar]); # Margin supply - substitution elasticity
+@NLparameter(cge, es_d[r in regions, g in goods]    == SUB_ELAST[:d]); # Domestic demand aggregation nest (intranational) - substitution elasticity
+@NLparameter(cge, es_f[r in regions, g in goods]    == SUB_ELAST[:f]); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
 
 
 ##################
 # -- VARIABLES -- 
 ##################
 
-cge = MCPModel();
-
 # small value that acts as a lower limit to variable values
 # default is zero
 sv = 0.00
+
+@variable(cge, Y[(r,s) in set[:Y], t in years] >= sv, start = 1);
 
 #sectors
 @variable(cge,Y[r in regions, s in sectors, t in years]>=sv,start=1)

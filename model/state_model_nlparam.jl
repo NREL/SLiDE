@@ -1,6 +1,7 @@
 ################################################
 #
 # Replication of the state-level blueNOTE model
+# SLiDE Model - Benchmark Replication
 #
 ################################################
 
