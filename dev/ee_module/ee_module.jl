@@ -1,26 +1,41 @@
-using SLiDE
+using SLiDE, DataFrames
 
 set = read_from(joinpath(SLIDE_DIR,"src","readfiles","setlist.yml"));
 
 WINDC_DIR = joinpath(SLIDE_DIR,"dev","windc_1.0")
 READ_DIR = joinpath(SLIDE_DIR,"dev","readfiles")
 
-seds_inp = read_from(joinpath(READ_DIR, "seds_inp.yml"); run_bash = true)
+seds_inp = read_from(joinpath(READ_DIR, "6_seds_inp.yml"); run_bash = true)
 seds_chk = read_from(joinpath(WINDC_DIR,"6_seds_chk"); run_bash = true)
 seds_int = read_from(joinpath(WINDC_DIR,"6_seds_int"); run_bash = true)
-# seds_out = read_from(joinpath(WINDC_DIR,"6_seds_out"); run_bash = true)
-seds_out = read_from(joinpath(READ_DIR, "seds_out.yml"); run_bash = true)
+seds_out_temp = read_from(joinpath(WINDC_DIR,"6_seds_out"); run_bash = true)
+seds_out = read_from(joinpath(READ_DIR, "6_seds_out.yml"); run_bash = true)
 
 seds_set = Dict()
-for (k,df) in seds_out
+for (k,df) in seds_out_temp
     if size(df,2) == 1
         global set[k] = df[:,1]
         global seds_set[k] = df[:,1]
-        delete!(seds_out,k)
+        # delete!(seds_out,k)
     end
 end
 
-df = sort(read_file(joinpath(SLIDE_DIR,"data","input","seds.csv")))
+d = Dict()
+d[:seds] = sort(read_file(joinpath(SLIDE_DIR,"data","input","seds.csv")))
+
+
+# ------------------------------------------------------------------------------------------
+# ELEGEN
+r = "co"
+yr = 2016
+
+df_map = DataFrame(
+    src = ["col","gas","oil","nu","hy","ge","so","wy"],
+    source_code = ["CL","NG","PA","NU","HY","GE","SO","WY"],
+    sector_code = [fill("EI", (3,1)); fill("EG", (5,1))][:,1],
+    units = [fill("billion btu", (3,1)); fill("million kilowatthours", (5,1))][:,1])
+
+
 
 # SEDS parameters used in bluenote.gms (or anywhere else): sedsenergy, co2emis, elegen
 
@@ -39,4 +54,4 @@ df = sort(read_file(joinpath(SLIDE_DIR,"data","input","seds.csv")))
 # set = read_from(joinpath(SLIDE_DIR,"src","readfiles","setlist.yml"))
 
 # io = SLiDE.read_build(default_dataset, "partition")
-# cal = calibrate(dataset, copy(io), set; overwrite = false)
+# cal = calibrate(dataset, copy(io), set; overwrite = false),1
