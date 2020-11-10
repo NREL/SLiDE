@@ -102,15 +102,14 @@ to the input DataFrame `df` over the input column(s) `col`.
     'shorter' than the input DataFrame.
 """
 function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
-    cols_ans = setdiff(propertynames(df), col)
+    val = findvalue(df)
+    idx_by = setdiff(propertynames(df), [col; val])
 
-    # val_cols = find_oftype(df, AbstractFloat)
-    val_cols = [find_oftype(df, AbstractFloat); find_oftype(df, Bool)]
-    by_cols = setdiff(propertynames(df), [col; val_cols])
-    df_ans = combine(groupby(df, by_cols), val_cols .=> fun .=> val_cols)
-    [df_ans[!,col] .= convert_type.(Float64, df_ans[:,col]) for col in val_cols
-        if eltype(df_ans[:,col]) == Int]
-    return df_ans[:,cols_ans]
+    df = combine(groupby(df, idx_by), val .=> fun .=> val)
+
+    [df[!,ii] .= round.(df[:,ii]; digits = 11) for ii in find_oftype(df[:,val], AbstractFloat)]
+    [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
+    return df
 end
 
 function combine_over(df::DataFrame, col::Symbol; fun::Function = sum)

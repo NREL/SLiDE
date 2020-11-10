@@ -136,6 +136,12 @@ end
 
 convert_type(::Type{T}, x::Symbol) where T <: Real = convert_type(T, convert_type(String, x))
 
+function convert_type(::Type{DataFrame}, x::Array{Any,2})
+    col = Symbol.(replace(x[1,:], "" => missing))
+    data = x[2:end,:]
+    return DataFrame(data, col, makeunique = true)
+end
+
 convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1}) = [DataFrame.(lst)...;]
 
 function convert_type(::Type{DataFrame}, arr::JuMP.Containers.DenseAxisArray; cols=[])
@@ -196,6 +202,7 @@ ensurearray(x::Array{T,1}) where T <: Any = x
 ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
 ensurearray(x::UnitRange) = collect(x)
 ensurearray(x::Base.ValueIterator) = [collect(x)...;]
+ensurearray(x::DataFrameRow) = ensurearray(values(x))
 ensurearray(x::Any) = [x]
 
 """

@@ -188,35 +188,35 @@ function _read_from_yaml(path::String; run_bash::Bool = false)
 
     # If the yaml file includes the key "Path", this indicates that the yaml file 
     if "Path" in keys(y)
-
         # Look for shell scripts in this path, and run them if they are there.
         # If none are found, nothing will happen.
         run_bash && _run_bash(joinpath(SLIDE_DIR, ensurearray(y["Path"])...))
         
-        inp = "Input" in keys(y) ? y["Input"] : collect(values(find_oftype(y, File)))[1]
+        files = ensurearray(values(find_oftype(y, File)))
+        inp = "Input" in keys(y) ? y["Input"] : files
         d = _read_from_yaml(y["Path"], inp)
-        _delete_empty!(d)
-        
-        [d[k] = edit_with(d[k], y) for k in keys(d) if typeof(d[k]) == DataFrame]
+        d = _edit_from_yaml(d, y, inp)
     else
-        inp = ensurearray(collect(values(find_oftype(y, CGE)))[1])
+        inp = ensurearray(values(find_oftype(y, CGE)))
         d = _read_from_yaml(inp)
     end
     return d
 end
 
-function _read_from_yaml(path::Array{String,1}, file::Dict)
-    path = joinpath(SLIDE_DIR, path...)
-    return Dict(_inp_key(k) => read_file(joinpath(path, f)) for (k,f) in file)
+function _read_from_yaml(path::String, files::Dict)
+    path = joinpath(SLIDE_DIR, path)
+    d = Dict(_inp_key(k) => read_file(joinpath(path, f)) for (k,f) in files)
+    return _delete_empty!(d)
 end
 
-function _read_from_yaml(path::Array{String,1}, file::Array{T,1}) where {T <: File}
-    path = joinpath(SLIDE_DIR, path...)
-    return Dict(_inp_key(f) => read_file(path, f) for f in file)
+function _read_from_yaml(path::String, files::Array{T,1}) where {T <: File}
+    path = joinpath(SLIDE_DIR, path)
+    d = Dict(_inp_key(f) => read_file(path, f) for f in files)
+    return _delete_empty!(d)
 end
 
-_read_from_yaml(path::String, file::Any) = _read_from_yaml(ensurearray(path), file)
-_read_from_yaml(lst::Array{Parameter,1}) = Dict(_inp_key(x) => x for x in lst)
+_read_from_yaml(path::Array{String,1}, file::Any) = _read_from_yaml(joinpath(path...), file)
+_read_from_yaml(lst::Array{Parameter,1}) = _delete_empty!(Dict(_inp_key(x) => x for x in lst))
 
 
 """
@@ -229,6 +229,22 @@ _inp_key(x::T) where {T <: File} = Symbol(x.descriptor)
 _inp_key(x::Parameter) = Symbol(x.parameter)
 _inp_key(x::String) = Symbol(x)
 _inp_key(x::String, ext::String) = Symbol(splitpath(x)[end][1:end-length(ext)])
+
+
+"""
+"""
+_edit_from_yaml(d::Dict, editor::Dict, files::Dict) = d
+_edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Dict) = d
+
+function _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Array{T,1}) where {T <: File}
+    [d[k] = edit_with(d[k], editor) for k in keys(d)]
+    return d
+end
+
+function _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Array{DataInput,1})
+    [d[_inp_key(f)] = select(edit_with(d[_inp_key(f)], editor), f.col) for f in files]
+    return d
+end
 
 
 """

@@ -39,39 +39,13 @@ end
 
 
 function read_file(path::Array{String,1}, file::CSVInput)
-    # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
-    df = CSV.read(filepath, DataFrame; silencewarnings=true, ignoreemptylines=true,
-        comment="#", missingstrings=["","\xc9","..."])
+    df = _read_csv(filepath)
 
-    # If there is only one column, don't check for headers, footers, etc. Just return it.
-    size(df,2) == 1 && (return df)
-
-    NUMTEST = min(10, size(df, 1))
-
-    # A column name containing the word "Column" indicates that the input csv file was
-    # missing a column header. Multiple (more than 2?) columns with missing header suggests
-    # that the first row in the .csv was not the header, but rather, the file began with
-    # comments. Here, we find the header and reread .csv into a DataFrame.
-    # CSV.read() was used rather than converting the 2-D Array read using  dlmread()
-    # because this was faster, and includes the option to ignore missing rows.
-    if sum(Int.(occursin.("Column", string.(propertynames(df))))) > 2 || size(df)[2] == 1
-        xf = DelimitedFiles.readdlm(filepath, ',', Any, '\n')
-        xf = xf[1:NUMTEST,:]
-
-        HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf) .!= 0)))) .> 1)[2]
-        df = CSV.read(filepath, DataFrame, silencewarnings=true, ignoreemptylines=true,
-            missingstrings=["","\xc9","..."]; header=HEAD)
-    end
-
-    # Remove footer rows. These are identified by rows at the bottom of the sheet that are
-    # empty with the exception of the first column.
-    if all(ismissing.(values(df[end,2:end])))
-        x = sum.([Int.(ismissing.(values(row))) for row in eachrow(df[end - NUMTEST:end,:])])
-        FOOT = size(df)[1] - (length(x) - (findmax(x)[2] - 1))
-        df = df[1:FOOT,:]
-    end
-    return unique(df)
+    df = _remove_header(df, filepath)
+    df = _remove_footer(df)
+    df = _remove_empty(df)
+    return df
 end
 
 
@@ -82,8 +56,8 @@ function read_file(path::Array{String,1}, file::XLSXInput)
     
     # Delete rows containing only missing values.
     xf = xf[[!all(row) for row in eachrow(ismissing.(xf))],:]
-    df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique=true)
-    return df
+    # df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique=true)
+    return convert_type(DataFrame, xf)
 end
 
 
@@ -98,8 +72,8 @@ end
 
 
 function read_file(path::Array{String,1}, file::SetInput)
-    # filepath = joinpath(SLIDE_DIR, path..., file.name)
-    df = read_file(path, convert_type(CSVInput, file))
+    filepath = joinpath(path..., file.name)
+    df = _read_csv(filepath)
     return sort(df[:,1])
 end
 
@@ -109,9 +83,10 @@ function read_file(path::String, file::T) where T <: File
 end
 
 
-function read_file(editor::T) where T <: Edit
+function SLiDE.read_file(editor::T) where T <: Edit
     # !!!! Should we avoid including specific paths within functions? -- Definitely make more general.
     # !!!! Need to throw error if this is called when "file" is not a field.
+    println(pwd())
     DIR = joinpath("data", "coremaps")
     df = read_file(joinpath(DIR, editor.file))
     return df
@@ -137,11 +112,82 @@ function read_file(file::String; colnames=false)
         return y
         
     elseif occursin(".csv", file)
-        df = CSV.read(file, DataFrame, silencewarnings=true, ignoreemptylines=true, comment="#",
-            missingstrings=["","\xc9","..."])
+        df = _read_csv(file)
         return df
     end
 end
+
+
+"""
+"""
+function _read_csv(filepath::String; header::Int=1)
+    return CSV.read(filepath, DataFrame,
+        silencewarnings=true,
+        ignoreemptylines=true,
+        comment="#",
+        missingstrings=["","\xc9","..."];
+        header=header)
+end
+
+
+"""
+This function removes footer rows. These are identified by rows at the bottom of the sheet
+that are empty with the exception of the first column.
+"""
+function _remove_footer(df::DataFrame)
+    N = size(df,1)
+    while all(ismissing.(values(df[N,2:end])))
+        N -= 1
+    end
+    return df[1:N,:]
+end
+
+
+"""
+"""
+function _remove_header(df::DataFrame, filepath::String)
+    cols = propertynames(df)
+    missing_cols = .|(occursin.(:Column, cols), occursin.(:missing, cols))
+
+    # If only one column was read, maybe this is because there was a problem?
+    if size(df,2) == 1
+        @warn("Removing header WITH reading ($filepath)")
+        xf = DelimitedFiles.readdlm(filepath, ',', Any, '\n')
+        HEAD = _find_header(xf)
+        df = _read_csv(filepath; header = HEAD)
+
+    elseif sum(missing_cols) > 0
+        @warn("Removing header without reading ($filepath)")
+        HEAD = _find_header(df)
+        df = rename(df[HEAD+1:end,:], Pair.(cols, Symbol.(ensurearray(df[HEAD,:]))))
+    end
+    return df
+end
+
+
+"""
+"""
+function _find_header(df::DataFrame)
+    HEAD = 1
+    while all(ismissing.(values(df[HEAD,2:end])))
+        HEAD += 1
+    end
+    return HEAD
+end
+
+function _find_header(xf::Array{Any,2})
+    HEAD = 1
+    while all(length.(xf[HEAD,2:end]) .== 0)
+        HEAD += 1
+    end
+    return HEAD
+end
+
+
+"""
+Ensure there are no empty columns (those containing all missing values)
+"""
+_remove_empty(df::DataFrame) = df[:,eltype.(eachcol(df)) .!== Missing]
 
 
 """

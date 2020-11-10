@@ -28,7 +28,7 @@ function compare_summary(
     tol::Float64 = DEFAULT_TOL,
     complete_summary::Bool = false
     )
-
+    df = copy.(df)
     rel = length(df) == 2 ? :reldiff : :maxreldiff
 
     # Do some checks on the indices before comparing.
