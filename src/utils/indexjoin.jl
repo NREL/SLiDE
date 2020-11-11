@@ -44,7 +44,6 @@ function indexjoin(df::Array{DataFrame,1};
 
     for ii in 2:N
         cols = intersect(propertynames(df_ans), idx[ii])
-
         df_ans = if length(cols) == 0
             crossjoin(df_ans, df[ii])
         else
@@ -57,6 +56,7 @@ function indexjoin(df::Array{DataFrame,1};
     
     # Handle missing keys.
     if fillmissing !== false
+        val_float = find_oftype(df_ans[:,valnames], AbstractFloat)
         df_ans = edit_with(df_ans, Replace.(valnames, missing, fillmissing))
     end
     

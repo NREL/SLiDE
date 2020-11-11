@@ -30,7 +30,6 @@ the `data/coremaps` directory. It returns a .csv file.
     to (lists of) those types.
 """
 function read_file(path::Array{String,1}, file::GAMSInput)
-    # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
     xf = readlines(filepath)
     df = gams_to_dataframe(xf; colnames=file.col)
@@ -41,7 +40,6 @@ end
 function read_file(path::Array{String,1}, file::CSVInput)
     filepath = joinpath(path..., file.name)
     df = _read_csv(filepath)
-
     df = _remove_header(df, filepath)
     df = _remove_footer(df)
     df = _remove_empty(df)
@@ -50,19 +48,16 @@ end
 
 
 function read_file(path::Array{String,1}, file::XLSXInput)
-    # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
     
     # Delete rows containing only missing values.
     xf = xf[[!all(row) for row in eachrow(ismissing.(xf))],:]
-    # df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique=true)
     return convert_type(DataFrame, xf)
 end
 
 
 function read_file(path::Array{String,1}, file::DataInput)
-    # filepath = joinpath(SLIDE_DIR, path..., file.name)
     df = read_file(path, convert_type(CSVInput, file))
     df = edit_with(df, Rename.(propertynames(df), file.col))
 
@@ -83,10 +78,7 @@ function read_file(path::String, file::T) where T <: File
 end
 
 
-function SLiDE.read_file(editor::T) where T <: Edit
-    # !!!! Should we avoid including specific paths within functions? -- Definitely make more general.
-    # !!!! Need to throw error if this is called when "file" is not a field.
-    println(pwd())
+function read_file(editor::T) where T <: Edit
     DIR = joinpath("data", "coremaps")
     df = read_file(joinpath(DIR, editor.file))
     return df
@@ -94,7 +86,6 @@ end
 
 
 function read_file(file::String; colnames=false)
-    # file = joinpath(SLIDE_DIR, file)
     file = joinpath(file)
 
     if occursin(".map", file) | occursin(".set", file)

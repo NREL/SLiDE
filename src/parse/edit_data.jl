@@ -833,7 +833,7 @@ julia> filter_with(df, (yr = 2016,); drop = true)
 │ 4   │ fbp    │ fbp    │ 205.21  │
 ```
 """
-function filter_with(
+function SLiDE.filter_with(
     df::DataFrame,
     set::Any;
     drop::Bool = false,
@@ -847,28 +847,33 @@ function filter_with(
 
     # Find keys that reference both column names in the input DataFrame df and
     # values in the set Dictionary. Then, created a DataFrame containing all permutations.
-    cols_key = find_oftype(df, Not(AbstractFloat))
-    cols_set = intersect(cols_key, collect(keys(set)))
-    vals_set = [intersect(unique(df[:,k]), ensurearray(set[k])) for k in cols_set]
+    idx = findindex(df)
+    idx_set = intersect(idx, collect(keys(set)))
+    val_set = [intersect(unique(df[:,k]), ensurearray(set[k])) for k in idx_set]
     
-    if any(length.(vals_set) .== 0)
-        cols_err = cols_set[length.(vals_set) .== 0]
+    if length(idx_set) == 0
+        @warn("Returning filtered dataframe. No overlap between dataframe index and set keys.")
+        return df
+    end
+
+    if any(length.(val_set) .== 0)
+        cols_err = idx_set[length.(val_set) .== 0]
         error("Cannot filter DataFrame. No overlap with input set. 
-            - Check set key(s): $cols_empty
+            - Check set key(s): $cols_err
             - Use extrapolate_year() or extrapolate_region() to extend the dataset")
     end
 
     # Drop values that are not in the current set.
-    df_set = DataFrame(permute(NamedTuple{Tuple(cols_set,)}(vals_set,)))
-    df = innerjoin(df, df_set, on = cols_set)
+    df_set = DataFrame(permute(NamedTuple{Tuple(idx_set,)}(val_set,)))
+    df = innerjoin(df, df_set, on = idx_set)
     
     if extrapolate
-        :yr in cols_set && (df = extrapolate_year(df, set; forward = forward, backward = backward))
-        :r in cols_set  && (df = extrapolate_region(df, r; overwrite = overwrite))
+        :yr in idx_set && (df = extrapolate_year(df, set; forward = forward, backward = backward))
+        :r in idx_set  && (df = extrapolate_region(df, r; overwrite = overwrite))
     end
 
     # If one of the filtered DataFrame columns contains only one unique value, drop it.
-    drop && setdiff!(cols, cols_set[length.(unique.(eachcol(df[:,cols_set]))) .=== 1])
+    drop && setdiff!(cols, idx_set[length.(unique.(eachcol(df[:,idx_set]))) .=== 1])
 
     return sort(df[:,cols])
 end
