@@ -233,7 +233,7 @@ _inp_key(x::String, ext::String) = Symbol(splitpath(x)[end][1:end-length(ext)])
 
 """
 """
-_edit_from_yaml(d::Dict, editor::Dict, files::Dict) = d
+_edit_from_yaml(d::Dict, editor::Dict, files::Array) = d
 _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Dict) = d
 
 function _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Array{T,1}) where {T <: File}
