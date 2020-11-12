@@ -330,7 +330,7 @@ lo = MODEL_LOWER_BOUND
 
 @mapping(cge,market_pa[(r,g) in set[:PA]],
 # absorption or supply
-        (haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.) * a0[r,g] 
+        (haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * a0[r,g] 
         - ( 
 # government demand (exogenous)       
         g0[r,g] 
