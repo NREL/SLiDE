@@ -277,7 +277,8 @@ cge = MCPModel();
 lo = 0.00
 
 # sectors
-@variable(cge, Y[(yr,r,s) in set[:Y]] >= lo, start = value(qvm[yr])); #
+@variable(cge, Y[yr in years, r in regions, s in sectors] >= lo, start = value(qvm[yr])); #
+#@variable(cge, Y[(yr,r,s) in set[:Y]] >= lo, start = value(qvm[yr])); #
 @variable(cge, X[(yr,r,g) in set[:X]] >= lo, start = value(qvm[yr])); #
 @variable(cge, A[(yr,r,g) in set[:A]] >= lo, start = value(qvm[yr])); # 
 @variable(cge, C[yr in years, r in regions] >= lo, start = value(qvm[yr])); #
@@ -286,7 +287,8 @@ lo = 0.00
 
 # commodities
 @variable(cge, PA[(yr,r,g) in set[:PA]] >= lo, start = value(pvm[yr])); # Regional market (input)
-@variable(cge, PY[(yr,r,g) in set[:PY]] >= lo, start = value(pvm[yr])); # Regional market (output)
+@variable(cge, PY[yr in years, r in regions, g in goods] >= lo, start = value(pvm[yr])); # Regional market (output)
+#@variable(cge, PY[(yr,r,g) in set[:PY]] >= lo, start = value(pvm[yr])); # Regional market (output)
 @variable(cge, PD[(yr,r,g) in set[:PD]] >= lo, start = value(pvm[yr])); # Local market price
 @variable(cge, PN[yr in years, g in goods] >= lo, start = value(pvm[yr])); # National market
 @variable(cge, PL[yr in years, r in regions] >= lo, start = value(pvm[yr])); # Wage rate
@@ -486,7 +488,8 @@ fixV[:TK]=0.0
 # -- Zero Profit Conditions --
 ###############################
 
-@mapping(cge,profit_y[(yr,r,s) in set[:Y]],
+#@mapping(cge,profit_y[(yr,r,s) in set[:Y]],
+@mapping(cge,profit_y[yr in years, r in regions, s in sectors],
 # cost of intermediate demand
         sum((haskey(PA.lookup[1], (yr,r,g)) ? PA[(yr,r,g)] : 1.0) * id0[r,g,s] for g in goods) 
 # cost of labor inputs
@@ -495,7 +498,8 @@ fixV[:TK]=0.0
         + ((haskey(RK.lookup[1], (yr,r,s)) ? RK[(yr,r,s)] : 1.0)/rk0)* AK[yr,r,s]
         - 
 # revenue from sectoral supply (take note of r/s/g indices on ys0)                
-        sum((haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0)  * ys0[r,s,g] for g in goods) * (1-ty[r,s])
+        sum(PY[yr,r,s]  * ys0[r,s,g] for g in goods) * (1-ty[r,s])
+#        sum((haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0)  * ys0[r,s,g] for g in goods) * (1-ty[r,s])
 );
 
 # @mapping(cge,profit_y[r in regions,s in sectors, t in years],
@@ -512,7 +516,8 @@ fixV[:TK]=0.0
 
 @mapping(cge,profit_x[(yr,r,g) in set[:X]],
 # output 'cost' from aggregate supply
-         (haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0) * s0[r,g] 
+        PY[yr,r,g] * s0[r,g] 
+#         (haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0) * s0[r,g] 
         - (
 # revenues from foreign exchange
         PFX[yr] * AX[yr,r,g]
@@ -609,7 +614,8 @@ fixV[:TK]=0.0
 # );
 
 @mapping(cge,profit_i[(yr,r,s) in set[:PK]],
-        (haskey(PY.lookup[1], (yr,r,s)) ? PY[(yr,r,s)] : 1.0)
+        PY[yr,r,s]
+#        (haskey(PY.lookup[1], (yr,r,s)) ? PY[(yr,r,s)] : 1.0)
         - 
         # (
         #     (1-bool_lastyear[yr])*(haskey(PK.lookup[1], (yr+1,r,s)) ? PK[(yr+1,r,s)] : 1.0)
@@ -663,7 +669,8 @@ fixV[:TK]=0.0
 # final demand        
         + C[yr,r] * CD[yr,r,g]
 # intermediate demand        
-        + sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * id0[r,g,s] for s in sectors if (yr,r,s) in set[:Y])
+        + sum(Y[yr,r,s] * id0[r,g,s] for s in sectors if (sum(sld[:ys0][r,s,g] for g in goods) != 0))
+#        + sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * id0[r,g,s] for s in sectors if (yr,r,s) in set[:Y])
         )
 );
 
@@ -684,9 +691,11 @@ fixV[:TK]=0.0
 #         )
 # );
 
-@mapping(cge,market_py[(yr,r,g) in set[:PY]],
+#@mapping(cge,market_py[(yr,r,g) in set[:PY]],
+@mapping(cge,market_py[yr in years, r in regions, g in goods],
 # sectoral supply
-        sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) *ys0[r,s,g] for s in sectors)
+        sum(Y[yr,r,s]*ys0[r,s,g] for s in sectors)
+#        sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) *ys0[r,s,g] for s in sectors)
 # household production (exogenous)        
         + yh0[r,g]
         - 
@@ -756,7 +765,8 @@ fixV[:TK]=0.0
         sum(ld0[r,s] for s in sectors)
         - 
 # demand for labor in all sectors        
-        sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * AL[yr,r,s] for s in sectors)
+        sum(Y[yr,r,s]* AL[yr,r,s] for s in sectors)
+#       sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * AL[yr,r,s] for s in sectors)
 );
 
 
@@ -797,7 +807,8 @@ fixV[:TK]=0.0
 @mapping(cge,market_rk[(yr,r,s) in set[:PK]],
         (haskey(K.lookup[1], (yr,r,s)) ? K[(yr,r,s)] : 0.0)
         -
-        (haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * AK[yr,r,s]
+        Y[yr,r,s]* AK[yr,r,s]
+#        (haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * AK[yr,r,s]
 );
 
 # @mapping(cge,market_rk[r in regions, s in sectors, t in years],
@@ -820,8 +831,10 @@ fixV[:TK]=0.0
          (haskey(I.lookup[1], (years_last,r,s)) ? I[(years_last,r,s)] : 0.0)
          / ((haskey(I.lookup[1], (years_last-1,r,s)) ? I[(years_last-1,r,s)] : 0.0))
         - 
-         (haskey(Y.lookup[1], (years_last,r,s)) ? Y[(years_last,r,s)] : 1.0)
-         / (haskey(Y.lookup[1], (years_last-1,r,s)) ? Y[(years_last-1,r,s)] : 1.0) 
+        Y[years_last,r,s]
+        / Y[years_last-1,r,s]
+#         (haskey(Y.lookup[1], (years_last,r,s)) ? Y[(years_last,r,s)] : 1.0)
+#         / (haskey(Y.lookup[1], (years_last-1,r,s)) ? Y[(years_last-1,r,s)] : 1.0) 
 );
 
 
@@ -906,7 +919,8 @@ fixV[:TK]=0.0
 # labor income        
         PL[yr,r] * sum(ld0[r,s] for s in sectors)
 # provision of household supply          
-        + sum( (haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0) * yh0[r,g] for g in goods)
+        + sum( PY[yr,r,g] * yh0[r,g] for g in goods)
+#        + sum( (haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0) * yh0[r,g] for g in goods)
 # revenue or costs of foreign exchange including household adjustment   
         + PFX[yr] * (bopdef0[r] + hhadj[r])
 # government and investment provision        
@@ -916,7 +930,8 @@ fixV[:TK]=0.0
 # taxes on intermediate demand - assumes lumpsum recycling
         + sum((haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * a0[r,g]*(haskey(PA.lookup[1], (yr,r,g)) ? PA[(yr,r,g)] : 1.0)*ta[r,g] for g in goods if (yr,r,g) in set[:A])
 # production taxes - assumes lumpsum recycling  
-        + sum( pvm[yr]*(haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * ys0[r,s,g] * ty[r,s] for s in sectors, g in goods)
+        + sum( pvm[yr]*Y[yr,r,s] * ys0[r,s,g] * ty[r,s] for s in sectors, g in goods)
+#        + sum( pvm[yr]*(haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * ys0[r,s,g] * ty[r,s] for s in sectors, g in goods)
 # capital income        
         + (1-bool_lastyear[yr]) * sum((haskey(PK.lookup[1], (yr,r,s)) ? PK[(yr,r,s)] : 1.0) * (haskey(K.lookup[1], (yr,r,s)) ? K[(yr,r,s)] : 0.0) for s in sectors) / (1+ir)
         + (bool_lastyear[yr]) * sum((haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0) * (haskey(TK.lookup[1], (r,s)) ? TK[(r,s)] : 0.0) for s in sectors)
@@ -968,6 +983,8 @@ fixV[:TK]=0.0
 # [fix(A[r,g,t],1,force=true) for r in regions for g in goods for t in years if (a_set[r,g] == 0)]
 # [fix(K[r,s,t],0;force=true) for r in regions for s in sectors for t in years if !(blueNOTE[:kd0][r,s] > 0)]
 # [fix(I[r,s,t],1e-5;force=true) for r in regions for s in sectors for t in years if !(blueNOTE[:kd0][r,s] > 0)]
+[fix(Y[yr,r,s],1;force=true) for yr in years for r in regions for s in sectors if !(sum(sld[:ys0][r,s,g] for g in goods) > 0)]
+[fix(PY[yr,r,s],1;force=true) for yr in years for r in regions for s in sectors if !(sum(sld[:ys0][r,s,g] for g in goods) > 0)]
 
 # define complementarity conditions
 # note the pattern of ZPC -> primal variable  &  MCC -> dual variable (price)

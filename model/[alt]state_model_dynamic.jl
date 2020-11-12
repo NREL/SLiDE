@@ -286,7 +286,7 @@ lo = 0.00
 
 # commodities
 @variable(cge, PA[(yr,r,g) in set[:PA]] >= lo, start = value(pvm[yr])); # Regional market (input)
-@variable(cge, PY[yr in years, r in regions, s in sectors] >= lo, start = value(pvm[yr])); # Regional market (output)
+@variable(cge, PY[yr in years, r in regions, g in goods] >= lo, start = value(pvm[yr])); # Regional market (output)
 @variable(cge, PD[(yr,r,g) in set[:PD]] >= lo, start = value(pvm[yr])); # Local market price
 @variable(cge, PN[yr in years, g in goods] >= lo, start = value(pvm[yr])); # National market
 @variable(cge, PL[yr in years, r in regions] >= lo, start = value(pvm[yr])); # Wage rate
