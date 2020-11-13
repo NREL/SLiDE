@@ -1,3 +1,5 @@
+import Base
+
 """
     Base.:/(df1::DataFrame, df2::DataFrame)
 Extends / to operate on 2 DataFrames, each with one column of AbstractFloat type.
@@ -5,9 +7,9 @@ The operation will join the DataFrames on their descriptive columns to ensure th
 is performed for related values. Values that are "missing" after joining are set to 0.
 """
 function Base.:/(df1::DataFrame, df2::DataFrame)
-    out = Symbol.(:x, 1:2)
+    out = _generate_id(2)
 
-    df = indexjoin(copy.([df1,df2]); valnames = out)
+    df = indexjoin(copy.([df1,df2]))
 
     df[!,:value] .= df[:, out[1]] ./ df[:, out[2]]
 
@@ -23,13 +25,13 @@ is performed for related values. Values that are "missing" after joining are set
 """
 function Base.:+(df::Vararg{DataFrame})
     N = length(df)
-    out = Symbol.(:x, 1:N)
+    out = _generate_id(N)
 
     if length(findvalue.(df)) > N
         @error("Can only add DataFrames with one value column EACH.")
     end
 
-    df = indexjoin(ensurearray(df); valnames = out)
+    df = indexjoin(ensurearray(df))
 
     df[!,:value] .= df[:, out[1]];
     [df[!,:value] += df[:, out[ii]] for ii in 2:N]
@@ -45,13 +47,13 @@ is performed for related values. Values that are "missing" after joining are set
 """
 function Base.:-(df::Vararg{DataFrame})
     N = length(df)
-    out = Symbol.(:x, 1:N)
+    out = _generate_id(N)
 
     if length(findvalue.(df)) > N
         @error("Can only subtract DataFrames with one value column EACH.")
     end
 
-    df = indexjoin(ensurearray(df); valnames = out)
+    df = indexjoin(ensurearray(df))
 
     df[!,:value] .= df[:, out[1]];
     [df[!,:value] -= df[:, out[ii]] for ii in 2:N]
@@ -67,13 +69,13 @@ is performed for related values. Values that are "missing" after joining are set
 """
 function Base.:*(df::Vararg{DataFrame})
     N = length(df)
-    out = Symbol.(:x, 1:N)
+    out = _generate_id(N)
 
     if length(findvalue.(df)) > N
         @error("Can only multiply DataFrames with one value column EACH.")
     end
 
-    df = indexjoin(ensurearray(df); valnames = out)
+    df = indexjoin(ensurearray(df))
 
     df[!,:value] .= df[:, out[1]];
     [df[!,:value] .*= df[:, out[ii]] for ii in 2:N]
@@ -107,14 +109,17 @@ function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
 
     df = combine(groupby(df, idx_by), val .=> fun .=> val)
 
-    [df[!,ii] .= round.(df[:,ii]; digits = 11) for ii in find_oftype(df[:,val], AbstractFloat)]
+    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
+        for ii in find_oftype(df[:,val], AbstractFloat)]
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
     return df
 end
 
+
 function combine_over(df::DataFrame, col::Symbol; fun::Function = sum)
     return combine_over(df, ensurearray(col); fun = fun)
 end
+
 
 """
     transform_over(df::DataFrame, col::Array{Symbol,1}; operation::Function = sum)
@@ -136,25 +141,49 @@ to the input DataFrame `df` over the input column(s) `col`.
     the same length as the input DataFrame.
 """
 function transform_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
-    cols_ans = propertynames(df)
+    val = findvalue(df)
+    idx_by = setdiff(propertynames(df), [col; val])
 
-    val_cols = [find_oftype(df, AbstractFloat); find_oftype(df, Bool)]
-    by_cols = setdiff(propertynames(df), [col; val_cols])
-    df_ans = transform(groupby(df, by_cols), val_cols .=> fun .=> val_cols)
-    [df_ans[!,col] .= convert_type.(Float64, df_ans[:,col]) for col in val_cols
-        if eltype(df_ans[:,col]) == Int]
-    return df_ans[:,cols_ans]
+    df = transform(groupby(df, idx_by), val .=> fun .=> val)
+
+    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
+        for ii in find_oftype(df[:,val], AbstractFloat)]
+    [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
+    return df
 end
+# function transform_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
+#     cols_ans = propertynames(df)
+
+#     val_cols = [find_oftype(df, AbstractFloat); find_oftype(df, Bool)]
+#     by_cols = setdiff(propertynames(df), [col; val_cols])
+#     df_ans = transform(groupby(df, by_cols), val_cols .=> fun .=> val_cols)
+#     [df_ans[!,col] .= convert_type.(Float64, df_ans[:,col]) for col in val_cols
+#         if eltype(df_ans[:,col]) == Int]
+#     return df_ans[:,cols_ans]
+# end
 
 function transform_over(df::DataFrame, col::Symbol; fun::Function = sum)
     return transform_over(df, ensurearray(col); fun = fun)
 end
 
 
-function round!(df::DataFrame; digits = false)
-    if digits !== false
-        val = find_oftype(df, AbstractFloat)
-        df[!,val] .= round.(df[:,val]; digits = digits)
-    end
+"""
+Round either the specified columns or all columns of type `AbstractFloat` to the specified
+number of digits.
+
+# Arguments
+- `df::DataFrame` of values in need of rounding
+- `col::Symbol` or `col::Array{Symbol,1}` to round. If no columns are specified,
+    all columns of type `AbstractFloat` will be rounded.
+
+# Keywords
+- `digits::Int = 10`: Number of decimal places to keep when rounding
+"""
+function round!(df::DataFrame; digits::Int = DEFAULT_ROUND_DIGITS)
+    return round!(df, find_oftype(df, AbstractFloat); digits = digits)
+end
+
+function round!(df::DataFrame, col::Union{Symbol,Array{Symbol,1}}; digits::Int = DEFAULT_ROUND_DIGITS)
+    df[!,col] .= round.(df[:,col]; digits = digits)
     return df
 end

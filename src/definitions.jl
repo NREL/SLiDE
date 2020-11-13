@@ -1,4 +1,4 @@
-# Build options.
+# BUILD OPTIONS
 const DEFAULT_SAVE_BUILD = false
 const DEFAULT_OVERWRITE = false
 const DEFAULT_DATASET = "state_model"

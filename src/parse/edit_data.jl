@@ -47,9 +47,6 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 - `df::DataFrame` including edit(s)
 """
 function edit_with(df::DataFrame, x::Add)
-    _print_status(x)
-
-    # df = copy(df)
     # If adding the length of a string...
     if typeof(x.val) == String && occursin("length", x.val)
         m = match(r"(?<col>\S*) length", x.val)
@@ -69,23 +66,19 @@ function edit_with(df::DataFrame, x::Add)
     return df
 end
 
-function edit_with(df::DataFrame, x::Combine)
-    _print_status(x)
-    df = combine_over(df, setdiff(findindex(df), x.output))
-    # [df[!,val] .= round(df[:,val]; digits = 11) for val in findvalue(df)]
-    return df
-end
 
-function edit_with(df, x::Deselect)
+edit_with(df::DataFrame, x::Combine) = combine_over(df, setdiff(findindex(df), x.output))
+
+
+function edit_with(df::DataFrame, x::Deselect)
     if x.operation == "occursin"
         x.col = propertynames(df)[occursin.(x.col[1], propertynames(df))]
     end
     return select(df, setdiff(propertynames(df), x.col))
 end
 
-function edit_with(df::DataFrame, x::Drop)
-    _print_status(x)
 
+function edit_with(df::DataFrame, x::Drop)
     if x.val === "all" && x.operation == "occursin"
         df = edit_with(df, Drop.(propertynames(df)[occursin.(x.col, propertynames(df))], "all", "=="))
     end
@@ -110,17 +103,16 @@ function edit_with(df::DataFrame, x::Drop)
     return df
 end
 
-function edit_with(df::DataFrame, x::Group)
-    _print_status(x)
-    
+
+function edit_with(df::DataFrame, x::Group)  
     # First, add a column to the original DataFrame indicating where the data set begins.
     cols = unique([propertynames(df); x.output])
     df[!,:start] = (1:size(df)[1]) .+ 1
 
-    # # Next, create a DataFrame describing where to "split" the input DataFrame.
-    # # Editing with a map will remove all rows that do not contain relevant information.
-    # # Add a column indicating where each data set STOPS, assuming all completely blank rows
-    # # were removed by read_file().
+    # Next, create a DataFrame describing where to "split" the input DataFrame.
+    # Editing with a map will remove all rows that do not contain relevant information.
+    # Add a column indicating where each data set STOPS, assuming all completely blank rows
+    # were removed by read_file().
     df_split = edit_with(copy(df), convert_type(Map, x); kind = :inner)
     df_split = sort(unique(df_split), :start)
     df_split[!, :stop] .= vcat(df_split[2:end, :start] .- 2, [size(df)[1]])
@@ -138,58 +130,49 @@ function edit_with(df::DataFrame, x::Group)
     return df[:, cols]
 end
 
+
 function edit_with(df::DataFrame, x::Map; kind = :left)
-    _print_status(x)
-    
-    # Save all input column propertynames, read the map file, and isolate relevant columns.
-    # # This prevents duplicate columns in the final DataFrame.
     cols = unique([propertynames(df); x.output])
-    df_map = copy(read_file(x))
-    df_map = unique(df_map[:,unique([x.from; x.to])])
-    
-    # If there are duplicate columns in from/to, differentiate between the two to save results.
-    duplicates = intersect(x.from, x.to)
-    if length(duplicates) > 0
-        (ii_from, ii_to) = (occursin.(duplicates, x.from), occursin.(duplicates, x.to));
-        x.from[ii_from] = Symbol.(x.from[ii_from], :_0)
-        [df_map[!,Symbol(col, :_0)] .= df_map[:,col] for col in duplicates]
-    end
-    
+
     # Rename columns in the mapping DataFrame to temporary values in case any of these
     # columns were already present in the input DataFrame.
-    temp_to = Symbol.(:to_, 1:length(x.to))
-    temp_from = Symbol.(:from_, 1:length(x.from))
-    df_map = edit_with(df_map, Rename.([x.to; x.from], [temp_to; temp_from]))
+    from = _generate_id(x.from, :from)
+    to = _generate_id(x.to, :to)
+
+    df_map = copy(read_file(x))
+    df_map = hcat(edit_with(df_map[:,x.from], Rename.(x.from, from)),
+        edit_with(df_map[:,x.to], Rename.(x.to, to)))
 
     # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
     # DataFrame are used since all values in each column should be of the same type.
-    for (col, col_map) in zip(x.input, temp_from)
-        try
-            new_type = eltype.(eachcol(dropmissing(df_map[:,[col_map]])))
-            df[!,col] .= convert_type.(new_type, df[:,col])
-        catch
-            df_map[!,col_map] .= convert_type.(String, df_map[:,col_map])
+    if findtype(df[:,x.input]) !== findtype(df_map[:,from])
+        for (ii, ff) in zip(x.input, from)
+            try
+                df[!,ii] .= convert_type.(findtype(df_map[:,ff]), df[:,ii])
+            catch
+                df[!,ii] .= convert_type.(String, df[:,ii])
+                df_map[!,ff] .= convert_type.(String, df_map[:,ff])
+            end
         end
     end
-    join_cols = Pair.(x.input, temp_from)
+    join_cols = Pair.(x.input, from)
     
     x.kind == :inner && (df = innerjoin(df, df_map, on = join_cols; makeunique = true))
     x.kind == :outer && (df = outerjoin(df, df_map, on = join_cols; makeunique = true))
-    x.kind == :left  && (df = leftjoin(df, df_map, on = join_cols; makeunique = true))
+    x.kind == :left  && (df = leftjoin(df, df_map,  on = join_cols; makeunique = true))
     x.kind == :right && (df = rightjoin(df, df_map, on = join_cols; makeunique = true))
-    x.kind == :semi  && (df = semijoin(df, df_map, on = join_cols; makeunique = true))
+    x.kind == :semi  && (df = semijoin(df, df_map,  on = join_cols; makeunique = true))
     
-    # Remove all output column propertynames that might already be in the DataFrame. These will be
-    # overwritten by the columns from the mapping DataFrame. Finally, remane mapping "to"
-    # columns from their temporary to output values.
+    # Remove all output column propertynames that might already be in the DataFrame.
+    # These will be overwritten by the columns from the mapping DataFrame. Finally,
+    # remane mapping "to" columns from their temporary to output values.
     df = df[:, setdiff(propertynames(df), x.output)]
-    df = edit_with(df, Rename.(temp_to, x.output))
+    df = edit_with(df, Rename.(to, x.output))
     return df[:,cols]
 end
 
-function edit_with(df::DataFrame, x::Match)
-    _print_status(x)
 
+function edit_with(df::DataFrame, x::Match)
     if x.on == r"expand range"
         ROWS, COLS = size(df)
         cols = propertynames(df)
@@ -213,24 +196,20 @@ function edit_with(df::DataFrame, x::Match)
     return df
 end
 
+
 function edit_with(df::DataFrame, x::Melt)
-    _print_status(x)
-    # df = copy(df)
     on = intersect(x.on, propertynames(df))
     df = melt(df, on, variable_name = x.var, value_name = x.val)
     df[!, x.var] .= convert_type.(String, df[:, x.var])
     return df
 end
 
-function edit_with(df::DataFrame, x::Operate)
-    _print_status(x)
-    
-    cols = [setdiff(propertynames(df), unique([x.from; x.to; x.input; x.output])); x.output; x.from]
 
-    # Isolate columns to be operated on.
-    # Append original columns that might be replaced "_0" to preserve information.
+function edit_with(df::DataFrame, x::Operate)
+    # Append columns from before the operation with 0 if they might be replaced.
+    # This is useful for debugging purposes.
     df_val = convert_type.(Float64, df[:,x.input])
-    x.output in x.input && (df = edit_with(df, Rename(x.output, Symbol(x.output, :_0))))
+    x.output in x.input && (df = edit_with(df, Rename(x.output, append(x.output, 0))))
     df[!,x.output] .= broadcast(datatype(x.operation), [col for col in eachcol(df_val)]...)
 
     # Adjust labeling columns: If both from/to descriptive columns are distinct and
@@ -238,18 +217,15 @@ function edit_with(df::DataFrame, x::Operate)
     for (from, to) in zip(x.from, x.to)
         if length(intersect(propertynames(df), [from,to])) == 2
             df_comment = dropmissing(unique(df[:, [from; to]]))
-            df[!, Symbol(from, :_0)] .= df[:,from]
+            df[!, append(from,0)] .= df[:,from]
             df = edit_with(df, Replace.(from, df_comment[:,from], df_comment[:,to]))
         end
     end
-    # !!!! How to handle floating point arithmetic? (ex: 1.1 + 0.1 = 1.2000000000000002)
-    df[!,x.output] .= round.(df[:,x.output], digits=11)
-    return df
+    return round!(df, x.output)
 end
 
+
 function edit_with(df::DataFrame, x::Order)
-    _print_status(x)
-    # df = copy(df)
     # If not all columns are present, return the DataFrame as is. Such is the case when a
     # descriptor column must be added when appending multiple data sets in one DataFrame.
     if size(intersect(x.col, propertynames(df)))[1] < size(x.col)[1]
@@ -257,24 +233,23 @@ function edit_with(df::DataFrame, x::Order)
     # If all of the columns are present in the original DataFrame,
     # reorder the DataFrame columns and set them to the specified type.
     else
-        df = df[!, x.col]  # reorder
-        [df[!, c] .= convert_type.(t, df[!, c]) for (c, t) in zip(x.col, x.type)]  # convert
+        df = df[!, x.col]
+        [df[!, c] .= convert_type.(t, df[!, c]) for (c, t) in zip(x.col, x.type)]
         return df
     end
 end
 
+
 function edit_with(df::DataFrame, x::Rename)
-    _print_status(x)
-    # df = copy(df)
-    x.from in propertynames(df) && (df = rename(df, x.from => x.to))
-    x.to == :upper && (df = edit_with(df, Rename.(propertynames(df), uppercase.(propertynames(df)))))
-    x.to == :lower && (df = edit_with(df, Rename.(propertynames(df), lowercase.(propertynames(df)))))
+    cols = propertynames(df)
+    x.from in cols && (df = rename(df, x.from => x.to))
+    x.to == :upper && (df = edit_with(df, Rename.(cols, uppercase.(cols))))
+    x.to == :lower && (df = edit_with(df, Rename.(cols, lowercase.(cols))))
     return df
 end
 
+
 function edit_with(df::DataFrame, x::Replace)
-    _print_status(x)
-    # df = copy(df)
     !(x.col in propertynames(df)) && (return df)
 
     if x.from === missing && Symbol(x.to) in propertynames(df)
@@ -296,9 +271,8 @@ function edit_with(df::DataFrame, x::Replace)
     return df
 end
 
+
 function edit_with(df::DataFrame, x::Stack)
-    _print_status(x)
-    # df = copy(df)
     df = [[edit_with(df[:, occursin.(indicator, propertynames(df))],
         [Rename.(propertynames(df)[occursin.(indicator, propertynames(df))], x.col);
             Add(x.var, replace(string(indicator), "_" => " "))]
@@ -306,51 +280,81 @@ function edit_with(df::DataFrame, x::Stack)
     return dropmissing(df)
 end
 
-function edit_with(df::DataFrame, lst::Array{T}) where T<:Edit
-    [df = edit_with(df, x) for x in lst]
-    return df
-end
 
 function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
-    # return select!(edit_with(df, Add(x.col, file.descriptor)), unique([x.col; propertynames(df)]))
     return edit_with(df, Add(x.col, file.descriptor))
 end
 
-function edit_with(df::DataFrame, y::Dict{Any,Any})
-    # Specify the order in which edits must occur. "Drop" is included twice, once at the
-    # beginning and once at the end. First, drop entire columns. Last, drop specific values.
-    EDITS = ["Deselect", "Rename", "Group", "Stack", "Match", "Melt", "Add", "Map", "Replace", "Drop", "Operate", "Combine"]
 
-    # Find which of thyese edits are represented in the yaml file of defined edits.
+# ----- SUPPORT FOR MULTIPLE EDITS ---------------------------------------------------------
+
+function edit_with(
+    df::DataFrame,
+    x::T,
+    file = nothing;
+    print_status::Bool = false) where T<:Edit
+
+    print_status && _print_status(x)
+    return edit_with(df, x)
+end
+
+
+function edit_with(
+    df::DataFrame,
+    lst::Array{T,1},
+    file = nothing;
+    print_status::Bool = false) where T<:Edit
+
+    [df = edit_with(df, x, file) for x in lst]
+    return df
+end
+
+
+# ----- EDIT FROM FILE ---------------------------------------------------------------------
+
+function edit_with(
+    df::DataFrame,
+    y::Dict{Any,Any},
+    file = nothing;
+    print_status::Bool = false) where T<:File
+
+    # Specify the order in which edits must occur and which of these edits are included
+    # in the yaml file of defined edits.
+    EDITS = ["Deselect", "Rename", "Group", "Stack", "Match", "Melt",
+        "Add", "Map", "Replace", "Drop", "Operate", "Combine", "Describe", "Order"]
     KEYS = intersect(EDITS, collect(keys(y)))
-    # "Drop" in KEYS && pushfirst!(KEYS, "Drop")
-    
-    [df = edit_with(df, y[k]) for k in KEYS]
+    [df = edit_with(df, y[k], file; print_status = print_status) for k in KEYS]
     return df
 end
 
-function edit_with(file::T, y::Dict{Any,Any}) where T<:File
+
+function edit_with(
+    file::T,
+    y::Dict{Any,Any};
+    print_status::Bool = false) where T<:File
+
     df = read_file(y["PathIn"], file)
-    df = edit_with(df, y)
-    
-    # Add a descriptor to identify the data from the file that was just added.
-    # Then, reorder the columns and set them to the correct types.
-    # This ensures consistency when concattenating.
-    "Describe" in keys(y) && (df = edit_with(df, y["Describe"], file))
-    "Order" in keys(y)    && (df = edit_with(df, y["Order"]))
-    return df
+    return edit_with(df, y, file)
 end
 
-function edit_with(files::Array{T}, y::Dict{Any,Any}) where T<:File
-    return [[edit_with(file, y) for file in files]...;]
-end
 
-function edit_with(y::Dict{Any,Any})
-    # Find all dictionary keys corresponding to file names and save these in a list.
-    file = ensurearray(values(find_oftype(y, File)))
-    df = edit_with(file, y)
+function edit_with(
+    files::Array{T},
+    y::Dict{Any,Any};
+    print_status::Bool = false) where T<:File
+
+    df = [[edit_with(file, y; print_status = print_status) for file in files]...;]
     return _sort_datastream(dropzero(df), y)
 end
+
+
+function edit_with(y::Dict{Any,Any}; print_status::Bool = false)
+    # Find all dictionary keys corresponding to file names and save these in a list to
+    # read, edit, and concattenate.
+    files = ensurearray(values(find_oftype(y, File)))
+    return edit_with(files, y; print_status = print_status)
+end
+
 
 """
     _sort_datastream(df::DataFrame)
@@ -423,8 +427,11 @@ end
 function _expand_range(x::String)
     if match(r"\D", x) !== nothing
         m = String.([m.match for m in collect(eachmatch(r"\D.*?", x))])
-        # length(setdiff(m, [",","-"," "])) .== 0 && (x = [_expand_range.(split(x, ","))...;])
-        x = length(setdiff(m, [",","-"," "])) .== 0 ? [_expand_range.(split(x, ","))...;] : missing
+        x = if length(setdiff(m, [",","-"," "])) .== 0
+            [_expand_range.(split(x, ","))...;]
+        else
+            missing
+        end
     else
         x = convert_type(Int, x)
     end
@@ -433,6 +440,7 @@ end
 
 _expand_range(x::Missing) = x
 _expand_range(x::Int) = x
+
 
 """
     fill_zero(keys_unique::NamedTuple; value_colnames)
@@ -481,17 +489,20 @@ function fill_zero(keys_fill::NamedTuple; value_colnames = :value)
     return edit_with(df_fill, Add.(convert_type.(Symbol, value_colnames), 0.))
 end
 
+
 function fill_zero(keys_fill::Any; permute_keys::Bool = true)
     permute_keys && (keys_fill = permute(keys_fill))
     return Dict(k => 0. for k in keys_fill)
 end
+
 
 function fill_zero(keys_fill::Vararg{Any}; permute_keys::Bool = true)
     permute_keys && (keys_fill = permute(keys_fill))
     return Dict(k => 0. for k in keys_fill)
 end
 
-# ----- Edit existing ----------------------------------------------------------------------
+
+# ----- EDIT EXISTING ----------------------------------------------------------------------
 
 function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
     df = ensurearray(df)
@@ -507,6 +518,7 @@ function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
     return length(df) == 1 ? df[1] : Tuple(df)
 end
 
+
 function fill_zero(d::Vararg{Dict}; permute_keys::Bool = true)
     d = copy.(ensurearray(d))
     # Find all keys present in the input dictionary/ies and ensure all are present.
@@ -515,7 +527,8 @@ function fill_zero(d::Vararg{Dict}; permute_keys::Bool = true)
     return length(d) == 1 ? d[1] : Tuple(d)
 end
 
-# ----- Given set list ---------------------------------------------------------------------
+
+# ----- GIVEN SET LIST ---------------------------------------------------------------------
 
 function fill_zero(keys_fill::NamedTuple, df::DataFrame)
     df = copy(df)
@@ -524,11 +537,13 @@ function fill_zero(keys_fill::NamedTuple, df::DataFrame)
     return df
 end
 
+
 function fill_zero(set::Dict, df::DataFrame)
     idx = intersect(findindex(df), collect(keys(set)))
     val = [set[k] for k in idx]
     return fill_zero(NamedTuple{Tuple(idx,)}(val,), df)
 end
+
 
 function fill_zero(keys_fill::Any, d::Dict; permute_keys::Bool = true)
     d = copy(d)
@@ -543,15 +558,14 @@ end
 
 
 """
-    fill_with(keys_unique::NamedTuple, value::Any; kwargs)
-
-Initializes a new DataFrame and fills it with the specified input value.
+Initialize a new DataFrame and fills it with the specified input value.
 """
 function fill_with(keys_fill::NamedTuple, value::Any; value_colnames = :value)
     df = fill_zero(keys_fill; value_colnames = value_colnames)
     df = edit_with(df, Replace.(value_colnames, 0.0, value))
     return df
 end
+
 
 """
     extrapolate_year(df::DataFrame, yr::Array{Int64,1}; kwargs...)
@@ -634,7 +648,7 @@ function extrapolate_year(
 
         push!(df_ext, df_back)
     end
-
+    
     if forward
         yr_max = maximum(df[:,:yr])
         df_max = filter_with(df, (yr = yr_max,))[:,cols]
@@ -644,9 +658,9 @@ function extrapolate_year(
 
         push!(df_ext, df_forward)
     end
-
     return sort([df_ext...; df])
 end
+
 
 function extrapolate_year(
     df::DataFrame,
@@ -657,6 +671,7 @@ function extrapolate_year(
     extrapolate_year(df, set[:yr]; forward = forward, backward = backward)
 end
 
+
 function extrapolate_year(
     df::DataFrame,
     yr::UnitRange{Int64};
@@ -665,6 +680,7 @@ function extrapolate_year(
 )
     extrapolate_year(df, ensurearray(yr); forward = forward, backward = backward)
 end
+
 
 """
     extrapolate_region(df::DataFrame; kwargs...)
@@ -744,7 +760,6 @@ julia> extrapolate_region(df, "va" => "dc")
 │ 11  │ va     │ 2016  │ agr    │ exports │ 1.16253   │
 │ 12  │ va     │ 2016  │ agr    │ imports │ 0.86741   │
 ```
-
 """
 function extrapolate_region(df::DataFrame, r::Pair = "md" => "dc"; overwrite = false)
     df = copy(df)
@@ -760,6 +775,7 @@ function extrapolate_region(df::DataFrame, r::Pair = "md" => "dc"; overwrite = f
     
     return sort([df_close; df])
 end
+
 
 """
 filter_with(df::DataFrame, set::Any; kwargs...)
@@ -833,7 +849,7 @@ julia> filter_with(df, (yr = 2016,); drop = true)
 │ 4   │ fbp    │ fbp    │ 205.21  │
 ```
 """
-function SLiDE.filter_with(
+function filter_with(
     df::DataFrame,
     set::Any;
     drop::Bool = false,

@@ -157,8 +157,8 @@ function _read_from_dir(dir::String; ext::String = ".csv", run_bash::Bool = fals
     # If the file is empty, If there's only one column containing values, rename it to value.
     # This is consistent with SLiDE naming convention.
     _delete_empty!(d)
-    [d[k] = edit_with(df, Rename.(findvalue(df), :value)) for (k,df) in d
-        if length(findvalue(df)) == 1]
+    # [d[k] = edit_with(df, Rename.(findvalue(df), :value)) for (k,df) in d
+    #     if length(findvalue(df)) == 1]
     return d
 end
 

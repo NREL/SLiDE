@@ -81,7 +81,7 @@ function _avg_ng(df::DataFrame, d::Dict, set::Dict)
 
     df_ng = transform_over(df, :g) / transform_over(not_ng, :g)
     
-    df = indexjoin(df, df_ng, copy(d[:ng]); valnames = [:value, :value_ng, :ng])
+    df = indexjoin(df, df_ng, copy(d[:ng]); id = [:value, :value_ng, :ng])
 
     df[!,:ng] .= convert_type.(Bool, df[:,:ng])
 

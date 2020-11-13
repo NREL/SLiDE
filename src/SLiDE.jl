@@ -71,6 +71,7 @@ export Edit
 export File
 
 # UTILITIES
+export append
 export convert_type
 export datatype
 export dropnan!

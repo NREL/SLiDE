@@ -14,7 +14,7 @@ function share_labor!(d::Dict, set::Dict)
     df = dropnan(df[:,cols])
 
     # Begin summary DataFrame.
-    df = indexjoin([df, d[:region], d[:lshr0]]; valnames = [:value, :region, :lshr0])
+    df = indexjoin([df, d[:region], d[:lshr0]]; id = [:value, :region, :lshr0])
 
     # Use the national average labor share (calculated when partitioning)
     # in cases where the labor share is zero (e.g. banking, finance, etc.).

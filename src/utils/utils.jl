@@ -216,7 +216,8 @@ ensuretuple(x::Any) = tuple(x)
 
 """
 """
-istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(dropmissing(df))), T)
+istype(df::DataFrame, T::DataType) = broadcast(<:, findtype(df), T)
+findtype(df::DataFrame) = eltype.(eachcol(dropmissing(df)))
 
 
 """
@@ -305,3 +306,13 @@ findvalue(df::DataFrame) = [find_oftype(df, AbstractFloat); find_oftype(df, Bool
     defined as columns that do NOT contain `AbstractFloat` or `Bool` DataTypes.
 """
 findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
+
+
+"""
+Appends inputs, maintaining type of first input (currently only works for symbols)
+"""
+append(x::Array{Symbol,1}) = Symbol(Symbol.(x[1:end-1], :_)..., x[end])
+append(x1::Symbol, x2::Any) = Symbol(x1,:_,x2)
+append(x1::Symbol, x2::Vararg{Any,N}) where N = append(Symbol.([x1; ensurearray(x2)]))
+
+# _append_as(::Type{T}, x::)

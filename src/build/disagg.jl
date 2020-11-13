@@ -454,10 +454,10 @@ function _disagg_dc0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
     # (!!!!) name for this?
     d[:dc0] = dropmissing((d[:s0] - d[:x0] + d[:rx0]))
 
-    if round_digits !== false
-        d[:dc0][!,:value] .= round.(d[:dc0][:,:value]; digits = round_digits)
-    end
-
+    # if round_digits !== false
+    #     d[:dc0][!,:value] .= round.(d[:dc0][:,:value]; digits = round_digits)
+    # end
+    (round_digits !== false) && (d[:dc0] = round!(d[:dc0], :value; digits = round_digits))
     return d[:dc0]
 end
 
@@ -477,7 +477,7 @@ function _disagg_pt0(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
     df_ptm0 = dropmissing(((d[:yr,:r,:g] + d[:tm0]) * d[:m0]) + combine_over(d[:md0], :m))
 
     df = df_pta0 - df_ptm0
-    (round_digits !== false) && (df[!,:value] .= round.(df[:,:value]; digits = round_digits))
+    (round_digits !== false) && round!(df, :value; digits = round_digits)
     return df
 end
 
@@ -547,7 +547,7 @@ end
 function _disagg_dd0max!(d::Dict)
     println("  Disaggregating dd0max(yr,r,g), maximum regional demand from local market")
     cols = propertynames(d[:pt0])
-    df = indexjoin(d[:pt0], d[:dc0]; valnames = [:pt0,:dc0])
+    df = indexjoin(d[:pt0], d[:dc0]; id = [:pt0,:dc0])
     df[!,:value] = min.(df[:,:pt0], df[:,:dc0])
     
     d[:dd0max] = df[:,cols]
@@ -559,7 +559,7 @@ end
 function _disagg_nd0max!(d::Dict)
     println("  Disaggregating nd0max(yr,r,g), maximum regional demand from national market")
     cols = propertynames(d[:pt0])
-    df = indexjoin(d[:pt0], d[:dc0]; valnames = [:pt0,:dc0])
+    df = indexjoin(d[:pt0], d[:dc0]; id = [:pt0,:dc0])
     df[!,:value] = min.(df[:,:pt0], df[:,:dc0])
 
     d[:nd0max] = df[:,cols]
@@ -601,7 +601,8 @@ function _disagg_nd0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
     df_pt0 = _disagg_pt0(d; round_digits = false)
 
     d[:nd0] = df_pt0 - d[:dd0]
-    (round_digits !== false) && (d[:nd0][!,:value] .= round.(d[:nd0][:,:value]; digits = round_digits))
+    # (round_digits !== false) && (d[:nd0][!,:value] .= round.(d[:nd0][:,:value]; digits = round_digits))
+    (round_digits !== false) && (d[:nd0] = round!(d[:nd0], :value; digits = round_digits))
     return d[:nd0]
 end
 
@@ -668,7 +669,7 @@ function _disagg_dm0!(d::Dict)
     dm1 = dropmissing(d[:ms0tot] * d[:rpc])
     dm2 = dropmissing((d[:shrtrd] * d[:dc0]) - d[:dd0])
 
-    df = indexjoin(dm1, dm2; valnames = [:dm1,:dm2])
+    df = indexjoin(dm1, dm2; id = [:dm1,:dm2])
     df[!,:value] .= min.(df[:,:dm1], df[:,:dm2])
     d[:dm0] = df[:,cols]
     return d[:dm0]
