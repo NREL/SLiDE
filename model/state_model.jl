@@ -1,7 +1,6 @@
-
 ################################################
 #
-# Replication of the state-level blueNOTE model
+# SLiDE Model - Static Model Benchmark Replication
 #
 ################################################
 
@@ -11,337 +10,316 @@ using JuMP
 using Complementarity
 using DataFrames
 
-##########
-# FUNCTIONS
-##########
 
-#replace here with "collect"
-function key_to_vec(d::Dict,index_num::Int64)
-  return [k[index_num] for k in keys(d)]
-end
+#################
+# -- FUNCTIONS --
+#################
 
-function fill_zero(source::Dict,tofill::Dict)
-  for k in keys(source)
-      if !haskey(tofill,k)
-          push!(tofill,k=>0)
-      end
-  end
-end
+"This function replaces `NaN` or `Inf` values with `0.0`."
+ensurefinite(x::Float64) = (isnan(x) || x==Inf) ? 0.0 : x
 
-function fill_zero(source::Tuple, tofill::Dict)
-# Assume all possible permutations of keys should be present
-# and determine which are missing.
-  allkeys = vcat(collect(Base.Iterators.product(source...))...)
-  missingkeys = setdiff(allkeys, collect(keys(tofill)))
 
-# Add
-  [push!(tofill, fill=>0) for fill in missingkeys]
-  return tofill
-end
+"""
+    nonzero_subset(df::DataFrame)
 
-#function here simplifies the loading and subsequent subsetting of the dataframes
-function read_data_temp(file::String,year::Int64,dir::String,desc::String)
-  df = SLiDE.read_file(dir,CSVInput(name=string(file,".csv"),descriptor=desc))
-  df = df[df[!,:yr].==year,:]
-  return df
-end
-
-function df_to_dict(df::DataFrame,remove_columns::Vector{Symbol},value_column::Symbol)
-  colnames = setdiff(names(df),[remove_columns; value_column])
-  return Dict(tuple(row[colnames]...)=>row[:Val] for row in eachrow(df))
+# Returns
+- `x::Array{Tuple,1}` of all parameter indices corresponding with non-zero values
+- `idx::Array{Symbol,1}` of parameter indices in `df`
+"""
+function nonzero_subset(df::DataFrame)
+    idx = findindex(df)
+    val = convert_type(Array{Tuple}, dropzero(df)[:,idx])
+    return (val, idx)
 end
 
 
+"""
+    _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
 
+# Arguments
+- `year::Int`: year for which to perform calibration
+- `d::Dict{Symbol,DataFrame}` of DataFrames containing the model data.
+- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `idx::Dict` of parameter indices
+
+# Returns
+- `d::Dict{Symbol,Dict}` of model data with all zeros filled
+- `set::Dict` of model indices, with added arrays of tuples indicating which (region,sector)
+    or (region,good) combinations are relevant to the zero-profit and market-clearing
+    conditions.
+- `idx::Dict` of parameter indices.
+"""
+function _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
+    @info("Preparing model data for $year.")
+    
+    d = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
+
+    isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d))
+    (set, idx) = _model_set!(d, set, idx)
+
+    d = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d)
+    return (d, set, idx)
+end
+
+
+"""
+    _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
+This function returns subsets intended to limit the size of the model by including only
+non-zero values when mapping zero-profit and market-clearing conditions.
+
+# Arguments
+- `d::Dict{Symbol,DataFrame}` of DataFrames containing the model data.
+- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `idx::Dict` of parameter indices
+
+# Returns
+- `d::Dict{Symbol,Dict}` of model data with all zeros filled
+- `set::Dict` of model indices, with added arrays of tuples indicating which (region,sector)
+    or (region,good) combinations are relevant to the zero-profit and market-clearing
+    conditions.
+- `idx::Dict` of indices, updated to include those used to define the newly-added sets.
+"""
+function _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
+    (set[:A], idx[:A]) = nonzero_subset(d[:a0] + d[:rx0])
+    (set[:Y], idx[:Y]) = nonzero_subset(combine_over(d[:ys0], :g))
+    (set[:X], idx[:X]) = nonzero_subset(d[:s0])
+    (set[:PA], idx[:PA]) = nonzero_subset(d[:a0])
+    (set[:PD], idx[:PD]) = nonzero_subset(d[:xd0])
+    (set[:PK], idx[:PK]) = nonzero_subset(d[:kd0])
+    (set[:PY], idx[:PY]) = nonzero_subset(d[:s0])
+    return (set, idx)
+end
 
 ############
 # LOAD DATA
 ############
 
-# year for the model to be based off of
-# mod_year = 2016
+#SLiDE data needs to be built or point to pre-existing build directory
+#can pass a name (d, set) = build_data("name_of_build_directory")
+!(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build_data("state_model"))
+d = copy(d_in)
+set = copy(set_in)
 
-#specify the path where the dumped csv files are stored
-# data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
+bmkyr = 2016
+(sld, set, idx) = _model_input(bmkyr, d, set)
 
-#blueNOTE contains a dictionary of the parameters needed to specify the model
-# blueNOTE = Dict(
-#     :ys0 => df_to_dict(read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"),[:yr],:Val),
-#     :id0 => df_to_dict(read_data_temp("id0",mod_year,data_temp_dir,"Intermediate demand"),[:yr],:Val),
-#     :ld0 => df_to_dict(read_data_temp("ld0",mod_year,data_temp_dir,"Labor demand"),[:yr],:Val),
-#     :kd0 => df_to_dict(read_data_temp("kd0",mod_year,data_temp_dir,"Capital demand"),[:yr],:Val),
-#     :ty0 => df_to_dict(read_data_temp("ty0",mod_year,data_temp_dir,"Production tax"),[:yr],:Val),
-#     :m0 => df_to_dict(read_data_temp("m0",mod_year,data_temp_dir,"Imports"),[:yr],:Val),
-#     :x0 => df_to_dict(read_data_temp("x0",mod_year,data_temp_dir,"Exports of goods and services"),[:yr],:Val),
-#     :rx0 => df_to_dict(read_data_temp("rx0",mod_year,data_temp_dir,"Re-exports of goods and services"),[:yr],:Val),
-#     :md0 => df_to_dict(read_data_temp("md0",mod_year,data_temp_dir,"Total margin demand"),[:yr],:Val),
-#     :nm0 => df_to_dict(read_data_temp("nm0",mod_year,data_temp_dir,"Margin demand from national market"),[:yr],:Val),
-#     :dm0 => df_to_dict(read_data_temp("dm0",mod_year,data_temp_dir,"Margin supply from local market"),[:yr],:Val),
-#     :s0 => df_to_dict(read_data_temp("s0",mod_year,data_temp_dir,"Aggregate supply"),[:yr],:Val),
-#     :a0 => df_to_dict(read_data_temp("a0",mod_year,data_temp_dir,"Armington supply"),[:yr],:Val),
-#     :ta0 => df_to_dict(read_data_temp("ta0",mod_year,data_temp_dir,"Tax net subsidy rate on intermediate demand"),[:yr],:Val),
-#     :tm0 => df_to_dict(read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"),[:yr],:Val),
-#     :cd0 => df_to_dict(read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"),[:yr],:Val),
-#     :c0 => df_to_dict(read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"),[:yr],:Val),
-#     :yh0 => df_to_dict(read_data_temp("yh0",mod_year,data_temp_dir,"Household production"),[:yr],:Val),
-#     :bopdef0 => df_to_dict(read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"),[:yr],:Val),
-#     :hhadj => df_to_dict(read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"),[:yr],:Val),
-#     :g0 => df_to_dict(read_data_temp("g0",mod_year,data_temp_dir,"Government demand"),[:yr],:Val),
-#     :i0 => df_to_dict(read_data_temp("i0",mod_year,data_temp_dir,"Investment demand"),[:yr],:Val),
-#     :xn0 => df_to_dict(read_data_temp("xn0",mod_year,data_temp_dir,"Regional supply to national market"),[:yr],:Val),
-#     :xd0 => df_to_dict(read_data_temp("xd0",mod_year,data_temp_dir,"Regional supply to local market"),[:yr],:Val),
-#     :dd0 => df_to_dict(read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"),[:yr],:Val),
-#     :nd0 => df_to_dict(read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"),[:yr],:Val)
-# )
-
-# year for the model to be based off of
- # mod_year = 2016
-
-#specify the path where the dumped csv files are stored
-data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "data_temp"))
-
-(d, set) = build_data(overwrite=true)
-#(d, set) = build_data()
-
-
-bmkyr=2016
-
-# blueNOTE = Dict(k => convert_type(Dict, dropzero(filter_with(d[k], (yr = bmkyr,); drop = true))) for k in keys(d))
-blueNOTE = Dict(k => convert_type(Dict, filter_with(d[k], (yr = bmkyr,); drop = true)) for k in keys(d))
 ###############
 # -- SETS --
 ###############
 
-# read sets from their dumped CSVs
-# these are converted to a vector of strings such that we can use them to populate variable indices
-# and to use them as as conditionals (e.g. see the use of goods_margins)
-# regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
-# sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
-# goods = sectors;
-# margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
-# goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
-
+#Read sets from SLiDE build dictionary
 regions = set[:r]
 sectors = set[:s]
 goods = set[:g]
 margins = set[:m]
 goods_margins = set[:gm]
 
-# need to fill in zeros to avoid missing keys
-fill_zero(tuple(regions,sectors,goods),blueNOTE[:ys0])
-fill_zero(tuple(regions,goods,sectors),blueNOTE[:id0])
-fill_zero(tuple(regions,sectors),blueNOTE[:ld0])
-fill_zero(tuple(regions,sectors),blueNOTE[:kd0])
-fill_zero(tuple(regions,sectors),blueNOTE[:ty0])
-fill_zero(tuple(regions,goods),blueNOTE[:m0])
-fill_zero(tuple(regions,goods),blueNOTE[:x0])
-fill_zero(tuple(regions,goods),blueNOTE[:rx0])
-fill_zero(tuple(regions,margins,goods),blueNOTE[:md0])
-fill_zero(tuple(regions,goods,margins),blueNOTE[:nm0])
-fill_zero(tuple(regions,goods,margins),blueNOTE[:dm0])
-fill_zero(tuple(regions,goods),blueNOTE[:s0])
-fill_zero(tuple(regions,goods),blueNOTE[:a0])
-fill_zero(tuple(regions,goods),blueNOTE[:ta0])
-fill_zero(tuple(regions,goods),blueNOTE[:tm0])
-fill_zero(tuple(regions,goods),blueNOTE[:cd0])
-#fill_zero(tuple(regions),blueNOTE[:c0])
-fill_zero(tuple(regions,goods),blueNOTE[:yh0])
-#fill_zero(tuple(regions),blueNOTE[:bopdef0])
-#fill_zero(tuple(regions),blueNOTE[:hhadj])
-fill_zero(tuple(regions,goods),blueNOTE[:g0])
-fill_zero(tuple(regions,goods),blueNOTE[:i0])
-fill_zero(tuple(regions,goods),blueNOTE[:xn0])
-fill_zero(tuple(regions,goods),blueNOTE[:xd0])
-fill_zero(tuple(regions,goods),blueNOTE[:dd0])
-fill_zero(tuple(regions,goods),blueNOTE[:nd0])
-
-# for s in keys(blueNOTE)
-#   for k in keys(blueNOTE[s])
-#     if blueNOTE[s][k] < 1e-5
-#       blueNOTE[s][k] = 0.0
-#     end
-#   end
-# end
-
-a_set = Dict()
-[a_set[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
-
-# y_check is used to make sure the r/s combination is a valid output
-y_check = Dict()
-[y_check[r,s] = sum(blueNOTE[:ys0][r,s,g] for g in goods) for r in regions for s in sectors]
-#[y_check[r,s] = sum(bn[:ys0][r,g,s] for g in goods) for r in regions for s in sectors]
-
+########## Model ##########
+cge = MCPModel();
 
 ##############
 # PARAMETERS
 ##############
 
-alpha_kl = Dict() #value share of labor in the K/L nest for regions and sectors
-alpha_x  = Dict() #export value share
-alpha_d  = Dict() #local/domestic supply share
-alpha_n  = Dict() #national supply share
-theta_n  = Dict() #national share of domestic Absorption
-theta_m  = Dict() #domestic share of absorption
+#benchmark values
+@NLparameter(cge, ys0[r in regions, s in sectors, g in goods] == sld[:ys0][r,s,g]); 
+@NLparameter(cge, id0[r in regions, s in sectors, g in goods] == sld[:id0][r,s,g]);
+@NLparameter(cge, ld0[r in regions, s in sectors] == sld[:ld0][r,s]);
+@NLparameter(cge, kd0[r in regions, s in sectors] == sld[:kd0][r,s]);
+@NLparameter(cge, ty0[r in regions, s in sectors] == sld[:ty0][r,s]);
+@NLparameter(cge, ty[r in regions, s in sectors] == sld[:ty0][r,s]);
+@NLparameter(cge, m0[r in regions, g in goods] == sld[:m0][r,g]);
+@NLparameter(cge, x0[r in regions, g in goods] == sld[:x0][r,g]);
+@NLparameter(cge, rx0[r in regions, g in goods] == sld[:rx0][r,g]);
+@NLparameter(cge, md0[r in regions, m in margins, g in goods] == sld[:md0][r,m,g]);
+@NLparameter(cge, nm0[r in regions, g in goods, m in margins] == sld[:nm0][r,g,m]);
+@NLparameter(cge, dm0[r in regions, g in goods, m in margins] == sld[:dm0][r,g,m]);
+@NLparameter(cge, s0[r in regions, g in goods] == sld[:s0][r,g]);
+@NLparameter(cge, a0[r in regions, g in goods] == sld[:a0][r,g]);
+@NLparameter(cge, ta0[r in regions, g in goods] == sld[:ta0][r,g]);
+@NLparameter(cge, ta[r in regions, g in goods] == sld[:ta0][r,g]);
+@NLparameter(cge, tm0[r in regions, g in goods] == sld[:tm0][r,g]);
+@NLparameter(cge, tm[r in regions, g in goods] == sld[:tm0][r,g]);
+@NLparameter(cge, cd0[r in regions, g in goods] == sld[:cd0][r,g]);
+@NLparameter(cge, c0[r in regions] == sld[:c0][r]);
+@NLparameter(cge, yh0[r in regions, g in goods] == sld[:yh0][r,g]);
+@NLparameter(cge, bopdef0[r in regions] == sld[:bopdef0][r]);
+@NLparameter(cge, hhadj[r in regions] == sld[:hhadj][r]);
+@NLparameter(cge, g0[r in regions, g in goods] == sld[:g0][r,g]);
+@NLparameter(cge, xn0[r in regions, g in goods] == sld[:xn0][r,g]);
+@NLparameter(cge, xd0[r in regions, g in goods] == sld[:xd0][r,g]);
+@NLparameter(cge, dd0[r in regions, g in goods] == sld[:dd0][r,g]);
+@NLparameter(cge, nd0[r in regions, g in goods] == sld[:nd0][r,g]);
+@NLparameter(cge, i0[r in regions, g in goods] == sld[:i0][r,g]);
 
-for k in keys(blueNOTE[:ld0])
-    val = blueNOTE[:ld0][k] / (blueNOTE[:kd0][k] + blueNOTE[:ld0][k])
-    push!(alpha_kl,k=>val)
-end
+# benchmark value share parameters
+@NLparameter(cge, alpha_kl[r in regions, s in sectors] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s])))); 
+@NLparameter(cge, alpha_x[r in regions, g in goods] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
+@NLparameter(cge, alpha_d[r in regions, g in goods] == ensurefinite(value(xd0[r,g]) / value(s0[r,g])));
+@NLparameter(cge, alpha_n[r in regions, g in goods] == ensurefinite(value(xn0[r,g]) / value(s0[r,g])));
+@NLparameter(cge, theta_n[r in regions, g in goods] == ensurefinite(value(nd0[r,g]) / (value(nd0[r,g]) - value(dd0[r,g]))));
+@NLparameter(cge, theta_m[r in regions, g in goods] == ensurefinite((1+value(tm0[r,g])) * value(m0[r,g]) / (value(nd0[r,g]) + value(dd0[r,g]) + (1 + value(tm0[r,g])) * value(m0[r,g]))));
 
-for k in keys(blueNOTE[:x0])
-    val = (blueNOTE[:x0][k] - blueNOTE[:rx0][k]) / blueNOTE[:s0][k]   
-    push!(alpha_x,k=>val)
-end
-
-for k in keys(blueNOTE[:xd0])
-    val = blueNOTE[:xd0][k] / blueNOTE[:s0][k]
-    push!(alpha_d,k=>val)
-end
-
-for k in keys(blueNOTE[:xn0])
-    val = blueNOTE[:xn0][k] / blueNOTE[:s0][k]
-    push!(alpha_n,k=>val)
-end
-
-for k in keys(blueNOTE[:nd0])
-    val = blueNOTE[:nd0][k] / (blueNOTE[:nd0][k] + blueNOTE[:dd0][k])
-    push!(theta_n,k=>val)
-end
-
-for k in keys(blueNOTE[:tm0])
-    val = (1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k] / (blueNOTE[:nd0][k]+blueNOTE[:dd0][k]+(1+blueNOTE[:tm0][k]) * blueNOTE[:m0][k])
-    push!(theta_m,k=>val)
-end
+#Substitution and transformation elasticities
+@NLparameter(cge, es_va[r in regions, s in sectors] == SUB_ELAST[:va]); # value-added nest - substitution elasticity
+@NLparameter(cge, es_y[r in regions, s in sectors]  == SUB_ELAST[:y]); # Top-level Y nest (VA,M) - substitution elasticity
+@NLparameter(cge, es_m[r in regions, s in sectors]  == SUB_ELAST[:m]); # Materials nest - substitution elasticity
+@NLparameter(cge, et_x[r in regions, g in goods]    == TRANS_ELAST[:x]); # Disposition, distribute regional supply to local, national, export - transformation elasticity
+@NLparameter(cge, es_a[r in regions, g in goods]    == SUB_ELAST[:a]); # Top-level A nest for aggregate demand (Margins, goods) - substitution elasticity
+@NLparameter(cge, es_mar[r in regions, g in goods]  == SUB_ELAST[:mar]); # Margin supply - substitution elasticity
+@NLparameter(cge, es_d[r in regions, g in goods]    == SUB_ELAST[:d]); # Domestic demand aggregation nest (intranational) - substitution elasticity
+@NLparameter(cge, es_f[r in regions, g in goods]    == SUB_ELAST[:f]); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
 
 
 ################
 # VARIABLES
 ################
 
-cge = MCPModel();
-
-# small value that acts as a lower limit to variable values
-# default is zero
-sv = 0.001
+# Set lower bound
+lo = MODEL_LOWER_BOUND
 
 #sectors
-@variable(cge,Y[r in regions,s in sectors]>=sv,start=1)
-@variable(cge,X[r in regions,g in goods]>=sv,start=1)
-@variable(cge,A[r in regions,g in goods]>=sv,start=1)
-@variable(cge,C[r in regions]>=sv,start=1)
-@variable(cge,MS[r in regions,m in margins]>=sv,start=1)
+@variable(cge, Y[(r,s) in set[:Y]] >= lo, start = 1);
+@variable(cge, X[(r,g) in set[:X]] >= lo, start = 1);
+@variable(cge, A[(r,g) in set[:A]] >= lo, start = 1);
+@variable(cge, C[r in regions] >= lo, start = 1);
+@variable(cge, MS[r in regions, m in margins] >= lo, start = 1);
 
 #commodities:
-@variable(cge,PA[r in regions,g in goods]>=sv,start=1) # Regional market (input)
-@variable(cge,PY[r in regions,g in goods]>=sv,start=1) # Regional market (output)
-@variable(cge,PD[r in regions,g in goods]>=sv,start=1) # Local market price
-@variable(cge,PN[g in goods]>=sv,start=1) # National market
-@variable(cge,PL[r in regions]>=sv,start=1) # Wage rate
-@variable(cge,PK[r in regions,s in sectors]>=sv,start=1) # Rental rate of capital
-@variable(cge,PM[r in regions,m in margins]>=sv,start=1) # Margin price
-@variable(cge,PC[r in regions]>=sv,start=1) # Consumer price index
-@variable(cge,PFX>=sv,start=1) # Foreign exchange
+@variable(cge, PA[(r,g) in set[:PA]] >= lo, start = 1); # Regional market (input)
+@variable(cge, PY[(r,g) in set[:PY]] >= lo, start = 1); # Regional market (output)
+@variable(cge, PD[(r,g) in set[:PD]] >= lo, start = 1); # Local market price
+@variable(cge, PN[g in goods] >= lo, start =1); # National market
+@variable(cge, PL[r in regions] >= lo, start = 1); # Wage rate
+@variable(cge, PK[(r,s) in set[:PK]] >= lo, start =1); # Rental rate of capital ###
+@variable(cge, PM[r in regions, m in margins] >= lo, start =1); # Margin price
+@variable(cge, PC[r in regions] >= lo, start = 1); # Consumer price index #####
+@variable(cge, PFX >= lo, start = 1); # Foreign exchange
 
 #consumer:
-@variable(cge,RA[r in regions]>=sv,start=blueNOTE[:c0][r]) # Representative agent
+@variable(cge,RA[r in regions]>=lo,start = value(c0[r])) ;
+
 
 ###############################
 # -- PLACEHOLDER VARIABLES --
 ###############################
 
+#cobb-douglas function for value added (VA)
 @NLexpression(cge,CVA[r in regions,s in sectors],
-  PL[r]^alpha_kl[r,s] * PK[r,s] ^(1-alpha_kl[r,s]) );
+  PL[r]^alpha_kl[r,s] * (haskey(PK.lookup[1], (r,s)) ? PK[(r,s)] : 1.0) ^ (1-alpha_kl[r,s]) );
 
-@NLexpression(cge,AL[r in regions, s in sectors],
-  blueNOTE[:ld0][r,s] * CVA[r,s] / PL[r] );
+#demand for labor in VA
+@NLexpression(cge,AL[r in regions, s in sectors], ld0[r,s] * CVA[r,s] / PL[r] );
 
+#demand for capital in VA
 @NLexpression(cge,AK[r in regions,s in sectors],
-  blueNOTE[:kd0][r,s] * CVA[r,s] / PK[r,s] );
+  kd0[r,s] * CVA[r,s] / (haskey(PK.lookup[1], (r,s)) ? PK[(r,s)] : 1.0) );
 
-  ###
-
+#CES function for output demand - including
+# exports (absent of re-exports) times the price for foreign exchange, 
+# region's supply to national market times the national market price
+# regional supply to local market times domestic price
 @NLexpression(cge,RX[r in regions,g in goods],
-  (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*PD[r,g]^5)^(1/5) );
+  (alpha_x[r,g]*PFX^(1 + et_x[r,g])+alpha_n[r,g]*PN[g]^(1 + et_x[r,g])+alpha_d[r,g]*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1 + et_x[r,g]))^(1/(1 + et_x[r,g])) );
 
-@NLexpression(cge,AX[r in regions,g in goods],
-  (blueNOTE[:x0][r,g] - blueNOTE[:rx0][r,g])*(PFX/RX[r,g])^4 );
+#demand for exports via demand function
+@NLexpression(cge,AX[r in regions,g in goods], (x0[r,g] - rx0[r,g])*(PFX/RX[r,g])^et_x[r,g] );
 
-@NLexpression(cge,AN[r in regions,g in goods],
-  blueNOTE[:xn0][r,g]*(PN[g]/(RX[r,g]))^4 );
+#demand for contribution to national market 
+@NLexpression(cge,AN[r in regions,g in goods], xn0[r,g]*(PN[g]/(RX[r,g]))^et_x[r,g] );
 
+#demand for regionals supply to local market
 @NLexpression(cge,AD[r in regions,g in goods],
-  blueNOTE[:xd0][r,g] * (PD[r,g] / (RX[r,g]))^4 );
+  xd0[r,g] * ((haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0) / (RX[r,g]))^et_x[r,g] );
 
-  ###
-
+# CES function for tradeoff between national and domestic market
 @NLexpression(cge,CDN[r in regions,g in goods],
-  (theta_n[r,g]*PN[g]^(1-2)+(1-theta_n[r,g])*PD[r,g]^(1-2))^(1/(1-2)) );
+  (theta_n[r,g]*PN[g]^(1-es_d[r,g])+(1-theta_n[r,g])*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1-es_d[r,g]))^(1/(1-es_d[r,g])) );
 
-#!!!! here replaced first :tm with :tm0
+# CES function for tradeoff between domestic consumption and foreign exports
+# recall tm in the import tariff thus tm / tm0 is the relative change in import tariff rates
 @NLexpression(cge,CDM[r in regions,g in goods],
-  ((1-theta_m[r,g])*CDN[r,g]^(1-4)+theta_m[r,g]*
-  (PFX*(1+blueNOTE[:tm0][r,g])/(1+blueNOTE[:tm0][r,g]))^(1-4))^(1/(1-4)) 
-  );
+  ((1-theta_m[r,g])*CDN[r,g]^(1-es_f[r,g])+theta_m[r,g]*(PFX*(1+tm[r,g])/(1+tm0[r,g]))^(1-es_f[r,g]))^(1/(1-es_f[r,g])) );
 
-  ###
-
+# regions demand from the national market <- note nesting of CDN in CDM
 @NLexpression(cge,DN[r in regions,g in goods],
-  blueNOTE[:nd0][r,g]*(CDN[r,g]/PN[g])^2*(CDM[r,g]/CDN[r,g])^4 );
+  nd0[r,g]*(CDN[r,g]/PN[g])^es_d[r,g]*(CDM[r,g]/CDN[r,g])^es_f[r,g] );
 
+# region demand from local market <- note nesting of CDN in CDM
 @NLexpression(cge,DD[r in regions,g in goods],
-  blueNOTE[:dd0][r,g]*(CDN[r,g]/PD[r,g])^2*(CDM[r,g]/CDN[r,g])^4 );
+  dd0[r,g]*(CDN[r,g]/(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0))^es_d[r,g]*(CDM[r,g]/CDN[r,g])^es_f[r,g] );
 
+# import demand
 @NLexpression(cge,MD[r in regions,g in goods],
-  blueNOTE[:m0][r,g]*(CDM[r,g]*(1+blueNOTE[:tm0][r,g])/(PFX*(1+blueNOTE[:tm0][r,g])))^4 );
+  m0[r,g]*(CDM[r,g]*(1+tm[r,g])/(PFX*(1+tm0[r,g])))^es_f[r,g] );
 
+# final demand
 @NLexpression(cge,CD[r in regions,g in goods],
-  blueNOTE[:cd0][r,g]*PC[r] / PA[r,g] );
+  cd0[r,g]*PC[r] / (haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) );
 
 
 ###############################
 # -- Zero Profit Conditions --
 ###############################
 
-@mapping(cge,profit_y[r in regions,s in sectors],
-                sum(PA[r,g] * blueNOTE[:id0][r,g,s] for g in goods) 
-                + PL[r] * AL[r,s]
-                + PK[r,s] * AK[r,s]
-                - 
-                sum(PY[r,g] * blueNOTE[:ys0][r,s,g] for g in goods) * (1-blueNOTE[:ty0][r,s])
+@mapping(cge,profit_y[(r,s) in set[:Y]],
+# cost of intermediate demand
+        sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * id0[r,g,s] for g in goods) 
+# cost of labor inputs
+        + PL[r] * AL[r,s]
+# cost of capital inputs 
+        + (haskey(PK.lookup[1], (r,s)) ? PK[(r,s)] : 1.0)* AK[r,s]
+        - 
+# revenue from sectoral supply (take note of r/s/g indices on ys0)                
+        sum((haskey(PY.lookup[1], (r,g)) ? PY[(r,g)] : 1.0)  * ys0[r,s,g] for g in goods) * (1-ty[r,s])
 );
 
-
-@mapping(cge,profit_x[r in regions,g in goods],
-                  PY[r,g] * blueNOTE[:s0][r,g] 
-                  - 
-                  (PFX * AX[r,g]
-                + PN[g] * AN[r,g]
-                + PD[r,g] * AD[r,g])
+@mapping(cge,profit_x[(r,g) in set[:X]],
+# output 'cost' from aggregate supply
+         (haskey(PY.lookup[1], (r,g)) ? PY[(r,g)] : 1.0) * s0[r,g] 
+        - (
+# revenues from foreign exchange
+        PFX * AX[r,g]
+# revenues from national market                  
+        + PN[g] * AN[r,g]
+# revenues from domestic market
+        + (haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0) * AD[r,g]
+        )
 );
 
-
-@mapping(cge,profit_a[r in regions,g in goods],
-                  PN[g] * DN[r,g] 
-                + PD[r,g] * DD[r,g] 
-                + PFX * (1+blueNOTE[:tm0][r,g]) * MD[r,g]
-                + sum(PM[r,m] * blueNOTE[:md0][r,m,g] for m in margins)
-                  - ( 
-                  PA[r,g] * (1-blueNOTE[:ta0][r,g]) * blueNOTE[:a0][r,g] 
-                + PFX * blueNOTE[:rx0][r,g]
-));
-
-@mapping(cge,profit_c[r in regions],
-                  sum(PA[r,g] * CD[r,g] for g in goods)
-                  - 
-                  PC[r] * blueNOTE[:c0][r]
+@mapping(cge,profit_a[(r,g) in set[:A]],
+# costs from national market
+        PN[g] * DN[r,g] 
+# costs from domestic market                  
+        + (haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0) * DD[r,g] 
+# costs from imports, including import tariff
+        + PFX * (1+tm[r,g]) * MD[r,g]
+# costs of margin demand                
+        + sum(PM[r,m] * md0[r,m,g] for m in margins)
+        - ( 
+# revenues from regional market based on armington supply               
+        (haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * (1-ta[r,g]) * a0[r,g] 
+# revenues from re-exports                   
+        + PFX * rx0[r,g]
+        )
 );
 
+@mapping(cge, profit_c[r in regions],
+# costs of inputs - computed as final demand times regional market prices
+        sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * CD[r,g] for g in goods)
+        - 
+# revenues/benefit computed as CPI * reference consumption                  
+        PC[r] * c0[r]
+);
 
 @mapping(cge,profit_ms[r in regions, m in margins],
-    sum(PN[gm]   * blueNOTE[:nm0][r,gm,m] for gm in goods_margins)
-  + sum(PD[r,gm] * blueNOTE[:dm0][r,gm,m] for gm in goods_margins)
-    - 
-    PM[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins)
+# provision of margins to national market
+        sum(PN[gm]   * nm0[r,gm,m] for gm in goods_margins)
+# provision of margins to domestic market    
+        + sum((haskey(PD.lookup[1], (r,gm)) ? PD[(r,gm)] : 1.0) * dm0[r,gm,m] for gm in goods_margins)
+        - 
+# total margin demand    
+        PM[r,m] * sum(md0[r,m,gm] for gm in goods_margins)
 );
 
 
@@ -349,110 +327,127 @@ sv = 0.001
 # -- Market Clearing Conditions -- 
 ###################################
 
-
-@mapping(cge,market_pa[r in regions, g in goods],
-        A[r,g] * blueNOTE[:a0][r,g] 
+@mapping(cge,market_pa[(r,g) in set[:PA]],
+# absorption or supply
+        (haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * a0[r,g] 
         - ( 
-        blueNOTE[:g0][r,g] 
-        + blueNOTE[:i0][r,g]
+# government demand (exogenous)       
+        g0[r,g] 
+# demand for investment (exogenous)
+        + i0[r,g]
+# final demand        
         + C[r] * CD[r,g]
-        + sum(Y[r,s] * blueNOTE[:id0][r,g,s] for s in sectors if (y_check[r,s] > 0))
+# intermediate demand        
+        + sum((haskey(Y.lookup[1], (r,s)) ? Y[(r,s)] : 1.0) * id0[r,g,s] for s in sectors if (r,s) in set[:Y])
         )
 );
 
-
-@mapping(cge,market_py[r in regions, g in goods],
-        sum(Y[r,s] * blueNOTE[:ys0][r,s,g] for s in sectors)
-      + blueNOTE[:yh0][r,g]
+@mapping(cge,market_py[(r,g) in set[:PY]],
+# sectoral supply
+        sum((haskey(Y.lookup[1], (r,s)) ? Y[(r,s)] : 1.0) *ys0[r,s,g] for s in sectors)
+# household production (exogenous)        
+        + yh0[r,g]
         - 
-        X[r,g] * blueNOTE[:s0][r,g]
+# aggregate supply (akin to market demand)                
+       (haskey(X.lookup[1], (r,g)) ? X[(r,g)] : 1.0) * s0[r,g]
 );
 
-
-@mapping(cge,market_pd[r in regions, g in goods],
-        X[r,g] * AD[r,g] 
+@mapping(cge,market_pd[(r,g) in set[:PD]],
+# aggregate supply
+        (haskey(X.lookup[1], (r,g)) ? X[(r,g)] : 1.0)  * AD[r,g] 
         - ( 
-        A[r,g] * DD[r,g]
-        + sum(MS[r,m] * blueNOTE[:dm0][r,g,m] for m in margins if (g in goods_margins ) )  
+# demand for local market          
+        (haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * DD[r,g]
+# margin supply from local market
+        + sum(MS[r,m] * dm0[r,g,m] for m in margins if (g in goods_margins ) )  
         )
 );
 
 @mapping(cge,market_pn[g in goods],
-        sum(X[r,g] * AN[r,g] for r in regions)
+# supply to the national market
+        sum((haskey(X.lookup[1], (r,g)) ? X[(r,g)] : 1.0)  * AN[r,g] for r in regions)
         - ( 
-        sum(A[r,g] * DN[r,g] for r in regions)
-        + sum(MS[r,m] * blueNOTE[:nm0][r,g,m] for r in regions for m in margins if (g in goods_margins) )
-));
-
-@mapping(cge,market_pl[r in regions],
-        sum(blueNOTE[:ld0][r,s] for s in sectors)
-        - 
-        sum(Y[r,s] * AL[r,s] for s in sectors)
+# demand from the national market 
+        sum((haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * DN[r,g] for r in regions)
+# market supply to the national market        
+        + sum(MS[r,m] * nm0[r,g,m] for r in regions for m in margins if (g in goods_margins) )
+        )
 );
 
+@mapping(cge,market_pl[r in regions],
+# supply of labor
+        sum(ld0[r,s] for s in sectors)
+        - 
+# demand for labor in all sectors        
+        sum((haskey(Y.lookup[1], (r,s)) ? Y[(r,s)] : 1.0) * AL[r,s] for s in sectors)
+);
 
-@mapping(cge,market_pk[r in regions, s in sectors],
-        blueNOTE[:kd0][r,s]
-        - Y[r,s] * AK[r,s]
+@mapping(cge,market_pk[(r,s) in set[:PK]],
+        kd0[r,s]
+        - 
+#current year's capital 
+       (haskey(Y.lookup[1], (r,s)) ? Y[(r,s)] : 1.0) * AK[r,s]
 );
 
 @mapping(cge,market_pm[r in regions, m in margins],
-        MS[r,m] * sum(blueNOTE[:md0][r,m,gm] for gm in goods_margins)
-        - (
-        sum(A[r,g] * blueNOTE[:md0][r,m,g] for g in goods)
-));
+# margin supply 
+        MS[r,m] * sum(md0[r,m,gm] for gm in goods_margins)
+        - 
+# margin demand        
+        sum((haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * md0[r,m,g] for g in goods)
+);
 
 @mapping(cge,market_pc[r in regions],
-        C[r] * blueNOTE[:c0][r] - ( RA[r] / PC[r]
-));
-
+# a period's final demand
+        C[r] * c0[r]
+        - 
+# consumption / utiltiy        
+        RA[r] / PC[r]
+);
 
 @mapping(cge,market_pfx,
-        sum(blueNOTE[:bopdef0][r] for r in regions)
-        + sum(X[r,g] * AX[r,g] for r in regions for g in goods)
-# add a set here        
-        + sum(A[r,g] * blueNOTE[:rx0][r,g] for r in regions for g in goods if (a_set[r,g] != 0))
-#need a_set here        
-        - sum(A[r,g] * MD[r,g] for r in regions for g in goods)
+# balance of payments (exogenous)
+        sum(bopdef0[r] for r in regions)
+# supply of exports     
+        + sum((haskey(X.lookup[1], (r,g)) ? X[(r,g)] : 1.0)  * AX[r,g] for r in regions for g in goods)
+# supply of re-exports        
+        + sum((haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * rx0[r,g] for r in regions for g in goods if (r,g) in set[:A])
+        - 
+# import demand                
+        sum((haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * MD[r,g] for r in regions for g in goods if (r,g) in set[:A])
 );
 
 @mapping(cge,income_ra[r in regions],
-        RA[r] - ( 
-        sum(PY[r,g]*blueNOTE[:yh0][r,g] for g in goods)
-#will fix reference here...        
-        + PFX * (blueNOTE[:bopdef0][r] + blueNOTE[:hhadj][r])
-        - sum(PA[r,g] * (blueNOTE[:g0][r,g] + blueNOTE[:i0][r,g]) for g in goods)
-        + PL[r] * sum(blueNOTE[:ld0][r,s] for s in sectors)
-        + sum(PK[r,s] * blueNOTE[:kd0][r,s] for s in sectors)
-#changed tm to tm0 here...        
-        + sum(A[r,g] * MD[r,g]* PFX * blueNOTE[:tm0][r,g] for g in goods if (a_set[r,g] != 0))
-#change ta to ta0 here
-        + sum(A[r,g] * blueNOTE[:a0][r,g]*PA[r,g]*blueNOTE[:ta0][r,g] for g in goods if (a_set[r,g] != 0) )
-        + sum(Y[r,s] * blueNOTE[:ys0][r,s,g] * blueNOTE[:ty0][r,s] for s in sectors for g in goods)
-));
+# consumption/utility
+        RA[r] 
+        - 
+        (
+# labor income        
+        PL[r] * sum(ld0[r,s] for s in sectors)
+# capital income        
+        + sum((haskey(PK.lookup[1], (r,s)) ? PK[(r,s)] : 1.0) * kd0[r,s] for s in sectors)
+# provision of household supply          
+        + sum( (haskey(PY.lookup[1], (r,g)) ? PY[(r,g)] : 1.0) * yh0[r,g] for g in goods)
+# revenue or costs of foreign exchange including household adjustment   
+        + PFX * (bopdef0[r] + hhadj[r])
+# government and investment provision        
+        - sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * (g0[r,g] + i0[r,g]) for g in goods)
+# import taxes - assumes lumpsum recycling
+        + sum((haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * MD[r,g] * PFX * tm[r,g] for g in goods if (r,g) in set[:A])
+# taxes on intermediate demand - assumes lumpsum recycling
+        + sum((haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * a0[r,g]*(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)*ta[r,g] for g in goods if (r,g) in set[:A])
+# production taxes - assumes lumpsum recycling  
+        + sum( (haskey(Y.lookup[1], (r,s)) ? Y[(r,s)] : 1.0) * ys0[r,s,g] * ty[r,s] for s in sectors, g in goods)
+        )
+);
 
 
 ####################################
 # -- Complementarity Conditions --
 ####################################
 
-# equations with conditions cannot be paired 
-# see workaround here: https://github.com/chkwon/Complementarity.jl/issues/37
-[fix(PK[r,s],1;force=true) for r in regions for s in sectors if !(blueNOTE[:kd0][r,s] > 0)]
-[fix(PA[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:a0][r,g]>0)]
-[fix(PY[r,g],1,force=true) for r in regions for g in goods if !(y_check[r,g]>0)]
-
-
-[fix(Y[r,s],1,force=true) for r in regions for s in sectors if !(y_check[r,s] > 0)]
-[fix(X[r,g],1,force=true) for r in regions for g in goods if !(blueNOTE[:s0][r,g] > 0)]
-
-# following lines are used in the GAMS version but not here 
-# and result in a non-zero residual for the benchmark
-#a_fix = Dict()
-#[a_fix[r,g] = blueNOTE[:a0][r,g] + blueNOTE[:rx0][r,g] for r in regions for g in goods]
-#[fix(PD[r,g],0,force=true) for r in regions for g in goods if !(blueNOTE[:xd0][r,g] != 0)]
-#[fix(A[r,g],0,force=true) for r in regions for g in goods if !(a_fix[r,g] != 0)]
-
+# define complementarity conditions
+# note the pattern of ZPC -> primal variable  &  MCC -> dual variable (price)
 @complementarity(cge,profit_y,Y);
 @complementarity(cge,profit_x,X);
 @complementarity(cge,profit_a,A);
@@ -475,13 +470,7 @@ sv = 0.001
 ####################
 
 #set up the options for the path solver
-PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
-
-# export the path license string to the environment
-# this is now done in the SLiDE initiation steps 
-ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
+PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
 
 # solve the model
 status = solveMCP(cge)
-
-

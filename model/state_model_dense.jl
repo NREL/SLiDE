@@ -1,7 +1,6 @@
 ################################################
 #
-# Replication of the state-level blueNOTE model
-# SLiDE Model - Benchmark Replication
+# SLiDE Model - Static Model Benchmark Replication
 #
 ################################################
 
@@ -84,10 +83,10 @@ function _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
     (set[:A], idx[:A]) = nonzero_subset(d[:a0] + d[:rx0])
     (set[:Y], idx[:Y]) = nonzero_subset(combine_over(d[:ys0], :g))
     (set[:X], idx[:X]) = nonzero_subset(d[:s0])
-    (set[:PA], idx[:PA]) = (set[:A], idx[:A])
-    (set[:PD], idx[:PA]) = nonzero_subset(d[:xd0])
+    (set[:PA], idx[:PA]) = nonzero_subset(d[:a0])
+    (set[:PD], idx[:PD]) = nonzero_subset(d[:xd0])
     (set[:PK], idx[:PK]) = nonzero_subset(d[:kd0])
-    (set[:PY], idx[:PY]) = (set[:PK], idx[:PK])
+    (set[:PY], idx[:PY]) = nonzero_subset(d[:s0])
     return (set, idx)
 end
 
