@@ -223,6 +223,7 @@ cge = MCPModel();
 
 # Temporal/Dynamic modifications
 @NLparameter(cge, ir == 0.05); # Interest rate
+#model only solves with zero growth rate currently
 @NLparameter(cge, gr == 0.0); # Growth rate
 @NLparameter(cge, dr == 0.02); # Depreciation rate
 
