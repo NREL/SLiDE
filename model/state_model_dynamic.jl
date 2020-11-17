@@ -258,7 +258,7 @@ lo = 0.00
 
 @variable(cge, K[(yr,r,s) in set[:PK]] >= lo, start = value(qvm[yr])*value(kd0[r,s])); # Capital
 @variable(cge, I[(yr,r,s) in set[:PK]] >= lo, start = value(qvm[yr])*(value(dr)+value(gr))*value(kd0[r,s])); # Investment
-@variable(cge, TK[(r,s) in set[:PKT]] >= lo, start = value(kd0[r,s]) * (1 + value(gr))^(years_last-bmkyr)); # Terminal Capital
+@variable(cge, TK[(r,s) in set[:PKT]] >= lo, start = value(kd0[r,s]) * value(qvm[years_last])*(1+value(gr))); # Terminal Capital
 
 #Future updates to capital stock/investment
 # @variable(cge, K[(yr,r,s) in set[:PK]] >= lo, start = value(qvm[yr])*value(k0[r,s])); # Capital
@@ -281,7 +281,7 @@ lo = 0.00
 #@variable(cge, PKT[(r,s) in set[:PKT]] >= lo, start = start_value(PK[years_last,r,s])/(1+value(ir)); # Terminal capital price
 
 # consumer
-@variable(cge,RA[yr in years, r in regions]>=lo,start = value(pvm[yr])*value(c0[r])); #Representative Agent
+@variable(cge,RA[yr in years, r in regions]>=lo,start = value(qvm[yr])*value(pvm[yr])*value(c0[r])); #Representative Agent
 
 # Values when zero or missing from set control
 # For haskey variable filters
@@ -447,9 +447,9 @@ fixV[:PKT]=1.0
         (haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * a0[r,g] 
         - ( 
 # government demand (exogenous)       
-        g0[r,g] 
+        g0[r,g]*qvm[yr]
 # demand for investment (exogenous)
-        + i0[r,g]
+        + i0[r,g]*qvm[yr]
 # final demand        
         + C[yr,r] * CD[yr,r,g]
 # intermediate demand        
@@ -461,7 +461,7 @@ fixV[:PKT]=1.0
 # sectoral supply
         sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) *ys0[r,s,g] for s in sectors)
 # household production (exogenous)        
-        + yh0[r,g]
+        + yh0[r,g]*qvm[yr]
         - 
 # aggregate supply (akin to market demand)                
        (haskey(X.lookup[1], (yr,r,g)) ? X[(yr,r,g)] : 1.0) * s0[r,g]
@@ -491,7 +491,7 @@ fixV[:PKT]=1.0
 
 @mapping(cge,market_pl[yr in years,r in regions],
 # supply of labor
-        sum(ld0[r,s] for s in sectors)
+        sum(ld0[r,s]*qvm[yr] for s in sectors)
         - 
 # demand for labor in all sectors        
        sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * AL[yr,r,s] for s in sectors)
@@ -538,7 +538,7 @@ fixV[:PKT]=1.0
 
 @mapping(cge,market_pfx[yr in years],
 # balance of payments (exogenous)
-        sum(bopdef0[r] for r in regions)
+        sum(bopdef0[r] for r in regions)*qvm[yr]
 # supply of exports     
         + sum((haskey(X.lookup[1], (yr,r,g)) ? X[(yr,r,g)] : 1.0)  * AX[yr,r,g] for r in regions for g in goods)
 # supply of re-exports        
@@ -558,17 +558,17 @@ fixV[:PKT]=1.0
 
 @mapping(cge,income_ra[yr in years,r in regions],
 # consumption/utility
-        RA[yr,r] 
+        RA[yr,r]
         - 
         (
 # labor income        
-        PL[yr,r] * sum(ld0[r,s] for s in sectors)
+        PL[yr,r] * sum(ld0[r,s] for s in sectors)*qvm[yr]
 # provision of household supply          
-        + sum( (haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0) * yh0[r,g] for g in goods)
+        + sum( (haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0) * yh0[r,g]*qvm[yr] for g in goods)
 # revenue or costs of foreign exchange including household adjustment   
-        + PFX[yr] * (bopdef0[r] + hhadj[r])
+        + PFX[yr] * (bopdef0[r] + hhadj[r])*qvm[yr]
 # government and investment provision        
-        - sum((haskey(PA.lookup[1], (yr,r,g)) ? PA[(yr,r,g)] : 1.0) * (g0[r,g] + i0[r,g]) for g in goods)
+        - sum((haskey(PA.lookup[1], (yr,r,g)) ? PA[(yr,r,g)] : 1.0) * (g0[r,g] + i0[r,g])*qvm[yr] for g in goods)
 # import taxes - assumes lumpsum recycling
         + sum((haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * MD[yr,r,g] * PFX[yr] * tm[r,g] for g in goods if (yr,r,g) in set[:A])
 # taxes on intermediate demand - assumes lumpsum recycling
@@ -577,7 +577,7 @@ fixV[:PKT]=1.0
         + sum( pvm[yr]*(haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * ys0[r,s,g] * ty[r,s] for s in sectors, g in goods)
 # capital income        
         + (1-bool_lastyear[yr]) * sum((haskey(PK.lookup[1], (yr,r,s)) ? PK[(yr,r,s)] : 1.0) * (haskey(K.lookup[1], (yr,r,s)) ? K[(yr,r,s)] : 0.0) for s in sectors) / (1+ir)
-        + (bool_lastyear[yr]) * sum((haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0) * (haskey(TK.lookup[1], (r,s)) ? TK[(r,s)] : 0.0) for s in sectors)
+        - (bool_lastyear[yr]) * sum((haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0) * (haskey(TK.lookup[1], (r,s)) ? TK[(r,s)] : 0.0) for s in sectors)
         )
 );
 
@@ -615,6 +615,7 @@ fixV[:PKT]=1.0
 ####################
 
 #set up the options for the path solver
+#PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
 PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
 
 # solve the model
