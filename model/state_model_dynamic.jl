@@ -155,13 +155,6 @@ end
 # -- SETS --
 ###############
 
-#Read sets from SLiDE build dictionary
-# set[:r] = set[:r]
-# set[:s] = set[:s]
-# set[:g] = set[:g]
-# set[:m] = set[:m]
-# set[:gm] = set[:gm]
-
 #Subsetting for terminal capital - omit year index
 set[:PKT] = filter(x -> sld[:kd0][x] != 0.0, permute(set[:r], set[:s]));
 
@@ -577,7 +570,7 @@ fixV[:PKT]=1.0
         + sum( pvm[yr]*(haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * ys0[r,s,g] * ty[r,s] for s in set[:s], g in set[:g])
 # capital income        
         + (1-bool_lastyear[yr]) * sum((haskey(PK.lookup[1], (yr,r,s)) ? PK[(yr,r,s)] : 1.0) * (haskey(K.lookup[1], (yr,r,s)) ? K[(yr,r,s)] : 0.0) for s in set[:s]) / (1+ir)
-        + (bool_lastyear[yr]) * sum((haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0) * (haskey(TK.lookup[1], (r,s)) ? TK[(r,s)] : 0.0) for s in set[:s])
+        + (bool_lastyear[yr]) * sum((haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0) * (haskey(TK.lookup[1], (r,s)) ? TK[(r,s)] : 0.0) for s in set[:s]) 
         )
 );
 
