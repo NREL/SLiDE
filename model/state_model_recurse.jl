@@ -1,7 +1,6 @@
 ####################################
 #
-# Extension of SLiDE model to include
-#       dynamics and perfect foresight
+# Recursive dynamic extension of SLiDE model 
 #
 ####################################
 
