@@ -217,7 +217,7 @@ cge = MCPModel();
 # Temporal/Dynamic modifications
 @NLparameter(cge, ir == 0.05); # Interest rate
 #model only solves with zero growth rate currently
-@NLparameter(cge, gr == 0.0); # Growth rate
+@NLparameter(cge, gr == 0.01); # Growth rate
 @NLparameter(cge, dr == 0.02); # Depreciation rate
 
 @NLparameter(cge, pvm[yr in years] == (1/(1+value(ir)))^(yr-bmkyr)); # Reference price path - Present value multiplier
@@ -570,7 +570,7 @@ fixV[:PKT]=1.0
         + sum( pvm[yr]*(haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * ys0[r,s,g] * ty[r,s] for s in set[:s], g in set[:g])
 # capital income        
         + (1-bool_lastyear[yr]) * sum((haskey(PK.lookup[1], (yr,r,s)) ? PK[(yr,r,s)] : 1.0) * (haskey(K.lookup[1], (yr,r,s)) ? K[(yr,r,s)] : 0.0) for s in set[:s]) / (1+ir)
-        + (bool_lastyear[yr]) * sum((haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0) * (haskey(TK.lookup[1], (r,s)) ? TK[(r,s)] : 0.0) for s in set[:s]) 
+        + (bool_lastyear[yr]) * sum((haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0) * (haskey(TK.lookup[1], (r,s)) ? TK[(r,s)] : 0.0) for s in set[:s]) / (1+gr) 
         )
 );
 
@@ -614,3 +614,42 @@ PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cum
 # solve the model
 status = solveMCP(cge)
 
+### Check RA ###
+# RA_dict=Dict()
+# for yr in years, r in set[:r]
+#         RA_dict[yr,r] =
+#         # consumption/utility
+#         value(qvm[yr])*value(pvm[yr])*value(c0[r])
+#         - 
+#         (
+# # labor income        
+#         value(pvm[yr]) * sum(value(ld0[r,s]) for s in set[:s])*value(qvm[yr])
+# # provision of household supply          
+#         + sum( value(pvm[yr]) * value(yh0[r,g])*value(qvm[yr]) for g in set[:g])
+# # revenue or costs of foreign exchange including household adjustment   
+#         + value(pvm[yr]) * (value(bopdef0[r]) + value(hhadj[r]))*value(qvm[yr])
+# # government and investment provision        
+#         - sum(value(pvm[yr]) * (value(g0[r,g]) + value(i0[r,g]))*value(qvm[yr]) for g in set[:g])
+# # import taxes - assumes lumpsum recycling
+#         + sum(value(qvm[yr]) * value(m0[r,g]) * value(pvm[yr]) * value(tm[r,g]) for g in set[:g] if (yr,r,g) in set[:A])
+# # taxes on intermediate demand - assumes lumpsum recycling
+#         + sum(value(qvm[yr]) * value(a0[r,g])*value(pvm[yr])*value(ta[r,g]) for g in set[:g] if (yr,r,g) in set[:A])
+# # production taxes - assumes lumpsum recycling  
+#         + sum( value(pvm[yr])*value(qvm[yr])* value(ys0[r,s,g]) * value(ty[r,s]) for s in set[:s], g in set[:g])
+# # capital income
+#         # + sum(value(pvm[yr]) * (1 + value(ir)) * value(qvm[yr])*value(kd0[r,s]) for s in set[:s]) / (1+value(ir))        
+#         + (1-bool_lastyear[yr]) * sum(value(pvm[yr]) * (1 + value(ir)) * value(qvm[yr])*value(kd0[r,s]) for s in set[:s]) / (1+value(ir))
+#         + (bool_lastyear[yr]) * sum(value(pvm[years_last]) * value(kd0[r,s]) * value(qvm[years_last])*(1+value(gr)) for s in set[:s]) 
+#         )
+# end
+
+RA_dict2=Dict()
+[RA_dict2[yr,r] = value(qvm[yr])*value(pvm[yr])*value(c0[r]) - (value(pvm[yr]) * sum(value(ld0[r,s]) for s in set[:s])*value(qvm[yr])+ sum( value(pvm[yr]) * value(yh0[r,g])*value(qvm[yr]) for g in set[:g])+ value(pvm[yr]) * (value(bopdef0[r]) + value(hhadj[r]))*value(qvm[yr])- sum(value(pvm[yr]) * (value(g0[r,g]) + value(i0[r,g]))*value(qvm[yr]) for g in set[:g])+ sum(value(qvm[yr]) * value(m0[r,g]) * value(pvm[yr]) * value(tm[r,g]) for g in set[:g] if (yr,r,g) in set[:A])+ sum(value(qvm[yr]) * value(a0[r,g])*value(pvm[yr])*value(ta[r,g]) for g in set[:g] if (yr,r,g) in set[:A])+ sum( value(pvm[yr])*value(qvm[yr])* value(ys0[r,s,g]) * value(ty[r,s]) for s in set[:s], g in set[:g])+ (1-bool_lastyear[yr]) * sum(value(pvm[yr]) * (1 + value(ir)) * value(qvm[yr])*value(kd0[r,s]) for s in set[:s]) / (1+value(ir))+ (bool_lastyear[yr]) * sum(value(pvm[years_last]) * value(kd0[r,s]) * value(qvm[years_last])*(1+value(gr)) for s in set[:s])/(1+value(gr)) ) for yr in years for r in set[:r]]
+for yr in years, r in set[:r]
+        if RA_dict2[yr,r] > 1e-6
+                println([yr,r],"=>",RA_dict2[yr,r])
+        end
+        if RA_dict2[yr,r] < -1e-6
+                println([yr,r],"=>",RA_dict2[yr,r])
+        end
+end
