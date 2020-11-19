@@ -170,6 +170,13 @@ a_set = Dict()
 y_check = Dict()
 [y_check[r,s] = sum(sld[:ys0][r,s,g] for g in goods) for r in regions for s in sectors]
 
+sub_set_y = set[:Y]
+sub_set_x = set[:X]
+sub_set_a = set[:A]
+sub_set_pa = set[:PA]
+sub_set_pd = set[:PD]
+sub_set_pk = set[:PK]
+sub_set_py = set[:PY]
 
 ########## Model ##########
 cge = MCPModel();
@@ -273,24 +280,6 @@ cge = MCPModel();
 ################
 
 sv = 0.001
-# sub_set_y = filter(x -> y_check[x] != 0.0, combvec(regions, sectors));
-# sub_set_x = filter(x -> haskey(s0, x), combvec(regions, goods));
-# sub_set_a = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(regions, goods));
-# sub_set_pa = 
-#     filter(x -> haskey(a0, (x[1], x[2])), combvec(regions, goods));
-# sub_set_pd =
-#     filter(x -> haskey(xd0, (x[1], x[2])), combvec(regions, goods));
-# sub_set_pk =
-#     filter(x -> haskey(kd0, (x[1], x[2])), combvec(regions, sectors));
-# sub_set_py = filter(x -> y_check[x[1], x[2]] >= 0, combvec(regions, goods));
-
-sub_set_y = set[:Y]
-sub_set_x = set[:X]
-sub_set_a = set[:A]
-sub_set_pa = set[:PA]
-sub_set_pd = set[:PD]
-sub_set_pk = set[:PK]
-sub_set_py = set[:PY]
 
 #sectors
 #@variable(cge, Y[(r, s) in sub_set_y] >= sv, start = 1);
@@ -763,27 +752,8 @@ for r in regions, g in goods
     set_value(theta_m[r,g], ensurefinite((1+value(tm0[r, g])) * value(m0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g]))));
 end
 
-# ensurefinite(alpha_kl)
-# ensurefinite(alpha_x)
-# ensurefinite(alpha_d)
-# ensurefinite(alpha_n)
-# ensurefinite(theta_n)
-# ensurefinite(theta_m)
-
-
-
 #set up the options for the path solver
 PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=100000)
-#=,
-crash_iteration_limit=50, merit_function=:fischer, crash_method=:pnewton, crash_minimum_dimension=1, crash_nbchange_limit=1,
-crash_perturb=1, crash_searchtype=:line, minor_iteration_limit=1000, nms=1, nms_searchtype=:line, nms_maximimum_watchdogs=5,
-preprocess=1, proximal_perturbation=0, chen_lambda=0.8, factorization_method=:lusol, gradient_searchtype=:arc, gradient_step_limit=10,
-interrupt_limit=10, lemke_rank_deficiency_iterations=10, lemke_start=:automatic, lemke_start_type=:slack)
-=#
-
-# export the path license string to the environment
-# this is now done in the SLiDE initiation steps 
-ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
 
 # solve next period
 status = solveMCP(cge)
