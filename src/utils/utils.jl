@@ -309,6 +309,18 @@ findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
 
 
 """
+# Returns
+- `utx::Array{Symbol,1}` of input DataFrame propertynames with "units" in the name.
+"""
+function findunits(df::DataFrame)
+    # This function is a bit niche, but will be used heavily in the EEM.
+    # Should maybe keep it internal.
+    col = propertynames(df)
+    return col[occursin.(:units,col)]
+end
+
+
+"""
 Appends inputs, maintaining type of first input (currently only works for symbols)
 """
 append(x::Array{Symbol,1}) = Symbol(Symbol.(x[1:end-1], :_)..., x[end])

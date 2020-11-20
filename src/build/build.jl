@@ -157,8 +157,6 @@ function _read_from_dir(dir::String; ext::String = ".csv", run_bash::Bool = fals
     # If the file is empty, If there's only one column containing values, rename it to value.
     # This is consistent with SLiDE naming convention.
     _delete_empty!(d)
-    # [d[k] = edit_with(df, Rename.(findvalue(df), :value)) for (k,df) in d
-    #     if length(findvalue(df)) == 1]
     return d
 end
 
@@ -237,12 +235,13 @@ _edit_from_yaml(d::Dict, editor::Dict, files::Array) = d
 _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Dict) = d
 
 function _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Array{T,1}) where {T <: File}
-    [d[k] = edit_with(d[k], editor) for k in keys(d)]
+    # [d[k] = edit_with(d[k], editor) for k in keys(d)]
+    [d[_inp_key(f)] = edit_with(d[_inp_key(f)], editor, f) for f in files]
     return d
 end
 
 function _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Array{DataInput,1})
-    [d[_inp_key(f)] = select(edit_with(d[_inp_key(f)], editor), f.col) for f in files]
+    [d[_inp_key(f)] = select(edit_with(d[_inp_key(f)], editor, f), f.col) for f in files]
     return d
 end
 

@@ -457,20 +457,8 @@ function run_yaml(filename::String; save::Bool=true)
         # Iteratively make all edits and update output data file in accordance with
         # operations defined in the input YAML file.
         println("  Parsing and standardizing...")
-        df = unique(edit_with(y))
-        
-        # Create the path where the output file will go if it doesn't already exist.
-        if save !== false
-            save_path = save == true ? "" : save
-
-            # path = joinpath(SLIDE_DIR, save_path, ensurearray(y["PathOut"])...)
-            path = joinpath(save_path, ensurearray(y["PathOut"])...)
-            file = joinpath(path, y["FileOut"])
-            !isdir(path) && mkpath(path)
-
-            println("  Writing to $file")
-            CSV.write(file, df)
-        end
+        df = unique(edit_with(y; print_status = true))
+        _save_datastream(df, y; save = save)
         return df
     else
         println("  Skipping... (not editable)")
@@ -495,6 +483,37 @@ function run_yaml(files::Array{String,1}; save::Bool=true)
     end
     return files
 end
+
+
+"""
+"""
+function _save_datastream(df::DataFrame, y::Dict; save = true)
+    save_path = save == true ? "" : save
+    ("Temporary" in keys(y) && y["Temporary"]) && (y["FileOut"] = "_" * y["FileOut"])
+
+    path = joinpath(save_path, ensurearray(y["PathOut"])...)
+    file = joinpath(path, y["FileOut"])
+    !isdir(path) && mkpath(path)
+
+    println("  Saving $file...")
+    CSV.write(file, df)
+    return nothing
+end
+
+
+"""
+Delete temporary files. These are pre-pended "_".
+"""
+function _delete_temporary(path::String)
+    curr_dir = pwd()
+    files = readdir(path)
+    files_temp = [file for file in files if file[1] == '_']
+    cd(path)
+    [rm(file) for file in files_temp]
+    cd(curr_dir)
+    return nothing
+end
+
 
 
 """

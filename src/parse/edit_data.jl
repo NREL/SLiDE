@@ -46,7 +46,7 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 # Returns
 - `df::DataFrame` including edit(s)
 """
-function edit_with(df::DataFrame, x::Add)
+function edit_with(df::DataFrame, x::Add; file = nothing)
     # If adding the length of a string...
     if typeof(x.val) == String && occursin("length", x.val)
         m = match(r"(?<col>\S*) length", x.val)
@@ -67,10 +67,12 @@ function edit_with(df::DataFrame, x::Add)
 end
 
 
-edit_with(df::DataFrame, x::Combine) = combine_over(df, setdiff(findindex(df), x.output))
+function edit_with(df::DataFrame, x::Combine; file = nothing)
+    return combine_over(df, setdiff(findindex(df), x.output))
+end
 
 
-function edit_with(df::DataFrame, x::Deselect)
+function edit_with(df::DataFrame, x::Deselect; file = nothing)
     if x.operation == "occursin"
         x.col = propertynames(df)[occursin.(x.col[1], propertynames(df))]
     end
@@ -78,7 +80,7 @@ function edit_with(df::DataFrame, x::Deselect)
 end
 
 
-function edit_with(df::DataFrame, x::Drop)
+function edit_with(df::DataFrame, x::Drop; file = nothing)
     if x.val === "all" && x.operation == "occursin"
         df = edit_with(df, Drop.(propertynames(df)[occursin.(x.col, propertynames(df))], "all", "=="))
     end
@@ -104,7 +106,7 @@ function edit_with(df::DataFrame, x::Drop)
 end
 
 
-function edit_with(df::DataFrame, x::Group)  
+function edit_with(df::DataFrame, x::Group; file = nothing)
     # First, add a column to the original DataFrame indicating where the data set begins.
     cols = unique([propertynames(df); x.output])
     df[!,:start] = (1:size(df)[1]) .+ 1
@@ -131,7 +133,7 @@ function edit_with(df::DataFrame, x::Group)
 end
 
 
-function edit_with(df::DataFrame, x::Map; kind = :left)
+function edit_with(df::DataFrame, x::Map; kind = :left, file = nothing)
     cols = unique([propertynames(df); x.output])
 
     # Rename columns in the mapping DataFrame to temporary values in case any of these
@@ -172,7 +174,7 @@ function edit_with(df::DataFrame, x::Map; kind = :left)
 end
 
 
-function edit_with(df::DataFrame, x::Match)
+function edit_with(df::DataFrame, x::Match; file = nothing)
     if x.on == r"expand range"
         ROWS, COLS = size(df)
         cols = propertynames(df)
@@ -197,7 +199,7 @@ function edit_with(df::DataFrame, x::Match)
 end
 
 
-function edit_with(df::DataFrame, x::Melt)
+function edit_with(df::DataFrame, x::Melt; file = nothing)
     on = intersect(x.on, propertynames(df))
     df = melt(df, on, variable_name = x.var, value_name = x.val)
     df[!, x.var] .= convert_type.(String, df[:, x.var])
@@ -205,7 +207,7 @@ function edit_with(df::DataFrame, x::Melt)
 end
 
 
-function edit_with(df::DataFrame, x::Operate)
+function edit_with(df::DataFrame, x::Operate; file = nothing)
     # Append columns from before the operation with 0 if they might be replaced.
     # This is useful for debugging purposes.
     df_val = convert_type.(Float64, df[:,x.input])
@@ -225,7 +227,7 @@ function edit_with(df::DataFrame, x::Operate)
 end
 
 
-function edit_with(df::DataFrame, x::Order)
+function edit_with(df::DataFrame, x::Order; file = nothing)
     # If not all columns are present, return the DataFrame as is. Such is the case when a
     # descriptor column must be added when appending multiple data sets in one DataFrame.
     if size(intersect(x.col, propertynames(df)))[1] < size(x.col)[1]
@@ -240,7 +242,7 @@ function edit_with(df::DataFrame, x::Order)
 end
 
 
-function edit_with(df::DataFrame, x::Rename)
+function edit_with(df::DataFrame, x::Rename; file = nothing)
     cols = propertynames(df)
     x.from in cols && (df = rename(df, x.from => x.to))
     x.to == :upper && (df = edit_with(df, Rename.(cols, uppercase.(cols))))
@@ -249,7 +251,7 @@ function edit_with(df::DataFrame, x::Rename)
 end
 
 
-function edit_with(df::DataFrame, x::Replace)
+function edit_with(df::DataFrame, x::Replace; file = nothing)
     !(x.col in propertynames(df)) && (return df)
 
     if x.from === missing && Symbol(x.to) in propertynames(df)
@@ -272,7 +274,7 @@ function edit_with(df::DataFrame, x::Replace)
 end
 
 
-function edit_with(df::DataFrame, x::Stack)
+function edit_with(df::DataFrame, x::Stack; file = nothing)
     df = [[edit_with(df[:, occursin.(indicator, propertynames(df))],
         [Rename.(propertynames(df)[occursin.(indicator, propertynames(df))], x.col);
             Add(x.var, replace(string(indicator), "_" => " "))]
@@ -281,31 +283,43 @@ function edit_with(df::DataFrame, x::Stack)
 end
 
 
-function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
+function edit_with(df::DataFrame, x::Describe, file; print_status::Bool = false)
     return edit_with(df, Add(x.col, file.descriptor))
 end
 
 
 # ----- SUPPORT FOR MULTIPLE EDITS ---------------------------------------------------------
 
-function edit_with(
-    df::DataFrame,
-    x::T,
-    file = nothing;
-    print_status::Bool = false) where T<:Edit
-
+# THIS is for those other functions 
+function edit_with(df::DataFrame, x::T, file; print_status::Bool=false) where T<:Edit
     print_status && _print_status(x)
     return edit_with(df, x)
+end
+
+# function edit_with(df::DataFrame, x::T; print_status::Bool = false) where T<:Edit
+#     # print_status && _print_status(x)
+#     return edit_with(df, x)
+# end
+
+
+function edit_with(
+    df::DataFrame,
+    lst::Array{T,1};
+    print_status::Bool = false) where T<:Edit
+
+    # [df = edit_with(df, x; print_status = print_status) for x in lst]
+    [df = edit_with(df, x) for x in lst]
+    return df
 end
 
 
 function edit_with(
     df::DataFrame,
     lst::Array{T,1},
-    file = nothing;
+    file;
     print_status::Bool = false) where T<:Edit
 
-    [df = edit_with(df, x, file) for x in lst]
+    [df = edit_with(df, x, file; print_status = print_status) for x in lst]
     return df
 end
 
@@ -315,7 +329,7 @@ end
 function edit_with(
     df::DataFrame,
     y::Dict{Any,Any},
-    file = nothing;
+    file::T;
     print_status::Bool = false) where T<:File
 
     # Specify the order in which edits must occur and which of these edits are included
@@ -342,9 +356,13 @@ function edit_with(
     files::Array{T},
     y::Dict{Any,Any};
     print_status::Bool = false) where T<:File
-
+    
     df = [[edit_with(file, y; print_status = print_status) for file in files]...;]
-    return _sort_datastream(dropzero(df), y)
+    df = dropzero(df)
+
+    df = _filter_datastream(df, y)
+    df = _sort_datastream(df, y)
+    return df
 end
 
 
@@ -353,6 +371,22 @@ function edit_with(y::Dict{Any,Any}; print_status::Bool = false)
     # read, edit, and concattenate.
     files = ensurearray(values(find_oftype(y, File)))
     return edit_with(files, y; print_status = print_status)
+end
+
+
+"""
+Allows for *basic* filtering over years. Will need to expand to include regions.
+"""
+function _filter_datastream(df::DataFrame, y::Dict)
+    path = joinpath("data","coresets")
+    set = Dict()
+    if "Filter" in keys(y)
+        y["Filter"] in ["all","year"]  && push!(set, :yr => read_file(joinpath(path,"yr.csv"))[:,1])
+        y["Filter"] in ["all","state"] && push!(set, :r => read_file(joinpath(path,"r","state.csv"))[:,1])
+    end
+
+    !isempty(set) && (df = filter_with(df, set; extrapolate = true))
+    return df
 end
 
 

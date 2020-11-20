@@ -89,7 +89,9 @@ export permute
 export add_permutation!
 export findindex
 export findvalue
+export findunits
 export indexjoin
+export convertjoin
 
 # EDIT
 export edit_with

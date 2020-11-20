@@ -11,15 +11,16 @@ This function joins input DataFrames on their index columns (ones that are not f
 function indexjoin(df::Array{DataFrame,1};
     id::Array = [],
     indicator::Bool = false,
-    fillmissing = 0.0
+    fillmissing = 0.0,
+    skipindex = [],
+    kind = :outer,
 )
-
     df = copy.(df[.!isempty.(df)])
     N = length(df)
 
     # all(length.(findvalue.(df)) .== 0) && (indicator = true)
 
-    (df,id) = _make_unique(df, id, indicator)
+    (df,id) = _make_unique(df, id, indicator; skipindex = skipindex)
     (df,id) = _add_indicator(df, id, indicator)
     idx = findindex.(df)
     
@@ -29,7 +30,11 @@ function indexjoin(df::Array{DataFrame,1};
         df_ans = if length(cols) == 0
             crossjoin(df_ans, df[ii])
         else
-            outerjoin(df_ans, df[ii], on=cols)
+            if kind == :outer;     outerjoin(df_ans, df[ii], on=cols)
+            elseif kind == :inner; innerjoin(df_ans, df[ii], on=cols)
+            elseif kind == :left;  leftjoin(df_ans, df[ii],  on=cols)
+            elseif kind == :right; rightjoin(df_ans, df[ii], on=cols)
+            end
         end
     end
 
@@ -42,11 +47,26 @@ end
 function indexjoin(df::Vararg{DataFrame};
     id::Array = [],
     indicator::Bool = false,
-    fillmissing = 0.0
-    )
+    fillmissing = 0.0,
+    skipindex = [],
+    kind = :outer
+)
     return indexjoin(ensurearray(df);
-        id = id, indicator = indicator, fillmissing = fillmissing)
+        id = id,
+        indicator = indicator,
+        fillmissing = fillmissing,
+        skipindex = skipindex,
+        kind = kind)
 end
+
+
+"""
+"""
+function convertjoin(df::Array{DataFrame,1}; id=[])
+    return indexjoin(df; id=id, indicator=false, fillmissing=1.0, skipindex=:units, kind=:inner)
+end
+
+convertjoin(df::Vararg{DataFrame}; id=[]) = convertjoin(ensurearray(df); id=id)
 
 
 """
@@ -60,9 +80,7 @@ Notes:
     This means that no joins are performed on unit columns to allow for operations that may
     convert between units.
 """
-function _make_unique(df::Array{DataFrame,1}, id::Array, indicator::Bool)
-    # (!!!!) do we want to keep units in the index or not?
-    # Dropping causes problems when benchmarking SEDS.
+function _make_unique(df::Array{DataFrame,1}, id::AbstractArray, indicator::Bool; skipindex=[])
     N = length(df)
 
     col = propertynames.(df)
@@ -88,18 +106,13 @@ function _make_unique(df::Array{DataFrame,1}, id::Array, indicator::Bool)
         end
     end
         
-    # Determine whether to edit unit names. If there are no float values in any of the input
-    # DataFrames, do NOT adjust units. This will prevent editing scaling mapping files
-    # (see: MSN). If at least one column has a float, add an id so we can remember where the
-    # units came from.
-    # if any(.!isempty.(flt))
-    #     for ii in 1:N
-    #         if :units in col[ii]
-    #             push!(from[ii], :units)
-    #             push!(to[ii], append(:units, id[ii]))
-    #         end
-    #     end
-    # end
+    # Remove indicies to be skipped.
+    for ii in 1:N
+        for idx in intersect(ensurearray(skipindex), col[ii])
+            push!(from[ii], idx)
+            push!(to[ii], append(idx, id[ii]))
+        end
+    end
 
     if any(.!isempty.(from))
         df = [!isempty(from[ii]) ? edit_with(df[ii], Rename.(from[ii], to[ii])) : df[ii]
