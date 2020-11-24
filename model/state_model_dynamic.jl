@@ -614,7 +614,7 @@ PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cum
 # solve the model
 status = solveMCP(cge)
 
-### Check RA ###
+### !!!! Check RA ###
 # RA_dict=Dict()
 # for yr in years, r in set[:r]
 #         RA_dict[yr,r] =
