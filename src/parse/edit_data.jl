@@ -360,7 +360,7 @@ function edit_with(
     df = [[edit_with(file, y; print_status = print_status) for file in files]...;]
     df = dropzero(df)
 
-    df = _filter_datastream(df, y)
+    # df = _filter_datastream(df, y)
     df = _sort_datastream(df, y)
     return df
 end

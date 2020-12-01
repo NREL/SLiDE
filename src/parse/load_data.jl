@@ -178,7 +178,14 @@ end
 """
 Ensure there are no empty columns (those containing all missing values)
 """
-_remove_empty(df::DataFrame) = df[:,eltype.(eachcol(df)) .!== Missing]
+function _remove_empty(df::DataFrame)
+    LAST = size(df,2)
+    while eltype(df[:,LAST]) === Missing
+        LAST -= 1
+    end
+    return df[:,1:LAST]
+end
+# _remove_empty(df::DataFrame) = df[:,eltype.(eachcol(df)) .!== Missing]
 
 
 """
@@ -535,7 +542,7 @@ function gams_to_dataframe(xf::Array{String,1}; colnames=[])
     matches = collect.(eachmatch.(r"((?<=\").*(?=\")|\((?>[^()]|(?R))*\)|[\w\d]+)", xf))
 
     if length(unique(length.(matches))) !== 1
-        @warn("Input gams set/map has unequal row lengths.")
+        @warn("Input gams set/map has unequal row lengths. Information will be left-justified.")
     end
 
     ROWS, COLS = length(matches), maximum(length.(matches))
@@ -558,6 +565,7 @@ function gams_to_dataframe(xf::Array{String,1}; colnames=[])
     else
         DataFrame(data, cols)
     end
-    
-    return df
+
+    x = [Replace.(cols,"",missing); Order(cols, fill(String,size(cols)))]
+    return edit_with(df, x)
 end
