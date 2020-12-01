@@ -85,7 +85,7 @@ function read_file(editor::T) where T <: Edit
 end
 
 
-function read_file(file::String; colnames=false)
+function read_file(file::String; colnames=[])
     file = joinpath(file)
 
     if occursin(".map", file) | occursin(".set", file)
@@ -524,32 +524,40 @@ This function converts a GAMS map or set to a DataFrame, expanding sets into mul
 - `xf::Array{String,1}`: A list of rows of text from a .map or a .set input file.
 
 # Keywords
-- `colnames = false`: A user has the option to specify the column propertynames of the output
+- `colnames = []`: A user has the option to specify the column propertynames of the output
     DataFrame. If none are specified, a default of `[missing, missing_1, ...]` will be used,
     consistent with the default column headers for `CSV.read()` if column propertynames are missing.
 
 # Returns
 - `df::DataFrame`: A dataframe representation of the GAMS map or set.
 """
-function gams_to_dataframe(xf::Array{String,1}; colnames=false)
-    # Convert the input array into a DataFrame and use SLiDE editing capabilities to split
-    # each rows into columns, based on the syntax.
-    df = DataFrame(missing=xf)
-    df = edit_with(df, Match(Regex("^(?<missing>\\S+)\\.(?<missing_1>[\\S^,]*)\\s*\"*(?<missing_2>[^\"]*),?"),
-        :missing, [:missing, :missing_1, :missing_2]))
-    ROWS, COLS = size(df)
-    
-    # Does the DataFrame row contain a set (indicated by parentheses)?
-    df_set = match.(r"^\((.*)\)", df)
-    df_isset = df_set .!== nothing
+function gams_to_dataframe(xf::Array{String,1}; colnames=[])
+    matches = collect.(eachmatch.(r"((?<=\").*(?=\")|\((?>[^()]|(?R))*\)|[\w\d]+)", xf))
 
-    # If so, expand into multiple rows by converting the row into a dictionary -- with
-    # column propertynames as keys and the set divided into a list -- and back into a DataFrame.
-    df = [[DataFrame(Dict(k => df_isset[ii,k] ? string.(split(df_set[ii,k][1], ",")) : df[ii,k]
-        for k in propertynames(df))) for ii in 1:ROWS]...;]
+    if length(unique(length.(matches))) !== 1
+        @warn("Input gams set/map has unequal row lengths.")
+    end
+
+    ROWS, COLS = length(matches), maximum(length.(matches))
+
+    data = fill("", (ROWS,COLS))
+    [data[ii,jj] = matches[ii][jj][1] for ii in 1:ROWS for jj in 1:length(matches[ii])]
+
+    # Does the DataFrame row contain a set (indicated by parentheses)?
+    data_set = match.(r"^\((.*)\)$", data)
+    isset = data_set .!== nothing
     
-    # If the user specified column propertynames, apply those here and
-    # return a DataFrame sorted based on the mapping values.
-    colnames != false && (df = edit_with(df, Rename.(propertynames(df), colnames)))
-    return COLS > 1 ? sort(df, reverse(propertynames(df)[1:2])) : sort(df)
+    # If so, expand into multiple rows by converting the row into a dictionary -- with
+    # column names as keys and the set divided into a list -- and back into a DataFrame
+    cols = isempty(colnames) ? _generate_id(COLS) : colnames
+
+    df = if any(isset)
+        [[DataFrame(Dict(col =>
+            isset[ii,jj] ? string.(strip.(split(data_set[ii,jj][1], ","))) : data[ii,jj]
+            for (jj,col) in zip(1:COLS,cols))) for ii in 1:ROWS]...;]
+    else
+        DataFrame(data, cols)
+    end
+    
+    return df
 end
