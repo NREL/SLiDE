@@ -103,7 +103,6 @@ set = copy(set_in)
 bmkyr = 2016
 (sld, set, idx) = _model_input(bmkyr, d, set)
 
-
 ########## Model ##########
 cge = MCPModel();
 

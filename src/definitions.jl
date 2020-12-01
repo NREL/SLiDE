@@ -29,5 +29,5 @@ SUB_ELAST[:f] = 4       # domestic and foreign demand aggregation nest (internat
 # Transportation elasticity: disposition, distribute regional supply to local, national, export
 const TRANS_ELAST = Dict(:x => 4)
 
-# Variable lower bound 
-const MODEL_LOWER_BOUND = 1e-3
+# Variable lower bound
+const MODEL_LOWER_BOUND = 0.00
