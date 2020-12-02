@@ -119,35 +119,12 @@ end
 d = copy(d_in)
 set = copy(set_in)
 
-#Specify benchmark year and end year for dynamic model time horizon
+#Specify benchmark year
 bmkyr = 2016
-#endyr = 2018
-
-#Define range of years in time horizon
-#years = bmkyr:endyr
 
 #Load slide data and time horizon to produce model data and appropriate time-indexed subsets
 (sld, set, idx) = _model_input(bmkyr, d, set)
 
-#last year is the maximum of all years
-# years_last = maximum(years)
-
-#Create boolean indicators of first and last year of time horizon
-# bool_firstyear = Dict()
-# bool_lastyear = Dict()
-# for t in years
-#         if t!=years_last
-#                 push!(bool_lastyear,t=>0)
-#         else
-#                 push!(bool_lastyear,t=>1)
-#         end
-
-#         if t!=bmkyr
-#                 push!(bool_firstyear,t=>0)
-#         else
-#                 push!(bool_firstyear,t=>1)
-#         end
-# end
 
 ###############
 # -- SETS --
