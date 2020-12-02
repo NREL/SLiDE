@@ -15,7 +15,7 @@ using DataFrames
 # -- FUNCTIONS --
 #################
 
-include("modelfunc.jl")
+include(joinpath(SLIDE_DIR,"model","modelfunc.jl"))
 
 ############
 # LOAD DATA

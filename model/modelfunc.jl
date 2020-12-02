@@ -37,22 +37,39 @@ end
     conditions.
 - `idx::Dict` of parameter indices.
 """
-function _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
-    @info("Preparing model data for $year.")
+# function _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
+#     @info("Preparing model data for $year.")
 
-    d = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
+#     d = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
 
-    isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d))
-    (set, idx) = _model_set!(d, set, idx)
+#     isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d))
+#     (set, idx) = _model_set!(d, set, idx)
 
-    d = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d)
-    return (d, set, idx)
+#     d = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d)
+#     return (d, set, idx)
+# end
+
+# function _model_input(year::Array{Int,1}, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
+#         @info("Preparing model data for $year.")
+
+#         d2 = Dict(k => filter_with(df, (yr = year,); extrapolate = true, drop = false) for (k,df) in d)
+
+#         isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d2))
+#         (set, idx) = _model_set!(d2, set, idx)
+
+#         d1 = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
+#         d1 = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d1)
+#         return (d1, set, idx)
+# end
+
+function _model_input(year::Any, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
+        return _model_input(ensurearray(year), d, set, idx)
 end
 
 function _model_input(year::Array{Int,1}, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
-        @info("Preparing model data for $year.")
-
-        d2 = Dict(k => filter_with(df, (yr = year,); extrapolate = true, drop = false) for (k,df) in d)
+    @info("Preparing model data for $year.")
+    if length(year) > 1
+        d2 = Dict(k => filter_with(df, (yr = year,); extrapolate = true) for (k,df) in d)
 
         isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d2))
         (set, idx) = _model_set!(d2, set, idx)
@@ -60,11 +77,18 @@ function _model_input(year::Array{Int,1}, d::Dict{Symbol,DataFrame}, set::Dict, 
         d1 = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
         d1 = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d1)
         return (d1, set, idx)
+    else
+        d = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
+
+        isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d))
+        (set, idx) = _model_set!(d, set, idx)
+
+        d = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d)
+        return (d, set, idx)
+    end
 end
 
-function _model_input(year::UnitRange{Int64}, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
-        return _model_input(ensurearray(year), d, set, idx)
-end
+
 
 """
     _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
@@ -91,6 +115,11 @@ function _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
     (set[:PD], idx[:PD]) = nonzero_subset(d[:xd0])
     (set[:PK], idx[:PK]) = nonzero_subset(d[:kd0])
     (set[:PY], idx[:PY]) = nonzero_subset(d[:s0])
+
+    if :yr in idx[:kd0]
+        set[:PKT] = convert_type(Array{Tuple}, unique(d[:kd0][:,setdiff(idx[:kd0],[:yr])]))
+    end
+
     return (set, idx)
 end
 

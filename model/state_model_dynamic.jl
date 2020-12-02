@@ -16,7 +16,7 @@ using DataFrames
 # -- FUNCTIONS --
 #################
 
-include("modelfunc.jl")
+include(joinpath(SLIDE_DIR,"model","modelfunc.jl"))
 
 ############
 # LOAD DATA
@@ -48,7 +48,7 @@ years = bmkyr:endyr
 
 #Subsetting for terminal capital - omit year index
 # !!!! Add to function _model_set
-set[:PKT] = filter(x -> sld[:kd0][x] != 0.0, permute(set[:r], set[:s]));
+# set[:PKT] = filter(x -> sld[:kd0][x] != 0.0, permute(set[:r], set[:s]));
 
 ########## Model ##########
 cge = MCPModel();
