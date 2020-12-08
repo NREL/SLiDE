@@ -12,7 +12,7 @@ CSVInput:
 Order:
   - {col: yr,    type: Int}
   - {col: r,     type: String}
-  - {col: s,     type: String}
+  - {col: g,     type: String}
   - {col: t,     type: String}
 # - {col: units, type: String}
   - {col: value, type: Float64}
@@ -22,7 +22,7 @@ Map:
     from:   naics_code
     to:     windc_code
     input:  n
-    output: s
+    output: g
     kind:   left
 
 Operate:
@@ -30,5 +30,5 @@ Operate:
   axis:   row
   from:   nothing
   to:     nothing
-  input:  [yr, r, s, t, units]
+  input:  [yr, r, g, t, units]
   output: value

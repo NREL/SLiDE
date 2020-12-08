@@ -1,3 +1,5 @@
+include("SetInput.jl")
+include("DataInput.jl")
 include("CSVInput.jl")
 include("GAMSInput.jl")
 include("XLSXInput.jl")

@@ -1,18 +1,18 @@
 Path: [data, coresets]
 
-Input:
-  yr: yr.csv
-  r:  [r, state.csv]
-  orig_state:  [r, state.csv]
-  dest_state:  [r, state.csv]
-  i:  [i, aggr.csv]
-  j:  [i, aggr.csv]
-  g:  [i, aggr.csv]
-  s:  [i, aggr.csv]
-  imrg: [i, mrg.csv]
-  m:  m.csv
-  fd: fd.csv
-  ts: ts.csv
-  va: va.csv
-  [oth,use]: [i, oth_use.csv]
-  gdpcat:  [gdpcat.csv]
+SetInput:
+  - {descriptor: yr,         name: yr.csv}
+  - {descriptor: r,          name: [r, state.csv]}
+  # - {descriptor: orig, name: [r, state.csv]}
+  # - {descriptor: dest, name: [r, state.csv]}
+  # - {descriptor: i,          name: [i, aggr.csv]}
+  # - {descriptor: j,          name: [i, aggr.csv]}
+  - {descriptor: s,          name: [i, aggr.csv]}
+  - {descriptor: g,          name: [i, aggr.csv]}
+  - {descriptor: imrg,       name: [i, mrg.csv]}
+  - {descriptor: m,          name: m.csv}
+  - {descriptor: fd,         name: fd.csv}
+  - {descriptor: ts,         name: ts.csv}
+  - {descriptor: va,         name: va.csv}
+  - {descriptor: oth use,    name: [i, oth_use.csv]}
+  - {descriptor: gdpcat,     name: gdpcat.csv}

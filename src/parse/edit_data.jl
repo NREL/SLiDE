@@ -43,11 +43,6 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
     from the yaml file. Dictionary keys must correspond EXACTLY with SLiDE.Edit DataType
     names, or the edits will not be made.
 
-# Keywords
-- `shorten::Bool = false` or `shorten::Int`: if an integer length is specified, the
-    DataFrame will be shortened to the input value. This is meant to aid troubleshooting
-    during development.
-
 # Returns
 - `df::DataFrame` including edit(s)
 """
@@ -71,6 +66,7 @@ function edit_with(df::DataFrame, x::Add)
     end
     return df
 end
+
 
 function edit_with(df::DataFrame, x::Drop)
     df = copy(df)
@@ -300,20 +296,25 @@ function edit_with(df::DataFrame, lst::Array{T}) where T<:Edit
 end
 
 function edit_with(df::DataFrame, x::Describe, file::T) where T<:File
-    return edit_with(copy(df), Add(x.col, file.descriptor))
+    return select!(edit_with(df, Add(x.col, file.descriptor)), [x.col; propertynames(df)])
 end
 
-function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
-    df = read_file(y["PathIn"], file; shorten = shorten)
+function edit_with(df::DataFrame, y::Dict{Any,Any})
     # Specify the order in which edits must occur. "Drop" is included twice, once at the
     # beginning and once at the end. First, drop entire columns. Last, drop specific values.
-    EDITS = ["Rename", "Group", "Stack", "Match", "Melt", "Add", "Map", "Replace", "Drop", "Operate"]
+    EDITS = ["Rename", "Group", "Stack", "Match", "Melt", "Add", "Map", "Replace", "Drop", "Operate", "Order"]
 
     # Find which of thyese edits are represented in the yaml file of defined edits.
     KEYS = intersect(EDITS, collect(keys(y)))
     "Drop" in KEYS && pushfirst!(KEYS, "Drop")
     
     [df = edit_with(df, y[k]) for k in KEYS]
+    return df
+end
+
+function edit_with(file::T, y::Dict{Any,Any}) where T<:File
+    df = read_file(y["PathIn"], file)
+    df = edit_with(df, y)
     
     # Add a descriptor to identify the data from the file that was just added.
     # Then, reorder the columns and set them to the correct types.
@@ -323,14 +324,15 @@ function edit_with(file::T, y::Dict{Any,Any}; shorten = false) where T<:File
     return df
 end
 
-function edit_with(files::Array{T}, y::Dict{Any,Any}; shorten = false) where T<:File
-    return [[edit_with(file, y; shorten = shorten) for file in files]...;]
+function edit_with(files::Array{T}, y::Dict{Any,Any}) where T<:File
+    return [[edit_with(file, y) for file in files]...;]
 end
 
-function edit_with(y::Dict{Any,Any}; shorten = false)
+function edit_with(y::Dict{Any,Any})
     # Find all dictionary keys corresponding to file names and save these in a list.
-    file = convert_type(Array, find_oftype(y, File))
-    df = edit_with(file, y; shorten = shorten)
+    # file = convert_type(Array, find_oftype(y, File))
+    file = ensurearray(values(find_oftype(y, File)))
+    df = edit_with(file, y)
     # return _sort_datastream(df)
 end
 
@@ -342,7 +344,7 @@ some time for users.
 """
 function _sort_datastream(df::DataFrame)
     colidx = 1:size(df,2)
-    isvalue = istype(df, AbstractFloat)
+    isvalue = istype(df, AbstractFloat) # user a different function!
     ii = colidx[.!isvalue]
 
     # If it's a mapping dataframe...s
@@ -430,9 +432,31 @@ function fill_zero(keys_fill::NamedTuple; value_colnames = :value)
     return edit_with(df_fill, Add.(convert_type.(Symbol, value_colnames), 0.))
 end
 
-function fill_zero(keys_fill::Tuple; permute_keys::Bool = true)
+function fill_zero(keys_fill::Any; permute_keys::Bool = true)
     permute_keys && (keys_fill = permute(keys_fill))
     return Dict(k => 0. for k in keys_fill)
+end
+
+function fill_zero(keys_fill::Vararg{Any}; permute_keys::Bool = true)
+    permute_keys && (keys_fill = permute(keys_fill))
+    return Dict(k => 0. for k in keys_fill)
+end
+
+# ----- Edit existing ----------------------------------------------------------------------
+
+function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
+    df = ensurearray(df)
+    df_fill = indexjoin(df)
+    idx = findindex(df_fill)
+
+    permute_keys && (df_fill = indexjoin(permute(df_fill[:,idx]), df_fill))
+    
+    sort!(df_fill)
+    val = findvalue(df_fill)
+    
+    [df[ii] = edit_with(df_fill[:,[idx;val[ii]]], Rename(val[ii],:value))
+        for ii in 1:length(df)]
+    return length(df) == 1 ? df[1] : Tuple(df)
 end
 
 function fill_zero(d::Vararg{Dict}; permute_keys::Bool = true)
@@ -443,30 +467,19 @@ function fill_zero(d::Vararg{Dict}; permute_keys::Bool = true)
     return length(d) == 1 ? d[1] : Tuple(d)
 end
 
+# ----- Given set list ---------------------------------------------------------------------
+
 function fill_zero(keys_fill::NamedTuple, df::DataFrame)
     df = copy(df)
     df_fill = fill_zero(keys_fill)
-    df = fill_zero(df, df_fill)[1]
+    df = fill_zero(df, df_fill; permute_keys = false)[1]
     return df
 end
 
-function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
-    df = copy.(ensurearray(df))
-    # Save propertynames of columns containing values to fill zeros later.
-    # Find descriptor columns to permute OR make consistent across input DataFrames.
-    value_colnames = find_oftype.(df, AbstractFloat)
-    cols = intersect(setdiff.(propertynames.(df), value_colnames)...)
-
-    # Find a unique list of descriptor keys in the input DataFrame(s). Permute as desired.
-    df_fill = sort(unique([[x[:,cols] for x in df]...;]))
-    permute_keys && (df_fill = permute(df_fill))
-    
-    # For each DataFrame in the list, join the input DataFrame to DataFrame keys_all on the
-    # descriptor columns shared by both DataFrames. Using a left join will add "missing"
-    # where a descriptor was not already present, which will be replaced by zero.
-    [df[ii] = edit_with(leftjoin(df_fill, df[ii], on = cols),
-        Replace.(value_colnames[ii], missing, 0.0)) for ii in 1:length(df)]
-    return length(df) == 1 ? df[1] : Tuple(df)
+function fill_zero(set::Dict, df::DataFrame)
+    idx = intersect(findindex(df), collect(keys(set)))
+    val = [set[k] for k in idx]
+    return fill_zero(NamedTuple{Tuple(idx,)}(val,), df)
 end
 
 function fill_zero(keys_fill::Any, d::Dict; permute_keys::Bool = true)
@@ -811,3 +824,22 @@ function filter_with(
 
     return sort(df[:,cols])
 end
+
+# function filter_with(
+#     df::DataFrame,
+#     set::NamedTuple;
+#     drop::Bool = false,
+#     extrapolate::Bool = false,
+#     forward::Bool = true,
+#     backward::Bool = true,
+#     r::Pair = "md" => "dc",
+#     overwrite::Bool = false
+# )
+#     if any(typeof.(collect(values(set))) .<: Pair)
+#         x = [Rename.(set[k].first, k) for k in keys(set) if typeof(set[k]) <: Pair]
+#         df = edit_with(df, x)
+#     end
+    
+#     set = Dict(k => (typeof(set[k]) <: Pair) ? set[k].second : set[k] for k in keys(set))
+#     return filter_with(df, set; drop = drop, extrapolate = extrapolate, forward = forward, backward = backward, r = r, overwrite = overwrite)
+# end
