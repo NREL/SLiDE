@@ -222,11 +222,22 @@ _read_from_yaml(lst::Array{Parameter,1}) = _delete_empty!(Dict(_inp_key(x) => x 
 This function is a standardized method for generating dictionary keys for
 [`SLiDE.read_from`](@ref) based on the type of information that is being read.
 """
+function _inp_key(paths::Array{String,1})
+    dir = splitdir.(paths)
+
+    while length(unique(getindex.(dir,2))) > 1
+        dir = splitdir.(getindex.(dir,1))
+    end
+
+    return convert_type(Symbol, dir[1][end])
+end
+
 _inp_key(x::SetInput) = length(split(x.descriptor)) > 1 ? Tuple(split(x.descriptor)) : x.descriptor
 _inp_key(x::T) where {T <: File} = Symbol(x.descriptor)
 _inp_key(x::Parameter) = Symbol(x.parameter)
 _inp_key(x::String) = Symbol(x)
 _inp_key(x::String, ext::String) = Symbol(splitpath(x)[end][1:end-length(ext)])
+
 
 
 """

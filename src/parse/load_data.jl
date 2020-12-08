@@ -430,13 +430,13 @@ function write_yaml(path::Array{String,1}, file::XLSXInput; overwrite::Bool=true
 end
 
 
-function write_yaml(path, files::Array{XLSXInput,1}; overwrite::Bool=true)
+function SLiDE.write_yaml(path, files::Array{XLSXInput,1}; overwrite::Bool=true)
     if length(unique(get_descriptor.(files))) < length(files)
         @error("Input XLSX files must have unique descriptors.")
     end
-    files = Dict(_inp_key(file) => file for file in files)
-    files = Dict(k => write_yaml(path, file; overwrite=overwrite) for (k,file) in files)
-    return files
+    # files = Dict(_inp_key(file) => file for file in files)
+    # files = Dict(k => write_yaml(path, file; overwrite=overwrite) for (k,file) in files)
+    return [write_yaml(path, file; overwrite=overwrite) for file in files]
 end
 
 
@@ -474,9 +474,8 @@ function run_yaml(filename::String; save::Bool=true)
 end
 
 
-function run_yaml(d::Dict; save::Bool=true)
-    d_ans = Dict(k => run_yaml(d[k]; save = save) for k in keys(d))
-    return d_ans
+function run_yaml(lst::AbstractArray; save::Bool=true)
+    return Dict(_inp_key(x) => run_yaml(x; save=save) for x in lst)
 end
 
 

@@ -142,8 +142,10 @@ function edit_with(df::DataFrame, x::Map; kind = :left, file = nothing)
     to = _generate_id(x.to, :to)
 
     df_map = copy(read_file(x))
-    df_map = hcat(edit_with(df_map[:,x.from], Rename.(x.from, from)),
-        edit_with(df_map[:,x.to], Rename.(x.to, to)))
+    df_map = unique(hcat(
+        edit_with(df_map[:,x.from], Rename.(x.from, from)),
+        edit_with(df_map[:,x.to], Rename.(x.to, to)),
+    ))
 
     # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
     # DataFrame are used since all values in each column should be of the same type.
@@ -157,6 +159,7 @@ function edit_with(df::DataFrame, x::Map; kind = :left, file = nothing)
             end
         end
     end
+    
     join_cols = Pair.(x.input, from)
     
     x.kind == :inner && (df = innerjoin(df, df_map, on = join_cols; makeunique = true))
@@ -360,7 +363,7 @@ function edit_with(
     df = [[edit_with(file, y; print_status = print_status) for file in files]...;]
     df = dropzero(df)
 
-    # df = _filter_datastream(df, y)
+    df = _filter_datastream(df, y)
     df = _sort_datastream(df, y)
     return df
 end
@@ -381,8 +384,8 @@ function _filter_datastream(df::DataFrame, y::Dict)
     path = joinpath("data","coresets")
     set = Dict()
     if "Filter" in keys(y)
-        y["Filter"] in ["all","year"]  && push!(set, :yr => read_file(joinpath(path,"yr.csv"))[:,1])
-        y["Filter"] in ["all","state"] && push!(set, :r => read_file(joinpath(path,"r","state.csv"))[:,1])
+        y["Filter"] in [true,"year"]  && push!(set, :yr => read_file(joinpath(path,"yr.csv"))[:,1])
+        y["Filter"] in [true,"state"] && push!(set, :r => read_file(joinpath(path,"r","state.csv"))[:,1])
     end
 
     !isempty(set) && (df = filter_with(df, set; extrapolate = true))
@@ -397,18 +400,16 @@ mapping and developing. Sorting isn't *necessary* and we could remove this funct
 some time for users.
 """
 function _sort_datastream(df::DataFrame, y::Dict{Any,Any})
-    idx = findindex(df)
+    sorting = "Sort" in keys(y) ? y["Sort"] : true
 
-    if "Sort" in keys(y)
-        if y["Sort"] == "unique code"
-            idx = idx[occursin.(:code, idx)]
-            df = sort(df, sortperm(length.(unique.(skipmissing.(eachcol(df[:,idx]))))))
-        elseif y["Sort"] == "unique"
-            df = sort(df, sortperm(length.(unique.(skipmissing.(eachcol(df[:,idx]))))))
-        end
-    else
-        df = sort(df, idx)
+    sorting == false && (return df)
+
+    df = if sorting == true
+        sort(df, findindex(df))
+    elseif occursin("unique", sorting)
+        sort_unique(df, sorting)
     end
+
     return df
 end
 
@@ -923,6 +924,8 @@ function filter_with(
     end
 
     # If one of the filtered DataFrame columns contains only one unique value, drop it.
+    # However, DO NOT DROP UNITS. EVER.
+    idx_set = setdiff(idx_set,[:units])
     drop && setdiff!(cols, idx_set[length.(unique.(eachcol(df[:,idx_set]))) .=== 1])
 
     return sort(df[:,cols])

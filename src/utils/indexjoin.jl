@@ -63,7 +63,7 @@ end
 """
 """
 function convertjoin(df::Array{DataFrame,1}; id=[])
-    return indexjoin(df; id=id, indicator=false, fillmissing=1.0, skipindex=:units, kind=:inner)
+    return indexjoin(df; id=id, indicator=false, fillmissing=1.0, skipindex=:units, kind=:left)
 end
 
 convertjoin(df::Vararg{DataFrame}; id=[]) = convertjoin(ensurearray(df); id=id)
@@ -138,16 +138,31 @@ end
 """
 """
 function _fill_missing(df::DataFrame, fillmissing)
-    if fillmissing !== false
-        fillmissing == true && (fillmissing = 0.0)
-        val_bool = find_oftype(df, Bool)
-        val_float = find_oftype(df, AbstractFloat)
+    # Do we even want to fill missing values?
+    fillmissing === false && (return df)
+    fillmissing === true  && (fillmissing = 0.0)
 
-        df = edit_with(df, Replace.(val_bool, missing, false))
-        df = edit_with(df, Replace.(val_float, missing, fillmissing))
-    end
+    # Are there missing values to fill?
+    dfmiss = df[:,any.(eachcol(ismissing.(df)))]
+    isempty(dfmiss) && (return df)
+    
+    # Replace values.
+    bool = find_oftype(dfmiss, Bool)
+    num = find_oftype(dfmiss, AbstractFloat)
+    
+    # Fill missing strings.
+    str = findindex(dfmiss)
+    str_unique = unique.(skipmissing.(eachcol(df[:,str])));
+    ii = length.(str_unique).==1
+
+    !isempty(bool) && (df = edit_with(df, Replace.(bool, missing, false)))
+    !isempty(num)  && (df = edit_with(df, Replace.(num, missing, fillmissing)))
+    any(ii)        && (df = edit_with(df, Replace.(str[ii], missing, [str_unique[ii]...;])))
     return df
 end
+
+
+_fill_missing(df::DataFrame) = _fill_missing(df, 0.0)
 
 
 """

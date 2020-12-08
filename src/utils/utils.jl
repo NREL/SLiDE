@@ -29,7 +29,7 @@ Base.split(x::Symbol) = Symbol.(split(string(x)))
     Base.strip(x::Number)
 Extends `strip` to ignore missing fields and numbers.
 """
-# Base.strip(x::String) = replace(x, r"^\s*\"*|\"*\s*$" => "")
+Base.strip(x::String) = replace(x, r"^\s*\"*|\"*\s*$" => "")
 Base.strip(x::Missing) = x
 Base.strip(x::Number) = x
 
@@ -266,7 +266,7 @@ function permute(x::NamedTuple)
     return NamedTuple{Tuple(idx, )}(val, )
 end
 
-permute(x::Any) = any(isarray.(x)) ? permute(x...) : x
+permute(x::Any) = any(isarray.(x)) ? permute(ensurearray.(x)...) : x
 permute(x::Vararg{Any}) = vec(collect(Iterators.product(x...)))
 
 
@@ -327,4 +327,36 @@ append(x::Array{Symbol,1}) = Symbol(Symbol.(x[1:end-1], :_)..., x[end])
 append(x1::Symbol, x2::Any) = Symbol(x1,:_,x2)
 append(x1::Symbol, x2::Vararg{Any,N}) where N = append(Symbol.([x1; ensurearray(x2)]))
 
-# _append_as(::Type{T}, x::)
+append(x::Tuple) = append(ensurearray(x))
+
+append(x::Array{String,1}) = string(string.(x[1:end-1], :_)..., x[end])
+append(x1::String, x2::Any) = string(x1,:_,x2)
+append(x1::String, x2::Vararg{Any,N}) where N = append(string.([x1; ensurearray(x2)]))
+
+
+"""
+"""
+function sort_unique(df::DataFrame, idx::Array{Symbol,1})
+    idx = idx[sortperm(length.(unique.(skipmissing.(eachcol(df[:,idx])))))]
+    return sort(df, idx)
+end
+
+function sort_unique(df::DataFrame, id::String)
+    (id == "unique") && (return sort_unique(df))
+
+    m = match.(r"unique\s+(\S+)", id)
+    id = m != nothing ? Symbol(m[1]) : Symbol(id)
+
+    return sort_unique(df, id)
+end
+
+function sort_unique(df::DataFrame, id::Symbol)
+    idx = propertynames(df)
+    subidx = idx[occursin.(id, idx)]
+
+    length(subidx) > 0 && (idx = subidx)
+
+    return sort_unique(df, idx)
+end
+
+sort_unique(df::DataFrame) = sort_unique(df, findindex(df))
