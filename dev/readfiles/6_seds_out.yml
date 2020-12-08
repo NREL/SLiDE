@@ -10,6 +10,6 @@ Path: [dev, windc_1.0, 6_seds_out]
 DataInput:
   - {descriptor: elegen,         name: elegen.csv,         col: [r,src,yr,value]}
   - {descriptor: sedsco2compare, name: sedsco2compare.csv, col: [co2dim,yr,data_source,value]}
-  - {descriptor: sedsenergy,     name: sedsenergy.csv,     col: [r,pq,e,sec,yr,value]}
-  - {descriptor: sedsother,      name: sedsother.csv,      col: [r,gdpcat,yr,value]}
+  - {descriptor: energy,         name: sedsenergy.csv,     col: [r,pq,src,sec,yr,value]}
+  - {descriptor: other,          name: sedsother.csv,      col: [r,gdpcat,yr,value]}
   - {descriptor: co2emis,        name: co2emis.csv,        col: [r,yr,co2dim_e,sec,data_source,value]}

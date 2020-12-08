@@ -6,7 +6,7 @@ DataInput:
   - {descriptor: crude_oil,   name: crude_oil_price_units.csv, col: [yr,units,value]}
   - {descriptor: emissions,   name: emissions_units.csv,       col: [co2dim,r,yr,units,value]}
   - {descriptor: gsp_state,   name: gsp_units.csv,             col: [r,yr,gdpcat,si,units,value]}
-  - {descriptor: heatrate,    name: heatrate_units.csv,        col: [yr,source,units,value]}
+  - {descriptor: heatrate,    name: heatrate_units.csv,        col: [yr,src,units,value]}
   - {descriptor: nass,        name: nass_units.csv,            col: [r,n,units,value]}
   - {descriptor: pce,         name: pce_units.csv,             col: [yr,r,pg,units,value]}
   - {descriptor: seds,        name: seds_units.csv,            col: [source,sector,r,yr,units,value]}
@@ -20,21 +20,21 @@ DataInput:
 Map:
   - file:   [standardize, units.csv]
     from:   from
-    to:     [to, factor, units_factor]
+    to:     [to, factor, units_out]
     input:  units
-    output: [units, factor, units_factor]
+    output: [units, factor, units_out]
     kind:   left
 
 Operate:
   axis: col
   operation: "*"
   from:   units
-  to:     units_factor
+  to:     units_out
   input:  [value, factor]
   output: value
 
 Replace:
-  - col:  [gdpcat, g, s, co2dim]
+  - col:  [gdpcat, g, s, co2dim, src]
     from: uppercase
     to:   lowercase
   - col:  [source, sector, ec]
