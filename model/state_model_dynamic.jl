@@ -35,20 +35,17 @@ endyr = 2018
 years = bmkyr:endyr
 #years = [2017, 2016, 2019, 2018]
 
-#Call yrsbool to build year sets
-(years, yrl, yrf, islast, isfirst, yrdiff) = yrsbool(years)
+#Define years and associated flags
+years = ensurearray(sort(years))
+yrl = years[length(years)]
+yrf = years[1]
+islast = Dict(years[k] => (years[k] == yrl ? 1 : 0) for k in keys(years))
+isfirst = Dict(years[k] => (years[k] == yrf ? 1 : 0) for k in keys(years))
+yrint = Dict(years[k+1] => years[k+1]-years[k] for k in 1:(length(years)-1))
 
 #Load slide data and time horizon to produce model data and appropriate time-indexed subsets
 (sld, set, idx) = _model_input(years, d, set)
 
-
-###############
-# -- SETS --
-###############
-
-#Subsetting for terminal capital - omit year index
-# !!!! Add to function _model_set
-# set[:PKT] = filter(x -> sld[:kd0][x] != 0.0, permute(set[:r], set[:s]));
 
 ########## Model ##########
 cge = MCPModel();
