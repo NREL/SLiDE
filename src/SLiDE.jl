@@ -156,6 +156,7 @@ abstract type CGE <: EconomicSystemsType end
 include("definitions.jl")
 export SUB_ELAST
 export TRANS_ELAST
+export MODEL_LOWER_BOUND
 
 # TYPES
 include(joinpath("parse", "generated_check", "includes.jl"))

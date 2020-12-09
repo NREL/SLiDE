@@ -798,10 +798,6 @@ sub_set_e = sub_set_pe;
 #set up the options for the path solver
 PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
 
-# export the path license string to the environment
-# this is now done in the SLiDE initiation steps 
-ENV["PATH_LICENSE_STRING"]="2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
 
 # solve the model
 status = solveMCP(cge)
-
