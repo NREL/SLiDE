@@ -58,7 +58,7 @@ function build_data(
             save_build = save_build, overwrite = overwrite)
 
         write_build!(dataset, PARAM_DIR, d)
-        # write_build!(dataset, SET_DIR, set)
+        filter_build!(SET_DIR, set)
     end
     return (d, set)
 end
@@ -154,9 +154,8 @@ function _read_from_dir(dir::String; ext::String = ".csv", run_bash::Bool = fals
     files = Dict(_inp_key(f, ext) => f for f in files if occursin(ext, f))
     d = Dict(k => read_file(joinpath(dir,f)) for (k,f) in files)
 
-    # If the file is empty, If there's only one column containing values, rename it to value.
-    # This is consistent with SLiDE naming convention.
     _delete_empty!(d)
+
     return d
 end
 
@@ -239,19 +238,30 @@ _inp_key(x::String) = Symbol(x)
 _inp_key(x::String, ext::String) = Symbol(splitpath(x)[end][1:end-length(ext)])
 
 
-
 """
 """
 _edit_from_yaml(d::Dict, editor::Dict, files::Array) = d
+
+# For when the yaml file only points to files to read and doesn't contain any edits.
 _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Dict) = d
 
+function _edit_from_yaml(d::Dict{Symbol,Dict{Any,Any}}, editor, files)
+    # For when the yaml file read contains a list of yaml files, each containing edits.
+    # See: src/readfiles/build/shareinp.yml.
+    return Dict(k => edit_with(y) for (k,y) in d)
+    # !!!! Maybe use _read_from_yaml again here hahah.
+end
+
 function _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Array{T,1}) where {T <: File}
-    # [d[k] = edit_with(d[k], editor) for k in keys(d)]
+    # For when the yaml file defines files AND edits that should be made to ALL data inputs.
     [d[_inp_key(f)] = edit_with(d[_inp_key(f)], editor, f) for f in files]
     return d
 end
 
 function _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Array{DataInput,1})
+    # For when the yaml file defines files AND edits that should be made to ALL data inputs.
+    # This is the same as when editing an array of files EXCEPT that we order the columns
+    # as specified. See: dev/readfiles/1_data_out.yml.
     [d[_inp_key(f)] = select(edit_with(d[_inp_key(f)], editor, f), f.col) for f in files]
     return d
 end
@@ -373,6 +383,7 @@ function filter_build!(subset::String, d::Dict{T,DataFrame}) where T <: Any
         delete_keys = setdiff(keys(d), save_keys)
 
         [delete!(d, k) for k in delete_keys]
+        # !!!! make specific to slide.
         [select!(d[k], param[k]) for k in save_keys]
     end
     return d
@@ -406,19 +417,19 @@ end
     subset. The dictionary key is consistent the value's field `parameter`.
 """
 function build_parameters(subset::String)
+    subset = convert_type(Symbol, subset)
+    df = read_file(joinpath(SLIDE_DIR,"src","build","parameters","define.csv"))
+    d = load_from(Dict{Parameter}, df)
 
-    df = read_file(joinpath(SLIDE_DIR,"src","build","parameters","parameter_define.csv"))
+    lst = read_from(joinpath(SLIDE_DIR,"src","readfiles","parameterlist.yml"))
 
-    lst_param = read_from(joinpath(SLIDE_DIR,"src","readfiles","parameterlist.yml"))
-    lst_param = (Symbol(subset) in keys(lst_param)) ? lst_param[Symbol(subset)] : DataFrame()
+    d = if subset in keys(lst)
+        Dict(k => d[k] for k in intersect(Symbol.(lst[subset]), keys(d)))
+    else
+        nothing
+    end
 
-    type_param = read_file(joinpath(SLIDE_DIR,"src","build","parameters","parameter_scope.csv"))
-    type_param = type_param[type_param[:,:subset] .== subset,:]
-
-    df = indexjoin(lst_param, type_param, df)
-    dropmissing!(df, intersect(propertynames(df),[:subset,:index]))
-    
-    return !isempty(df) ? load_from(Dict{Parameter}, df) : nothing
+    return d
 end
 
 
