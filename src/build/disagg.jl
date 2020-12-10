@@ -78,8 +78,10 @@ function disagg(
     _disagg_xn0!(d)
     _disagg_hhadj!(d)
 
+    # Should other
     d[:xn0][d[:xn0][:,:value] .< 1e-8,:value] .= 0;
-    
+    d[:xd0][d[:xd0][:,:value] .< 1e-8,:value] .= 0;
+
     write_build!(dataset, CURR_STEP, d; save_build = save_build)
     write_build!(dataset, SET_DIR, Dict(k => set[k] for k in [:gm]))
     return (d, set)
