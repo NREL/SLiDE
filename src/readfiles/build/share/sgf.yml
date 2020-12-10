@@ -29,10 +29,6 @@ Drop:
   val: [0, 99]
   operation: "=="
 
-Operate:
+Combine:
   operation: sum
-  axis:   row
-  from:   nothing
-  to:     nothing
-  input:  [yr, r, g, units]
-  output: value
+  output: [yr, r, g, units]
