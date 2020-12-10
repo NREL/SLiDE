@@ -24,7 +24,6 @@ function calibrate(
     penalty_nokey = DEFAULT_PENALTY_NOKEY
     )
     CURR_STEP = "calibrate"
-    @info("changes made!")
 
     # If there is already calibration data, read it and return.
     d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
@@ -238,6 +237,7 @@ function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
     cal = Dict(k => convert_type(Dict, d[k]) for k in param[:cal])
     return (cal, idx)
 end
+
 
 function _calibration_set!(set)
     # (!!!!) should just replace in usage.

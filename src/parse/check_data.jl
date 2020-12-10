@@ -5,9 +5,9 @@
 - `df::Array{DataFrame,1}`: List of DataFrames to compare.
     These must all share the same column names.
 - `d::Array{Dict,1}`: Array of dictonaries of DataFrames to compare.
-- `indicator::Array{Symbol,1}`: List of indicators that describe each DataFrame and track which
+- `id::Array{Symbol,1}`: List of IDs that describe each DataFrame and track which
     values/keys are present in each DataFrame. There must be an equal number of input
-    DataFrames and indicators.
+    DataFrames and IDs.
 
 # Keywords
 - `tol::Float64 = 1E-6`: Tolerance used when determining whether values are equal.
@@ -24,11 +24,11 @@
 """
 function compare_summary(
     df::Array{DataFrame,1},
-    indicator::Array{Symbol,1};
-    tol::Float64 = DEFAULT_TOL,
-    complete_summary::Bool = false
-    )
-
+    id::Array{Symbol,1};
+    tol::Float64=DEFAULT_TOL,
+    complete_summary::Bool=false
+)
+    df = copy.(df)
     rel = length(df) == 2 ? :reldiff : :maxreldiff
 
     # Do some checks on the indices before comparing.
@@ -36,12 +36,12 @@ function compare_summary(
     length(unique(sort.(idx))) > 1 && @error("Cannot compare DataFrames with different indices.")
     length(unique(idx)) > 1 && @warn("Comparing DataFrames with different index orders.")
 
-    df = indexjoin(df; indicator = indicator, mark_source = true, fillmissing = false)
+    df = indexjoin(df; id=id, indicator=true, fillmissing=true)
     idx = findindex(df)
-    val = setdiff(findvalue(df), indicator)
+    val = setdiff(findvalue(df), id)
 
     # Are all of the keys here?
-    df[!,:equal_keys] .= prod.(eachrow(df[:,indicator]))
+    df[!,:equal_keys] .= prod.(eachrow(df[:,id]))
 
     if !isempty(val)
         # Are there discrepancies between PRESENT values (within the specified tolerance)?
@@ -55,10 +55,10 @@ function compare_summary(
 
         # What if some zeros were include but not others?
         # df[all.(eachrow(.|(ismissing.(df[:,val]), df[:,val].==0))), :equal_values] .= true
-        select!(df, [idx; val; indicator; rel; :equal_keys; :equal_values])
+        select!(df, [idx; val; id; rel; :equal_keys; :equal_values])
         ii = df[:,:equal_keys] .* df[:,:equal_values]
     else
-        select!(df, [idx; indicator; :equal_keys])
+        select!(df, [idx; id; :equal_keys])
         ii = df[:,:equal_keys]
     end
 
@@ -66,14 +66,18 @@ function compare_summary(
     return df
 end
 
+
 function compare_summary(
     d::Array{Dict{Symbol,DataFrame},1},
-    indicator::Array{Symbol,1};
-    tol::Float64=SLiDE.DEFAULT_TOL,
+    id::Array{Symbol,1};
+    tol::Float64=DEFAULT_TOL,
     complete_summary::Bool=false
 )
     keys_comp = intersect(collect.(keys.(d))...)
-    d = Dict(k => compare_summary([d[m][k] for m in keys(d)], indicator;
+
+    length(keys_comp) == 0 && @warn("Cannot compare Dictionaries that share no common keys.")
+    
+    d = Dict(k => compare_summary([d[m][k] for m in keys(d)], id;
         tol=tol, complete_summary=complete_summary) for k in keys_comp)
     return d
 end
@@ -85,20 +89,20 @@ end
 # Arguments
 - df_lst::Array{DataFrame,1}: List of DataFrames to compare.
     These must all share the same column names.
-- `inds::Array{Symbol,1}`: List of indicators that describe each DataFrame and track which
+- `inds::Array{Symbol,1}`: List of IDs that describe each DataFrame and track which
     values/keys are present in each DataFrame. There must be an equal number of input
-    DataFrames and indicators.
+    DataFrames and IDs.
 
 # Keyword Argument
 - `tol::Float64 = 1E-6`: Tolerance used when determining whether values are equal.
     Default values is `1E-6`.
 """
-function compare_values(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol = DEFAULT_TOL)
+function compare_values(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1}; tol=DEFAULT_TOL)
     df_lst = copy.(df_lst)
-    df = compare_summary(copy.(df_lst), inds; tol = tol)
+    df = compare_summary(copy.(df_lst), inds; tol=tol)
     df = df[.!df[:,:equal_values],:]
 
-    size(df,1) > 0 && @warn("Inconsistent values:", df)
+    # size(df, 1) > 0 && @warn("Inconsistent values:", df)
     return df
 end
 
@@ -109,9 +113,9 @@ end
 # Arguments
 - df_lst::Array{DataFrame,1}: List of DataFrames to compare.
     These must all share the same column names.
-- `inds::Array{Symbol,1}`: List of indicators that describe each DataFrame and track which
+- `inds::Array{Symbol,1}`: List of IDs that describe each DataFrame and track which
     values/keys are present in each DataFrame. There must be an equal number of input
-    DataFrames and indicators.
+    DataFrames and IDs.
 """
 function compare_keys(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
     df_lst = copy.(df_lst)
@@ -133,7 +137,7 @@ function compare_keys(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
     df = DataFrame()
 
     for col in cols
-        df_temp = DataFrame(key = fill(col, size(d_all[col])))
+        df_temp = DataFrame(key=fill(col, size(d_all[col])))
         d_check = CHECKCASE[col] ? d_unique[col] : d_lower[col]
 
         [df_temp[!,ind] = [v in d_check[ind] ? d_unique[col][ind][v .== d_check[ind]][1] :
@@ -143,21 +147,21 @@ function compare_keys(df_lst::Array{DataFrame,1}, inds::Array{Symbol,1})
         df = [df; df_temp]
     end
     
-    size(df,1) > 0 && @warn("Inconsistent keys:", df)
+    # size(df, 1) > 0 && @warn("Inconsistent keys:", df)
     return df
 end
 
 
 """
-    benchmark_against(d_summ::Dict, k::Symbol, d_bench::Dict, d_calc::Dict;
+    benchmark_against(df_calc, df_bench; kwargs...)
 """
 function benchmark_against(
     df_calc::DataFrame,
     df_bench::DataFrame;
-    key = missing,
-    tol = DEFAULT_TOL,
-    small = DEFAULT_SMALL)
-
+    key=missing,
+    tol=DEFAULT_TOL,
+    small=DEFAULT_SMALL
+)
     # Remove very small numbers. These might be zero or missing in the other DataFrame,
     # and we're not splitting hairs here.
     if small !== missing
@@ -167,32 +171,29 @@ function benchmark_against(
 
     (key !== missing) && println("  Comparing keys and values for ", key)
 
-    df_comp = compare_summary([df_calc, df_bench], [:calc,:bench]; tol = tol)
-    key == :utd && (df_comp = edit_with(df_comp, Drop(:yr,2002,"<")))
+    df_comp = compare_summary([df_calc, df_bench], [:calc,:bench]; tol=tol)
+    # key == :utd && (df_comp = edit_with(df_comp, Drop(:yr,2002,"<")))
 
     # If the dataframes are in agreement, store this value as "true".
     # Otherwise, store the comparison dataframe rows that are not in agreement.
-    return size(df_comp,1) == 0 ? true : df_comp
+    return size(df_comp, 1) == 0 ? true : df_comp
 end
 
 
-function benchmark_against(calc::Dict, bench::Dict; tol = DEFAULT_TOL, small = DEFAULT_SMALL)
+function benchmark_against(calc::Dict, bench::Dict; tol=DEFAULT_TOL, small=DEFAULT_SMALL)
     keys_comp = intersect(keys(calc), keys(bench))
     
-    if length(keys_comp) == 0
-        @warn("Cannot compare Dictionaries that share no common keys.")
-        return
-    end
+    length(keys_comp) == 0 && @warn("Cannot compare Dictionaries that share no common keys.")
 
-    return Dict(k => benchmark_against(calc[k], bench[k]; key = k, tol = tol) for k in keys_comp)
+    return Dict(k => benchmark_against(calc[k], bench[k]; key=k, tol=tol) for k in keys_comp)
 end
 
 
 """
     verify_over(df::DataFrame, col::Any; tol = 1E-6)
 """
-function verify_over(df::DataFrame, col::Any; tol = DEFAULT_TOL)
+function verify_over(df::DataFrame, col::Any; tol=DEFAULT_TOL)
     df = combine_over(df, col)
     df = df[(df[:,:value] .- 1.0) .> tol, :]
-    return size(df,1) == 0 ? true : df
+    return size(df, 1) == 0 ? true : df
 end

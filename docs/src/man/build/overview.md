@@ -22,7 +22,7 @@ build_data
 Divide BEA supply/use data into parameters.
 
 ```@docs
-partition!
+partition
 ```
 
 ### Calibrate
@@ -37,7 +37,7 @@ Divide data into regional component. This will guide how to break the national d
 regional components by state or county.
 
 ```@docs
-share!
+share
 ```
 
 
@@ -45,5 +45,5 @@ share!
 ### Disaggregate
 
 ```@docs
-disagg!
+disagg
 ```

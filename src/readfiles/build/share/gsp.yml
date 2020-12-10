@@ -24,10 +24,6 @@ Map:
     output: s
     kind:   left
 
-Operate:
+Combine:
   operation: sum
-  axis:   row
-  from:   nothing
-  to:     nothing
-  input:  [yr, r, s, gdpcat, units]
-  output: value
+  output: [yr, r, s, gdpcat, units]

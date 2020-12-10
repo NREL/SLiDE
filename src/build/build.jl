@@ -1,16 +1,35 @@
 """
     build_data(; kwargs...)
+This function will execute the SLiDE buildstream and generate the parameters necessary to
+run the model. If the dataset has already been generated and saved, the function will read
+and return those values.
+
+Otherwise, it will read BEA supply/use data from the `/SLIDE_DIR/data/input/` directory.
+
+Then, execute the four steps of the SLiDE buildstream by executing the following functions:
+1. [`SLiDE.partition`](@ref)
+2. [`SLiDE.calibrate`](@ref)
+3. [`SLiDE.share`](@ref)
+4. [`SLiDE.disagg`](@ref)
+
+This information will be saved in the following structure:
+
+    /SLIDE_DATA/data/dataset/
+    ├── parameters/
+    └── sets/
+
+# Arguments
+- `dataset::String`: Dataset identifier
 
 # Keywords
-- `save_build = true`:
-    - `save_build = true` (default) or `save_build::String = "path/to/version"`: save_build data in each build
-        step in the path returned by [`SLiDE.build_path`](@ref).
-    - `save_build = false`: the files at each step will not be saved.
-- `overwrite = false`: If data exists, do not read it. Build the data from scratch.
+- `save_build::Bool = false`: That decides whether to save the information at each build
+    step. Setting `save_build = true` will add the directory `/SLIDE_DATA/data/dataset/build`
+    to contain a subdirectory for each of the four build steps.
+- `overwrite::Bool = false`: If data exists, do not read it. Build the data from scratch.
 
 # Returns
-- `d::Dict` of DataFrames containing the model data.
-- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `d::Dict{Symbol,DataFrame}` of model parameters
+- `set::Dict{Any,Array}` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
 function build_data(
     dataset::String = DEFAULT_DATASET;
@@ -39,28 +58,27 @@ function build_data(
             save_build = save_build, overwrite = overwrite)
 
         write_build!(dataset, PARAM_DIR, d)
-        # write_build!(dataset, SET_DIR, set)
+        filter_build!(SET_DIR, set)
     end
     return (d, set)
 end
 
 
 """
-    build_path(subset::String; kwargs...)
+    sub_path(dataset::String, subset::String; kwargs...)
 
 # Arguments
-- `subset::String`: Internally-passed parameter indicating the build step. For the four
-    build steps, these are: partition, calibrate, share, and build.
-
-# Keyword Arguments
-- `save_build`: Will this data be saved? If so, where?
-    - `save_build = true` (default): save data in each build step ([`SLiDE.partition!`](@ref),
-        [`SLiDE.calibrate`](@ref), [`SLiDE.share!`](@ref), [`SLiDE.disagg!`](@ref))
-        to a directory in `SLiDE/data/default/build/`.
-    - `save_build = path/to/version`: Build data will be saved in `SLiDE/data/path/to/version/build/`.
+- `dataset::String`: Dataset identifier
+- `subset::String`: Internally-passed parameter indicating the type of information to save
+    (set, parameter, or build step)
 
 # Returns
-- `path::String`: standardized location indicating where to save intermediate files.
+- `path::String`: Standardized location indicating where to save intermediate files.
+    Here, `/path/to/dataset` is returned by [`SLiDE.data_path`](@ref)
+    - If saving build steps: `/path/to/dataset/build/<build_step>`. For the For the four build
+        steps, these are: partition, calibrate, share, and build.
+    - Model input parameters: `/path/to/dataset/parameters`
+    - Parameter indices: `/path/to/dataset/sets`
 """
 function sub_path(dataset::String, subset::String)
     path = data_path(dataset)
@@ -69,6 +87,18 @@ function sub_path(dataset::String, subset::String)
 end
 
 
+"""
+    data_path(dataset::String)
+
+# Arguments
+- `dataset::String`: Dataset identifier
+
+# Returns
+- `dir::String = /path/to/dataset`
+    - `SLIDE_DIR` is the path to the location of the SLiDE.jl package on the user's machine.
+    - The default dataset identifier is `state_model`. This dataset includes all
+        U.S. states and summary-level sectors and goods.
+"""
 function data_path(dataset::String)
     joinpath(SLIDE_DIR, "data", dataset)
 end
@@ -76,44 +106,63 @@ end
 
 """
     read_from(path::String)
+This function reads information as specified by the path argument.
+
+# Arguments
+- `path::String` to a directory containing files to read *or* to a yaml file with
+    information on what to read and how.
+
+# Returns
+- `d::Dict` of file contents.
 """
 function read_from(path::String; ext = ".csv", run_bash::Bool = false)
-    # Should update to make read_from(::Type, path), so the output is not a mystery.
     d = if any(occursin.([".yml",".yaml"], path))
         _read_from_yaml(path; run_bash = run_bash)
     elseif isdir(path)
         _read_from_dir(path; ext = ext, run_bash = run_bash)
     else
-        @error("Cannot read from $path. Please enter an existing directory or yaml file name.")
+        @error("Cannot read from $path. Function input must point to an existing directory or yaml file.")
     end
     return d
 end
 
 
 """
+    _read_from_dir(dir::String; kwargs...)
+This function reads all of the files from the input directory and returns the contents of
+those of the specified extension.
+
+# Arguments
+- `dir::String`: Relative path to directory to read
+
+# Keywords
+- `ext::String = ".csv"`: File extension to read and return
+- `run_bash::Bool = false`: If there's a shell script in `dir`, run it to generate/update
+    directory contents before reading the files.
+
+# Returns
+- `d::Dict{Symbol,Any}` of file contents where the key references the source file name.
 """
-function _read_from_dir(dir::String; ext = ".csv", run_bash::Bool = false)
+function _read_from_dir(dir::String; ext::String = ".csv", run_bash::Bool = false)
     files = readdir(dir)
 
     # If the path contains both a .gdx file and a bash shell script, assume that the script
     # is there to execute "gdxdump" on the shell files.
-    run_bash && _run_bash(dir, files)
-    # (any(occursin.(".sh", files)) && any(occursin.(".gdx", files))) && _run_bash(dir, files)
+    run_bash && (files = _run_bash(dir, files))
 
     @info("Reading $ext files from $dir.")
     files = Dict(_inp_key(f, ext) => f for f in files if occursin(ext, f))
     d = Dict(k => read_file(joinpath(dir,f)) for (k,f) in files)
 
-    # If the file is empty, If there's only one column containing values, rename it to value.
-    # This is consistent with SLiDE naming convention.
     _delete_empty!(d)
-    [d[k] = edit_with(df, Rename.(findvalue(df), :value)) for (k,df) in d
-        if length(findvalue(df)) == 1]
+
     return d
 end
 
 
 """
+    _delete_empty!(d::Dict)
+This function removes dictionary entries with empty values.
 """
 function _delete_empty!(d::Dict)
     for k in keys(d)
@@ -122,8 +171,10 @@ function _delete_empty!(d::Dict)
             delete!(d, k)
         end
     end
+    return d
 end
-_delete_empty!(d::Any) = nothing
+
+_delete_empty!(d::Any) = d
 
 
 """
@@ -134,40 +185,52 @@ function _read_from_yaml(path::String; run_bash::Bool = false)
 
     # If the yaml file includes the key "Path", this indicates that the yaml file 
     if "Path" in keys(y)
-
         # Look for shell scripts in this path, and run them if they are there.
         # If none are found, nothing will happen.
         run_bash && _run_bash(joinpath(SLIDE_DIR, ensurearray(y["Path"])...))
         
-        inp = "Input" in keys(y) ? y["Input"] : collect(values(find_oftype(y, File)))[1]
+        files = ensurearray(values(find_oftype(y, File)))
+        inp = "Input" in keys(y) ? y["Input"] : files
         d = _read_from_yaml(y["Path"], inp)
-        
-        # 
-        _delete_empty!(d)
-        [d[k] = edit_with(d[k], y) for k in keys(d) if typeof(d[k]) == DataFrame]
+        d = _edit_from_yaml(d, y, inp)
     else
-        inp = ensurearray(collect(values(find_oftype(y, CGE)))[1])
+        inp = ensurearray(values(find_oftype(y, CGE)))
         d = _read_from_yaml(inp)
     end
     return d
 end
 
-function _read_from_yaml(path::Array{String,1}, file::Dict)
-    path = joinpath(SLIDE_DIR, path...)
-    return Dict(_inp_key(k) => read_file(joinpath(path, f)) for (k,f) in file)
+function _read_from_yaml(path::String, files::Dict)
+    path = joinpath(SLIDE_DIR, path)
+    d = Dict(_inp_key(k) => read_file(joinpath(path, f)) for (k,f) in files)
+    return _delete_empty!(d)
 end
 
-function _read_from_yaml(path::Array{String,1}, file::Array{T,1}) where {T <: File}
-    path = joinpath(SLIDE_DIR, path...)
-    return Dict(_inp_key(f) => read_file(path, f) for f in file)
+function _read_from_yaml(path::String, files::Array{T,1}) where {T <: File}
+    path = joinpath(SLIDE_DIR, path)
+    d = Dict(_inp_key(f) => read_file(path, f) for f in files)
+    return _delete_empty!(d)
 end
 
-_read_from_yaml(path::String, file::Any) = _read_from_yaml(ensurearray(path), file)
-_read_from_yaml(lst::Array{Parameter,1}) = Dict(_inp_key(x) => x for x in lst)
+_read_from_yaml(path::Array{String,1}, file::Any) = _read_from_yaml(joinpath(path...), file)
+_read_from_yaml(lst::Array{Parameter,1}) = _delete_empty!(Dict(_inp_key(x) => x for x in lst))
 
 
 """
+    _inp_key(x::Any)
+This function is a standardized method for generating dictionary keys for
+[`SLiDE.read_from`](@ref) based on the type of information that is being read.
 """
+function _inp_key(paths::Array{String,1})
+    dir = splitdir.(paths)
+
+    while length(unique(getindex.(dir,2))) > 1
+        dir = splitdir.(getindex.(dir,1))
+    end
+
+    return convert_type(Symbol, dir[1][end])
+end
+
 _inp_key(x::SetInput) = length(split(x.descriptor)) > 1 ? Tuple(split(x.descriptor)) : x.descriptor
 _inp_key(x::T) where {T <: File} = Symbol(x.descriptor)
 _inp_key(x::Parameter) = Symbol(x.parameter)
@@ -176,10 +239,52 @@ _inp_key(x::String, ext::String) = Symbol(splitpath(x)[end][1:end-length(ext)])
 
 
 """
-    write_build(subset::String, d::Dict; kwargs...)
-This function writes intermediary build files if desired by the user.
 """
-function write_build!(dataset::String,
+_edit_from_yaml(d::Dict, editor::Dict, files::Array) = d
+
+# For when the yaml file only points to files to read and doesn't contain any edits.
+_edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Dict) = d
+
+function _edit_from_yaml(d::Dict{Symbol,Dict{Any,Any}}, editor, files)
+    # For when the yaml file read contains a list of yaml files, each containing edits.
+    # See: src/readfiles/build/shareinp.yml.
+    return Dict(k => edit_with(y) for (k,y) in d)
+    # !!!! Maybe use _read_from_yaml again here hahah.
+end
+
+function _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Array{T,1}) where {T <: File}
+    # For when the yaml file defines files AND edits that should be made to ALL data inputs.
+    [d[_inp_key(f)] = edit_with(d[_inp_key(f)], editor, f) for f in files]
+    return d
+end
+
+function _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Array{DataInput,1})
+    # For when the yaml file defines files AND edits that should be made to ALL data inputs.
+    # This is the same as when editing an array of files EXCEPT that we order the columns
+    # as specified. See: dev/readfiles/1_data_out.yml.
+    [d[_inp_key(f)] = select(edit_with(d[_inp_key(f)], editor, f), f.col) for f in files]
+    return d
+end
+
+
+"""
+    write_build(dataset::String, subset::String, d::Dict; kwargs...)
+This function filters the contents of the input dictionary `d` to include only relevant
+files using [`SLiDE.filter_build!`](@ref) and writes set lists and parameter DataFrames to
+csv files in the directory named by [`SLiDE.sub_path`](@ref) and named for their associated
+dictionary key.
+
+# Arguments
+- `dataset::String`: Dataset identifier
+- `subset::String`: Internally-passed parameter indicating the type of information to save
+    (set, parameter, or build step)
+- `d::Dict` of information to write
+
+# Returns
+- `d::Dict`: filtered dictionary
+"""
+function write_build!(
+    dataset::String,
     subset::String,
     d::Dict;
     save_build::Bool = DEFAULT_SAVE_BUILD
@@ -215,11 +320,22 @@ end
 
 
 """
-    read_build(subset::String; kwargs...)
-This function reads intermediary build files if they have previously been saved by the user.
+    read_build(dataset::String, subset::String; kwargs...)
+This function reads data from the specified `subset` if this information has previously been
+generated and saved.
+
+# Arguments
+- `dataset::String`: Dataset identifier
+- `subset::String`: Internally-passed parameter indicating the type of information to save
+    (set, parameter, or build step)
+
+# Keywords
+- `overwrite::Bool = true`: If the user would like to re-generate the `subset` of data in 
+    specified `dataset`, delete the directory. The information must now be re-calculated
+    to repopulate the subset directory.
 
 # Returns
-- `d::Dict` of DataFrames
+- `d::Dict{Symbol,DataFrame}` if reading parameters or `d::Dict{Any,Array}` if reading sets
 """
 function read_build(dataset::String, subset::String; overwrite::Bool = DEFAULT_OVERWRITE)
 
@@ -242,6 +358,23 @@ function read_build(dataset::String, subset::String; overwrite::Bool = DEFAULT_O
 end
 
 
+"""
+    filter_build!(subset::String, d::Dict; kwargs...)
+This function filters `d` to contain only keys relevant to the specified `subset`.
+This avoids cluttering a saved directory with superfluous parameters that may have been
+calculated at intermediate steps.
+
+If filtering DataFrames, this reorders the DataFrame indices. This is important when
+importing parameters into JuMP models when calibrating or modeling.
+
+# Arguments
+- `subset::String`: Internally-passed parameter indicating the type of information to save
+    (set, parameter, or build step)
+- `d::Dict` of DataFrames containing data for the specified data subset
+
+# Returns
+- `d::Dict` filtered to include only relevant parameters.
+"""
 function filter_build!(subset::String, d::Dict{T,DataFrame}) where T <: Any
     param = build_parameters(subset)
     
@@ -250,11 +383,11 @@ function filter_build!(subset::String, d::Dict{T,DataFrame}) where T <: Any
         delete_keys = setdiff(keys(d), save_keys)
 
         [delete!(d, k) for k in delete_keys]
+        # !!!! make specific to slide.
         [select!(d[k], param[k]) for k in save_keys]
     end
     return d
 end
-
 
 function filter_build!(subset::String, d::Dict)
     if subset == SET_DIR
@@ -273,27 +406,48 @@ end
 
 
 """
+    build_parameters(subset::String)
+
+# Arguments
+- `subset::String`: Internally-passed parameter indicating the type of information to save
+    (set, parameter, or build step)
+
+# Returns
+- `d::Dict{Symbol,`[`SLiDE.Parameter`](@ref)`}` of Parameters relevant to the specified data
+    subset. The dictionary key is consistent the value's field `parameter`.
 """
 function build_parameters(subset::String)
+    subset = convert_type(Symbol, subset)
+    df = read_file(joinpath(SLIDE_DIR,"src","build","parameters","define.csv"))
+    d = load_from(Dict{Parameter}, df)
 
-    df = read_file(joinpath(SLIDE_DIR,"src","build","parameters","parameter_define.csv"))
+    lst = read_from(joinpath(SLIDE_DIR,"src","readfiles","parameterlist.yml"))
 
-    lst_param = read_from(joinpath(SLIDE_DIR,"src","readfiles","parameterlist.yml"))
-    lst_param = (Symbol(subset) in keys(lst_param)) ? lst_param[Symbol(subset)] : DataFrame()
+    d = if subset in keys(lst)
+        Dict(k => d[k] for k in intersect(Symbol.(lst[subset]), keys(d)))
+    else
+        nothing
+    end
 
-    type_param = read_file(joinpath(SLIDE_DIR,"src","build","parameters","parameter_scope.csv"))
-    type_param = type_param[type_param[:,:subset] .== subset,:]
-
-    df = indexjoin(lst_param, type_param, df)
-    dropmissing!(df, intersect(propertynames(df),[:subset,:index]))
-    
-    return !isempty(df) ? load_from(Dict{Parameter}, df) : nothing
+    return d
 end
 
 
 """
+    _run_bash(dir::String, files)
+    _run_bash(path::String)
+This function runs a shell script if one is found.
+
+# Arguments
+- `path::String`: Relative path to a specific shell script to run or to a directory that
+    might contain a shell script.
+- `file::String` or `files::Array{String,1}`: A list of files in the specified directory.
+
+# Returns
+- `files::Array{String,1}`: An updated list of files in the specified directory after
+    running the shell script if a list of files is given as an argument.
 """
-function _run_bash(dir::String, files::Array{String,1})
+function _run_bash(path::String, files::Array{String,1})
     scripts = files[occursin.(".sh", files)]
     isempty(scripts) && return
     
@@ -302,12 +456,14 @@ function _run_bash(dir::String, files::Array{String,1})
     # We default to iterating over a loop of an array of files, even if that array contains
     # only one file, to minimize changing directories.
     curr_dir = pwd()
-    cd(dir)
+    cd(path)
     for s in scripts
-        @info("Running bash script $s in $dir.")
+        @info("Running bash script $s in $path.")
         run(`bash $s`)
     end
     cd(curr_dir)
+    files = readdir(path)
+    return readdir(path)
 end
 
 function _run_bash(path::String)
@@ -317,9 +473,7 @@ function _run_bash(path::String)
         dir = joinpath(splitpath(path)[1:end-1]...)
         file = splitpath(path)[end]
         _run_bash(dir, file)
-    # else
-    #     @warn("$path is not a valid bash file nor is it a directory that contains one.")
     end
 end
 
-_run_bash(dir::String, file::String) = _run_bash(dir, ensurearray(file))
+_run_bash(path::String, file::String) = _run_bash(path, ensurearray(file))

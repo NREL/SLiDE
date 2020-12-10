@@ -22,7 +22,7 @@ makedocs(clean = true,
         prettyurls = get(ENV, "CI", nothing) == "true",
     ),
     sitename = "SLiDE.jl",
-    authors = "Maxwell Brown, Caroline L. Hughes",
+    authors = "Jonathon Becker, Maxwell Brown, Caroline L. Hughes",
     workdir = "../",
     pages = [
         "Home" => "index.md",

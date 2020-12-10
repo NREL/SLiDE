@@ -35,10 +35,6 @@ Drop:
   val: [0, 99]
   operation: "=="
 
-Operate:
+Combine:
   operation: sum
-  axis:   row
-  from:   nothing
-  to:     nothing
-  input:  [orig, dest, g, units]
-  output: value
+  output: [orig, dest, g, units]
