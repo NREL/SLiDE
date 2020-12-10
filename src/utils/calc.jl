@@ -110,8 +110,8 @@ function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
 
     df = combine(groupby(df, idx_by), val .=> fun .=> val)
 
-    # [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
-    #     for ii in find_oftype(df[:,val], AbstractFloat)]
+    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
+        for ii in find_oftype(df[:,val], AbstractFloat)]
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
     return df
 end
@@ -147,21 +147,12 @@ function transform_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum
 
     df = transform(groupby(df, idx_by), val .=> fun .=> val)
 
-    # [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
-    #     for ii in find_oftype(df[:,val], AbstractFloat)]
+    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
+        for ii in find_oftype(df[:,val], AbstractFloat)]
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
     return df
 end
-# function transform_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
-#     cols_ans = propertynames(df)
 
-#     val_cols = [find_oftype(df, AbstractFloat); find_oftype(df, Bool)]
-#     by_cols = setdiff(propertynames(df), [col; val_cols])
-#     df_ans = transform(groupby(df, by_cols), val_cols .=> fun .=> val_cols)
-#     [df_ans[!,col] .= convert_type.(Float64, df_ans[:,col]) for col in val_cols
-#         if eltype(df_ans[:,col]) == Int]
-#     return df_ans[:,cols_ans]
-# end
 
 function transform_over(df::DataFrame, col::Symbol; fun::Function = sum)
     return transform_over(df, ensurearray(col); fun = fun)
