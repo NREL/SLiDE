@@ -30,12 +30,11 @@ function share(
     # Read sharing input data.
     d_read = read_build(dataset, STEP_INP; overwrite = overwrite)
     if isempty(d_read)
-        y = read_from(joinpath("src","readfiles","build","shareinp.yml"))
         # Here, we're not using read yaml/run yaml because the location we're saving in
         # depends on the "save" path specified in this function input.
         [set[k] = set[:r] for k in [:orig,:dest]]
-        d_read = Dict(k => edit_with(v) for (k,v) in y)
-        d_read = Dict(k => sort(filter_with(df, set; extrapolate = true)) for (k, df) in d_read)
+        d_read = read_from(joinpath("src","readfiles","build","shareinp.yml"))
+        d_read = Dict(k => sort(dropmissing(filter_with(df, set; extrapolate = true))) for (k, df) in d_read)
         write_build!(dataset, STEP_INP, d_read; save_build = save_build)
     end
     

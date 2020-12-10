@@ -7,13 +7,12 @@ The operation will join the DataFrames on their descriptive columns to ensure th
 is performed for related values. Values that are "missing" after joining are set to 0.
 """
 function Base.:/(df1::DataFrame, df2::DataFrame)
-    out = _generate_id(2)
-
     df = indexjoin(copy.([df1,df2]))
+    out = findvalue(df)
 
     df[!,:value] .= df[:, out[1]] ./ df[:, out[2]]
 
-    return df[:, setdiff(propertynames(df),out)]
+    return df[:, unique([setdiff(propertynames(df),out);:value])]
 end
 
 
@@ -25,19 +24,20 @@ is performed for related values. Values that are "missing" after joining are set
 """
 function Base.:+(df::Vararg{DataFrame})
     N = length(df)
-    out = _generate_id(N)
 
     if length(findvalue.(df)) > N
         @error("Can only add DataFrames with one value column EACH.")
     end
 
     df = indexjoin(ensurearray(df))
+    out = findvalue(df)
 
     df[!,:value] .= df[:, out[1]];
     [df[!,:value] += df[:, out[ii]] for ii in 2:N]
 
-    return df[:, setdiff(propertynames(df),out)]
+    return df[:, unique([setdiff(propertynames(df),out);:value])]
 end
+
 
 """
     Base.:-(df::Vararg{DataFrame})
@@ -47,19 +47,20 @@ is performed for related values. Values that are "missing" after joining are set
 """
 function Base.:-(df::Vararg{DataFrame})
     N = length(df)
-    out = _generate_id(N)
 
     if length(findvalue.(df)) > N
         @error("Can only subtract DataFrames with one value column EACH.")
     end
 
     df = indexjoin(ensurearray(df))
+    out = findvalue(df)
 
     df[!,:value] .= df[:, out[1]];
     [df[!,:value] -= df[:, out[ii]] for ii in 2:N]
 
-    return df[:, setdiff(propertynames(df),out)]
+    return df[:, unique([setdiff(propertynames(df),out);:value])]
 end
+
 
 """
     Base.:*(df::Vararg{DataFrame})
@@ -69,18 +70,18 @@ is performed for related values. Values that are "missing" after joining are set
 """
 function Base.:*(df::Vararg{DataFrame})
     N = length(df)
-    out = _generate_id(N)
 
     if length(findvalue.(df)) > N
         @error("Can only multiply DataFrames with one value column EACH.")
     end
 
     df = indexjoin(ensurearray(df))
+    out = findvalue(df)
 
     df[!,:value] .= df[:, out[1]];
     [df[!,:value] .*= df[:, out[ii]] for ii in 2:N]
 
-    return df[:, setdiff(propertynames(df),out)]
+    return df[:, unique([setdiff(propertynames(df),out);:value])]
 end
 
 
@@ -109,8 +110,8 @@ function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
 
     df = combine(groupby(df, idx_by), val .=> fun .=> val)
 
-    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
-        for ii in find_oftype(df[:,val], AbstractFloat)]
+    # [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
+    #     for ii in find_oftype(df[:,val], AbstractFloat)]
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
     return df
 end
@@ -146,8 +147,8 @@ function transform_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum
 
     df = transform(groupby(df, idx_by), val .=> fun .=> val)
 
-    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
-        for ii in find_oftype(df[:,val], AbstractFloat)]
+    # [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
+    #     for ii in find_oftype(df[:,val], AbstractFloat)]
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
     return df
 end

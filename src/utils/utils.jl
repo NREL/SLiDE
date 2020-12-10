@@ -222,7 +222,9 @@ findtype(df::DataFrame) = eltype.(eachcol(dropmissing(df)))
 
 """
 """
-DataFrames.select!(df::DataFrame, x::Parameter) = select!(df, [x.index; :value])
+function DataFrames.select!(df::DataFrame, x::Parameter)
+    return select!(df, intersect([x.index; :value], propertynames(df)))
+end
 
 
 """

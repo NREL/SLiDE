@@ -92,7 +92,7 @@ function _share_lshr0!(d::Dict, set::Dict)
         Replace.(Symbol.(set[:va]), missing, 0.0))
     idx = findindex(va0)
     
-    d[:lshr0]  = va0[:,[idx;:compen]]
+    d[:lshr0] = va0[:,[idx;:compen]]
     d[:lshr0] /= (va0[:,[idx;:compen]] + va0[:,[idx;:surplus]])
 
     d[:lshr0][va0[:,:surplus] .< 0,:value] .= 1.0
