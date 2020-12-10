@@ -30,7 +30,6 @@ the `data/coremaps` directory. It returns a .csv file.
     to (lists of) those types.
 """
 function read_file(path::Array{String,1}, file::GAMSInput)
-    # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
     xf = readlines(filepath)
     df = gams_to_dataframe(xf; colnames=file.col)
@@ -39,56 +38,26 @@ end
 
 
 function read_file(path::Array{String,1}, file::CSVInput)
-    # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
-    df = CSV.read(filepath, DataFrame; silencewarnings=true, ignoreemptylines=true,
-        comment="#", missingstrings=["","\xc9","..."])
-
-    # If there is only one column, don't check for headers, footers, etc. Just return it.
-    size(df,2) == 1 && (return df)
-
-    NUMTEST = min(10, size(df, 1))
-
-    # A column name containing the word "Column" indicates that the input csv file was
-    # missing a column header. Multiple (more than 2?) columns with missing header suggests
-    # that the first row in the .csv was not the header, but rather, the file began with
-    # comments. Here, we find the header and reread .csv into a DataFrame.
-    # CSV.read() was used rather than converting the 2-D Array read using  dlmread()
-    # because this was faster, and includes the option to ignore missing rows.
-    if sum(Int.(occursin.("Column", string.(propertynames(df))))) > 2 || size(df)[2] == 1
-        xf = DelimitedFiles.readdlm(filepath, ',', Any, '\n')
-        xf = xf[1:NUMTEST,:]
-
-        HEAD = findmax(sum.(collect(eachrow(Int.(length.(xf) .!= 0)))) .> 1)[2]
-        df = CSV.read(filepath, DataFrame, silencewarnings=true, ignoreemptylines=true,
-            missingstrings=["","\xc9","..."]; header=HEAD)
-    end
-
-    # Remove footer rows. These are identified by rows at the bottom of the sheet that are
-    # empty with the exception of the first column.
-    if all(ismissing.(values(df[end,2:end])))
-        x = sum.([Int.(ismissing.(values(row))) for row in eachrow(df[end - NUMTEST:end,:])])
-        FOOT = size(df)[1] - (length(x) - (findmax(x)[2] - 1))
-        df = df[1:FOOT,:]
-    end
-    return unique(df)
+    df = _read_csv(filepath)
+    df = _remove_header(df, filepath)
+    df = _remove_footer(df)
+    df = _remove_empty(df)
+    return df
 end
 
 
 function read_file(path::Array{String,1}, file::XLSXInput)
-    # filepath = joinpath(SLIDE_DIR, path..., file.name)
     filepath = joinpath(path..., file.name)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
     
     # Delete rows containing only missing values.
     xf = xf[[!all(row) for row in eachrow(ismissing.(xf))],:]
-    df = DataFrame(xf[2:end,:], Symbol.(xf[1,:]), makeunique=true)
-    return df
+    return convert_type(DataFrame, xf)
 end
 
 
 function read_file(path::Array{String,1}, file::DataInput)
-    # filepath = joinpath(SLIDE_DIR, path..., file.name)
     df = read_file(path, convert_type(CSVInput, file))
     df = edit_with(df, Rename.(propertynames(df), file.col))
 
@@ -98,8 +67,8 @@ end
 
 
 function read_file(path::Array{String,1}, file::SetInput)
-    # filepath = joinpath(SLIDE_DIR, path..., file.name)
-    df = read_file(path, convert_type(CSVInput, file))
+    filepath = joinpath(path..., file.name)
+    df = _read_csv(filepath)
     return sort(df[:,1])
 end
 
@@ -110,16 +79,13 @@ end
 
 
 function read_file(editor::T) where T <: Edit
-    # !!!! Should we avoid including specific paths within functions? -- Definitely make more general.
-    # !!!! Need to throw error if this is called when "file" is not a field.
     DIR = joinpath("data", "coremaps")
     df = read_file(joinpath(DIR, editor.file))
     return df
 end
 
 
-function read_file(file::String; colnames=false)
-    # file = joinpath(SLIDE_DIR, file)
+function read_file(file::String; colnames=[])
     file = joinpath(file)
 
     if occursin(".map", file) | occursin(".set", file)
@@ -137,11 +103,89 @@ function read_file(file::String; colnames=false)
         return y
         
     elseif occursin(".csv", file)
-        df = CSV.read(file, DataFrame, silencewarnings=true, ignoreemptylines=true, comment="#",
-            missingstrings=["","\xc9","..."])
+        df = _read_csv(file)
         return df
     end
 end
+
+
+"""
+"""
+function _read_csv(filepath::String; header::Int=1)
+    return CSV.read(filepath, DataFrame,
+        silencewarnings=true,
+        ignoreemptylines=true,
+        comment="#",
+        missingstrings=["","\xc9","..."];
+        header=header)
+end
+
+
+"""
+This function removes footer rows. These are identified by rows at the bottom of the sheet
+that are empty with the exception of the first column.
+"""
+function _remove_footer(df::DataFrame)
+    N = size(df,1)
+    while all(ismissing.(values(df[N,2:end])))
+        N -= 1
+    end
+    return df[1:N,:]
+end
+
+
+"""
+"""
+function _remove_header(df::DataFrame, filepath::String)
+    cols = propertynames(df)
+    missing_cols = .|(occursin.(:Column, cols), occursin.(:missing, cols))
+
+    # If only one column was read, maybe this is because there was a problem?
+    if size(df,2) == 1
+        @warn("Removing header WITH reading ($filepath)")
+        xf = DelimitedFiles.readdlm(filepath, ',', Any, '\n')
+        HEAD = _find_header(xf)
+        df = _read_csv(filepath; header = HEAD)
+
+    elseif sum(missing_cols) > 0
+        @warn("Removing header without reading ($filepath)")
+        HEAD = _find_header(df)
+        df = rename(df[HEAD+1:end,:], Pair.(cols, Symbol.(ensurearray(df[HEAD,:]))))
+    end
+    return df
+end
+
+
+"""
+"""
+function _find_header(df::DataFrame)
+    HEAD = 1
+    while all(ismissing.(values(df[HEAD,2:end])))
+        HEAD += 1
+    end
+    return HEAD
+end
+
+function _find_header(xf::Array{Any,2})
+    HEAD = 1
+    while all(length.(xf[HEAD,2:end]) .== 0)
+        HEAD += 1
+    end
+    return HEAD
+end
+
+
+"""
+Ensure there are no empty columns (those containing all missing values)
+"""
+function _remove_empty(df::DataFrame)
+    LAST = size(df,2)
+    while eltype(df[:,LAST]) === Missing
+        LAST -= 1
+    end
+    return df[:,1:LAST]
+end
+# _remove_empty(df::DataFrame) = df[:,eltype.(eachcol(df)) .!== Missing]
 
 
 """
@@ -386,13 +430,13 @@ function write_yaml(path::Array{String,1}, file::XLSXInput; overwrite::Bool=true
 end
 
 
-function write_yaml(path, files::Array{XLSXInput,1}; overwrite::Bool=true)
+function SLiDE.write_yaml(path, files::Array{XLSXInput,1}; overwrite::Bool=true)
     if length(unique(get_descriptor.(files))) < length(files)
         @error("Input XLSX files must have unique descriptors.")
     end
-    files = Dict(_inp_key(file) => file for file in files)
-    files = Dict(k => write_yaml(path, file; overwrite=overwrite) for (k,file) in files)
-    return files
+    # files = Dict(_inp_key(file) => file for file in files)
+    # files = Dict(k => write_yaml(path, file; overwrite=overwrite) for (k,file) in files)
+    return [write_yaml(path, file; overwrite=overwrite) for file in files]
 end
 
 
@@ -420,20 +464,8 @@ function run_yaml(filename::String; save::Bool=true)
         # Iteratively make all edits and update output data file in accordance with
         # operations defined in the input YAML file.
         println("  Parsing and standardizing...")
-        df = unique(edit_with(y))
-        
-        # Create the path where the output file will go if it doesn't already exist.
-        if save !== false
-            save_path = save == true ? "" : save
-
-            # path = joinpath(SLIDE_DIR, save_path, ensurearray(y["PathOut"])...)
-            path = joinpath(save_path, ensurearray(y["PathOut"])...)
-            file = joinpath(path, y["FileOut"])
-            !isdir(path) && mkpath(path)
-
-            println("  Writing to $file")
-            CSV.write(file, df)
-        end
+        df = unique(edit_with(y; print_status = true))
+        _save_datastream(df, y; save = save)
         return df
     else
         println("  Skipping... (not editable)")
@@ -442,9 +474,8 @@ function run_yaml(filename::String; save::Bool=true)
 end
 
 
-function run_yaml(d::Dict; save::Bool=true)
-    d_ans = Dict(k => run_yaml(d[k]; save = save) for k in keys(d))
-    return d_ans
+function run_yaml(lst::AbstractArray; save::Bool=true)
+    return Dict(_inp_key(x) => run_yaml(x; save=save) for x in lst)
 end
 
 
@@ -461,6 +492,37 @@ end
 
 
 """
+"""
+function _save_datastream(df::DataFrame, y::Dict; save = true)
+    save_path = save == true ? "" : save
+    ("Temporary" in keys(y) && y["Temporary"]) && (y["FileOut"] = "_" * y["FileOut"])
+
+    path = joinpath(save_path, ensurearray(y["PathOut"])...)
+    file = joinpath(path, y["FileOut"])
+    !isdir(path) && mkpath(path)
+
+    println("  Saving $file...")
+    CSV.write(file, df)
+    return nothing
+end
+
+
+"""
+Delete temporary files. These are pre-pended "_".
+"""
+function _delete_temporary(path::String)
+    curr_dir = pwd()
+    files = readdir(path)
+    files_temp = [file for file in files if file[1] == '_']
+    cd(path)
+    [rm(file) for file in files_temp]
+    cd(curr_dir)
+    return nothing
+end
+
+
+
+"""
     gams_to_dataframe(xf::Array{String,1}; colnames = false)
 This function converts a GAMS map or set to a DataFrame, expanding sets into multiple rows.
 
@@ -468,32 +530,41 @@ This function converts a GAMS map or set to a DataFrame, expanding sets into mul
 - `xf::Array{String,1}`: A list of rows of text from a .map or a .set input file.
 
 # Keywords
-- `colnames = false`: A user has the option to specify the column propertynames of the output
+- `colnames = []`: A user has the option to specify the column propertynames of the output
     DataFrame. If none are specified, a default of `[missing, missing_1, ...]` will be used,
     consistent with the default column headers for `CSV.read()` if column propertynames are missing.
 
 # Returns
 - `df::DataFrame`: A dataframe representation of the GAMS map or set.
 """
-function gams_to_dataframe(xf::Array{String,1}; colnames=false)
-    # Convert the input array into a DataFrame and use SLiDE editing capabilities to split
-    # each rows into columns, based on the syntax.
-    df = DataFrame(missing=xf)
-    df = edit_with(df, Match(Regex("^(?<missing>\\S+)\\.(?<missing_1>[\\S^,]*)\\s*\"*(?<missing_2>[^\"]*),?"),
-        :missing, [:missing, :missing_1, :missing_2]))
-    ROWS, COLS = size(df)
-    
-    # Does the DataFrame row contain a set (indicated by parentheses)?
-    df_set = match.(r"^\((.*)\)", df)
-    df_isset = df_set .!== nothing
+function gams_to_dataframe(xf::Array{String,1}; colnames=[])
+    matches = collect.(eachmatch.(r"((?<=\").*(?=\")|\((?>[^()]|(?R))*\)|[\w\d]+)", xf))
 
-    # If so, expand into multiple rows by converting the row into a dictionary -- with
-    # column propertynames as keys and the set divided into a list -- and back into a DataFrame.
-    df = [[DataFrame(Dict(k => df_isset[ii,k] ? string.(split(df_set[ii,k][1], ",")) : df[ii,k]
-        for k in propertynames(df))) for ii in 1:ROWS]...;]
+    if length(unique(length.(matches))) !== 1
+        @warn("Input gams set/map has unequal row lengths. Information will be left-justified.")
+    end
+
+    ROWS, COLS = length(matches), maximum(length.(matches))
+
+    data = fill("", (ROWS,COLS))
+    [data[ii,jj] = matches[ii][jj][1] for ii in 1:ROWS for jj in 1:length(matches[ii])]
+
+    # Does the DataFrame row contain a set (indicated by parentheses)?
+    data_set = match.(r"^\((.*)\)$", data)
+    isset = data_set .!== nothing
     
-    # If the user specified column propertynames, apply those here and
-    # return a DataFrame sorted based on the mapping values.
-    colnames != false && (df = edit_with(df, Rename.(propertynames(df), colnames)))
-    return COLS > 1 ? sort(df, reverse(propertynames(df)[1:2])) : sort(df)
+    # If so, expand into multiple rows by converting the row into a dictionary -- with
+    # column names as keys and the set divided into a list -- and back into a DataFrame
+    cols = isempty(colnames) ? _generate_id(COLS) : colnames
+
+    df = if any(isset)
+        [[DataFrame(Dict(col =>
+            isset[ii,jj] ? string.(strip.(split(data_set[ii,jj][1], ","))) : data[ii,jj]
+            for (jj,col) in zip(1:COLS,cols))) for ii in 1:ROWS]...;]
+    else
+        DataFrame(data, cols)
+    end
+
+    x = [Replace.(cols,"",missing); Order(cols, fill(String,size(cols)))]
+    return edit_with(df, x)
 end

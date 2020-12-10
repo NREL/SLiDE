@@ -29,7 +29,7 @@ Base.split(x::Symbol) = Symbol.(split(string(x)))
     Base.strip(x::Number)
 Extends `strip` to ignore missing fields and numbers.
 """
-# Base.strip(x::String) = replace(x, r"^\s*\"*|\"*\s*$" => "")
+Base.strip(x::String) = replace(x, r"^\s*\"*|\"*\s*$" => "")
 Base.strip(x::Missing) = x
 Base.strip(x::Number) = x
 
@@ -108,7 +108,7 @@ function (!!!!)
 - `::Type{T}`: target DataType.
 - `x<:Any`: value to convert.
 
-# Keyword Arguments
+# Keywords
 Options available when converting a DataFrame into a dictionary of keys pointing to a value:
 - `drop_cols = []`: Columns not to include in
     the keys. By default, no columns are dropped.
@@ -135,6 +135,12 @@ function convert_type(::Type{T}, x::AbstractString) where T <: Real
 end
 
 convert_type(::Type{T}, x::Symbol) where T <: Real = convert_type(T, convert_type(String, x))
+
+function convert_type(::Type{DataFrame}, x::Array{Any,2})
+    col = Symbol.(replace(x[1,:], "" => missing))
+    data = x[2:end,:]
+    return DataFrame(data, col, makeunique = true)
+end
 
 convert_type(::Type{DataFrame}, lst::Array{Dict{Any,Any},1}) = [DataFrame.(lst)...;]
 
@@ -196,6 +202,7 @@ ensurearray(x::Array{T,1}) where T <: Any = x
 ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
 ensurearray(x::UnitRange) = collect(x)
 ensurearray(x::Base.ValueIterator) = [collect(x)...;]
+ensurearray(x::DataFrameRow) = ensurearray(values(x))
 ensurearray(x::Any) = [x]
 
 """
@@ -209,12 +216,15 @@ ensuretuple(x::Any) = tuple(x)
 
 """
 """
-istype(df::DataFrame, T::DataType) = broadcast(<:, eltype.(eachcol(dropmissing(df))), T)
+istype(df::DataFrame, T::DataType) = broadcast(<:, findtype(df), T)
+findtype(df::DataFrame) = eltype.(eachcol(dropmissing(df)))
 
 
 """
 """
-DataFrames.select!(df::DataFrame, x::Parameter) = select!(df, [x.index; :value])
+function DataFrames.select!(df::DataFrame, x::Parameter)
+    return select!(df, intersect([x.index; :value], propertynames(df)))
+end
 
 
 """
@@ -258,7 +268,7 @@ function permute(x::NamedTuple)
     return NamedTuple{Tuple(idx, )}(val, )
 end
 
-permute(x::Any) = any(isarray.(x)) ? permute(x...) : x
+permute(x::Any) = any(isarray.(x)) ? permute(ensurearray.(x)...) : x
 permute(x::Vararg{Any}) = vec(collect(Iterators.product(x...)))
 
 
@@ -298,3 +308,57 @@ findvalue(df::DataFrame) = [find_oftype(df, AbstractFloat); find_oftype(df, Bool
     defined as columns that do NOT contain `AbstractFloat` or `Bool` DataTypes.
 """
 findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
+
+
+"""
+# Returns
+- `utx::Array{Symbol,1}` of input DataFrame propertynames with "units" in the name.
+"""
+function findunits(df::DataFrame)
+    # This function is a bit niche, but will be used heavily in the EEM.
+    # Should maybe keep it internal.
+    col = propertynames(df)
+    return col[occursin.(:units,col)]
+end
+
+
+"""
+Appends inputs, maintaining type of first input (currently only works for symbols)
+"""
+append(x::Array{Symbol,1}) = Symbol(Symbol.(x[1:end-1], :_)..., x[end])
+append(x1::Symbol, x2::Any) = Symbol(x1,:_,x2)
+append(x1::Symbol, x2::Vararg{Any,N}) where N = append(Symbol.([x1; ensurearray(x2)]))
+
+append(x::Tuple) = append(ensurearray(x))
+
+append(x::Array{String,1}) = string(string.(x[1:end-1], :_)..., x[end])
+append(x1::String, x2::Any) = string(x1,:_,x2)
+append(x1::String, x2::Vararg{Any,N}) where N = append(string.([x1; ensurearray(x2)]))
+
+
+"""
+"""
+function sort_unique(df::DataFrame, idx::Array{Symbol,1})
+    idx = idx[sortperm(length.(unique.(skipmissing.(eachcol(df[:,idx])))))]
+    return sort(df, idx)
+end
+
+function sort_unique(df::DataFrame, id::String)
+    (id == "unique") && (return sort_unique(df))
+
+    m = match.(r"unique\s+(\S+)", id)
+    id = m != nothing ? Symbol(m[1]) : Symbol(id)
+
+    return sort_unique(df, id)
+end
+
+function sort_unique(df::DataFrame, id::Symbol)
+    idx = propertynames(df)
+    subidx = idx[occursin.(id, idx)]
+
+    length(subidx) > 0 && (idx = subidx)
+
+    return sort_unique(df, idx)
+end
+
+sort_unique(df::DataFrame) = sort_unique(df, findindex(df))

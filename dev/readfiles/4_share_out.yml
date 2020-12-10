@@ -1,4 +1,4 @@
-Path: [dev, validate, windc_1.0, 4_share_out]
+Path: [dev, windc_1.0, 4_share_out]
 
 DataInput:
   - {descriptor: region, name: region_shr.csv, col: [yr,r,s,value]}

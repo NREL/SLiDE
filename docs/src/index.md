@@ -25,10 +25,12 @@ Build the SLiDE package from the Pkg REPL. Type `]` to enter the Pkg REPL and ru
 
 This will generate the `Manifest.toml` file, including the package dependencies. If the directory `SLiDE/data/` does not exist, this will download SLiDE input data.
 
-Build the model input data by running:
+Precompile the SLiDE package and build the model input data by running:
 
-```julia
-> (d, set) = build_data()
+```
+julia> using SLiDE
+
+julia> (d, set) = build_data()
 ```
 
 ## References

@@ -25,10 +25,6 @@ Map:
     output: g
     kind:   left
 
-Operate:
+Combine:
   operation: sum
-  axis:   row
-  from:   nothing
-  to:     nothing
-  input:  [yr, r, g, t, units]
-  output: value
+  output: [yr, r, g, t, units]

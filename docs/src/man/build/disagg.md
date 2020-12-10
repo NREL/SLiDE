@@ -31,7 +31,7 @@ SLiDE._disagg_m0!
 SLiDE._disagg_md0!
 SLiDE._disagg_bop!
 
-SLiDE._disagg_pt0!
+SLiDE._disagg_pt0
 SLiDE._disagg_dc0!
 SLiDE._disagg_dd0max!
 SLiDE._disagg_dd0!

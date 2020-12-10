@@ -1,9 +1,9 @@
-# Build
+<!-- # Build
 ```@autodocs
 Modules = [SLiDE]
 Pages = ["build/build.jl"]
 Public = false
-```
+``` -->
 
 # Share
 
@@ -18,9 +18,3 @@ Pages = [
 Public = false
 ```
 
-# Disaggregate
-<!-- ```@autodocs
-Modules = [SLiDE]
-Pages = ["build/disagg.jl"]
-Public = false
-``` -->

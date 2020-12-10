@@ -3,7 +3,6 @@ This file is auto-generated. Do not edit.
 =#
 """
     mutable struct Operate <: Edit
-        axis::Symbol
         operation::String
         from::Array{Symbol,1}
         to::Array{Symbol,1}
@@ -14,7 +13,6 @@ This file is auto-generated. Do not edit.
 Perform an arithmetic operation across multiple DataFrame columns.
 
 # Arguments
-- `axis::Symbol`: Axis across which to perform operation
 - `operation::String`: operation to perform (+, -, *, /)
 - `from::Array{Symbol,1}`: name of original comment column (ex. units)
 - `to::Array{Symbol,1}`: name of new comment column (ex. units)
@@ -22,8 +20,6 @@ Perform an arithmetic operation across multiple DataFrame columns.
 - `output::Symbol`: name of result column
 """
 mutable struct Operate <: Edit
-    "Axis across which to perform operation"
-    axis::Symbol
     "operation to perform (+, -, *, /)"
     operation::String
     "name of original comment column (ex. units)"
@@ -37,12 +33,10 @@ mutable struct Operate <: Edit
 end
 
 
-function Operate(; axis, operation, from, to, input, output, )
-    Operate(axis, operation, from, to, input, output, )
+function Operate(; operation, from, to, input, output, )
+    Operate(operation, from, to, input, output, )
 end
 
-"""Get [`Operate`](@ref) `axis`."""
-get_axis(value::Operate) = value.axis
 """Get [`Operate`](@ref) `operation`."""
 get_operation(value::Operate) = value.operation
 """Get [`Operate`](@ref) `from`."""
@@ -54,8 +48,6 @@ get_input(value::Operate) = value.input
 """Get [`Operate`](@ref) `output`."""
 get_output(value::Operate) = value.output
 
-"""Set [`Operate`](@ref) `axis`."""
-set_axis!(value::Operate, val) = value.axis = val
 """Set [`Operate`](@ref) `operation`."""
 set_operation!(value::Operate, val) = value.operation = val
 """Set [`Operate`](@ref) `from`."""

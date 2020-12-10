@@ -39,6 +39,7 @@ export SLIDE_DIR
 
 # EXPORTS
 export Add
+export Combine
 export Describe
 export Drop
 export Group
@@ -49,6 +50,7 @@ export Order
 export Match
 export Rename
 export Replace
+export Deselect
 export Stack
 
 export SetInput
@@ -69,6 +71,7 @@ export Edit
 export File
 
 # UTILITIES
+export append
 export convert_type
 export datatype
 export dropnan!
@@ -86,7 +89,9 @@ export permute
 export add_permutation!
 export findindex
 export findvalue
+export findunits
 export indexjoin
+export convertjoin
 
 # EDIT
 export edit_with
