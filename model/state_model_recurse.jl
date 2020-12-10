@@ -37,41 +37,48 @@ bmkyr = 2016
 ########## Model ##########
 cge = MCPModel();
 
+#set[:s] -> sectors
+#set[:g] -> goods
+#set[:r] -> regions
+#set[:m] -> margins
+#set[:gm] -> goods_margins
+
 ##############
 # PARAMETERS
 ##############
 
 #benchmark values
-@NLparameter(cge, ys0[r in set[:r], s in set[:s], g in set[:g]] == sld[:ys0][r,s,g]);
-@NLparameter(cge, id0[r in set[:r], s in set[:s], g in set[:g]] == sld[:id0][r,s,g]);
-@NLparameter(cge, ld0[r in set[:r], s in set[:s]] == sld[:ld0][r,s]);
-@NLparameter(cge, kd0[r in set[:r], s in set[:s]] == sld[:kd0][r,s]);
-@NLparameter(cge, ty0[r in set[:r], s in set[:s]] == sld[:ty0][r,s]);
-@NLparameter(cge, ty[r in set[:r], s in set[:s]] == sld[:ty0][r,s]);
-@NLparameter(cge, m0[r in set[:r], g in set[:g]] == sld[:m0][r,g]);
-@NLparameter(cge, x0[r in set[:r], g in set[:g]] == sld[:x0][r,g]);
-@NLparameter(cge, rx0[r in set[:r], g in set[:g]] == sld[:rx0][r,g]);
-@NLparameter(cge, md0[r in set[:r], m in set[:m], g in set[:g]] == sld[:md0][r,m,g]);
-@NLparameter(cge, nm0[r in set[:r], g in set[:g], m in set[:m]] == sld[:nm0][r,g,m]);
-@NLparameter(cge, dm0[r in set[:r], g in set[:g], m in set[:m]] == sld[:dm0][r,g,m]);
-@NLparameter(cge, s0[r in set[:r], g in set[:g]] == sld[:s0][r,g]);
-@NLparameter(cge, a0[r in set[:r], g in set[:g]] == sld[:a0][r,g]);
-@NLparameter(cge, ta0[r in set[:r], g in set[:g]] == sld[:ta0][r,g]);
-@NLparameter(cge, ta[r in set[:r], g in set[:g]] == sld[:ta0][r,g]);
-@NLparameter(cge, tm0[r in set[:r], g in set[:g]] == sld[:tm0][r,g]);
-@NLparameter(cge, tm[r in set[:r], g in set[:g]] == sld[:tm0][r,g]);
-@NLparameter(cge, cd0[r in set[:r], g in set[:g]] == sld[:cd0][r,g]);
-@NLparameter(cge, c0[r in set[:r]] == sld[:c0][r]);
-@NLparameter(cge, yh0[r in set[:r], g in set[:g]] == sld[:yh0][r,g]);
-@NLparameter(cge, bopdef0[r in set[:r]] == sld[:bopdef0][r]);
-@NLparameter(cge, hhadj[r in set[:r]] == sld[:hhadj][r]);
-@NLparameter(cge, g0[r in set[:r], g in set[:g]] == sld[:g0][r,g]);
-@NLparameter(cge, xn0[r in set[:r], g in set[:g]] == sld[:xn0][r,g]);
-@NLparameter(cge, xd0[r in set[:r], g in set[:g]] == sld[:xd0][r,g]);
-@NLparameter(cge, dd0[r in set[:r], g in set[:g]] == sld[:dd0][r,g]);
-@NLparameter(cge, nd0[r in set[:r], g in set[:g]] == sld[:nd0][r,g]);
-@NLparameter(cge, i0[r in set[:r], g in set[:g]] == sld[:i0][r,g]);
+@NLparameter(cge, ys0[r in set[:r], s in set[:s], g in set[:g]] == sld[:ys0][r,s,g]); # Sectoral supply
+@NLparameter(cge, id0[r in set[:r], s in set[:s], g in set[:g]] == sld[:id0][r,s,g]); # Intermediate demand
+@NLparameter(cge, ld0[r in set[:r], s in set[:s]] == sld[:ld0][r,s]); # Labor demand
+@NLparameter(cge, kd0[r in set[:r], s in set[:s]] == sld[:kd0][r,s]); # Capital demand
+@NLparameter(cge, ty0[r in set[:r], s in set[:s]] == sld[:ty0][r,s]); # Production tax (benchmark)
+@NLparameter(cge, m0[r in set[:r], g in set[:g]] == sld[:m0][r,g]); # Imports
+@NLparameter(cge, x0[r in set[:r], g in set[:g]] == sld[:x0][r,g]); # Exports of goods and services
+@NLparameter(cge, rx0[r in set[:r], g in set[:g]] == sld[:rx0][r,g]); # Re-exports of goods and services
+@NLparameter(cge, md0[r in set[:r], m in set[:m], g in set[:g]] == sld[:md0][r,m,g]); # Total margin demand
+@NLparameter(cge, nm0[r in set[:r], g in set[:g], m in set[:m]] == sld[:nm0][r,g,m]); # Margin demand from national market
+@NLparameter(cge, dm0[r in set[:r], g in set[:g], m in set[:m]] == sld[:dm0][r,g,m]); # Margin supply from local market
+@NLparameter(cge, s0[r in set[:r], g in set[:g]] == sld[:s0][r,g]); # Aggregate supply
+@NLparameter(cge, a0[r in set[:r], g in set[:g]] == sld[:a0][r,g]); # Armington supply
+@NLparameter(cge, ta0[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); # Tax net of subsidy rate on intermediate demand
+@NLparameter(cge, tm0[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); # Import tariff
+@NLparameter(cge, cd0[r in set[:r], g in set[:g]] == sld[:cd0][r,g]); # Final demand
+@NLparameter(cge, c0[r in set[:r]] == sld[:c0][r]); # Aggregate final demand
+@NLparameter(cge, yh0[r in set[:r], g in set[:g]] == sld[:yh0][r,g]); #Household production
+@NLparameter(cge, bopdef0[r in set[:r]] == sld[:bopdef0][r]); #Balance of payments
+@NLparameter(cge, hhadj[r in set[:r]] == sld[:hhadj][r]); # Household adjustment
+@NLparameter(cge, g0[r in set[:r], g in set[:g]] == sld[:g0][r,g]); # Government demand
+@NLparameter(cge, i0[r in set[:r], g in set[:g]] == sld[:i0][r,g]); # Investment demand
+@NLparameter(cge, xn0[r in set[:r], g in set[:g]] == sld[:xn0][r,g]); # Regional supply to national market
+@NLparameter(cge, xd0[r in set[:r], g in set[:g]] == sld[:xd0][r,g]); # Regional supply to local market
+@NLparameter(cge, dd0[r in set[:r], g in set[:g]] == sld[:dd0][r,g]); # Regional demand to local market
+@NLparameter(cge, nd0[r in set[:r], g in set[:g]] == sld[:nd0][r,g]); # Regional demand to national market
 
+#counterfactual taxes
+@NLparameter(cge, ty[r in set[:r], s in set[:s]] == sld[:ty0][r,s]); #
+@NLparameter(cge, ta[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); #
+@NLparameter(cge, tm[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); #
 
 # -- Major Assumptions --
 # Temporal/Dynamic modifications
@@ -87,6 +94,24 @@ cge = MCPModel();
 #@NLparameter(cge, etars[r in set[:r], s in set[:s]] == get(etars_d,(r,s),0.0));
 @NLparameter(cge, etars[r in set[:r], s in set[:s]] == 0.0); # Growth rate adder for testing
 # set_value(etars["ca","uti"], 0.03);
+
+"""
+# !!!! Autonomous energy efficiency improvements (aeei) could also be employed
+# (1%/yr) 0.01 for all industries except electricity/power (0.3%/yr) 0.003
+# aeeir[r,s] -> aeei annual growth rate
+# aeeir[r,s] = 0.01
+# aeeir[r,"ele"] = 0.003
+# aeeif -> aeei coefficient
+# aeeif[r,s] = 1/(1+aeeir)
+
+# !!!! Population growth rate and labor productivity growth
+# !!!! labor augmentation rate (ftar) = fpopgr + glr
+# !!!! Productivity index gprod = (1+ftar)^t
+
+# !!!! Scale aeei for electricity sector to AEO estimates/forecasts
+# !!!! Scale productivity index to GDP estimates/forecasts
+# !!!! further calibration for regional/subnational fitting
+"""
 
 #new capital endowment
 @NLparameter(cge, ks_n[r in set[:r], s in set[:s]] ==
@@ -162,7 +187,18 @@ lo = 0.001
 @variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
 @variable(cge,RK[(r,s) in set[:PK]] >= lo, start = 1); #Return to regional capital
 
+"""
+# !!!! Zero-profit and market clearance for investment?
 
+# !!!! Capital and Investment assumptions, global, national, local market clearing price?
+# !!!! Assume initial steady-state investment?
+# .... Derived from benchmark capital or from Investment demand (i0[r,s])?
+
+# Investment produced using intermediate goods
+# Investment and Consumption combined to produce welfare index W (fixed proportions)
+# W demanded by RA --- or INV and C demanded by RA
+
+"""
 ###############################
 # -- PLACEHOLDER VARIABLES --
 ###############################
@@ -531,7 +567,7 @@ total_cap = Dict()
 [total_cap[r,s]=value(ks_n[r,s])+value(ks_s[r,s])+value(ks_x[r,s]) for r in set[:r], s in set[:s]]
 
 scalecap=Dict()
-[scalecap[r,s]=(value(dr))*total_cap[r,s]/(value(i0[r,s])*(value(ir)+value(dr))) for r in set[:r], s in set[:s]]
+[scalecap[r,s]=(1-value(dr))*total_cap[r,s]/(value(i0[r,s])*(value(ir)+value(dr))) for r in set[:r], s in set[:s]]
 # get(scalecap, (r,s), 0.0)
 
 # Update parameters for next period
@@ -553,26 +589,32 @@ for r in set[:r], s in set[:s]
     set_value(le0[r,s], (1 + value(gr)+value(etars[r,s])) * value(le0[r,s]));
 end
 
+#update balance of payments
 for r in set[:r]
     set_value(bopdef0[r], (1 + value(gr)) * value(bopdef0[r]));
 end
 
+#update government and exogenous investment parameters
+# !!!! What should happen with i0?
 for r in set[:r], g in set[:g]
     set_value(g0[r,g], (1 + value(gr)+value(etars[r,g])) * value(g0[r,g]));
     set_value(i0[r,g], (1 + value(gr)+value(etars[r,g])) * value(i0[r,g]));
 end
 
+#update all model variable start values to previous period solution value
 set_start_value.(all_variables(cge), result_value.(all_variables(cge)));
 
+#update consumption start value
 for r in set[:r]
     set_start_value(C[r], result_value(C[r])*(1+value(gr)));
 end
 
+#update exports start value
 for (r,g) in set[:X]
     set_start_value(X[(r,g)], result_value(X[(r,g)])*(1+value(gr)+value(etars[r,g])));
 end
 
-
+#update armington start value
 for (r,g) in set[:A]
     set_start_value(A[(r,g)], result_value(A[(r,g)])*(1+value(gr)+value(etars[r,g])));
 end
@@ -581,19 +623,19 @@ for r in set[:r], m in set[:m]
     set_start_value(MS[r,m], result_value(MS[r,m])*(1+value(gr)));
 end
 
+#update output variable start values
 for (r,s) in set[:Y]
     set_start_value(YX[(r,s)], result_value(YX[(r,s)])*(1-value(dr)));
     set_start_value(YM[(r,s)], result_value(YM[(r,s)])*(1+value(gr)+value(etars[r,s])));
 end
 
-
-for r in set[:r], s in set[:s]
 #update value shares
+for r in set[:r], s in set[:s]
     set_value(alpha_kl[r,s], ensurefinite(value(ld0[r,s])/(value(ld0[r,s]) + value(kd0[r,s]))));
 end
 
-for r in set[:r], g in set[:g]
 #update value shares
+for r in set[:r], g in set[:g]
     set_value(alpha_x[r,g], ensurefinite((value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g])));
     set_value(alpha_d[r,g], ensurefinite((value(xd0[r,g])) / value(s0[r, g])));
     set_value(alpha_n[r,g], ensurefinite(value(xn0[r,g]) / (value(s0[r, g]))));
