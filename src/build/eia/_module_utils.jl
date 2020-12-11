@@ -119,7 +119,7 @@ end
 split_with(df::DataFrame, splitter::NamedTuple) = split_with(df, fill_zero(splitter))
 
 function split_with(df::DataFrame, splitter::DataFrame)
-    splitter = splitter[:,findindex(splitter)]
+    # splitter = splitter[:,findindex(splitter)]
     idx_join = intersect(propertynames(df), propertynames(splitter))
     df_in = innerjoin(df, splitter, on=idx_join)
     df_out = antijoin(df, splitter, on=idx_join)
