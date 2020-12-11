@@ -37,6 +37,10 @@ bmkyr = 2016
 ########## Model ##########
 cge = MCPModel();
 
+##############
+# SETS
+##############
+
 #set[:s] -> sectors
 #set[:g] -> goods
 #set[:r] -> regions
@@ -88,34 +92,27 @@ cge = MCPModel();
 @NLparameter(cge, dr == 0.07); # capital depreciation rate
 @NLparameter(cge, thetax == 0.75); # extant production share
 
-# !!!! Growth rate adder - work out sector/region specific growth and energy-specific growth
-# etars_d = Dict()
-# [etars_d[r,s]=0.0 for r in set[:r], s in set[:s]]
-#@NLparameter(cge, etars[r in set[:r], s in set[:s]] == get(etars_d,(r,s),0.0));
-@NLparameter(cge, etars[r in set[:r], s in set[:s]] == 0.0); # Growth rate adder for testing
-# set_value(etars["ca","uti"], 0.03);
+# """
+# # !!!! Autonomous energy efficiency improvements (aeei) could also be employed
+# # (1%/yr) 0.01 for all industries except electricity/power (0.3%/yr) 0.003
+# # aeeir[r,s] -> aeei annual growth rate
+# # aeeir[r,s] = 0.01
+# # aeeir[r,"ele"] = 0.003
+# # aeeif -> aeei coefficient
+# # aeeif[r,s] = 1/(1+aeeir)
 
-"""
-# !!!! Autonomous energy efficiency improvements (aeei) could also be employed
-# (1%/yr) 0.01 for all industries except electricity/power (0.3%/yr) 0.003
-# aeeir[r,s] -> aeei annual growth rate
-# aeeir[r,s] = 0.01
-# aeeir[r,"ele"] = 0.003
-# aeeif -> aeei coefficient
-# aeeif[r,s] = 1/(1+aeeir)
+# # !!!! Population growth rate and labor productivity growth
+# # !!!! labor augmentation rate (ftar) = fpopgr + glr
+# # !!!! Productivity index gprod = (1+ftar)^t
 
-# !!!! Population growth rate and labor productivity growth
-# !!!! labor augmentation rate (ftar) = fpopgr + glr
-# !!!! Productivity index gprod = (1+ftar)^t
-
-# !!!! Scale aeei for electricity sector to AEO estimates/forecasts
-# !!!! Scale productivity index to GDP estimates/forecasts
-# !!!! further calibration for regional/subnational fitting
-"""
+# # !!!! Scale aeei for electricity sector to AEO estimates/forecasts
+# # !!!! Scale productivity index to GDP estimates/forecasts
+# # !!!! further calibration for regional/subnational fitting
+# """
 
 #new capital endowment
 @NLparameter(cge, ks_n[r in set[:r], s in set[:s]] ==
-             value(kd0[r, s])  * (value(dr)+value(gr)+value(etars[r,s])) / (1 + value(gr)) );
+             value(kd0[r, s])  * (value(dr)+value(gr)) / (1 + value(gr)) );
 
 # mutable old capital endowment
 @NLparameter(cge, ks_s[r in set[:r], s in set[:s]] ==
@@ -187,18 +184,19 @@ lo = 0.001
 @variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
 @variable(cge,RK[(r,s) in set[:PK]] >= lo, start = 1); #Return to regional capital
 
-"""
-# !!!! Zero-profit and market clearance for investment?
 
-# !!!! Capital and Investment assumptions, global, national, local market clearing price?
-# !!!! Assume initial steady-state investment?
-# .... Derived from benchmark capital or from Investment demand (i0[r,s])?
+# """
+# # !!!! Zero-profit and market clearance for investment?
 
-# Investment produced using intermediate goods
-# Investment and Consumption combined to produce welfare index W (fixed proportions)
-# W demanded by RA --- or INV and C demanded by RA
+# # !!!! Capital and Investment assumptions, global, national, local market clearing price?
+# # !!!! Assume initial steady-state investment?
+# # .... Derived from benchmark capital or from Investment demand (i0[r,s])?
 
-"""
+# # Investment produced using intermediate goods
+# # Investment and Consumption combined to produce welfare index W (fixed proportions)
+# # W demanded by RA --- or INV and C demanded by RA
+# """
+
 ###############################
 # -- PLACEHOLDER VARIABLES --
 ###############################
@@ -222,6 +220,25 @@ lo = 0.001
               );
 
 ###
+
+# """
+# # !!!! issue in market_rkx and/or profit_yx
+# #Leontief for extant/old
+# @NLexpression(cge, CVAyx[r in set[:r], s in set[:s]],
+#               (alpha_kl[r,s])*PL[r] + (1-alpha_kl[r,s])*(haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0)
+#               );
+
+# #demand for labor in VA
+# @NLexpression(cge,ALyx[r in set[:r], s in set[:s]],
+#               ld0[r,s] * (CVAyx[r,s] / PL[r])^0
+#               );
+
+# #demand for capital in VA
+# @NLexpression(cge,AKyx[r in set[:r],s in set[:s]],
+#               kd0[r,s] * (CVAyx[r,s] / (haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0))^0
+#               );
+# """
+
 #----------
 
 #CES function for output demand - including
@@ -551,101 +568,113 @@ lo = 0.001
 #set up the options for the path solver
 PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
 
-
 # solve the model
-
 status = solveMCP(cge)
 
-for t in 1:3
+# !!!! Problem solving with growth rate - solver pointing to income_ra as culprit
+for t in 1:1
+    # !!!! Save for later when making investment better
+    #scale(r,s,t) = (1-delta)*(ks_n(r,s,"%bmkyr%")+ks_s(r,s,"%bmkyr%")+ks_x(r,s,"%bmkyr%")) / (i0(r,s)*(ir+delta));
+    #ks_n(r,s,t) = scale(r,s,t)*i0(r,s))*I.l(r,s)*(ir+delta);
+    #totcap = ks_n+ks_s+ks_x
 
-# !!!! Save for later when making investment better
-#scale(r,s,t) = (1-delta)*(ks_n(r,s,"%bmkyr%")+ks_s(r,s,"%bmkyr%")+ks_x(r,s,"%bmkyr%")) / (i0(r,s)*(ir+delta));
-#ks_n(r,s,t) = scale(r,s,t)*i0(r,s))*I.l(r,s)*(ir+delta);
-#total_cap = ks_n+ks_s+ks_x
+    totcap = Dict((r,s) => value(ks_n[r,s])+value(ks_s[r,s])+value(ks_x[r,s])
+        for r in set[:r], s in set[:s])
 
-total_cap = Dict()
-[total_cap[r,s]=value(ks_n[r,s])+value(ks_s[r,s])+value(ks_x[r,s]) for r in set[:r], s in set[:s]]
+    # scalecap = Dict((r,s) => (1-value(dr))*totcap[r,s]/(value(i0[r,s])*(value(ir)+value(dr)))
+    #     for r in set[:r], s in set[:s])
 
-scalecap=Dict()
-[scalecap[r,s]=(1-value(dr))*total_cap[r,s]/(value(i0[r,s])*(value(ir)+value(dr))) for r in set[:r], s in set[:s]]
-# get(scalecap, (r,s), 0.0)
+    # Update parameters for next period
+    for r in set[:r], s in set[:s]
+    #update capital endowments
+        set_value(ks_s[r,s], (1-value(dr)) * (value(ks_s[r,s]) + value(ks_n[r,s])));
+        set_value(ks_x[r,s], (1-value(dr)) * value(ks_x[r,s]));
+        set_value(ks_n[r,s], value(dr) * get(totcap,(r,s),0.0));
+        # set_value(ks_n[r,s], (value(ir)+value(dr)) * get(totcap,(r,s),0.0));
+    end
 
-# Update parameters for next period
-for r in set[:r], s in set[:s]
-#update capital endowments
-    set_value(ks_s[r,s], (1-value(dr)) * (value(ks_s[r,s]) + value(ks_n[r,s])));
-    set_value(ks_x[r,s], (1-value(dr)) * value(ks_x[r,s]));
-#    set_value(ks_n[r,s], (value(ir) + value(dr)) * value(i0[r,s]) );
-    set_value(ks_n[r,s], value(dr)*(1 + value(gr) + value(etars[r,s]))*get(total_cap,(r,s),0.0));
-#    set_value(ks_n[r,s], value(dr)*get(total_cap,(r,s),0.0));
-end
+    for r in set[:r], s in set[:s]
+        set_value(ks_n[r,s], (1+value(gr))*value(ks_n[r,s]))
+        set_value(ks_s[r,s], (1+value(gr))*value(ks_s[r,s]))
+        set_value(ks_x[r,s], (1+value(gr))*value(ks_x[r,s]))
+    end
 
-#steady-state investment assumption test
-testk=Dict()
-[testk[r,s]=value(kd0[r,s])-(value(ks_n[r,s])+value(ks_s[r,s])+value(ks_x[r,s])) for r in set[:r], s in set[:s]]
+    #steady-state investment assumption test - check to see if no change in total capital
+    chkcap = Dict((r,s) => (value(ks_n[r,s])+value(ks_s[r,s])+value(ks_x[r,s]))/(value(kd0[r,s]))
+        for (r,s) in set[:PK])
 
-for r in set[:r], s in set[:s]
-#update labor endowments --- I think I need separate parameters for labor endowments versus demand
-    set_value(le0[r,s], (1 + value(gr)+value(etars[r,s])) * value(le0[r,s]));
-end
+    for r in set[:r], s in set[:s]
+    #update labor endowments --- I think I need separate parameters for labor endowments versus demand
+        set_value(le0[r,s], (1 + value(gr)) * value(le0[r,s]));
+    end
 
-#update balance of payments
-for r in set[:r]
-    set_value(bopdef0[r], (1 + value(gr)) * value(bopdef0[r]));
-end
+    #update balance of payments and household adjustment
+    for r in set[:r]
+        set_value(bopdef0[r], (1 + value(gr)) * value(bopdef0[r]));
+        set_value(hhadj[r], (1 + value(gr)) * value(hhadj[r]));
+    end
 
-#update government and exogenous investment parameters
-# !!!! What should happen with i0?
-for r in set[:r], g in set[:g]
-    set_value(g0[r,g], (1 + value(gr)+value(etars[r,g])) * value(g0[r,g]));
-    set_value(i0[r,g], (1 + value(gr)+value(etars[r,g])) * value(i0[r,g]));
-end
+    #update government and exogenous investment parameters
+    # !!!! What should happen with i0?
+    for r in set[:r], g in set[:g]
+        set_value(g0[r,g], (1 + value(gr)) * value(g0[r,g]));
+        set_value(i0[r,g], (1 + value(gr)) * value(i0[r,g]));
+        set_value(yh0[r,g], (1 + value(gr)) * value(yh0[r,g]));
+    end
 
-#update all model variable start values to previous period solution value
-set_start_value.(all_variables(cge), result_value.(all_variables(cge)));
+    #update all model variable start values to previous period solution value
+    set_start_value.(all_variables(cge), result_value.(all_variables(cge)));
 
-#update consumption start value
-for r in set[:r]
-    set_start_value(C[r], result_value(C[r])*(1+value(gr)));
-end
+    #update consumption start value
+    for r in set[:r]
+        set_start_value(C[r], result_value(C[r])*(1+value(gr)));
+        set_start_value(RA[r], start_value(C[r])*value(c0[r]));
+    end
 
-#update exports start value
-for (r,g) in set[:X]
-    set_start_value(X[(r,g)], result_value(X[(r,g)])*(1+value(gr)+value(etars[r,g])));
-end
+    #update exports start value
+    for (r,g) in set[:X]
+        set_start_value(X[(r,g)], result_value(X[(r,g)])*(1+value(gr)));
+    end
 
-#update armington start value
-for (r,g) in set[:A]
-    set_start_value(A[(r,g)], result_value(A[(r,g)])*(1+value(gr)+value(etars[r,g])));
-end
+    #update armington start value
+    for (r,g) in set[:A]
+        set_start_value(A[(r,g)], result_value(A[(r,g)])*(1+value(gr)));
+    end
 
-for r in set[:r], m in set[:m]
-    set_start_value(MS[r,m], result_value(MS[r,m])*(1+value(gr)));
-end
+    for r in set[:r], m in set[:m]
+        set_start_value(MS[r,m], result_value(MS[r,m])*(1+value(gr)));
+    end
 
-#update output variable start values
-for (r,s) in set[:Y]
-    set_start_value(YX[(r,s)], result_value(YX[(r,s)])*(1-value(dr)));
-    set_start_value(YM[(r,s)], result_value(YM[(r,s)])*(1+value(gr)+value(etars[r,s])));
-end
+    #update output variable start values
+    for (r,s) in set[:Y]
+        set_start_value(YX[(r,s)], (result_value(YX[(r,s)])*(1-value(dr))*(1+value(gr))));
+        set_start_value(YM[(r,s)], (start_value(C[r]) - start_value(YX[(r,s)])));
+    end
+    # for (r,s) in set[:Y]
+    #     set_start_value(YX[(r,s)], start_value(YX[(r,s)])*(1+value(gr)));
+    #     set_start_value(YM[(r,s)], start_value(YM[(r,s)])*(1+value(gr)));
+    # end
+    chkyxm = Dict((r,s) => start_value(YX[(r,s)])/start_value(YM[(r,s)]) for (r,s) in set[:Y])
+    chkkxm = Dict((r,s) => value(ks_x[r,s])/(value(ks_s[r,s])+value(ks_n[r,s])) for (r,s) in set[:Y])
 
-#update value shares
-for r in set[:r], s in set[:s]
-    set_value(alpha_kl[r,s], ensurefinite(value(ld0[r,s])/(value(ld0[r,s]) + value(kd0[r,s]))));
-end
+    #update value shares
+    for r in set[:r], s in set[:s]
+        set_value(alpha_kl[r,s], ensurefinite(value(ld0[r,s])/(value(ld0[r,s]) + value(kd0[r,s]))));
+    end
 
-#update value shares
-for r in set[:r], g in set[:g]
-    set_value(alpha_x[r,g], ensurefinite((value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g])));
-    set_value(alpha_d[r,g], ensurefinite((value(xd0[r,g])) / value(s0[r, g])));
-    set_value(alpha_n[r,g], ensurefinite(value(xn0[r,g]) / (value(s0[r, g]))));
-    set_value(theta_n[r,g], ensurefinite(value(nd0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]))));
-    set_value(theta_m[r,g], ensurefinite((1+value(tm0[r, g])) * value(m0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g]))));
-end
+    #update value shares
+    for r in set[:r], g in set[:g]
+        set_value(alpha_x[r,g], ensurefinite((value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g])));
+        set_value(alpha_d[r,g], ensurefinite((value(xd0[r,g])) / value(s0[r, g])));
+        set_value(alpha_n[r,g], ensurefinite(value(xn0[r,g]) / (value(s0[r, g]))));
+        set_value(theta_n[r,g], ensurefinite(value(nd0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]))));
+        set_value(theta_m[r,g], ensurefinite((1+value(tm0[r, g])) * value(m0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g]))));
+    end
 
-#set up the options for the path solver
-PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=100000)
+    #set up the options for the path solver
+    # PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
+    PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
 
-# solve next period
-status = solveMCP(cge)
+    # solve next period
+    status = solveMCP(cge)
 end
