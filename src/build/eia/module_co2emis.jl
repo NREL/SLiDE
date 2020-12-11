@@ -11,6 +11,7 @@ function module_co2emis!(d::Dict, set::Dict, maps::Dict)
     d[:co2emis] = vcat(
         edit_with(df, Add(:dataset,"seds"))[:,[idx;:value]],
         edit_with(d[:emissions], [
+            Drop(:yr, 2013, ">"),   # !!!! dropping for now for consistency with bluenote.
             Add(:sec,"total"),
             Add(:dataset,"epa"),
         ])[:,[idx;:value]],
