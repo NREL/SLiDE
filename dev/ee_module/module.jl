@@ -14,6 +14,7 @@ global CHAINED_USD = "millions of chained 2009 us dollars (USD)"
 f_eia = joinpath(SLIDE_DIR,"src","build","eia")
 include(joinpath(f_eia,"_module_utils.jl"))
 include(joinpath(f_eia,"module_bluenote.jl"))
+include(joinpath(f_eia,"module_co2emis.jl"))
 include(joinpath(f_eia,"module_elegen.jl"))
 include(joinpath(f_eia,"module_energy.jl"))
 
@@ -54,7 +55,7 @@ maps[:operate] = [
     DataFrame(
         from_units = "trillion btu",
         factor = 1e-3,
-        operation = /,
+        operation = *,
         by_units = "kilograms CO2 per million btu",
         to_units = "million metric tons of carbon dioxide",
     );
@@ -167,14 +168,29 @@ d[:seds] = edit_with(d[:seds], Combine("sum", IDX))
 # Calculate elegen and benchmark. It works! Yay!
 module_elegen!(d, maps)
 module_energy!(d, set, maps)
+module_co2emis!(d, set, maps)
 
 # col = intersect(propertynames(d[:energy]), propertynames(seds_out[:energy]));
 # benchmark_against(d[:elegen][:,[:yr,:r,:src,:value]], seds_out[:elegen])
 # benchmark_against(d[:energy][:,col], seds_out[:energy][:,col])
 
-set[:co2dim] = unique(d[:emissions][:,:src])
+# function module_co2emis!(d::Dict, set::Dict, maps::Dict)
+#     set[:co2dim] = unique(d[:emissions][:,:src])
 
-id=[:btu,:co2perbtu]
-df = filter_with(d[:energy], (src=set[:e], sec=set[:sec], units=BTU))
-df = convertjoin(df, maps[:co2perbtu]; id=id)
-df = convertjoin(df, maps[:operate]; id=id)
+#     id=[:btu,:co2perbtu]
+
+#     df = filter_with(d[:energy], (src=set[:e], sec=set[:sec], units=BTU))
+#     df = convertjoin(df, maps[:co2perbtu]; id=id)
+#     df = operate_with(df, maps[:operate]; id=id)
+#     idx = setdiff([findindex(df);:dataset],[:pq])
+
+#     d[:co2emis] = vcat(
+#         edit_with(df, Add(:dataset,"seds"))[:,[idx;:value]],
+#         edit_with(d[:emissions], [
+#             Add(:sec,"total"),
+#             Add(:dataset,"epa"),
+#         ])[:,[idx;:value]],
+#     )
+
+#     return d[:co2emis]
+# end

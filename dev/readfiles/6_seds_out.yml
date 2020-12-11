@@ -13,3 +13,6 @@ DataInput:
   - {descriptor: energy,         name: sedsenergy.csv,     col: [r,pq,src,sec,yr,value]}
   - {descriptor: other,          name: sedsother.csv,      col: [r,gdpcat,yr,value]}
   - {descriptor: co2emis,        name: co2emis.csv,        col: [r,yr,src,sec,dataset,value]}
+
+Replace:
+  - {col: sec, from: TOTAL, to: total}
