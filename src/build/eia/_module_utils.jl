@@ -51,9 +51,6 @@ function DataFrames.stack(df::DataFrame, id_vars::Tuple)
 end
 
 
-
-
-
 """
 """
 function operate_with(df::DataFrame, conversion::DataFrame; id=[], keepinput::Bool=false)
@@ -111,12 +108,10 @@ function _operate_on(df::DataFrame, id, val::Symbol)
 end
 
 
-
-
-
 """
 """
 split_with(df::DataFrame, splitter::NamedTuple) = split_with(df, fill_zero(splitter))
+# !!!! fill zero here causes issues for value
 
 function split_with(df::DataFrame, splitter::DataFrame)
     # splitter = splitter[:,findindex(splitter)]

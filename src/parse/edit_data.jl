@@ -566,6 +566,7 @@ end
 # ----- GIVEN SET LIST ---------------------------------------------------------------------
 
 function fill_zero(keys_fill::NamedTuple, df::DataFrame)
+    @warn("Depreciated!")
     df = copy(df)
     df_fill = fill_zero(keys_fill)
     df = fill_zero(df, df_fill; permute_keys = false)[1]
@@ -574,6 +575,7 @@ end
 
 
 function fill_zero(set::Dict, df::DataFrame)
+    @warn("Depreciated!")
     idx = intersect(findindex(df), collect(keys(set)))
     val = [set[k] for k in idx]
     return fill_zero(NamedTuple{Tuple(idx,)}(val,), df)
@@ -581,6 +583,7 @@ end
 
 
 function fill_zero(keys_fill::Any, d::Dict; permute_keys::Bool = true)
+    @warn("Depreciated!")
     d = copy(d)
     # If permuting keys, find all possible permutations of keys that should be present
     # and determine which are missing. Then add missing keys to the dictionary and return.
