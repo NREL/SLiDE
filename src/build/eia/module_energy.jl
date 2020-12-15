@@ -37,9 +37,9 @@ function _module_energy_ref(df::DataFrame)
     )))
 
     df, df_out, df_split = _split_with(df, df_split, [:sec,:base])
-
-    df[!,:ref_kwh_value] .= df[:,:ref_btu_value] .* (df[:,:ind_kwh_value] ./ df[:,:ind_btu_value])
-    df[!,:ref_kwh_units] .= df[:,:ind_kwh_units]
+    
+    df[!,:ref_kwh] .= df[:,:ref_btu] .* (df[:,:ind_kwh] ./ df[:,:ind_btu])
+    df[!,_add_id(:ref_kwh,:units)] .= df[:,_add_id(:ind_kwh,:units)]
 
     return _merge_with(df, df_out, df_split)
 end
@@ -56,7 +56,7 @@ function _module_energy_ind(df::DataFrame)
     ), [:src,:sec,:base])
 
     df, df_out, df_split = _split_with(df, df_split, [:sec])
-    df[!,:ind_value] .= df[:,:ind_value] .- df[:,:ref_value]
+    df[!,:ind] .= df[:,:ind] .- df[:,:ref]
     return _merge_with(df, df_out, df_split)
 end
 
@@ -81,28 +81,34 @@ end
 
 
 function _module_energy_price(df::DataFrame, df_split::DataFrame, maps::Dict)
-    id = [:usd,:x]
+    id = [:value,:units]
+    key = [:usd,:x]
+
     df, df_out, df_split = _split_with(df, df_split, :key)
-    df = operate_with(df, maps[:operate]; id=id, keepinput=true)
+    df = operate_with(df, maps[:operate]; id=key, keepinput=true)
 
     # Function to ensure finite/set col to another col based on condition.
-    alt = append(setdiff(Symbol.(df_split[:,:key]), id)[1], :value)
-    if alt in propertynames(df)
+    # !!!! function to go to <-> from value
+    alt = setdiff(convert_type.(Symbol, df_split[:,:key]), key)[1]
+    if alt in _with_id(df,:value)
         ii = .|(isnan.(df[:,:value]), isinf.(df[:,:value]))
-        df[ii,:value] .= df[ii, alt]
-    else
-        df = edit_with(df, Replace.(:value, [Inf,NaN], 0.0))
+        df[ii,:value] .= df[ii, _add_id(alt,:value)]
     end
-    
-    # !!!! Functions to go between key/with units/values when stacking and unstacking.
-    # !!!! Function to ensure finite/set col to another col based on condition.
-    # When we restack at the end, we need the calculated value name to be consistent with
-    # keys in slice so we know.
-    # !!!! Move to _merge_with, before stacking. This will likely come up more than once.
-    # Note: include output key in split df.
-    res = [:value,:units]
-    alt = append.(setdiff(Symbol.(df_split[:,:key]), id)[1], res)
-    df = edit_with(df, [Deselect(alt,"==");Rename.(res, alt)])
 
+    df = edit_with(df, Replace.(:value, [Inf,NaN], 0.0))
+
+    # Maybe move to _merge_with if this all is general enough? Doubt it tbh.
+    alt = _add_id.(alt, id)
+    df = edit_with(df, [Deselect(alt,"=="); Rename.(id, alt)])
     return _merge_with(df, df_out, df_split)
 end
+
+
+
+_add_id(x::String, id::Symbol) = _add_id(Symbol(x), id)
+_add_id(x::Symbol, id::Symbol) = (id==:value) ? x : append(x,id)
+
+_with_id(df::DataFrame, id::Symbol) = (id==:value) ? findvalue(df) : propertynames_with(df, id)
+
+_remove_id(x::Symbol, id::Symbol) = (x == id) ? x : getid(x, id)
+_remove_id(x::AbstractArray, id::Symbol) = _remove_id.(x, id)

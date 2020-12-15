@@ -25,27 +25,22 @@ function DataFrames.unstack(df::DataFrame, colkey::Symbol, value::Tuple; fillmis
     idx = setdiff(propertynames(df), ensurearray(colkey), ensurearray(value))
     ii0 = length(idx)+1
 
-    lst = [edit_with(unstack(df[:,[idx;[colkey,val]]], colkey, val),
-            Rename.(colnew, append.(colnew,val)))
+    lst = [unstack(df[:,[idx;[colkey,val]]], colkey, val, renamecols=x->_add_id(x,val))
         for val in value]
-    
+
     return indexjoin(lst...; fillmissing=fillmissing)
 end
 
 
 function DataFrames.stack(df::DataFrame, id_vars::Tuple)
-    col = propertynames(df)
+    from = Dict(k => _with_id(df, k) for k in id_vars)
+    to = Dict(k => _remove_id(v, k) for (k,v) in from)
+    idx = setdiff(propertynames(df), values(from)...)
 
-    measure_vars = [col[occursin.(id, col)] for id in id_vars]
-    idx = setdiff(col, measure_vars...)
-    ii0 = length(idx)+1
-
-    # !!!! Function that isolates key vs units/value -- if we go this route, use it here.
-    # Would need to look for units/whatever at the beginning AND END.
-    lst = [edit_with(df[:,[idx;var]], [
-            Melt(idx, :key, id),
-            Match(Regex("(?<key>.*)_$id\$"), :key, [:key]),
-        ]) for (id,var) in zip(id_vars,measure_vars)]
+    lst = [edit_with(df[:,[idx;from[k]]], [
+            Rename.(from[k], to[k]);
+            Melt(idx, :key, k);
+        ]) for k in keys(from)]
 
     return indexjoin(lst...)
 end
@@ -108,6 +103,9 @@ function _operate_on(df::DataFrame, id, val::Symbol)
 end
 
 
+
+
+
 """
 """
 split_with(df::DataFrame, splitter::NamedTuple) = split_with(df, fill_zero(splitter))
@@ -120,6 +118,20 @@ function split_with(df::DataFrame, splitter::DataFrame)
     df_out = antijoin(df, splitter, on=idx_join)
     # df_in = fill_zero(df_in, splitter)[1]
     return df_in, df_out
+end
+
+
+
+"""
+"""
+function index_with(df::DataFrame, splitter)
+    idx = findindex(df)
+    idx = idx[length.(unique.(eachcol(df[:,idx]))) .> 1]
+
+    df = edit_with(df, Replace.(findvalue(df), [Inf,NaN], 0.0))
+    df_in, df_out = split_with(fill_zero(df), splitter)
+    return df_in[:,idx], df_out[:,idx]
+    # return df_in, df_out
 end
 
 
