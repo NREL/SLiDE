@@ -539,19 +539,63 @@ end
 
 # ----- EDIT EXISTING ----------------------------------------------------------------------
 
-function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
-    df = ensurearray(df)
-    df_fill = sort(indexjoin(df))
-    idx = findindex(df_fill)
 
-    permute_keys && (df_fill = indexjoin(permute(df_fill[:,idx]), df_fill))
-    
-    val = findvalue(df_fill)
-    
-    [df[ii] = edit_with(df_fill[:,[idx;val[ii]]], Rename(val[ii],:value))
-        for ii in 1:length(df)]
-    return length(df) == 1 ? df[1] : Tuple(df)
+function fill_zero(
+    df::Vararg{DataFrame};
+    permute_keys::Bool = true,
+    colnames = [],
+    with::Union{Dict,NamedTuple} = Dict(),
+)
+    df = ensurearray(df)
+    N = length(df)
+
+    id = _generate_id(N)
+    idx = findindex.(df)
+    to = findvalue.(df)
+
+    df = indexjoin(df)
+    df = fill_zero2(df; permute_keys=permute_keys, colnames=colnames, with=with)
+    from = [propertynames_with(df, k) for k in id]
+
+    df = [edit_with(df[:,[idx[ii];from[ii]]], Rename.(from[ii],to[ii])) for ii in 1:N]
+
+    return Tuple(df)
 end
+
+
+function fill_zero(
+    df::DataFrame;
+    permute_keys::Bool = true,
+    colnames = [],
+    with::Union{Dict,NamedTuple} = Dict(),
+)
+    idx = findindex(df)
+
+    !isempty(colnames) && intersect!(idx, ensurearray(colnames))
+
+    if !isempty(with)
+        df = indexjoin(df, _intersect_with(with, df))
+    elseif permute_keys
+        df = indexjoin(permute(df[:,idx]), df)
+    end
+
+    return df
+end
+
+
+# function fill_zero(df::Vararg{DataFrame}; permute_keys::Bool = true)
+#     df = ensurearray(df)
+#     df_fill = sort(indexjoin(df))
+#     idx = findindex(df_fill)
+
+#     permute_keys && (df_fill = indexjoin(permute(df_fill[:,idx]), df_fill))
+    
+#     val = findvalue(df_fill)
+    
+#     [df[ii] = edit_with(df_fill[:,[idx;val[ii]]], Rename(val[ii],:value))
+#         for ii in 1:length(df)]
+#     return length(df) == 1 ? df[1] : Tuple(df)
+# end
 
 
 function fill_zero(d::Vararg{Dict}; permute_keys::Bool = true)
@@ -890,7 +934,7 @@ julia> filter_with(df, (yr = 2016,); drop = true)
 function filter_with(
     df::DataFrame,
     set::Any;
-    drop::Bool = false,
+    drop = false,
     extrapolate::Bool = false,
     forward::Bool = true,
     backward::Bool = true,
@@ -901,24 +945,22 @@ function filter_with(
 
     # Find keys that reference both column names in the input DataFrame df and
     # values in the set Dictionary. Then, created a DataFrame containing all permutations.
-    idx = findindex(df)
-    idx_set = intersect(idx, collect(keys(set)))
-    val_set = [intersect(unique(df[:,k]), ensurearray(set[k])) for k in idx_set]
+    df_set = _intersect_with(set, df; intersect_values=true)
+    idx_set = propertynames(df_set)
     
-    if length(idx_set) == 0
-        @warn("Returning filtered dataframe. No overlap between dataframe index and set keys.")
-        return df
-    end
+    # if length(idx_set) == 0
+    #     @warn("Returning filtered dataframe. No overlap between dataframe index and set keys.")
+    #     return df
+    # end
 
-    if any(length.(val_set) .== 0)
-        cols_err = idx_set[length.(val_set) .== 0]
-        error("Cannot filter DataFrame. No overlap with input set. 
-            - Check set key(s): $cols_err
-            - Use extrapolate_year() or extrapolate_region() to extend the dataset")
-    end
+    # if any(length.(val_set) .== 0)
+    #     cols_err = idx_set[length.(val_set) .== 0]
+    #     error("Cannot filter DataFrame. No overlap with input set. 
+    #         - Check set key(s): $cols_err
+    #         - Use extrapolate_year() or extrapolate_region() to extend the dataset")
+    # end
 
     # Drop values that are not in the current set.
-    df_set = DataFrame(permute(NamedTuple{Tuple(idx_set,)}(val_set,)))
     df = innerjoin(df, df_set, on = idx_set)
     
     if extrapolate
@@ -927,28 +969,41 @@ function filter_with(
     end
 
     # If one of the filtered DataFrame columns contains only one unique value, drop it.
-    # However, DO NOT DROP UNITS. EVER.
-    idx_set = setdiff(idx_set,[:units])
-    drop && setdiff!(cols, idx_set[length.(unique.(eachcol(df[:,idx_set]))) .=== 1])
+    # If drop specifies columns to drop, drop only these IFF they contain one unique value.
+    # NEVER drop units and never drop columns containing multiple unique values.
+    if drop !== false
+        idx_drop = setdiff(cols, [_find_relevant_index(df);:units])
+        drop !== true && intersect!(idx_drop, ensurearray(drop))
+        setdiff!(cols, idx_drop)
+    end
 
     return sort(df[:,cols])
 end
 
-# function filter_with(
-#     df::DataFrame,
-#     set::NamedTuple;
-#     drop::Bool = false,
-#     extrapolate::Bool = false,
-#     forward::Bool = true,
-#     backward::Bool = true,
-#     r::Pair = "md" => "dc",
-#     overwrite::Bool = false
-# )
-#     if any(typeof.(collect(values(set))) .<: Pair)
-#         x = [Rename.(set[k].first, k) for k in keys(set) if typeof(set[k]) <: Pair]
-#         df = edit_with(df, x)
-#     end
-    
-#     set = Dict(k => (typeof(set[k]) <: Pair) ? set[k].second : set[k] for k in keys(set))
-#     return filter_with(df, set; drop = drop, extrapolate = extrapolate, forward = forward, backward = backward, r = r, overwrite = overwrite)
-# end
+
+"""
+"""
+function _intersect_with(
+    x::Union{Dict,NamedTuple},
+    df::DataFrame;
+    intersect_values::Bool=false
+)
+    idx = intersect(findindex(df), collect(keys(x)))
+    val = [intersect_values ? intersect(unique(df[:,k]), ensurearray(x[k])) : x[k] for k in idx]
+
+    # if any(length.(val) .== 0)
+    #     cols_err = idx[length.(val) .== 0]
+    #     T = typeof(x)
+    #     warn("Cannot intersect input $T with input DataFrame.")
+    # end
+
+    return DataFrame(permute(NamedTuple{Tuple(idx,)}(val,)))
+end
+
+
+"""
+"""
+function _find_relevant_index(df::DataFrame)
+    idx = findindex(df)
+    return idx[length.(unique.(eachcol(df[:,idx]))) .> 1]
+end

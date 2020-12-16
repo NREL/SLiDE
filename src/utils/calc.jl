@@ -104,14 +104,14 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `df::DataFrame` WITHOUT the specified column(s) argument. The resulting DataFrame will be
     'shorter' than the input DataFrame.
 """
-function SLiDE.combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
+function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
     val = findvalue(df)
     idx_by = setdiff(propertynames(df), [col; val])
 
     df = combine(groupby(df, idx_by), val .=> fun .=> val)
 
-    # [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
-    #     for ii in find_oftype(df[:,val], AbstractFloat)]
+    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
+        for ii in find_oftype(df[:,val], AbstractFloat)]
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
     return df
 end

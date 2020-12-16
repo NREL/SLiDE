@@ -362,3 +362,9 @@ function sort_unique(df::DataFrame, id::Symbol)
 end
 
 sort_unique(df::DataFrame) = sort_unique(df, findindex(df))
+
+
+function propertynames_with(df::DataFrame, id::Symbol)
+    col = propertynames(df)
+    return col[occursin.(id,col)]
+end

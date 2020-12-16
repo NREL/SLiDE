@@ -3,10 +3,10 @@ using DataFrames
 import CSV
 
 
-function propertynames_with(df::DataFrame, id::Symbol)
-    col = propertynames(df)
-    return col[occursin.(id,col)]
-end
+# function propertynames_with(df::DataFrame, id::Symbol)
+#     col = propertynames(df)
+#     return col[occursin.(id,col)]
+# end
 
 
 """
@@ -129,7 +129,7 @@ function index_with(df::DataFrame, splitter)
     idx = idx[length.(unique.(eachcol(df[:,idx]))) .> 1]
 
     df = edit_with(df, Replace.(findvalue(df), [Inf,NaN], 0.0))
-    df_in, df_out = split_with(fill_zero(df), splitter)
+    df_in, df_out = split_with(df, splitter)
     return df_in[:,idx], df_out[:,idx]
     # return df_in, df_out
 end

@@ -92,6 +92,7 @@ export findvalue
 export findunits
 export indexjoin
 export convertjoin
+export propertynames_with
 
 # EDIT
 export edit_with
