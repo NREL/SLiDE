@@ -1,4 +1,8 @@
 """
+```math
+\\tilde{energy}_{yr,r,src,sec} = \\left\\{\\tilde{seds}\\left( yr,r,src,sec \\right)
+\\;\\vert\\; yr, \\, r, \\, e \\in src, \\, ed \\in sec \\right\\}
+```
 """
 function module_energy!(d::Dict, set::Dict, maps::Dict)
     df = copy(d[:seds])
@@ -17,9 +21,11 @@ end
 
 
 """
+```math
+\\tilde{supply}_{yr,r,src=ele} = \\sum_{src} \\tilde{ele}_{yr,r,src}
+```
 """
 function _module_energy_supply(d::Dict)
-    # !!!! Do something with sets to select.
     idx = DataFrame(src="ele", sec="supply")
     df = combine_over(d[:elegen], :src)
     df = indexjoin(idx, df)
@@ -28,6 +34,14 @@ end
 
 
 """
+```math
+\\tilde{ref}_{yr,r,src=ele} \\text{ [billion kWh]}
+=
+\\tilde{ref}_{yr,r,src=ele} \\text{ [trillion btu]}
+\\cdot
+\\dfrac{\\tilde{ind}_{yr,r,src=ele} \\text{ [billion kWh]}}
+      {\\tilde{ind}_{yr,r,src=ele} \\text{ [trillion btu]}}
+```
 """
 function _module_energy_ref(df::DataFrame)
     df_split = DataFrame(permute((
@@ -46,6 +60,11 @@ end
 
 
 """
+```math
+\\tilde{ind}_{yr,r,src=(ff,ele)}
+= \\tilde{ind}_{yr,r,src=(ff,ele)}
+- \\tilde{ref}_{yr,r,src=(ff,ele)}
+```
 """
 function _module_energy_ind(df::DataFrame)
     df_split = select(crossjoin(
@@ -62,6 +81,19 @@ end
 
 
 """
+```math
+\\begin{aligned}
+\\tilde{ff}_{yr,r,sec=ele} \\text{ [USD/million btu]}
+&= 10^3 \\cdot
+\\dfrac{\\tilde{ff}_{yr,r,sec=ele} \\text{ [billion USD]}}
+      {\\tilde{ff}_{yr,r,sec=ele} \\text{ [trillion btu]}}
+\\\\
+\\tilde{ele}_{yr,r,sec} \\text{ [USD/thousand kWh]}
+&= 10^3 \\cdot
+\\dfrac{\\tilde{ele}_{yr,r,sec} \\text{ [billion USD]}}
+      {\\tilde{ele}_{yr,r,sec} \\text{ [thousand kWh]}}
+\\end{aligned}
+```
 """
 function _module_energy_price(df::DataFrame, maps::Dict)
     splitter = Dict(
@@ -81,14 +113,15 @@ end
 
 
 function _module_energy_price(df::DataFrame, df_split::DataFrame, maps::Dict)
+    # !!!! figure out the units situation when joining to make this one function.
+    # This wouldn't be such an issue if we ignored the units columns,
+    # but they're nice to keep track of for now.
     id = [:value,:units]
     key = [:usd,:x]
 
     df, df_out, df_split = _split_with(df, df_split, :key)
     df = operate_with(df, maps[:operate]; id=key, keepinput=true)
 
-    # Function to ensure finite/set col to another col based on condition.
-    # !!!! function to go to <-> from value
     alt = setdiff(convert_type.(Symbol, df_split[:,:key]), key)[1]
     if alt in _with_id(df,:value)
         ii = .|(isnan.(df[:,:value]), isinf.(df[:,:value]))
@@ -102,13 +135,3 @@ function _module_energy_price(df::DataFrame, df_split::DataFrame, maps::Dict)
     df = edit_with(df, [Deselect(alt,"=="); Rename.(id, alt)])
     return _merge_with(df, df_out, df_split)
 end
-
-
-
-_add_id(x::String, id::Symbol) = _add_id(Symbol(x), id)
-_add_id(x::Symbol, id::Symbol) = (id==:value) ? x : append(x,id)
-
-_with_id(df::DataFrame, id::Symbol) = (id==:value) ? findvalue(df) : propertynames_with(df, id)
-
-_remove_id(x::Symbol, id::Symbol) = (x == id) ? x : getid(x, id)
-_remove_id(x::AbstractArray, id::Symbol) = _remove_id.(x, id)
