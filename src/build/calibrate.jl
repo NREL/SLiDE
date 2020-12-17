@@ -221,7 +221,7 @@ function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
     param[:var] = setdiff(param[:cal], param[:tax])
 
     # Isolate the current year.
-    d = Dict(k => fill_zero(set, filter_with(d[k], (yr = year,); drop = true))
+    d = Dict(k => fill_zero(filter_with(d[k], (yr=year,); drop=true); with=set)
         for k in param[:cal])
 
     # Save the DataFrame indices in correct order. This will be used to convert the

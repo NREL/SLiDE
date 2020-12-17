@@ -30,14 +30,26 @@ function share(
     # Read sharing input data.
     d_read = read_build(dataset, STEP_INP; overwrite = overwrite)
     if isempty(d_read)
-        # Here, we're not using read yaml/run yaml because the location we're saving in
-        # depends on the "save" path specified in this function input.
-        [set[k] = set[:r] for k in [:orig,:dest]]
-        d_read = read_from(joinpath("src","readfiles","build","shareinp.yml"))
-        d_read = Dict(k => sort(dropmissing(filter_with(df, set; extrapolate = true))) for (k, df) in d_read)
-        write_build!(dataset, STEP_INP, d_read; save_build = save_build)
+        if !isdir(joinpath(SLIDE_DIR,"data","input","eia"))
+            # Here, we're not using read yaml/run yaml because the location we're saving in
+            # depends on the "save" path specified in this function input.
+            [set[k] = set[:r] for k in [:orig,:dest]]
+            d_read = read_from(joinpath("src","readfiles","build","shareinp.yml"))
+            d_read = Dict(k => sort(dropmissing(filter_with(df, set; extrapolate = true))) for (k, df) in d_read)
+            write_build!(dataset, STEP_INP, d_read; save_build = save_build)
+        else
+            f_shr = joinpath(SLIDE_DIR,"data","input")
+            
+            d_read[:utd] = read_file(joinpath(f_shr,"utd.csv"))
+            d_read[:gsp] = read_file(joinpath(f_shr,"gsp_state.csv"))
+            d_read[:pce] = read_file(joinpath(f_shr,"pce.csv"))
+            d_read[:sgf] = read_file(joinpath(f_shr,"sgf.csv"))
+            d_read[:cfs] = read_file(joinpath(f_shr,"cfs_state.csv"))
+
+            [d_read[k] = edit_with(d_read[k], Deselect([:units],"==")) for k in keys(d_read)]
+        end
     end
-    
+
     merge!(d, d_read)
 
     share_pce!(d)

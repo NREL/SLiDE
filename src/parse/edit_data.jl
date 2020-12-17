@@ -554,7 +554,7 @@ function fill_zero(
     to = findvalue.(df)
 
     df = indexjoin(df)
-    df = fill_zero2(df; permute_keys=permute_keys, colnames=colnames, with=with)
+    df = fill_zero(df; permute_keys=permute_keys, colnames=colnames, with=with)
     from = [propertynames_with(df, k) for k in id]
 
     df = [edit_with(df[:,[idx[ii];from[ii]]], Rename.(from[ii],to[ii])) for ii in 1:N]
@@ -946,21 +946,14 @@ function filter_with(
     # Find keys that reference both column names in the input DataFrame df and
     # values in the set Dictionary. Then, created a DataFrame containing all permutations.
     df_set = _intersect_with(set, df; intersect_values=true)
-    idx_set = propertynames(df_set)
-    
-    # if length(idx_set) == 0
-    #     @warn("Returning filtered dataframe. No overlap between dataframe index and set keys.")
-    #     return df
-    # end
 
-    # if any(length.(val_set) .== 0)
-    #     cols_err = idx_set[length.(val_set) .== 0]
-    #     error("Cannot filter DataFrame. No overlap with input set. 
-    #         - Check set key(s): $cols_err
-    #         - Use extrapolate_year() or extrapolate_region() to extend the dataset")
-    # end
-
+    if df_set === nothing
+        @warn("Returning unfiltered DataFrame.")
+        return df
+    end
+        
     # Drop values that are not in the current set.
+    idx_set = propertynames(df_set)
     df = innerjoin(df, df_set, on = idx_set)
     
     if extrapolate
@@ -972,7 +965,7 @@ function filter_with(
     # If drop specifies columns to drop, drop only these IFF they contain one unique value.
     # NEVER drop units and never drop columns containing multiple unique values.
     if drop !== false
-        idx_drop = setdiff(cols, [_find_relevant_index(df);:units])
+        idx_drop = setdiff(_find_constant(df[:,idx_set]), propertynames_with(df,:units))
         drop !== true && intersect!(idx_drop, ensurearray(drop))
         setdiff!(cols, idx_drop)
     end
@@ -988,14 +981,29 @@ function _intersect_with(
     df::DataFrame;
     intersect_values::Bool=false
 )
+    T = typeof(x)
     idx = intersect(findindex(df), collect(keys(x)))
+
+    if isempty(idx)
+        @error("Cannot overlap input $T and DataFrame. No overlapping keys/columns.")
+        return nothing
+    end
+
     val = [intersect_values ? intersect(unique(df[:,k]), ensurearray(x[k])) : x[k] for k in idx]
 
-    # if any(length.(val) .== 0)
-    #     cols_err = idx[length.(val) .== 0]
-    #     T = typeof(x)
-    #     warn("Cannot intersect input $T with input DataFrame.")
-    # end
+    ii = .!isempty.(val)
+
+    if any(.!ii)
+        idx_drop = idx[.!ii]
+        @warn("No overlapping values in $idx_drop. These will be removed.")
+        idx = idx[ii]
+        val = val[ii]
+
+        if isempty(idx)
+            @error("Cannot overlap input $T and DataFrame. No overlapping values.")
+            return nothing
+        end
+    end
 
     return DataFrame(permute(NamedTuple{Tuple(idx,)}(val,)))
 end
@@ -1003,7 +1011,15 @@ end
 
 """
 """
-function _find_relevant_index(df::DataFrame)
+function _find_constant(df::DataFrame)
     idx = findindex(df)
-    return idx[length.(unique.(eachcol(df[:,idx]))) .> 1]
+    return idx[length.(unique.(eachcol(df[:,idx]))) .== 1]
 end
+
+
+# """
+# """
+# function _find_variable(df::DataFrame)
+#     idx = findindex(df)
+#     return idx[length.(unique.(eachcol(df[:,idx]))) .> 1]
+# end
