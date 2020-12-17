@@ -3,10 +3,13 @@ using DataFrames
 import CSV
 
 
-# function propertynames_with(df::DataFrame, id::Symbol)
-#     col = propertynames(df)
-#     return col[occursin.(id,col)]
-# end
+_add_id(x::String, id::Symbol) = _add_id(Symbol(x), id)
+_add_id(x::Symbol, id::Symbol) = (id==:value) ? x : append(x,id)
+
+_with_id(df::DataFrame, id::Symbol) = (id==:value) ? findvalue(df) : propertynames_with(df, id)
+
+_remove_id(x::Symbol, id::Symbol) = (x == id) ? x : getid(x, id)
+_remove_id(x::AbstractArray, id::Symbol) = _remove_id.(x, id)
 
 
 """
