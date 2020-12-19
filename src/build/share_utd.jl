@@ -1,9 +1,20 @@
 """
-    share_utd!(d::Dict, set::Dict)
-`utd`: Share of total trade by region.
+`utd(yr,r,g,t)`: Share of total trade by region.
+
+```math
+\\alpha_{yr,r,g,t}^{utd}
+=
+\\begin{cases}
+\\dfrac{           \\bar{utd}_{yr,r ,g,t}}
+       {\\sum_{r'} \\bar{utd}_{yr,r',g,t}}        & notrd\\ni g
+\\\\
+\\dfrac{\\sum_{yr'}    \\bar{utd}_{yr',r ,g,t}}
+       {\\sum_{yr',r'} \\bar{utd}_{yr',r',g,t}}   & notrd\\in g
+\\end{cases}
+```
 """
 function share_utd!(d::Dict, set::Dict)
-    println("  Calculating share of total trade by region")
+    println("  Calculating utd(yr,r,g,t), share of total trade by region")
     d[:utd] = fill_zero(d[:utd])
     df = d[:utd] / transform_over(d[:utd], :r)
 

@@ -134,6 +134,8 @@ export share
 # export share_utd!
 export disagg
 
+export module_energy!
+
 #################################################################################
 # INCLUDES
 """
@@ -185,6 +187,11 @@ include(joinpath("build","share_pce.jl"))
 include(joinpath("build","share_sgf.jl"))
 include(joinpath("build","share_utd.jl"))
 include(joinpath("build","disagg.jl"))
+
+include(joinpath("build","eia","_module_utils.jl"))
+include(joinpath("build","eia","module_co2emis.jl"))
+include(joinpath("build","eia","module_elegen.jl"))
+include(joinpath("build","eia","module_energy.jl"))
 
 function __init__()
     # See: http://pages.cs.wisc.edu/~ferris/path/LICENSE

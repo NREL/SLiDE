@@ -24,13 +24,10 @@ getid(x::Symbol, id::Symbol) = Symbol(getid(string(x), string(id)))
 """
 function DataFrames.unstack(df::DataFrame, colkey::Symbol, value::Tuple; fillmissing=0.0)
     colnew = convert_type.(Symbol, unique(df[:,colkey]))
-
     idx = setdiff(propertynames(df), ensurearray(colkey), ensurearray(value))
     ii0 = length(idx)+1
-
     lst = [unstack(df[:,[idx;[colkey,val]]], colkey, val, renamecols=x->_add_id(x,val))
         for val in value]
-
     return indexjoin(lst...; fillmissing=fillmissing)
 end
 

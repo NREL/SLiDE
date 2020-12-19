@@ -2,7 +2,7 @@
     share_labor!(d::Dict, set::Dict)
 """
 function share_labor!(d::Dict, set::Dict)
-    println("  Calculating labor share")
+    println("  Calculating labor(yr,r,s), labor share")
 
     !(:region in collect(keys(d))) && share_region!(d, set)
     _share_lshr0!(d, set)
@@ -40,12 +40,24 @@ function share_labor!(d::Dict, set::Dict)
     return d[:labor]
 end
 
+
 """
-    share_region!(d::Dict, set::Dict)
-`region`: Regional share of value added
+`region(yr,r,s)`: Regional share of value added
+
+```math
+\\alpha_{yr,r,s}^{gsp}
+=
+\\begin{cases}
+\\dfrac{           \\bar{gdp}_{yr,r,s}}
+       {\\sum_{s'} \\bar{gdp}_{yr,r,s'}}      & \\sum_{s'} \\bar{gdp}_{yr,r,s'} \\neq 0
+\\\\
+\\dfrac{\\sum_{s}    \\bar{gdp}_{yr,r ,s}}
+       {\\sum_{r',s} \\bar{gdp}_{yr,r',s}}    & \\sum_{s'} \\bar{gdp}_{yr,r,s'} = 0
+\\end{cases}
+```
 """
 function share_region!(d::Dict, set::Dict)
-    println("  Calculating regional share of value added")
+    println("  Calculating region(yr,r,s), regional share of value added")
     :gdpcat in propertynames(d[:gsp]) && _share_gsp!(d, set)
 
     cols = [findindex(d[:gsp]); :value]
@@ -69,13 +81,23 @@ function share_region!(d::Dict, set::Dict)
 end
 
 
-"`gsp`: Calculated gross state product."
+"""
+`gsp`: Calculated gross state product.
+
+Calculate factor totals:
+```math
+\\begin{aligned}
+\\bar{sudo}_{yr,r,s} &= \\bar{gdp}_{yr,r,s} - \\bar{taxsbd}_{yr,r,s}
+\\\\
+\\bar{comp}_{yr,r,s} &= \\bar{cmp}_{yr,r,s} - \\bar{gos}_{yr,r,s}
+\\end{aligned}
+```
+"""
 function _share_gsp!(d::Dict, set::Dict)
     df = copy(d[:gsp])
     :gdpcat in propertynames(d[:gsp]) && (df = unstack(dropzero(d[:gsp]), :gdpcat, :value))
     
     df = edit_with(df, Replace.(Symbol.(set[:gdpcat]), missing, 0.0))
-    # df = edit_with(df, Replace.(find_oftype(df, AbstractFloat), missing, 0.0))
 
     df[!,:sudo] .= df[:,:gdp] - df[:,:taxsbd]
     df[!,:comp] .= df[:,:cmp] + df[:,:gos]

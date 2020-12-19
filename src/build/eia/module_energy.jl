@@ -1,8 +1,16 @@
 """
 ```math
-\\tilde{energy}_{yr,r,src,sec} = \\left\\{\\tilde{seds}\\left( yr,r,src,sec \\right)
+\\bar{energy}_{yr,r,src,sec} = \\left\\{seds\\left( yr,r,src,sec \\right)
 \\;\\vert\\; yr, \\, r, \\, e \\in src, \\, ed \\in sec \\right\\}
 ```
+
+[`SLiDE._module_energy_supply`](@ref) adds supply information from the electricity
+generation dataset output by [`SLiDE.module_elegen!`](@ref). The following functions are
+used to calculate values or make adjustments to values in the energy dataset.
+These operations must occur in the following order:
+1. [`SLiDE._module_energy_ref`](@ref)
+2. [`SLiDE._module_energy_ind`](@ref)
+3. [`SLiDE._module_energy_price`](@ref)
 """
 function module_energy!(d::Dict, set::Dict, maps::Dict)
     df = copy(d[:seds])
@@ -22,7 +30,7 @@ end
 
 """
 ```math
-\\tilde{supply}_{yr,r,src=ele} = \\sum_{src} \\tilde{ele}_{yr,r,src}
+\\bar{supply}_{yr,r,src=ele} = \\sum_{src} \\bar{ele}_{yr,r,src}
 ```
 """
 function _module_energy_supply(d::Dict)
@@ -35,12 +43,12 @@ end
 
 """
 ```math
-\\tilde{ref}_{yr,r,src=ele} \\text{ [billion kWh]}
+\\bar{ref}_{yr,r,src=ele} \\text{ [billion kWh]}
 =
-\\tilde{ref}_{yr,r,src=ele} \\text{ [trillion btu]}
+\\bar{ref}_{yr,r,src=ele} \\text{ [trillion btu]}
 \\cdot
-\\dfrac{\\tilde{ind}_{yr,r,src=ele} \\text{ [billion kWh]}}
-      {\\tilde{ind}_{yr,r,src=ele} \\text{ [trillion btu]}}
+\\dfrac{\\bar{ind}_{yr,r,src=ele} \\text{ [billion kWh]}}
+      {\\bar{ind}_{yr,r,src=ele} \\text{ [trillion btu]}}
 ```
 """
 function _module_energy_ref(df::DataFrame)
@@ -61,9 +69,9 @@ end
 
 """
 ```math
-\\tilde{ind}_{yr,r,src=(ff,ele)}
-= \\tilde{ind}_{yr,r,src=(ff,ele)}
-- \\tilde{ref}_{yr,r,src=(ff,ele)}
+\\bar{ind}_{yr,r,src=(ff,ele)}
+= \\bar{ind}_{yr,r,src=(ff,ele)}
+- \\bar{ref}_{yr,r,src=(ff,ele)}
 ```
 """
 function _module_energy_ind(df::DataFrame)
@@ -83,15 +91,15 @@ end
 """
 ```math
 \\begin{aligned}
-\\tilde{ff}_{yr,r,sec=ele} \\text{ [USD/million btu]}
+\\bar{ff}_{yr,r,sec=ele} \\text{ [USD/million btu]}
 &= 10^3 \\cdot
-\\dfrac{\\tilde{ff}_{yr,r,sec=ele} \\text{ [billion USD]}}
-      {\\tilde{ff}_{yr,r,sec=ele} \\text{ [trillion btu]}}
+\\dfrac{\\bar{ff}_{yr,r,sec=ele} \\text{ [billion USD]}}
+      {\\bar{ff}_{yr,r,sec=ele} \\text{ [trillion btu]}}
 \\\\
-\\tilde{ele}_{yr,r,sec} \\text{ [USD/thousand kWh]}
+\\bar{ele}_{yr,r,sec} \\text{ [USD/thousand kWh]}
 &= 10^3 \\cdot
-\\dfrac{\\tilde{ele}_{yr,r,sec} \\text{ [billion USD]}}
-      {\\tilde{ele}_{yr,r,sec} \\text{ [thousand kWh]}}
+\\dfrac{\\bar{ele}_{yr,r,sec} \\text{ [billion USD]}}
+      {\\bar{ele}_{yr,r,sec} \\text{ [thousand kWh]}}
 \\end{aligned}
 ```
 """
