@@ -106,6 +106,14 @@ function edit_with(df::DataFrame, x::Drop; file = nothing)
 end
 
 
+function edit_with(df::DataFrame, x::OrderedGroup)
+    # !!!! can we merge this with Group? So we can group on either?
+    # !!!! Can we group when we just need to fill columns with what's below them? (think: sctg codes)
+    [df = _group_by(df, OrderedGroup(x.on, x.var, [val])) for val in x.val]
+    return df
+end
+
+
 function edit_with(df::DataFrame, x::Group; file = nothing)
     # First, add a column to the original DataFrame indicating where the data set begins.
     cols = unique([propertynames(df); x.output])
@@ -299,11 +307,6 @@ function edit_with(df::DataFrame, x::T, file; print_status::Bool=false) where T<
     return edit_with(df, x)
 end
 
-# function edit_with(df::DataFrame, x::T; print_status::Bool = false) where T<:Edit
-#     # print_status && _print_status(x)
-#     return edit_with(df, x)
-# end
-
 
 function edit_with(
     df::DataFrame,
@@ -337,7 +340,7 @@ function edit_with(
 
     # Specify the order in which edits must occur and which of these edits are included
     # in the yaml file of defined edits.
-    EDITS = ["Deselect", "Rename", "Group", "Stack", "Match", "Melt",
+    EDITS = ["Deselect", "Rename", "OrderedGroup", "Group", "Stack", "Match", "Melt",
         "Add", "Map", "Replace", "Drop", "Operate", "Combine", "Describe", "Order"]
     KEYS = intersect(EDITS, collect(keys(y)))
     [df = edit_with(df, y[k], file; print_status = print_status) for k in KEYS]
@@ -348,9 +351,9 @@ end
 function edit_with(
     file::T,
     y::Dict{Any,Any};
-    print_status::Bool = false) where T<:File
-
-    df = read_file(y["PathIn"], file)
+    print_status::Bool=false) where T<:File
+    
+    df = read_file(y["PathIn"], file; remove_notes=true)
     return edit_with(df, y, file)
 end
 
@@ -475,6 +478,37 @@ end
 
 _expand_range(x::Missing) = x
 _expand_range(x::Int) = x
+
+
+"""
+"""
+function _group_by(df::DataFrame, x::OrderedGroup)
+    id = x.val[1]
+    colid = SLiDE._add_id.(id,x.on)
+    cols = unique([propertynames(df); colid])
+    
+    # Find the line where each group begins and ends.
+    if length(unique(df[:,x.var])) > 1
+        N = size(df,1)
+        df[!,:line] .= (1:N)
+        df_split = df[df[:,x.var].==id, :]
+        df_split = edit_with(df_split, Rename.(x.on, colid))
+        df_split[!,:start] .= df_split[:,:line].+1
+        df_split[!,:stop] .= [df_split[:,:line][2:end].-1; N]
+        
+        # Can probably change a little to fill in values.
+        [df[!,col] .= "" for col in colid]
+        [df[row[:start]:row[:stop], col] .= row[col] for row in eachrow(df_split)
+            for col in colid]
+
+        # Drop "headers" that indicated where groups stopped and started.
+        df = df[df[:,colid[1]].!=="", cols]
+    else
+        df = edit_with(df, [Rename.(x.on, colid); Deselect([x.var],"==")])
+    end
+
+    return df
+end
 
 
 """

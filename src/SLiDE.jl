@@ -43,6 +43,7 @@ export Combine
 export Describe
 export Drop
 export Group
+export OrderedGroup
 export Map
 export Melt
 export Operate
@@ -135,6 +136,8 @@ export share
 export disagg
 
 export module_energy!
+export module_elegen!
+export module_co2emis!
 
 #################################################################################
 # INCLUDES

@@ -29,25 +29,29 @@ the `data/coremaps` directory. It returns a .csv file.
     dictionary. All keys that correspond with SLiDE DataStream DataTypes will be converted
     to (lists of) those types.
 """
-function read_file(path::Array{String,1}, file::GAMSInput)
+function read_file(path::Array{String,1}, file::GAMSInput; remove_notes::Bool=false)
     filepath = joinpath(path..., file.name)
     xf = readlines(filepath)
-    df = gams_to_dataframe(xf; colnames=file.col)
+    df = split_gams(xf; colnames=file.col)
+    # df = gams_to_dataframe(xf; colnames=file.col)
     return df
 end
 
 
-function read_file(path::Array{String,1}, file::CSVInput)
+function SLiDE.read_file(path::Array{String,1}, file::CSVInput; remove_notes::Bool=false)
     filepath = joinpath(path..., file.name)
-    df = _read_csv(filepath)
-    df = _remove_header(df, filepath)
-    df = _remove_footer(df)
-    df = _remove_empty(df)
+    df = SLiDE._read_csv(filepath)
+
+    if remove_notes && size(df,1) > 1
+        df = SLiDE._remove_header(df, filepath)
+        df = SLiDE._remove_footer(df)
+        df = SLiDE._remove_empty(df)
+    end
     return df
 end
 
 
-function read_file(path::Array{String,1}, file::XLSXInput)
+function read_file(path::Array{String,1}, file::XLSXInput; remove_notes::Bool=true)
     filepath = joinpath(path..., file.name)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
     
@@ -89,7 +93,8 @@ function read_file(file::String; colnames=[])
     file = joinpath(file)
 
     if occursin(".map", file) | occursin(".set", file)
-        return gams_to_dataframe(readlines(file); colnames=colnames)
+        # return gams_to_dataframe(readlines(file); colnames=colnames)
+        return split_gams(readlines(file); colnames=colnames)
     end
 
     if occursin(".yml", file) | occursin(".yaml", file)
@@ -112,12 +117,16 @@ end
 """
 """
 function _read_csv(filepath::String; header::Int=1)
-    return CSV.read(filepath, DataFrame,
+    df = CSV.read(filepath, DataFrame,
         silencewarnings=true,
         ignoreemptylines=true,
         comment="#",
         missingstrings=["","\xc9","..."];
         header=header)
+    
+    (header>0 && isempty(df)) && (df = _read_csv(filepath; header=0))
+
+    return df
 end
 
 
@@ -264,9 +273,9 @@ function load_from(::Type{T}, df::DataFrame) where T <: Any
 
     # Print warning if DataFrame is missing required columns.
     missing_fields = setdiff(fields, propertynames(df))
-    if length(missing_fields) > 0
-        @warn("DataFrame columns missing fields required to fill DataType $T" * missing_fields)
-    end
+    # if length(missing_fields) > 0
+    #     @warn("DataFrame columns missing fields required to fill DataType $T" * missing_fields)
+    # end
 
     df = df[:, ensurearray(fields)]
     # If all of the struct fields are arrays, we assume all DataFrame rows should be saved.
@@ -523,6 +532,45 @@ end
 
 
 """
+"""
+function split_gams(x::String)
+    matches = collect(eachmatch(r"((?<=\").*(?=\")|\((?>[^()]|(?R))*\)|[\w\d]+)", x))
+    return [_expand_set(matches[jj][1]) for jj in 1:length(matches)]
+end
+
+function split_gams(xf::Array{String,1}; colnames=[])
+    xf = xf[xf .!== ""]                             # blank lines
+    xf = xf[match.(r"^\s*SET", xf) .=== nothing]    # set definitions
+    xf = xf[match.(r"^\s*\*", xf) .=== nothing]     # commented lines
+    length(xf) == 0 && (return nothing)
+
+    data = split_gams.(xf)
+
+    if length(unique(length.(data))) == 1
+        COLS = length(data[1])
+        cols = isempty(colnames) ? SLiDE._generate_id(COLS) : colnames
+        data = if all(typeof.(data) .== Array{String,1})
+            DataFrame(permutedims(hcat(data...)), cols)
+        else
+            vcat([DataFrame(Pair.(cols, row)) for row in data]...)
+        end
+    end
+
+    return data
+end
+
+
+"""
+"""
+function _expand_set(x)
+    m = match(r"^\((.*)\)$", x)
+    x = (m !== nothing) ? string.(strip.(split(m[1],","))) : string(x)
+    return x
+end
+
+
+
+"""
     gams_to_dataframe(xf::Array{String,1}; colnames = false)
 This function converts a GAMS map or set to a DataFrame, expanding sets into multiple rows.
 
@@ -538,6 +586,9 @@ This function converts a GAMS map or set to a DataFrame, expanding sets into mul
 - `df::DataFrame`: A dataframe representation of the GAMS map or set.
 """
 function gams_to_dataframe(xf::Array{String,1}; colnames=[])
+    # Remove commented lines.
+    xf = xf[match.(r"^\s*\*", xf) .=== nothing]
+
     matches = collect.(eachmatch.(r"((?<=\").*(?=\")|\((?>[^()]|(?R))*\)|[\w\d]+)", xf))
 
     if length(unique(length.(matches))) !== 1
