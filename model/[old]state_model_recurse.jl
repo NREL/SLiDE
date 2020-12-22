@@ -89,9 +89,8 @@ cge = MCPModel();
 
 @NLparameter(cge, ir == 0.05); # interest rate
 @NLparameter(cge, gr == 0.02); # growth rate --- try sector and set[:r] specific
-@NLparameter(cge, dr == 0.05); # capital depreciation rate
-@NLparameter(cge, thetax == 0.3); # extant production share
-
+@NLparameter(cge, dr == 0.07); # capital depreciation rate
+@NLparameter(cge, thetax == 0.75); # extant production share
 
 # """
 # # !!!! Autonomous energy efficiency improvements (aeei) could also be employed
@@ -113,28 +112,22 @@ cge = MCPModel();
 
 #new capital endowment
 @NLparameter(cge, ks_n[r in set[:r], s in set[:s]] ==
-    value(kd0[r, s])  * (value(dr)+value(gr)) / (1 + value(gr)) );
+             value(kd0[r, s])  * (value(dr)+value(gr)) / (1 + value(gr)) );
 
 # mutable old capital endowment
 @NLparameter(cge, ks_s[r in set[:r], s in set[:s]] ==
-    value(kd0[r, s]) * (1 - value(thetax)) - value(ks_n[r,s]) );
+             value(kd0[r, s]) * (1 - value(thetax)) - value(ks_n[r,s]) );
 
-# Mutable total capital endowment - Non-extant capital
-@NLparameter(cge, ks_m[r in set[:r]] == sum(value(kd0[r,s]) * (1-value(thetax)) for s in set[:s]));
 
 # Extant capital endowment
 @NLparameter(cge, ks_x[r in set[:r], s in set[:s]] ==
-    value(kd0[r, s]) * value(thetax) );
+             value(kd0[r, s]) * value(thetax) );
 
 # Labor endowment
 @NLparameter(cge, le0[r in set[:r], s in set[:s]] == value(ld0[r,s]));
 
-# Benchmark investment supply
-@NLparameter(cge, inv0[r in set[:r]] == sum(value(i0[r,g]) for g in set[:g]));
 
-# Benchmark welfare index
-@NLparameter(cge, w0[r in set[:r]] == value(inv0[r])+value(c0[r]));
-
+# --- end recursive dynamic preproc ---
 
 # benchmark value share parameters
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
@@ -143,8 +136,6 @@ cge = MCPModel();
 @NLparameter(cge, alpha_n[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(s0[r,g])));
 @NLparameter(cge, theta_n[r in set[:r], g in set[:g]] == ensurefinite(value(nd0[r,g]) / (value(nd0[r,g]) - value(dd0[r,g]))));
 @NLparameter(cge, theta_m[r in set[:r], g in set[:g]] == ensurefinite((1+value(tm0[r,g])) * value(m0[r,g]) / (value(nd0[r,g]) + value(dd0[r,g]) + (1 + value(tm0[r,g])) * value(m0[r,g]))));
-
-@NLparameter(cge, theta_inv[r in set[:r], g in set[:g]] == value(i0[r,g]) / value(inv0[r])); # Intermediate input share of investment output
 
 #Substitution and transformation elasticities
 @NLparameter(cge, es_va[r in set[:r], s in set[:s]] == SUB_ELAST[:va]); # value-added nest - substitution elasticity
@@ -156,14 +147,13 @@ cge = MCPModel();
 @NLparameter(cge, es_d[r in set[:r], g in set[:g]]    == SUB_ELAST[:d]); # Domestic demand aggregation nest (intranational) - substitution elasticity
 @NLparameter(cge, es_f[r in set[:r], g in set[:g]]    == SUB_ELAST[:f]); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
 
-@NLparameter(cge, es_inv[r in set[:r]] == 5); # Investment production - substitution elasticity
 
 ################
 # VARIABLES
 ################
 
 # specify value close to zero - true zero creates convergence issues in this version
-lo = 0.0
+lo = 0.001
 
 # sectors
 #@variable(cge, Y[(r, s) in set[:Y]] >= lo, start = 1);
@@ -184,23 +174,28 @@ lo = 0.0
 @variable(cge, PFX >= lo, start = 1); # Foreign exchange
 
 #consumer:
-@variable(cge,RA[r in set[:r]]>=lo,start = value(w0[r])) ;
+@variable(cge,RA[r in set[:r]]>=lo,start = value(c0[r])) ;
 
 
 #--- recursive dynamic variable declaration ---
-@variable(cge,YM[(r,s) in set[:Y]] >= lo, start = (1-value(thetax))); # Mutable production index - replaces Y
-@variable(cge,YX[(r,s) in set[:Y]] >= lo, start = value(thetax)); # Extant production index
-@variable(cge,INV[r in set[:r]] >= lo, start = 1); # Investment
-@variable(cge,W[r in set[:r]] >= lo, start = 1); # Welfare index
+@variable(cge,YM[(r,s) in set[:Y]] >= lo, start = (1-value(thetax))); #Mutable production index - replaces Y
+@variable(cge,YX[(r,s) in set[:Y]] >= lo, start = value(thetax)); #Extant production index
 
 @variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
-@variable(cge,RK[r in set[:r]] >= lo, start = 1); # Return to regional capital
-@variable(cge,PINV[r in set[:r]] >= lo, start = 1); # Investment price index
-@variable(cge,PW[r in set[:r]] >= lo, start = 1); # Welfare price index
+@variable(cge,RK[(r,s) in set[:PK]] >= lo, start = 1); #Return to regional capital
 
-# Reporting variables
-@variable(cge,DKM[(r,s) in set[:PK]] >= lo, start = start_value(YM[(r,s)]) * value(kd0[r,s]));
 
+# """
+# # !!!! Zero-profit and market clearance for investment?
+
+# # !!!! Capital and Investment assumptions, global, national, local market clearing price?
+# # !!!! Assume initial steady-state investment?
+# # .... Derived from benchmark capital or from Investment demand (i0[r,s])?
+
+# # Investment produced using intermediate goods
+# # Investment and Consumption combined to produce welfare index W (fixed proportions)
+# # W demanded by RA --- or INV and C demanded by RA
+# """
 
 ###############################
 # -- PLACEHOLDER VARIABLES --
@@ -211,20 +206,20 @@ lo = 0.0
 
 #Cobb-douglas for mutable/new
 @NLexpression(cge, CVAym[r in set[:r], s in set[:s]],
-    PL[r]^alpha_kl[r,s] * RK[r]^(1-alpha_kl[r,s]));
+              PL[r]^alpha_kl[r,s] * (haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) ^(1-alpha_kl[r,s])
+              );
 
 #demand for labor in VA
 @NLexpression(cge,ALym[r in set[:r], s in set[:s]],
-    ld0[r,s] * CVAym[r,s] / PL[r]);
+              ld0[r,s] * CVAym[r,s] / PL[r]
+              );
 
 #demand for capital in VA
 @NLexpression(cge,AKym[r in set[:r],s in set[:s]],
-    kd0[r,s] * CVAym[r,s] / RK[r]);
+              kd0[r,s] * CVAym[r,s] / (haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0)
+              );
 
-@NLexpression(cge,DINV[r in set[:r], g in set[:g]],
-    (i0[r,g] * (PINV[r]/(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)^es_inv[r])));
-
-    ###
+###
 
 # """
 # # !!!! issue in market_rkx and/or profit_yx
@@ -303,7 +298,7 @@ lo = 0.0
 # cost of labor inputs
         + PL[r] * ALym[r,s]
 # cost of capital inputs
-        + RK[r] * AKym[r,s]
+        + (haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) * AKym[r,s]
         -
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
         sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
@@ -376,18 +371,6 @@ lo = 0.0
         PC[r] * c0[r]
 );
 
-@mapping(cge, profit_inv[r in set[:r]],
-    sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * DINV[r,g] for g in set[:g])
-    -
-    PINV[r] * inv0[r]
-);
-
-@mapping(cge, profit_w[r in set[:r]],
-    PINV[r]*inv0[r] + PC[r]*c0[r]
-    -
-    PW[r]*w0[r]
-);
-
 @mapping(cge,profit_ms[r in set[:r], m in set[:m]],
 # provision of set[:m] to national market
         sum(PN[gm]   * nm0[r,gm,m] for gm in set[:gm])
@@ -406,11 +389,11 @@ lo = 0.0
 #----------
 #Recursive dynamics mkt clearance
 
-@mapping(cge,market_rk[r in set[:r]],
-        ks_m[r]
+@mapping(cge,market_rk[(r, s) in set[:PK]],
+        (ks_n[r,s] + ks_s[r,s])
         -
-#current year's capital demand
-       sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AKym[r,s] for s in set[:s])
+#current year's capital
+       (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.) * AKym[r,s]
 );
 
 @mapping(cge,market_rkx[(r, s) in set[:PK]],
@@ -426,22 +409,22 @@ lo = 0.0
         - (
 # government demand (exogenous)
         g0[r,g]
-# demand for investment
-        + INV[r]*DINV[r,g]
+# demand for investment (exogenous)
+        + i0[r,g]
 # final demand
         + C[r] * CD[r,g]
 # intermediate demand
 #            + sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
-        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
-        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
+            + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
+            + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
         )
 );
 
 @mapping(cge,market_py[(r, g) in set[:PY]],
 # sectoral supply
 #        sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) *ys0[r,s,g] for s in set[:s])
-         sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 0.0) *ys0[r,s,g] for s in set[:s])
-         + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 0.0) *ys0[r,s,g] for s in set[:s])
+         sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) *ys0[r,s,g] for s in set[:s])
+         + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) *ys0[r,s,g] for s in set[:s])
 # household production (exogenous)
         + yh0[r,g]
         -
@@ -495,24 +478,13 @@ lo = 0.0
 );
 
 @mapping(cge,market_pc[r in set[:r]],
-# Consumption supply
+# a period's final demand
         C[r] * c0[r]
         -
-# Consumption demand
-        W[r] * c0[r]
+# consumption / utiltiy
+        RA[r] / PC[r]
 );
 
-@mapping(cge, market_pinv[r in set[:r]],
-        INV[r]*inv0[r]
-        -
-        W[r]*inv0[r]
-);
-
-@mapping(cge, market_pw[r in set[:r]],
-        W[r]*w0[r]
-        -
-        RA[r] / PW[r]
-);
 
 @mapping(cge,market_pfx,
 # balance of payments (exogenous)
@@ -537,15 +509,15 @@ lo = 0.0
 # labor income
         PL[r] * sum(le0[r,s] for s in set[:s])
 # capital income
-        + RK[r] * ks_m[r]
-        +sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in set[:s])
+            +sum((haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) * (ks_n[r,s]+ks_s[r,s]) for s in set[:s])
+            +sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in set[:s])
         #+ sum((haskey(PK.lookup[1], (r, s)) ? PK[(r,s)] : 1.0) * kd0[r,s] for s in set[:s])
 # provision of household supply
         + sum( (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * yh0[r,g] for g in set[:g])
 # revenue or costs of foreign exchange including household adjustment
         + PFX * (bopdef0[r] + hhadj[r])
-# government provision
-        - sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * (g0[r,g]) for g in set[:g])
+# government and investment provision
+        - sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * (g0[r,g] + i0[r,g]) for g in set[:g])
 # import taxes - assumes lumpsum recycling
         + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * MD[r,g] * PFX * tm[r,g] for g in set[:g] if (r,g) in set[:A])
 # taxes on intermediate demand - assumes lumpsum recycling
@@ -557,12 +529,7 @@ lo = 0.0
 );
 
 #----------
-# Reporting
-@mapping(cge, DKMdef[(r,s) in set[:PK]],
-        DKM[(r,s)]
-        -
-        YM[(r,s)]*AKym[r,s]
-);
+
 
 ####################################
 # -- Complementarity Conditions --
@@ -592,13 +559,7 @@ lo = 0.0
 
 #----------
 #Recursive Dynamics
-@complementarity(cge,profit_inv,INV);
-@complementarity(cge,profit_w,W);
-@complementarity(cge,market_pinv,PINV);
-@complementarity(cge,market_pw,PW);
 
-#Reporting
-@complementarity(cge,DKMdef,DKM);
 
 ####################
 # -- Model Solve --
@@ -610,47 +571,37 @@ PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cum
 # solve the model
 status = solveMCP(cge)
 
-# Pre-loop calculations
-ktot_mx = Dict((r,bmkyr) => value(ks_m[r]) + sum(value(ks_x[r,s]) for s in set[:s])
-    for r in set[:r])
+# !!!! Problem solving with growth rate - solver pointing to income_ra as culprit
+for t in 1:1
+    # !!!! Save for later when making investment better
+    #scale(r,s,t) = (1-delta)*(ks_n(r,s,"%bmkyr%")+ks_s(r,s,"%bmkyr%")+ks_x(r,s,"%bmkyr%")) / (i0(r,s)*(ir+delta));
+    #ks_n(r,s,t) = scale(r,s,t)*i0(r,s))*I.l(r,s)*(ir+delta);
+    #totcap = ks_n+ks_s+ks_x
 
-srv = 1-value(dr)
+    totcap = Dict((r,s) => value(ks_n[r,s])+value(ks_s[r,s])+value(ks_x[r,s])
+        for r in set[:r], s in set[:s])
 
-# Begin loop
-# !!!! consider defining empty dictionaries outside of the loop to store values for postproc
-# Been tested from 2017 to 2050 in 1 year increments
-for t in 2017:2020
-    @info("Begin loop prior to $t Solve.")
+    # scalecap = Dict((r,s) => (1-value(dr))*totcap[r,s]/(value(i0[r,s])*(value(ir)+value(dr)))
+    #     for r in set[:r], s in set[:s])
 
-    # !!!! Should growth rate be in here? Benchmark cannot replicate if not here.
-    newkm = Dict((r,t) => (ktot_mx[r,bmkyr]*(1+value(gr)) - ktot_mx[r,bmkyr]*srv) * result_value(INV[r])
-        for r in set[:r]);
-
-    dkml = Dict((r,s) => (haskey(DKM.lookup[1], (r,s)) ? result_value(DKM[(r,s)]) : 0.0)
-        for r in set[:r], s in set[:s]);
-
-    # !!!! Should old putty be frozen?
-    # ktot_m = Dict((r,t) => newkm[r,t] + value(ks_m[r])*srv - sum(value(thetax)*dkml[r,s]*srv for s in set[:s])
-    #     for r in set[:r]);
-    ktot_m = Dict((r,t) => newkm[r,t] + value(ks_m[r])*srv
-        for r in set[:r]);
-
-    for r in set[:r]
-        set_value(ks_m[r], ktot_m[r,t]);
+    # Update parameters for next period
+    for r in set[:r], s in set[:s]
+    #update capital endowments
+        set_value(ks_s[r,s], (1-value(dr)) * (value(ks_s[r,s]) + value(ks_n[r,s])));
+        set_value(ks_x[r,s], (1-value(dr)) * value(ks_x[r,s]));
+        set_value(ks_n[r,s], value(dr) * get(totcap,(r,s),0.0));
+        # set_value(ks_n[r,s], (value(ir)+value(dr)) * get(totcap,(r,s),0.0));
     end
-
-    yxl = Dict((r,s) => (haskey(YX.lookup[1], (r,s)) ? result_value(YX[(r,s)]) : 0.0)
-        for r in set[:r], s in set[:s]);
-
-    # !!!! Should old clay increase by frozen putty each period?
-    # ktot_x = Dict((r,s,t) => srv*yxl[r,s]*value(kd0[r,s]) + value(thetax)*dkml[r,s]*srv
-    #     for r in set[:r], s in set[:s]);
-    ktot_x = Dict((r,s,t) => srv*yxl[r,s]*value(kd0[r,s])
-        for r in set[:r], s in set[:s]);
 
     for r in set[:r], s in set[:s]
-        set_value(ks_x[r,s], ktot_x[r,s,t]);
+        set_value(ks_n[r,s], (1+value(gr))*value(ks_n[r,s]))
+        set_value(ks_s[r,s], (1+value(gr))*value(ks_s[r,s]))
+        set_value(ks_x[r,s], (1+value(gr))*value(ks_x[r,s]))
     end
+
+    #steady-state investment assumption test - check to see if no change in total capital
+    chkcap = Dict((r,s) => (value(ks_n[r,s])+value(ks_s[r,s])+value(ks_x[r,s]))/(value(kd0[r,s]))
+        for (r,s) in set[:PK])
 
     for r in set[:r], s in set[:s]
     #update labor endowments --- I think I need separate parameters for labor endowments versus demand
@@ -667,6 +618,7 @@ for t in 2017:2020
     # !!!! What should happen with i0?
     for r in set[:r], g in set[:g]
         set_value(g0[r,g], (1 + value(gr)) * value(g0[r,g]));
+        set_value(i0[r,g], (1 + value(gr)) * value(i0[r,g]));
         set_value(yh0[r,g], (1 + value(gr)) * value(yh0[r,g]));
     end
 
@@ -676,9 +628,7 @@ for t in 2017:2020
     #update consumption start value
     for r in set[:r]
         set_start_value(C[r], result_value(C[r])*(1+value(gr)));
-        set_start_value(INV[r], result_value(INV[r])*(1+value(gr)));
-        set_start_value(W[r], result_value(W[r])*(1+value(gr)));
-        set_start_value(RA[r], start_value(W[r])*value(w0[r]));
+        set_start_value(RA[r], start_value(C[r])*value(c0[r]));
     end
 
     #update exports start value
@@ -696,12 +646,16 @@ for t in 2017:2020
     end
 
     #update output variable start values
-    # !!!! Eventually you could get so much clay, that YM level value is negative (Divide by kd0?)
     for (r,s) in set[:Y]
-        set_start_value(YX[(r,s)], value(ks_x[r,s])/value(kd0[r,s])); # !!!! divide by kd0? Sensitive to thetax and dr
+        set_start_value(YX[(r,s)], (result_value(YX[(r,s)])*(1-value(dr))*(1+value(gr))));
         set_start_value(YM[(r,s)], (start_value(C[r]) - start_value(YX[(r,s)])));
-        set_start_value(DKM[(r,s)], start_value(YM[(r,s)])*value(kd0[r,s]));
     end
+    # for (r,s) in set[:Y]
+    #     set_start_value(YX[(r,s)], start_value(YX[(r,s)])*(1+value(gr)));
+    #     set_start_value(YM[(r,s)], start_value(YM[(r,s)])*(1+value(gr)));
+    # end
+    chkyxm = Dict((r,s) => start_value(YX[(r,s)])/start_value(YM[(r,s)]) for (r,s) in set[:Y])
+    chkkxm = Dict((r,s) => value(ks_x[r,s])/(value(ks_s[r,s])+value(ks_n[r,s])) for (r,s) in set[:Y])
 
     #update value shares
     for r in set[:r], s in set[:s]
@@ -718,7 +672,7 @@ for t in 2017:2020
     end
 
     #set up the options for the path solver
-    #PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=10000)
+    # PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
     PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
 
     # solve next period
