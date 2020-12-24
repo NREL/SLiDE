@@ -38,10 +38,10 @@ function read_file(path::Array{String,1}, file::GAMSInput; remove_notes::Bool=fa
 end
 
 
-function SLiDE.read_file(path::Array{String,1}, file::CSVInput; remove_notes::Bool=false)
+function read_file(path::Array{String,1}, file::CSVInput; remove_notes::Bool=false)
     filepath = joinpath(path..., file.name)
     df = SLiDE._read_csv(filepath)
-
+    
     if remove_notes && size(df,1) > 1
         df = SLiDE._remove_header(df, filepath)
         df = SLiDE._remove_footer(df)
@@ -51,7 +51,7 @@ function SLiDE.read_file(path::Array{String,1}, file::CSVInput; remove_notes::Bo
 end
 
 
-function read_file(path::Array{String,1}, file::XLSXInput; remove_notes::Bool=true)
+function read_file(path::Array{String,1}, file::XLSXInput; remove_notes::Bool=false)
     filepath = joinpath(path..., file.name)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
     
@@ -61,7 +61,7 @@ function read_file(path::Array{String,1}, file::XLSXInput; remove_notes::Bool=tr
 end
 
 
-function read_file(path::Array{String,1}, file::DataInput)
+function read_file(path::Array{String,1}, file::DataInput; remove_notes::Bool=false)
     df = read_file(path, convert_type(CSVInput, file))
     df = edit_with(df, Rename.(propertynames(df), file.col))
 
@@ -70,15 +70,15 @@ function read_file(path::Array{String,1}, file::DataInput)
 end
 
 
-function read_file(path::Array{String,1}, file::SetInput)
+function read_file(path::Array{String,1}, file::SetInput; remove_notes::Bool=false)
     filepath = joinpath(path..., file.name)
     df = _read_csv(filepath)
     return sort(df[:,1])
 end
 
 
-function read_file(path::String, file::T) where T <: File
-    return read_file([path], file)
+function read_file(path::String, file::T; remove_notes::Bool=false) where T <: File
+    return read_file([path], file; remove_notes=remove_notes)
 end
 
 
@@ -151,13 +151,13 @@ function _remove_header(df::DataFrame, filepath::String)
 
     # If only one column was read, maybe this is because there was a problem?
     if size(df,2) == 1
-        @warn("Removing header WITH reading ($filepath)")
+        # @warn("Removing header WITH reading ($filepath)")
         xf = DelimitedFiles.readdlm(filepath, ',', Any, '\n')
         HEAD = _find_header(xf)
         df = _read_csv(filepath; header = HEAD)
 
     elseif sum(missing_cols) > 0
-        @warn("Removing header without reading ($filepath)")
+        # @warn("Removing header without reading ($filepath)")
         HEAD = _find_header(df)
         df = rename(df[HEAD+1:end,:], Pair.(cols, Symbol.(ensurearray(df[HEAD,:]))))
     end
@@ -329,6 +329,7 @@ _load_as_type(::Type{Operate}, entry, type::Type{Symbol}) = _load_as_type(_load_
 _load_as_type(::Type{Parameter}, entry, type::Type{Array{Symbol,1}}) = _load_as_type(_load_index(entry), type)
 _load_as_type(::Type{T}, entry::Missing, type::Type{String}) where T <: Any = _load_as_type(T, "", type)        # if we're reading in dataframe with missing values
 
+
 """
     _load_case(entry::AbstractString)
 Standardizes string identifiers that indicate a case change (upper-to-lower or vice-versa)
@@ -439,7 +440,7 @@ function write_yaml(path::Array{String,1}, file::XLSXInput; overwrite::Bool=true
 end
 
 
-function SLiDE.write_yaml(path, files::Array{XLSXInput,1}; overwrite::Bool=true)
+function write_yaml(path, files::Array{XLSXInput,1}; overwrite::Bool=true)
     if length(unique(get_descriptor.(files))) < length(files)
         @error("Input XLSX files must have unique descriptors.")
     end
@@ -473,8 +474,8 @@ function run_yaml(filename::String; save::Bool=true)
         # Iteratively make all edits and update output data file in accordance with
         # operations defined in the input YAML file.
         println("  Parsing and standardizing...")
-        df = unique(edit_with(y; print_status = true))
-        _save_datastream(df, y; save = save)
+        df = unique(edit_with(y; print_status=true))
+        _save_datastream(df, y; save=save)
         return df
     else
         println("  Skipping... (not editable)")
@@ -491,11 +492,17 @@ end
 function run_yaml(files::Array{String,1}; save::Bool=true)
     @info("Standardize data files.")
     files = Dict(_inp_key(f, ".yml") => run_yaml(f) for f in files)
+
+    # Print message indicating which, if any, files could not be executed.
     unedited = [f for f in values(files) if typeof(f) == String]
     if length(unedited) > 0
         @warn(string("run_yaml() generated no output for:", string.("\n  ", unedited)...,
             "\nAdd \"Editable: true\" to yaml file to run automatically."))
     end
+
+    # !!!! Would be nice to track output directories created (output from _save_datastream)
+    # and delete after all of the edits in a directory have been made.
+
     return files
 end
 
@@ -503,8 +510,9 @@ end
 """
 """
 function _save_datastream(df::DataFrame, y::Dict; save = true)
-    save_path = save == true ? "" : save
-    ("Temporary" in keys(y) && y["Temporary"]) && (y["FileOut"] = "_" * y["FileOut"])
+    save_path = save==true ? "" : save
+    haskey(y,"Temporary")   && (y["FileOut"] = _temporary(y["FileOut"]))
+    haskey(y,"Development") && (y["FileOut"] = _development(y["FileOut"]))
 
     path = joinpath(save_path, ensurearray(y["PathOut"])...)
     file = joinpath(path, y["FileOut"])
@@ -512,8 +520,16 @@ function _save_datastream(df::DataFrame, y::Dict; save = true)
 
     println("  Saving $file...")
     CSV.write(file, df)
-    return nothing
+    return path
 end
+
+
+_temporary(x::String) = "__" * x
+_development(x::String) = "_" * x
+
+
+_isdevelopment(x::String) = match(r"^_[^_]", x) !== nothing
+_istemporary(x::String) = match(r"^_{2}[^_]", x) !== nothing
 
 
 """
@@ -522,9 +538,9 @@ Delete temporary files. These are pre-pended "_".
 function _delete_temporary(path::String)
     curr_dir = pwd()
     files = readdir(path)
-    files_temp = [file for file in files if file[1] == '_']
+    files = files[SLiDE._istemporary.(files)]
     cd(path)
-    [rm(file) for file in files_temp]
+    [rm(file) for file in files]
     cd(curr_dir)
     return nothing
 end
@@ -548,7 +564,7 @@ function split_gams(xf::Array{String,1}; colnames=[])
 
     if length(unique(length.(data))) == 1
         COLS = length(data[1])
-        cols = isempty(colnames) ? SLiDE._generate_id(COLS) : colnames
+        cols = isempty(colnames) ? _generate_id(COLS) : colnames
         data = if all(typeof.(data) .== Array{String,1})
             DataFrame(permutedims(hcat(data...)), cols)
         else

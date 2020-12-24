@@ -27,8 +27,8 @@ function partition(
     !(isempty(d_read)) && (return d_read)
     
     # Renaming i -> g and j -> s first, in supply/use data.
-    x = [Rename(:i,:g), Rename(:j,:s), Drop(:units, "all", "==")]
-    [d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), x) for k in [:supply, :use]]
+    x = [Deselect([:units],"=="), Rename(:i,:g), Rename(:j,:s)]
+    [d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), x) for k in [:supply,:use]]
 
     _partition_io!(d, set)
     

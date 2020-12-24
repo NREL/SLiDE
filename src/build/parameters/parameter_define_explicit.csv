@@ -1,0 +1,72 @@
+﻿parameter,index,name,units,tex,scope
+a0,"[yr,r,g]",Armington supply,billions of us dollars (USD),,regional
+a0,"[yr,g]",Armington supply,billions of us dollars (USD),,national
+bopdef0,[yr],Balance of payments,billions of us dollars (USD),,national
+bopdef0,"[yr,r]",Balance of payments,billions of us dollars (USD),,regional
+c0,"[yr,r]",Total final household consumption,billions of us dollars (USD),,regional
+cd0,"[yr,r,g]",Final demand,billions of us dollars (USD),,regional
+cif0,"[yr,g]",CIF/FOB Adjustments on Imports,billions of us dollars (USD),,national
+d0,"[r,g]",,,,share
+dc0,"[yr,r,g]",,billions of us dollars (USD),,regional
+dd0,"[yr,r,g]",State level demand,billions of us dollars (USD),,regional
+dd0max,"[yr,r,g]",Maximum regional demand from local market,billions of us dollars (USD),,regional
+dd0min,"[yr,r,g]",Minimum regional demand from local market,billions of us dollars (USD),,regional
+dm0,"[yr,r,g,m]",State level margin supply,billions of us dollars (USD),,regional
+duty0,"[yr,g]",Import duties,billions of us dollars (USD),,national
+fd0,"[yr,s,fdcat]",,,,regional
+fd0,"[yr,g,fd]",Final demand payments,billions of us dollars (USD),,national
+fe0,"[yr,r]",Total factor demand,billions of us dollars (USD),,regional
+fs0,"[yr,g]",Household production,billions of us dollars (USD),,national
+g0,"[yr,r,g]",Government demand,billions of us dollars (USD),,regional
+hhadj,"[yr,r]",Household adjustment,billions of us dollars (USD),,regional
+i0,"[yr,r,g]",Investment demand,billions of us dollars (USD),,regional
+id0,"[yr,r,g,s]",Intermediate demand,billions of us dollars (USD),,regional
+id0,"[yr,g,s]",Intermediate demand,billions of us dollars (USD),,national
+kd0,"[yr,r,s]",Capital demand,billions of us dollars (USD),,regional
+labor,"[yr,r,s]",,,,share
+ld0,"[yr,r,s]",Labor demand,billions of us dollars (USD),,regional
+m0,"[yr,r,g]",Imports,billions of us dollars (USD),,regional
+m0,"[yr,g]",Imports,billions of us dollars (USD),,national
+md0,"[yr,r,m,g]",Margin demand,billions of us dollars (USD),,regional
+md0,"[yr,m,g]",Margin demand,billions of us dollars (USD),,national
+mn0,"[r,g]",,,,share
+mrg0,"[yr,g]",Trade margins,billions of us dollars (USD),,national
+mrgshr,"[yr,r,m]",Share of margin demand by region,USD/USD,"""\\alpha_{yr,r,m}^{md}""",regional
+mrt0,"[orig,dest,g]",,,,share
+ms0,"[yr,g,m]",Margin supply,billions of us dollars (USD),,national
+ms0tot,"[yr,r,g,m]",Designate total supply of margins,billions of us dollars (USD),"""\\hat{ms}_{yr,r,m,g}""",regional
+nd0,"[yr,r,g]",National demand,billions of us dollars (USD),,regional
+nd0max,"[yr,r,g]",Maximum regional demand from national market,billions of us dollars (USD),,regional
+nd0min,"[yr,r,g]",Minimum regional demand from national market,billions of us dollars (USD),,regional
+nm0,"[yr,r,g,m]",National margin supply,billions of us dollars (USD),,regional
+pce,"[yr,r,g]",,,,share
+pt0,"[yr,r,g]",,billions of us dollars (USD),,regional
+region,"[yr,r,s]",,,,share
+rpc,"[r,g]",,,,share
+rx0,"[yr,r,g]",,,,regional
+s0,"[yr,s]",Aggregate supply,billions of us dollars (USD),,national
+s0,"[yr,r,g]",Aggregate supply,billions of us dollars (USD),,regional
+sbd0,"[yr,g]",Subsidies on products,billions of us dollars (USD),,national
+sgf,"[yr,r,g]",,,,share
+shrtrd,"[yr,r,g,m]",Share of margin total by margin type,USD/USD,"""\\beta_{yr,r,g,m}^{mar}""",regional
+ta0,"[yr,r,g]",Tax net subsidy rate on intermediate demand,USD/USD,,regional
+ta0,"[yr,g]",Tax net subsidy rate on intermediate demand,USD/USD,,national
+tax0,"[yr,g]",Taxes on products,billions of us dollars (USD),,national
+thetaa,"[yr,r,g]",Share of regional absorption,USD/USD,,regional
+tm0,"[yr,r,g]",Import tariff,USD/USD,,regional
+tm0,"[yr,g]",Import tariff,USD/USD,,national
+trn0,"[yr,g]",Transportation costs,billions of us dollars (USD),,national
+ts0,"[yr,ts,s]",Taxes and subsidiex,billions of us dollars (USD),,national
+ty0,"[yr,r,s]",Production tax rate,USD/USD,,regional
+utd,"[yr,r,g,t]",,,,share
+va0,"[yr,va,s]",Value added factor demand,billions of us dollars (USD),,national
+va0,"[yr,r,s]",Regional value added,billions of us dollars (USD),,regional
+x0,"[yr,r,g]",Foreign exports,billions of us dollars (USD),,regional
+x0,"[yr,g]",Foreign exports,billions of us dollars (USD),,national
+xd0,"[yr,r,g]",State level supply,billions of us dollars (USD),,regional
+xn0,"[yr,r,g]",National supply,billions of us dollars (USD),,regional
+xn0,"[r,g]",National supply,,,share
+y0,"[yr,g]",Gross output (net margin supply),billions of us dollars (USD),,national
+yh0,"[yr,r,g]",Household production,billions of us dollars (USD),,regional
+ys0,"[yr,s,g]",Sectoral supply (with byproducts),billions of us dollars (USD),,national
+ys0,"[yr,r,s,g]",Sectoral supply (with byproducts),billions of us dollars (USD),,regional

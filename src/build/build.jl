@@ -42,11 +42,11 @@ function build_data(
 
     if |(isempty(d), isempty(set), overwrite)
         if isempty(set)
-            set = read_from(joinpath("src","readfiles","setlist.yml"))
+            set = read_from(joinpath("src","readfiles","setlist_1.0.yml"))  # !!!! version
             write_build(dataset, SET_DIR, set)
         end
         
-        io = read_from(joinpath("src","readfiles","build","partitioninp.yml"))
+        io = read_from(joinpath("src","readfiles","build","partitioninp_1.0.yml"))  # !!!! version
 
         io = partition(dataset, io, set; save_build = save_build, overwrite = overwrite)
         cal = calibrate(dataset, io, set; save_build = save_build, overwrite = overwrite)

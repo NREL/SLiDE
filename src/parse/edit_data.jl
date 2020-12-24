@@ -361,7 +361,7 @@ end
 function edit_with(
     files::Array{T},
     y::Dict{Any,Any};
-    print_status::Bool = false) where T<:File
+    print_status::Bool=false) where T<:File
     
     df = [[edit_with(file, y; print_status = print_status) for file in files]...;]
     df = dropzero(df)
@@ -372,11 +372,11 @@ function edit_with(
 end
 
 
-function edit_with(y::Dict{Any,Any}; print_status::Bool = false)
+function edit_with(y::Dict{Any,Any}; print_status::Bool=false)
     # Find all dictionary keys corresponding to file names and save these in a list to
     # read, edit, and concattenate.
     files = ensurearray(values(find_oftype(y, File)))
-    return edit_with(files, y; print_status = print_status)
+    return edit_with(files, y; print_status=print_status)
 end
 
 
@@ -387,11 +387,12 @@ function _filter_datastream(df::DataFrame, y::Dict)
     path = joinpath("data","coresets")
     set = Dict()
     if "Filter" in keys(y)
-        y["Filter"] in [true,"year"]  && push!(set, :yr => read_file(joinpath(path,"yr.csv"))[:,1])
+        # !!!! version matters
+        y["Filter"] in [true,"year"]  && push!(set, :yr => read_file(joinpath(path,"yr","yr_1.0.csv"))[:,1])
         y["Filter"] in [true,"state"] && push!(set, :r => read_file(joinpath(path,"r","state.csv"))[:,1])
     end
 
-    !isempty(set) && (df = filter_with(df, set; extrapolate = true))
+    !isempty(set) && (df = filter_with(df, set; extrapolate=false))
     return df
 end
 
@@ -484,7 +485,7 @@ _expand_range(x::Int) = x
 """
 function _group_by(df::DataFrame, x::OrderedGroup)
     id = x.val[1]
-    colid = SLiDE._add_id.(id,x.on)
+    colid = append.(convert_type(Symbol,id), x.on)
     cols = unique([propertynames(df); colid])
     
     # Find the line where each group begins and ends.
