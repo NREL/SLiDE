@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Filter and Resize · SLiDE.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">SLiDE.jl</span></div><form class="docs-search" action="../../search.html"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../index.html">Home</a></li><li><span class="tocitem">Introduction</span><ul><li><input class="collapse-toggle" id="menuitem-2-1" type="checkbox"/><label class="tocitem" for="menuitem-2-1"><span class="docs-label">Data</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../man/data/overview.html">Overview</a></li><li><a class="tocitem" href="../../man/data/preparation.html">Preparation</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-2" type="checkbox"/><label class="tocitem" for="menuitem-2-2"><span class="docs-label">Build</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../man/build/overview.html">Overview</a></li><li><a class="tocitem" href="../../man/build/partition.html">Partition</a></li><li><a class="tocitem" href="../../man/build/share.html">Share</a></li><li><a class="tocitem" href="../../man/build/disagg.html">Disaggregate</a></li></ul></li><li><a class="tocitem" href="../../man/scaling.html">Scaling</a></li><li><a class="tocitem" href="../../man/parameters.html">Parameters</a></li></ul></li><li><span class="tocitem">API</span><ul><li><input class="collapse-toggle" id="menuitem-3-1" type="checkbox"/><label class="tocitem" for="menuitem-3-1"><span class="docs-label">Types</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../types/parse.html">Parsing</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-3-2" type="checkbox" checked/><label class="tocitem" for="menuitem-3-2"><span class="docs-label">Functions</span><i class="docs-chevron"></i></label><ul class="collapsed"><li class="is-active"><a class="tocitem" href="filter.html">Filter and Resize</a><ul class="internal"><li class="toplevel"><a class="tocitem" href="#Filter"><span>Filter</span></a></li><li class="toplevel"><a class="tocitem" href="#Fill"><span>Fill</span></a></li></ul></li><li><a class="tocitem" href="parse.html">Parse</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-3-3" type="checkbox"/><label class="tocitem" for="menuitem-3-3"><span class="docs-label">Internals</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../internals/build.html">-</a></li><li><a class="tocitem" href="../internals/parse.html">Parse</a></li></ul></li></ul></li><li><a class="tocitem" href="../model.html">Model</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">API</a></li><li><a class="is-disabled">Functions</a></li><li class="is-active"><a href="filter.html">Filter and Resize</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="filter.html">Filter and Resize</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/NREL/SLiDE/blob/master/docs/src/api/functions/filter.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Filter-and-Resize"><a class="docs-heading-anchor" href="#Filter-and-Resize">Filter and Resize</a><a id="Filter-and-Resize-1"></a><a class="docs-heading-anchor-permalink" href="#Filter-and-Resize" title="Permalink"></a></h1><h1 id="Filter"><a class="docs-heading-anchor" href="#Filter">Filter</a><a id="Filter-1"></a><a class="docs-heading-anchor-permalink" href="#Filter" title="Permalink"></a></h1><article class="docstring"><header><a class="docstring-binding" id="SLiDE.filter_with" href="#SLiDE.filter_with"><code>SLiDE.filter_with</code></a> — <span class="docstring-category">Function</span></header><section><div><p>filter_with(df::DataFrame, set::Any; kwargs...)</p><p><strong>Arguments</strong></p><ul><li><code>df::DataFrame</code> to filter.</li><li><code>set::Dict</code> or <code>set::NamedTuple</code>: Values to keep in the DataFrame.</li></ul><p><strong>Keywords</strong></p><ul><li><code>extrapolate::Bool = false</code>: Add missing regions/years to the DataFrame?   If <code>extrapolate</code> is set to true, the following <code>kwargs</code> become relevant:<ul><li>When extrapolating over years,<ul><li><code>backward::Bool = true</code>: Do we extrapolate backward in time?</li><li><code>forward::Bool = true</code>: Do we extrapolate forward in time?</li></ul>Currently, &quot;extrapolating&quot; means copying the closest </li><li>When extrapolating across regions,<ul><li><code>r::Pair = &quot;md&quot; =&gt; &quot;dc</code>: <code>Pair</code> indicating a region (<code>r.first</code>) to extrapolate to   another region (<code>r.second</code>). A suggested regional extrapolation: MD data will be   used to approximate DC data in the event that it is missing.</li><li><code>overwrite::Bool = false</code>: If data in the target region <code>r.second</code> is already present,   should it be overwritten?</li></ul></li></ul></li></ul><p><strong>Returns</strong></p><ul><li><code>df::DataFrame</code> with only the desired keys.</li></ul><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; df = read_file(joinpath(SLIDE_DIR,&quot;docs&quot;,&quot;src&quot;,&quot;assets&quot;,&quot;data&quot;,&quot;filter_use.csv&quot;))
+14×4 DataFrame
+│ Row │ yr    │ i      │ j      │ value   │
+│     │ Int64 │ String │ String │ Float64 │
+├─────┼───────┼────────┼────────┼─────────┤
+│ 1   │ 2015  │ agr    │ agr    │ 69.42   │
+│ 2   │ 2015  │ agr    │ fbp    │ 277.179 │
+│ 3   │ 2015  │ fbp    │ agr    │ 49.132  │
+│ 4   │ 2015  │ fbp    │ fbp    │ 210.998 │
+│ 5   │ 2015  │ uti    │ agr    │ 4.846   │
+│ 6   │ 2015  │ uti    │ fbp    │ 10.102  │
+│ 7   │ 2015  │ uti    │ uti    │ 35.093  │
+│ 8   │ 2016  │ agr    │ agr    │ 60.197  │
+│ 9   │ 2016  │ agr    │ fbp    │ 264.173 │
+│ 10  │ 2016  │ fbp    │ agr    │ 47.739  │
+│ 11  │ 2016  │ fbp    │ fbp    │ 205.21  │
+│ 12  │ 2016  │ uti    │ agr    │ 4.548   │
+│ 13  │ 2016  │ uti    │ fbp    │ 9.152   │
+│ 14  │ 2016  │ uti    │ uti    │ 27.47   │
+
+julia&gt; df = filter_with(df, (i = [&quot;agr&quot;,&quot;fbp&quot;], j = [&quot;agr&quot;,&quot;fbp&quot;]))
+8×4 DataFrame
+│ Row │ yr    │ i      │ j      │ value   │
+│     │ Int64 │ String │ String │ Float64 │
+├─────┼───────┼────────┼────────┼─────────┤
+│ 1   │ 2015  │ agr    │ agr    │ 69.42   │
+│ 2   │ 2015  │ agr    │ fbp    │ 277.179 │
+│ 3   │ 2015  │ fbp    │ agr    │ 49.132  │
+│ 4   │ 2015  │ fbp    │ fbp    │ 210.998 │
+│ 5   │ 2016  │ agr    │ agr    │ 60.197  │
+│ 6   │ 2016  │ agr    │ fbp    │ 264.173 │
+│ 7   │ 2016  │ fbp    │ agr    │ 47.739  │
+│ 8   │ 2016  │ fbp    │ fbp    │ 205.21  │
+
+julia&gt; filter_with(df, (yr = 2016,); drop = true)
+4×3 DataFrame
+│ Row │ i      │ j      │ value   │
+│     │ String │ String │ Float64 │
+├─────┼────────┼────────┼─────────┤
+│ 1   │ agr    │ agr    │ 60.197  │
+│ 2   │ agr    │ fbp    │ 264.173 │
+│ 3   │ fbp    │ agr    │ 47.739  │
+│ 4   │ fbp    │ fbp    │ 205.21  │</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/NREL/SLiDE/blob/707518d2d71a144611ccc6def180470bc528ee15/src/parse/edit_data.jl#L897-L968">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="SLiDE.extrapolate_year" href="#SLiDE.extrapolate_year"><code>SLiDE.extrapolate_year</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">extrapolate_year(df::DataFrame, yr::Array{Int64,1}; kwargs...)
+extrapolate_year(df::DataFrame, set::Any; kwargs...)</code></pre><p><strong>Arguments</strong></p><ul><li><code>df::DataFrame</code> that might be in need of extrapolation.</li><li><code>yr::Array{Int64,1}</code>: List of years overwhich extrapolation is possible (depending on the kwargs)</li><li><code>set::Dict</code> or <code>set::NamedTuple</code> containing list of years, identified by the key <code>:yr</code>.</li></ul><p><strong>Keywords</strong></p><ul><li><code>backward::Bool = true</code>: Do we extrapolate backward in time?</li><li><code>forward::Bool = true</code>: Do we extrapolate forward in time?</li></ul><p><strong>Returns</strong></p><ul><li><code>df::DataFrame</code> extrapolated in time.</li></ul><p><strong>Example</strong></p><p>Continuing with the DataFrame from <a href="filter.html#SLiDE.filter_with"><code>SLiDE.filter_with</code></a>,</p><pre><code class="language-julia-repl">julia&gt; df
+8×4 DataFrame
+│ Row │ yr    │ i      │ j      │ value   │
+│     │ Int64 │ String │ String │ Float64 │
+├─────┼───────┼────────┼────────┼─────────┤
+│ 1   │ 2015  │ agr    │ agr    │ 69.42   │
+│ 2   │ 2015  │ agr    │ fbp    │ 277.179 │
+│ 3   │ 2015  │ fbp    │ agr    │ 49.132  │
+│ 4   │ 2015  │ fbp    │ fbp    │ 210.998 │
+│ 5   │ 2016  │ agr    │ agr    │ 60.197  │
+│ 6   │ 2016  │ agr    │ fbp    │ 264.173 │
+│ 7   │ 2016  │ fbp    │ agr    │ 47.739  │
+│ 8   │ 2016  │ fbp    │ fbp    │ 205.21  │
+
+julia&gt; extrapolate_year(df, Dict(:yr =&gt; 2014:2017))
+16×4 DataFrame
+│ Row │ yr    │ i      │ j      │ value   │
+│     │ Int64 │ String │ String │ Float64 │
+├─────┼───────┼────────┼────────┼─────────┤
+│ 1   │ 2014  │ agr    │ agr    │ 69.42   │
+│ 2   │ 2014  │ agr    │ fbp    │ 277.179 │
+│ 3   │ 2014  │ fbp    │ agr    │ 49.132  │
+│ 4   │ 2014  │ fbp    │ fbp    │ 210.998 │
+│ 5   │ 2015  │ agr    │ agr    │ 69.42   │
+│ 6   │ 2015  │ agr    │ fbp    │ 277.179 │
+│ 7   │ 2015  │ fbp    │ agr    │ 49.132  │
+│ 8   │ 2015  │ fbp    │ fbp    │ 210.998 │
+│ 9   │ 2016  │ agr    │ agr    │ 60.197  │
+│ 10  │ 2016  │ agr    │ fbp    │ 264.173 │
+│ 11  │ 2016  │ fbp    │ agr    │ 47.739  │
+│ 12  │ 2016  │ fbp    │ fbp    │ 205.21  │
+│ 13  │ 2017  │ agr    │ agr    │ 60.197  │
+│ 14  │ 2017  │ agr    │ fbp    │ 264.173 │
+│ 15  │ 2017  │ fbp    │ agr    │ 47.739  │
+│ 16  │ 2017  │ fbp    │ fbp    │ 205.21  │</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/NREL/SLiDE/blob/707518d2d71a144611ccc6def180470bc528ee15/src/parse/edit_data.jl#L687-L743">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="SLiDE.extrapolate_region" href="#SLiDE.extrapolate_region"><code>SLiDE.extrapolate_region</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">extrapolate_region(df::DataFrame; kwargs...)
+extrapolate_region(df::DataFrame, r::Pair; kwargs...)</code></pre><p>Fills in missing data in the input DataFrame <code>df</code> by filling it with existing information in <code>df</code>. Here, &quot;extrapolate&quot; makes a direct copy of the data.</p><p><strong>Arguments</strong></p><ul><li><code>df::DataFrame</code> that might be in need of extrapolation.</li><li><code>r::Pair = &quot;md&quot; =&gt; &quot;dc</code>: <code>Pair</code> indicating a region (<code>r.first</code>) to extrapolate to another   region (<code>r.second</code>). A suggested regional extrapolation: MD data will be used to   approximate DC data in the event that it is missing. To fill multiple regions with data,   use &quot;md&quot; =&gt; [&quot;dc&quot;,&quot;va&quot;].</li></ul><p><strong>Keyword Argument:</strong></p><ul><li><code>overwrite::Bool = false</code>: If data in the target region <code>r.second</code> is already present,   should it be overwritten?</li></ul><p><strong>Returns</strong></p><ul><li><code>df::DataFrame</code> extrapolated in region.</li></ul><p><strong>Example</strong></p><pre><code class="language-julia-repl">julia&gt; df = read_file(joinpath(SLIDE_DIR,&quot;docs&quot;,&quot;src&quot;,&quot;assets&quot;,&quot;data&quot;,&quot;filter_utd.csv&quot;))
+8×5 DataFrame
+│ Row │ yr    │ r      │ s      │ t       │ value     │
+│     │ Int64 │ String │ String │ String  │ Float64   │
+├─────┼───────┼────────┼────────┼─────────┼───────────┤
+│ 1   │ 2015  │ md     │ agr    │ exports │ 0.0390152 │
+│ 2   │ 2015  │ md     │ agr    │ imports │ 0.778159  │
+│ 3   │ 2015  │ va     │ agr    │ exports │ 1.11601   │
+│ 4   │ 2015  │ va     │ agr    │ imports │ 0.88253   │
+│ 5   │ 2016  │ md     │ agr    │ exports │ 0.0330508 │
+│ 6   │ 2016  │ md     │ agr    │ imports │ 0.762089  │
+│ 7   │ 2016  │ va     │ agr    │ exports │ 1.16253   │
+│ 8   │ 2016  │ va     │ agr    │ imports │ 0.86741   │
+
+julia&gt; extrapolate_region(df)
+12×5 DataFrame
+│ Row │ r      │ yr    │ s      │ t       │ value     │
+│     │ String │ Int64 │ String │ String  │ Float64   │
+├─────┼────────┼───────┼────────┼─────────┼───────────┤
+│ 1   │ dc     │ 2015  │ agr    │ exports │ 0.0390152 │
+│ 2   │ dc     │ 2015  │ agr    │ imports │ 0.778159  │
+│ 3   │ dc     │ 2016  │ agr    │ exports │ 0.0330508 │
+│ 4   │ dc     │ 2016  │ agr    │ imports │ 0.762089  │
+│ 5   │ md     │ 2015  │ agr    │ exports │ 0.0390152 │
+│ 6   │ md     │ 2015  │ agr    │ imports │ 0.778159  │
+│ 7   │ md     │ 2016  │ agr    │ exports │ 0.0330508 │
+│ 8   │ md     │ 2016  │ agr    │ imports │ 0.762089  │
+│ 9   │ va     │ 2015  │ agr    │ exports │ 1.11601   │
+│ 10  │ va     │ 2015  │ agr    │ imports │ 0.88253   │
+│ 11  │ va     │ 2016  │ agr    │ exports │ 1.16253   │
+│ 12  │ va     │ 2016  │ agr    │ imports │ 0.86741   │</code></pre><p>If we instead want to copy VA data into DC, specify:</p><pre><code class="language-julia-repl">julia&gt; extrapolate_region(df, &quot;va&quot; =&gt; &quot;dc&quot;)
+12×5 DataFrame
+│ Row │ r      │ yr    │ s      │ t       │ value     │
+│     │ String │ Int64 │ String │ String  │ Float64   │
+├─────┼────────┼───────┼────────┼─────────┼───────────┤
+│ 1   │ dc     │ 2015  │ agr    │ exports │ 1.11601   │
+│ 2   │ dc     │ 2015  │ agr    │ imports │ 0.88253   │
+│ 3   │ dc     │ 2016  │ agr    │ exports │ 1.16253   │
+│ 4   │ dc     │ 2016  │ agr    │ imports │ 0.86741   │
+│ 5   │ md     │ 2015  │ agr    │ exports │ 0.0390152 │
+│ 6   │ md     │ 2015  │ agr    │ imports │ 0.778159  │
+│ 7   │ md     │ 2016  │ agr    │ exports │ 0.0330508 │
+│ 8   │ md     │ 2016  │ agr    │ imports │ 0.762089  │
+│ 9   │ va     │ 2015  │ agr    │ exports │ 1.11601   │
+│ 10  │ va     │ 2015  │ agr    │ imports │ 0.88253   │
+│ 11  │ va     │ 2016  │ agr    │ exports │ 1.16253   │
+│ 12  │ va     │ 2016  │ agr    │ imports │ 0.86741   │</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/NREL/SLiDE/blob/707518d2d71a144611ccc6def180470bc528ee15/src/parse/edit_data.jl#L802-L880">source</a></section></article><h1 id="Fill"><a class="docs-heading-anchor" href="#Fill">Fill</a><a id="Fill-1"></a><a class="docs-heading-anchor-permalink" href="#Fill" title="Permalink"></a></h1><article class="docstring"><header><a class="docstring-binding" id="SLiDE.fill_zero" href="#SLiDE.fill_zero"><code>SLiDE.fill_zero</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">fill_zero(keys_unique::NamedTuple; value_colnames)
+fill_zero(keys_unique::NamedTuple, df::DataFrame)
+fill_zero(df::DataFrame...)
+fill_zero(d::Dict...)
+fill_zero(keys_unique, d::Dict)</code></pre><p>This function can be used to fill zeros in either a dictionary or DataFrame.</p><ul><li>Options for dictionary editing:<ul><li>If only (a) dictionary/ies is/are input, the dictionaries will be edited such that   they all contain all permutations of their key values. All dictionaries in a   resultant list of dictionaries will be the same length.</li><li>If a dictionary is input with a list of keys, it will be edited to ensure that it   includes all permutations.</li><li>If only a list of keys is input, a new dictionary will be created, containing all key   permutations with values initialized to zero.</li></ul></li><li>Options for DataFrame editing:<ul><li>If only (a) DataFrame(s) is/are input, the DataFrame(s) will be edited such that   they all contain all permutations of their key values. All DataFrames in a   resultant list of DataFrames will be the same length.</li><li>If a DataFrame is input with a NamedTuple, it will be edited to ensure that it   includes all permutations of the NamedTuple&#39;s values.</li><li>If only a NamedTuple is input, a new DataFrame will be created, containing all key   permutations with values initialized to zero.</li></ul></li></ul><p><strong>Arguments</strong></p><ul><li><code>keys_unique::Tuple</code>: A list of arrays whose permutations should be included in the   resultant dictionary.</li><li><code>keys_unique::NamedTuple</code>: A list of arrays whose permutations should be included in the   resultant dictionary. The NamedTuple&#39;s keys correspond to the DataFrame columns where   they will be stored.</li><li><code>d::Dict...</code>: The dictionary/ies to edit.</li><li><code>df::DataFrame...</code>: The DataFrame(s) to edit.</li></ul><p><strong>Keywords</strong></p><ul><li><code>value_colnames::Any = :value</code>: &quot;value&quot; column labels to add and set to zero when creating   a new DataFrame. Default is <code>:value</code>.</li></ul><p><strong>Returns</strong></p><ul><li><code>d::Dict...</code> if input included dictionaries and/or Tuples</li><li><code>df::DataFrame...</code> if input included DataFrames and/or NamedTuples</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/NREL/SLiDE/blob/707518d2d71a144611ccc6def180470bc528ee15/src/parse/edit_data.jl#L515-L556">source</a></section></article><p><strong>Initialize a new DataFrame or dictionary.</strong></p><pre><code class="language-julia-repl">julia&gt; years = 2015:2016; regions = [&quot;md&quot;,&quot;va&quot;];
+
+julia&gt; fill_zero((years, regions))
+Dict{Tuple{Int64,String},Float64} with 4 entries:
+  (2015, &quot;va&quot;) =&gt; 0.0
+  (2015, &quot;md&quot;) =&gt; 0.0
+  (2016, &quot;md&quot;) =&gt; 0.0
+  (2016, &quot;va&quot;) =&gt; 0.0
+
+julia&gt; fill_zero((yr = years, r = regions))
+4×3 DataFrame
+│ Row │ yr    │ r      │ value   │
+│     │ Int64 │ String │ Float64 │
+├─────┼───────┼────────┼─────────┤
+│ 1   │ 2015  │ md     │ 0.0     │
+│ 2   │ 2016  │ md     │ 0.0     │
+│ 3   │ 2015  │ va     │ 0.0     │
+│ 4   │ 2016  │ va     │ 0.0     │</code></pre><p><strong>Edit an existing DataFrame or dictionary.</strong></p><pre><code class="language-julia-repl">julia&gt; df = read_file(joinpath(SLIDE_DIR,&quot;docs&quot;,&quot;src&quot;,&quot;assets&quot;,&quot;data&quot;,&quot;fill_use.csv&quot;))
+6×4 DataFrame
+│ Row │ yr    │ i      │ j      │ value   │
+│     │ Int64 │ String │ String │ Float64 │
+├─────┼───────┼────────┼────────┼─────────┤
+│ 1   │ 2015  │ agr    │ agr    │ 69.42   │
+│ 2   │ 2015  │ uti    │ agr    │ 4.846   │
+│ 3   │ 2015  │ uti    │ uti    │ 35.093  │
+│ 4   │ 2016  │ agr    │ agr    │ 60.197  │
+│ 5   │ 2016  │ uti    │ agr    │ 4.548   │
+│ 6   │ 2016  │ uti    │ uti    │ 27.47   │
+
+julia&gt; fill_zero(df)
+8×4 DataFrame
+│ Row │ yr     │ i       │ j       │ value   │
+│     │ Int64? │ String? │ String? │ Float64 │
+├─────┼────────┼─────────┼─────────┼─────────┤
+│ 1   │ 2015   │ agr     │ agr     │ 69.42   │
+│ 2   │ 2016   │ agr     │ agr     │ 60.197  │
+│ 3   │ 2015   │ uti     │ agr     │ 4.846   │
+│ 4   │ 2016   │ uti     │ agr     │ 4.548   │
+│ 5   │ 2015   │ agr     │ uti     │ 0.0     │
+│ 6   │ 2016   │ agr     │ uti     │ 0.0     │
+│ 7   │ 2015   │ uti     │ uti     │ 35.093  │
+│ 8   │ 2016   │ uti     │ uti     │ 27.47   │</code></pre><pre><code class="language-julia-repl">julia&gt; d = convert_type(Dict, df)
+Dict{Tuple{Int64,String,String},Float64} with 6 entries:
+  (2015, &quot;uti&quot;, &quot;uti&quot;) =&gt; 35.093
+  (2016, &quot;agr&quot;, &quot;agr&quot;) =&gt; 60.197
+  (2015, &quot;agr&quot;, &quot;agr&quot;) =&gt; 69.42
+  (2016, &quot;uti&quot;, &quot;uti&quot;) =&gt; 27.47
+  (2015, &quot;uti&quot;, &quot;agr&quot;) =&gt; 4.846
+  (2016, &quot;uti&quot;, &quot;agr&quot;) =&gt; 4.548
+
+julia&gt; fill_zero(d)
+┌ Warning: Depreciated!
+└ @ SLiDE ~/Documents/Git/SLiDE/src/parse/edit_data.jl:665
+Dict{Tuple{Int64,String,String},Float64} with 6 entries:
+  (2015, &quot;uti&quot;, &quot;uti&quot;) =&gt; 35.093
+  (2016, &quot;agr&quot;, &quot;agr&quot;) =&gt; 60.197
+  (2015, &quot;agr&quot;, &quot;agr&quot;) =&gt; 69.42
+  (2016, &quot;uti&quot;, &quot;uti&quot;) =&gt; 27.47
+  (2015, &quot;uti&quot;, &quot;agr&quot;) =&gt; 4.846
+  (2016, &quot;uti&quot;, &quot;agr&quot;) =&gt; 4.548</code></pre><article class="docstring"><header><a class="docstring-binding" id="SLiDE.fill_with" href="#SLiDE.fill_with"><code>SLiDE.fill_with</code></a> — <span class="docstring-category">Function</span></header><section><div><p>Initialize a new DataFrame and fills it with the specified input value.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/NREL/SLiDE/blob/707518d2d71a144611ccc6def180470bc528ee15/src/parse/edit_data.jl#L677-L679">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../types/parse.html">« Parsing</a><a class="docs-footer-nextpage" href="parse.html">Parse »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 6 January 2021 08:53">Wednesday 6 January 2021</span>. Using Julia version 1.5.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

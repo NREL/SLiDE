@@ -1,0 +1,9 @@
+GeoFIPS,GeoName,Region,TableName,ComponentName,Unit,IndustryId,IndustryClassification,Description,2016,2017
+00000,United States*,,SAGDP2N,Gross domestic product (GDP) by state,Millions of current dollars,1,,All industry total,18707189.0,19485394.0
+00000,United States*,,SAGDP2N,Gross domestic product (GDP) by state,Millions of current dollars,2,, Private industries,16319357.2,17031689.7
+00000,United States*,,SAGDP2N,Gross domestic product (GDP) by state,Millions of current dollars,3,11,"  Agriculture, forestry, fishing, and hunting",164913.2,169225.2
+00000,United States*,,SAGDP2N,Gross domestic product (GDP) by state,Millions of current dollars,4,111-112,   Farms,129458.0,(NA)
+24000,Maryland,2,SAGDP2N,Gross domestic product (GDP) by state,Millions of current dollars,1,,All industry total,384376.8,399537.9
+24000,Maryland,2,SAGDP2N,Gross domestic product (GDP) by state,Millions of current dollars,2,, Private industries,306028.2,318703.6
+24000,Maryland,2,SAGDP2N,Gross domestic product (GDP) by state,Millions of current dollars,3,11,"  Agriculture, forestry, fishing, and hunting",867.3,914.1
+24000,Maryland,2,SAGDP2N,Gross domestic product (GDP) by state,Millions of current dollars,4,111-112,   Farms,730.8,(NA)
