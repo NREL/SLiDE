@@ -387,8 +387,7 @@ function _filter_datastream(df::DataFrame, y::Dict)
     path = joinpath("data","coresets")
     set = Dict()
     if "Filter" in keys(y)
-        # !!!! version matters
-        y["Filter"] in [true,"year"]  && push!(set, :yr => read_file(joinpath(path,"yr","yr_1.0.csv"))[:,1])
+        y["Filter"] in [true,"year"]  && push!(set, :yr => read_file(joinpath(path,"yr","yr_1.0.1.csv"))[:,1]) # !!!! version
         y["Filter"] in [true,"state"] && push!(set, :r => read_file(joinpath(path,"r","state.csv"))[:,1])
     end
 

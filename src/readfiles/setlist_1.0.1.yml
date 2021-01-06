@@ -1,7 +1,7 @@
 Path: [data, coresets]
 
 SetInput:
-  - {descriptor: yr,         name: [yr, yr_1.0.csv]}
+  - {descriptor: yr,         name: [yr, yr_1.0.1.csv]}
   - {descriptor: r,          name: [r, state.csv]}
   - {descriptor: s,          name: [s, summary.csv]}
   - {descriptor: g,          name: [s, summary.csv]}

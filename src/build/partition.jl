@@ -19,7 +19,8 @@ function partition(
     set::Dict;
     save_build::Bool = DEFAULT_SAVE_BUILD,
     overwrite::Bool = DEFAULT_OVERWRITE
-    )
+)
+    # !!!! different for "detailed" sector as not to overwrite.
     CURR_STEP = "partition"
     
     # If there is already partition data, read it and return.
@@ -185,6 +186,9 @@ function _partition_fd0!(d::Dict, set::Dict)
     println("  Partitioning fd0, final demand")
     d[:fd0] = filter_with(d[:use], (g = set[:g],  s = set[:fd]))
     d[:fd0] = edit_with(d[:fd0], Rename(:s, :fd))
+
+    # d[:fd0][.&(d[:fd0][:,:fd] .== "pce", d[:fd0][:,:value] .< 0),:value] .= 0.0
+    # !!!! set = 0 for pce.
     return d[:fd0]
 end
 
@@ -225,12 +229,14 @@ Adjust transport margins according to CIF/FOB adjustments:
 """
 function _partition_m0!(d::Dict, set::Dict)
     println("  Partitioning m0, imports")
-    d[:m0]  = filter_with(d[:supply], (g = set[:g], s = "imports"); drop = true)
+    d[:m0]  = filter_with(d[:supply], (g=set[:g], s="imports"); drop = true)
 
     # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
     # Insurance imports are specified as net of adjustments.
-    d[:m0] += filter_with(d[:cif0], (g = "ins",))
-    d[:m0] = _remove_imrg(d[:m0], :g => set[:imrg])
+    if "ins" in d[:cif0][:,:g]
+        d[:m0] += filter_with(d[:cif0], (g = "ins",))
+        d[:m0] = _remove_imrg(d[:m0], :g => set[:imrg])
+    end
     return d[:m0]
 end
 

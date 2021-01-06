@@ -122,6 +122,29 @@ function combine_over(df::DataFrame, col::Symbol; fun::Function = sum)
 end
 
 
+# function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function=sum, integer_as_value::Bool=false)
+#     # !!!! add kwarg to findvalue to indicate whether to include integers as values
+#     val = findvalue(df)
+#     integer_as_value && (val = intersect(propertynames(df),vcat(val,find_oftype(df,Int))))
+
+#     idx_by = setdiff(propertynames(df), [col; val])
+
+#     df = combine(groupby(df, idx_by), val .=> fun .=> val)
+
+#     [df[!,ii] .= round.(df[:,ii]; digits = SLiDE.DEFAULT_ROUND_DIGITS)
+#         for ii in find_oftype(df[:,val], AbstractFloat)]
+#     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
+#     # !!! See where we actually want to do this (^)?? I think it's just in some labor sharing.
+#     # We can probably keep summed booleans as integers. This seems less confusing.
+#     return df
+# end
+
+
+# function SLiDE.combine_over(df::DataFrame, col::Symbol; fun::Function=sum, integer_as_value::Bool=false)
+#     return combine_over(df, ensurearray(col); fun=fun, integer_as_value=integer_as_value)
+# end
+
+
 """
     transform_over(df::DataFrame, col::Array{Symbol,1}; operation::Function = sum)
     transform_over(df::DataFrame, col::Symbol; operation::Function = sum)

@@ -42,11 +42,11 @@ function build_data(
 
     if |(isempty(d), isempty(set), overwrite)
         if isempty(set)
-            set = read_from(joinpath("src","readfiles","setlist_1.0.yml"))  # !!!! version
+            set = read_from(joinpath("src","readfiles","setlist_1.0.1.yml"))  # !!!! version
             write_build(dataset, SET_DIR, set)
         end
         
-        io = read_from(joinpath("src","readfiles","build","partitioninp_1.0.yml"))  # !!!! version
+        io = read_from(joinpath("src","readfiles","build","partitioninp_1.0.1.yml"))  # !!!! version
 
         io = partition(dataset, io, set; save_build = save_build, overwrite = overwrite)
         cal = calibrate(dataset, io, set; save_build = save_build, overwrite = overwrite)
@@ -222,6 +222,7 @@ This function is a standardized method for generating dictionary keys for
 [`SLiDE.read_from`](@ref) based on the type of information that is being read.
 """
 function _inp_key(paths::Array{String,1})
+    # !!!! check where this is used and see if it's doing what we want.
     dir = splitdir.(paths)
 
     while length(unique(getindex.(dir,2))) > 1
@@ -234,7 +235,7 @@ end
 _inp_key(x::SetInput) = length(split(x.descriptor)) > 1 ? Tuple(split(x.descriptor)) : x.descriptor
 _inp_key(x::T) where {T <: File} = Symbol(x.descriptor)
 _inp_key(x::Parameter) = Symbol(x.parameter)
-_inp_key(x::String) = Symbol(x)
+_inp_key(x::String) = Symbol(splitpath(x)[end])
 _inp_key(x::String, ext::String) = Symbol(splitpath(x)[end][1:end-length(ext)])
 
 
@@ -383,7 +384,6 @@ function filter_build!(subset::String, d::Dict{T,DataFrame}) where T <: Any
         delete_keys = setdiff(keys(d), save_keys)
 
         [delete!(d, k) for k in delete_keys]
-        # !!!! make specific to slide.
         [select!(d[k], param[k]) for k in save_keys]
     end
     return d

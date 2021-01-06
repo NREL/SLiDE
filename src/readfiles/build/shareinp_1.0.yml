@@ -1,8 +1,8 @@
-Path: [data, input_1.0]
+Path: [src, readfiles, build, share_1.0]
 
 Input:
-  cfs: cfs_state.csv
-  gsp: gsp_state.csv
-  pce: pce.csv
-  sgf: sgf.csv
-  utd: utd.csv
+  cfs: cfs.yml
+  gsp: gsp.yml
+  pce: pce.yml
+  sgf: sgf.yml
+  utd: utd.yml
