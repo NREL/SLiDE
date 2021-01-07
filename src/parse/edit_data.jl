@@ -47,7 +47,7 @@ This function edits the input DataFrame `df` and returns the resultant DataFrame
 - `df::DataFrame` including edit(s)
 """
 function edit_with(df::DataFrame, x::Add; file = nothing)
-    # If adding the length of a string...
+    # If adding the length of a string... (!!!! doc this option; used for naics code scaling)
     if typeof(x.val) == String && occursin("length", x.val)
         m = match(r"(?<col>\S*) length", x.val)
 
@@ -262,25 +262,36 @@ function edit_with(df::DataFrame, x::Rename; file = nothing)
 end
 
 
-function edit_with(df::DataFrame, x::Replace; file = nothing)
+function SLiDE.edit_with(df::DataFrame, x::Replace; file = nothing)
     !(x.col in propertynames(df)) && (return df)
 
-    if x.from === missing && Symbol(x.to) in propertynames(df)
-        df[ismissing.(df[:,x.col]),x.col] .= df[ismissing.(df[:,x.col]), Symbol(x.to)]
-        return df
-    end
+    # Check if we want to replace a value x.from in the column x.col with a value in the
+    # from another column in the same row. !!!! add this option to the documentation.
+    m = match(r"(?<col>\S*) value", string(x.to))
+    if !isnothing(m) && (m[:col] in names(df))
+        ii = df[:,x.col] .=== x.from
+        df[ii,x.col] .= df[ii,Symbol(m[:col])]
 
-    if x.to === Not && eltype(df[:,x.col]) == Bool
-        df[!,x.col] .= .!df[:,x.col]
-    end
-
-    df[!,x.col] .= if x.to === "lower"  lowercase.(df[:,x.col])
-    elseif x.to === "upper"             uppercase.(df[:,x.col])
-    elseif x.to === "uppercasefirst"    uppercasefirst.(lowercase.(df[:,x.col]))
-    elseif x.to === "titlecase"         titlecase.(df[:,x.col])
     else
-        replace(strip.(copy(df[:,x.col])), x.from => x.to)
+        if x.from === missing && Symbol(x.to) in propertynames(df)
+            df[ismissing.(df[:,x.col]),x.col] .= df[ismissing.(df[:,x.col]), Symbol(x.to)]
+            return df
+        end
+
+        # !!!! find out where we use this (i think check share_gsp, labor) and doc this option!
+        if x.to === Not && eltype(df[:,x.col]) == Bool
+            df[!,x.col] .= .!df[:,x.col]
+        end
+
+        df[!,x.col] .= if x.to === "lower"  lowercase.(df[:,x.col])
+        elseif x.to === "upper"             uppercase.(df[:,x.col])
+        elseif x.to === "uppercasefirst"    uppercasefirst.(lowercase.(df[:,x.col]))
+        elseif x.to === "titlecase"         titlecase.(df[:,x.col])
+        else
+            replace(strip.(copy(df[:,x.col])), x.from => x.to)
+        end
     end
+
     return df
 end
 
