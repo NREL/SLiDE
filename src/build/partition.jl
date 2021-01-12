@@ -17,8 +17,12 @@ function partition(
     dataset::String,
     d::Dict,
     set::Dict;
+    version::String = DEFAULT_VERSION,
     save_build::Bool = DEFAULT_SAVE_BUILD,
-    overwrite::Bool = DEFAULT_OVERWRITE
+    overwrite::Bool = DEFAULT_OVERWRITE,
+    # drop_negative_pce::Bool = false,
+    # subtract_margin_from_output::Bool=true,
+    map_fdcat::Bool = false,
 )
     # !!!! different for "detailed" sector as not to overwrite.
     CURR_STEP = "partition"
@@ -31,9 +35,12 @@ function partition(
     x = [Deselect([:units],"=="), Rename(:i,:g), Rename(:j,:s)]
     [d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), x) for k in [:supply,:use]]
 
+    map_fdcat && _filter_use!(d,set)
+
     _partition_io!(d, set)
-    
-    _partition_fd0!(d, set)
+    _partition_fd!(d, set)
+
+    # _partition_fd0!(d, set)
     _partition_ts0!(d, set)
     _partition_va0!(d, set)
     _partition_x0!(d, set)
@@ -46,7 +53,7 @@ function partition(
     _partition_md0!(d, set)  # mrg0, trn0
     _partition_ms0!(d)       # mrg0, trn0
     
-    _partition_fs0!(d)       # fd0
+    # _partition_fs0!(d)       # fd0
     _partition_s0!(d)        # ys0
     
     _partition_y0!(d, set)   # ms0, fs0, ys0
@@ -68,6 +75,29 @@ for supplying retail sales margin.
 function _remove_imrg(df::DataFrame, x::Pair{Symbol,Array{String,1}})
     df[findall(in(x.second), df[:,x.first]), :value] .= 0.0
     return df
+end
+
+
+"""
+This function combines fd values into fdcat values upfront. Doing so changes the results of
+the calibration routine slightly, but isn't too bad. This is the only mapping
+still performed in the build stream. If the difference in output is alright, we can
+move this mapping to the data stream.
+"""
+function _filter_use!(d::Dict, set::Dict)
+    df = copy(d[:use])
+    s0 = append(:s,:fd)
+    
+    x = [
+        Rename(:s,s0),
+        Map("crosswalk/fd.csv",[:fd],[:fdcat],[s0],[:s],:left),
+        Replace(:s,missing,"$s0 value"),
+        Combine("",propertynames(df)),
+        Order(propertynames(df), eltype.(eachcol(df))),
+    ]
+
+    set[:fd] = unique(read_file(x[2])[:,:fdcat])
+    d[:use] = edit_with(df,x)
 end
 
 
@@ -102,13 +132,19 @@ function _partition_io!(d::Dict, set::Dict)
     d[:id0] = filter_with(d[:use], set)
     d[:ys0] = filter_with(d[:supply], set)
 
+    # In sectordisagg, the good/sector column names are switched...
+    if d[:sector]==:detail
+        x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
+        d[:ys0] = edit_with(d[:ys0], x)
+    end
+
     (d[:id0], d[:ys0]) = fill_zero(d[:id0], d[:ys0])
 
     # Treat negative inputs as outputs.
     d[:ys0][!,:value] = d[:ys0][:,:value] - min.(0, d[:id0][:,:value])
     d[:id0][!,:value] = max.(0, d[:id0][:,:value])
 
-    [dropzero!(d[k]) for k in keys(d)]
+    [dropzero!(d[k]) for k in [:ys0,:id0]]
     return d
 end
 
@@ -175,38 +211,75 @@ end
 
 
 """
+`fd(yr,g,fd)`, final demand, and
+`fs(yr,g)`, household supply
+
+```math
+\\begin{aligned}
+\\tilde{fd}_{yr,g,fd} &= \\left\\{{use}\\left(yr,i,j\\right) \\;\\vert\\; yr,\\, g \\in i,\\, fd \\in j \\right\\}
+\\\\
+\\tilde{fs}_{yr,g} &= \\left\\{\\tilde{fd}_{yr,g,fd} \\;\\vert\\; yr,\\, g \\in i,\\, fd = pce \\right\\}
+\\end{aligned}
+```
+
+```math
+\\begin{aligned}
+\\tilde{fs}_{yr,g} &= - \\min\\left\\{0, \\tilde{fs}_{yr,g} \\right\\}
+\\\\
+\\tilde{fd}_{yr,g,fd} &= \\max\\left\\{0, \\tilde{fd}_{yr,g,fd} \\right\\} \\;\\vert\\; yr,\\, g,\\, fd = pce \\right\\}
+\\end{aligned}
+```
+"""
+function _partition_fd!(d::Dict, set::Dict)
+    x = Rename(:s, :fd)
+    d[:fd0] = filter_with(edit_with(d[:use],x), set)
+    d[:fs0] = filter_with(d[:fd0], (fd=["pce","C"],); drop = true)
+    
+    d[:fs0][!,:value] .= - min.(0, d[:fs0][:,:value])
+
+    # For the sectoral disaggregation, 
+    if d[:sector]==:detail
+        d[:fd0][.&(d[:fd0][:,:fd].=="pce", d[:fd0][:,:value].<0),:value] .= 0.0
+        d[:fd0][.&(d[:fd0][:,:fd].=="C", d[:fd0][:,:value].<0),:value] .= 0.0
+    end
+
+    [dropzero!(d[k]) for k in [:fd0,:fs0]]
+    return d
+end
+
+
+"""
 `fd(yr,g,fd)`, final demand
 
 ```math
 \\tilde{fd}_{yr,g,fd} = \\left\\{{use}\\left(yr,i,j\\right)
 \\;\\vert\\; yr,\\, g \\in i,\\, fd \\in j \\right\\}
+\\\\
+\\tilde{fd}_{yr,g,fd} = \\max\\left\\{0, \\tilde{fd}_{yr,g,fd} \\right\\} \\;\\vert\\; yr,\\, g,\\, fd = pce \\right\\}
 ```
 """
 function _partition_fd0!(d::Dict, set::Dict)
     println("  Partitioning fd0, final demand")
     d[:fd0] = filter_with(d[:use], (g = set[:g],  s = set[:fd]))
     d[:fd0] = edit_with(d[:fd0], Rename(:s, :fd))
-
-    # d[:fd0][.&(d[:fd0][:,:fd] .== "pce", d[:fd0][:,:value] .< 0),:value] .= 0.0
-    # !!!! set = 0 for pce.
     return d[:fd0]
 end
 
 
 """
-    _partition_fs0!(d::Dict)
-`fs0`: Household supply.
-Move household supply of recycled goods into the domestic output market,
-from which some may be exported.
+`fd(yr,g,fd)`, final demand, and
+`fs(yr,g)`, household supply
 
 ```math
 \\tilde{fs}_{yr,g} = \\left\\{\\tilde{fd}_{yr,g,fd}
 \\;\\vert\\; yr,\\, g \\in i,\\, fd = pce \\right\\}
+\\\\
+\\tilde{fs}_{yr,g} = - \\min\\left\\{0, \\tilde{fs}_{yr,g} \\right\\}
 ```
 """
 function _partition_fs0!(d::Dict)
     println("  Partitioning fs0, household supply")
-    d[:fs0] = filter_with(d[:fd0], (fd = "pce",); drop = true)
+    d[:fs0] = filter_with(d[:fd0], (fd=["pce","C"],); drop=true)
     d[:fs0][!,:value] .= - min.(d[:fs0][:,:value], 0)
     return dropzero!(d[:fs0])
 end
@@ -233,7 +306,7 @@ function _partition_m0!(d::Dict, set::Dict)
 
     # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
     # Insurance imports are specified as net of adjustments.
-    if "ins" in d[:cif0][:,:g]
+    if d[:sector]==:summary
         d[:m0] += filter_with(d[:cif0], (g = "ins",))
         d[:m0] = _remove_imrg(d[:m0], :g => set[:imrg])
     end
@@ -475,14 +548,22 @@ end
 
 """
 `y(yr,g)`, gross output
+"Move household supply of recycled goods into the domestic output market
+from which some may be exported. Net out margin supply from output."
 
 ```math
-\\tilde{y}_{yr,g} = \\sum_{s}\\tilde{ys}_{yr,s,g} - \\sum_{m}\\tilde{ms}_{yr,g,m}
+\\tilde{y}_{yr,g} = \\sum_{s}\\tilde{ys}_{yr,s,g} + \\tilde{fd}_{yr,g} - \\sum_{m}\\tilde{ms}_{yr,g,m}
 ```
 """
 function _partition_y0!(d::Dict, set::Dict)
     println("  Partitioning y0, gross output")
-    d[:y0] = combine_over(d[:ys0], :s) + d[:fs0] - combine_over(d[:ms0], :m)
+
+    d[:y0] = if d[:sector]==:summary
+        combine_over(d[:ys0], :s) + d[:fs0] - combine_over(d[:ms0], :m)
+    elseif d[:sector]==:detail
+        combine_over(d[:ys0], :s) + d[:fs0]
+    end
+
     d[:y0] = _remove_imrg(d[:y0], :g => set[:imrg])
     return d[:y0]
 end

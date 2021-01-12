@@ -193,10 +193,13 @@ This function aggregates final demand categories into national consumption (`C`)
 (`G`), and investment (`I`) demand.
 """
 function _disagg_fdcat!(d::Dict)
-    if !(:fdcat in propertynames(d[:fd0]))
-        x = Map(joinpath("crosswalk","fd.csv"), [:fd], [:fdcat], [:fd], [:fdcat], :inner)
+    if "pce" in d[:fd0][:,:fd]
+        x = [
+            Map(joinpath("crosswalk","fd.csv"), [:fd], [:fdcat], [:fd], [:fd], :inner),
+            Combine("sum",propertynames(d[:fd0])),
+        ]
         d[:fd0] = edit_with(d[:fd0], x)
-        d[:fd0] = combine_over(d[:fd0], :fd)
+        # d[:fd0] = combine_over(d[:fd0], :fd)
     end
     return d[:fd0]
 end
@@ -211,9 +214,9 @@ end
 """
 function _disagg_g0!(d::Dict)
     println("  Disaggregating g0(yr,r,g), national government demand")
-    !(:fdcat in propertynames(d[:fd0])) && (_disagg_fdcat!(d))
+    ("pce" in d[:fd0][:,:fd]) && (_disagg_fdcat!(d))
 
-    df = filter_with(d[:fd0], (fdcat = "G",); drop = true)
+    df = filter_with(d[:fd0], (fd="G",); drop = true)
     d[:g0] = d[:sgf] * df
     return d[:g0]
 end
@@ -228,9 +231,9 @@ end
 """
 function _disagg_i0!(d::Dict)
     println("  Disaggregating i0(yr,r,g), national investment demand")
-    !(:fdcat in propertynames(d[:fd0])) && (_disagg_fdcat!(d))
+    !("pce" in d[:fd0][:,:fd]) && (_disagg_fdcat!(d))
 
-    df = filter_with(d[:fd0], (fdcat = "I",); drop = true)
+    df = filter_with(d[:fd0], (fd="I",); drop = true)
     d[:i0] = d[:region] * df
     return d[:i0]
 end
@@ -245,9 +248,9 @@ end
 """
 function _disagg_cd0!(d::Dict)
     println("  Disaggregating cd0(yr,r,g), national final consumption")
-    !(:fdcat in propertynames(d[:fd0])) && (_disagg_fdcat!(d))
+    !("pce" in d[:fd0][:,:fd]) && (_disagg_fdcat!(d))
 
-    df = filter_with(d[:fd0], (fdcat = "C",); drop = true)
+    df = filter_with(d[:fd0], (fd="C",); drop = true)
     d[:cd0] = d[:pce] * df
     return d[:cd0]
 end

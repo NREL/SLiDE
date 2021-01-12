@@ -33,23 +33,29 @@ This information will be saved in the following structure:
 """
 function build_data(
     dataset::String = DEFAULT_DATASET;
+    version::String = "1.0.1",
     save_build::Bool = DEFAULT_SAVE_BUILD,
-    overwrite::Bool = DEFAULT_OVERWRITE
-    )
+    overwrite::Bool = DEFAULT_OVERWRITE,
+    # drop_negative_pce::Bool = false,
+    # subtract_margin_from_output::Bool=true,
+    map_fdcat::Bool=false,
+)
 
     d = read_build(dataset, PARAM_DIR; overwrite = overwrite)
     set = read_build(dataset, SET_DIR; overwrite = overwrite)
 
     if |(isempty(d), isempty(set), overwrite)
         if isempty(set)
-            set = read_from(joinpath("src","readfiles","setlist_1.0.1.yml"))  # !!!! version
+            set = read_from(joinpath("src","build","readfiles","setlist_1.0.1.yml"))  # !!!! version
             write_build(dataset, SET_DIR, set)
         end
         
-        io = read_from(joinpath("src","readfiles","build","partitioninp_1.0.1.yml"))  # !!!! version
+        io = merge(read_from(joinpath("src","build","readfiles","partition","partitioninp_$version.yml")),  # !!!! version
+            Dict(:sector=>:summary))
 
-        io = partition(dataset, io, set; save_build = save_build, overwrite = overwrite)
-        cal = calibrate(dataset, io, set; save_build = save_build, overwrite = overwrite)
+        io = partition(dataset, io, set; save_build=save_build, overwrite=overwrite)
+        
+        cal = calibrate(dataset, io, set; save_build=save_build, overwrite=overwrite)
         
         (shr, set) = share(dataset, Dict(:va0 => cal[:va0]), set;
             save_build = save_build, overwrite = overwrite)
@@ -243,8 +249,11 @@ _inp_key(x::String, ext::String) = Symbol(splitpath(x)[end][1:end-length(ext)])
 """
 _edit_from_yaml(d::Dict, editor::Dict, files::Array) = d
 
-# For when the yaml file only points to files to read and doesn't contain any edits.
 _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Dict) = d
+# function _edit_from_yaml(d::Dict{Symbol,DataFrame}, editor::Dict, files::Dict)
+#     # For when the yaml file only points to files to read and doesn't contain any edits.    
+#     return Dict(k => edit_with(y) for (k,y) in d)
+# end
 
 function _edit_from_yaml(d::Dict{Symbol,Dict{Any,Any}}, editor, files)
     # For when the yaml file read contains a list of yaml files, each containing edits.
@@ -304,7 +313,7 @@ function write_build!(
         
         for k in keys(d_write)
             println("  Writing $k")
-            CSV.write(joinpath(path, "$k.csv"), d_write[k])
+            typeof(d_write[k])==DataFrame && CSV.write(joinpath(path, "$k.csv"), d_write[k])
         end
     end
     return d
@@ -315,7 +324,7 @@ function write_build(
     subset::String,
     d::Dict;
     save_build::Bool = DEFAULT_SAVE_BUILD
-    )
+)
     write_build!(dataset, subset, copy(d); save_build = save_build)
 end
 
@@ -421,7 +430,7 @@ function build_parameters(subset::String)
     df = read_file(joinpath(SLIDE_DIR,"src","build","parameters","define.csv"))
     d = load_from(Dict{Parameter}, df)
 
-    lst = read_from(joinpath(SLIDE_DIR,"src","readfiles","parameterlist.yml"))
+    lst = read_from(joinpath(SLIDE_DIR,"src","build","readfiles","parameterlist.yml"))
 
     d = if subset in keys(lst)
         Dict(k => d[k] for k in intersect(Symbol.(lst[subset]), keys(d)))

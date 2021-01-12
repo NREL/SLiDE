@@ -231,6 +231,7 @@ function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
     # Set negative values to zero. In the case of final demand,
     # only set negative values to zero for fd = pce.
      d[:fd0][.&(d[:fd0][:,:fd] .== "pce", d[:fd0][:,:value] .< 0),:value] .= 0.0
+     d[:fd0][.&(d[:fd0][:,:fd] .== "C", d[:fd0][:,:value] .< 0),:value] .= 0.0
     [d[k][d[k][:,:value] .< 0, :value] .= 0.0 for k in param[:var] if k !== :fd0]
 
     # Convert the calibration input into DataFrames. Fill zeros for taxes; drop otherwise. 

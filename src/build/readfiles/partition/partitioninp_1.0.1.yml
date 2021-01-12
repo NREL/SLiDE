@@ -3,3 +3,7 @@ Path: [data, input_1.0.1]
 Input:
   supply: supply.csv
   use:    use.csv
+
+Deselect:
+  col: units
+  operation: "=="

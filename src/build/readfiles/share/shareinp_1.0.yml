@@ -1,4 +1,4 @@
-Path: [src, readfiles, build, share_1.0]
+Path: [src, build, readfiles, share, share_1.0]
 
 Input:
   cfs: cfs.yml

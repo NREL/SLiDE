@@ -1,6 +1,7 @@
 # BUILD OPTIONS
 const DEFAULT_SAVE_BUILD = false
 const DEFAULT_OVERWRITE = false
+const DEFAULT_VERSION = "1.0.1"
 const DEFAULT_DATASET = "state_model"
 const BUILD_STEPS = ["partition", "share", "share_i", "calibrate", "disagg"];
 const PARAM_DIR = "parameters"
