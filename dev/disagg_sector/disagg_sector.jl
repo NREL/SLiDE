@@ -1,7 +1,17 @@
 using SLiDE
 using DataFrames
+import Statistics
 
-# fbn = read_from("dev/readfiles/7_sectordisagg_int.yml"; run_bash=true)
+include(joinpath(SLIDE_DIR,"dev","disagg_sector","disagg_sector_utils.jl"))
+
+(d,set) = build_data("state_model_1.0.1")
+
+# Read to check.
+f_read = joinpath("dev","readfiles")
+det_bn = merge(
+    read_from(joinpath(f_read,"7_sectordisagg_int.yml"); run_bash=true),
+    read_from(joinpath(f_read,"7_sectordisagg_int_share.yml")),
+)
 
 f_set = joinpath(SLIDE_DIR,"src","build","readfiles","setlist_1.0.1.yml");
 set = read_from(f_set);
@@ -12,59 +22,109 @@ set_det = copy(set)
 set_det[:g] = set[:g_det]
 set_det[:s] = set[:s_det]
 
-d = Dict()
-d[:use_det] = read_file(path*"use_det.csv")
-d[:supply_det] = read_file(path*"supply_det.csv")
-d[:sector] = :detail
+f_in = joinpath("data","input_1.0.1")
+det = Dict()
+det[:use_det] = read_file(joinpath(f_in,"use_det.csv"))
+det[:supply_det] = read_file(joinpath(f_in,"supply_det.csv"))
+det[:sector] = :detail
 
-d = partition("state_model_det", d, set_det; save_build=true)
+det = partition("state_model_det", det, set_det; save_build=true)
+set[:yr_det] = unique(det[:y0][:,:yr])
 
+f_eem = joinpath("scale","sector","eem_sectors.csv")
 
-function _share_sector!(d::Dict)
-    df = copy(d[:y0])
-    col = [:yr,:summary,:detail,:value]
+_share_aggregate!(det, set, joinpath("scale","sector","eem_sectors.csv"))
 
-    x = [
-        Rename(:g,:detail);
-        Map("scale/sector/bluenote.csv",[:detail_code],[:summary_code],[:detail],[:summary],:left);
-    ]
+maps = Dict()
+_map_year!(set, maps)
 
-    df = select(edit_with(df,x),col)
-    d[:share] = df / combine_over(df,:detail)
-    return d[:share]
-end
+det[:share_] = _map_year(det[:share],maps)
 
 
 
+# x = :summary=>set[:yr]
+# y = :detail=>[set[:yr_det];2017]
 
-df_det = _share_sector!(d)
-
-df_sum = fill_with((yr=[2007,2012],summary=set[:s]), 1.)
-
-
-x_det = [
-    Rename.([:detail,:summary],:disagg);
-    Map(joinpath("scale","sector","eem_sectors.csv"),[:disagg_code],[:disagg_code],[:disagg],[:disagg],:inner);
-]
-# x_sum = Map(joinpath("scale","sector","eem_sectors.csv"),[:disagg_code],[:aggr_code],[:summary],[:aggr],:inner)
-df_det = edit_with(df_det, x_det)
-
-
-df_sum = df_sum - combine_over(df_det, [:detail,:aggr])
+# _map_year(:summary=>set[:yr], :detail=>set[:yr_det])
 
 
 
+# det[:share_summary] = _map_year(det[:share_summary], maps)
+# det[:share_detail] = _map_year(det[:share_detail], maps)
+# det[:share_] = det[:share_detail]
 
-# split_with / something from the eem utils? I think this will help!
-# 
-# start with all shares = 1.
-# 
+# d[:share_] = det[:share_summary]
+
+# df = _share_bluenote!(d)
 
 
-# df_share = fill_with((yr=[2007,2012],summary=set[:s]), 1.)
 
-# LET'S SEE.. Do these things add up?
-# d[:use]
+# Symbol(string(k)[1:end-1],:_,:0)
+# shr = _compound_sectoral_sharing(d[:share_])
+# d_new = Dict(k => _aggregate_with(d[k], shr) for k in keys(d) if k !== :share_)
+
+
+
+
+
+# dropmissing(df * edit_with(dfmap,Rename.([:disagg,:aggr],[col,append(col,:aggr)])))
+
+
+# !!!! update Map to work for file OR dataframe
+# df = copy(d[:share_detail])
+
+
+
+
+    # df_sum = fill_with((yr=[2007,2012],summary=set[:s]), 1.)
+
+    # # !!!! check that user-defined scheme has correct naming.
+    # # will also need to make sure path is relative to data/coremaps directory.
+
+    # df_det = edit_with(df_det, [Rename(:detail,:disagg),x])
+
+    # df_sum = df_sum - combine_over(df_det, [:disagg,:aggr])
+    # df_sum = edit_with(df_sum, [Rename(:summary,:disagg),x])
+
+    # d[:share_] = vcat(df_sum[:,col], df_det[:,col])
+    # return sort!(d[:share_])
+# end
+
+
+# _mix_sector_levels!(d, joinpath("scale","sector","eem_sectors.csv"))
+
+# set[:yr_det] = unique(d[:y0][:,:yr])
+
+# set[:yr] = unique([set[:yr]; 2017:2020])
+# set[:yr_det] = unique([set[:yr_det]; 2017])
+
+# Extrapolate years divided at the mean.
+
+
+
+
+
+# Dict(cut[ii,:det] => ensurearray(cut[ii,:min]:cut[ii,:max]) for ii in 1:size(cut,1))
+
+
+
+# cols = Symbol.(yr_det[1:end-1])
+# [df[!,col] .= df[:,:sum] .< df[:,col] for col in cols]
+
+# cut = DataFrame(det=yr_det[1:end-1], max=yr_max)
+# ii = 1
+# jj = 1
+
+# # for ii in 1:size(yr,2)
+# df[ii,:sum] .< cut[jj,:max]
+
+# while jj
+#     df[]
+#     jj+=1
+#     jj>size(yr,2) && break
+# end
+
+
 
 
 # # Sets and things?
