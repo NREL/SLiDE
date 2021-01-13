@@ -10,5 +10,6 @@ admin/
 data/
 dev/
 calibrate/
+model/data_temp/*.csv
 
 docs/build/
