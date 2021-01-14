@@ -106,7 +106,7 @@
             {
                 "name": "file",
                 "comment": "mapping .csv file name in the coremaps directory",
-                "data_type": "String"
+                "data_type": "Any"
             },
             {
                 "name": "from",
