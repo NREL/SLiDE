@@ -2,7 +2,7 @@ using SLiDE
 using DataFrames
 import Statistics
 
-include(joinpath(SLIDE_DIR,"dev","disagg_sector","disagg_sector_utils.jl"))
+include(joinpath(SLIDE_DIR,"src","build","disagg","_disagg_sector_utils.jl"))
 
 (d,set) = build_data("state_model_1.0.1")
 
@@ -34,12 +34,9 @@ set[:yr_det] = unique(det[:y0][:,:yr])
 f_eem = joinpath("scale","sector","eem_sectors.csv")
 
 _share_aggregate!(det, set, joinpath("scale","sector","eem_sectors.csv"))
+_map_year!(set, d)
 
-maps = Dict()
-_map_year!(set, maps)
-
-det[:share_] = _map_year(det[:share],maps)
-
+det[:share_] = _map_year_with(det[:share], maps)
 
 
 # x = :summary=>set[:yr]

@@ -30,14 +30,14 @@ function share(
     [set[k] = set[:r] for k in [:orig,:dest]]
     
     # Read sharing input data.
-    d_read = read_from(joinpath("src","readfiles","build","shareinp_1.0.1.yml"))  # !!!! version
+    d_read = read_from(joinpath("src","build","readfiles","share","shareinp_1.0.1.yml"))  # !!!! version
     d_read = Dict(k => sort(dropmissing(edit_with(
         filter_with(df, set; extrapolate = true),
         Deselect([:units],"==")
     ))) for (k, df) in d_read)
 
     merge!(d, d_read)
-
+    
     share_pce!(d)
     share_sgf!(d)
     share_utd!(d, set)

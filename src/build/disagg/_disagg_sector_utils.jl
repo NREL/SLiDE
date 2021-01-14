@@ -1,3 +1,6 @@
+# ------------------------------------------------------------------------------------------
+# Map years in detailed set to summary.
+
 function _map_step(x::Pair, y::Pair; fun::Function=Statistics.mean)
     (COL,VAL) = (1,2)
 
@@ -19,34 +22,27 @@ function _map_step(x::Pair, y::Pair; fun::Function=Statistics.mean)
 end
 
 
-function _map_year!(set::Dict, maps::Dict; fun::Function=Statistics.mean)
-    if !haskey(maps,:yr)
-        maps[:yr] = _map_step(:summary=>set[:yr], :detail=>set[:yr_det]; fun=fun)
+function _map_year!(d::Dict, set::Dict; fun::Function=Statistics.mean)
+    if !haskey(d,:yr)
+        d[:yr] = _map_step(:summary=>set[:yr], :detail=>set[:yr_det]; fun=fun)
     end
-    return maps[:yr]
+    return d[:yr]
 end
 
 
-function _map_year(df::DataFrame, maps::Dict; fun::Function=Statistics.mean)
+function _map_year_with(df::DataFrame, d::Dict; fun::Function=Statistics.mean)
 # function _map_year(df::DataFrame, set::Dict, maps::Dict; fun::Function=Statistics.mean)
     col = propertynames(df)
-    dfmap = edit_with(maps[:yr], Rename.(propertynames(maps[:yr]), [:x,:y]))
+    dfmap = edit_with(d[:yr], Rename.(propertynames(d[:yr]), [:x,:y]))
 
     df = edit_with(outerjoin(dfmap, df, on=Pair(:y,:yr)), Rename(:x,:yr))
     return df[:,col]
 end
 
-# function _map_year!(set::Dict, maps::Dict; fun::Function=Statistics.mean)
-#     !haskey(maps,:yr) && (maps[:yr] = _map_year(set; fun=fun))
-#     return maps[:yr]
-# end
 
-# function _map_year!(df::DataFrame, set::Dict, maps::Dict; fun::Function=Statistics.mean)
-#     col = propertynames(df)
-#     dfmap = _map_year!(set, maps; fun=fun)
-#     df = edit_with(outerjoin(dfmap, df, on=Pair(:detail,:yr)), Rename(:summary,:yr))
-#     return df[:,col]
-# end
+# ------------------------------------------------------------------------------------------
+# Map bluenote sectors.
+# 
 
 function _share_bluenote!(d::Dict)
     df = copy(d[:y0])
@@ -105,6 +101,7 @@ function _share_aggregate!(d::Dict, set::Dict, path::String)
     return sort!(select!(d[:share], col), col[[1,4,3,2]])
 end
 
+# ------------------------------------------------------------------------------------------
 
 function _compound_sectoral_sharing(df::DataFrame, cols::Any)
     # cols = intersect(propertynames(df), [:g,:s])

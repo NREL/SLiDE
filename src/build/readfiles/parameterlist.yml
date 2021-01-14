@@ -6,3 +6,4 @@ SetInput:
   - {descriptor: share,      name: list_share.csv}
   - {descriptor: disagg,     name: list_disagg.csv}
   - {descriptor: parameters, name: list_model.csv}
+  - {descriptor: sets,       name: list_index.csv}

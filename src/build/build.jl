@@ -298,9 +298,9 @@ function write_build!(
     subset::String,
     d::Dict;
     save_build::Bool = DEFAULT_SAVE_BUILD
-    )
+)
     
-    [sort!(dropzero!(d[k])) for k in keys(d) if typeof(d[k]) == DataFrame]
+    [sort!(dropzero!(d[k])) for k in keys(d) if typeof(d[k])==DataFrame]
     d_write = filter_build!(subset, d)
     
     if isempty(d_write)
@@ -385,32 +385,23 @@ importing parameters into JuMP models when calibrating or modeling.
 # Returns
 - `d::Dict` filtered to include only relevant parameters.
 """
-function filter_build!(subset::String, d::Dict{T,DataFrame}) where T <: Any
-    param = build_parameters(subset)
-    
-    if param !== nothing
-        save_keys = intersect(keys(d), keys(param))
-        delete_keys = setdiff(keys(d), save_keys)
+function filter_build!(subset::String, d::Dict)
+    lst = build_parameters(subset)
+    return _filter_with!(d, lst)
+end
 
-        [delete!(d, k) for k in delete_keys]
-        [select!(d[k], param[k]) for k in save_keys]
-    end
+
+"""
+"""
+function _filter_with!(d::Dict, lst::Dict{Symbol,Parameter})
+    keep = Dict(k => haskey(lst,k) for k in keys(d))
+    [keep[k] ? select!(d[k], lst[k]) : delete!(d,k) for k in keys(d)]
     return d
 end
 
-function filter_build!(subset::String, d::Dict)
-    if subset == SET_DIR
-        lst_index = Symbol.(read_file(joinpath(SLIDE_DIR,"src","build","parameters"),
-            SetInput("list_index.csv", :index)))
-
-        save_keys = intersect(keys(d), intersect(lst_index))
-        delete_keys = setdiff(keys(d), save_keys)
-
-        [delete!(d, k) for k in delete_keys]
-        return Dict(k => DataFrame([d[k]], [k]) for k in save_keys)
-    else
-        return d
-    end
+function _filter_with!(d::Dict, lst::AbstractArray)
+    [delete!(d,k) for k in keys(d) if !(k in lst)]
+    return d
 end
 
 
@@ -427,15 +418,15 @@ end
 """
 function build_parameters(subset::String)
     subset = convert_type(Symbol, subset)
-    df = read_file(joinpath(SLIDE_DIR,"src","build","parameters","define.csv"))
-    d = load_from(Dict{Parameter}, df)
-
     lst = read_from(joinpath(SLIDE_DIR,"src","build","readfiles","parameterlist.yml"))
 
-    d = if subset in keys(lst)
-        Dict(k => d[k] for k in intersect(Symbol.(lst[subset]), keys(d)))
-    else
-        nothing
+    !haskey(lst,subset) && (return nothing)
+
+    df = read_file(joinpath(SLIDE_DIR,"src","build","parameters","define.csv"))
+    df = innerjoin(DataFrame(parameter=lst[subset]), df, on=:parameter)
+
+    d = if isempty(df); convert_type.(Symbol, lst[subset])
+    else;               load_from(Dict{Parameter}, df)
     end
 
     return d
