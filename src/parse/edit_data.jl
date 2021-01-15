@@ -482,6 +482,7 @@ end
 
 
 """
+Edits input DataFrame given either a DataFrame or file path.
 """
 function _map_with(df::DataFrame, df_map::DataFrame, x::Map)
     cols = unique([propertynames(df); x.output])
