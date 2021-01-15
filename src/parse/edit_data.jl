@@ -123,7 +123,7 @@ function edit_with(df::DataFrame, x::Group; file = nothing)
     # Editing with a map will remove all rows that do not contain relevant information.
     # Add a column indicating where each data set STOPS, assuming all completely blank rows
     # were removed by read_file().
-    df_split = edit_with(copy(df), convert_type(Map, x); kind = :inner)
+    df_split = edit_with(copy(df), convert_type(Map, x))
     df_split = sort(unique(df_split), :start)
     df_split[!, :stop] .= vcat(df_split[2:end, :start] .- 2, [size(df)[1]])
 
@@ -141,48 +141,7 @@ function edit_with(df::DataFrame, x::Group; file = nothing)
 end
 
 
-function edit_with(df::DataFrame, x::Map; kind = :left, file = nothing)
-    cols = unique([propertynames(df); x.output])
-
-    # Rename columns in the mapping DataFrame to temporary values in case any of these
-    # columns were already present in the input DataFrame.
-    from = _generate_id(x.from, :from)
-    to = _generate_id(x.to, :to)
-
-    df_map = copy(read_file(x))
-    df_map = unique(hcat(
-        edit_with(df_map[:,x.from], Rename.(x.from, from)),
-        edit_with(df_map[:,x.to], Rename.(x.to, to)),
-    ))
-
-    # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
-    # DataFrame are used since all values in each column should be of the same type.
-    if findtype(df[:,x.input]) !== findtype(df_map[:,from])
-        for (ii, ff) in zip(x.input, from)
-            try
-                df[!,ii] .= convert_type.(findtype(df_map[:,ff]), df[:,ii])
-            catch
-                df[!,ii] .= convert_type.(String, df[:,ii])
-                df_map[!,ff] .= convert_type.(String, df_map[:,ff])
-            end
-        end
-    end
-    
-    join_cols = Pair.(x.input, from)
-    
-    x.kind == :inner && (df = innerjoin(df, df_map, on = join_cols; makeunique = true))
-    x.kind == :outer && (df = outerjoin(df, df_map, on = join_cols; makeunique = true))
-    x.kind == :left  && (df = leftjoin(df, df_map,  on = join_cols; makeunique = true))
-    x.kind == :right && (df = rightjoin(df, df_map, on = join_cols; makeunique = true))
-    x.kind == :semi  && (df = semijoin(df, df_map,  on = join_cols; makeunique = true))
-    
-    # Remove all output column propertynames that might already be in the DataFrame.
-    # These will be overwritten by the columns from the mapping DataFrame. Finally,
-    # remane mapping "to" columns from their temporary to output values.
-    df = df[:, setdiff(propertynames(df), x.output)]
-    df = edit_with(df, Rename.(to, x.output))
-    return df[:,cols]
-end
+edit_with(df::DataFrame, x::Map; file = nothing) = _map_with(df, x.file, x)
 
 
 function edit_with(df::DataFrame, x::Match; file = nothing)
@@ -520,6 +479,53 @@ function _group_by(df::DataFrame, x::OrderedGroup)
 
     return df
 end
+
+
+"""
+"""
+function _map_with(df::DataFrame, df_map::DataFrame, x::Map)
+    cols = unique([propertynames(df); x.output])
+
+    # Rename columns in the mapping DataFrame to temporary values in case any of these
+    # columns were already present in the input DataFrame.
+    from = SLiDE._generate_id(x.from, :from)
+    to = SLiDE._generate_id(x.to, :to)
+
+    df_map = unique(hcat(
+        edit_with(df_map[:,x.from], Rename.(x.from, from)),
+        edit_with(df_map[:,x.to], Rename.(x.to, to)),
+    ))
+
+    # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
+    # DataFrame are used since all values in each column should be of the same type.
+    if findtype(df[:,x.input]) !== findtype(df_map[:,from])
+        for (ii, ff) in zip(x.input, from)
+            try
+                df[!,ii] .= convert_type.(findtype(df_map[:,ff]), df[:,ii])
+            catch
+                df[!,ii] .= convert_type.(String, df[:,ii])
+                df_map[!,ff] .= convert_type.(String, df_map[:,ff])
+            end
+        end
+    end
+    
+    join_cols = Pair.(x.input, from)
+    
+    x.kind == :inner && (df = innerjoin(df, df_map, on=join_cols; makeunique=true))
+    x.kind == :outer && (df = outerjoin(df, df_map, on=join_cols; makeunique=true))
+    x.kind == :left  && (df = leftjoin(df, df_map,  on=join_cols; makeunique=true))
+    x.kind == :right && (df = rightjoin(df, df_map, on=join_cols; makeunique=true))
+    x.kind == :semi  && (df = semijoin(df, df_map,  on=join_cols; makeunique=true))
+    
+    # Remove all output column propertynames that might already be in the DataFrame.
+    # These will be overwritten by the columns from the mapping DataFrame. Finally,
+    # remane mapping "to" columns from their temporary to output values.
+    df = df[:, setdiff(propertynames(df), x.output)]
+    df = edit_with(df, Rename.(to, x.output))
+    return df[:,cols]
+end
+
+_map_with(df::DataFrame, file::String, x::Map) = _map_with(df, read_file(x), x)
 
 
 """
