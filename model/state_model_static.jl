@@ -17,7 +17,6 @@ using DataFrames
 
 include(joinpath(SLIDE_DIR,"model","modelfunc.jl"))
 
-
 ############
 # LOAD DATA
 ############
@@ -34,23 +33,11 @@ bmkyr = 2016
 ########## Model ##########
 cge = MCPModel();
 
-
-##############
-# SETS
-##############
-
-# Set description
-#set[:s] -> sectors
-#set[:g] -> goods
-#set[:r] -> regions
-#set[:m] -> margins
-#set[:gm] -> goods_margins
-
-
 ##############
 # PARAMETERS
 ##############
 
+#benchmark values
 #benchmark values
 @NLparameter(cge, ys0[r in set[:r], s in set[:s], g in set[:g]] == sld[:ys0][r,s,g]); # Sectoral supply
 @NLparameter(cge, id0[r in set[:r], s in set[:s], g in set[:g]] == sld[:id0][r,s,g]); # Intermediate demand
@@ -80,9 +67,9 @@ cge = MCPModel();
 @NLparameter(cge, nd0[r in set[:r], g in set[:g]] == sld[:nd0][r,g]); # Regional demand to national market
 
 #counterfactual taxes
-@NLparameter(cge, ty[r in set[:r], s in set[:s]] == sld[:ty0][r,s]); # output tax
-@NLparameter(cge, ta[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); # Armington tax
-@NLparameter(cge, tm[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); # import tariff
+@NLparameter(cge, ty[r in set[:r], s in set[:s]] == sld[:ty0][r,s]); #
+@NLparameter(cge, ta[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); #
+@NLparameter(cge, tm[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); #
 
 # benchmark value share parameters
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
@@ -111,11 +98,11 @@ cge = MCPModel();
 lo = MODEL_LOWER_BOUND
 
 #set[:s]
-@variable(cge, Y[(r,s) in set[:Y]] >= lo, start = 1); # Output
-@variable(cge, X[(r,g) in set[:X]] >= lo, start = 1); # Exports
-@variable(cge, A[(r,g) in set[:A]] >= lo, start = 1); # Armington
-@variable(cge, C[r in set[:r]] >= lo, start = 1); # Consumption
-@variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1); # Margin supply
+@variable(cge, Y[(r,s) in set[:Y]] >= lo, start = 1);
+@variable(cge, X[(r,g) in set[:X]] >= lo, start = 1);
+@variable(cge, A[(r,g) in set[:A]] >= lo, start = 1);
+@variable(cge, C[r in set[:r]] >= lo, start = 1);
+@variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1);
 
 #commodities:
 @variable(cge, PA[(r,g) in set[:PA]] >= lo, start = 1); # Regional market (input)
@@ -129,7 +116,7 @@ lo = MODEL_LOWER_BOUND
 @variable(cge, PFX >= lo, start = 1); # Foreign exchange
 
 #consumer:
-@variable(cge,RA[r in set[:r]]>=lo,start = value(c0[r])) ; # Representative Agent/Consumer
+@variable(cge,RA[r in set[:r]]>=lo,start = value(c0[r])) ;
 
 
 ###############################
@@ -208,7 +195,7 @@ lo = MODEL_LOWER_BOUND
 
 @mapping(cge,profit_x[(r,g) in set[:X]],
 # output 'cost' from aggregate supply
-         (haskey(PY.lookup[1], (r,g)) ? PY[(r,g)] : 1.0) * s0[r,g]
+        (haskey(PY.lookup[1], (r,g)) ? PY[(r,g)] : 1.0) * s0[r,g]
         - (
 # revenues from foreign exchange
         PFX * AX[r,g]
@@ -315,10 +302,9 @@ lo = MODEL_LOWER_BOUND
 );
 
 @mapping(cge,market_pk[(r,s) in set[:PK]],
-# supply of capital
         kd0[r,s]
         -
-# current year's capital demand
+#current year's capital
        (haskey(Y.lookup[1], (r,s)) ? Y[(r,s)] : 1.0) * AK[r,s]
 );
 

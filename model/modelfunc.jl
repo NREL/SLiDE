@@ -20,7 +20,6 @@ function nonzero_subset(df::DataFrame)
 end
 
 
-# !!!! Collapse _model_input into a single function
 """
     _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
 
@@ -37,30 +36,6 @@ end
     conditions.
 - `idx::Dict` of parameter indices.
 """
-# function _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
-#     @info("Preparing model data for $year.")
-
-#     d = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
-
-#     isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d))
-#     (set, idx) = _model_set!(d, set, idx)
-
-#     d = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d)
-#     return (d, set, idx)
-# end
-
-# function _model_input(year::Array{Int,1}, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
-#         @info("Preparing model data for $year.")
-
-#         d2 = Dict(k => filter_with(df, (yr = year,); extrapolate = true, drop = false) for (k,df) in d)
-
-#         isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d2))
-#         (set, idx) = _model_set!(d2, set, idx)
-
-#         d1 = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
-#         d1 = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d1)
-#         return (d1, set, idx)
-# end
 
 function _model_input(year::Any, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
         return _model_input(ensurearray(year), d, set, idx)
@@ -121,39 +96,4 @@ function _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
     end
 
     return (set, idx)
-end
-
-
-"""
-    yrsbool(years::Array{Int,1})
-This function to sort model years, produce first year, last year, booleans, and interval
-
-# Arguments
-- `years::Array{Int,1}` array of years to model
-
-# Returns
-- `years::Array{Int,1}` sorted array of years to model
-- `yrlast::Int` last year in years array
-- `yrfirst::Int` first year in years array
-- `islast::Dict` of booleans [1] indicating last year
-- `isfirst::Dict` of booleans [1] indicating first year
-- `yrdiff::Dict` of differences between years
-
-# Usage
-years = [2017, 2016, 2019, 2018]
-(years, yrl, yrf, islast, isfirst, yrdiff) = yrsbool(years)
-"""
-function yrsbool(years::Array{Int,1})
-    years = sort(years)
-    yrlast = years[length(years)]
-    yrfirst = years[1]
-    islast = Dict(years[k] => (years[k] == yrlast ? 1 : 0) for k in keys(years))
-    isfirst = Dict(years[k] => (years[k] == yrfirst ? 1 : 0) for k in keys(years))
-    yrdiff = Dict(years[k+1] => years[k+1]-years[k] for k in 1:(length(years)-1))
-    return (years, yrlast, yrfirst, islast, isfirst, yrdiff)
-end
-
-"If given a unit range such as years = 2016:2019 instead of array"
-function yrsbool(years::UnitRange{Int64})
-    return yrsbool(ensurearray(years))
 end
