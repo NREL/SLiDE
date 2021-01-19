@@ -28,7 +28,7 @@ Build the model input data by running:
 > (d, set) = build_data()
 ```
 
-Where `d` is a dictionary of DataFrames containing the model data and `s` is a dictionary of sets describing region, sector, final demand, etc.
+Where `d` is a dictionary of DataFrames containing the model data and `set` is a dictionary of sets describing region, sector, final demand, etc.
 By default, this will save data to a directory in `SLiDE/data/<date>/build/`, where `<date>` is the date on which the data is built.
 If data already exists in this directory, running `build_data()` will read it.
 
