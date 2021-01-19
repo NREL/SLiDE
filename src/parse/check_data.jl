@@ -177,7 +177,7 @@ function benchmark_against(
         df_bench = df_bench[abs.(df_bench[:,:value] .> small), :]
     end
 
-    (key !== missing) && println("  Comparing keys and values for ", key)
+    !ismissing(key) && println("  Comparing keys and values for ", key)
 
     df_comp = compare_summary([df_calc, df_bench], [:calc,:bench]; tol=tol)
     # key == :utd && (df_comp = edit_with(df_comp, Drop(:yr,2002,"<")))

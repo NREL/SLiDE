@@ -3,10 +3,12 @@ Path: [data, coresets]
 SetInput:
   - {descriptor: yr,         name: [yr, yr_1.0.1.csv]}
   - {descriptor: r,          name: [r, state.csv]}
-  - {descriptor: s,          name: [s, summary.csv]}
-  - {descriptor: g,          name: [s, summary.csv]}
-  - {descriptor: g_det,      name: [s, detail.csv]}
-  - {descriptor: s_det,      name: [s, detail.csv]}
+  - {descriptor: summary,    name: [s, summary.csv]}
+  - {descriptor: detail,     name: [s, detail.csv]}
+  # - {descriptor: s,          name: [s, summary.csv]}
+  # - {descriptor: g,          name: [s, summary.csv]}
+  # - {descriptor: g_det,      name: [s, detail.csv]}
+  # - {descriptor: s_det,      name: [s, detail.csv]}
   - {descriptor: m,          name: [s, m.csv]}
   - {descriptor: imrg,       name: [s, mrg.csv]}
   - {descriptor: oth use,    name: [s, oth_use.csv]}

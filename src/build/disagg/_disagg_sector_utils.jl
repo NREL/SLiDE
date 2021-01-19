@@ -1,3 +1,21 @@
+findsector(col::Array{Symbol,1}) = intersect([:g,:s], col)
+findsector(df::DataFrame) = findsector(propertynames(df))
+
+function _set_yr_detail!(d::Dict, set::Dict)
+    if !haskey(set,:yr_det)
+        set[:yr_det] = unique(d[:y0][:,:yr])
+    end
+    return set[:yr_det]
+end
+
+function SLiDE._inp_key(x::AbstractArray)
+    x = if length(x) == 0; nothing
+    elseif length(x) == 1; x[1]
+    else;                  Tuple(x)
+    end
+    return x
+end
+
 # ------------------------------------------------------------------------------------------
 # Map years in detailed set to summary.
 
@@ -24,7 +42,7 @@ end
 
 function _map_year!(d::Dict, set::Dict; fun::Function=Statistics.mean)
     if !haskey(d,:yr)
-        d[:yr] = _map_step(:summary=>set[:yr], :detail=>set[:yr_det]; fun=fun)
+        d[:yr] = _map_step(:summary=>set[:yr], :detail=>_set_yr_detail!(d,set); fun=fun)
     end
     return d[:yr]
 end
@@ -44,6 +62,9 @@ end
 # Map bluenote sectors.
 # 
 
+"""
+Calculate share from `y0`.
+"""
 function _share_bluenote!(d::Dict)
     df = copy(d[:y0])
     col = [:yr,:summary,:detail,:value]
@@ -62,6 +83,9 @@ function _share_bluenote!(d::Dict)
 end
 
 
+"""
+Calculate 
+"""
 function _share_bluenote_detail!(d::Dict, path::String)
     df = _share_bluenote!(d)
 
@@ -78,7 +102,7 @@ end
 
 function _share_bluenote_summary!(d::Dict, set::Dict, path::String)
     x = Map(path,[:disagg_code],[:disagg_code,:aggr_code],[:summary],[:disagg,:aggr],:inner)
-    df_sum = fill_with((yr=set[:yr_det], summary=set[:s]), 1.)
+    df_sum = fill_with((yr=_set_yr_detail!(d,set), summary=set[:summary]), 1.)
     
     df_det = _share_bluenote_detail!(d,path)
 
@@ -98,23 +122,29 @@ end
 function _share_aggregate!(d::Dict, set::Dict, path::String)
     col = [:yr,:aggr,:disagg,:summary,:value]
     d[:share] = vcat(_share_bluenote_summary!(d,set,path), d[:share_detail])
-    return sort!(select!(d[:share], col), col[[1,4,3,2]])
+    # return sort!(select!(d[:share], col), col[[1,4,3,2]])
+    return select!(d[:share], col)
 end
 
 # ------------------------------------------------------------------------------------------
 
-function _compound_sectoral_sharing(df::DataFrame, cols::Any)
-    # cols = intersect(propertynames(df), [:g,:s])
-    df = [edit_with(df, Rename.([:disagg,:aggr],[col,append(col,:aggr)]))
-        for col in ensurearray(cols)]
-    df = length(df)==1 ? df[1] : Base.:*(df...)
+"""
+"""
+function _compound_for(df::DataFrame, cols::Array{Symbol,1}; on::Symbol=:summary)
+    if length(cols)==1
+        df = isnothing(cols[1]) ? DataFrame() : _compound_for(df, cols[1]; on=on)
+    else
+        df = [_compound_for(df, col; on=on) for col in cols]
+        df = Base.:*(df...)
+    end
+
     return df
 end
 
-
-function _compound_sectoral_sharing(df::DataFrame)
-    return Dict(k => _compound_sectoral_sharing(df, ensurearray(k))
-        for k in [:g,:s,(:g,:s),(:g,:m)])
+function _compound_for(df::DataFrame, col::Symbol; on::Symbol=:summary)
+    col_map = find_oftype(df,String)
+    df = edit_with(df, Rename.(col_map, append.(replace(col_map, on=>nothing), col)))
+    return df
 end
 
 

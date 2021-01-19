@@ -46,11 +46,12 @@ function build_data(
 
     if |(isempty(d), isempty(set), overwrite)
         if isempty(set)
-            set = read_from(joinpath("src","build","readfiles","setlist_1.0.1.yml"))  # !!!! version
+            set = read_from(joinpath("src","build","readfiles","setlist_$version.yml"))  # !!!! version
+            [set[k] = set[:summary] for k in [:g,:s]]
             write_build(dataset, SET_DIR, set)
         end
         
-        io = merge(read_from(joinpath("src","build","readfiles","partition","partitioninp_$version.yml")),  # !!!! version
+        io = merge(read_from(joinpath("src","build","readfiles","partition","summary_$version.yml")),  # !!!! version
             Dict(:sector=>:summary))
 
         io = partition(dataset, io, set; save_build=save_build, overwrite=overwrite)

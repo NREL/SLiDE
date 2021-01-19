@@ -335,6 +335,10 @@ append(x::Array{String,1}) = string(string.(x[1:end-1], :_)..., x[end])
 append(x1::String, x2::Any) = string(x1,:_,x2)
 append(x1::String, x2::Vararg{Any,N}) where N = append(string.([x1; ensurearray(x2)]))
 
+append(x1::Nothing, x2::Vararg{Any,N}) where N = append(x2)
+append(x::Any) = x
+
+# !!!! Can definitely clean this functon up
 
 """
 """
