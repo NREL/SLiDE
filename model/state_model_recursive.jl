@@ -17,6 +17,7 @@ using DataFrames
 
 include(joinpath(SLIDE_DIR,"model","modelfunc.jl"))
 
+
 ############
 # LOAD DATA
 ############
@@ -37,15 +38,18 @@ bmkyr = 2016
 ########## Model ##########
 cge = MCPModel();
 
+
 ##############
 # SETS
 ##############
 
+# Set description
 #set[:s] -> sectors
 #set[:g] -> goods
 #set[:r] -> regions
 #set[:m] -> margins
 #set[:gm] -> goods_margins
+
 
 ##############
 # PARAMETERS
@@ -80,9 +84,9 @@ cge = MCPModel();
 @NLparameter(cge, nd0[r in set[:r], g in set[:g]] == sld[:nd0][r,g]); # Regional demand to national market
 
 #counterfactual taxes
-@NLparameter(cge, ty[r in set[:r], s in set[:s]] == sld[:ty0][r,s]); #
-@NLparameter(cge, ta[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); #
-@NLparameter(cge, tm[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); #
+@NLparameter(cge, ty[r in set[:r], s in set[:s]] == sld[:ty0][r,s]); # output tax
+@NLparameter(cge, ta[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); # Armington tax
+@NLparameter(cge, tm[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); # import tariff
 
 # -- Major Assumptions --
 # Temporal/Dynamic modifications
@@ -91,25 +95,6 @@ cge = MCPModel();
 @NLparameter(cge, gr == 0.02); # growth rate --- try sector and set[:r] specific
 @NLparameter(cge, dr == 0.05); # capital depreciation rate
 @NLparameter(cge, thetax == 0.3); # extant production share
-
-
-# """
-# # !!!! Autonomous energy efficiency improvements (aeei) could also be employed
-# # (1%/yr) 0.01 for all industries except electricity/power (0.3%/yr) 0.003
-# # aeeir[r,s] -> aeei annual growth rate
-# # aeeir[r,s] = 0.01
-# # aeeir[r,"ele"] = 0.003
-# # aeeif -> aeei coefficient
-# # aeeif[r,s] = 1/(1+aeeir)
-
-# # !!!! Population growth rate and labor productivity growth
-# # !!!! labor augmentation rate (ftar) = fpopgr + glr
-# # !!!! Productivity index gprod = (1+ftar)^t
-
-# # !!!! Scale aeei for electricity sector to AEO estimates/forecasts
-# # !!!! Scale productivity index to GDP estimates/forecasts
-# # !!!! further calibration for regional/subnational fitting
-# """
 
 #new capital endowment
 @NLparameter(cge, ks_n[r in set[:r], s in set[:s]] ==
@@ -135,7 +120,6 @@ cge = MCPModel();
 # Benchmark welfare index
 @NLparameter(cge, w0[r in set[:r]] == value(inv0[r])+value(c0[r]));
 
-
 # benchmark value share parameters
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
 @NLparameter(cge, alpha_x[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
@@ -158,19 +142,20 @@ cge = MCPModel();
 
 @NLparameter(cge, es_inv[r in set[:r]] == 5); # Investment production - substitution elasticity
 
+
 ################
 # VARIABLES
 ################
 
-# specify value close to zero - true zero creates convergence issues in this version
+# specify lower bound
 lo = 0.0
 
 # sectors
 #@variable(cge, Y[(r, s) in set[:Y]] >= lo, start = 1);
-@variable(cge, X[(r, g) in set[:X]] >= lo, start = 1);
-@variable(cge, A[(r, g) in set[:A]] >= lo, start = 1);
-@variable(cge, C[r in set[:r]] >= lo, start = 1);
-@variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1);
+@variable(cge, X[(r, g) in set[:X]] >= lo, start = 1); # Exports
+@variable(cge, A[(r, g) in set[:A]] >= lo, start = 1); # Armington
+@variable(cge, C[r in set[:r]] >= lo, start = 1); # Consumption
+@variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1); # Margin Supply
 
 #commodities:
 @variable(cge, PA[(r, g) in set[:PA]] >= lo, start = 1); # Regional market (input)
@@ -188,11 +173,13 @@ lo = 0.0
 
 
 #--- recursive dynamic variable declaration ---
+# sectors
 @variable(cge,YM[(r,s) in set[:Y]] >= lo, start = (1-value(thetax))); # Mutable production index - replaces Y
 @variable(cge,YX[(r,s) in set[:Y]] >= lo, start = value(thetax)); # Extant production index
 @variable(cge,INV[r in set[:r]] >= lo, start = 1); # Investment
 @variable(cge,W[r in set[:r]] >= lo, start = 1); # Welfare index
 
+# commodities
 @variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
 @variable(cge,RK[r in set[:r]] >= lo, start = 1); # Return to regional capital
 @variable(cge,PINV[r in set[:r]] >= lo, start = 1); # Investment price index
@@ -223,26 +210,6 @@ lo = 0.0
 
 @NLexpression(cge,DINV[r in set[:r], g in set[:g]],
     (i0[r,g] * (PINV[r]/(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)^es_inv[r])));
-
-    ###
-
-# """
-# # !!!! issue in market_rkx and/or profit_yx
-# #Leontief for extant/old
-# @NLexpression(cge, CVAyx[r in set[:r], s in set[:s]],
-#               (alpha_kl[r,s])*PL[r] + (1-alpha_kl[r,s])*(haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0)
-#               );
-
-# #demand for labor in VA
-# @NLexpression(cge,ALyx[r in set[:r], s in set[:s]],
-#               ld0[r,s] * (CVAyx[r,s] / PL[r])^0
-#               );
-
-# #demand for capital in VA
-# @NLexpression(cge,AKyx[r in set[:r],s in set[:s]],
-#               kd0[r,s] * (CVAyx[r,s] / (haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0))^0
-#               );
-# """
 
 #----------
 
@@ -299,103 +266,93 @@ lo = 0.0
 #Recursive  --- update to Y
 @mapping(cge,profit_ym[(r, s) in set[:Y]],
 # cost of intermediate demand
-        sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
+    sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
 # cost of labor inputs
-        + PL[r] * ALym[r,s]
+    + PL[r] * ALym[r,s]
 # cost of capital inputs
-        + RK[r] * AKym[r,s]
-        -
+    + RK[r] * AKym[r,s]
+    -
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
-        sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
+    sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
 );
 
 @mapping(cge,profit_yx[(r, s) in set[:Y]],
 # cost of intermediate demand
-        sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
+    sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
 # cost of labor inputs
-        + PL[r] * ld0[r,s]
+    + PL[r] * ld0[r,s]
 # cost of capital inputs
-        + (haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * kd0[r,s]
-        -
+    + (haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * kd0[r,s]
+    -
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
-        sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
+    sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
 );
 
 #----------
 
-# @mapping(cge,profit_y[(r, s) in set[:Y]],
-# # cost of intermediate demand
-#         sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
-# # cost of labor inputs
-#         + PL[r] * AL[r,s]
-# # cost of capital inputs
-#         + (haskey(PK.lookup[1], (r, s)) ? PK[(r, s)] : 1.0)* AK[r,s]
-#         -
-# # revenue from sectoral supply (take note of r/s/g indices on ys0)
-#         sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
-# );
-
-
-
 @mapping(cge,profit_x[(r, g) in set[:X]],
 # output 'cost' from aggregate supply
-         (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * s0[r,g]
-        - (
+    (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * s0[r,g]
+    - (
 # revenues from foreign exchange
         PFX * AX[r,g]
 # revenues from national market
         + PN[g] * AN[r,g]
 # revenues from domestic market
         + (haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) * AD[r,g]
-        )
+    )
 );
 
 
 @mapping(cge,profit_a[(r, g) in set[:A]],
 # costs from national market
-        PN[g] * DN[r,g]
+    PN[g] * DN[r,g]
 # costs from domestic market
-        + (haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) * DD[r,g]
+    + (haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) * DD[r,g]
 # costs from imports, including import tariff
-        + PFX * (1+tm[r,g]) * MD[r,g]
+    + PFX * (1+tm[r,g]) * MD[r,g]
 # costs of margin demand
-        + sum(PM[r,m] * md0[r,m,g] for m in set[:m])
-        - (
+    + sum(PM[r,m] * md0[r,m,g] for m in set[:m])
+    - (
 # revenues from regional market based on armington supply
-        (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * (1-ta[r,g]) * a0[r,g]
+       (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * (1-ta[r,g]) * a0[r,g]
 # revenues from re-exports
         + PFX * rx0[r,g]
-        )
+    )
 );
 
 @mapping(cge, profit_c[r in set[:r]],
 # costs of inputs - computed as final demand times regional market prices
-        sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * CD[r,g] for g in set[:g])
-        -
+    sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * CD[r,g] for g in set[:g])
+    -
 # revenues/benefit computed as CPI * reference consumption
-        PC[r] * c0[r]
+    PC[r] * c0[r]
 );
 
 @mapping(cge, profit_inv[r in set[:r]],
+# inputs to investment
     sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * DINV[r,g] for g in set[:g])
     -
+# Investment
     PINV[r] * inv0[r]
 );
 
 @mapping(cge, profit_w[r in set[:r]],
+# inputs to welfare index
     PINV[r]*inv0[r] + PC[r]*c0[r]
     -
+# Welfare
     PW[r]*w0[r]
 );
 
 @mapping(cge,profit_ms[r in set[:r], m in set[:m]],
 # provision of set[:m] to national market
-        sum(PN[gm]   * nm0[r,gm,m] for gm in set[:gm])
+    sum(PN[gm]   * nm0[r,gm,m] for gm in set[:gm])
 # provision of set[:m] to domestic market
-        + sum((haskey(PD.lookup[1], (r, gm)) ? PD[(r, gm)] : 1.0) * dm0[r,gm,m] for gm in set[:gm])
-        -
+    + sum((haskey(PD.lookup[1], (r, gm)) ? PD[(r, gm)] : 1.0) * dm0[r,gm,m] for gm in set[:gm])
+    -
 # total margin demand
-        PM[r,m] * sum(md0[r,m,gm] for gm in set[:gm])
+    PM[r,m] * sum(md0[r,m,gm] for gm in set[:gm])
 );
 
 
@@ -407,23 +364,25 @@ lo = 0.0
 #Recursive dynamics mkt clearance
 
 @mapping(cge,market_rk[r in set[:r]],
-        ks_m[r]
-        -
-#current year's capital demand
-       sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AKym[r,s] for s in set[:s])
+# mutable capital supply
+    ks_m[r]
+    -
+# mutable capital demand
+    sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AKym[r,s] for s in set[:s])
 );
 
 @mapping(cge,market_rkx[(r, s) in set[:PK]],
-         (ks_x[r,s])
-         -
-       (haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.) * kd0[r,s]
+# extant capital supply
+    (ks_x[r,s])
+    -
+# extant capital demand
+    (haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.) * kd0[r,s]
 );
-
 
 @mapping(cge,market_pa[(r, g) in set[:PA]],
 # absorption or supply
-        (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g]
-        - (
+    (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g]
+    - (
 # government demand (exogenous)
         g0[r,g]
 # demand for investment
@@ -431,99 +390,100 @@ lo = 0.0
 # final demand
         + C[r] * CD[r,g]
 # intermediate demand
-#            + sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
         + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
         + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
-        )
+    )
 );
 
 @mapping(cge,market_py[(r, g) in set[:PY]],
 # sectoral supply
-#        sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) *ys0[r,s,g] for s in set[:s])
-         sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 0.0) *ys0[r,s,g] for s in set[:s])
-         + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 0.0) *ys0[r,s,g] for s in set[:s])
+    sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 0.0) *ys0[r,s,g] for s in set[:s])
+    + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 0.0) *ys0[r,s,g] for s in set[:s])
 # household production (exogenous)
-        + yh0[r,g]
-        -
+    + yh0[r,g]
+    -
 # aggregate supply (akin to market demand)
-       (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1) * s0[r,g]
+    (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1) * s0[r,g]
 );
 
 @mapping(cge,market_pl[r in set[:r]],
 # supply of labor
-        sum(le0[r,s] for s in set[:s])
-        -
+    sum(le0[r,s] for s in set[:s])
+    -
 # demand for labor in all set[:s]
-#        sum((haskey(Y.lookup[1], (r, s)) ? Y[(r, s)] : 1) * AL[r,s] for s in set[:s])
-        (
-                sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ALym[r,s] for s in set[:s])
-                + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ld0[r,s] for s in set[:s])
-        )
+    (
+        sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ALym[r,s] for s in set[:s])
+        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ld0[r,s] for s in set[:s])
+    )
 );
 #----------
 
 
 @mapping(cge,market_pd[(r, g) in set[:PD]],
 # aggregate supply
-        (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1)  * AD[r,g]
-        - (
+    (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1)  * AD[r,g]
+    - (
 # demand for local market
         (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * DD[r,g]
-# margin supply from local market
+# margin formulation from local market
         + sum(MS[r,m] * dm0[r,g,m] for m in set[:m] if (g in set[:gm] ) )
-        )
+    )
 );
 
 @mapping(cge,market_pn[g in set[:g]],
 # supply to the national market
-        sum((haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1)  * AN[r,g] for r in set[:r])
-        - (
+    sum((haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1)  * AN[r,g] for r in set[:r])
+    - (
 # demand from the national market
         sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * DN[r,g] for r in set[:r])
-# market supply to the national market
+# margin formulation from the national market
         + sum(MS[r,m] * nm0[r,g,m] for r in set[:r] for m in set[:m] if (g in set[:gm]) )
-        )
+    )
 );
 
 
 @mapping(cge,market_pm[r in set[:r], m in set[:m]],
 # margin supply
-        MS[r,m] * sum(md0[r,m,gm] for gm in set[:gm])
-        -
+    MS[r,m] * sum(md0[r,m,gm] for gm in set[:gm])
+    -
 # margin demand
-        sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * md0[r,m,g] for g in set[:g])
+    sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * md0[r,m,g] for g in set[:g])
 );
 
 @mapping(cge,market_pc[r in set[:r]],
 # Consumption supply
-        C[r] * c0[r]
-        -
+    C[r] * c0[r]
+    -
 # Consumption demand
-        W[r] * c0[r]
+    W[r] * c0[r]
 );
 
 @mapping(cge, market_pinv[r in set[:r]],
-        INV[r]*inv0[r]
-        -
-        W[r]*inv0[r]
+# investment supply
+    INV[r]*inv0[r]
+    -
+# investment demanded
+    W[r]*inv0[r]
 );
 
 @mapping(cge, market_pw[r in set[:r]],
-        W[r]*w0[r]
-        -
-        RA[r] / PW[r]
+# welfare supply
+    W[r]*w0[r]
+    -
+# full consumption welfare / utility
+    RA[r] / PW[r]
 );
 
 @mapping(cge,market_pfx,
 # balance of payments (exogenous)
-        sum(bopdef0[r] for r in set[:r])
+    sum(bopdef0[r] for r in set[:r])
 # supply of exports
-        + sum((haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1.0)  * AX[r,g] for r in set[:r] for g in set[:g])
+    + sum((haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1.0)  * AX[r,g] for r in set[:r] for g in set[:g])
 # supply of re-exports
-        + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * rx0[r,g] for r in set[:r] for g in set[:g] if (r,g) in set[:A])
-        -
+    + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * rx0[r,g] for r in set[:r] for g in set[:g] if (r,g) in set[:A])
+    -
 # import demand
-        sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] for r in set[:r] for g in set[:g] if (r,g) in set[:A])
+    sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] for r in set[:r] for g in set[:g] if (r,g) in set[:A])
 );
 
 
@@ -531,15 +491,14 @@ lo = 0.0
 #Income balance update for recursive dynamics
 @mapping(cge,income_ra[r in set[:r]],
 # consumption/utility
-        RA[r]
-        -
-        (
+    RA[r]
+    -
+    (
 # labor income
         PL[r] * sum(le0[r,s] for s in set[:s])
 # capital income
         + RK[r] * ks_m[r]
         +sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in set[:s])
-        #+ sum((haskey(PK.lookup[1], (r, s)) ? PK[(r,s)] : 1.0) * kd0[r,s] for s in set[:s])
 # provision of household supply
         + sum( (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * yh0[r,g] for g in set[:g])
 # revenue or costs of foreign exchange including household adjustment
@@ -551,17 +510,17 @@ lo = 0.0
 # taxes on intermediate demand - assumes lumpsum recycling
         + sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g]*(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)*ta[r,g] for g in set[:g] if (r,g) in set[:A])
 # production taxes - assumes lumpsum recycling
-            + sum( (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ys0[r,s,g] * ty[r,s] for s in set[:s], g in set[:g])
-            + sum( (haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ys0[r,s,g] * ty[r,s] for s in set[:s], g in set[:g])
-        )
+        + sum( (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ys0[r,s,g] * ty[r,s] for s in set[:s], g in set[:g])
+        + sum( (haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ys0[r,s,g] * ty[r,s] for s in set[:s], g in set[:g])
+    )
 );
 
 #----------
 # Reporting
 @mapping(cge, DKMdef[(r,s) in set[:PK]],
-        DKM[(r,s)]
-        -
-        YM[(r,s)]*AKym[r,s]
+    DKM[(r,s)]
+    -
+    YM[(r,s)]*AKym[r,s]
 );
 
 ####################################
@@ -623,12 +582,15 @@ for t in 2017:2020
     @info("Begin loop prior to $t Solve.")
 
     # !!!! Should growth rate be in here? Benchmark cannot replicate if not here.
+    # new mutable capital
     newkm = Dict((r,t) => (ktot_mx[r,bmkyr]*(1+value(gr)) - ktot_mx[r,bmkyr]*srv) * result_value(INV[r])
         for r in set[:r]);
 
+    # mutable capital demand from previous solve
     dkml = Dict((r,s) => (haskey(DKM.lookup[1], (r,s)) ? result_value(DKM[(r,s)]) : 0.0)
         for r in set[:r], s in set[:s]);
 
+    # Total mutable/putty capital
     # !!!! Should old putty be frozen?
     # ktot_m = Dict((r,t) => newkm[r,t] + value(ks_m[r])*srv - sum(value(thetax)*dkml[r,s]*srv for s in set[:s])
     #     for r in set[:r]);
@@ -642,6 +604,7 @@ for t in 2017:2020
     yxl = Dict((r,s) => (haskey(YX.lookup[1], (r,s)) ? result_value(YX[(r,s)]) : 0.0)
         for r in set[:r], s in set[:s]);
 
+    # Total extant/clay capital
     # !!!! Should old clay increase by frozen putty each period?
     # ktot_x = Dict((r,s,t) => srv*yxl[r,s]*value(kd0[r,s]) + value(thetax)*dkml[r,s]*srv
     #     for r in set[:r], s in set[:s]);
@@ -653,7 +616,7 @@ for t in 2017:2020
     end
 
     for r in set[:r], s in set[:s]
-    #update labor endowments --- I think I need separate parameters for labor endowments versus demand
+    #update labor endowments --- separate parameters for labor endowments versus demand
         set_value(le0[r,s], (1 + value(gr)) * value(le0[r,s]));
     end
 
@@ -663,8 +626,7 @@ for t in 2017:2020
         set_value(hhadj[r], (1 + value(gr)) * value(hhadj[r]));
     end
 
-    #update government and exogenous investment parameters
-    # !!!! What should happen with i0?
+    #update government and household production
     for r in set[:r], g in set[:g]
         set_value(g0[r,g], (1 + value(gr)) * value(g0[r,g]));
         set_value(yh0[r,g], (1 + value(gr)) * value(yh0[r,g]));
@@ -691,6 +653,7 @@ for t in 2017:2020
         set_start_value(A[(r,g)], result_value(A[(r,g)])*(1+value(gr)));
     end
 
+    #update margin supply start value
     for r in set[:r], m in set[:m]
         set_start_value(MS[r,m], result_value(MS[r,m])*(1+value(gr)));
     end

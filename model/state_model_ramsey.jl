@@ -55,39 +55,40 @@ cge = MCPModel();
 ##############
 
 #benchmark values
-# !!!! Add Comments/Descriptions
-@NLparameter(cge, ys0[r in set[:r], s in set[:s], g in set[:g]] == sld[:ys0][r,s,g]);
-@NLparameter(cge, id0[r in set[:r], s in set[:s], g in set[:g]] == sld[:id0][r,s,g]);
-@NLparameter(cge, ld0[r in set[:r], s in set[:s]] == sld[:ld0][r,s]);
-@NLparameter(cge, kd0[r in set[:r], s in set[:s]] == sld[:kd0][r,s]);
-@NLparameter(cge, ty0[r in set[:r], s in set[:s]] == sld[:ty0][r,s]);
-@NLparameter(cge, ty[r in set[:r], s in set[:s]] == sld[:ty0][r,s]);
-@NLparameter(cge, m0[r in set[:r], g in set[:g]] == sld[:m0][r,g]);
-@NLparameter(cge, x0[r in set[:r], g in set[:g]] == sld[:x0][r,g]);
-@NLparameter(cge, rx0[r in set[:r], g in set[:g]] == sld[:rx0][r,g]);
-@NLparameter(cge, md0[r in set[:r], m in set[:m], g in set[:g]] == sld[:md0][r,m,g]);
-@NLparameter(cge, nm0[r in set[:r], g in set[:g], m in set[:m]] == sld[:nm0][r,g,m]);
-@NLparameter(cge, dm0[r in set[:r], g in set[:g], m in set[:m]] == sld[:dm0][r,g,m]);
-@NLparameter(cge, s0[r in set[:r], g in set[:g]] == sld[:s0][r,g]);
-@NLparameter(cge, a0[r in set[:r], g in set[:g]] == sld[:a0][r,g]);
-@NLparameter(cge, ta0[r in set[:r], g in set[:g]] == sld[:ta0][r,g]);
-@NLparameter(cge, ta[r in set[:r], g in set[:g]] == sld[:ta0][r,g]);
-@NLparameter(cge, tm0[r in set[:r], g in set[:g]] == sld[:tm0][r,g]);
-@NLparameter(cge, tm[r in set[:r], g in set[:g]] == sld[:tm0][r,g]);
-@NLparameter(cge, cd0[r in set[:r], g in set[:g]] == sld[:cd0][r,g]);
-@NLparameter(cge, c0[r in set[:r]] == sld[:c0][r]);
-@NLparameter(cge, yh0[r in set[:r], g in set[:g]] == sld[:yh0][r,g]);
-@NLparameter(cge, bopdef0[r in set[:r]] == sld[:bopdef0][r]);
-@NLparameter(cge, hhadj[r in set[:r]] == sld[:hhadj][r]);
-@NLparameter(cge, g0[r in set[:r], g in set[:g]] == sld[:g0][r,g]);
-@NLparameter(cge, xn0[r in set[:r], g in set[:g]] == sld[:xn0][r,g]);
-@NLparameter(cge, xd0[r in set[:r], g in set[:g]] == sld[:xd0][r,g]);
-@NLparameter(cge, dd0[r in set[:r], g in set[:g]] == sld[:dd0][r,g]);
-@NLparameter(cge, nd0[r in set[:r], g in set[:g]] == sld[:nd0][r,g]);
-@NLparameter(cge, i0[r in set[:r], g in set[:g]] == sld[:i0][r,g]);
+#benchmark values
+@NLparameter(cge, ys0[r in set[:r], s in set[:s], g in set[:g]] == sld[:ys0][r,s,g]); # Sectoral supply
+@NLparameter(cge, id0[r in set[:r], s in set[:s], g in set[:g]] == sld[:id0][r,s,g]); # Intermediate demand
+@NLparameter(cge, ld0[r in set[:r], s in set[:s]] == sld[:ld0][r,s]); # Labor demand
+@NLparameter(cge, kd0[r in set[:r], s in set[:s]] == sld[:kd0][r,s]); # Capital demand
+@NLparameter(cge, ty0[r in set[:r], s in set[:s]] == sld[:ty0][r,s]); # Production tax (benchmark)
+@NLparameter(cge, m0[r in set[:r], g in set[:g]] == sld[:m0][r,g]); # Imports
+@NLparameter(cge, x0[r in set[:r], g in set[:g]] == sld[:x0][r,g]); # Exports of goods and services
+@NLparameter(cge, rx0[r in set[:r], g in set[:g]] == sld[:rx0][r,g]); # Re-exports of goods and services
+@NLparameter(cge, md0[r in set[:r], m in set[:m], g in set[:g]] == sld[:md0][r,m,g]); # Total margin demand
+@NLparameter(cge, nm0[r in set[:r], g in set[:g], m in set[:m]] == sld[:nm0][r,g,m]); # Margin demand from national market
+@NLparameter(cge, dm0[r in set[:r], g in set[:g], m in set[:m]] == sld[:dm0][r,g,m]); # Margin supply from local market
+@NLparameter(cge, s0[r in set[:r], g in set[:g]] == sld[:s0][r,g]); # Aggregate supply
+@NLparameter(cge, a0[r in set[:r], g in set[:g]] == sld[:a0][r,g]); # Armington supply
+@NLparameter(cge, ta0[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); # Tax net of subsidy rate on intermediate demand
+@NLparameter(cge, tm0[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); # Import tariff
+@NLparameter(cge, cd0[r in set[:r], g in set[:g]] == sld[:cd0][r,g]); # Final demand
+@NLparameter(cge, c0[r in set[:r]] == sld[:c0][r]); # Aggregate final demand
+@NLparameter(cge, yh0[r in set[:r], g in set[:g]] == sld[:yh0][r,g]); #Household production
+@NLparameter(cge, bopdef0[r in set[:r]] == sld[:bopdef0][r]); #Balance of payments
+@NLparameter(cge, hhadj[r in set[:r]] == sld[:hhadj][r]); # Household adjustment
+@NLparameter(cge, g0[r in set[:r], g in set[:g]] == sld[:g0][r,g]); # Government demand
+@NLparameter(cge, i0[r in set[:r], g in set[:g]] == sld[:i0][r,g]); # Investment demand
+@NLparameter(cge, xn0[r in set[:r], g in set[:g]] == sld[:xn0][r,g]); # Regional supply to national market
+@NLparameter(cge, xd0[r in set[:r], g in set[:g]] == sld[:xd0][r,g]); # Regional supply to local market
+@NLparameter(cge, dd0[r in set[:r], g in set[:g]] == sld[:dd0][r,g]); # Regional demand to local market
+@NLparameter(cge, nd0[r in set[:r], g in set[:g]] == sld[:nd0][r,g]); # Regional demand to national market
+
+#counterfactual taxes
+@NLparameter(cge, ty[r in set[:r], s in set[:s]] == sld[:ty0][r,s]); # Output tax
+@NLparameter(cge, ta[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); # Armington tax
+@NLparameter(cge, tm[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); # Import tariff
 
 # benchmark value share parameters
-# !!!! Add Comments/Descriptions
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
 @NLparameter(cge, alpha_x[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
 @NLparameter(cge, alpha_d[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(s0[r,g])));
@@ -170,27 +171,6 @@ lo = MODEL_LOWER_BOUND
 # !!!! Updates needed for Intertemporal Consumption
 @variable(cge,RA[yr in years, r in set[:r]]>=lo,start = value(qvm[yr])*value(pvm[yr])*value(c0[r])); #Representative Agent
 
-"""
-# !!!! Method for fixing equation variables when missing from set control for haskey filters
-# Example:
-# Current: (haskey(RK.lookup[1], (yr,r,s)) ? RK[(yr,r,s)] : 1.0)
-# Alternate: (haskey(RK.lookup[1], (yr,r,s)) ? RK[(yr,r,s)] : fixV[:RK])
-"""
-fixV=Dict()
-fixV[:Y]=1.0
-fixV[:X]=1.0
-fixV[:A]=1.0
-fixV[:K]=0.0
-fixV[:I]=0.0
-fixV[:TK]=0.0
-
-fixV[:PA]=1.0
-fixV[:PY]=1.0
-fixV[:PD]=1.0
-fixV[:RK]=1.0
-fixV[:PK]=1.0
-fixV[:PKT]=1.0
-
 ###############################
 # -- PLACEHOLDER VARIABLES --
 ###############################
@@ -256,76 +236,76 @@ fixV[:PKT]=1.0
 
 @mapping(cge,profit_y[(yr,r,s) in set[:Y]],
 # cost of intermediate demand
-        sum((haskey(PA.lookup[1], (yr,r,g)) ? PA[(yr,r,g)] : 1.0) * id0[r,g,s] for g in set[:g])
+    sum((haskey(PA.lookup[1], (yr,r,g)) ? PA[(yr,r,g)] : 1.0) * id0[r,g,s] for g in set[:g])
 # cost of labor inputs
-        + PL[yr,r] * AL[yr,r,s]
+    + PL[yr,r] * AL[yr,r,s]
 # cost of capital inputs
-        + ((haskey(RK.lookup[1], (yr,r,s)) ? RK[(yr,r,s)] : 1.0)/rk0)* AK[yr,r,s]
-        -
+    + ((haskey(RK.lookup[1], (yr,r,s)) ? RK[(yr,r,s)] : 1.0)/rk0)* AK[yr,r,s]
+    -
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
-        sum((haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
+    sum((haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
 );
 
 @mapping(cge,profit_x[(yr,r,g) in set[:X]],
 # output 'cost' from aggregate supply
-         (haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0) * s0[r,g]
-        - (
+    (haskey(PY.lookup[1], (yr,r,g)) ? PY[(yr,r,g)] : 1.0) * s0[r,g]
+    - (
 # revenues from foreign exchange
         PFX[yr] * AX[yr,r,g]
 # revenues from national market
         + PN[yr,g] * AN[yr,r,g]
 # revenues from domestic market
         + (haskey(PD.lookup[1], (yr,r,g)) ? PD[(yr,r,g)] : 1.0) * AD[yr,r,g]
-        )
+    )
 );
 
 @mapping(cge,profit_a[(yr,r,g) in set[:A]],
 # costs from national market
-        PN[yr,g] * DN[yr,r,g]
+    PN[yr,g] * DN[yr,r,g]
 # costs from domestic market
-        + (haskey(PD.lookup[1], (yr,r,g)) ? PD[(yr,r,g)] : 1.0) * DD[yr,r,g]
+    + (haskey(PD.lookup[1], (yr,r,g)) ? PD[(yr,r,g)] : 1.0) * DD[yr,r,g]
 # costs from imports, including import tariff
-        + PFX[yr] * (1+tm[r,g]) * MD[yr,r,g]
+    + PFX[yr] * (1+tm[r,g]) * MD[yr,r,g]
 # costs of margin demand
-        + sum(PM[yr,r,m] * md0[r,m,g] for m in set[:m])
-        - (
+    + sum(PM[yr,r,m] * md0[r,m,g] for m in set[:m])
+    - (
 # revenues from regional market based on armington supply
         (haskey(PA.lookup[1], (yr,r,g)) ? PA[(yr,r,g)] : 1.0) * (1-ta[r,g]) * a0[r,g]
 # revenues from re-exports
         + PFX[yr] * rx0[r,g]
-        )
+    )
 );
 
 @mapping(cge, profit_c[yr in years,r in set[:r]],
 # costs of inputs - computed as final demand times regional market prices
-        sum((haskey(PA.lookup[1], (yr,r,g)) ? PA[(yr,r,g)] : 1.0) * CD[yr,r,g] for g in set[:g])
-        -
+    sum((haskey(PA.lookup[1], (yr,r,g)) ? PA[(yr,r,g)] : 1.0) * CD[yr,r,g] for g in set[:g])
+    -
 # revenues/benefit computed as CPI * reference consumption
-        PC[yr,r] * c0[r]
+    PC[yr,r] * c0[r]
 );
 
 @mapping(cge,profit_k[(yr,r,s) in set[:PK]],
-        (haskey(PK.lookup[1], (yr,r,s)) ? PK[(yr,r,s)] : 1.0)
-        - (
+    (haskey(PK.lookup[1], (yr,r,s)) ? PK[(yr,r,s)] : 1.0)
+    - (
         (haskey(RK.lookup[1], (yr,r,s)) ? RK[(yr,r,s)] : 1.0)
         + (1-dr) * (yr!=yrl ? (haskey(PK.lookup[1], (yr+1,r,s)) ? PK[(yr+1,r,s)] : 1.0) : (haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0))
-        )
+    )
 );
 
 @mapping(cge,profit_i[(yr,r,s) in set[:PK]],
-        (haskey(PY.lookup[1], (yr,r,s)) ? PY[(yr,r,s)] : 1.0)
-        -
-        (yr!=yrl ? (haskey(PK.lookup[1], (yr+1,r,s)) ? PK[(yr+1,r,s)] : 1.0) : (haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0))
+    (haskey(PY.lookup[1], (yr,r,s)) ? PY[(yr,r,s)] : 1.0)
+    -
+    (yr!=yrl ? (haskey(PK.lookup[1], (yr+1,r,s)) ? PK[(yr+1,r,s)] : 1.0) : (haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0))
 );
 
 @mapping(cge,profit_ms[yr in years,r in set[:r],m in set[:m]],
 # provision of set[:m] to national market
-        sum(PN[yr,gm]   * nm0[r,gm,m] for gm in set[:gm])
+    sum(PN[yr,gm]   * nm0[r,gm,m] for gm in set[:gm])
 # provision of set[:m] to domestic market
-        + sum((haskey(PD.lookup[1], (yr,r,gm)) ? PD[(yr,r,gm)] : 1.0) * dm0[r,gm,m] for gm in set[:gm])
-        -
+    + sum((haskey(PD.lookup[1], (yr,r,gm)) ? PD[(yr,r,gm)] : 1.0) * dm0[r,gm,m] for gm in set[:gm])
+    -
 # total margin demand
-        PM[yr,r,m] * sum(md0[r,m,gm] for gm in set[:gm])
+    PM[yr,r,m] * sum(md0[r,m,gm] for gm in set[:gm])
 );
 
 
@@ -335,8 +315,8 @@ fixV[:PKT]=1.0
 
 @mapping(cge,market_pa[(yr,r,g) in set[:PA]],
 # absorption or supply
-        (haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * a0[r,g]
-        - (
+    (haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * a0[r,g]
+    - (
 # government demand (exogenous)
         g0[r,g]*qvm[yr]
 # demand for investment (exogenous)
@@ -345,114 +325,114 @@ fixV[:PKT]=1.0
         + C[yr,r] * CD[yr,r,g]
 # intermediate demand
         + sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * id0[r,g,s] for s in set[:s] if (yr,r,s) in set[:Y])
-        )
-);
+    )
+)
 
 @mapping(cge,market_py[(yr,r,g) in set[:PY]],
 # sectoral supply
-        sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) *ys0[r,s,g] for s in set[:s])
+    sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) *ys0[r,s,g] for s in set[:s])
 # household production (exogenous)
-        + yh0[r,g]*qvm[yr]
-        -
+    + yh0[r,g]*qvm[yr]
+    -
 # aggregate supply (akin to market demand)
-       (haskey(X.lookup[1], (yr,r,g)) ? X[(yr,r,g)] : 1.0) * s0[r,g]
+    (haskey(X.lookup[1], (yr,r,g)) ? X[(yr,r,g)] : 1.0) * s0[r,g]
 );
 
 @mapping(cge,market_pd[(yr,r,g) in set[:PD]],
 # aggregate supply
-        (haskey(X.lookup[1], (yr,r,g)) ? X[(yr,r,g)] : 1.0)  * AD[yr,r,g]
-        - (
+    (haskey(X.lookup[1], (yr,r,g)) ? X[(yr,r,g)] : 1.0)  * AD[yr,r,g]
+    - (
 # demand for local market
         (haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * DD[yr,r,g]
 # margin supply from local market
         + sum(MS[yr,r,m] * dm0[r,g,m] for m in set[:m] if (g in set[:gm] ) )
-        )
+    )
 );
 
 @mapping(cge,market_pn[yr in years,g in set[:g]],
 # supply to the national market
-        sum((haskey(X.lookup[1], (yr,r,g)) ? X[(yr,r,g)] : 1.0)  * AN[yr,r,g] for r in set[:r])
-        - (
+    sum((haskey(X.lookup[1], (yr,r,g)) ? X[(yr,r,g)] : 1.0)  * AN[yr,r,g] for r in set[:r])
+    - (
 # demand from the national market
         sum((haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * DN[yr,r,g] for r in set[:r])
 # market supply to the national market
         + sum(MS[yr,r,m] * nm0[r,g,m] for r in set[:r] for m in set[:m] if (g in set[:gm]) )
-        )
+    )
 );
 
 @mapping(cge,market_pl[yr in years,r in set[:r]],
 # supply of labor
-        sum(ld0[r,s]*qvm[yr] for s in set[:s])
-        -
+    sum(ld0[r,s]*qvm[yr] for s in set[:s])
+    -
 # demand for labor in all set[:s]
-       sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * AL[yr,r,s] for s in set[:s])
+    sum((haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * AL[yr,r,s] for s in set[:s])
 );
 
 @mapping(cge,market_pk[(yr,r,s) in set[:PK]],
 # if first year, initial capital
 # else investment plus previous year's decayed capital
-        (yr==yrf ? kd0[r,s] : (haskey(I.lookup[1], (yr-1,r,s)) ? I[(yr-1,r,s)] : 0.0))
-        +(1-dr) * (yr>yrf ? (haskey(K.lookup[1], (yr-1,r,s)) ? K[(yr-1,r,s)] : 0.0) : 0.0)
-        -
+    (yr==yrf ? kd0[r,s] : (haskey(I.lookup[1], (yr-1,r,s)) ? I[(yr-1,r,s)] : 0.0))
+    +(1-dr) * (yr>yrf ? (haskey(K.lookup[1], (yr-1,r,s)) ? K[(yr-1,r,s)] : 0.0) : 0.0)
+    -
 # capital in year [yr]
-        (haskey(K.lookup[1], (yr,r,s)) ? K[(yr,r,s)] : 0.0)
+    (haskey(K.lookup[1], (yr,r,s)) ? K[(yr,r,s)] : 0.0)
 );
 
 @mapping(cge,market_rk[(yr,r,s) in set[:PK]],
-        (haskey(K.lookup[1], (yr,r,s)) ? K[(yr,r,s)] : 0.0)
-        -
-        (haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * AK[yr,r,s]
+    (haskey(K.lookup[1], (yr,r,s)) ? K[(yr,r,s)] : 0.0)
+    -
+    (haskey(Y.lookup[1], (yr,r,s)) ? Y[(yr,r,s)] : 1.0) * AK[yr,r,s]
 );
 
 @mapping(cge,market_pkt[(r,s) in set[:PKT]],
-        (1-dr)*(haskey(K.lookup[1], (yrl,r,s)) ? K[(yrl,r,s)] : 0.0)
-        + (haskey(I.lookup[1], (yrl,r,s)) ? I[(yrl,r,s)] : 0.0)
-        -
-        (haskey(TK.lookup[1], (r,s)) ? TK[(r,s)] : 0.0)
+    (1-dr)*(haskey(K.lookup[1], (yrl,r,s)) ? K[(yrl,r,s)] : 0.0)
+    + (haskey(I.lookup[1], (yrl,r,s)) ? I[(yrl,r,s)] : 0.0)
+    -
+    (haskey(TK.lookup[1], (r,s)) ? TK[(r,s)] : 0.0)
 );
 
 @mapping(cge,termk[(r,s) in set[:PKT]],
-        (haskey(I.lookup[1], (yrl,r,s)) ? I[(yrl,r,s)] : 0.0)
-        / ((haskey(I.lookup[1], (yrl-1,r,s)) ? I[(yrl-1,r,s)] : 0.0))
-        -
-        (haskey(Y.lookup[1], (yrl,r,s)) ? Y[(yrl,r,s)] : 1.0)
-        / (haskey(Y.lookup[1], (yrl-1,r,s)) ? Y[(yrl-1,r,s)] : 1.0)
+    (haskey(I.lookup[1], (yrl,r,s)) ? I[(yrl,r,s)] : 0.0)
+    / ((haskey(I.lookup[1], (yrl-1,r,s)) ? I[(yrl-1,r,s)] : 0.0))
+    -
+    (haskey(Y.lookup[1], (yrl,r,s)) ? Y[(yrl,r,s)] : 1.0)
+    / (haskey(Y.lookup[1], (yrl-1,r,s)) ? Y[(yrl-1,r,s)] : 1.0)
 );
 
 @mapping(cge,market_pm[yr in years,r in set[:r], m in set[:m]],
 # margin supply
-        MS[yr,r,m] * sum(md0[r,m,gm] for gm in set[:gm])
-        -
+    MS[yr,r,m] * sum(md0[r,m,gm] for gm in set[:gm])
+    -
 # margin demand
-        sum((haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * md0[r,m,g] for g in set[:g])
+    sum((haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * md0[r,m,g] for g in set[:g])
 );
 
 @mapping(cge,market_pfx[yr in years],
 # balance of payments (exogenous)
-        sum(bopdef0[r] for r in set[:r])*qvm[yr]
+    sum(bopdef0[r] for r in set[:r])*qvm[yr]
 # supply of exports
-        + sum((haskey(X.lookup[1], (yr,r,g)) ? X[(yr,r,g)] : 1.0)  * AX[yr,r,g] for r in set[:r] for g in set[:g])
+    + sum((haskey(X.lookup[1], (yr,r,g)) ? X[(yr,r,g)] : 1.0)  * AX[yr,r,g] for r in set[:r] for g in set[:g])
 # supply of re-exports
-        + sum((haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * rx0[r,g] for r in set[:r] for g in set[:g] if (yr,r,g) in set[:A])
-        -
+    + sum((haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * rx0[r,g] for r in set[:r] for g in set[:g] if (yr,r,g) in set[:A])
+    -
 # import demand
-        sum((haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * MD[yr,r,g] for r in set[:r] for g in set[:g] if (yr,r,g) in set[:A])
+    sum((haskey(A.lookup[1], (yr,r,g)) ? A[(yr,r,g)] : 1.0) * MD[yr,r,g] for r in set[:r] for g in set[:g] if (yr,r,g) in set[:A])
 );
 
 @mapping(cge,market_pc[yr in years,r in set[:r]],
 # a period's final demand
-        C[yr,r] * c0[r]
-        -
+    C[yr,r] * c0[r]
+    -
 # consumption / utiltiy
-        RA[yr,r] / PC[yr,r]
+    RA[yr,r] / PC[yr,r]
 );
 
 # !!!! Updates needed for Intertemporal Consumption
 @mapping(cge,income_ra[yr in years,r in set[:r]],
 # consumption/utility
-        RA[yr,r]
-        -
-        (
+    RA[yr,r]
+    -
+    (
 # labor income
         PL[yr,r] * sum(ld0[r,s] for s in set[:s])*qvm[yr]
 # provision of household supply
@@ -470,7 +450,7 @@ fixV[:PKT]=1.0
 # capital income
         + (1-islast[yr]) * sum((haskey(PK.lookup[1], (yr,r,s)) ? PK[(yr,r,s)] : 1.0) * (haskey(K.lookup[1], (yr,r,s)) ? K[(yr,r,s)] : 0.0) for s in set[:s]) / (1+ir)
         + (islast[yr]) * sum((haskey(PKT.lookup[1], (r,s)) ? PKT[(r,s)] : 1.0) * (haskey(TK.lookup[1], (r,s)) ? TK[(r,s)] : 0.0) for s in set[:s]) / (1+gr)
-        )
+    )
 );
 
 

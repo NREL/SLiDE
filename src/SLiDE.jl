@@ -201,7 +201,7 @@ function __init__()
     # https://docs.julialang.org/en/v1/base/base/#Base.ENV
     # https://docs.julialang.org/en/v1/manual/modules/index.html -> init
     Base.ENV["PATH_LICENSE_STRING"] =
-        "2617827524&Courtesy&&&USR&64785&11_12_2017&1000&PATH&GEN&31_12_2020&0_0_0&5000&0_0"
+        "2830898829&Courtesy&&&USR&45321&5_1_2021&1000&PATH&GEN&31_12_2025&0_0_0&6000&0_0"
 end
 
 end # module
