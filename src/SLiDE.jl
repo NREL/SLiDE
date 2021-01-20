@@ -193,11 +193,6 @@ include(joinpath("build", "share", "share_sgf.jl"))
 include(joinpath("build", "share", "share_utd.jl"))
 include(joinpath("build", "disagg", "disagg_region.jl"))
 
-include(joinpath("build", "eia", "_module_utils.jl"))
-include(joinpath("build", "eia", "module_co2emis.jl"))
-include(joinpath("build", "eia", "module_elegen.jl"))
-include(joinpath("build", "eia", "module_energy.jl"))
-
 include(joinpath("model", "model_input.jl"))
 
 function __init__()
