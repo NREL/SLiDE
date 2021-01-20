@@ -11,20 +11,13 @@ using Complementarity
 using DataFrames
 
 
-#################
-# -- FUNCTIONS --
-#################
-
-include(joinpath(SLIDE_DIR,"model","modelfunc.jl"))
-
-
 ############
 # LOAD DATA
 ############
 
 #SLiDE data needs to be built or point to pre-existing build directory
 #can pass a name (d, set) = build_data("name_of_build_directory")
-!(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build_data("state_model"))
+!(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build("state_model"))
 d = copy(d_in)
 set = copy(set_in)
 
@@ -32,7 +25,7 @@ set = copy(set_in)
 bmkyr = 2016
 
 #Load slide data and time horizon to produce model data and appropriate time-indexed subsets
-(sld, set, idx) = _model_input(bmkyr, d, set)
+(sld, set, idx) = model_input(bmkyr, d, set)
 
 
 ########## Model ##########

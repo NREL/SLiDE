@@ -14,12 +14,12 @@
     conditions.
 - `idx::Dict` of parameter indices.
 """
-function model_input(year::Any, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict=Dict())
+function model_input(year::Any, d::Dict, set::Dict, idx::Dict=Dict())
     return model_input(ensurearray(year), d, set, idx)
 end
 
 
-function model_input(year::Array{Int,1}, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict=Dict())
+function model_input(year::Array{Int,1}, d::Dict, set::Dict, idx::Dict=Dict())
     @info("Preparing model data for $year.")
     if length(year) > 1
         d2 = Dict(k => filter_with(df, (yr = year,); extrapolate=true) for (k, df) in d)
@@ -28,7 +28,7 @@ function model_input(year::Array{Int,1}, d::Dict{Symbol,DataFrame}, set::Dict, i
         (set, idx) = _model_set!(d2, set, idx)
 
         d1 = Dict(k => filter_with(df, (yr = year,); drop=true) for (k, df) in d)
-        d1 = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k, df) in d1)
+        d1 = Dict(k => convert_type(Dict, fill_zero(df; with=set)) for (k, df) in d1)
         return (d1, set, idx)
     else
         d = Dict(k => filter_with(df, (yr = year,); drop=true) for (k, df) in d)
@@ -36,7 +36,7 @@ function model_input(year::Array{Int,1}, d::Dict{Symbol,DataFrame}, set::Dict, i
         isempty(idx) && (idx = Dict(k => findindex(df) for (k, df) in d))
         (set, idx) = _model_set!(d, set, idx)
 
-        d = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k, df) in d)
+        d = Dict(k => convert_type(Dict, fill_zero(df; with=set)) for (k, df) in d)
         return (d, set, idx)
     end
 end

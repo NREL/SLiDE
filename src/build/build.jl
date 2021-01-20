@@ -145,11 +145,18 @@ function write_build!(
         
         for k in keys(d_write)
             println("  Writing $k")
-            typeof(d_write[k]) == DataFrame && CSV.write(joinpath(path, "$k.csv"), d_write[k])
+            
+            if typeof(d_write[k]) == DataFrame
+                CSV.write(joinpath(path, "$k.csv"), d_write[k])
+            elseif typeof(d_write[k]) <: AbstractArray
+                CSV.write(joinpath(path, "$k.csv"), DataFrame(k=d_write[k]))
+            end
+            # typeof(d_write[k]) == DataFrame && CSV.write(joinpath(path, "$k.csv"), d_write[k])
         end
     end
     return d
 end
+
 
 function write_build(
     dataset::String,

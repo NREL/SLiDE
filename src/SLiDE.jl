@@ -83,11 +83,12 @@ export dropvalue!
 export dropvalue
 export ensurearray
 export ensuretuple
+export ensurefinite
 export find_oftype
 # export isarray
 # export istype
 export permute
-export add_permutation!
+# export add_permutation!
 export findindex
 export findvalue
 export findunits
