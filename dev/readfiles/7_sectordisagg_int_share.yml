@@ -1,5 +1,0 @@
-Path: [dev, windc_1.0, 7_sectordisagg_int]
-
-DataInput:
-  - {descriptor: share, name: share.csv, col: [yr,disagg,summary,value]}
-  - {descriptor: share_, name: share_.csv, col: [yr,disagg,summary,value]}
