@@ -8,7 +8,7 @@
 # Keywords
 - `save_build = true`
 - `overwrite = false`
-See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
+See [`SLiDE.build`](@ref) for keyword argument descriptions.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data at the sharing step.
@@ -17,23 +17,23 @@ function share(
     dataset::String,
     d::Dict,
     set::Dict;
-    save_build::Bool = DEFAULT_SAVE_BUILD,
-    overwrite::Bool = DEFAULT_OVERWRITE
+    save_build::Bool=DEFAULT_SAVE_BUILD,
+    overwrite::Bool=DEFAULT_OVERWRITE,
 )
     CURR_STEP = "share"
 
     # If there is already sharing data, read it and return.
-    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
+    d_read = read_build(dataset, CURR_STEP; overwrite=overwrite)
     !(isempty(d_read)) && (return d_read, set)
 
     # Add CFS regional sets for filtering.
     [set[k] = set[:r] for k in [:orig,:dest]]
     
     # Read sharing input data.
-    d_read = read_from(joinpath("src","build","readfiles","share","shareinp_1.0.1.yml"))  # !!!! version
+    d_read = read_from(joinpath("src", "build", "readfiles", "input", "share.yml"))
     d_read = Dict(k => sort(dropmissing(edit_with(
-        filter_with(df, set; extrapolate = true),
-        Deselect([:units],"==")
+        filter_with(df, set; extrapolate=true),
+        Deselect([:units], "==")
     ))) for (k, df) in d_read)
 
     merge!(d, d_read)
@@ -45,7 +45,7 @@ function share(
     share_labor!(d, set)
     share_rpc!(d, set)
     
-    write_build!(dataset, CURR_STEP, d; save_build = save_build)
+    write_build!(dataset, CURR_STEP, d; save_build=save_build)
     write_build!(dataset, SET_DIR, Dict(k => set[k] for k in [:notrd,:ng]))
 
     return (d, set)

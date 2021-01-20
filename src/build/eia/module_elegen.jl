@@ -21,6 +21,6 @@ function module_elegen!(d::Dict, maps::Dict)
     df = indexjoin(d[:seds], maps[:elegen]; kind=:inner)
     df = convertjoin(df, d[:heatrate]; id=id)
     df = operate_with(df, maps[:operate]; id=id)
-    d[:elegen] = edit_with(df, Deselect([:sec],"=="))
+    d[:elegen] = edit_with(df, Deselect([:sec], "=="))
     return d[:elegen]
 end

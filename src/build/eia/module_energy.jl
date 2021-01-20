@@ -14,7 +14,7 @@ These operations must occur in the following order:
 """
 function module_energy!(d::Dict, set::Dict, maps::Dict)
     df = copy(d[:seds])
-    df = filter_with(df, (src=set[:e], sec=set[:ed],))
+    df = filter_with(df, (src = set[:e], sec = set[:ed],))
     df = indexjoin(df, maps[:units_base]; kind=:inner)
 
     df_elegen = _module_energy_supply(d)
@@ -52,16 +52,14 @@ end
 ```
 """
 function _module_energy_ref(df::DataFrame)
-    df_split = DataFrame(permute((
-        src = "ele",
+    df_split = DataFrame(permute((src = "ele",
         sec = ["ind","ref"],
-        base = ["btu","kwh"],
-    )))
+        base = ["btu","kwh"],)))
 
     df, df_out, df_split = _split_with(df, df_split, [:sec,:base])
     
     df[!,:ref_kwh] .= df[:,:ref_btu] .* (df[:,:ind_kwh] ./ df[:,:ind_btu])
-    df[!,_add_id(:ref_kwh,:units)] .= df[:,_add_id(:ind_kwh,:units)]
+    df[!,_add_id(:ref_kwh, :units)] .= df[:,_add_id(:ind_kwh, :units)]
 
     return _merge_with(df, df_out, df_split)
 end
@@ -131,15 +129,15 @@ function _module_energy_price(df::DataFrame, df_split::DataFrame, maps::Dict)
     df = operate_with(df, maps[:operate]; id=key, keepinput=true)
 
     alt = setdiff(convert_type.(Symbol, df_split[:,:key]), key)[1]
-    if alt in _with_id(df,:value)
+    if alt in _with_id(df, :value)
         ii = .|(isnan.(df[:,:value]), isinf.(df[:,:value]))
-        df[ii,:value] .= df[ii, _add_id(alt,:value)]
+        df[ii,:value] .= df[ii, _add_id(alt, :value)]
     end
 
     df = edit_with(df, Replace.(:value, [Inf,NaN], 0.0))
 
     # Maybe move to _merge_with if this all is general enough? Doubt it tbh.
     alt = _add_id.(alt, id)
-    df = edit_with(df, [Deselect(alt,"=="); Rename.(id, alt)])
+    df = edit_with(df, [Deselect(alt, "=="); Rename.(id, alt)])
     return _merge_with(df, df_out, df_split)
 end

@@ -8,16 +8,10 @@ function _set_yr_detail!(d::Dict, set::Dict)
     return set[:yr_det]
 end
 
-function SLiDE._inp_key(x::AbstractArray)
-    x = if length(x) == 0; nothing
-    elseif length(x) == 1; x[1]
-    else;                  Tuple(x)
-    end
-    return x
-end
 
 # ------------------------------------------------------------------------------------------
 # Map years in detailed set to summary.
+# !!!! move to filter_with and extend/modify extrapolate_year
 
 function _map_step(x::Pair, y::Pair; fun::Function=Statistics.mean)
     (COL,VAL) = (1,2)

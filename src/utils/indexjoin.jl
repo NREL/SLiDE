@@ -66,6 +66,7 @@ function convertjoin(df::Array{DataFrame,1}; id=[])
     return indexjoin(df; id=id, indicator=false, fillmissing=1.0, skipindex=:units, kind=:left)
 end
 
+
 convertjoin(df::Vararg{DataFrame}; id=[]) = convertjoin(ensurearray(df); id=id)
 
 
@@ -165,11 +166,3 @@ end
 
 
 _fill_missing(df::DataFrame) = _fill_missing(df, 0.0)
-
-
-"""
-If no id is specified, default to `id = [x1,x2,...,xN]`
-where `N` is the length of the input array `x`
-"""
-_generate_id(N::Int, id::Symbol = :x) = Symbol.(id, 1:N)
-_generate_id(x::Array, id::Symbol = :x) = _generate_id(length(x), id)

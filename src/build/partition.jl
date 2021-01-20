@@ -1,5 +1,5 @@
 """
-    partition!(d::Dict, set::Dict; kwargs...)
+    partition(d::Dict, set::Dict; kwargs...)
 
 # Arguments
 - `d::Dict` of DataFrames containing the model data.
@@ -8,7 +8,7 @@
 # Keywords
 - `save_build = true`
 - `overwrite = false`
-See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
+See [`SLiDE.build`](@ref) for keyword argument descriptions.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data at the
@@ -17,12 +17,10 @@ function partition(
     dataset::String,
     d::Dict,
     set::Dict;
-    version::String = DEFAULT_VERSION,
-    save_build::Bool = DEFAULT_SAVE_BUILD,
-    overwrite::Bool = DEFAULT_OVERWRITE,
-    # drop_negative_pce::Bool = false,
-    # subtract_margin_from_output::Bool=true,
-    map_fdcat::Bool = false,
+    version::String=DEFAULT_VERSION,
+    save_build::Bool=DEFAULT_SAVE_BUILD,
+    overwrite::Bool=DEFAULT_OVERWRITE,
+    map_fdcat::Bool=false,
 )
     # !!!! different for "detailed" sector as not to overwrite.
     CURR_STEP = "partition"
@@ -31,9 +29,8 @@ function partition(
     d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
     !(isempty(d_read)) && (return d_read)
     
-    # Renaming i -> g and j -> s first, in supply/use data.
-    x = [Deselect([:units],"=="), Rename(:i,:g), Rename(:j,:s)]
-    [d[k] = edit_with(filter_with(d[k], (yr = set[:yr],)), x) for k in [:supply,:use]]
+    x = Deselect([:units],"==")
+    [d[k] = edit_with(filter_with(d[k], (yr=set[:yr],)), x) for k in [:supply,:use]]
 
     map_fdcat && _filter_use!(d,set)
 

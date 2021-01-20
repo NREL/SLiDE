@@ -25,7 +25,7 @@ function share_rpc!(d::Dict, set::Dict)
 
     df = dropnan(d[:d0] / (d[:d0] + d[:mn0]))
 
-    df = edit_with(df, Drop(:g,"uti","=="))
+    df = edit_with(df, Drop(:g, "uti", "=="))
     df_uti = fill_with((r = set[:r], g = "uti"), 0.9)
 
     d[:rpc] = sort([df; df_uti])
@@ -54,7 +54,7 @@ function _share_d0!(d::Dict, set::Dict)
     df = copy(d[:cfs])
 
     df = df[df[:,:orig] .== df[:,:dest],:]
-    df = edit_with(df, [Rename(:orig,:r), Deselect([:dest],"==")])
+    df = edit_with(df, [Rename(:orig, :r), Deselect([:dest], "==")])
 
     d[:d0] = _avg_ng(df, set)
     return d[:d0]
@@ -87,8 +87,8 @@ function _share_mn0!(d::Dict, set::Dict)
     println("\tmn0(r,g), national demand")
     df = copy(d[:mrt0])
 
-    df = edit_with(combine_over(df, :orig), Rename(:dest,:r))
-    d[:mn0] = _avg_ng(df, set)
+    df = edit_with(combine_over(df, :orig), Rename(:dest, :r))
+d[:mn0] = _avg_ng(df, set)
     return d[:mn0]
 end
 
@@ -104,7 +104,7 @@ function _share_xn0!(d::Dict, set::Dict)
     println("\txn0(r,g), national exports")
     df = copy(d[:mrt0])
 
-    df = edit_with(combine_over(df, :dest), Rename(:orig,:r))
+    df = edit_with(combine_over(df, :dest), Rename(:orig, :r))
     d[:xn0] = _avg_ng(df, set)
     return d[:xn0]
 end
@@ -122,7 +122,7 @@ function _avg_ng(df::DataFrame, set::Dict)
         combine_over(copy(df), :g; fun=Statistics.sum),
     )
 
-    df_ng[!,:value] ./= length(setdiff(set[:g],set[:ng]))
+    df_ng[!,:value] ./= length(setdiff(set[:g], set[:ng]))
     
     return vcat(df, df_ng)
 end

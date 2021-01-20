@@ -8,7 +8,7 @@
 # Keywords
 - `save_build = true`
 - `overwrite = false`
-See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
+See [`SLiDE.build`](@ref) for keyword argument descriptions.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data at the disaggregation step

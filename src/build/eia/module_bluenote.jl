@@ -1,7 +1,7 @@
 """
 """
 function _module_convfac(d::Dict)
-    return filter_with(d[:seds], (src="cru", sec="supply", units=BTU_PER_BARREL); drop=:sec)
+    return filter_with(d[:seds], (src = "cru", sec = "supply", units = BTU_PER_BARREL); drop=:sec)
 end
 
 
@@ -18,7 +18,7 @@ end
 """
 """
 function _module_prodbtu(d::Dict, set::Dict)
-    d[:prodbtu] = filter_with(d[:seds], (src=set[:as], sec="supply", units=BTU); drop=:sec)
+    d[:prodbtu] = filter_with(d[:seds], (src = set[:as], sec = "supply", units = BTU); drop=:sec)
     return d[:prodbtu]
 end
 
@@ -29,16 +29,12 @@ function _module_pedef!(d::Dict, set::Dict)
     df = copy(d[:energy])
     
     splitter = Dict(
-        :ff => DataFrame(permute((
-            src = set[:ff],
+        :ff => DataFrame(permute((src = set[:ff],
             sec = set[:demsec],
-            pq = ["p","q"], # must include to act as key when splitting.
-        ))),
-        :ele => DataFrame(permute((
-            src = "ele",
+            pq = ["p","q"],))),
+        :ele => DataFrame(permute((src = "ele",
             sec = set[:demsec],
-            pq = ["p","q"], # must include to act as key when splitting.
-        ))),
+            pq = ["p","q"],))),
     )
 
     d[:pedef] = vcat([_module_pedef(df, df_split) for df_split in values(splitter)]...)
@@ -87,10 +83,10 @@ end
 """
 function _module_pe0!(d::Dict, set::Dict)
     df_demsec = DataFrame(sec=set[:demsec])
-    df_energy = filter_with(d[:energy], (src=set[:e], sec=set[:demsec]))
+    df_energy = filter_with(d[:energy], (src = set[:e], sec = set[:demsec]))
 
     # Use average energy demand prices where available.
-    df_p = filter_with(df_energy, (pq="p",); drop=true)
+    df_p = filter_with(df_energy, (pq = "p",); drop=true)
     df_pedef = crossjoin(d[:pedef], df_demsec)
     col = propertynames(df_p)
     idx = findindex(df_p)
@@ -106,16 +102,16 @@ function _module_pe0!(d::Dict, set::Dict)
     df_r = combine_over(df_cprice, :r; fun=Statistics.mean)
 
     # !!!! simplify this with index_with.
-    df_q = filter_with(df_energy, (src="cru", pq="q"); drop=:pq)
+    df_q = filter_with(df_energy, (src = "cru", pq = "q"); drop=:pq)
     df_q[!,:value] .= max.(df_q[:,:value], 0)
     dropzero!(df_q)
 
-    df_idx = indexjoin(df_q, crossjoin(df_cprice,df_demsec);
+    df_idx = indexjoin(df_q, crossjoin(df_cprice, df_demsec);
         id=[:q,:cprice], indicator=true, skipindex=:units)
     ii = .!df_idx[:,:cprice] .* df_idx[:,:q];
 
-    idx_cprice = df_idx[.!ii,idx[1:end-1]];
-    idx_r = df_idx[ii,idx[1:end-1]];
+    idx_cprice = df_idx[.!ii,idx[1:end - 1]];
+    idx_r = df_idx[ii,idx[1:end - 1]];
 
     df_cprice = indexjoin(idx_cprice, df_cprice; kind=:left)
     df_r = indexjoin(idx_r, df_r; kind=:left)
@@ -136,7 +132,7 @@ function _module_ps0!(d::Dict)
     df_split = DataFrame(src=["cru","oil"])
     df, df_out, df_split = _split_with(df, df_split, [:src])
 
-    df[!,:cru] .= df[:,:oil]/2
+    df[!,:cru] .= df[:,:oil] / 2
 
     d[:ps0] = _merge_with(df, df_out, df_split)
     return d[:ps0]
@@ -147,7 +143,7 @@ end
 """
 function _module_prodval!(d::Dict, set::Dict, maps::Dict)
     id = [:ps0,:prodbtu]
-    df_ps0 = filter_with(d[:ps0], (src=set[:as],))
+    df_ps0 = filter_with(d[:ps0], (src = set[:as],))
     df = convertjoin(df_ps0, d[:prodbtu]; id=id)
     d[:prodval] = operate_with(df, maps[:operate]; id=id)
     return d[:prodval]
@@ -160,7 +156,7 @@ function _module_shrgas!(d::Dict, set::Dict)
     df = copy(d[:prodval])
     df = df / transform_over(df, :src)
 
-    x = (yr=set[:yr], r=set[:r], src=set[:as])
+    x = (yr = set[:yr], r = set[:r], src = set[:as])
     idx_r, idx_shr = index_with(fill_zero(df; with=x), DataFrame(value=0.0))
 
     df_r = combine_over(df, :r; fun=Statistics.mean)
@@ -177,8 +173,8 @@ end
 """
 function _module_netgen!(d::Dict)
     id = [:ps0,:netgen]
-    df_ps0 = filter_with(d[:ps0], (src="ele",))
-    df_netgen = filter_with(d[:seds], (sec="netgen", units=KWH); drop=true)
+    df_ps0 = filter_with(d[:ps0], (src = "ele",))
+    df_netgen = filter_with(d[:seds], (sec = "netgen", units = KWH); drop=true)
     df = convertjoin(df_ps0, df_netgen; id=id)
     df = operate_with(df, maps[:operate]; id=id)
     d[:netgen] = edit_with(df, Add(:dataset, "seds"))
@@ -189,7 +185,7 @@ end
 """
 """
 function _module_eq0!(d::Dict, set::Dict)
-    df = filter_with(d[:energy], (src=set[:e], sec=set[:demsec], pq="q"); drop=true)
+    df = filter_with(d[:energy], (src = set[:e], sec = set[:demsec], pq = "q"); drop=true)
     df[!,:value] = max.(0, df[:,:value])
     d[:eq0] = df
     return d[:eq0]

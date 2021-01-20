@@ -102,7 +102,6 @@ export fill_with
 export extrapolate_region
 export extrapolate_year
 export filter_with
-export gams_to_dataframe
 
 # CALCULATE
 export combine_over
@@ -123,21 +122,18 @@ export verify_over
 export benchmark_against
 
 # BUILD
-export build_data
+export build
 export partition
 export calibrate
 export share
-# export share_labor!
-# export share_pce!
-# export share_region!
-# export share_rpc!
-# export share_sgf!
-# export share_utd!
 export disagg
 
 export module_energy!
 export module_elegen!
 export module_co2emis!
+
+# MODEL
+export model_input
 
 #################################################################################
 # INCLUDES
@@ -172,31 +168,47 @@ include(joinpath("parse", "generated_file", "includes.jl"))
 include(joinpath("model", "generated_cge", "includes.jl"))
 
 # UTILITIES
-include(joinpath("utils", "utils.jl"))
 include(joinpath("utils", "calc.jl"))
+include(joinpath("utils", "fill_zero.jl"))
 include(joinpath("utils", "indexjoin.jl"))
+include(joinpath("utils", "label.jl"))
+include(joinpath("utils", "utils.jl"))
 
-include(joinpath("parse", "load_data.jl"))
-include(joinpath("parse", "edit_data.jl"))
+include(joinpath("parse", "edit_with.jl"))
+include(joinpath("parse", "filter_with.jl"))
+include(joinpath("parse", "load_from.jl"))
+include(joinpath("parse", "read_file.jl"))
+include(joinpath("parse", "run_yaml.jl"))
 include(joinpath("parse", "check_data.jl"))
 
-include(joinpath("build","build.jl"))
-include(joinpath("build","partition.jl"))
-include(joinpath("build","calibrate.jl"))
-include(joinpath("build","share","share.jl"))
-include(joinpath("build","share","share_cfs.jl"))
-include(joinpath("build","share","share_gsp.jl"))
-include(joinpath("build","share","share_pce.jl"))
-include(joinpath("build","share","share_sgf.jl"))
-include(joinpath("build","share","share_utd.jl"))
-include(joinpath("build","disagg","disagg_region.jl"))
+include(joinpath("build", "build.jl"))
+include(joinpath("build", "partition.jl"))
+include(joinpath("build", "calibrate.jl"))
+include(joinpath("build", "share", "share.jl"))
+include(joinpath("build", "share", "share_cfs.jl"))
+include(joinpath("build", "share", "share_gsp.jl"))
+include(joinpath("build", "share", "share_pce.jl"))
+include(joinpath("build", "share", "share_sgf.jl"))
+include(joinpath("build", "share", "share_utd.jl"))
+include(joinpath("build", "disagg", "disagg_region.jl"))
 
-include(joinpath("build","eia","_module_utils.jl"))
-include(joinpath("build","eia","module_co2emis.jl"))
-include(joinpath("build","eia","module_elegen.jl"))
-include(joinpath("build","eia","module_energy.jl"))
+include(joinpath("build", "eia", "_module_utils.jl"))
+include(joinpath("build", "eia", "module_co2emis.jl"))
+include(joinpath("build", "eia", "module_elegen.jl"))
+include(joinpath("build", "eia", "module_energy.jl"))
+
+include(joinpath("model", "model_input.jl"))
 
 function __init__()
+
+    last_updated = Dates.DateTime("2021-01-20T00:00:00.0")
+    data = joinpath(SLiDE.SLIDE_DIR, "data")
+    if isdir(data) && last_updated > Dates.unix2datetime(ctime(data))
+        @warn("SLiDE input data has been updated.
+            Remove or rename $data and
+            rebuild SLiDE (] build) to avoid compatibility issues.")
+    end
+
     # See: http://pages.cs.wisc.edu/~ferris/path/LICENSE
     # https://docs.julialang.org/en/v1/base/base/#Base.ENV
     # https://docs.julialang.org/en/v1/manual/modules/index.html -> init

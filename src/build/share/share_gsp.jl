@@ -14,7 +14,7 @@ function share_labor!(d::Dict, set::Dict)
     df = dropnan(df[:,cols])
 
     # Begin summary DataFrame.
-    df = indexjoin([df, d[:region], d[:lshr0]]; id = [:value, :region, :lshr0])
+    df = indexjoin([df, d[:region], d[:lshr0]]; id=[:value,:region,:lshr0])
 
     # Use the national average labor share (calculated when partitioning)
     # in cases where the labor share is zero (e.g. banking, finance, etc.).
@@ -61,7 +61,7 @@ function share_region!(d::Dict, set::Dict)
     :gdpcat in propertynames(d[:gsp]) && _share_gsp!(d, set)
 
     cols = [findindex(d[:gsp]); :value]
-    df = edit_with(copy(d[:gsp]), Rename(:gdp,:value))[:,cols]
+    df = edit_with(copy(d[:gsp]), Rename(:gdp, :value))[:,cols]
     df = df / transform_over(df, :r)
     
     # JUST IN CASE we switch back to g here..
@@ -76,7 +76,7 @@ function share_region!(d::Dict, set::Dict)
     df_s = crossjoin(DataFrame(s => set[:oth,:use]), df_s)
 
     d[:region] = dropnan(dropmissing(sort([df; df_s])))
-    verify_over(d[:region],:r) !== true && @error("Regional shares don't sum to 1.")
+    verify_over(d[:region], :r) !== true && @error("Regional shares don't sum to 1.")
     return d[:region]
 end
 
@@ -108,6 +108,7 @@ function _share_gsp!(d::Dict, set::Dict)
     d[:gsp] = df
 end
 
+
 "`lshr0`: Labor share of value added"
 function _share_lshr0!(d::Dict, set::Dict)
     va0 = edit_with(unstack(copy(d[:va0]), :va, :value),
@@ -121,22 +122,15 @@ function _share_lshr0!(d::Dict, set::Dict)
     return dropmissing!(dropnan!(d[:lshr0]))
 end
 
-# " `netval`: Factor totals"
-# function _share_netval!(d::Dict)
-#     cols = [:yr,:r,:s,:sudo,:comp]
-#     df = copy(d[:gsp])
-#     df[!,:sudo] .= df[:,:gdp] - df[:,:taxsbd]
-#     df[!,:comp] .= df[:,:cmp] + df[:,:gos]
-#     d[:netval] = df[:,cols]
-# end
 
 "`wg(yr,r,s)`: Index pairs with high wage shares (>1)"
 function _share_wg!(d::Dict, set::Dict)
     d[:wg] = copy(d[:labor])
     d[:wg][!,:value] .= d[:wg][:,:value] .> 1
-    set[:wg] = values.(eachrow(d[:wg][d[:wg][:,:value], find_oftype(d[:wg],Not(Bool))]))
+    set[:wg] = values.(eachrow(d[:wg][d[:wg][:,:value], find_oftype(d[:wg], Not(Bool))]))
     return d[:wg] # must return the DataFrame
 end
+
 
 "`hw(r,s)`: (region,sector) pairings with ALL wage shares > 1"
 function _share_hw!(d::Dict, set::Dict)
@@ -145,21 +139,27 @@ function _share_hw!(d::Dict, set::Dict)
     !(:wg in collect(keys(d))) && _share_wg!(d, set)
 
     df = copy(d[:wg])
-    d[:hw] = combine_over(df, :yr; fun = prod)
-    set[:hw] = values.(eachrow(d[:hw][d[:hw][:,:value], find_oftype(d[:hw],String)]))
-    return transform_over(df, :yr; fun = prod) # must return the DataFrame
+    d[:hw] = combine_over(df, :yr; fun=prod)
+    set[:hw] = values.(eachrow(d[:hw][d[:hw][:,:value], find_oftype(d[:hw], String)]))
+    return transform_over(df, :yr; fun=prod) # must return the DataFrame
 end
 
+
+"""
+"""
 function _share_avg_wg!(d::Dict)
     # Here, WiNDC uses .!wg, which DOES include labor = 1.
     !(:wg in collect(keys(d))) && _share_wg!(d, set)
-    not_wg = edit_with(copy(d[:wg]), Replace(:value,Bool,Not))
+    not_wg = edit_with(copy(d[:wg]), Replace(:value, Bool, Not))
     
     df = copy(d[:labor]) * not_wg
-    d[:avg_wg] = edit_with(combine_over(df, :yr) / combine_over(not_wg, :yr), Replace(:value,NaN,0.0))
-    return edit_with(transform_over(df, :yr) / transform_over(not_wg, :yr), Replace(:value,NaN,0.0))
+    d[:avg_wg] = edit_with(combine_over(df, :yr) / combine_over(not_wg, :yr), Replace(:value, NaN, 0.0))
+    return edit_with(transform_over(df, :yr) / transform_over(not_wg, :yr), Replace(:value, NaN, 0.0))
 end
 
+
+"""
+"""
 function _share_sec_labor!(d::Dict)
     # Cannot use .!wg because this will include labor = 1.
     not_wg = copy(d[:labor])

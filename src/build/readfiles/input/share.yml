@@ -1,4 +1,4 @@
-Path: [data, input_1.0.1]
+Path: [data, input]
 
 Input:
   cfs: cfs_state.csv

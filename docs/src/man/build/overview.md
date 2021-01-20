@@ -14,7 +14,7 @@ meant to replicate the WiNDC buildstream. For more information, please reference
     [*J Global Econ Anal* 4(2): 1-66](https://doi.org/10.21642/JGEA.040201AF).
 
 ```@docs
-build_data
+build
 ```
 
 ### Partition

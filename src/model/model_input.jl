@@ -1,27 +1,5 @@
-# This file declares functions used for loading and manipulating data and sets within the
-# model file. It should be included at the beginning after loading other packages
-
-# !!!! Where might ensurefinite go within src directory?
-"This function replaces `NaN` or `Inf` values with `0.0`."
-ensurefinite(x::Float64) = (isnan(x) || x==Inf) ? 0.0 : x
-
-
 """
-    nonzero_subset(df::DataFrame)
-
-# Returns
-- `x::Array{Tuple,1}` of all parameter indices corresponding with non-zero values
-- `idx::Array{Symbol,1}` of parameter indices in `df`
-"""
-function nonzero_subset(df::DataFrame)
-    idx = findindex(df)
-    val = convert_type(Array{Tuple}, dropzero(df)[:,idx])
-    return (val, idx)
-end
-
-
-"""
-    _model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
+    model_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
 
 # Arguments
 - `year::Int`: year for which to perform calibration
@@ -36,33 +14,32 @@ end
     conditions.
 - `idx::Dict` of parameter indices.
 """
-
-function _model_input(year::Any, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
-        return _model_input(ensurearray(year), d, set, idx)
+function model_input(year::Any, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict=Dict())
+    return model_input(ensurearray(year), d, set, idx)
 end
 
-function _model_input(year::Array{Int,1}, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict = Dict())
+
+function model_input(year::Array{Int,1}, d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict=Dict())
     @info("Preparing model data for $year.")
     if length(year) > 1
-        d2 = Dict(k => filter_with(df, (yr = year,); extrapolate = true) for (k,df) in d)
+        d2 = Dict(k => filter_with(df, (yr = year,); extrapolate=true) for (k, df) in d)
 
-        isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d2))
+        isempty(idx) && (idx = Dict(k => findindex(df) for (k, df) in d2))
         (set, idx) = _model_set!(d2, set, idx)
 
-        d1 = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
-        d1 = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d1)
+        d1 = Dict(k => filter_with(df, (yr = year,); drop=true) for (k, df) in d)
+        d1 = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k, df) in d1)
         return (d1, set, idx)
     else
-        d = Dict(k => filter_with(df, (yr = year,); drop = true) for (k,df) in d)
+        d = Dict(k => filter_with(df, (yr = year,); drop=true) for (k, df) in d)
 
-        isempty(idx) && (idx = Dict(k => findindex(df) for (k,df) in d))
+        isempty(idx) && (idx = Dict(k => findindex(df) for (k, df) in d))
         (set, idx) = _model_set!(d, set, idx)
 
-        d = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k,df) in d)
+        d = Dict(k => convert_type(Dict, fill_zero(set, df)) for (k, df) in d)
         return (d, set, idx)
     end
 end
-
 
 
 """
@@ -92,8 +69,22 @@ function _model_set!(d::Dict{Symbol,DataFrame}, set::Dict, idx::Dict)
     (set[:PY], idx[:PY]) = nonzero_subset(d[:s0])
 
     if :yr in idx[:kd0]
-        set[:PKT] = convert_type(Array{Tuple}, unique(d[:kd0][:,setdiff(idx[:kd0],[:yr])]))
+        set[:PKT] = convert_type(Array{Tuple}, unique(d[:kd0][:,setdiff(idx[:kd0], [:yr])]))
     end
 
     return (set, idx)
+end
+
+
+"""
+    nonzero_subset(df::DataFrame)
+
+# Returns
+- `x::Array{Tuple,1}` of all parameter indices corresponding with non-zero values
+- `idx::Array{Symbol,1}` of parameter indices in `df`
+"""
+function nonzero_subset(df::DataFrame)
+    idx = findindex(df)
+    val = convert_type(Array{Tuple}, dropzero(df)[:,idx])
+    return (val, idx)
 end

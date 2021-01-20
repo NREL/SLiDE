@@ -1,23 +1,6 @@
-using SLiDE
-using DataFrames
-import CSV
-
-
-_add_id(x::String, id::Symbol) = _add_id(Symbol(x), id)
-_add_id(x::Symbol, id::Symbol) = (id==:value) ? x : append(x,id)
-
-_with_id(df::DataFrame, id::Symbol) = (id==:value) ? findvalue(df) : propertynames_with(df, id)
-
-_remove_id(x::Symbol, id::Symbol) = (x == id) ? x : getid(x, id)
-_remove_id(x::AbstractArray, id::Symbol) = _remove_id.(x, id)
-
-
-"""
-"""
-getid(x::String, id::String) = replace(x, Regex("_*$id"*"_*") => "")
-getid(x::Symbol, id::Symbol) = Symbol(getid(string(x), string(id)))
-# !!!! function name??? elsewhere, find* selects df columns based on some criteria.
-# !!!! replace findunits with general findcol or something.
+# using SLiDE
+# using DataFrames
+# import CSV
 
 
 """
@@ -25,16 +8,18 @@ getid(x::Symbol, id::Symbol) = Symbol(getid(string(x), string(id)))
 function DataFrames.unstack(df::DataFrame, colkey::Symbol, value::Tuple; fillmissing=0.0)
     colnew = convert_type.(Symbol, unique(df[:,colkey]))
     idx = setdiff(propertynames(df), ensurearray(colkey), ensurearray(value))
-    ii0 = length(idx)+1
-    lst = [unstack(df[:,[idx;[colkey,val]]], colkey, val, renamecols=x->_add_id(x,val))
+    ii0 = length(idx) + 1
+    lst = [unstack(df[:,[idx;[colkey,val]]], colkey, val, renamecols=x -> _add_id(x, val))
         for val in value]
     return indexjoin(lst...; fillmissing=fillmissing)
 end
 
 
+"""
+"""
 function DataFrames.stack(df::DataFrame, id_vars::Tuple)
     from = Dict(k => _with_id(df, k) for k in id_vars)
-    to = Dict(k => _remove_id(v, k) for (k,v) in from)
+    to = Dict(k => _remove_id(v, k) for (k, v) in from)
     idx = setdiff(propertynames(df), values(from)...)
 
     lst = [edit_with(df[:,[idx;from[k]]], [
@@ -103,9 +88,6 @@ function _operate_on(df::DataFrame, id, val::Symbol)
 end
 
 
-
-
-
 """
 """
 split_with(df::DataFrame, splitter::NamedTuple) = split_with(df, fill_zero(splitter))
@@ -119,7 +101,6 @@ function split_with(df::DataFrame, splitter::DataFrame)
     # df_in = fill_zero(df_in, splitter)[1]
     return df_in, df_out
 end
-
 
 
 """
@@ -151,8 +132,8 @@ _calc_key(df, col::Symbol) = _calc_key(df, ensurearray(col))
 function _split_with(df::DataFrame, df_split::DataFrame, key)
     df_split = _calc_key(df_split, key);
     df_in, df_out = split_with(df, df_split)
-    df_in = edit_with(df_in, Deselect(setdiff([key;:base],[:key]),"=="))
-    df_in = unstack(df_in, :key, (:units,:value))
+    df_in = edit_with(df_in, Deselect(setdiff([key;:base], [:key]), "=="))
+    df_in = unstack(df_in, :key, (:units, :value))
     return df_in, df_out, df_split
 end
 
@@ -160,7 +141,7 @@ end
 """
 """
 function _merge_with(df_in::DataFrame, df_out::DataFrame, df_split::DataFrame)
-    df_in = stack(df_in, (:units,:value))
+    df_in = stack(df_in, (:units, :value))
     df_in = indexjoin(df_in, df_split; kind=:left)
     return [dropzero(df_in[:,propertynames(df_out)]); df_out]
 end
