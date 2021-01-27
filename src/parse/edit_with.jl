@@ -333,7 +333,12 @@ function edit_with(
     y::Dict{Any,Any};
     print_status::Bool=false) where T <: File
     
-    df = [[edit_with(file, y; print_status=print_status) for file in files]...;]
+    df = vcat([edit_with(file, y; print_status=print_status) for file in files]...; cols=:union)
+    
+    if haskey(y,"Order")
+        df = edit_with(df, y["Order"])
+    end
+
     df = dropzero(df)
 
     df = _filter_datastream(df, y)
@@ -422,7 +427,8 @@ end
 """
 function _expand_range(x::T) where T <: AbstractString
     if occursin("-", x)
-        if all(string(strip(x)) .!= ["31-33", "44-45", "48-49"])
+        x = string(strip(x))
+        if all(x .!= ["31-33", "44-45", "48-49"])
             x = split(x, "-")
             x = ensurearray(convert_type(Int, x[1]):convert_type(Int, x[1][1:end - 1] * x[end][end]))
         end
@@ -489,8 +495,8 @@ function _map_with(df::DataFrame, df_map::DataFrame, x::Map)
 
     # Rename columns in the mapping DataFrame to temporary values in case any of these
     # columns were already present in the input DataFrame.
-    from = SLiDE._generate_id(x.from, :from)
-    to = SLiDE._generate_id(x.to, :to)
+    from = _generate_id(x.from, :from)
+    to = _generate_id(x.to, :to)
 
     df_map = unique(hcat(
         edit_with(df_map[:,x.from], Rename.(x.from, from)),

@@ -158,7 +158,7 @@ convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
 convert_type(::Type{Array{T}}, x::Any) where T <: Any = convert_type.(T, x)
 convert_type(::Type{Array{T,1}}, x::Any) where T <: Any = convert_type.(T, x)
 
-# WARNING: DEPRECIATED.
+# !!!! WARNING: DEPRECIATED.
 convert_type(::Type{Array}, d::Dict) = [collect(values(d))...;]
 
 convert_type(::Type{Array{Tuple}}, df::DataFrame) = ensuretuple.(eachrow(df))
@@ -170,6 +170,9 @@ convert_type(::Type{Any}, x::Any) = x
 convert_type(::Type{T}, x::Any) where T = T(x)
 
 convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : false
+
+convert_type(::Type{UnitRange}, x::AbstractArray) = x[1]:x[end]
+convert_type(::Type{UnitRange}, x::Any) = convert_type(UnitRange, ensurearray(x))
 
 # [@printf("%-8s %s\n", T, fieldpropertynames(T)[T.types .== Any]) for T in subtypes(Edit) if Any in T.types]
 
@@ -216,7 +219,9 @@ ensurefinite(x::Float64) = (isnan(x) || x==Inf) ? 0.0 : x
 """
 """
 istype(df::DataFrame, T::DataType) = broadcast(<:, findtype(df), T)
+
 findtype(df::DataFrame) = eltype.(eachcol(dropmissing(df)))
+findtype(x::AbstractArray) = eltype(skipmissing(x))
 
 
 """
