@@ -1,75 +1,15 @@
-.gitignore
-.DS_Store
+# .gitignore
+**/.DS_Store
+**/scratch
 .git/
 .vscode/
 
-admin/
-
 Manifest.toml
 
 admin/
-
-# calibrate/data_temp/
-calibrate/disagg_working.jl
-calibrate/old_disagg.jl
-calibrate/old_io.jl
-calibrate/old_share.jl
-calibrate/scratch.jl
-
-data/output_example/
-data/Edit.jl
-data/scratch*.jl
-data/datasources/
-data/experiment/
-data/share/
-data/windc_output/
-data/windc_raw_input/
-data/input/
-data/output/
-data/outputs/
-data/old/
-data/old/readfiles/
-data/coremaps/temp/
-data/coremaps/windc/
-data/readfiles/~$*
-data/readfiles/map_bluenote/
-data/readfiles/map_crosswalk/
-data/readfiles/map_experiment/
-data/readfiles/map_parse/
-data/readfiles/map_scale/
-data/readfiles/benchmark/
-data/readfiles/build/
-data/readfiles/share/
-data/readfiles/experiment/
-
-data/readfiles/slide-yaml.xlsx
-data/windc_raw_data/
-data/*.zip
-
-data/readfiles/parse/
-data/outputs_csv/
-data/windc_output/*/*.csv
-
-dev/scratch/
-data/readfiles/parse/
-data/outputs_csv/
-data/windc_output/
-
-docs/build/
-
-src/datastream/
-
-# src/parse/generated_check/
-# src/parse/generated_edit/
-# src/parse/generated_load/
-src/parse/scratch/
-src/parse/utils/generate_structs.jl
-
-Manifest.toml
-
+data/
+dev/
+calibrate/
 model/data_temp/*.csv
 
-src/parse/scratch/
-src/parse/utils/generate_structs.jl
-
-# tests/scratch*.jl
+docs/build/

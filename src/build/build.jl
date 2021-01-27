@@ -47,10 +47,11 @@ end
     read_set(path::String)
 """
 function read_set(path::String)
-    cp(joinpath(SLIDE_DIR,"temp","gdpcat.csv"), joinpath(SLIDE_DIR,"data","coresets","gdpcat.csv"), force = true)
-    cp(joinpath(SLIDE_DIR,"temp","oth_use.csv"), joinpath(SLIDE_DIR,"data","coresets","i","oth_use.csv"), force = true)
-    cp(joinpath(SLIDE_DIR,"temp","cross_fd.csv"), joinpath(SLIDE_DIR,"data","coremaps","crosswalk","fd.csv"), force = true)
-    cp(joinpath(SLIDE_DIR,"temp","parse_fd.csv"), joinpath(SLIDE_DIR,"data","coremaps","parse","fd.csv"), force = true)
+    temp_dir = joinpath(SLIDE_DIR,"src","readfiles","_sets")
+    cp(joinpath(temp_dir,"gdpcat.csv"), joinpath(SLIDE_DIR,"data","coresets","gdpcat.csv"), force = true)
+    cp(joinpath(temp_dir,"oth_use.csv"), joinpath(SLIDE_DIR,"data","coresets","i","oth_use.csv"), force = true)
+    cp(joinpath(temp_dir,"cross_fd.csv"), joinpath(SLIDE_DIR,"data","coremaps","crosswalk","fd.csv"), force = true)
+    cp(joinpath(temp_dir,"parse_fd.csv"), joinpath(SLIDE_DIR,"data","coremaps","parse","fd.csv"), force = true)
 
     d = read_from(path)
     d = Dict(k => sort(v[:,1]) for (k,v) in d)
