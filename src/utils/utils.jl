@@ -174,6 +174,9 @@ convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : 
 convert_type(::Type{UnitRange}, x::AbstractArray) = x[1]:x[end]
 convert_type(::Type{UnitRange}, x::Any) = convert_type(UnitRange, ensurearray(x))
 
+convert_type(::Type{DataFrame}, x::NamedTuple) = DataFrame(permute(x))
+convert_type(::Type{T}, x::T) where T = x
+
 # [@printf("%-8s %s\n", T, fieldpropertynames(T)[T.types .== Any]) for T in subtypes(Edit) if Any in T.types]
 
 """
@@ -290,6 +293,18 @@ function propertynames_with(df::DataFrame, id::Symbol)
     col = propertynames(df)
     return col[occursin.(id,col)]
 end
+
+
+"""
+"""
+nunique(df::DataFrame) = nunique.(eachcol(df))
+nunique(x::AbstractArray) = length(unique(skipmissing(x)))
+
+
+"""
+"""
+DataFrames.nonunique(x::AbstractArray) = unique(x[nonunique(DataFrame(x=x))])
+
 
 
 """

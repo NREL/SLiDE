@@ -8,7 +8,7 @@ module SLiDE
 #################################################################################
 # IMPORTS
 import CSV
-# import InvertedIndices
+import Combinatorics
 import DataFrames;          using DataFrames
 import Dates
 import DelimitedFiles;      using DelimitedFiles
@@ -103,6 +103,9 @@ export fill_with
 export extrapolate_region
 export extrapolate_year
 export filter_with
+export split_with
+export split_fill_unstack
+export stack_append
 
 # CALCULATE
 export combine_over

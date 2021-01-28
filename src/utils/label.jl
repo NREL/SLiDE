@@ -5,6 +5,7 @@ This function is a standardized method for generating dictionary keys for
 """
 function _inp_key(paths::Array{String,1})
     # !!!! check where this is used and see if it's doing what we want.
+    # !!!! EXAMPLES.
     dir = splitdir.(paths)
 
     while length(unique(getindex.(dir, 2))) > 1
@@ -38,8 +39,8 @@ _generate_id(x::Array, id::Symbol=:x) = _generate_id(length(x), id)
 
 """
 """
-_add_id(x::Symbol, id::Symbol) = (id == :value) ? x : append(x, id)
-_add_id(x::String, id::Symbol) = _add_id(Symbol(x), id)
+_add_id(x::Symbol, from::Any; replace=:value) = (x == replace) ? from : append(x, from)
+
 
 
 """

@@ -9,19 +9,19 @@ This function joins input DataFrames on their index columns (ones that are not f
 - `df::DataFrame...` to join.
 """
 function indexjoin(df::Array{DataFrame,1};
-    id::Array = [],
-    indicator::Bool = false,
-    fillmissing = 0.0,
-    skipindex = [],
-    kind = :outer,
+    id::Array=[],
+    indicator::Bool=false,
+    fillmissing=0.0,
+    skipindex=[],
+    kind=:outer,
 )
     df = copy.(df[.!isempty.(df)])
     N = length(df)
 
     # all(length.(findvalue.(df)) .== 0) && (indicator = true)
 
-    (df,id) = _make_unique(df, id, indicator; skipindex = skipindex)
-    (df,id) = _add_indicator(df, id, indicator)
+    (df, id) = _make_unique(df, id, indicator; skipindex=skipindex)
+    (df, id) = _add_indicator(df, id, indicator)
     idx = findindex.(df)
     
     df_ans = copy(df[1])
@@ -45,18 +45,18 @@ end
 
 
 function indexjoin(df::Vararg{DataFrame};
-    id::Array = [],
-    indicator::Bool = false,
-    fillmissing = 0.0,
-    skipindex = [],
-    kind = :outer
+    id::Array=[],
+    indicator::Bool=false,
+    fillmissing=0.0,
+    skipindex=[],
+    kind=:outer
 )
     return indexjoin(ensurearray(df);
-        id = id,
-        indicator = indicator,
-        fillmissing = fillmissing,
-        skipindex = skipindex,
-        kind = kind)
+        id=id,
+        indicator=indicator,
+        fillmissing=fillmissing,
+        skipindex=skipindex,
+        kind=kind)
 end
 
 
@@ -134,7 +134,7 @@ function _add_indicator(df::Array{DataFrame,1}, id::Array, indicator::Bool)
         isempty(id) && (id = _generate_id(df))
         df = [edit_with(df[ii], Add(id[ii], true)) for ii in 1:length(df)]
     end
-    return (df,id)
+    return (df, id)
 end
 
 
@@ -156,7 +156,7 @@ function _fill_missing(df::DataFrame, fillmissing)
     # Fill missing strings.
     str = findindex(dfmiss)
     str_unique = unique.(skipmissing.(eachcol(df[:,str])));
-    ii = length.(str_unique).==1
+    ii = length.(str_unique) .== 1
 
     !isempty(bool) && (df = edit_with(df, Replace.(bool, missing, false)))
     !isempty(num)  && (df = edit_with(df, Replace.(num, missing, fillmissing)))

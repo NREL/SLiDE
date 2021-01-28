@@ -1,5 +1,5 @@
 """
-filter_with(df::DataFrame, set::Any; kwargs...)
+    filter_with(df::DataFrame, set::Any; kwargs...)
 
 # Arguments
 - `df::DataFrame` to filter.
@@ -110,6 +110,103 @@ function filter_with(
     end
 
     return sort(df[:,cols])
+end
+
+
+"""
+    split_with(df::DataFrame, splitter)
+This function separates `df` into two DataFrames, `df_in` and `df_out`.
+
+This is helpful for operating on a slice of `df` while saving the slice of `df` not included
+in the operation.
+
+# Arguments
+- `df::DataFrame` to split
+- `splitter::DataFrame` or `splitter::NamedTuple` containing indices of `df` to isolate
+
+# Returns
+- `df_in::DataFrame`: slice of `df` found in `splitter` by
+    [`DataFrames.innerjoin`](https://dataframes.juliadata.org/stable/lib/functions/#DataFrames.innerjoin)
+- `df_out::DataFrame`: slice of `df` **not** found in `splitter` by
+    [`DataFrames.antijoin`](https://dataframes.juliadata.org/stable/lib/functions/#DataFrames.antijoin)
+"""
+function split_with(df::DataFrame, splitter::DataFrame)
+    idx_join = intersect(propertynames(df), propertynames(splitter))
+    df_in = innerjoin(df, splitter, on=idx_join)
+    df_out = antijoin(df, splitter, on=idx_join)
+    return df_in, df_out
+end
+
+split_with(df::DataFrame, splitter::NamedTuple) = split_with(df, DataFrame(permute(splitter)))
+
+
+"""
+    split_fill_unstack(df::DataFrame, splitter, colkey, value)
+This function prepares a slice of `df` for a calculation during which units are preserved by:
+
+1. Splitting `df` with `splitter` using [`SLiDE.split_with`](@ref);
+2. Filling zeros in `df_in` to prevent missing entries in the unstacked DataFrame.
+    Approaching these steps in this order enables non-unique contents indicated by `colkey`;
+    and
+3. Unstacking `df_in`.
+
+# Arguments
+- `df::DataFrame` to stack
+- `colkey::Symbol` or `colkey::Array{Symbol,1}`: variable column(s)
+- `value::Symbol` or `value::Array{Symbol,1}`: value column(s)
+
+# Returns
+- `df_in::DataFrame`: slice of `df` found in `splitter`, unstacked and without missing values.
+- `df_out::DataFrame`: slice of `df` **not** found in the DataFrame slice.
+"""
+function split_fill_unstack(
+    df::DataFrame,
+    splitter::DataFrame,
+    colkey::Union{Symbol, Array{Symbol,1}},
+    value::Union{Symbol, Array{Symbol,1}},
+)
+    df_in, df_out = split_with(df, splitter)
+    df_in = fill_zero(df_in; with=splitter)
+    df_in = _unstack(df_in, colkey, value)
+
+    return df_in, df_out
+end
+
+
+function split_fill_unstack(
+    df::DataFrame,
+    splitter::NamedTuple,
+    colkey::Union{Symbol, Array{Symbol,1}},
+    value::Union{Symbol, Array{Symbol,1}},
+)
+    return split_fill_unstack(df, convert_type(DataFrame, splitter), colkey, value)
+end
+
+
+"""
+    stack_append(df_wide::DataFrame, df_long::DataFrame, colkey, value)
+This function prepares a slice of `df` for a calculation during which units are preserved by:
+
+1. Stacking `df_wide` and
+2. Concatening `df_wide` and `df_long`
+    
+# Arguments
+- `df_wide::DataFrame` to stack
+- `df_long::DataFrame` to append
+- `colkey::Symbol` or `colkey::Array{Symbol,1}`: variable column(s)
+- `value::Symbol` or `value::Array{Symbol,1}`: value column(s)
+
+# Returns
+- `df::DataFrame`
+"""
+function stack_append(
+    df_wide::DataFrame,
+    df_out::DataFrame,
+    colkey::Union{Symbol, Array{Symbol,1}},
+    value::Union{Symbol, Array{Symbol,1}},
+)
+    df_wide = _stack(df_wide, colkey, value)
+    return vcat(df_wide, df_out; cols=:intersect)
 end
 
 
@@ -362,7 +459,8 @@ end
 """
 function _find_constant(df::DataFrame)
     idx = findindex(df)
-    return idx[length.(unique.(eachcol(df[:,idx]))) .== 1]
+    # return idx[length.(unique.(eachcol(df[:,idx]))) .== 1]
+    return idx[nunique(df[:,idx]) .== 1]
 end
 
 
