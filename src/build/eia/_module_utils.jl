@@ -17,18 +17,18 @@ end
 
 """
 """
-function DataFrames.stack(df::DataFrame, id_vars::Tuple)
-    from = Dict(k => _with_id(df, k) for k in id_vars)
-    to = Dict(k => _remove_id(v, k) for (k, v) in from)
-    idx = setdiff(propertynames(df), values(from)...)
+# function DataFrames.stack(df::DataFrame, id_vars::Tuple)
+#     from = Dict(k => _with_id(df, k) for k in id_vars)
+#     to = Dict(k => _remove_id(v, k) for (k, v) in from)
+#     idx = setdiff(propertynames(df), values(from)...)
 
-    lst = [edit_with(df[:,[idx;from[k]]], [
-            Rename.(from[k], to[k]);
-            Melt(idx, :key, k);
-        ]) for k in keys(from)]
+#     lst = [edit_with(df[:,[idx;from[k]]], [
+#             Rename.(from[k], to[k]);
+#             Melt(idx, :key, k);
+#         ]) for k in keys(from)]
 
-    return indexjoin(lst...)
-end
+#     return indexjoin(lst...)
+# end
 
 
 """
@@ -90,17 +90,10 @@ end
 
 """
 """
-split_with(df::DataFrame, splitter::NamedTuple) = split_with(df, fill_zero(splitter))
+split_with(df::DataFrame, splitter::NamedTuple) = split_with(df, DataFrame(permute(splitter)))
 # !!!! fill zero here causes issues for value
 
-function split_with(df::DataFrame, splitter::DataFrame)
-    # splitter = splitter[:,findindex(splitter)]
-    idx_join = intersect(propertynames(df), propertynames(splitter))
-    df_in = innerjoin(df, splitter, on=idx_join)
-    df_out = antijoin(df, splitter, on=idx_join)
-    # df_in = fill_zero(df_in, splitter)[1]
-    return df_in, df_out
-end
+
 
 
 """
