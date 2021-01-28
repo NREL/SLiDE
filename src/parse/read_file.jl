@@ -29,16 +29,16 @@ the `data/coremaps` directory. It returns a .csv file.
     dictionary. All keys that correspond with SLiDE DataStream DataTypes will be converted
     to (lists of) those types.
 """
-function read_file(path::Array{String,1}, file::GAMSInput; remove_notes::Bool=false)
-    filepath = joinpath(path..., file.name)
+function read_file(path::Any, file::GAMSInput; remove_notes::Bool=false)
+    filepath = _joinpath(path, file)
     xf = readlines(filepath)
     df = split_gams(xf; colnames=file.col)
     return df
 end
 
 
-function read_file(path::Array{String,1}, file::CSVInput; remove_notes::Bool=false)
-    filepath = joinpath(path..., file.name)
+function read_file(path::Any, file::CSVInput; remove_notes::Bool=false)
+    filepath = _joinpath(path, file)
     df = SLiDE._read_csv(filepath)
     
     if remove_notes && size(df, 1) > 1
@@ -50,8 +50,8 @@ function read_file(path::Array{String,1}, file::CSVInput; remove_notes::Bool=fal
 end
 
 
-function read_file(path::Array{String,1}, file::XLSXInput; remove_notes::Bool=false)
-    filepath = joinpath(path..., file.name)
+function read_file(path::Any, file::XLSXInput; remove_notes::Bool=false)
+    filepath = _joinpath(path, file)
     xf = XLSX.readdata(filepath, file.sheet, file.range)
     
     # Delete rows containing only missing values.
@@ -60,7 +60,7 @@ function read_file(path::Array{String,1}, file::XLSXInput; remove_notes::Bool=fa
 end
 
 
-function read_file(path::Array{String,1}, file::DataInput; remove_notes::Bool=false)
+function read_file(path::Any, file::DataInput; remove_notes::Bool=false)
     df = read_file(path, convert_type(CSVInput, file))
     df = edit_with(df, Rename.(propertynames(df), file.col))
 
@@ -69,27 +69,26 @@ function read_file(path::Array{String,1}, file::DataInput; remove_notes::Bool=fa
 end
 
 
-function read_file(path::Array{String,1}, file::SetInput; remove_notes::Bool=false)
-    filepath = joinpath(path..., file.name)
+function read_file(path::Any, file::SetInput; remove_notes::Bool=false)
+    filepath = _joinpath(path, file)
     df = _read_csv(filepath)
     return sort(df[:,1])
 end
 
 
-function read_file(path::String, file::T; remove_notes::Bool=false) where T <: File
-    return read_file([path], file; remove_notes=remove_notes)
-end
+# function read_file(path::Array{String,1}, file::T; remove_notes::Bool=false) where T <: File
+#     return read_file(_joinpath(path), file; remove_notes=remove_notes)
+# end
 
 
 function read_file(editor::T) where T <: Edit
-    DIR = joinpath("data", "coremaps")
-    df = read_file(joinpath(DIR, editor.file))
+    filepath = _joinpath("data", "coremaps", editor.file)
+    df = read_file(filepath)
     return df
 end
 
 
 function read_file(file::String; colnames=[])
-    file = joinpath(file)
 
     if occursin(".map", file) | occursin(".set", file)
         # return gams_to_dataframe(readlines(file); colnames=colnames)
@@ -111,6 +110,19 @@ function read_file(file::String; colnames=[])
         return df
     end
 end
+
+
+function read_file(path::Union{Array{String,1}, String}...; colnames=[])
+    return read_file(_joinpath(path); colnames=colnames)
+end
+
+
+"""
+"""
+_joinpath(path::String) = path
+_joinpath(path::Array{String,1}) = joinpath(path...)
+_joinpath(path::Union{Array{String,1}, String}...) = _joinpath(vcat(path...))
+_joinpath(path::Union{Array{String,1}, String}, file::T) where T<:File = _joinpath(path, file.name)
 
 
 """
@@ -335,7 +347,7 @@ function _read_from_yaml(path::String; run_bash::Bool=false)
         
         files = ensurearray(values(find_oftype(y, File)))
         inp = "Input" in keys(y) ? y["Input"] : files
-        d = _read_from_yaml(y["Path"], inp)
+        d = SLiDE._read_from_yaml(SLiDE._joinpath(y["Path"]), inp)
         d = _edit_from_yaml(d, y, inp)
     else
         inp = ensurearray(values(find_oftype(y, CGE)))
@@ -345,18 +357,18 @@ function _read_from_yaml(path::String; run_bash::Bool=false)
 end
 
 function _read_from_yaml(path::String, files::Dict)
-    path = joinpath(SLIDE_DIR, path)
-    d = Dict(_inp_key(k) => read_file(joinpath(path, f)) for (k, f) in files)
-    return _delete_empty!(d)
+    path = SLiDE._joinpath(SLIDE_DIR, path)
+    d = Dict(SLiDE._inp_key(k) => read_file(SLiDE._joinpath(path, f)) for (k, f) in files)
+    return SLiDE._delete_empty!(d)
 end
 
 function _read_from_yaml(path::String, files::Array{T,1}) where {T <: File}
-    path = joinpath(SLIDE_DIR, path)
-    d = Dict(_inp_key(f) => read_file(path, f) for f in files)
-    return _delete_empty!(d)
+    path = SLiDE._joinpath(SLIDE_DIR, path)
+    d = Dict(SLiDE._inp_key(f) => read_file(SLiDE._joinpath(path, f)) for f in files)
+    return SLiDE._delete_empty!(d)
 end
 
-_read_from_yaml(path::Array{String,1}, file::Any) = _read_from_yaml(joinpath(path...), file)
+# _read_from_yaml(path::Array{String,1}, file::Any) = _read_from_yaml(joinpath(path...), file)
 _read_from_yaml(lst::Array{Parameter,1}) = _delete_empty!(Dict(_inp_key(x) => x for x in lst))
 
 
