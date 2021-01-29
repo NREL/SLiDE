@@ -111,14 +111,38 @@ cge = MCPModel();
 @NLparameter(cge, ks_x[r in set[:r], s in set[:s]] ==
     value(kd0[r, s]) * value(thetax) );
 
-# Labor endowment
-@NLparameter(cge, le0[r in set[:r], s in set[:s]] == value(ld0[r,s]));
-
 # Benchmark investment supply
 @NLparameter(cge, inv0[r in set[:r]] == sum(value(i0[r,g]) for g in set[:g]));
 
+
+# --- Labor-leisure setup ---
+# Labor endowment
+@NLparameter(cge, le0[r in set[:r], s in set[:s]] == value(ld0[r,s]));
+@NLparameter(cge, lab0[r in set[:r]] == sum(value(ld0[r,s]) for s in set[:s]));
+
+# Benchmark labor tax rate
+@NLparameter(cge, tl0[r in set[:r]] == 0);
+
+# Benchmark leisure share of time endowment
+@NLparameter(cge, theta_ll == 0.4);
+
+# Benchmark time endowment
+@NLparameter(cge, lte0[r in set[:r]] == value(lab0[r]) / (1-value(theta_ll)));
+
+# Benchmark leisure endowment
+@NLparameter(cge, leis0[r in set[:r]] == value(lte0[r]) - value(lab0[r]));
+
+# Benchmark full consumption
+@NLparameter(cge, z0[r in set[:r]] == value(c0[r]) + value(leis0[r]));
+
+# Leisure share of full consumption
+@NLparameter(cge, theta_lz[r in set[:r]] == value(leis0[r])/value(z0[r]));
+
+# ------
+
 # Benchmark welfare index
-@NLparameter(cge, w0[r in set[:r]] == value(inv0[r])+value(c0[r]));
+@NLparameter(cge, w0[r in set[:r]] == value(inv0[r])+value(z0[r]));
+
 
 # benchmark value share parameters
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
@@ -142,6 +166,12 @@ cge = MCPModel();
 
 @NLparameter(cge, es_inv[r in set[:r]] == 5); # Investment production - substitution elasticity
 
+# Calibrate subsitution elasticity between leisure and consumption
+# based on uncompensated elasticity of labor supply
+@NLparameter(cge, ulse == 0.05); # uncompensated labor supply elasticity
+@NLparameter(cge, es_z[r in set[:r]] == 1 + (value(ulse) / value(theta_lz[r]))); # final consumption nest - substitution elasticity
+
+
 
 ################
 # VARIABLES
@@ -162,7 +192,6 @@ lo = 0.0
 @variable(cge, PY[(r, g) in set[:PY]] >= lo, start = 1); # Regional market (output)
 @variable(cge, PD[(r, g) in set[:PD]] >= lo, start = 1); # Local market price
 @variable(cge, PN[g in set[:g]] >= lo, start =1); # National market
-@variable(cge, PL[r in set[:r]] >= lo, start = 1); # Wage rate
 #@variable(cge, PK[(r, s) in set[:PK]] >= lo, start =1); # Rental rate of capital ###
 @variable(cge, PM[r in set[:r], m in set[:m]] >= lo, start =1); # Margin price
 @variable(cge, PC[r in set[:r]] >= lo, start = 1); # Consumer price index #####
@@ -177,7 +206,6 @@ lo = 0.0
 @variable(cge,YM[(r,s) in set[:Y]] >= lo, start = (1-value(thetax))); # Mutable production index - replaces Y
 @variable(cge,YX[(r,s) in set[:Y]] >= lo, start = value(thetax)); # Extant production index
 @variable(cge,INV[r in set[:r]] >= lo, start = 1); # Investment
-@variable(cge,W[r in set[:r]] >= lo, start = 1); # Welfare index
 
 # commodities
 @variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
@@ -188,6 +216,17 @@ lo = 0.0
 # Reporting variables
 @variable(cge,DKM[(r,s) in set[:PK]] >= lo, start = start_value(YM[(r,s)]) * value(kd0[r,s]));
 
+#--- Labor-leisure variable declaration ---
+# sectors
+@variable(cge, LS[r in set[:r]] >= lo, start = 1); # Labor supply
+@variable(cge, Z[r in set[:r]] >= lo, start = 1); # Full consumption
+
+# commodities
+@variable(cge, PL[r in set[:r]] >= lo, start = 1); # Wage rate (after tax)
+@variable(cge, PLS[r in set[:r]] >= lo, start = 1); # Wage rate (before tax)
+@variable(cge, PZ[r in set[:r]] >= lo, start = 1); # Full consumption price index
+
+@variable(cge,W[r in set[:r]] >= lo, start = 1); # Welfare index
 
 ###############################
 # -- PLACEHOLDER VARIABLES --
@@ -198,18 +237,33 @@ lo = 0.0
 
 #Cobb-douglas for mutable/new
 @NLexpression(cge, CVAym[r in set[:r], s in set[:s]],
-    PL[r]^alpha_kl[r,s] * RK[r]^(1-alpha_kl[r,s]));
+    PLS[r]^alpha_kl[r,s] * RK[r]^(1-alpha_kl[r,s]));
 
 #demand for labor in VA
 @NLexpression(cge,ALym[r in set[:r], s in set[:s]],
-    ld0[r,s] * CVAym[r,s] / PL[r]);
+    ld0[r,s] * CVAym[r,s] / PLS[r]);
 
 #demand for capital in VA
 @NLexpression(cge,AKym[r in set[:r],s in set[:s]],
     kd0[r,s] * CVAym[r,s] / RK[r]);
 
+#demand for investment
 @NLexpression(cge,DINV[r in set[:r], g in set[:g]],
     (i0[r,g] * (PINV[r]/(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)^es_inv[r])));
+
+# Unit cost for full consumption
+@NLexpression(cge, CZ[r in set[:r]],
+    (theta_lz[r]*PL[r]^(1-es_z[r]) + (1-theta_lz[r])*PC[r]^(1-es_z[r]))^(1/(1-es_z[r])));
+
+# Leisure demand
+@NLexpression(cge, DLEIS[r in set[:r]],
+    leis0[r]*(CZ[r]/PL[r])^(es_z[r]));
+
+# Consumption demand
+@NLexpression(cge, DCONS[r in set[:r]],
+    c0[r]*(CZ[r]/PC[r])^(es_z[r]));
+
+
 
 #----------
 
@@ -268,7 +322,7 @@ lo = 0.0
 # cost of intermediate demand
     sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
 # cost of labor inputs
-    + PL[r] * ALym[r,s]
+    + PLS[r] * ALym[r,s]
 # cost of capital inputs
     + RK[r] * AKym[r,s]
     -
@@ -280,7 +334,7 @@ lo = 0.0
 # cost of intermediate demand
     sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
 # cost of labor inputs
-    + PL[r] * ld0[r,s]
+    + PLS[r] * ld0[r,s]
 # cost of capital inputs
     + (haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * kd0[r,s]
     -
@@ -329,6 +383,21 @@ lo = 0.0
     PC[r] * c0[r]
 );
 
+# Full consumption
+@mapping(cge, profit_z[r in set[:r]],
+    PC[r]*DCONS[r] + PL[r]*DLEIS[r]
+    -
+    PZ[r]*z0[r]
+);
+
+# Labor supply
+@mapping(cge, profit_ls[r in set[:r]],
+    PL[r]*lab0[r]
+    -
+    PLS[r]*lab0[r]
+);
+
+
 @mapping(cge, profit_inv[r in set[:r]],
 # inputs to investment
     sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * DINV[r,g] for g in set[:g])
@@ -339,7 +408,7 @@ lo = 0.0
 
 @mapping(cge, profit_w[r in set[:r]],
 # inputs to welfare index
-    PINV[r]*inv0[r] + PC[r]*c0[r]
+    PINV[r]*inv0[r] + PZ[r]*z0[r]
     -
 # Welfare
     PW[r]*w0[r]
@@ -406,16 +475,7 @@ lo = 0.0
     (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1) * s0[r,g]
 );
 
-@mapping(cge,market_pl[r in set[:r]],
-# supply of labor
-    sum(le0[r,s] for s in set[:s])
-    -
-# demand for labor in all set[:s]
-    (
-        sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ALym[r,s] for s in set[:s])
-        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ld0[r,s] for s in set[:s])
-    )
-);
+
 #----------
 
 
@@ -455,7 +515,37 @@ lo = 0.0
     C[r] * c0[r]
     -
 # Consumption demand
-    W[r] * c0[r]
+    Z[r]*DCONS[r]
+);
+
+@mapping(cge,market_pls[r in set[:r]],
+# labor supply
+    LS[r]*lab0[r]
+    -
+# demand for labor in all set[:s]
+    (
+        sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ALym[r,s] for s in set[:s])
+        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ld0[r,s] for s in set[:s])
+    )
+);
+
+@mapping(cge,market_pl[r in set[:r]],
+# time endowment - supply
+    lte0[r]
+    -
+# demand for time
+    (
+        LS[r]*lab0[r]
+        + Z[r]*DLEIS[r]
+    )
+);
+
+@mapping(cge,market_pz[r in set[:r]],
+# supply of full consumption good
+    Z[r]*z0[r]
+    -
+# demand for full consumption
+    W[r]*z0[r]
 );
 
 @mapping(cge, market_pinv[r in set[:r]],
@@ -494,8 +584,10 @@ lo = 0.0
     RA[r]
     -
     (
-# labor income
-        PL[r] * sum(le0[r,s] for s in set[:s])
+# # labor income
+#         PL[r] * sum(le0[r,s] for s in set[:s])
+# value of time endowment
+        PL[r]*lte0[r]
 # capital income
         + RK[r] * ks_m[r]
         +sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in set[:s])
@@ -559,6 +651,15 @@ lo = 0.0
 #Reporting
 @complementarity(cge,DKMdef,DKM);
 
+#----------
+#Labor-Leisure
+@complementarity(cge,profit_z,Z);
+@complementarity(cge,profit_ls,LS);
+@complementarity(cge,market_pls,PLS);
+@complementarity(cge,market_pz,PZ);
+
+
+
 ####################
 # -- Model Solve --
 ####################
@@ -615,15 +716,17 @@ for t in 2017:2020
         set_value(ks_x[r,s], ktot_x[r,s,t]);
     end
 
-    for r in set[:r], s in set[:s]
-    #update labor endowments --- separate parameters for labor endowments versus demand
-        set_value(le0[r,s], (1 + value(gr)) * value(le0[r,s]));
-    end
+    # for r in set[:r], s in set[:s]
+    # #update labor endowments --- separate parameters for labor endowments versus demand
+    #     set_value(le0[r,s], (1 + value(gr)) * value(le0[r,s]));
+    # end
 
     #update balance of payments and household adjustment
     for r in set[:r]
         set_value(bopdef0[r], (1 + value(gr)) * value(bopdef0[r]));
         set_value(hhadj[r], (1 + value(gr)) * value(hhadj[r]));
+        # set_value(lab0[r], (1 + value(gr)) * value(lab0[r]));
+        set_value(lte0[r], (1 + value(gr)) * value(lte0[r]));
     end
 
     #update government and household production
@@ -639,6 +742,8 @@ for t in 2017:2020
     for r in set[:r]
         set_start_value(C[r], result_value(C[r])*(1+value(gr)));
         set_start_value(INV[r], result_value(INV[r])*(1+value(gr)));
+        set_start_value(Z[r], result_value(Z[r])*(1+value(gr)));
+        set_start_value(LS[r], result_value(LS[r])*(1+value(gr)));
         set_start_value(W[r], result_value(W[r])*(1+value(gr)));
         set_start_value(RA[r], start_value(W[r])*value(w0[r]));
     end
