@@ -63,7 +63,7 @@ end
 
 function fill_zero(
     df::Vararg{DataFrame};
-    permute_keys::Bool=true,
+    permute_keys::Bool=false,
     colnames=[],
     with::Union{Dict,NamedTuple}=Dict(),
 )
@@ -206,6 +206,7 @@ function _fill_zero_with(df::DataFrame, with::Any;
     if !isempty(with)
         df = indexjoin(df, _intersect_with(with, df))
     elseif permute_keys
+        idx = findindex(df)
         df = indexjoin(permute(df[:,idx]), df)
     end
     
@@ -293,10 +294,10 @@ This is relevant during calculations when both (base, units) are present.
 - `idx::Array{Symbol,1}`: list of DataFrame indices that provide duplicate information.
 """
 function _find_duplicate_index(df::DataFrame)
-    idx_duplicate = SLiDE._find_constant(df)
+    idx_duplicate = _find_constant(df)
     idx = setdiff(findindex(df), idx_duplicate)
 
-    num_unique = SLiDE.nunique(df[:,idx])
+    num_unique = nunique(df[:,idx])
 
     idx_duplicate = vcat(
         [idx_duplicate],
@@ -309,7 +310,7 @@ end
 
 function _find_duplicate_index(df::DataFrame, idx::Array{Symbol,1})
     df = unique(df[:,idx])
-    N = SLiDE.nunique(df[:,idx[1]])
+    N = nunique(df[:,idx[1]])
 
     idx_all = reverse(collect(Combinatorics.combinations(idx)))
     idx_all = idx_all[length.(idx_all) .> 1]

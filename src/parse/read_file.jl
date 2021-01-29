@@ -39,12 +39,12 @@ end
 
 function read_file(path::Any, file::CSVInput; remove_notes::Bool=false)
     filepath = _joinpath(path, file)
-    df = SLiDE._read_csv(filepath)
+    df = _read_csv(filepath)
     
     if remove_notes && size(df, 1) > 1
-        df = SLiDE._remove_header(df, filepath)
-        df = SLiDE._remove_footer(df)
-        df = SLiDE._remove_empty(df)
+        df = _remove_header(df, filepath)
+        df = _remove_footer(df)
+        df = _remove_empty(df)
     end
     return df
 end
@@ -347,7 +347,7 @@ function _read_from_yaml(path::String; run_bash::Bool=false)
         
         files = ensurearray(values(find_oftype(y, File)))
         inp = "Input" in keys(y) ? y["Input"] : files
-        d = SLiDE._read_from_yaml(SLiDE._joinpath(y["Path"]), inp)
+        d = _read_from_yaml(_joinpath(y["Path"]), inp)
         d = _edit_from_yaml(d, y, inp)
     else
         inp = ensurearray(values(find_oftype(y, CGE)))
@@ -357,15 +357,16 @@ function _read_from_yaml(path::String; run_bash::Bool=false)
 end
 
 function _read_from_yaml(path::String, files::Dict)
-    path = SLiDE._joinpath(SLIDE_DIR, path)
-    d = Dict(SLiDE._inp_key(k) => read_file(SLiDE._joinpath(path, f)) for (k, f) in files)
-    return SLiDE._delete_empty!(d)
+    # needs to be a dictionary of paths.
+    path = _joinpath(SLIDE_DIR, path)
+    d = Dict(_inp_key(k) => read_file(_joinpath(path, f)) for (k, f) in files)
+    return _delete_empty!(d)
 end
 
 function _read_from_yaml(path::String, files::Array{T,1}) where {T <: File}
-    path = SLiDE._joinpath(SLIDE_DIR, path)
-    d = Dict(SLiDE._inp_key(f) => read_file(SLiDE._joinpath(path, f)) for f in files)
-    return SLiDE._delete_empty!(d)
+    path = _joinpath(SLIDE_DIR, path)
+    d = Dict(_inp_key(f) => read_file(path,f) for f in files)
+    return _delete_empty!(d)
 end
 
 # _read_from_yaml(path::Array{String,1}, file::Any) = _read_from_yaml(joinpath(path...), file)
