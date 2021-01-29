@@ -269,7 +269,7 @@
         "supertype": "Edit"
     },
     {
-        "struct_name": "Stack",
+        "struct_name": "Concatenate",
         "docstring": "Concatenate side-by-side DataFrames into one normal-form DataFrame.",
         "fields": [
             {

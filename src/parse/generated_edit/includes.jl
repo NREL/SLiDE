@@ -10,7 +10,7 @@ include("Order.jl")
 include("Rename.jl")
 include("Replace.jl")
 include("Match.jl")
-include("Stack.jl")
+include("Concatenate.jl")
 include("Deselect.jl")
 include("OrderedGroup.jl")
 

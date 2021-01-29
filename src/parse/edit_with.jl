@@ -255,7 +255,7 @@ function edit_with(df::DataFrame, x::Replace; file=nothing)
 end
 
 
-function edit_with(df::DataFrame, x::Stack; file=nothing)
+function edit_with(df::DataFrame, x::Concatenate; file=nothing)
     df = [[edit_with(df[:, occursin.(indicator, propertynames(df))],
         [Rename.(propertynames(df)[occursin.(indicator, propertynames(df))], x.col);
             Add(x.var, replace(string(indicator), "_" => " "))]
@@ -310,7 +310,7 @@ function edit_with(
 
     # Specify the order in which edits must occur and which of these edits are included
     # in the yaml file of defined edits.
-    EDITS = ["Deselect", "Rename", "OrderedGroup", "Group", "Stack", "Match", "Melt",
+    EDITS = ["Deselect", "Rename", "OrderedGroup", "Group", "Concatenate", "Match", "Melt",
         "Add", "Map", "Replace", "Drop", "Operate", "Combine", "Describe", "Order"]
     KEYS = intersect(EDITS, collect(keys(y)))
     [df = edit_with(df, y[k], file; print_status=print_status) for k in KEYS]

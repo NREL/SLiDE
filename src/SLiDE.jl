@@ -39,6 +39,7 @@ export SLIDE_DIR
 
 # EXPORTS
 export Add
+export Concatenate
 export Combine
 export Describe
 export Drop
