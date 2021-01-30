@@ -170,9 +170,17 @@ end
 
 
 function edit_with(df::DataFrame, x::Melt; file=nothing)
+    @warn("Melt <: Edit is depreciated. Use Stack instead.")
     on = intersect(x.on, propertynames(df))
     df = melt(df, on, variable_name=x.var, value_name=x.val)
     df[!, x.var] .= convert_type.(String, df[:, x.var])
+    return df
+end
+
+
+function edit_with(df::DataFrame, x::Stack; file=nothing)
+    on = intersect(x.on, propertynames(df))
+    df = stack(df, Not(on); variable_name=x.var, value_name=x.val, variable_eltype=String)
     return df
 end
 
@@ -588,11 +596,11 @@ This is helpful when preparing input for calculations during which units are pre
 function _unstack(df::DataFrame, colkey::Symbol, value::Array{Symbol,1})
     idx = setdiff(propertynames(df), [colkey;value])
     lst = [_unstack(df[:,[idx;[colkey,val]]], colkey, val) for val in value]
-    return indexjoin(lst...; fillmissing=false)
+    return indexjoin(lst...)
 end
 
 function _unstack(df::DataFrame, colkey::Symbol, value::Symbol)
-    return unstack(df, colkey, value, renamecols=x -> _add_id(value, x))
+    return unstack(df, colkey, value; renamecols=x -> _add_id(value, x))
 end
 
 function _unstack(df::DataFrame, colkey::Array{Symbol,1}, value::Union{Symbol,Array{Symbol,1}})

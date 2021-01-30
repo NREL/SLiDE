@@ -42,6 +42,7 @@ export Add
 export Concatenate
 export Combine
 export Describe
+export Deselect
 export Drop
 export Group
 export OrderedGroup
@@ -52,7 +53,6 @@ export Order
 export Match
 export Rename
 export Replace
-export Deselect
 export Stack
 
 export SetInput
