@@ -37,21 +37,33 @@ _generate_id(N::Int, id::Symbol=:x) = Symbol.(id, 1:N)
 _generate_id(x::Array, id::Symbol=:x) = _generate_id(length(x), id)
 
 
-"""
-"""
 _add_id(x::Symbol, from::Any; replace=:value) = (x == replace) ? from : append(x, from)
 
+_remove_id(x::Symbol, sub; replace=:value) = (sub == replace) ? x : _remove(x, sub)
+
+_remove(x::String, sub::String) = (x == sub) ? x : replace(x, Regex("_*$sub" * "_*") => "")
+_remove(x::Symbol, sub) = Symbol(_remove(string(x), string(sub)))
+
+function _with_id(df::DataFrame, sub::Symbol; replace=:value)
+    return (sub == replace) ? findvalue(df) : propertynames_with(df, sub)
+end
 
 
-"""
-"""
-_with_id(df::DataFrame, id::Symbol) = (id == :value) ? findvalue(df) : propertynames_with(df, id)
+# """
+# """
+# _add_id(x::Symbol, from::Any; replace=:value) = (x == replace) ? from : append(x, from)
 
 
-"""
-"""
-_remove_id(x::Symbol, id::Symbol) = (x == id) ? x : getid(x, id)
-_remove_id(x::AbstractArray, id::Symbol) = _remove_id.(x, id)
+
+# """
+# """
+# _with_id(df::DataFrame, id::Symbol) = (id == :value) ? findvalue(df) : propertynames_with(df, id)
+
+
+# """
+# """
+# _remove_id(x::Symbol, id::Symbol) = (x == id) ? x : getid(x, id)
+# _remove_id(x::AbstractArray, id::Symbol) = _remove_id.(x, id)
 
 
 """

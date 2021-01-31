@@ -289,9 +289,10 @@ findunits(df::DataFrame) = propertynames_with(df, :units)
 
 """
 """
-function propertynames_with(df::DataFrame, id::Symbol)
-    col = propertynames(df)
-    return col[occursin.(id,col)]
+propertynames_with(df::DataFrame, id) = propertynames_with(propertynames(df), id)
+
+function propertynames_with(col::Array{Symbol,1}, id)
+    return col[.!isnothing.(match.(Regex("\\b$id\\b"), replace.(string.(col), "_"=>" ")))]
 end
 
 

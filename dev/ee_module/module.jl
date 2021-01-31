@@ -3,141 +3,67 @@ using DataFrames
 import CSV
 import Statistics
 
-global BTU = "trillion btu"
-global KWH = "billion kilowatthours"
-global USD = "billions of us dollars (USD)"
-global USD_PER_KWH = "us dollars (USD) per thousand kilowatthour"
-global USD_PER_BTU = "us dollars (USD) per million btu"
-global BTU_PER_BARREL = "million btu per barrel"
-global POPULATION = "thousand"
-global CHAINED_USD = "millions of chained 2009 us dollars (USD)"
+# Include development utilities.
+f_dev = joinpath(SLIDE_DIR,"dev","ee_module")
+include(joinpath(f_dev,"module_constants.jl"))
 
-f_eia = joinpath(SLIDE_DIR,"src","build","eia")
-include(joinpath(f_eia,"_module_utils.jl"))
-include(joinpath(f_eia,"module_bluenote.jl"))
-include(joinpath(f_eia,"module_co2emis.jl"))
-include(joinpath(f_eia,"module_elegen.jl"))
-include(joinpath(f_eia,"module_energy.jl"))
+f_eem = joinpath(SLIDE_DIR,"src","build","eem")
+include(joinpath(f_eem,"eem_bluenote.jl"))
 
-# maps = Dict()
-# maps[:elegen] = read_file(joinpath("data","coremaps","select","elegen.csv"))
-# maps[:co2perbtu] = read_file(joinpath("data","coremaps","define","co2perbtu.csv"))
-# maps[:pq] = read_file(joinpath("data","coremaps","crosswalk","seds_pq.csv"))
-# maps[:units_base] = read_file(joinpath("data","coremaps","define","units.csv"))
-# maps[:og] = DataFrame(src=set[:as], s="cng")
-# maps[:operate] = [
-#     DataFrame(
-#         from_units = "trillion btu",
-#         factor = 1e3,
-#         operation = /,
-#         by_units = "btu per kilowatthour",
-#         to_units = "billion kilowatthours",
-#     );
-#     DataFrame(
-#         from_units = "us dollars (USD) per barrel",
-#         factor = 1.,
-#         operation = /,
-#         by_units = "million btu per barrel",
-#         to_units = "us dollars (USD) per million btu",
-#     );
-#     DataFrame(
-#         from_units = "billions of us dollars (USD)",
-#         factor = 1e3,
-#         operation = /,
-#         by_units = "trillion btu",
-#         to_units = "us dollars (USD) per million btu",
-#     );
-#     DataFrame(
-#         from_units = "billions of us dollars (USD)",
-#         factor = 1e3,
-#         operation = /,
-#         by_units = "billion kilowatthours",
-#         to_units = "us dollars (USD) per thousand kilowatthour",
-#     );
-#     DataFrame(
-#         from_units = "trillion btu",
-#         factor = 1e-3,
-#         operation = *,
-#         by_units = "kilograms CO2 per million btu",
-#         to_units = "million metric tons of carbon dioxide",
-#     );
-#     DataFrame(
-#         from_units = "us dollars (USD) per million btu",
-#         factor = 1E-3,
-#         operation = *,
-#         by_units = "trillion btu",
-#         to_units = "billions of us dollars (USD)",
-#     );
-#     DataFrame(
-#         from_units = "us dollars (USD) per thousand kilowatthour",
-#         factor = 1E-3,
-#         operation = /,
-#         by_units = "billion kilowatthours",
-#         to_units = "billions of us dollars (USD)",
-#     );
-# ]
+f_bench = joinpath("dev","readfiles")
+seds_out = read_from(joinpath(f_bench, "6_seds_out.yml"); run_bash=true)
+bn_out = read_from(joinpath(f_bench, "7_bluenote_int.yml"); run_bash=true)
 
-# maps[:units_base] = edit_with(maps[:units_base], Rename.(propertynames(maps[:units_base]), [:base,:units]))
-# maps[:pq] = edit_with(maps[:pq], Rename.([:pq_code,:src_code], [:pq,:src]))
+d, set, maps = eem()
+
+
+# # # seds_out[:energy] = sort(select(
+# # #         indexjoin(seds_out[:energy], maps[:pq], maps[:units_base]; kind=:left),
+# # #     [:yr,:r,:src,:sec,:pq,:base,:units,:value]))
+
 
 # # ------------------------------------------------------------------------------------------
-# # Column names! We'll use these later.
-# cols_elegen = [:yr,:r,:src,:units,:value]
+# f_data = joinpath(SLIDE_DIR,"data")
+# f_read = joinpath(SLIDE_DIR,"src","build","readfiles")
 
-# (d, set) = build_data("state_model")
+# set = merge(
+#     read_from(joinpath(f_read,"setlist.yml")),
+#     Dict(k=>df[:,1] for (k,df) in read_from(joinpath(f_data,"coresets","eem"))),
+# )
 
-# # SETS - Read the sets we already have saved. Then, manually define new ones.
-# # !!!! DON'T WORRY. Relevant sets will be saved once we know what is and isn't necessary.
-f_set = joinpath(SLIDE_DIR,"src","build","readfiles","setlist.yml")
-set = read_from(f_set)
+# maps = read_from(joinpath(f_read,"maplist.yml"))
+# maps[:og] = DataFrame(src=set[:as], s="cng")
 
-set[:sec] = ["com", "ele", "ind", "res", "trn"]
-set[:ed] = ["supply"; set[:sec]; "ref"]
-set[:demsec] = ["com","ele","ind","ref","res","trn"]
-set[:fds_e] = ["com","ind","res","trn"]
-
-set[:src] = ["col", "gas", "ge", "hy", "nu", "oil", "so", "wy"]
-set[:e] = ["col", "cru", "ele", "gas", "oil"]
-set[:ff] = ["col", "gas", "oil"]
-
-set[:as] = ["cru","gas"]
-
-# # SLiDE data.
-f_input = joinpath("data","input")
-f_eia = joinpath(f_input,"eia")
-d = read_from(f_eia)
-# d = merge(d, read_from(f_eia))
-
-# # blueNOTE data (for comparison)
-# f_read = joinpath(SLIDE_DIR,"dev","readfiles")
-# bn_int = read_from(joinpath(f_read,"7_bluenote_int.yml"); run_bash = true)
-
-# seds_out = read_from(joinpath(f_read, "6_seds_out.yml"); run_bash = true)
-# seds_out[:elegen] = filter_with(select!(seds_out[:elegen], setdiff(cols_elegen,[:units])), set)
-# seds_out[:energy] = sort(select(
-#         indexjoin(seds_out[:energy], maps[:pq], maps[:units_base]; kind=:left),
-#     [:yr,:r,:src,:sec,:pq,:base,:units,:value]))
+# d = read_from(joinpath(f_data,"input","eia"))
+# [d[k] = extrapolate_year(df, (yr=set[:yr],)) for (k,df) in d]
 
 # # ----- ENERGY -----------------------------------------------------------------------------
-
-# # Summing over (msn,source,sector) will be incorporated into the datastream.
-# # Leaving out for now to make it easier to verify.
-IDX = [:yr,:r,:src,:sec,:units,:value]
-# d[:seds] = edit_with(d[:seds], Combine("sum", IDX))
-d[:seds] = select!(d[:seds], IDX)
-
-
 # # Calculate elegen and benchmark. It works! Yay!
 
 # # @info("printing calculations")
-# module_elegen!(d, maps)
-# module_energy!(d, set, maps)
-# module_co2emis!(d, set, maps)
+# eem_elegen!(d, maps)
+# eem_energy!(d, set, maps)
+# eem_co2emis!(d, set, maps)
 
+seds_out[:elegen] = sort(select(filter_with(seds_out[:elegen], set), [:yr,:r,:src,:value]))
+seds_out[:energy] = sort(select(indexjoin(seds_out[:energy], maps[:pq]; kind=:left), [:yr,:r,:src,:sec,:units,:value]))
+# seds_out[:co2emis] = filter_with(seds_out[:co2emis], merge(set, Dict(:dataset=>["epa","seds"])))
 
+# # ----- ENERGY -----------------------------------------------------------------------------
 # d[:convfac] = _module_convfac(d)
-# d[:cprice] = _module_cprice(d, maps)
-# d[:prodbtu] = _module_prodbtu(d, set)
+# d[:cprice] = _module_cprice!(d, maps)
+# d[:prodbtu] = _module_prodbtu!(d, set)
+
+# var = :pq
+# val = [:units,:value]
+
+# df = copy(d[:energy])
+# splitter = DataFrame(permute((src=[set[:ff];"ele"], sec=set[:demsec], pq=["p","q"])))
+# splitter = indexjoin(splitter, maps[:pq]; kind=:left)
+
+# df, df_out = split_fill_unstack(copy(d[:energy]), splitter, var, val);
+
+
 # _module_pedef!(d, set)
 # _module_pe0!(d, set)
 # _module_ps0!(d)
@@ -146,8 +72,6 @@ d[:seds] = select!(d[:seds], IDX)
 # # _module_netgen!(d)
 # _module_eq0!(d, set)
 # # _module_ed0!(d, set)
-
-
 
 # # # !!!! Should just update in benchmark. This always seems to cause issues.
 # d_comp = Dict()

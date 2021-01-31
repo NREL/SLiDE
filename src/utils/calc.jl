@@ -185,3 +185,75 @@ function round!(df::DataFrame, col::Union{Symbol,Array{Symbol,1}}; digits::Int =
     df[!,col] .= round.(df[:,col]; digits = digits)
     return df
 end
+
+
+"""
+"""
+function operate_over(df::Vararg{DataFrame};
+    id=[]=>[],
+    units::DataFrame=DataFrame(),
+    copyinput::Bool=false,
+    fillmissing=1.0,
+    # fillmissing::Bool=true,
+)
+    df = indexjoin(df...; id=id[1], fillmissing=fillmissing, skipindex=:units, kind=:left)
+    return operate_over(df; id=id, units=units, copyinput=copyinput, fillmissing=fillmissing)
+end
+
+
+function operate_over(df::DataFrame;
+    id=[]=>[],
+    units::DataFrame=DataFrame(),
+    copyinput::Bool=false,
+    fillmissing=1.0,
+    # fillmissing::Bool=true,
+)
+    if !isempty(units)
+        df = _join_units(df, units, id; copyinput=copyinput, fillmissing=fillmissing)
+    end
+    return df
+end
+
+
+"""
+"""
+function _join_units(
+    df::DataFrame,
+    units::DataFrame,
+    id;
+    copyinput::Bool=false,
+    fillmissing=1.0,
+)
+    on = :units
+
+    utx = _add_id.(on, id[1]) => _add_id(on, id[2])
+    idx_units = propertynames_with(units, on)[1:length(id[1])]
+
+    # If we might be performing a calculation that will replace an existing output,
+    # append that input with 0.
+    if copyinput
+        id[2] in propertynames(df)  && (df[!,append(id[2],0)] .= df[:,id[2]])
+        utx[2] in propertynames(df) && (df[!,append(utx[2],0)] .= df[:,utx[2]])
+    end
+    
+    df = leftjoin(df, units, on=Pair.(utx[1], idx_units))
+    
+    # Check for missing values and fill these if they are found.
+    # Do not fill anything in the "operation" column to return this indicator that the join
+    # was incomplete.
+    ii = ismissing.(df[:, :operation])
+
+    if any(ii)
+        df[!,:complete] .= .!ii
+
+        if !isempty(intersect(id[1], [id[2]]))
+            df[!, :value] .= df[:,id[2]] .* ii
+        end
+
+        if fillmissing !== false
+            df[ii,:factor] = fillmissing
+            df[ii,:units] = df[ii,utx[2]]
+        end
+    end
+    return df
+end

@@ -111,6 +111,7 @@ export stack_append
 # CALCULATE
 export combine_over
 export transform_over
+export operate_over
 
 # READ
 export read_file
@@ -133,9 +134,11 @@ export calibrate
 export share
 export disagg
 
-export module_energy!
-export module_elegen!
-export module_co2emis!
+# ENERGY ENVIRONMENT MODULE
+export eem
+export eem_elegen!
+export eem_energy!
+export eem_co2emis!
 
 # MODEL
 export model_input
@@ -196,6 +199,11 @@ include(joinpath("build", "share", "share_pce.jl"))
 include(joinpath("build", "share", "share_sgf.jl"))
 include(joinpath("build", "share", "share_utd.jl"))
 include(joinpath("build", "disagg", "disagg_region.jl"))
+
+include(joinpath("build", "eem", "eem.jl"))
+include(joinpath("build", "eem", "eem_elegen.jl"))
+include(joinpath("build", "eem", "eem_energy.jl"))
+include(joinpath("build", "eem", "eem_co2emis.jl"))
 
 include(joinpath("model", "model_input.jl"))
 

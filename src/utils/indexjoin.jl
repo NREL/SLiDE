@@ -67,7 +67,7 @@ function convertjoin(df::Array{DataFrame,1}; id=[])
 end
 
 
-convertjoin(df::Vararg{DataFrame}; id=[]) = convertjoin(ensurearray(df); id=id)
+
 
 
 """

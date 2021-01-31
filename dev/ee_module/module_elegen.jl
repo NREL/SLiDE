@@ -102,6 +102,7 @@ dmap[:msn_to_src] = read_file("../forked/SLiDEData/data/coremaps/crosswalk/seds_
 #     # 
 #     # WHAT ABOUT THE YEAR EXTRAPOLATION???
 #     # WHEN SHOULD WE EXTRAPOLATE? PROBABLY IN DATASTREAM FOR ALL YEARS, RIGHT?
+#           [CLH 1/30/2021: NO.]
 #     # ADD filter = true/extrapolate = true flag for years that should be most of the years.
 #     #   This means year set must already be defined. Maybe from bea??
 #     #   We only really extrapolate backward.

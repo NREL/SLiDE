@@ -37,9 +37,9 @@ makedocs(clean = true,
                 "Share" => "man/build/share.md",
                 "Disaggregate" => "man/build/disagg.md",
             ],
-            # "EEM" => Any[
-            #     "SEDS" => "man/eem/seds.md",
-            # ],
+            "EEM" => Any[
+                "SEDS" => "man/eem/seds.md",
+            ],
             "Scaling" => "man/scaling.md",
             "Parameters" => "man/parameters.md"
         ],

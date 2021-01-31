@@ -200,9 +200,7 @@ This function fills zeros in `df` given a slice of keys/values that must be fill
 # Returns
 - `df::DataFrame` with zeros filled.
 """
-function _fill_zero_with(df::DataFrame, with::Any;
-    permute_keys::Bool=true,
-)
+function _fill_zero_with(df::DataFrame, with::Any; permute_keys::Bool=true)
     if !isempty(with)
         df = indexjoin(df, _intersect_with(with, df))
     elseif permute_keys
@@ -214,109 +212,120 @@ function _fill_zero_with(df::DataFrame, with::Any;
 end
 
 
-function _fill_zero_with(df::DataFrame, with::DataFrame;
-    permute_keys::Bool=true,
-)
-    df = indexjoin(_permute_unique(df; permute_keys=permute_keys, with=with), df)
+function _fill_zero_with(df::DataFrame, with::DataFrame; permute_keys::Bool=true)
+    idx = findindex(df)
+
+    if !isempty(with)
+        idx_with = findindex(with)
+
+        df_perm = df[:,setdiff(idx,idx_with)]
+        permute_keys && (df_perm = permute(df_perm))
+
+        df_perm = crossjoin(df_perm, with)
+        df = indexjoin(df_perm, df)
+    elseif permute_keys
+        idx = findindex(df)
+        df = indexjoin(permute(df[:,idx]), df)
+    end
     
     return df
 end
 
 
-"""
-    _permute_unique(df::DataFrame; kwargs...)
-This function returns an index of `df` where only unique columns are permuted.
+# """
+#     _permute_unique(df::DataFrame; kwargs...)
+# This function returns an index of `df` where only unique columns are permuted.
 
-# Arguments
-- `df::DataFrame` to permute
+# # Arguments
+# - `df::DataFrame` to permute
 
-# Keywords
-- `permute_keys::Bool=true`: Should we permute non-duplcate `df` indices?
-- `with::DataFrame=DataFrame()`: Index slice that must be completely represented in the
-    permutation.
+# # Keywords
+# - `permute_keys::Bool=true`: Should we permute non-duplcate `df` indices?
+# - `with::DataFrame=DataFrame()`: Index slice that must be completely represented in the
+#     permutation.
 
-# Returns
-- `df::DataFrame` of **index** columns (not including values), as indicated by keywords
-"""
-function _permute_unique(df::DataFrame; permute_keys::Bool=true, with::DataFrame=DataFrame())
-    idx_permute, idx_static = _split_index(df)
-    df_static = unique(df[:,idx_static])
+# # Returns
+# - `df::DataFrame` of **index** columns (not including values), as indicated by keywords
+# """
+# function _permute_unique(df::DataFrame; permute_keys::Bool=true, with::DataFrame=DataFrame())
+#     idx_permute, idx_static = _split_index(df)
+#     df_static = unique(df[:,idx_static])
 
-    if !isempty(with)
-        idx_with = findindex(with)
-        idx_permute = setdiff(idx_permute, idx_with)
+#     if !isempty(with)
+#         idx_with = findindex(with)
+#         idx_permute = setdiff(idx_permute, idx_with)
         
-        df_static = innerjoin(df_static, with,
-            on=intersect(idx_static,idx_with))
-    end
+#         df_static = innerjoin(df_static, with,
+#             on=intersect(idx_static,idx_with))
+#     end
 
-    df_permute = unique(df[:,idx_permute])
-    permute_keys && (df_permute = permute(df_permute))
+#     df_permute = unique(df[:,idx_permute])
+#     permute_keys && (df_permute = permute(df_permute))
     
-    return crossjoin(df_permute, df_static)
-end
+#     return crossjoin(df_permute, df_static)
+# end
 
 
-"""
-    _split_index(df::DataFrame)
-This function separates `df` indices that *should* be permuted from ones that do not need to
-be because they contain duplicate information.
+# """
+#     _split_index(df::DataFrame)
+# This function separates `df` indices that *should* be permuted from ones that do not need to
+# be because they contain duplicate information.
 
-# Arguments
-- `df::DataFrame` to divide into type of index (permuted vs. static).
+# # Arguments
+# - `df::DataFrame` to divide into type of index (permuted vs. static).
 
-# Returns
-- `idx_permute::Array{Symbol,1}` indices to permute
-- `idx_static::Array{Symbol,1}` indices to join to each row of the permuted indices.
-"""
-function _split_index(df::DataFrame)
-    # !!!! Would be SO NICE if we could figure out if some units go with some values.
-    # Like in MSN data. Or (src,sec,units) in EEM.
-    idx = findindex(df)
-    idx_static = _find_duplicate_index(df)
-    idx_permute = setdiff(idx, idx_static)
-    return idx_permute, idx_static
-end
+# # Returns
+# - `idx_permute::Array{Symbol,1}` indices to permute
+# - `idx_static::Array{Symbol,1}` indices to join to each row of the permuted indices.
+# """
+# function _split_index(df::DataFrame)
+#     # !!!! Would be SO NICE if we could figure out if some units go with some values.
+#     # Like in MSN data. Or (src,sec,units) in EEM.
+#     idx = findindex(df)
+#     idx_static = _find_duplicate_index(df)
+#     idx_permute = setdiff(idx, idx_static)
+#     return idx_permute, idx_static
+# end
 
 
-"""
-    _find_duplicate_index(df::DataFrame)
-This function finds and returns a list of DataFrame indices that do not provide unique
-information. This might be the case (for example), if both a code and a corresponding description are
-included. Duplicate indices will **not** be permuted when filling zeros.
+# """
+#     _find_duplicate_index(df::DataFrame)
+# This function finds and returns a list of DataFrame indices that do not provide unique
+# information. This might be the case (for example), if both a code and a corresponding description are
+# included. Duplicate indices will **not** be permuted when filling zeros.
 
-This is relevant during calculations when both (base, units) are present.
+# This is relevant during calculations when both (base, units) are present.
 
-# Arguments
-- `df::DataFrame`
+# # Arguments
+# - `df::DataFrame`
 
-# Returns
-- `idx::Array{Symbol,1}`: list of DataFrame indices that provide duplicate information.
-"""
-function _find_duplicate_index(df::DataFrame)
-    idx_duplicate = _find_constant(df)
-    idx = setdiff(findindex(df), idx_duplicate)
+# # Returns
+# - `idx::Array{Symbol,1}`: list of DataFrame indices that provide duplicate information.
+# """
+# function _find_duplicate_index(df::DataFrame)
+#     idx_duplicate = _find_constant(df)
+#     idx = setdiff(findindex(df), idx_duplicate)
 
-    num_unique = nunique(df[:,idx])
+#     num_unique = nunique(df[:,idx])
 
-    idx_duplicate = vcat(
-        [idx_duplicate],
-        [_find_duplicate_index(df, idx[num_unique .== nn]) for nn in nonunique(num_unique)],
-    )
+#     idx_duplicate = vcat(
+#         [idx_duplicate],
+#         [_find_duplicate_index(df, idx[num_unique .== nn]) for nn in nonunique(num_unique)],
+#     )
     
-    return vcat(idx_duplicate...)
-end
+#     return vcat(idx_duplicate...)
+# end
 
 
-function _find_duplicate_index(df::DataFrame, idx::Array{Symbol,1})
-    df = unique(df[:,idx])
-    N = nunique(df[:,idx[1]])
+# function _find_duplicate_index(df::DataFrame, idx::Array{Symbol,1})
+#     df = unique(df[:,idx])
+#     N = nunique(df[:,idx[1]])
 
-    idx_all = reverse(collect(Combinatorics.combinations(idx)))
-    idx_all = idx_all[length.(idx_all) .> 1]
+#     idx_all = reverse(collect(Combinatorics.combinations(idx)))
+#     idx_all = idx_all[length.(idx_all) .> 1]
 
-    idx_duplicate = idx_all[[size(unique(df, idx), 1) for idx in idx_all] .== N]
+#     idx_duplicate = idx_all[[size(unique(df, idx), 1) for idx in idx_all] .== N]
 
-    length(idx_duplicate) == 1 && (idx_duplicate = idx_duplicate[1])
-    return idx_duplicate
-end
+#     length(idx_duplicate) == 1 && (idx_duplicate = idx_duplicate[1])
+#     return idx_duplicate
+# end

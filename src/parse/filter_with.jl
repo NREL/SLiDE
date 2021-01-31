@@ -113,6 +113,22 @@ function filter_with(
 end
 
 
+function filter_with(df::DataFrame, set::DataFrame; drop=false)
+    idx_set = propertynames(set)
+    df = indexjoin(df, set; kind=:inner)
+
+    cols = propertynames(df)
+
+    if drop !== false
+        idx_drop = setdiff(_find_constant(df[:,idx_set]), propertynames_with(df,:units))
+        drop !== true && intersect!(idx_drop, ensurearray(drop))
+        setdiff!(cols, idx_drop)
+    end
+
+    return df[:,cols]
+end
+
+
 """
     split_with(df::DataFrame, splitter)
 This function separates `df` into two DataFrames, `df_in` and `df_out`.
@@ -166,7 +182,13 @@ function split_fill_unstack(
     value::Union{Symbol, Array{Symbol,1}},
 )
     df_in, df_out = split_with(df, splitter)
+    
     df_in = fill_zero(df_in; with=splitter)
+    # idx = findindex(df_in)
+    # idx_split = findindex(splitter)
+    # df_perm = crossjoin(permute(df_in[:,setdiff(idx,idx_split)]), splitter)
+    # df_in = indexjoin(df_in, df_perm)
+    
     df_in = _unstack(df_in, colkey, value)
 
     return df_in, df_out
@@ -203,10 +225,25 @@ function stack_append(
     df_wide::DataFrame,
     df_out::DataFrame,
     colkey::Union{Symbol, Array{Symbol,1}},
-    value::Union{Symbol, Array{Symbol,1}},
+    value::Union{Symbol, Array{Symbol,1}};
+    cols::Symbol=:intersect,
+    ensure_finite::Bool=true,
 )
+    if ensure_finite
+        inputs = propertynames_with(findvalue(df_wide),0)
+        if !isempty(inputs)
+            outputs = _remove_id.(inputs,0)
+            for (inp,out) in zip(inputs,outputs)
+                ii = .!isfinite.(df_wide[:,out])
+                df_wide[ii,out] .= df_wide[ii,inp]
+            end
+        end
+    end
+
+    
     df_wide = _stack(df_wide, colkey, value)
-    return vcat(df_wide, df_out; cols=:intersect)
+
+    return vcat(df_wide, df_out; cols=cols)
 end
 
 

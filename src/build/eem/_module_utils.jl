@@ -17,18 +17,18 @@ end
 
 """
 """
-# function DataFrames.stack(df::DataFrame, id_vars::Tuple)
-#     from = Dict(k => _with_id(df, k) for k in id_vars)
-#     to = Dict(k => _remove_id(v, k) for (k, v) in from)
-#     idx = setdiff(propertynames(df), values(from)...)
+function DataFrames.stack(df::DataFrame, id_vars::Tuple)
+    from = Dict(k => _with_id(df, k) for k in id_vars)
+    to = Dict(k => _remove_id(v, k) for (k, v) in from)
+    idx = setdiff(propertynames(df), values(from)...)
 
-#     lst = [edit_with(df[:,[idx;from[k]]], [
-#             Rename.(from[k], to[k]);
-#             Melt(idx, :key, k);
-#         ]) for k in keys(from)]
+    lst = [edit_with(df[:,[idx;from[k]]], [
+            Rename.(from[k], to[k]);
+            Melt(idx, :key, k);
+        ]) for k in keys(from)]
 
-#     return indexjoin(lst...)
-# end
+    return indexjoin(lst...)
+end
 
 
 """

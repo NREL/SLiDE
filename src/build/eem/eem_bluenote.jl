@@ -1,24 +1,30 @@
 """
 """
 function _module_convfac(d::Dict)
-    return filter_with(d[:seds], (src = "cru", sec = "supply", units = BTU_PER_BARREL); drop=:sec)
+    return filter_with(d[:seds], (src="cru", sec="supply", units=BTU_PER_BARREL); drop=true)
 end
 
 
 """
 """
-function _module_cprice(d::Dict, maps::Dict)
-    id = [:cru,:convfac]
-    df = convertjoin(d[:crude_oil], _module_convfac(d); id=id)
-    d[:cprice] = operate_with(df, maps[:operate]; id=id)
+function _module_cprice!(d::Dict, maps::Dict)
+    id = [:usd_per_barrel,:btu_per_barrel] => :usd_per_btu
+    df = _module_convfac(d)
+    col = propertynames(df)
+
+    df = operate_over(d[:crude_oil], df; id=id, units=maps[:operate])
+
+    df[!,:value] .= df[:,:factor] .* df[:,:usd_per_barrel] ./ df[:,:btu_per_barrel]
+
+    d[:cprice] = df[:,col]
     return d[:cprice]
 end
 
 
 """
 """
-function _module_prodbtu(d::Dict, set::Dict)
-    d[:prodbtu] = filter_with(d[:seds], (src = set[:as], sec = "supply", units = BTU); drop=:sec)
+function _module_prodbtu!(d::Dict, set::Dict)
+    d[:prodbtu] = filter_with(d[:seds], (src=set[:as], sec="supply", units=BTU); drop=:sec)
     return d[:prodbtu]
 end
 
@@ -36,7 +42,7 @@ function _module_pedef!(d::Dict, set::Dict)
             sec = set[:demsec],
             pq = ["p","q"],))),
     )
-
+    
     d[:pedef] = vcat([_module_pedef(df, df_split) for df_split in values(splitter)]...)
     return d[:pedef]
 end
