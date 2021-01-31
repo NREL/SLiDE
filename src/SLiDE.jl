@@ -101,6 +101,7 @@ export propertynames_with
 export edit_with
 export fill_zero
 export fill_with
+export extend_year
 export extrapolate_region
 export extrapolate_year
 export filter_with
@@ -133,6 +134,11 @@ export partition
 export calibrate
 export share
 export disagg
+
+export share_sector!
+export aggregate_share!
+export share_disagg_sector!
+export disagg_sector!
 
 # ENERGY ENVIRONMENT MODULE
 export eem
@@ -198,7 +204,9 @@ include(joinpath("build", "share", "share_gsp.jl"))
 include(joinpath("build", "share", "share_pce.jl"))
 include(joinpath("build", "share", "share_sgf.jl"))
 include(joinpath("build", "share", "share_utd.jl"))
+include(joinpath("build", "share", "share_sector.jl"))
 include(joinpath("build", "disagg", "disagg_region.jl"))
+include(joinpath("build", "disagg", "disagg_sector.jl"))
 
 include(joinpath("build", "eem", "eem.jl"))
 include(joinpath("build", "eem", "eem_elegen.jl"))

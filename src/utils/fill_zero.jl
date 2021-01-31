@@ -144,9 +144,16 @@ end
 """
 Initialize a new DataFrame and fills it with the specified input value.
 """
-function fill_with(keys_fill::NamedTuple, value::Any; value_colnames=:value)
+function fill_with(keys_fill, value::Any; value_colnames=:value)
     df = fill_zero(keys_fill; value_colnames=value_colnames)
     df = edit_with(df, Replace.(value_colnames, 0.0, value))
+    return df
+end
+
+function fill_with(df::DataFrame, value::Any; value_colnames=:value)
+    idx = findindex(df)
+    df = permute(df[:,idx])
+    df[!,:value] .= value
     return df
 end
 

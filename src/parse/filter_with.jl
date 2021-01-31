@@ -306,7 +306,7 @@ julia> extrapolate_year(df, Dict(:yr => 2014:2017))
 """
 function extrapolate_year(
     df::DataFrame,
-    yr::Array{Int64,1};
+    yr::AbstractArray;
     backward::Bool = true,
     forward::Bool = true
 )
@@ -342,23 +342,81 @@ function extrapolate_year(
 end
 
 
-function extrapolate_year(
-    df::DataFrame,
-    set;
-    backward::Bool = true,
-    forward::Bool = true
-)
+function extrapolate_year(df::DataFrame, set; backward::Bool=true, forward::Bool=true)
     extrapolate_year(df, set[:yr]; forward = forward, backward = backward)
 end
 
 
-function extrapolate_year(
-    df::DataFrame,
-    yr::UnitRange{Int64};
-    backward::Bool = true,
-    forward::Bool = true
-)
-    extrapolate_year(df, ensurearray(yr); forward = forward, backward = backward)
+"""
+"""
+function extend_year(df::DataFrame, mapping::DataFrame)
+    col = propertynames(df)
+    df = edit_with(outerjoin(mapping, df, on=Pair(:y,:yr)), Rename(:x,:yr))
+    return df[:,col]
+end
+
+function extend_year(df::DataFrame, yr::AbstractArray)
+    years = unique(df[:,:yr])
+    df = extend_year(df, map_step(yr, years))
+    return df
+end
+
+extend_year(df::DataFrame, set::Dict) = extend_year(df, set[:yr])
+
+
+"""
+This function returns a DataFrame defining mapping for a step function.
+
+# Keywords
+- `fun::Function`: how to pick the cut-off boundary. By default, this is set to occur
+    between to values. For example, this would result in using 2007 data for years <= 2009
+    and 2012 data for years >= 2009.
+
+# Returns
+
+
+# Example
+
+```jldoctest
+julia> map_step((:x,:y) => (2005:2015, [2007,2012]))
+11×2 DataFrame
+│ Row │ x     │ y     │
+│     │ Int64 │ Int64 │
+├─────┼───────┼───────┤
+│ 1   │ 2005  │ 2007  │
+│ 2   │ 2006  │ 2007  │
+│ 3   │ 2007  │ 2007  │
+│ 4   │ 2008  │ 2007  │
+│ 5   │ 2009  │ 2007  │
+│ 6   │ 2010  │ 2012  │
+│ 7   │ 2011  │ 2012  │
+│ 8   │ 2012  │ 2012  │
+│ 9   │ 2013  │ 2012  │
+│ 10  │ 2014  │ 2012  │
+│ 11  │ 2015  │ 2012  │
+```
+"""
+function map_step(x::AbstractArray, y::AbstractArray; fun::Function=Statistics.mean)
+    cut = sort([
+        x[1]; x[end];
+        fun.(eachrow(DataFrame(low=y[1:end-1], high=y[2:end])));
+    ])
+
+    cut = DataFrame(
+        :y   => y,
+        :min => convert_type.(Int,Statistics.ceil.(cut[1:end-1])),
+        :max => convert_type.(Int,Statistics.floor.(cut[2:end])),
+    )
+
+    df = crossjoin(DataFrame(x=x), cut)
+    df[!,:keep] .= (df[:,:x].>=df[:,:min]) .* (df[:,:x].<=df[:,:max])
+    df = df[df[:,:keep], [:x,:y]]
+    return df
+end
+
+
+function map_step(f::Pair; fun::Function=Statistics.mean)
+    return edit_with(map_step(f[2]...; fun=fun), Rename.([:x,:y], ensurearray(f[1])))
 end
 
 
@@ -487,7 +545,6 @@ function _intersect_with(
             return nothing
         end
     end
-
     return DataFrame(permute(NamedTuple{Tuple(idx,)}(val,)))
 end
 
@@ -496,9 +553,10 @@ end
 """
 function _find_constant(df::DataFrame)
     idx = findindex(df)
-    # return idx[length.(unique.(eachcol(df[:,idx]))) .== 1]
     return idx[nunique(df[:,idx]) .== 1]
 end
+
+_find_constant(row::DataFrameRow) = nunique(row)==1
 
 
 """

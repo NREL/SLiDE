@@ -300,6 +300,7 @@ end
 """
 nunique(df::DataFrame) = nunique.(eachcol(df))
 nunique(x::AbstractArray) = length(unique(skipmissing(x)))
+nunique(row::DataFrameRow) = length(unique(skipmissing(row)))
 
 
 """
