@@ -49,7 +49,8 @@ cge = MCPModel();
 #set[:r] -> regions
 #set[:m] -> margins
 #set[:gm] -> goods_margins
-
+set[:uti] = ["uti"]
+set[:nuti] = setdiff(set[:g],set[:uti])
 
 ##############
 # PARAMETERS
@@ -154,6 +155,8 @@ cge = MCPModel();
 
 @NLparameter(cge, theta_inv[r in set[:r], g in set[:g]] == value(i0[r,g]) / value(inv0[r])); # Intermediate input share of investment output
 
+@NLparameter(cge, theta_cd[r in set[:r], g in set[:g]] == ensurefinite(value(cd0[r,g]) / sum(value(cd0[r,gg]) for gg in set[:g]))); # final consumption input demand shares
+
 #Substitution and transformation elasticities
 @NLparameter(cge, es_va[r in set[:r], s in set[:s]] == SUB_ELAST[:va]); # value-added nest - substitution elasticity
 @NLparameter(cge, es_y[r in set[:r], s in set[:s]]  == SUB_ELAST[:y]); # Top-level Y nest (VA,M) - substitution elasticity
@@ -166,11 +169,25 @@ cge = MCPModel();
 
 @NLparameter(cge, es_inv[r in set[:r]] == 5); # Investment production - substitution elasticity
 
+@NLparameter(cge, es_cd == 0.99); # Consumption - substitution elasticity - approximate to 1
+
 # Calibrate subsitution elasticity between leisure and consumption
 # based on uncompensated elasticity of labor supply
 @NLparameter(cge, ulse == 0.05); # uncompensated labor supply elasticity
 @NLparameter(cge, es_z[r in set[:r]] == 1 + (value(ulse) / value(theta_lz[r]))); # final consumption nest - substitution elasticity
 
+# Autonomous energy efficienty improvements (aeei)
+@NLparameter(cge, aeeigr[r in set[:r], g in set[:g]] == 0.0); # improvement rate
+@NLparameter(cge, aeeigrcd[r in set[:r]] == 0.0); # improvement rate for final consumption
+@NLparameter(cge, aeei[r in set[:r], g in set[:g]] == 1); # growth factor
+@NLparameter(cge, aeeicd[r in set[:r]] == 1); # growth factor for final consumption
+
+# for r in set[:r]
+#     for g in set[:g]
+#         set_value(aeeigr[r,g], 0.01);
+#     end
+#     set_value(aeeigrcd[r], 0.01);
+# end
 
 
 ################
@@ -264,6 +281,16 @@ lo = 0.0
     c0[r]*(CZ[r]/PC[r])^(es_z[r]));
 
 
+# unit cost for consumption
+@NLexpression(cge, CC[r in set[:r]],
+    sum( theta_cd[r,gg]*(haskey(PA.lookup[1], (r, gg)) ? PA[(r, gg)] : 1.0)^(1-es_cd) for gg in set[:g])^(1/(1-es_cd))
+);
+
+# final demand
+@NLexpression(cge,CD[r in set[:r],g in set[:g]],
+    (cd0[r,g]*(CC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0))^es_cd));
+#  cd0[r,g]*PC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0));
+
 
 #----------
 
@@ -307,9 +334,6 @@ lo = 0.0
 @NLexpression(cge,MD[r in set[:r],g in set[:g]],
   m0[r,g]*(CDM[r,g]*(1+tm[r,g])/(PFX*(1+tm0[r,g])))^4 );
 
-# final demand
-@NLexpression(cge,CD[r in set[:r],g in set[:g]],
-  cd0[r,g]*PC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) );
 
 
 ###############################
@@ -720,6 +744,16 @@ for t in 2017:2020
     # #update labor endowments --- separate parameters for labor endowments versus demand
     #     set_value(le0[r,s], (1 + value(gr)) * value(le0[r,s]));
     # end
+
+
+    for r in set[:r]
+        set_value(aeeicd[r], value(aeeicd[r])*(1/(1+value(aeeigrcd[r]))));
+        set_value(cd0[r,"uti"], value(cd0[r,"uti"])*value(aeeicd[r]));
+    end
+    for r in set[:r], g in set[:g]
+        set_value(aeei[r,g], value(aeei[r,g])*(1/(1+value(aeeigr[r,g]))));
+        set_value(theta_cd[r,g], value(cd0[r,g])/sum(value(cd0[r,gg]) for gg in set[:g]));
+    end
 
     #update balance of payments and household adjustment
     for r in set[:r]
