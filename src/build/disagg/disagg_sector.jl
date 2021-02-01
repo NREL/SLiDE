@@ -8,8 +8,10 @@ function share_disagg_sector!(dataset::String, d::Dict; scheme=:summary=>:disagg
         Dict(:sector=>:detail),
     )
 
-    det = partition(dataset, det, set)
-
+    # !!!! Need to make sure this doesn't try to read summary-level partition
+    # info if it is already saved.
+    det = partition(_development(dataset), det, set)
+    
     # Share and aggregate the sectoral map.
     share_sector!(det)
     aggregate_share!(det)
@@ -54,7 +56,7 @@ function _disagg_sector(
         col = propertynames(df)
         if length(on) > 1
             dfmap = _compound_for(dfmap, on; scheme=scheme)
-            (from,to) = (SLiDE._add_id.(scheme[1],on), SLiDE._add_id.(scheme[2],on))
+            (from,to) = (_add_id.(scheme[1],on), _add_id.(scheme[2],on))
         else
             (from,to) = (scheme[1], scheme[2])
         end
@@ -108,7 +110,7 @@ function _compound_for(df::DataFrame, col::Array{Symbol,1}; scheme=:summary=>:di
     # In the case that (g,s) is the same  at the summary level, address the following cases:
     #   1. (g,s) are the SAME at the disaggregate level, sum all of the share values.
     #   2. (g,s) are DIFFERENT at the disaggregate level, drop these.
-    (from,to) = (SLiDE._add_id.(scheme[1],col), SLiDE._add_id.(scheme[2],col))
+    (from,to) = (_add_id.(scheme[1],col), _add_id.(scheme[2],col))
 
     # Split df based on whether (g,s) are the same at the summary level.
     splitter = DataFrame(fill(unique(df[:,from[1]]), length(from)), from)
@@ -117,7 +119,7 @@ function _compound_for(df::DataFrame, col::Array{Symbol,1}; scheme=:summary=>:di
     # Sum over (g) at the disaggregate level, keeping only the rows for which (g,s) are the
     # same at this level.
     df_same = transform_over(df_same, to[2:end])
-    ii_same = SLiDE._find_constant.(eachrow(df_same[:,to]))
+    ii_same = _find_constant.(eachrow(df_same[:,to]))
     df_same = df_same[ii_same,:]
 
     return vcat(df_same, df_diff)

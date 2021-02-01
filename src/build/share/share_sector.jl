@@ -26,7 +26,7 @@ end
 function aggregate_share!(
     d::Dict;
     scheme=:disagg=>:aggr,
-    path = joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem.csv")
+    path = joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem.csv"),
 )
     dfmap = read_file(path)
 
