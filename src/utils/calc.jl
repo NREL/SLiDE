@@ -105,16 +105,23 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `df::DataFrame` WITHOUT the specified column(s) argument. The resulting DataFrame will be
     'shorter' than the input DataFrame.
 """
-function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
+function combine_over(
+    df::DataFrame,
+    col::Array{Symbol,1};
+    fun::Function=sum,
+    digits=DEFAULT_ROUND_DIGITS,
+)
     # !!!! add kwarg to findvalue to indicate whether to include integers as values
     val = findvalue(df)
     idx_by = setdiff(propertynames(df), [col; val])
     
     df = combine(groupby(df, idx_by), val .=> fun .=> val)
     
-    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
-        for ii in find_oftype(df[:,val], AbstractFloat)]
-
+    if digits!==false
+        [df[!,ii] .= round.(df[:,ii]; digits=digits)
+            for ii in find_oftype(df[:,val], AbstractFloat)]
+    end
+    
     # !!!! See where we actually want to convert boolean sums to integers. I think it's just
     # in some labor sharing. We can probably keep summed booleans as integers. This seems less confusing.
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
@@ -122,9 +129,16 @@ function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
 end
 
 
-function combine_over(df::DataFrame, col::Symbol; fun::Function = sum)
-    return combine_over(df, ensurearray(col); fun = fun)
+function combine_over(
+    df::DataFrame,
+    col::Symbol;
+    fun::Function=sum,
+    digits=DEFAULT_ROUND_DIGITS,
+)
+    return combine_over(df, ensurearray(col); fun=fun, digits=digits)
 end
+
+combine_over(df, col::Any) = df
 
 
 """
@@ -162,6 +176,8 @@ end
 function transform_over(df::DataFrame, col::Symbol; fun::Function = sum)
     return transform_over(df, ensurearray(col); fun = fun)
 end
+
+transform_over(df, col::Any) = df
 
 
 """

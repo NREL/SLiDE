@@ -89,7 +89,7 @@ function _make_unique(df::Array{DataFrame,1}, id::AbstractArray, indicator::Bool
     flt = find_oftype.(df, AbstractFloat)
 
     # If there are no values, don't make any changes.
-    all(length.(val) .== 0) && (return df, id)
+    .&(all(length.(val) .== 0), isempty(skipindex)) && (return df, id)
     
     isempty(id) && (id = _generate_id(N))
 
@@ -108,7 +108,7 @@ function _make_unique(df::Array{DataFrame,1}, id::AbstractArray, indicator::Bool
             broadcast.(append, val, id)
         end
     end
-        
+    
     # Remove indicies to be skipped.
     for ii in 1:N
         for idx in intersect(ensurearray(skipindex), col[ii])

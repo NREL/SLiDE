@@ -11,7 +11,7 @@ function share_disagg_sector!(dataset::String, d::Dict; scheme=:summary=>:disagg
     # !!!! Need to make sure this doesn't try to read summary-level partition
     # info if it is already saved.
     det = partition(_development(dataset), det, set)
-    
+
     # Share and aggregate the sectoral map.
     share_sector!(det)
     aggregate_share!(det)
@@ -32,8 +32,8 @@ function disagg_sector!(d::Dict, set::Dict; scheme=:summary=>:disagg)
 
     taxes = [:ta0,:tm0,:ty0]
     
-    [d[k] = _disagg_sector_tax(d[k], dfmap; key=k) for k in taxes]
-    [d[k] = _disagg_sector(d[k], dfmap; key=k) for k in setdiff(keys(d), [taxes;:sector])]
+    [d[k] = _disagg_sector_map(d[k], dfmap; key=k) for k in taxes]
+    [d[k] = _disagg_sector_share(d[k], dfmap; key=k) for k in setdiff(keys(d), [taxes;:sector])]
     
     return d
 end
@@ -43,7 +43,7 @@ end
 This function maps from the aggregate to the disaggregate level and multiplies by the
 sectoral sharing defined in dfmap.
 """
-function _disagg_sector(
+function _disagg_sector_share(
     df::DataFrame,
     dfmap::DataFrame;
     scheme=:summary=>:disagg,
@@ -61,6 +61,8 @@ function _disagg_sector(
             (from,to) = (scheme[1], scheme[2])
         end
 
+        # Map from the sectoral sharing DataFrame (aggregate -> (disagg,value)) while renaming
+        # the sector in the input DataFrame.
         df = edit_with(df, Map(dfmap, [:yr;from], [to;:value], [:yr;on], [on;:share], :inner))
         df[!,:value] = df[:,:value] .* df[:,:share]
         df = select(df,col)
@@ -71,23 +73,30 @@ end
 
 
 """
-This function disaggregates taxes with the assumption that the tax rate is the same for all
-disaggregate levels.
 """
-function _disagg_sector_tax(
+function _disagg_sector_map(
     df::DataFrame,
     dfmap::DataFrame;
-    # on;
     scheme=:summary=>:disagg,
+    fun::Function=sum,
     key=missing,
 )
-    !ismissing(key) && println("  Mapping sectors for $key")
-    
-    # Map from the sectoral sharing DataFrame (aggregate -> (disagg,value)) while renaming
-    # the sector in the input DataFrame.
     on = _find_sector(df)
-    (from,to) = (scheme[1], scheme[2])
-    return edit_with(df, Map(dfmap,[from],[to],on,on,:inner))
+    
+    if !isempty(on)
+        !ismissing(key) && println("  Mapping sectors for $key")
+        if length(on) > 1
+            dfmap = _map_for(dfmap, on; scheme=scheme)
+            (from,to) = (_add_id.(scheme[1],on), _add_id.(scheme[2],on))
+        else
+            (from,to) = (scheme[1], scheme[2])
+        end
+
+        # Map from the sectoral sharing DataFrame (aggregate -> (disagg,value)) while renaming
+        # the sector in the input DataFrame.
+        df = edit_with(df, Map(dfmap,ensurearray(from),ensurearray(to),on,on,:inner))
+    end
+    return df
 end
 
 
@@ -101,9 +110,7 @@ generates a dataframe with these sharing parameters through the following proces
 """
 function _compound_for(df::DataFrame, col::Array{Symbol,1}; scheme=:summary=>:disagg)
     # First, multiply shares for all (g,s) combinations. Drop input rows.
-    (from_in,to_in) = (scheme[1], scheme[2])
-    df = indexjoin(fill(copy(df),length(col)); id=col, skipindex=[from_in,to_in])
-
+    df = _map_for(df, col; scheme=scheme)
     df[!,:value] .= prod.(eachrow(df[:,col]))
     df = select(df, Not(col))
 
@@ -123,6 +130,15 @@ function _compound_for(df::DataFrame, col::Array{Symbol,1}; scheme=:summary=>:di
     df_same = df_same[ii_same,:]
 
     return vcat(df_same, df_diff)
+end
+
+
+"""
+"""
+function _map_for(df::DataFrame, col::Array{Symbol,1}; scheme=:summary=>:disagg)
+    (from,to) = (scheme[1], scheme[2])
+    df = indexjoin(fill(copy(df),length(col)); id=col, skipindex=[from,to])    
+    return df
 end
 
 

@@ -135,10 +135,12 @@ export calibrate
 export share
 export disagg
 
-export share_sector!
+export share_sector!        # for sectoral sharing
 export aggregate_share!
-export share_disagg_sector!
-export disagg_sector!
+
+export share_disagg_sector!     # share and then disaggregate
+export disagg_sector!           # disaggregate
+export aggregate_sector!        # aggregate
 
 # ENERGY ENVIRONMENT MODULE
 export eem
@@ -195,6 +197,7 @@ include(joinpath("parse", "read_file.jl"))
 include(joinpath("parse", "run_yaml.jl"))
 include(joinpath("parse", "check_data.jl"))
 
+include(joinpath("build", "aggregate.jl"))
 include(joinpath("build", "build.jl"))
 include(joinpath("build", "partition.jl"))
 include(joinpath("build", "calibrate.jl"))
