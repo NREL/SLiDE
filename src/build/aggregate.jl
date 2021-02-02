@@ -3,7 +3,7 @@ function aggregate_sector!(
     d::Dict,
     set::Dict;
     scheme=:disagg=>:aggr,
-    path = joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem_pmt.csv"),
+    path::String=joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem.csv"),
 )
     (from,to) = (scheme[1], scheme[2])
     dfmap = read_file(path)[:,[from,to]]

@@ -1,20 +1,20 @@
 function share_sector!(dataset::String, d::Dict, set::Dict)
-    !haskey(set,:sector) && (set[:sector] = set[:summary])
+    # If no scheme is specified, sha
+    !haskey(set,:sector) && (set[:sector] = set[:detail])
 
     if !isempty(intersect(set[:sector], set[:detail]))
-        # !!!! future, check if we did the save-build thing and read sectors if we did.
-
         # Read the set and BEA input, this time for the DETAILED level, and partition.
-        [set[k] = set[:detail] for k in [:g,:s]]
+        # _set_sector!(set, set[:detail])
+        set_det = _set_sector!(copy(set), set[:detail])
 
         det = merge(
             read_from(joinpath("src","build","readfiles","input","detail.yml")),
             Dict(:sector=>:detail),
         )
-
+        
         # !!!! Need to make sure this doesn't try to read summary-level partition
         # info if it is already saved.
-        det = partition(SLiDE._development(dataset), det, set)
+        det = partition(_development(dataset), det, set_det)
 
         df = _share_sector(det[:y0])
         (d[:sector], set) = _combine_sector_levels!(df, set)
@@ -31,7 +31,7 @@ end
 function _share_sector(df::DataFrame)
     f_map = joinpath("scale","sector","bluenote.csv")
     (from,to) = (:detail,:summary)
-    sector = SLiDE._find_sector(df)
+    sector = _find_sector(df)
     
     df = edit_with(df, [
         Rename.(sector, from);
@@ -77,7 +77,7 @@ function _combine_sector_levels!(df::DataFrame, set::Dict)
         @info("Sectoral disaggregation required.")
     end
 
-    df = SLiDE.sort_unique(vcat(df_det, df_sum))
+    df = sort_unique(vcat(df_det, df_sum))
 
     return (df, set)
 end

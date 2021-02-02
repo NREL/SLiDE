@@ -45,7 +45,8 @@ function build(
     if |(isempty(d), isempty(set), overwrite)
         if isempty(set)
             set = read_from(joinpath("src", "build", "readfiles", "setlist.yml"))
-            [set[k] = set[:summary] for k in [:g,:s]]
+            _set_sector!(set, set[:summary])
+            # [set[k] = set[:summary] for k in [:g,:s]]
             write_build(dataset, SET_DIR, set)
         end
         
