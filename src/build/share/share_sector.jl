@@ -1,78 +1,89 @@
-"""
-"""
-function share_sector!(
-    d::Dict;
-    path::String=joinpath(SLIDE_DIR,"data","coremaps","scale","sector","bluenote.csv"),
-)
-    (from,to) = (:detail,:summary)
+function share_sector!(dataset::String, d::Dict, set::Dict)
+    !haskey(set,:sector) && (set[:sector] = set[:summary])
 
-    df = copy(d[:y0])
-    dfmap = read_file(path)
+    if !isempty(intersect(set[:sector], set[:detail]))
+        # !!!! future, check if we did the save-build thing and read sectors if we did.
+
+        # Read the set and BEA input, this time for the DETAILED level, and partition.
+        [set[k] = set[:detail] for k in [:g,:s]]
+
+        det = merge(
+            read_from(joinpath("src","build","readfiles","input","detail.yml")),
+            Dict(:sector=>:detail),
+        )
+
+        # !!!! Need to make sure this doesn't try to read summary-level partition
+        # info if it is already saved.
+        det = partition(SLiDE._development(dataset), det, set)
+
+        df = _share_sector(det[:y0])
+        (d[:sector], set) = _combine_sector_levels!(df, set)
+    # else
+        # what if there's no detailed info?? Just do some mapping.
+    end
+    
+    return d, set
+end
+
+
+"""
+"""
+function _share_sector(df::DataFrame)
+    f_map = joinpath("scale","sector","bluenote.csv")
+    (from,to) = (:detail,:summary)
+    sector = SLiDE._find_sector(df)
     
     df = edit_with(df, [
-        Rename(:g, from);
-        Map(dfmap,[from],[to],[from],[to],:left);
+        Rename.(sector, from);
+        Map(f_map,[from],[to],[from],[to],:left);
         Order([:yr,to,from,:value], [Int,String,String,Float64]);
     ])
 
-    d[:sector] = df / combine_over(df,:detail)
-
-    return d[:sector]
+    df = df / combine_over(df,from)
+    return df
 end
 
 
 """
 """
-function aggregate_share!(
-    d::Dict;
-    scheme=:disagg=>:aggr,
-    path = joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem.csv"),
-)
-    dfmap = read_file(path)
-
-    d[:sector] = vcat(
-        _share_summary(d, dfmap; scheme=scheme),
-        _share_detail!(d, dfmap; scheme=scheme)
-    )
-
-    delete!(d, :sector_detail)
-    return d[:sector]
-end
-
-
-"""
-"""
-function _share_detail!(d::Dict, dfmap::DataFrame; scheme=:disagg=>:aggr)
-    k = :sector_detail
+function _combine_sector_levels!(df::DataFrame, set::Dict)
+    # !!!! later -- will make general to work for regions.
+    (var,val) = (:sector, set[:sector])
+    d = Dict()
     
-    if !haskey(d,k)
-        (from,to) = (scheme[1], scheme[2])
-
-        d[k] = edit_with(copy(d[:sector]), [
-            Rename(:detail,from),
-            Map(dfmap,[from],[to],[from],[to],:inner),
-            Order([:yr,to,from,:summary,:value], [Int;fill(String,3);Float64]),
-        ])
-    end
-    return d[k]
-end
-
-
-"""
-"""
-function _share_summary(d::Dict, dfmap::DataFrame; scheme=:disagg=>:aggr)
-    (from,to) = (scheme[1],scheme[2])
-
-    df_det = _share_detail!(d, dfmap; scheme=scheme)
-    df = d[:sector]
-    
-    df_sum = fill_with(df[:,[:yr,:summary]], 1.0)
-    df_sum = df_sum - combine_over(df_det, [from,to])
-
-    df_sum = edit_with(df_sum, [
-        Map(dfmap,[from],[from,to],[:summary],[from,to],:inner),
-        Order([:yr,to,from,:summary,:value], [Int;fill(String,3);Float64]),
+    df_det = edit_with(filter_with(df, (detail=val,)), [
+        Rename(:detail,:disagg),
+        Rename(:summary,:aggr),
     ])
 
-    return df_sum
+    # !!!! If detail is empty, should return something saying that we don't need to continue
+    # with the sectoral disaggregation process.
+    if isempty(df_det)
+        df_sum = fill_with((yr=unique(df[:,:yr]), sector=set[:sector]), 1.0)
+    else
+        # If detail shares are represented, initialize summary shares to one for all summary
+        # shares included in the mapping DataFrame (which should be all 73 summary shares).
+        # We need to start with all of them present in case there are some detail shares
+        # present for which no summary data is requested.
+        _set_sector!(set, unique([val; df_det[:,:aggr]]))
+        
+        df_sum = fill_with((
+            yr=unique(df[:,:yr]),
+            aggr=intersect(set[:summary], set[:sector])
+        ), 1.0)
+        df_sum = df_sum - combine_over(df_det, :disagg)
+        df_sum[:,:disagg] .= df_sum[:,:aggr]
+
+        @info("Sectoral disaggregation required.")
+    end
+
+    df = SLiDE.sort_unique(vcat(df_det, df_sum))
+
+    return (df, set)
+end
+
+
+function _set_sector!(set::Dict, x::AbstractArray)
+    [set[k] = x for k in [:s,:g,:sector]]
+    return set
 end

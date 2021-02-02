@@ -16,9 +16,18 @@ agg_out = read_from(joinpath(f_read,"8_aggr_out.yml"); run_bash=true)
 # Read original build stream output from WiNDC results so we can be completely consistent
 # when we do our calculations later.
 d = read_from(joinpath(f_read,"5_disagg_out.yml"); run_bash=true)
+dataset = "state_model"
 
-dis = share_disagg_sector!("", copy(d))
+path = joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem_pmt.csv")
+
+dfmap = read_file(path)
+
+set = read_from(joinpath("src","build","readfiles","setlist.yml"))
+set[:sector] = unique(dfmap[:,:disagg])
+
+(d,set) = share_sector!(dataset, d, set)
+(dis,set) = disagg_sector!(dataset, d, set)
+(agg,set) = aggregate_sector!(dataset, d, set)
+
 dis_comp = benchmark_against(dis, dis_out)
-
-agg = aggregate_sector!(dis)
 agg_comp = benchmark_against(agg, agg_out)

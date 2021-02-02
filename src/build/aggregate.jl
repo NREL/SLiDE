@@ -1,10 +1,14 @@
 function aggregate_sector!(
-    d::Dict;
+    dataset::String,
+    d::Dict,
+    set::Dict;
     scheme=:disagg=>:aggr,
     path = joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem_pmt.csv"),
 )
     (from,to) = (scheme[1], scheme[2])
     dfmap = read_file(path)[:,[from,to]]
+
+    _set_sector!(set, unique(dfmap[:,to]))
 
     taxes = [:ta0,:tm0,:ty0, :a0,:m0,:ys0]
 
@@ -14,30 +18,7 @@ function aggregate_sector!(
 
     _aggregate_sector_map!(d, dfmap, setdiff(keys(d), [taxes;:sector]); scheme=scheme)
 
-    return d
-end
-
-
-"""
-"""
-function _aggregate_sector_map(
-    df::DataFrame,
-    dfmap::DataFrame;
-    scheme=:summary=>:disagg,
-    key=missing,
-)
-    df = _disagg_sector_map(df, dfmap; scheme=scheme, key=key)
-    df = combine_over(df, :dummy; digits=false)
-    return df
-end
-
-
-"""
-"""
-function _aggregate_sector_map!(d::Dict, dfmap, parameters; scheme=:disagg=>:aggr)
-    [d[k] = _aggregate_sector_map(d[k], dfmap; scheme=scheme, key=k)
-        for k in parameters]
-    return d
+    return d, set
 end
 
 
@@ -51,6 +32,28 @@ function _aggregate_tax_with!(d::Dict, dfmap, kt, k; scheme=:disagg=>:aggr)
     d[kt] = d[kt] / combine_over(d[k], sector)
 
     return dropzero!(dropnan!(d[kt])), d[k]
+end
+
+"""
+"""
+function _aggregate_sector_map!(d::Dict, dfmap, parameters; scheme=:disagg=>:aggr)
+    [d[k] = _aggregate_sector_map(d[k], dfmap; scheme=scheme, key=k)
+        for k in parameters]
+    return d
+end
+
+
+"""
+"""
+function _aggregate_sector_map(
+    df::DataFrame,
+    dfmap::DataFrame;
+    scheme=:disagg=>:aggr,
+    key=missing,
+)
+    df = _disagg_sector_map(df, dfmap; scheme=scheme, key=key)
+    df = combine_over(df, :dummy; digits=false)
+    return df
 end
 
 

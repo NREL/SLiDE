@@ -8,7 +8,8 @@ This function prepares SEDS energy data for the EEM.
     1. Energy - [`eem_energy!`](@ref)
     3. CO2 Emissions - [`eem_co2emis!`](@ref)
 """
-function eem()
+function eem(dataset::String)
+
     # !!!! will probably rename such preparing the energy input is a sub-feature of the
     # module as a whole -- this feels similar to partitioning the supply/use data?
     f_data = joinpath(SLIDE_DIR,"data")
