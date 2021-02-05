@@ -1,4 +1,4 @@
-# Disaggregate
+# Regional Disaggregation
 
 ```@docs
 SLiDE._disagg_ys0!
