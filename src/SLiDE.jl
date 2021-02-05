@@ -101,9 +101,10 @@ export propertynames_with
 export edit_with
 export fill_zero
 export fill_with
-export extend_year
+export extend_year      # maybe depreciated
+export map_year
 export extrapolate_region
-export extrapolate_year
+export extrapolate_year # maybe depreciated
 export filter_with
 export split_with
 export split_fill_unstack

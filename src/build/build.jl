@@ -19,7 +19,7 @@ This information will be saved in the following structure:
     └── sets/
 
 # Arguments
-- `dataset::String`: Dataset identifier
+- `dataset::String`: dataset identifier
 
 # Keywords
 - `save_build::Bool = false`: That decides whether to save the information at each build
