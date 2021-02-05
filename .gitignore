@@ -14,8 +14,18 @@ Manifest.toml
 
 admin/
 calibrate/
-dev/
+# dev/
 deps/*.log
 docs/build/
 examples/
 test
+
+dev/*.jl
+dev/bluenote_sets
+dev/buildstream
+dev/experiments
+dev/readfiles
+dev/runtime
+dev/validate
+dev/verify
+dev/windc_1.0
