@@ -106,7 +106,7 @@
             {
                 "name": "file",
                 "comment": "mapping .csv file name in the coremaps directory",
-                "data_type": "String"
+                "data_type": "Any"
             },
             {
                 "name": "from",
@@ -303,6 +303,28 @@
                 "name": "operation",
                 "comment": "how to determine what to drop",
                 "data_type": "String"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "OrderedGroup",
+        "docstring": "maybe, if on and var are the same, we can just fill in groups? i'm thinking SCTG group.",
+        "fields": [
+            {
+                "name": "on",
+                "comment": "name of columns containing information specific to a particular level",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "var",
+                "comment": "name of column containing information of what we will unstack on",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "val",
+                "comment": "ordered list of values to unstack on. If empty, unstack in order of appearance.",
+                "data_type": "Array{Any,1}"
             }
         ],
         "supertype": "Edit"

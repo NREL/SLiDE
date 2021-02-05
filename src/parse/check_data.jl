@@ -33,6 +33,8 @@ function compare_summary(
 
     # Do some checks on the indices before comparing.
     idx = findindex.(df)
+    # !!!! If columns are different, print a warning message, but make them consistent and
+    # press on!
     length(unique(sort.(idx))) > 1 && @error("Cannot compare DataFrames with different indices.")
     length(unique(idx)) > 1 && @warn("Comparing DataFrames with different index orders.")
 
@@ -160,8 +162,14 @@ function benchmark_against(
     df_bench::DataFrame;
     key=missing,
     tol=DEFAULT_TOL,
-    small=DEFAULT_SMALL
+    small=missing
 )
+    # # Make sure that all input DataFrames have the same columns.
+    # # !!!! Todo: keep units where they appear!
+    # col = intersect(propertynames(df_calc), propertynames(df_bench))
+    # select!(df_calc, col)
+    # select!(df_bench, col)
+
     # Remove very small numbers. These might be zero or missing in the other DataFrame,
     # and we're not splitting hairs here.
     if small !== missing
@@ -169,7 +177,7 @@ function benchmark_against(
         df_bench = df_bench[abs.(df_bench[:,:value] .> small), :]
     end
 
-    (key !== missing) && println("  Comparing keys and values for ", key)
+    !ismissing(key) && println("  Comparing keys and values for ", key)
 
     df_comp = compare_summary([df_calc, df_bench], [:calc,:bench]; tol=tol)
     # key == :utd && (df_comp = edit_with(df_comp, Drop(:yr,2002,"<")))

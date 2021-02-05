@@ -1,5 +1,5 @@
 """
-    calibrate(d::Dict, set::Dict; save_build = true, overwrite = false)
+    calibrate(d::Dict, set::Dict; save_build=true, overwrite=false)
     calibrate(year::Int, d::Dict, set::Dict)
 
 # Arguments
@@ -10,7 +10,7 @@
 # Keywords
 - `save_build = true`
 - `overwrite = false`
-See [`SLiDE.build_data`](@ref) for keyword argument descriptions.
+See [`SLiDE.build`](@ref) for keyword argument descriptions.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data at the calibration step.
@@ -19,10 +19,10 @@ function calibrate(
     dataset::String,
     d::Dict,
     set::Dict;
-    save_build::Bool = DEFAULT_SAVE_BUILD,
-    overwrite::Bool = DEFAULT_OVERWRITE,
-    penalty_nokey = DEFAULT_PENALTY_NOKEY
-    )
+    save_build::Bool=DEFAULT_SAVE_BUILD,
+    overwrite::Bool=DEFAULT_OVERWRITE,
+    penalty_nokey::AbstractFloat=DEFAULT_PENALTY_NOKEY,
+)
     CURR_STEP = "calibrate"
 
     # If there is already calibration data, read it and return.
@@ -46,14 +46,19 @@ function calibrate(
 end
 
 
-function calibrate(year::Int, io::Dict, set::Dict; penalty_nokey = DEFAULT_PENALTY_NOKEY)
+function calibrate(
+    year::Int,
+    io::Dict,
+    set::Dict;
+    penalty_nokey::AbstractFloat=DEFAULT_PENALTY_NOKEY,
+)
     @info("Calibrating $year data")
 
     # Prepare the data and initialize the model.
     _calibration_set!(set)
     (cal, idx) = _calibration_input(year, io, set);
     calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time" => 60.0))
-
+    
     @variable(calib, ys0_est[j in set[:j], i in set[:i]]   >= 0, start = 0);
     @variable(calib, fs0_est[i in set[:i]]                 >= 0, start = 0);
     @variable(calib, ms0_est[i in set[:i], m in set[:m]]   >= 0, start = 0);
@@ -221,7 +226,7 @@ function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
     param[:var] = setdiff(param[:cal], param[:tax])
 
     # Isolate the current year.
-    d = Dict(k => fill_zero(set, filter_with(d[k], (yr = year,); drop = true))
+    d = Dict(k => fill_zero(filter_with(d[k], (yr=year,); drop=true); with=set)
         for k in param[:cal])
 
     # Save the DataFrame indices in correct order. This will be used to convert the
@@ -231,6 +236,7 @@ function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
     # Set negative values to zero. In the case of final demand,
     # only set negative values to zero for fd = pce.
      d[:fd0][.&(d[:fd0][:,:fd] .== "pce", d[:fd0][:,:value] .< 0),:value] .= 0.0
+     d[:fd0][.&(d[:fd0][:,:fd] .== "C", d[:fd0][:,:value] .< 0),:value] .= 0.0
     [d[k][d[k][:,:value] .< 0, :value] .= 0.0 for k in param[:var] if k !== :fd0]
 
     # Convert the calibration input into DataFrames. Fill zeros for taxes; drop otherwise. 
@@ -239,8 +245,10 @@ function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
 end
 
 
+"""
+"""
 function _calibration_set!(set)
-    # (!!!!) should just replace in usage.
+    # !!!! replace in usage.
     !(:i in keys(set)) && (set[:i] = set[:g])
     !(:j in keys(set)) && (set[:j] = set[:s])
 

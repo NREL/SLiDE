@@ -9,11 +9,13 @@ function datatype(str::String)
     return isdefined(SLiDE, type) ? eval(type) : nothing
 end
 
+
 """
     Base.broadcastable(x::InvertedIndex{T}) where {T<:Any}
 (!!!!) add docs here.
 """
 Base.broadcastable(x::InvertedIndex{T}) where {T <: Any} = [x];
+
 
 """
     Base.split(x::Missing)
@@ -24,6 +26,7 @@ Base.split(str::Missing) = str
 Base.split(str::Missing, splitter::Any) = str
 Base.split(x::Symbol) = Symbol.(split(string(x)))
 
+
 """
     Base.strip(x::Missing)
     Base.strip(x::Number)
@@ -33,6 +36,7 @@ Base.strip(x::String) = replace(x, r"^\s*\"*|\"*\s*$" => "")
 Base.strip(x::Missing) = x
 Base.strip(x::Number) = x
 
+
 """
     Base.lowercase(x::Symbol)
 Extends `lowercase` to handle other data types.
@@ -40,6 +44,7 @@ Extends `lowercase` to handle other data types.
 Base.lowercase(x::Int) = x
 Base.lowercase(x::Symbol) = Symbol(lowercase(string(x)))
 Base.lowercase(x::Missing) = missing
+
 
 """
     Base.titlecase(x::Symbol)
@@ -49,6 +54,7 @@ Base.titlecase(x::Int) = x
 Base.titlecase(x::Symbol) = Symbol(titlecase(string(x)))
 Base.titlecase(x::Missing) = missing
 
+
 """
     Base.uppercase(x::Symbol)
 Extends `uppercase` to handle other data types.
@@ -56,6 +62,7 @@ Extends `uppercase` to handle other data types.
 Base.uppercase(x::Int) = x
 Base.uppercase(x::Symbol) = Symbol(uppercase(string(x)))
 Base.uppercase(x::Missing) = missing
+
 
 """
     Base.uppercasefirst(x::Symbol)
@@ -65,6 +72,7 @@ Base.uppercasefirst(x::Int) = x
 Base.uppercasefirst(x::Symbol) = Symbol(uppercasefirst(string(x)))
 Base.uppercasefirst(x::Missing) = missing
 
+
 """
     Base.occursin(x::Symbol, y::Symbol)
     Base.occursin(x::String, y::Symbol)
@@ -72,28 +80,6 @@ Extends `occursin` to work for symbols. Potentially helpful for DataFrame column
 """
 Base.occursin(x::Symbol, y::Symbol) = occursin(string(x), y)
 Base.occursin(x::String, y::Symbol) = occursin(x, string(y))
-
-"""
-"""
-function dropvalue!(df::DataFrame, x::Float64)
-    cols = find_oftype(df, typeof(x));
-    if isnan(x); [filter!(row -> .!isnan.(row[col]), df) for col in cols]
-    else;        [filter!(row -> row[col] .!== x, df) for col in cols]
-    end
-    return df
-end
-
-dropvalue(df::DataFrame, x::Float64) = dropvalue!(copy(df), x)
-
-"""
-    dropzero!(df::DataFrame)
-Returns a DataFrame without zero values in columns of type AbstractFloat.
-"""
-dropzero!(df::DataFrame) = dropvalue!(dropvalue!(df, 0.0), -0.0)
-dropzero(df::DataFrame) = dropzero!(copy(df))
-
-dropnan!(df::DataFrame) = dropvalue!(df, NaN)
-dropnan(df::DataFrame) = dropnan!(copy(df))
 
 
 """
@@ -172,7 +158,7 @@ convert_type(::Type{DataType}, x::AbstractString) = datatype(x)
 convert_type(::Type{Array{T}}, x::Any) where T <: Any = convert_type.(T, x)
 convert_type(::Type{Array{T,1}}, x::Any) where T <: Any = convert_type.(T, x)
 
-# WARNING: DEPRECIATED.
+# !!!! WARNING: DEPRECIATED.
 convert_type(::Type{Array}, d::Dict) = [collect(values(d))...;]
 
 convert_type(::Type{Array{Tuple}}, df::DataFrame) = ensuretuple.(eachrow(df))
@@ -184,6 +170,9 @@ convert_type(::Type{Any}, x::Any) = x
 convert_type(::Type{T}, x::Any) where T = T(x)
 
 convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : false
+
+convert_type(::Type{UnitRange}, x::AbstractArray) = x[1]:x[end]
+convert_type(::Type{UnitRange}, x::Any) = convert_type(UnitRange, ensurearray(x))
 
 # [@printf("%-8s %s\n", T, fieldpropertynames(T)[T.types .== Any]) for T in subtypes(Edit) if Any in T.types]
 
@@ -197,6 +186,8 @@ isarray(::Any) = false
 
 """
     ensurearray(x::Any)
+# Returns
+- `x`::AbstractArray
 """
 ensurearray(x::Array{T,1}) where T <: Any = x
 ensurearray(x::Tuple{Vararg{Any}}) = collect(x)
@@ -205,26 +196,32 @@ ensurearray(x::Base.ValueIterator) = [collect(x)...;]
 ensurearray(x::DataFrameRow) = ensurearray(values(x))
 ensurearray(x::Any) = [x]
 
+
 """
     ensuretuple(x::Any)
-Returns `x` in a tuple.
+# Returns
+- `x`::Tuple
 """
 ensuretuple(x::Tuple{Vararg{Any}}) = x
 ensuretuple(x::DataFrameRow) = Tuple(x)
 ensuretuple(x::Any) = tuple(x)
+# !!!! add examples showing dimensionality to the documentation.
+
+
+"""
+    ensurefinite(x::Float64)
+# Returns
+- `x`, replacing `NaN` or `Inf` values with `0.0`.
+"""
+ensurefinite(x::Float64) = (isnan(x) || x==Inf) ? 0.0 : x
 
 
 """
 """
 istype(df::DataFrame, T::DataType) = broadcast(<:, findtype(df), T)
+
 findtype(df::DataFrame) = eltype.(eachcol(dropmissing(df)))
-
-
-"""
-"""
-function DataFrames.select!(df::DataFrame, x::Parameter)
-    return select!(df, intersect([x.index; :value], propertynames(df)))
-end
+findtype(x::AbstractArray) = eltype(skipmissing(x))
 
 
 """
@@ -238,38 +235,6 @@ find_oftype(df::DataFrame, T::InvertedIndex{DataType}) = propertynames(df)[.!ist
 function find_oftype(d::Dict, T::DataType)
     return Dict(k => v for (k, v) in d if any(broadcast(<:, typeof.(ensurearray(v)), T)))
 end
-
-
-"""
-    permute(x::Any)
-    permute(x...)
-
-# Arguments
-- `x::Any`: input data to permute
-
-# Returns
-All possible permutations of the input values. 
-    - `x::DataFrame` or `x::NamedTuple`: Input type and key/column names will be preserved.
-    - Given any other input `x`,
-        - `x::Array{Tuple,1}` of the possible combinations of the input data.
-            Each tuple will be ordered in the same way the input data was ordered.
-        - `x::Any`: If `x` does not contain multiple sets to permute, `permute` will return
-            `x`, unchanged.
-"""
-function permute(df::DataFrame)
-    idx = propertynames(df)
-    val = DataFrame(permute(unique.(eachcol(df))))
-    return edit_with(val, Rename.(propertynames(val), idx))
-end
-
-function permute(x::NamedTuple)
-    idx = keys(x)
-    val = eachcol(DataFrame(ensuretuple.(permute(values(x)))))
-    return NamedTuple{Tuple(idx, )}(val, )
-end
-
-permute(x::Any) = any(isarray.(x)) ? permute(ensurearray.(x)...) : x
-permute(x::Vararg{Any}) = vec(collect(Iterators.product(x...)))
 
 
 """
@@ -314,11 +279,16 @@ findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
 # Returns
 - `utx::Array{Symbol,1}` of input DataFrame propertynames with "units" in the name.
 """
-function findunits(df::DataFrame)
-    # This function is a bit niche, but will be used heavily in the EEM.
-    # Should maybe keep it internal.
+findunits(df::DataFrame) = propertynames_with(df, :units)
+# This function is a bit niche, but will be used heavily in the EEM.
+# Should maybe keep it internal.
+
+
+"""
+"""
+function propertynames_with(df::DataFrame, id::Symbol)
     col = propertynames(df)
-    return col[occursin.(:units,col)]
+    return col[occursin.(id,col)]
 end
 
 
@@ -335,30 +305,6 @@ append(x::Array{String,1}) = string(string.(x[1:end-1], :_)..., x[end])
 append(x1::String, x2::Any) = string(x1,:_,x2)
 append(x1::String, x2::Vararg{Any,N}) where N = append(string.([x1; ensurearray(x2)]))
 
-
-"""
-"""
-function sort_unique(df::DataFrame, idx::Array{Symbol,1})
-    idx = idx[sortperm(length.(unique.(skipmissing.(eachcol(df[:,idx])))))]
-    return sort(df, idx)
-end
-
-function sort_unique(df::DataFrame, id::String)
-    (id == "unique") && (return sort_unique(df))
-
-    m = match.(r"unique\s+(\S+)", id)
-    id = m != nothing ? Symbol(m[1]) : Symbol(id)
-
-    return sort_unique(df, id)
-end
-
-function sort_unique(df::DataFrame, id::Symbol)
-    idx = propertynames(df)
-    subidx = idx[occursin.(id, idx)]
-
-    length(subidx) > 0 && (idx = subidx)
-
-    return sort_unique(df, idx)
-end
-
-sort_unique(df::DataFrame) = sort_unique(df, findindex(df))
+append(x1::Nothing, x2::Vararg{Any,N}) where N = append(x2)
+append(x::Any) = x
+# !!!! clean up this function.

@@ -66,6 +66,7 @@ function convertjoin(df::Array{DataFrame,1}; id=[])
     return indexjoin(df; id=id, indicator=false, fillmissing=1.0, skipindex=:units, kind=:left)
 end
 
+
 convertjoin(df::Vararg{DataFrame}; id=[]) = convertjoin(ensurearray(df); id=id)
 
 
@@ -89,13 +90,15 @@ function _make_unique(df::Array{DataFrame,1}, id::AbstractArray, indicator::Bool
 
     # If there are no values, don't make any changes.
     all(length.(val) .== 0) && (return df, id)
+    
+    isempty(id) && (id = _generate_id(N))
 
     # If all value names are already unique, don't edit these.
+    # !!!! What if they're already unique but there's an indicator?
     if length(unique([val...;])) == length([val...;])
-        from = fill(Array{Symbol,1}[], (N,))
-        to = fill(Array{Symbol,1}[], (N,))
+        from = fill([], (N,))
+        to = fill([], (N,))
     else
-        isempty(id) && (id = _generate_id(N))
         from = val
         # If there is only one value column / input dataframe, we are NOT including an
         # indicator, and ids are defined, rename that one value column to match the given id.
@@ -109,8 +112,8 @@ function _make_unique(df::Array{DataFrame,1}, id::AbstractArray, indicator::Bool
     # Remove indicies to be skipped.
     for ii in 1:N
         for idx in intersect(ensurearray(skipindex), col[ii])
-            push!(from[ii], idx)
-            push!(to[ii], append(idx, id[ii]))
+            from[ii] = push!(copy(from[ii]), idx)
+            to[ii] = push!(copy(to[ii]), append(idx, id[ii]))
         end
     end
 
@@ -163,11 +166,3 @@ end
 
 
 _fill_missing(df::DataFrame) = _fill_missing(df, 0.0)
-
-
-"""
-If no id is specified, default to `id = [x1,x2,...,xN]`
-where `N` is the length of the input array `x`
-"""
-_generate_id(N::Int, id::Symbol = :x) = Symbol.(id, 1:N)
-_generate_id(x::Array, id::Symbol = :x) = _generate_id(length(x), id)

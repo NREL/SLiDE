@@ -21,9 +21,12 @@ Order:
   - {col: gdpcat, type: String}
   - {col: si,     type: String}
   - {col: n,      type: String}
-# - {col: desc,   type: String}
   - {col: units,  type: String}
   - {col: value,  type: Float64}
+
+Deselect:
+  col: [Region, TableName, GeoFIPS, ComponentName, Description]
+  operation: "=="
 
 Rename:
   - {from: GeoName,                to: r}
@@ -69,15 +72,9 @@ Replace:
     to:   0
 
 Drop:
-  - col: [Region, TableName, GeoFIPS, ComponentName, Description]
-    val: all
-    operation: "=="
-# - col: [IndustryClassification, Description]
-#   val: all
-#   operation: "=="
-# - col: gdpcat
-#   val: missing
-#   operation: "=="
+  col: n
+  val: missing
+  operation: "=="
 
 Operate:
   operation: "*"

@@ -1,38 +1,14 @@
-.gitignore
-.DS_Store
+# .gitignore
+**/.DS_Store
+**/scratch*
+**/data*/
 .git/
 .vscode/
 
 Manifest.toml
-scratch.jl
 
 admin/
-
-calibrate/calibrate_test.jl
-calibrate/function_national_calibration.jl
-calibrate/load_io.jl
-calibrate/data_temp/*.csv
-calibrate/disagg_working.jl
-calibrate/old_disagg.jl
-calibrate/old_io.jl
-calibrate/old_share.jl
-calibrate/scratch.jl
-
-data*/
-
-dev/readfiles/_*
-dev/validate/penalty_nokey/
-dev/windc_1.0/
-dev/windc_1.0/*/*.csv
-
+dev/
+calibrate/
 docs/build/
-docs/src/man/parameter_list.xlsx
-
 deps/*.log
-
-model/_*
-
-src/parse/scratch/
-# src/parse/utils/generate_structs.jl
-
-# tests/scratch*.jl

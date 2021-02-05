@@ -14,8 +14,7 @@ SLiDE._partition_io!
 SLiDE._partition_ts0!
 SLiDE._partition_va0!
 SLiDE._partition_x0!
-SLiDE._partition_fd0!
-SLiDE._partition_fs0!
+SLiDE._partition_fd!
 ```
 
 ### Calculate aggregates

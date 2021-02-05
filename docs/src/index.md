@@ -30,7 +30,7 @@ Precompile the SLiDE package and build the model input data by running:
 ```
 julia> using SLiDE
 
-julia> (d, set) = build_data()
+julia> (d, set) = build()
 ```
 
 ## References

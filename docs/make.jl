@@ -23,7 +23,7 @@ makedocs(clean = true,
     ),
     sitename = "SLiDE.jl",
     authors = "Jonathon Becker, Maxwell Brown, Caroline L. Hughes",
-    workdir = "../",
+    # workdir = "../",
     pages = [
         "Home" => "index.md",
         "Introduction" => Any[
@@ -34,8 +34,12 @@ makedocs(clean = true,
             "Build" => Any[
                 "Overview" => "man/build/overview.md",
                 "Partition" => "man/build/partition.md",
+                "Share" => "man/build/share.md",
                 "Disaggregate" => "man/build/disagg.md",
             ],
+            # "EEM" => Any[
+            #     "SEDS" => "man/eem/seds.md",
+            # ],
             "Scaling" => "man/scaling.md",
             "Parameters" => "man/parameters.md"
         ],
@@ -54,11 +58,11 @@ makedocs(clean = true,
     ]
 )
 
-deploydocs(
-    repo = "https://github.com/NREL/SLiDE.git",
-    target = "build",
-    branch = "gh-pages",
-    devbranch = "docs",
-    devurl = "dev",
-    versions = ["stable" => "v^", "v#.#"],
-)
+# deploydocs(
+#     repo = "https://github.com/NREL/SLiDE.git",
+#     target = "build",
+#     branch = "gh-pages",
+#     devbranch = "docs",
+#     devurl = "dev",
+#     versions = ["stable" => "v^", "v#.#"],
+# )

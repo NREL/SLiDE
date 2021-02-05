@@ -12,6 +12,7 @@ include("Replace.jl")
 include("Match.jl")
 include("Stack.jl")
 include("Deselect.jl")
+include("OrderedGroup.jl")
 
 export get_col
 export get_file

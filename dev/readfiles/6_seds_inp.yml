@@ -1,6 +1,0 @@
-Path: [dev, windc_1.0, 1_data_out]
-
-DataInput:
-  - {descriptor: seds,      name: seds_units.csv,      col: [source,sector,r,yr,units,value]}
-  - {descriptor: heatrate,  name: heatrate_units.csv,  col: [yr,source,units,value]}
-  - {descriptor: emissions, name: emissions_units.csv, col: [source,r,year,units,value]}

@@ -30,10 +30,10 @@ Precompile the SLiDE package and build the model input data by running:
 
 ```julia
 julia> using SLiDE
-julia> (d, set) = build_data()
+julia> (d, set) = build()
 ```
 
-Reference [`build_data()` documentation](https://nrel.github.io/SLiDE/man/build/overview.html#SLiDE.build_data) for options.
+Reference [`build()` documentation](https://nrel.github.io/SLiDE/man/build/overview.html#SLiDE.build) for options.
 
 
 ## References

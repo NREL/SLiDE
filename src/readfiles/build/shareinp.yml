@@ -1,8 +1,0 @@
-Path: [src, readfiles, build, share]
-
-Input:
-  cfs: cfs.yml
-  gsp: gsp.yml
-  pce: pce.yml
-  sgf: sgf.yml
-  utd: utd.yml
