@@ -377,46 +377,67 @@ This function returns a DataFrame defining mapping for a step function.
 
 # Example
 
-```jldoctest
-julia> map_step((:x,:y) => (2005:2015, [2007,2012]))
+```jldoctest map_year
+julia> map_year([2007,2012] => 2005:2015)
 11×2 DataFrame
-│ Row │ x     │ y     │
+│ Row │ from  │ to    │
 │     │ Int64 │ Int64 │
 ├─────┼───────┼───────┤
-│ 1   │ 2005  │ 2007  │
-│ 2   │ 2006  │ 2007  │
+│ 1   │ 2007  │ 2005  │
+│ 2   │ 2007  │ 2006  │
 │ 3   │ 2007  │ 2007  │
-│ 4   │ 2008  │ 2007  │
-│ 5   │ 2009  │ 2007  │
-│ 6   │ 2010  │ 2012  │
-│ 7   │ 2011  │ 2012  │
+│ 4   │ 2007  │ 2008  │
+│ 5   │ 2007  │ 2009  │
+│ 6   │ 2012  │ 2010  │
+│ 7   │ 2012  │ 2011  │
 │ 8   │ 2012  │ 2012  │
-│ 9   │ 2013  │ 2012  │
-│ 10  │ 2014  │ 2012  │
-│ 11  │ 2015  │ 2012  │
+│ 9   │ 2012  │ 2013  │
+│ 10  │ 2012  │ 2014  │
+│ 11  │ 2012  │ 2015  │
 ```
 """
-function map_step(x::AbstractArray, y::AbstractArray; fun::Function=Statistics.mean)
-    cut = sort([
-        x[1]; x[end];
-        fun.(eachrow(DataFrame(low=y[1:end-1], high=y[2:end])));
-    ])
+function map_year(from::AbstractArray, to::AbstractArray; fun=Statistics.mean, extrapolate=true)
 
-    cut = DataFrame(
-        :y   => y,
-        :min => convert_type.(Int,Statistics.ceil.(cut[1:end-1])),
-        :max => convert_type.(Int,Statistics.floor.(cut[2:end])),
-    )
+    if !extrapolate
+        to = intersect(ensurearray(to), intersect(from))
+        isempty(to) && (return DataFrame())
+    end
+    
+    rng = DataFrame(low=from[1:end-1], high=from[2:end])
+    rng[!,:mid] = fun.(eachrow(rng))
 
-    df = crossjoin(DataFrame(x=x), cut)
-    df[!,:keep] .= (df[:,:x].>=df[:,:min]) .* (df[:,:x].<=df[:,:max])
-    df = df[df[:,:keep], [:x,:y]]
+    df = crossjoin(DataFrame(to=to), rng)
+    df[!,:diff] .= df[:,:to].-df[:,:mid]
+
+    df[!,:from] .= df[:,:low].*(df[:,:diff].<0) + df[:,:high].*(df[:,:diff].>0)
+    df[!,:dist] .= abs.(df[:,:diff])
+
+    df = unique(df[:,[:from,:to,:dist]])
+
+    df_closest = combine_over(df, :from; fun=Statistics.minimum)
+    df = innerjoin(df, df_closest, on=[:to,:dist])[:,[:from,:to]]
     return df
 end
 
+function map_year(from::AbstractArray, to::Integer; fun=Statistics.mean, extrapolate=true)
+    df = DataFrame(to=to)
 
-function map_step(f::Pair; fun::Function=Statistics.mean)
-    return edit_with(map_step(f[2]...; fun=fun), Rename.([:x,:y], ensurearray(f[1])))
+    df[!,:from] .= if to in from;         to
+    elseif to > from[end] && extrapolate; from[end]
+    elseif to < from[1]   && extrapolate; from[1]
+    end
+
+    return df[:,[:from,:to]]
+end
+
+function map_year(scheme::Pair; fun=Statistics.mean, extrapolate=true)
+    return map_year(scheme[1], scheme[2]; fun=fun, extrapolate=extrapolate)
+end
+
+function map_year(df::DataFrame, x; extrapolate=true)
+    dfmap = map_year(unique(df[:,:yr]), x; extrapolate=extrapolate)
+    df = edit_with(df, Map(dfmap,[:from],[:to],[:yr],[:yr],:outer))
+    return df
 end
 
 
