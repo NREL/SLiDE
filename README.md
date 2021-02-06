@@ -35,7 +35,6 @@ julia> (d, set) = build()
 
 Reference [`build()` documentation](https://nrel.github.io/SLiDE/man/build/overview.html#SLiDE.build) for options.
 
-
 ## References
 - Thomas F. Rutherford and Andrew Schreiber, "Tools for Open Source, Subnational CGE
     Modeling with an Illustrative Analysis of Carbon Leakage,"
