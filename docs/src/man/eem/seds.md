@@ -1,23 +1,27 @@
 # SEDS
 
+```@docs
+eem
+```
+
 ## Electricity
 
 ```@docs
-module_elegen!
+eem_elegen!
 ```
 
 ## Energy
 
 ```@docs
-module_energy!
-SLiDE._module_energy_supply
-SLiDE._module_energy_ref
-SLiDE._module_energy_ind
-SLiDE._module_energy_price
+eem_energy!
+SLiDE._eem_energy_supply
+SLiDE._eem_energy_ref
+SLiDE._eem_energy_ind
+SLiDE._eem_energy_price
 ```
 
 ## Emissions
 
 ```@docs
-module_co2emis!
+eem_co2emis!
 ```

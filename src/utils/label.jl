@@ -5,6 +5,7 @@ This function is a standardized method for generating dictionary keys for
 """
 function _inp_key(paths::Array{String,1})
     # !!!! check where this is used and see if it's doing what we want.
+    # !!!! EXAMPLES.
     dir = splitdir.(paths)
 
     while length(unique(getindex.(dir, 2))) > 1
@@ -36,21 +37,33 @@ _generate_id(N::Int, id::Symbol=:x) = Symbol.(id, 1:N)
 _generate_id(x::Array, id::Symbol=:x) = _generate_id(length(x), id)
 
 
-"""
-"""
-_add_id(x::Symbol, id::Symbol) = (id == :value) ? x : append(x, id)
-_add_id(x::String, id::Symbol) = _add_id(Symbol(x), id)
+_add_id(x::Symbol, from::Any; replace=:value) = (x == replace) ? from : append(x, from)
+
+_remove_id(x::Symbol, sub; replace=:value) = (sub == replace) ? x : _remove(x, sub)
+
+_remove(x::String, sub::String) = (x == sub) ? x : replace(x, Regex("_*$sub" * "_*") => "")
+_remove(x::Symbol, sub) = Symbol(_remove(string(x), string(sub)))
+
+function _with_id(df::DataFrame, sub::Symbol; replace=:value)
+    return (sub == replace) ? findvalue(df) : propertynames_with(df, sub)
+end
 
 
-"""
-"""
-_with_id(df::DataFrame, id::Symbol) = (id == :value) ? findvalue(df) : propertynames_with(df, id)
+# """
+# """
+# _add_id(x::Symbol, from::Any; replace=:value) = (x == replace) ? from : append(x, from)
 
 
-"""
-"""
-_remove_id(x::Symbol, id::Symbol) = (x == id) ? x : getid(x, id)
-_remove_id(x::AbstractArray, id::Symbol) = _remove_id.(x, id)
+
+# """
+# """
+# _with_id(df::DataFrame, id::Symbol) = (id == :value) ? findvalue(df) : propertynames_with(df, id)
+
+
+# """
+# """
+# _remove_id(x::Symbol, id::Symbol) = (x == id) ? x : getid(x, id)
+# _remove_id(x::AbstractArray, id::Symbol) = _remove_id.(x, id)
 
 
 """

@@ -1,0 +1,8 @@
+global BTU = "trillion btu"
+global KWH = "billion kilowatthours"
+global USD = "billions of us dollars (USD)"
+global USD_PER_KWH = "us dollars (USD) per thousand kilowatthour"
+global USD_PER_BTU = "us dollars (USD) per million btu"
+global BTU_PER_BARREL = "million btu per barrel"
+global POPULATION = "thousand"
+global CHAINED_USD = "millions of chained 2009 us dollars (USD)"

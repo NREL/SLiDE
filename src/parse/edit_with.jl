@@ -170,9 +170,17 @@ end
 
 
 function edit_with(df::DataFrame, x::Melt; file=nothing)
+    @warn("Melt <: Edit is depreciated. Use Stack instead.")
     on = intersect(x.on, propertynames(df))
     df = melt(df, on, variable_name=x.var, value_name=x.val)
     df[!, x.var] .= convert_type.(String, df[:, x.var])
+    return df
+end
+
+
+function edit_with(df::DataFrame, x::Stack; file=nothing)
+    on = intersect(x.on, propertynames(df))
+    df = stack(df, Not(on); variable_name=x.var, value_name=x.val, variable_eltype=String)
     return df
 end
 
@@ -255,7 +263,7 @@ function edit_with(df::DataFrame, x::Replace; file=nothing)
 end
 
 
-function edit_with(df::DataFrame, x::Stack; file=nothing)
+function edit_with(df::DataFrame, x::Concatenate; file=nothing)
     df = [[edit_with(df[:, occursin.(indicator, propertynames(df))],
         [Rename.(propertynames(df)[occursin.(indicator, propertynames(df))], x.col);
             Add(x.var, replace(string(indicator), "_" => " "))]
@@ -310,7 +318,7 @@ function edit_with(
 
     # Specify the order in which edits must occur and which of these edits are included
     # in the yaml file of defined edits.
-    EDITS = ["Deselect", "Rename", "OrderedGroup", "Group", "Stack", "Match", "Melt",
+    EDITS = ["Deselect", "Rename", "OrderedGroup", "Group", "Concatenate", "Match", "Melt",
         "Add", "Map", "Replace", "Drop", "Operate", "Combine", "Describe", "Order"]
     KEYS = intersect(EDITS, collect(keys(y)))
     [df = edit_with(df, y[k], file; print_status=print_status) for k in KEYS]
@@ -538,7 +546,7 @@ _map_with(df::DataFrame, file::String, x::Map) = _map_with(df, read_file(x), x)
 """
 """
 function sort_unique(df::DataFrame, idx::Array{Symbol,1})
-    idx = idx[sortperm(length.(unique.(skipmissing.(eachcol(df[:,idx])))))]
+    idx = idx[sortperm(nunique(df[:,idx]))]
     return sort(df, idx)
 end
 
@@ -567,4 +575,92 @@ sort_unique(df::DataFrame) = sort_unique(df, findindex(df))
 """
 function DataFrames.select!(df::DataFrame, x::Parameter)
     return select!(df, intersect([x.index; :value], propertynames(df)))
+end
+
+
+"""
+    _unstack(df::DataFrame, colkey, value)
+This function enables unstacking DataFrames (long -> wide) given one or multiple variable
+and/or value columns.
+
+This is helpful when preparing input for calculations during which units are preserved.
+
+# Arguments
+- `df::DataFrame` to stack
+- `colkey::Symbol` or `colkey::Array{Symbol,1}`: variable column(s)
+- `value::Symbol` or `value::Array{Symbol,1}`: value column(s)
+
+# Returns
+
+"""
+function _unstack(df::DataFrame, colkey::Symbol, value::Array{Symbol,1})
+    idx = setdiff(propertynames(df), [colkey;value])
+    lst = [_unstack(df[:,[idx;[colkey,val]]], colkey, val) for val in value]
+    return indexjoin(lst...)
+end
+
+function _unstack(df::DataFrame, colkey::Symbol, value::Symbol)
+    return unstack(df, colkey, value; renamecols=x -> _add_id(value, x))
+end
+
+function _unstack(df::DataFrame, colkey::Array{Symbol,1}, value::Union{Symbol,Array{Symbol,1}})
+    df[!,:variable] .= append.(convert_type(Array{Tuple}, df[:,colkey]))
+    df = select(df, Not(colkey))
+
+    return _unstack(df, :variable, value)
+end
+
+
+"""
+    _stack(df::DataFrame, colkey, value)
+This function enables stacking DataFrames (wide -> long) given one or multiple variable
+and/or value columns.
+
+This is helpful when normalizing a DataFrame after a calculation during which units were
+preserved.
+
+# Arguments
+- `df::DataFrame` to stack
+- `colkey::Symbol` or `colkey::Array{Symbol,1}`: variable column(s)
+- `value::Symbol` or `value::Array{Symbol,1}`: value column(s)
+
+# Returns
+- `df::DataFrame` where colkeys
+
+# Example
+!!!!docs
+"""
+function _stack(df::DataFrame, colkey::Symbol, value::Symbol)
+    return stack(df; variable_name=colkey, value_name=value, variable_eltype=String)
+end
+
+
+function _stack(df::DataFrame, colkey::Array{Symbol,1}, value::Array{Symbol,1})
+    df = _stack(df, :variable, value)
+    N = length(colkey)
+
+    x = [
+        Rename.(Symbol.(1:N), colkey);
+        Order([:variable;colkey], fill(String, N + 1));
+    ]
+
+    df_var = unique(df[:,[:variable]])
+    df_var = hcat(df_var, DataFrame(Tuple.(split.(df_var[:,1], "_"))))
+    df_var = edit_with(df_var, x)
+
+    return innerjoin(df, df_var, on=:variable)
+end
+
+
+function _stack(df::DataFrame, colkey::Symbol, value::Array{Symbol,1})
+    from = Dict(k => _with_id(df, k) for k in value)
+    to = Dict(k => _remove_id.(v, k) for (k, v) in from)
+    idx = setdiff(propertynames(df), values(from)...)
+
+    lst = [edit_with(df[:,[idx;from[k]]], [
+                Rename.(from[k], to[k]);
+                Melt(idx, colkey, k);       # !!!! Melt relies on DataFrames.melt, which is depreciated
+            ]) for k in keys(from)]
+
+    return indexjoin(lst...)
 end

@@ -134,7 +134,7 @@ function _partition_io!(d::Dict, set::Dict)
         x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
         d[:ys0] = edit_with(d[:ys0], x)
     end
-
+    
     (d[:id0], d[:ys0]) = fill_zero(d[:id0], d[:ys0])
 
     # Treat negative inputs as outputs.

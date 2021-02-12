@@ -1,8 +1,8 @@
 Path: [data, input]
 
 Input:
-  supply: supply.csv
-  use:    use.csv
+  supply: supply_det.csv
+  use:    use_det.csv
 
 Deselect:
   col: units

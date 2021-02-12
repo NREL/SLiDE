@@ -19,7 +19,7 @@ This information will be saved in the following structure:
     └── sets/
 
 # Arguments
-- `dataset::String`: Dataset identifier
+- `dataset::String`: dataset identifier
 
 # Keywords
 - `save_build::Bool = false`: That decides whether to save the information at each build
@@ -45,7 +45,8 @@ function build(
     if |(isempty(d), isempty(set), overwrite)
         if isempty(set)
             set = read_from(joinpath("src", "build", "readfiles", "setlist.yml"))
-            [set[k] = set[:summary] for k in [:g,:s]]
+            _set_sector!(set, set[:summary])
+            # [set[k] = set[:summary] for k in [:g,:s]]
             write_build(dataset, SET_DIR, set)
         end
         

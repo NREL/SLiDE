@@ -7,6 +7,10 @@ extrapolate_year
 extrapolate_region
 ```
 
+```@docs
+map_year
+```
+
 # Fill
 ```@docs
 fill_zero

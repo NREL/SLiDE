@@ -8,7 +8,7 @@ module SLiDE
 #################################################################################
 # IMPORTS
 import CSV
-# import InvertedIndices
+import Combinatorics
 import DataFrames;          using DataFrames
 import Dates
 import DelimitedFiles;      using DelimitedFiles
@@ -39,8 +39,10 @@ export SLIDE_DIR
 
 # EXPORTS
 export Add
+export Concatenate
 export Combine
 export Describe
+export Deselect
 export Drop
 export Group
 export OrderedGroup
@@ -51,7 +53,6 @@ export Order
 export Match
 export Rename
 export Replace
-export Deselect
 export Stack
 
 export SetInput
@@ -100,13 +101,19 @@ export propertynames_with
 export edit_with
 export fill_zero
 export fill_with
+export extend_year      # maybe depreciated
+export map_year
 export extrapolate_region
-export extrapolate_year
+export extrapolate_year # maybe depreciated
 export filter_with
+export split_with
+export split_fill_unstack
+export stack_append
 
 # CALCULATE
 export combine_over
 export transform_over
+export operate_over
 
 # READ
 export read_file
@@ -129,9 +136,15 @@ export calibrate
 export share
 export disagg
 
-export module_energy!
-export module_elegen!
-export module_co2emis!
+export share_sector!
+export disagg_sector!
+export aggregate_sector!
+
+# ENERGY ENVIRONMENT MODULE
+export eem
+export eem_elegen!
+export eem_energy!
+export eem_co2emis!
 
 # MODEL
 export model_input
@@ -182,6 +195,7 @@ include(joinpath("parse", "read_file.jl"))
 include(joinpath("parse", "run_yaml.jl"))
 include(joinpath("parse", "check_data.jl"))
 
+include(joinpath("build", "aggregate.jl"))
 include(joinpath("build", "build.jl"))
 include(joinpath("build", "partition.jl"))
 include(joinpath("build", "calibrate.jl"))
@@ -191,7 +205,14 @@ include(joinpath("build", "share", "share_gsp.jl"))
 include(joinpath("build", "share", "share_pce.jl"))
 include(joinpath("build", "share", "share_sgf.jl"))
 include(joinpath("build", "share", "share_utd.jl"))
+include(joinpath("build", "share", "share_sector.jl"))
 include(joinpath("build", "disagg", "disagg_region.jl"))
+include(joinpath("build", "disagg", "disagg_sector.jl"))
+
+include(joinpath("build", "eem", "eem.jl"))
+include(joinpath("build", "eem", "eem_elegen.jl"))
+include(joinpath("build", "eem", "eem_energy.jl"))
+include(joinpath("build", "eem", "eem_co2emis.jl"))
 
 include(joinpath("model", "model_input.jl"))
 

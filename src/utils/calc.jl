@@ -105,16 +105,23 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `df::DataFrame` WITHOUT the specified column(s) argument. The resulting DataFrame will be
     'shorter' than the input DataFrame.
 """
-function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
+function combine_over(
+    df::DataFrame,
+    col::Array{Symbol,1};
+    fun::Function=sum,
+    digits=DEFAULT_ROUND_DIGITS,
+)
     # !!!! add kwarg to findvalue to indicate whether to include integers as values
     val = findvalue(df)
     idx_by = setdiff(propertynames(df), [col; val])
     
     df = combine(groupby(df, idx_by), val .=> fun .=> val)
     
-    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
-        for ii in find_oftype(df[:,val], AbstractFloat)]
-
+    if digits!==false
+        [df[!,ii] .= round.(df[:,ii]; digits=digits)
+            for ii in find_oftype(df[:,val], AbstractFloat)]
+    end
+    
     # !!!! See where we actually want to convert boolean sums to integers. I think it's just
     # in some labor sharing. We can probably keep summed booleans as integers. This seems less confusing.
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
@@ -122,9 +129,16 @@ function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
 end
 
 
-function combine_over(df::DataFrame, col::Symbol; fun::Function = sum)
-    return combine_over(df, ensurearray(col); fun = fun)
+function combine_over(
+    df::DataFrame,
+    col::Symbol;
+    fun::Function=sum,
+    digits=DEFAULT_ROUND_DIGITS,
+)
+    return combine_over(df, ensurearray(col); fun=fun, digits=digits)
 end
+
+combine_over(df, col::Any) = df
 
 
 """
@@ -146,22 +160,30 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `df::DataFrame` WITH the specified column(s) argument. The resulting DataFrame will be
     the same length as the input DataFrame.
 """
-function transform_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
+function transform_over(
+    df::DataFrame,
+    col::Array{Symbol,1};
+    fun::Function=sum,
+    digits=SLiDE.DEFAULT_ROUND_DIGITS,
+)
+    cols_out = propertynames(df)
     val = findvalue(df)
     idx_by = setdiff(propertynames(df), [col; val])
 
     df = transform(groupby(df, idx_by), val .=> fun .=> val)
 
-    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
+    [df[!,ii] .= round.(df[:,ii]; digits=digits)
         for ii in find_oftype(df[:,val], AbstractFloat)]
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
-    return df
+    return df[:,cols_out]
 end
 
 
 function transform_over(df::DataFrame, col::Symbol; fun::Function = sum)
     return transform_over(df, ensurearray(col); fun = fun)
 end
+
+transform_over(df, col::Any) = df
 
 
 """
@@ -183,5 +205,89 @@ end
 
 function round!(df::DataFrame, col::Union{Symbol,Array{Symbol,1}}; digits::Int = DEFAULT_ROUND_DIGITS)
     df[!,col] .= round.(df[:,col]; digits = digits)
+    return df
+end
+
+
+"""
+"""
+function operate_over(df::Vararg{DataFrame};
+    id=[]=>[],
+    units::DataFrame=DataFrame(),
+    copyinput::Bool=false,
+    fillmissing=1.0,
+    # fillmissing::Bool=true,
+)
+    # df = ensurearray(df)
+    # idx = findindex.(df)
+    # idx_all = setdiff(union(idx...), [:units])
+
+    # with = permute(dropmissing(vcat(df...; cols=:union)[:,idx_all]))
+    # diff = [setdiff(idx_all, idx[ii]) for ii in 1:length(idx)]
+
+    # df = [isempty(diff[ii]) ? df[ii] : crossjoin(df[ii], unique(with[:,diff[ii]]))
+    #     for ii in 1:length(df)]
+    df = indexjoin(df...; id=id[1], fillmissing=fillmissing, skipindex=:units, kind=:left)
+
+    # df = df[:, [idx_all; propertynames_with(df,:units); findvalue(df)]]
+
+    return operate_over(df; id=id, units=units, copyinput=copyinput, fillmissing=fillmissing)
+end
+
+
+function operate_over(df::DataFrame;
+    id=[]=>[],
+    units::DataFrame=DataFrame(),
+    copyinput::Bool=false,
+    fillmissing=1.0,
+    # fillmissing::Bool=true,
+)
+    if !isempty(units)
+        df = _join_units(df, units, id; copyinput=copyinput, fillmissing=fillmissing)
+    end
+    return df
+end
+
+
+"""
+"""
+function _join_units(
+    df::DataFrame,
+    units::DataFrame,
+    id;
+    copyinput::Bool=false,
+    fillmissing=1.0,
+)
+    on = :units
+
+    utx = _add_id.(on, id[1]) => _add_id(on, id[2])
+    idx_units = propertynames_with(units, on)[1:length(id[1])]
+
+    # If we might be performing a calculation that will replace an existing output,
+    # append that input with 0.
+    if copyinput
+        id[2] in propertynames(df)  && (df[!,append(id[2],0)] .= df[:,id[2]])
+        utx[2] in propertynames(df) && (df[!,append(utx[2],0)] .= df[:,utx[2]])
+    end
+    
+    df = leftjoin(df, units, on=Pair.(utx[1], idx_units))
+    
+    # Check for missing values and fill these if they are found.
+    # Do not fill anything in the "operation" column to return this indicator that the join
+    # was incomplete.
+    ii = ismissing.(df[:, :operation])
+
+    if any(ii)
+        df[!,:complete] .= .!ii
+
+        if !isempty(intersect(id[1], [id[2]]))
+            df[!, :value] .= df[:,id[2]] .* ii
+        end
+
+        if fillmissing !== false
+            df[ii,:factor] = fillmissing
+            df[ii,:units] = df[ii,utx[2]]
+        end
+    end
     return df
 end

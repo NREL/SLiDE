@@ -1,5 +1,5 @@
 """
-filter_with(df::DataFrame, set::Any; kwargs...)
+    filter_with(df::DataFrame, set::Any; kwargs...)
 
 # Arguments
 - `df::DataFrame` to filter.
@@ -113,6 +113,140 @@ function filter_with(
 end
 
 
+function filter_with(df::DataFrame, set::DataFrame; drop=false)
+    idx_set = propertynames(set)
+    df = indexjoin(df, set; kind=:inner)
+
+    cols = propertynames(df)
+
+    if drop !== false
+        idx_drop = setdiff(_find_constant(df[:,idx_set]), propertynames_with(df,:units))
+        drop !== true && intersect!(idx_drop, ensurearray(drop))
+        setdiff!(cols, idx_drop)
+    end
+
+    return df[:,cols]
+end
+
+
+"""
+    split_with(df::DataFrame, splitter)
+This function separates `df` into two DataFrames, `df_in` and `df_out`.
+
+This is helpful for operating on a slice of `df` while saving the slice of `df` not included
+in the operation.
+
+# Arguments
+- `df::DataFrame` to split
+- `splitter::DataFrame` or `splitter::NamedTuple` containing indices of `df` to isolate
+
+# Returns
+- `df_in::DataFrame`: slice of `df` found in `splitter` by
+    [`DataFrames.innerjoin`](https://dataframes.juliadata.org/stable/lib/functions/#DataFrames.innerjoin)
+- `df_out::DataFrame`: slice of `df` **not** found in `splitter` by
+    [`DataFrames.antijoin`](https://dataframes.juliadata.org/stable/lib/functions/#DataFrames.antijoin)
+"""
+function split_with(df::DataFrame, splitter::DataFrame)
+    idx_join = intersect(propertynames(df), propertynames(splitter))
+    df_in = innerjoin(df, splitter, on=idx_join)
+    df_out = antijoin(df, splitter, on=idx_join)
+    return df_in, df_out
+end
+
+split_with(df::DataFrame, splitter::NamedTuple) = split_with(df, DataFrame(permute(splitter)))
+
+
+"""
+    split_fill_unstack(df::DataFrame, splitter, colkey, value)
+This function prepares a slice of `df` for a calculation during which units are preserved by:
+
+1. Splitting `df` with `splitter` using [`SLiDE.split_with`](@ref);
+2. Filling zeros in `df_in` to prevent missing entries in the unstacked DataFrame.
+    Approaching these steps in this order enables non-unique contents indicated by `colkey`;
+    and
+3. Unstacking `df_in`.
+
+# Arguments
+- `df::DataFrame` to stack
+- `colkey::Symbol` or `colkey::Array{Symbol,1}`: variable column(s)
+- `value::Symbol` or `value::Array{Symbol,1}`: value column(s)
+
+# Returns
+- `df_in::DataFrame`: slice of `df` found in `splitter`, unstacked and without missing values.
+- `df_out::DataFrame`: slice of `df` **not** found in the DataFrame slice.
+"""
+function split_fill_unstack(
+    df::DataFrame,
+    splitter::DataFrame,
+    colkey::Union{Symbol, Array{Symbol,1}},
+    value::Union{Symbol, Array{Symbol,1}},
+)
+    df_in, df_out = split_with(df, splitter)
+    
+    df_in = fill_zero(df_in; with=splitter)
+    # idx = findindex(df_in)
+    # idx_split = findindex(splitter)
+    # df_perm = crossjoin(permute(df_in[:,setdiff(idx,idx_split)]), splitter)
+    # df_in = indexjoin(df_in, df_perm)
+    
+    df_in = _unstack(df_in, colkey, value)
+
+    return df_in, df_out
+end
+
+
+function split_fill_unstack(
+    df::DataFrame,
+    splitter::NamedTuple,
+    colkey::Union{Symbol, Array{Symbol,1}},
+    value::Union{Symbol, Array{Symbol,1}},
+)
+    return split_fill_unstack(df, convert_type(DataFrame, splitter), colkey, value)
+end
+
+
+"""
+    stack_append(df_wide::DataFrame, df_long::DataFrame, colkey, value)
+This function prepares a slice of `df` for a calculation during which units are preserved by:
+
+1. Stacking `df_wide` and
+2. Concatening `df_wide` and `df_long`
+    
+# Arguments
+- `df_wide::DataFrame` to stack
+- `df_long::DataFrame` to append
+- `colkey::Symbol` or `colkey::Array{Symbol,1}`: variable column(s)
+- `value::Symbol` or `value::Array{Symbol,1}`: value column(s)
+
+# Returns
+- `df::DataFrame`
+"""
+function stack_append(
+    df_wide::DataFrame,
+    df_out::DataFrame,
+    colkey::Union{Symbol, Array{Symbol,1}},
+    value::Union{Symbol, Array{Symbol,1}};
+    cols::Symbol=:intersect,
+    ensure_finite::Bool=true,
+)
+    if ensure_finite
+        inputs = propertynames_with(findvalue(df_wide),0)
+        if !isempty(inputs)
+            outputs = _remove_id.(inputs,0)
+            for (inp,out) in zip(inputs,outputs)
+                ii = .!isfinite.(df_wide[:,out])
+                df_wide[ii,out] .= df_wide[ii,inp]
+            end
+        end
+    end
+
+    
+    df_wide = _stack(df_wide, colkey, value)
+
+    return vcat(df_wide, df_out; cols=cols)
+end
+
+
 """
     extrapolate_year(df::DataFrame, yr::Array{Int64,1}; kwargs...)
     extrapolate_year(df::DataFrame, set::Any; kwargs...)
@@ -172,7 +306,7 @@ julia> extrapolate_year(df, Dict(:yr => 2014:2017))
 """
 function extrapolate_year(
     df::DataFrame,
-    yr::Array{Int64,1};
+    yr::AbstractArray;
     backward::Bool = true,
     forward::Bool = true
 )
@@ -208,23 +342,102 @@ function extrapolate_year(
 end
 
 
-function extrapolate_year(
-    df::DataFrame,
-    set;
-    backward::Bool = true,
-    forward::Bool = true
-)
+function extrapolate_year(df::DataFrame, set; backward::Bool=true, forward::Bool=true)
     extrapolate_year(df, set[:yr]; forward = forward, backward = backward)
 end
 
 
-function extrapolate_year(
-    df::DataFrame,
-    yr::UnitRange{Int64};
-    backward::Bool = true,
-    forward::Bool = true
-)
-    extrapolate_year(df, ensurearray(yr); forward = forward, backward = backward)
+"""
+"""
+function extend_year(df::DataFrame, mapping::DataFrame)
+    col = propertynames(df)
+    df = edit_with(outerjoin(mapping, df, on=Pair(:y,:yr)), Rename(:x,:yr))
+    return df[:,col]
+end
+
+function extend_year(df::DataFrame, yr::AbstractArray)
+    years = unique(df[:,:yr])
+    df = extend_year(df, map_step(yr, years))
+    return df
+end
+
+extend_year(df::DataFrame, set::Dict) = extend_year(df, set[:yr])
+
+
+"""
+This function returns a DataFrame defining mapping for a step function.
+
+# Keywords
+- `fun::Function`: how to pick the cut-off boundary. By default, this is set to occur
+    between to values. For example, this would result in using 2007 data for years <= 2009
+    and 2012 data for years >= 2009.
+
+# Returns
+
+
+# Example
+
+```jldoctest map_year
+julia> map_year([2007,2012] => 2005:2015)
+11×2 DataFrame
+│ Row │ from  │ to    │
+│     │ Int64 │ Int64 │
+├─────┼───────┼───────┤
+│ 1   │ 2007  │ 2005  │
+│ 2   │ 2007  │ 2006  │
+│ 3   │ 2007  │ 2007  │
+│ 4   │ 2007  │ 2008  │
+│ 5   │ 2007  │ 2009  │
+│ 6   │ 2012  │ 2010  │
+│ 7   │ 2012  │ 2011  │
+│ 8   │ 2012  │ 2012  │
+│ 9   │ 2012  │ 2013  │
+│ 10  │ 2012  │ 2014  │
+│ 11  │ 2012  │ 2015  │
+```
+"""
+function map_year(from::AbstractArray, to::AbstractArray; fun=Statistics.mean, extrapolate=true)
+
+    if !extrapolate
+        to = intersect(ensurearray(to), intersect(from))
+        isempty(to) && (return DataFrame())
+    end
+    
+    rng = DataFrame(low=from[1:end-1], high=from[2:end])
+    rng[!,:mid] = fun.(eachrow(rng))
+
+    df = crossjoin(DataFrame(to=to), rng)
+    df[!,:diff] .= df[:,:to].-df[:,:mid]
+
+    df[!,:from] .= df[:,:low].*(df[:,:diff].<0) + df[:,:high].*(df[:,:diff].>0)
+    df[!,:dist] .= abs.(df[:,:diff])
+
+    df = unique(df[:,[:from,:to,:dist]])
+
+    df_closest = combine_over(df, :from; fun=Statistics.minimum)
+    df = innerjoin(df, df_closest, on=[:to,:dist])[:,[:from,:to]]
+    return df
+end
+
+function map_year(from::AbstractArray, to::Integer; fun=Statistics.mean, extrapolate=true)
+    df = DataFrame(to=to)
+
+    df[!,:from] .= if to in from;         to
+    elseif to > from[end] && extrapolate; from[end]
+    elseif to < from[1]   && extrapolate; from[1]
+    end
+
+    return df[:,[:from,:to]]
+end
+
+function map_year(scheme::Pair; fun=Statistics.mean, extrapolate=true)
+    return map_year(scheme[1], scheme[2]; fun=fun, extrapolate=extrapolate)
+end
+
+function map_year(df::DataFrame, x; extrapolate=true)
+    dfmap = map_year(unique(df[:,:yr]), x; extrapolate=extrapolate)
+    df = edit_with(df, Map(dfmap,[:from],[:to],[:yr],[:yr],:outer))
+    return df
 end
 
 
@@ -353,7 +566,6 @@ function _intersect_with(
             return nothing
         end
     end
-
     return DataFrame(permute(NamedTuple{Tuple(idx,)}(val,)))
 end
 
@@ -362,8 +574,10 @@ end
 """
 function _find_constant(df::DataFrame)
     idx = findindex(df)
-    return idx[length.(unique.(eachcol(df[:,idx]))) .== 1]
+    return idx[nunique(df[:,idx]) .== 1]
 end
+
+_find_constant(row::DataFrameRow) = nunique(row)==1
 
 
 """

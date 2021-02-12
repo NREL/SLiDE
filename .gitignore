@@ -2,13 +2,30 @@
 **/.DS_Store
 **/scratch*
 **/data*/
+**/_*
+
+*.csv
+*.xlsx
+
 .git/
 .vscode/
 
 Manifest.toml
 
 admin/
-dev/
 calibrate/
-docs/build/
+# dev/
 deps/*.log
+docs/build/
+examples/
+test
+
+dev/*.jl
+dev/bluenote_sets
+dev/buildstream
+dev/experiments
+# dev/readfiles
+dev/runtime
+dev/validate
+dev/verify
+# dev/windc_1.0/*/*/*.csv
