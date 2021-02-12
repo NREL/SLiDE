@@ -288,7 +288,21 @@ end
 """
 function _map_for(df::DataFrame, col::Array{Symbol,1}; scheme=:aggr=>:disagg)
     (from,to) = (scheme[1], scheme[2])
-    df = indexjoin(fill(copy(df),length(col)); id=col, skipindex=[from,to])    
+
+    # Are there any sector names already in df? If so, save this for renaming later.
+    sec = intersect(SLiDE._find_sector(df), [from;to])
+
+    if length(col) > 1
+        df = indexjoin(fill(copy(df),length(col)); id=col, skipindex=[from,to])
+
+        # If any sector names WERE overwritten, leave these alone and simply rename.
+        # !!!! We COULD add the kwarg to indexjoin so "values" aren't what's being replaced by default.
+        !isempty(sec) && (df = edit_with(df, Rename.(SLiDE._add_id.(sec,col), col)))
+    else
+        println("renaming only")
+        !isempty(sec) && (df = edit_with(df, Rename.(sec,col)))
+    end
+
     return df
 end
 

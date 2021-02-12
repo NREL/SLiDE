@@ -24,8 +24,8 @@ dev/*.jl
 dev/bluenote_sets
 dev/buildstream
 dev/experiments
-dev/readfiles
+# dev/readfiles
 dev/runtime
 dev/validate
 dev/verify
-dev/windc_1.0
+dev/windc_1.0/*/*/*.csv
