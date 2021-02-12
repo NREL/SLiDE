@@ -160,16 +160,22 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `df::DataFrame` WITH the specified column(s) argument. The resulting DataFrame will be
     the same length as the input DataFrame.
 """
-function transform_over(df::DataFrame, col::Array{Symbol,1}; fun::Function = sum)
+function transform_over(
+    df::DataFrame,
+    col::Array{Symbol,1};
+    fun::Function=sum,
+    digits=SLiDE.DEFAULT_ROUND_DIGITS,
+)
+    cols_out = propertynames(df)
     val = findvalue(df)
     idx_by = setdiff(propertynames(df), [col; val])
 
     df = transform(groupby(df, idx_by), val .=> fun .=> val)
 
-    [df[!,ii] .= round.(df[:,ii]; digits = DEFAULT_ROUND_DIGITS)
+    [df[!,ii] .= round.(df[:,ii]; digits=digits)
         for ii in find_oftype(df[:,val], AbstractFloat)]
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
-    return df
+    return df[:,cols_out]
 end
 
 
@@ -212,7 +218,19 @@ function operate_over(df::Vararg{DataFrame};
     fillmissing=1.0,
     # fillmissing::Bool=true,
 )
+    # df = ensurearray(df)
+    # idx = findindex.(df)
+    # idx_all = setdiff(union(idx...), [:units])
+
+    # with = permute(dropmissing(vcat(df...; cols=:union)[:,idx_all]))
+    # diff = [setdiff(idx_all, idx[ii]) for ii in 1:length(idx)]
+
+    # df = [isempty(diff[ii]) ? df[ii] : crossjoin(df[ii], unique(with[:,diff[ii]]))
+    #     for ii in 1:length(df)]
     df = indexjoin(df...; id=id[1], fillmissing=fillmissing, skipindex=:units, kind=:left)
+
+    # df = df[:, [idx_all; propertynames_with(df,:units); findvalue(df)]]
+
     return operate_over(df; id=id, units=units, copyinput=copyinput, fillmissing=fillmissing)
 end
 

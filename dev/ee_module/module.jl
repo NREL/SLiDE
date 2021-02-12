@@ -11,18 +11,40 @@ f_eem = joinpath(SLIDE_DIR,"src","build","eem")
 include(joinpath(f_eem,"eem_bluenote.jl"))
 
 f_bench = joinpath("dev","readfiles")
-seds_out = read_from(joinpath(f_bench, "6_seds_out.yml"); run_bash=true)
-bn_out = read_from(joinpath(f_bench, "7_bluenote_int.yml"); run_bash=true)
 
-d, set, maps = eem()
+bn = merge(
+    read_from(joinpath(f_bench, "8b_bluenote_energy.yml"); run_bash=true),
+    read_from(joinpath(f_bench, "8b_bluenote_electricity.yml"); run_bash=true),
+    read_from(joinpath(f_bench, "8b_bluenote_emissions.yml"); run_bash=true),
+)
+
+bn = copy(bn_out)
+bn[:trdele] = edit_with(bn[:trdele], Replace.(:t,["imp","exp"],["imports","exports"]))
+
+bn[:netgen][bn[:netgen][:,:dataset].=="seds",:value] *= 10
+bn[:trdele][!,:value] *= 10
+bn[:ed0][!,:value]    *= 10
+bn[:emarg0][!,:value] *= 10
+bn[:ned0][!,:value]   *= 10
+
+# # # # seds_out[:energy] = sort(select(
+# # # #         indexjoin(seds_out[:energy], maps[:pq], maps[:units_base]; kind=:left),
+# # # #     [:yr,:r,:src,:sec,:pq,:base,:units,:value]))
+
+# function _module_impele!(d::Dict)
+#     df = filter_with(d[:seds], (src="ele", sec="imports"); drop=:sec)
+#     d[:impele] = edit_with(df, Rename(:src,:g))
+#     return d[:impele]
+# end
+
+# function _module_expele!(d::Dict)
+#     df = filter_with(d[:seds], (src="ele", sec="exports"); drop=:sec)
+#     d[:expele] = edit_with(df, Rename(:src,:g))
+#     return d[:expele]
+# end
 
 
-# # # seds_out[:energy] = sort(select(
-# # #         indexjoin(seds_out[:energy], maps[:pq], maps[:units_base]; kind=:left),
-# # #     [:yr,:r,:src,:sec,:pq,:base,:units,:value]))
-
-
-# # ------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
 # f_data = joinpath(SLIDE_DIR,"data")
 # f_read = joinpath(SLIDE_DIR,"src","build","readfiles")
 
@@ -32,46 +54,73 @@ d, set, maps = eem()
 # )
 
 # maps = read_from(joinpath(f_read,"maplist.yml"))
-# maps[:og] = DataFrame(src=set[:as], s="cng")
 
 # d = read_from(joinpath(f_data,"input","eia"))
 # [d[k] = extrapolate_year(df, (yr=set[:yr],)) for (k,df) in d]
+d_aggr = read_from("data/state_model/build/aggregate")
+d_eem, set, maps = eem("state_model")
 
-# # ----- ENERGY -----------------------------------------------------------------------------
-# # Calculate elegen and benchmark. It works! Yay!
+maps[:og] = DataFrame(src=set[:as], s="cng")
 
-# # @info("printing calculations")
-# eem_elegen!(d, maps)
-# eem_energy!(d, set, maps)
-# eem_co2emis!(d, set, maps)
+d = merge!(Dict(), d_eem, d_aggr)
 
-seds_out[:elegen] = sort(select(filter_with(seds_out[:elegen], set), [:yr,:r,:src,:value]))
-seds_out[:energy] = sort(select(indexjoin(seds_out[:energy], maps[:pq]; kind=:left), [:yr,:r,:src,:sec,:units,:value]))
-# seds_out[:co2emis] = filter_with(seds_out[:co2emis], merge(set, Dict(:dataset=>["epa","seds"])))
+# # # ----- ENERGY -----------------------------------------------------------------------------
+# # # Calculate elegen and benchmark. It works! Yay!
 
-# # ----- ENERGY -----------------------------------------------------------------------------
-# d[:convfac] = _module_convfac(d)
-# d[:cprice] = _module_cprice!(d, maps)
-# d[:prodbtu] = _module_prodbtu!(d, set)
+# # # @info("printing calculations")
+# # eem_elegen!(d, maps)
+# # eem_energy!(d, set, maps)
+# # eem_co2emis!(d, set, maps)
 
-# var = :pq
-# val = [:units,:value]
-
-# df = copy(d[:energy])
-# splitter = DataFrame(permute((src=[set[:ff];"ele"], sec=set[:demsec], pq=["p","q"])))
-# splitter = indexjoin(splitter, maps[:pq]; kind=:left)
-
-# df, df_out = split_fill_unstack(copy(d[:energy]), splitter, var, val);
+# # seds_out[:elegen] = sort(select(filter_with(seds_out[:elegen], set), [:yr,:r,:src,:value]))
+# # seds_out[:energy] = sort(select(indexjoin(seds_out[:energy], maps[:pq]; kind=:left), [:yr,:r,:src,:sec,:units,:value]))
+# # seds_out[:co2emis] = filter_with(seds_out[:co2emis], merge(set, Dict(:dataset=>["epa","seds"])))
 
 
-# _module_pedef!(d, set)
-# _module_pe0!(d, set)
-# _module_ps0!(d)
-# _module_prodval!(d, set, maps)
-# # _module_shrgas!(d, set)
-# # _module_netgen!(d)
-# _module_eq0!(d, set)
-# # _module_ed0!(d, set)
+# ----- ENERGY -----------------------------------------------------------------------------
+d[:convfac] = _module_convfac(d)
+d[:cprice] = _module_cprice!(d, maps)
+d[:prodbtu] = _module_prodbtu!(d, set)
+d[:pedef] = _module_pedef!(d, set)
+d[:pe0] = _module_pe0!(d, set)
+d[:ps0] = _module_ps0!(d)
+d[:prodval] = _module_prodval!(d, set, maps)
+d[:shrgas] = _module_shrgas!(d)
+d[:netgen] = _module_netgen!(d)
+d[:trdele] = _module_trdele!(d)
+d[:eq0] = _module_eq0!(d, set)
+d[:ed0] = _module_ed0!(d, set, maps)
+d[:emarg0] = _module_emarg0!(d, set, maps)
+d[:ned0] = _module_ned0!(d)
+
+
+
+
+
+
+# maps[:operation] -> operate is WRONG here. Should be *, not /
+# :usd_per_kwh
+# :kwh
+
+
+# scheme = :s=>:src
+# (from,to) = (scheme[1], scheme[2])
+
+
+# # Could maybe figure out the crossjoin situation --
+# # what do we do if some of the columns overlap but others don't?
+# # CHECK THIS by looking at disagg and how we cross join regions and whatnot.
+# # I think this really becomes an issue when we have multiple columns that don't overlap.
+# # LIKE WE DO FOR FILLING ZEROS WHEN WE UNSTACK? -- FOR ALL OF IT. YAY!
+
+
+# consumer expeniture survey (CEX - Tom has done this)
+# look at expenditure by household and break out by race.
+# if ACS responded to CEX, what would they say?
+# did this work for the Citizen's climate lobby
+# data to break out households by demographics, race -- so we can flexibly 
+# cq climate justice webstie -- some of the info from lead
+# it's going to look like ej screen?
 
 # # # !!!! Should just update in benchmark. This always seems to cause issues.
 # d_comp = Dict()

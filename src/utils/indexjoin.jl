@@ -84,6 +84,7 @@ Notes:
 function _make_unique(df::Array{DataFrame,1}, id::AbstractArray, indicator::Bool; skipindex=[])
     N = length(df)
 
+    skipindex = ensurearray(skipindex)
     col = propertynames.(df)
     val = findvalue.(df)
     flt = find_oftype.(df, AbstractFloat)
