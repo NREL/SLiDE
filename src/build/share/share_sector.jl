@@ -228,6 +228,7 @@ function _combine_sector_levels(df::DataFrame, x::AbstractArray; scheme=:detail=
 
     # !!!! If detail is empty, should return something saying that we don't need to continue
     # with the sectoral disaggregation process.
+    # !!!! Make general enough in case it's not just year we need to add.
     if isempty(df_dis)
         df_agg = fill_with((yr=unique(df[:,:yr]), sector=x), 1.0)
     else
