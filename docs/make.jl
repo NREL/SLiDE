@@ -43,6 +43,7 @@ makedocs(clean = true,
             ],
             "EEM" => Any[
                 "SEDS" => "man/eem/seds.md",
+                "Parameters" => "man/eem/parameters.md",
             ],
             "Parameters" => "man/parameters.md"
         ],
