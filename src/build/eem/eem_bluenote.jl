@@ -116,10 +116,10 @@ end
 """
 function _module_pe0!(d::Dict, set::Dict)
     df_demsec = DataFrame(sec=set[:demsec])
-    df_energy = filter_with(d[:energy], (src = set[:e], sec = set[:demsec]))
+    df_energy = filter_with(d[:energy], (src=set[:e], sec=set[:demsec]))
 
     # Use average energy demand prices where available.
-    df_p = filter_with(df_energy, (pq = "p",); drop=true)
+    df_p = filter_with(df_energy, (pq="p",); drop=true)
     df_pedef = crossjoin(d[:pedef], df_demsec)
     col = propertynames(df_p)
     idx = findindex(df_p)
@@ -215,7 +215,7 @@ function _module_shrgas!(d::Dict)
         filter_with(combine_over(d[:ys0], :g), (s="cng",); drop=true)[:,1:end-1],
         DataFrame(src=unique(df[:,:src])),
     )
-
+    
     # Define indices where we need to calculate an average (that present for ys0 but not for
     # prodval), calculate REGIONAL average, and apply that to the determined index.
     idx_avg = antijoin(idx_ys0, df, on=propertynames(idx_ys0))
@@ -226,7 +226,7 @@ function _module_shrgas!(d::Dict)
     # Ensure all SECTORAL shares sum to one.
     df = vcat(df, df_avg)
     df = df / combine_over(df, :src)
-    d[:shrgas] = df
+    d[:shrgas] = select(df, Not(:units))
 
     return d[:shrgas]
 end
@@ -271,6 +271,27 @@ function _module_trdele!(d::Dict)
     df = filter_with(d[:seds], (src="ele", sec=["imports","exports"], units=USD); drop=:src)
     d[:trdele] = edit_with(df, [Rename(:src,:g), Rename(:sec,:t)])
     return d[:trdele]
+end
+
+
+"""
+"""
+function _module_pctgen!(d::Dict, set::Dict)
+    df_ele = copy(d[:elegen])
+    df_ele = df_ele / transform_over(df_ele, :src)
+
+    df_ele = filter_with(df_ele, (src=set[:ff],))
+
+    df_oth = fill_with((
+        yr=set[:yr],
+        r=set[:r],
+        src=set[:e],
+        sec=setdiff(set[:demsec],["ele"]),
+        units=KWH,
+    ), 0.02)
+
+    d[:pctgen] = vcat(df_oth, edit_with(df_ele, Add(:sec,"ele")))
+    return d[:pctgen]
 end
 
 
@@ -332,11 +353,12 @@ function _module_emarg0!(d::Dict, set::Dict, maps::Dict)
 
     df_p = fill_zero(df_p; with=idx_p)
     df_q = fill_zero(d[:eq0]; with=idx_q)
+    col = propertynames(df_p)
 
     df = operate_over(df_p, df_q; id=id, units=maps[:operate], fillmissing=false)
     df[!,:value] .= df[:,:factor] .* df[:,:usd_per_x] .* df[:,:x]
 
-    d[:emarg0] = df[abs.(df[:,:value]).>=1e-8,col]
+    d[:emarg0] = df[abs.(df[:,:value]).>=1e-8, col]
 
     return d[:emarg0]
 end
@@ -352,6 +374,166 @@ function _module_ned0!(d::Dict)
     return d[:ned0]
 end
 
+
+"""
+"""
+function _scale_shrgas!(d::Dict, maps::Dict, set::Dict, on)
+    key = Tuple([:shrgas;on])
+    if !haskey(d,key)
+        d[key] = SLiDE._scale_extend(d[:shrgas], maps[:og], set[:sector], on)
+    end
+    return d[key]
+end
+
+
+"""
+"""
+function _disagg_with_shrgas!(d::Dict, maps::Dict, set::Dict, key::Symbol)
+    taxes = [:ta0,:tm0,:ty0]
+    on = SLiDE._find_sector(d[key])
+
+    if !isempty(on)
+        d[key] = if key in taxes
+            SLiDE.scale_with_map(d[key], _scale_shrgas!(d, maps, set, on), on; key=key)
+        else
+            SLiDE.scale_with_share(d[key], _scale_shrgas!(d, maps, set, on), on; key=key)
+        end
+    end
+
+    return d[key]
+end
+
+
+"""
+```math
+\\begin{aligned}
+mrgshr_{yr,r,m,g=trn} &= \\dfrac
+    {md_{yr,r,m,g=trn}}
+    {\\sum_m md_{yr,r,m,g=trn}}
+\\\\
+mrgshr_{yr,r,m,g=trd} &= 1 - mrgshr_{yr,r,m,g=trn}
+\\end{aligned}
+```
+"""
+function _module_mrgshr!(d::Dict, set::Dict)
+    if !haskey(d,:mrgshr)
+        var = :m
+        val = :value
+        col = propertynames(d[:md0])
+
+        df = filter_with(d[:md0], (g=set[:e],))
+
+        df = df / combine_over(df, var; digits=false)
+
+        df = unstack(df, var, val)
+        df = fill_zero(df; with=(yr=set[:yr], r=set[:r], g=set[:e]))
+
+        df[!,:trd] .= 1.0 .- df[:,:trn]
+
+        d[:mrgshr] = select(dropzero(SLiDE._stack(df, :m, :value)), col)
+    end
+    return d[:mrgshr]
+end
+
+
+"""
+```math
+md_{yr,r,m,g} = mrgshr_{yr,r,m,g} \\cdot \\sum_{sec} emrg_{yr,r,src\\rightarrow g, sec}
+```
+"""
+function _module_md0!(d::Dict, set::Dict)
+    df = d[:md0]
+    g = SLiDE._find_sector(df)[1]
+
+    df, df_out = split_with(df, DataFrame(g=>set[:e],))
+
+    df_emrg = edit_with(d[:emarg0], Rename(:src,g))
+
+    df = d[:mrgshr] * combine_over(df_emrg, :sec)
+
+    d[:md0] = dropzero(vcat(df_out, df; cols=:intersect))
+    return d[:md0]
+
+    # x = [Rename(:src,:g); Deselect([:units], "==")]
+    # splitter = DataFrame(g=set[:e])
+
+    # df, df_out = split_with(copy(d[:md0]), DataFrame(col=>set[:e],))
+    
+    # df = d[:mrgshr] * combine_over(edit_with(d[:emarg0], x), :sec)
+
+    # d[:md0] = dropzero(vcat(df_out, df))
+    # return d[:md0]
+end
+
+
+"""
+```math
+\\tilde{cd}_{yr,r,g}
+= \\left\\{
+    ed \\left(yr,r,src\\rightarrow g, sec\\right) \\;\\vert\\; yr,\\, r,\\, g,\\, sec=res
+\\right\\}
+```
+"""
+function _module_cd0!(d::Dict)
+    df = d[:cd0]
+    g = SLiDE._find_sector(df)[1]
+
+    df, df_out = split_with(df, DataFrame(g=>set[:e],))
+
+    df_ed0 = edit_with(d[:ed0], Rename(:src,g))
+
+    df = filter_with(df_ed0, (sec="res",); drop=true)
+    d[:cd0] = vcat(df_out, df; cols=:intersect)
+
+    return d[:cd0]
+end
+
+
+"""
+"""
+function _module_ys0!(d::Dict, set::Dict, maps::Dict)
+    x = set[:e]
+    idx = SLiDE._find_sector(d[:ys0])
+    df, df_out = split_with(d[:ys0], DataFrame(s=x, g=x))
+
+    # -----
+    # Edit ele,cru,gas,col.
+    df_energy = filter_with(d[:energy], (src=x, sec="supply", pq="q"); drop=true)
+    df_ps = filter_with(d[:ps0], (src=x,))
+
+    df = operate_over(df_energy, df_ps;
+        id=[:x,:usd_per_x]=>:usd,
+        units=maps[:operate], 
+        fillmissing=0.0,
+    )
+
+    df[!,:value] .= df[:,:factor] .* df[:,:x] .* df[:,:usd_per_x]
+
+    # -----
+    # Since we don't have ps0(oil), calculate (oil,oil) as a share of ned0.
+    x = Deselect([:units],"==")
+    df_energy = filter_with(edit_with(d[:energy], x), (src="cru", sec="ref", pq="q"); drop=true)
+    df_ned = filter_with(edit_with(d[:ned0], x), (src="oil",))
+
+    df_energy = df_energy / transform_over(df_energy, :r)
+    df_ned = transform_over(combine_over(df_ned, :sec), :r)
+
+    df_oil = df_energy * df_ned
+
+    # Add this back to df and adjust indices to get src -> (s,g).
+    df = edit_with(vcat(df, df_oil; cols=:intersect), Rename(:src,idx[1]))
+    df[!,idx[2]] .= df[:,idx[1]]
+
+    # -----
+    # Make zero if production is zero.
+    idxgen = filter_with(df[:,findindex(df)], (s="ele",g="ele"); drop=:g)
+    df_out = indexjoin(df_out, idxgen; id=[:ys0,:generation], indicator=true)
+    df_out[.&(df_out[:,:s].==xgen, .!df_out[:,:generation]),:value] .= 0.0
+
+    # FINALLY, add this back to ys0.
+    d[:ys0] = dropzero(vcat(df_out[:,1:end-2], df))
+    return d[:ys0]
+end
 
 
 """

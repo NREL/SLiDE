@@ -50,7 +50,7 @@ df = [
     DataFrame(
         from_units = "us dollars (USD) per thousand kilowatthour",
         factor = 1E-3,
-        operation = /,
+        operation = *,
         by_units = "billion kilowatthours",
         units = "billions of us dollars (USD)",
     );

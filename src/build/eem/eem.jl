@@ -25,7 +25,7 @@ function eem(dataset::String)
 
     d = read_from(joinpath(f_data,"input","eia"))
     [d[k] = extrapolate_year(df, (yr=set[:yr],)) for (k,df) in d]
-
+    
     eem_elegen!(d, maps)
     eem_energy!(d, set, maps)
     eem_co2emis!(d, set, maps)

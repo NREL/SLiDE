@@ -16,9 +16,12 @@ bn = merge(
     read_from(joinpath(f_bench, "8b_bluenote_energy.yml"); run_bash=true),
     read_from(joinpath(f_bench, "8b_bluenote_electricity.yml"); run_bash=true),
     read_from(joinpath(f_bench, "8b_bluenote_emissions.yml"); run_bash=true),
+    read_from(joinpath(f_bench, "8b_bluenote_share.yml"); run_bash=true),
 )
+bn1 = read_from(joinpath(f_bench, "8b_bluenote1_shrgas.yml"))
+bn2 = read_from(joinpath(f_bench, "8b_bluenote2_unfiltered.yml"))
 
-bn = copy(bn_out)
+# bn = copy(bn_out)
 bn[:trdele] = edit_with(bn[:trdele], Replace.(:t,["imp","exp"],["imports","exports"]))
 
 bn[:netgen][bn[:netgen][:,:dataset].=="seds",:value] *= 10
@@ -26,6 +29,16 @@ bn[:trdele][!,:value] *= 10
 bn[:ed0][!,:value]    *= 10
 bn[:emarg0][!,:value] *= 10
 bn[:ned0][!,:value]   *= 10
+bn[:pctgen][!,:value] /= 100
+
+
+[global bn2[k][[x in set[:e] for x in bn2[k][:,:g]], :value] *= 10 for k in [:md0,:cd0]];
+
+bn2[:ys0][.&(
+    [x in set[:e] for x in bn2[:ys0][:,:g]],
+    bn2[:ys0][:,:s].==bn2[:ys0][:,:g],
+),:value] *= 10
+
 
 # # # # seds_out[:energy] = sort(select(
 # # # #         indexjoin(seds_out[:energy], maps[:pq], maps[:units_base]; kind=:left),
@@ -60,9 +73,10 @@ bn[:ned0][!,:value]   *= 10
 d_aggr = read_from("data/state_model/build/aggregate")
 d_eem, set, maps = eem("state_model")
 
-maps[:og] = DataFrame(src=set[:as], s="cng")
+maps[:og] = DataFrame(:s=>"cng", :src=>set[:as])
 
 d = merge!(Dict(), d_eem, d_aggr)
+SLiDE._set_sector!(set, unique(d[:ys0][:,:s]))
 
 # # # ----- ENERGY -----------------------------------------------------------------------------
 # # # Calculate elegen and benchmark. It works! Yay!
@@ -88,51 +102,56 @@ d[:prodval] = _module_prodval!(d, set, maps)
 d[:shrgas] = _module_shrgas!(d)
 d[:netgen] = _module_netgen!(d)
 d[:trdele] = _module_trdele!(d)
+d[:pctgen] = _module_pctgen!(d, set)
 d[:eq0] = _module_eq0!(d, set)
 d[:ed0] = _module_ed0!(d, set, maps)
 d[:emarg0] = _module_emarg0!(d, set, maps)
 d[:ned0] = _module_ned0!(d)
 
+parameters = collect(keys(SLiDE.build_parameters("parameters")))
+[_disagg_with_shrgas!(d, maps, set, k) for k in parameters]
+
+d[:mrgshr] = _module_mrgshr!(d, set)
+
+d1 = copy(d)
+
+d2 = Dict()
+d2[:md0] = _module_md0!(d, set)
+d2[:cd0] = _module_cd0!(d)
+d2[:ys0] = _module_ys0!(d, set, maps)
+
+# some md0
+dcomp = benchmark_against(d1, bn; tol=1e-5)
+dcomp1 = benchmark_against(d1, bn1; tol=1e-5)
+dcomp2 = benchmark_against(d2, bn2; tol=1e-5)
 
 
+# # # Could maybe figure out the crossjoin situation --
+# # # what do we do if some of the columns overlap but others don't?
+# # # CHECK THIS by looking at disagg and how we cross join regions and whatnot.
+# # # I think this really becomes an issue when we have multiple columns that don't overlap.
+# # # LIKE WE DO FOR FILLING ZEROS WHEN WE UNSTACK? -- FOR ALL OF IT. YAY!
 
 
+# # consumer expeniture survey (CEX - Tom has done this)
+# # look at expenditure by household and break out by race.
+# # if ACS responded to CEX, what would they say?
+# # did this work for the Citizen's climate lobby
+# # data to break out households by demographics, race -- so we can flexibly 
+# # cq climate justice webstie -- some of the info from lead
+# # it's going to look like ej screen?
 
-# maps[:operation] -> operate is WRONG here. Should be *, not /
-# :usd_per_kwh
-# :kwh
+# # # # !!!! Should just update in benchmark. This always seems to cause issues.
+# # d_comp = Dict()
+# # seds_comp = merge(seds_out, bn_int)
 
+# # seds_out_comp = Dict()
+# # for k in intersect(keys(d),keys(seds_comp))
+# #     local col = intersect(propertynames(d[k]), propertynames(seds_comp[k]))
+# #     global d_comp[k] = select(d[k], col)
+# #     global seds_out_comp[k] = select(seds_comp[k], col)    
+# # end
 
-# scheme = :s=>:src
-# (from,to) = (scheme[1], scheme[2])
+# # # seds_out_comp[:ed0][!,:value] .*= 10
 
-
-# # Could maybe figure out the crossjoin situation --
-# # what do we do if some of the columns overlap but others don't?
-# # CHECK THIS by looking at disagg and how we cross join regions and whatnot.
-# # I think this really becomes an issue when we have multiple columns that don't overlap.
-# # LIKE WE DO FOR FILLING ZEROS WHEN WE UNSTACK? -- FOR ALL OF IT. YAY!
-
-
-# consumer expeniture survey (CEX - Tom has done this)
-# look at expenditure by household and break out by race.
-# if ACS responded to CEX, what would they say?
-# did this work for the Citizen's climate lobby
-# data to break out households by demographics, race -- so we can flexibly 
-# cq climate justice webstie -- some of the info from lead
-# it's going to look like ej screen?
-
-# # # !!!! Should just update in benchmark. This always seems to cause issues.
-# d_comp = Dict()
-# seds_comp = merge(seds_out, bn_int)
-
-# seds_out_comp = Dict()
-# for k in intersect(keys(d),keys(seds_comp))
-#     local col = intersect(propertynames(d[k]), propertynames(seds_comp[k]))
-#     global d_comp[k] = select(d[k], col)
-#     global seds_out_comp[k] = select(seds_comp[k], col)    
-# end
-
-# # seds_out_comp[:ed0][!,:value] .*= 10
-
-# d_bench = benchmark_against(d_comp, seds_out_comp; tol=1E-4)
+# # d_bench = benchmark_against(d_comp, seds_out_comp; tol=1E-4)
