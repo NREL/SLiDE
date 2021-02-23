@@ -380,7 +380,7 @@ end
 function _scale_shrgas!(d::Dict, maps::Dict, set::Dict, on)
     key = Tuple([:shrgas;on])
     if !haskey(d,key)
-        d[key] = SLiDE._scale_extend(d[:shrgas], maps[:og], set[:sector], on)
+        d[key] = SLiDE._scale_extend(d[:shrgas], maps[:cng], set[:sector], on)
     end
     return d[key]
 end
@@ -526,7 +526,8 @@ function _module_ys0!(d::Dict, set::Dict, maps::Dict)
 
     # -----
     # Make zero if production is zero.
-    idxgen = filter_with(df[:,findindex(df)], (s="ele",g="ele"); drop=:g)
+    xgen = "ele"
+    idxgen = filter_with(df[:,findindex(df)], (s=xgen,g=xgen); drop=:g)
     df_out = indexjoin(df_out, idxgen; id=[:ys0,:generation], indicator=true)
     df_out[.&(df_out[:,:s].==xgen, .!df_out[:,:generation]),:value] .= 0.0
 

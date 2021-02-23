@@ -21,25 +21,6 @@ bn = merge(
 bn1 = read_from(joinpath(f_bench, "8b_bluenote1_shrgas.yml"))
 bn2 = read_from(joinpath(f_bench, "8b_bluenote2_unfiltered.yml"))
 
-# bn = copy(bn_out)
-bn[:trdele] = edit_with(bn[:trdele], Replace.(:t,["imp","exp"],["imports","exports"]))
-
-bn[:netgen][bn[:netgen][:,:dataset].=="seds",:value] *= 10
-bn[:trdele][!,:value] *= 10
-bn[:ed0][!,:value]    *= 10
-bn[:emarg0][!,:value] *= 10
-bn[:ned0][!,:value]   *= 10
-bn[:pctgen][!,:value] /= 100
-
-
-[global bn2[k][[x in set[:e] for x in bn2[k][:,:g]], :value] *= 10 for k in [:md0,:cd0]];
-
-bn2[:ys0][.&(
-    [x in set[:e] for x in bn2[:ys0][:,:g]],
-    bn2[:ys0][:,:s].==bn2[:ys0][:,:g],
-),:value] *= 10
-
-
 # # # # seds_out[:energy] = sort(select(
 # # # #         indexjoin(seds_out[:energy], maps[:pq], maps[:units_base]; kind=:left),
 # # # #     [:yr,:r,:src,:sec,:pq,:base,:units,:value]))
@@ -56,20 +37,7 @@ bn2[:ys0][.&(
 #     return d[:expele]
 # end
 
-
 # ------------------------------------------------------------------------------------------
-# f_data = joinpath(SLIDE_DIR,"data")
-# f_read = joinpath(SLIDE_DIR,"src","build","readfiles")
-
-# set = merge(
-#     read_from(joinpath(f_read,"setlist.yml")),
-#     Dict(k=>df[:,1] for (k,df) in read_from(joinpath(f_data,"coresets","eem"))),
-# )
-
-# maps = read_from(joinpath(f_read,"maplist.yml"))
-
-# d = read_from(joinpath(f_data,"input","eia"))
-# [d[k] = extrapolate_year(df, (yr=set[:yr],)) for (k,df) in d]
 d_aggr = read_from("data/state_model/build/aggregate")
 d_eem, set, maps = eem("state_model")
 
@@ -77,6 +45,25 @@ maps[:og] = DataFrame(:s=>"cng", :src=>set[:as])
 
 d = merge!(Dict(), d_eem, d_aggr)
 SLiDE._set_sector!(set, unique(d[:ys0][:,:s]))
+
+# ------------------------------------------------------------------------------------------
+# Address some discrepancies in energy values.
+bn[:trdele] = edit_with(bn[:trdele], Replace.(:t,["imp","exp"],["imports","exports"]))
+
+bn[:netgen][bn[:netgen][:,:dataset].=="seds",:value] *= 10
+bn[:trdele][!,:value] *= 10
+bn[:ed0][!,:value]    *= 10
+bn[:emarg0][!,:value] *= 10
+bn[:ned0][!,:value]   *= 10
+bn[:pctgen][!,:value] /= 100
+
+# Fix some errors in bn2 output values.
+[global bn2[k][[x in set[:e] for x in bn2[k][:,:g]], :value] *= 10 for k in [:md0,:cd0]];
+
+bn2[:ys0][.&(
+    [x in set[:e] for x in bn2[:ys0][:,:g]],
+    bn2[:ys0][:,:s].==bn2[:ys0][:,:g],
+),:value] *= 10
 
 # # # ----- ENERGY -----------------------------------------------------------------------------
 # # # Calculate elegen and benchmark. It works! Yay!

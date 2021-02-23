@@ -1,116 +1,79 @@
+bn_id0_avg = antijoin(bn[:inpshrs], bn[:inpshrs_temp], on=[:yr,:r,:g,:s,:sec]; makeunique=true)
+bninpshrs = copy(bn[:inpshrs_temp])
 
-df = copy(d[:shrgas])
-dfmap = maps[:og]
-x = copy(set[:sector])
-
-
-# For only g or only s.
-col = :g
-
-function _find_scheme(df, dfmap::DataFrame)
-    idx = findindex(df)
-    idxmap = propertynames(dfmap)
-
-    from = intersect(idx, idxmap)[1]
-    to = setdiff(idxmap, [from])[1]
-    return from, to
-end
-
-function _find_scheme(df, set::AbstractArray)
-    # Determine which column overlaps completely with the set.
-    # We will scale from/to using this scheme.
-    col = propertynames(df)
-    ii = length.([intersect(set, col) for col in eachcol(df)]) .== SLiDE.nunique(df)
-
-    aggr = propertynames(df)[ii][1]
-    disagg = propertynames(df)[.!ii][1]
-    return aggr, disagg
-end
+set[:ds] = sort(setdiff(maps[:demand][:,:s], maps[:cng][:,:s]))
+maps[:e] = DataFrame(g=set[:e], src=set[:e])
 
 
-function _extend_over(df::DataFrame, set::AbstractArray, col::Symbol; add_id=false)
-    # Determine which column overlaps completely with the set.
-    # We will scale from/to using this scheme.
-    from, to = _find_scheme(df, set)
-    x = add_id ? Rename.([from;to], SLiDE._add_id.([from;to], col; replace=from)) : Rename(from,col)
+xs = set[:ds]
+x_idx = [Deselect([:g,:units,:value], "=="); Rename(:src,:g)]
 
-    return edit_with(df, x)
-end
+idx_pctgen = edit_with(d[:pctgen][d[:pctgen][:,:value].>0.01, :], x_idx)
+idx_ys0 = edit_with(filter_with(d[:ys0], DataFrame(s=x, g=x)), x_idx)
+idx_ed0 = edit_with(d[:ed0], x_idx)
 
-function _extend_over(df::DataFrame, set::AbstractArray)
-    # Determine which column overlaps completely with the set.
-    # We will scale from/to using this scheme.
-    from, to = _find_scheme(df, set)
-    # x = add_id ? Rename.([from;to], SLiDE._add_id.([from;to], col; replace=from)) : Rename(from,col)
+idx_id0 = filter_with(innerjoin(idx_pctgen, maps[:demand], on=:sec), (s=x,))
+idx_id0_avg = indexjoin(idx_id0, idx_ys0, idx_ed0; kind=:inner)
 
-    df = leftjoin(DataFrame(from=>set), df, on=from)
-    return edit_with(df, Replace(to, missing, "$from value"))
-end
+# Indices to keep:
+# idx_pctgen = edit_with(d[:pctgen][d[:pctgen][:,:value].>0.01, 1:end-2], Rename(:src,:g))
+# idx_id0 = innerjoin(idx_pctgen, maps[:demand], on=:sec)
 
+# METHOD ONE:
+# df = filter_with(copy(d[:id0]), (g=set[:e], s=x))
+# df = indexjoin(df, idx_id0; kind=:inner)
+# df_id0 = df / transform_over(df, :s; digits=false)
 
-function _scale_with(df, dfmap, col::Symbol; add_id=false)
-    from, to = _find_scheme(df, dfmap)
-    x = add_id ? Rename.([from;to], SLiDE._add_id.([from;to], col; replace=to)) : Rename(to,col)
-    return edit_with(_scale_with(df, dfmap), x)
-end
+# METHOD TWO:
+df = filter_with(copy(d[:id0]), (g=set[:e], s=x))
+df = indexjoin(df, maps[:demand]; kind=:inner)
 
-_scale_with(df, dfmap) = indexjoin(df, dfmap)
+df_sum = transform_over(df, :s; digits=false)
 
+df_id0 = df / df_sum
+df_id0 = filter_with(df_id0, idx_id0)
 
-function _scale_extend(df, dfmap, set, col::AbstractArray)
-    from, to = _find_scheme(df, dfmap)
-    x = Dict(k => Rename.([from;to], SLiDE._add_id.([from;to], k; replace=to)) for k in col)
+# Calculate average.
+idx_id0_avg = antijoin(idx_id0_avg, df_id0,
+    on=intersect(propertynames(idx_id0_avg), propertynames(df_id0)))
 
-    df = _scale_with(df, dfmap)
-    dfmap = _extend_over(dfmap, set)
-
-    dfout = vcat([crossjoin(edit_with(df, x[col]), edit_with(dfmap, x[rev]))
-        for (col, rev) in zip(sort!(col), sort(col; rev=true))]...)
-    return dfout
-end
-
-# crossjoin(_extend_over(dfmap, df, :g))
-
-
-# function _scale_extend_over(df, dfmap, x, col::AbstractArray)
-    # idx = findindex(df)
-    # idxmap = propertynames(dfmap)
-
-    # from = intersect(idx, idxmap)[1]
-    # to = setdiff(idxmap, [from])[1]
-
-
-# end
-
-
-# from, to = _find_scheme(df, dfmap)
-
-# edit_with(x)
-
-
-# function _scale_sector_with()
+df_id0_avg = combine_over(df, :r; digits=false) / combine_over(df_sum, :r; digits=false)
+df_id0_avg = indexjoin(idx_id0_avg, df_id0_avg; kind=:inner)
 
 
 
 
 
 
-# share_slice(x, d[:og,:s])
 
-# function _
+# 
+# idx_id0_avg = antijoin(idx_id0, df_id0)
 
 
+# df_id0_avg, df_id0 = split_with(df_id0_tmp, DataFrame(value=NaN))
 
-# df_s = indexjoin(df, edit_with(dfmap, Rename.(SLiDE._find_sector(dfmap),col)))
+# df
 
-# col = :g
-# df_g = indexjoin(df, edit_with(dfmap, Rename.(SLiDE._find_sector(dfmap),col)))
+# df_id0_tmp = df / transform_over(indexjoin(df, idx_id0; kind=:inner), :s; digits=false)
 
-# dfmap_g = share_slice(x, Rename.(SLiDE._find_sector(dfmap),col))
+# df_id0
 
-# d[:shrgas,:s] = indexjoin(df, )
 
-col = propertynames(df)
-colmap = propertynames(dfmap)
-from = intersect(col, colmap)[1]
-to = setdiff(colmap, [from])[1]
+# # Sum id0:
+# d[:id0_sum] = sort(combine_over(innerjoin(df, maps[:demand], on=:s), :s; digits=false))
+
+# df_sum = sort(transform_over(innerjoin(df, maps[:demand], on=:s), :s; digits=false))
+# df_ans = df / df_sum
+
+# # df_mean = sort(transform_over(innerjoin(df, maps[:demand], on=:s), :s; fun=Statistics.mean, digits=false))
+
+# # col = [:yr,:r,:g,:s,:sec,:value]
+# # sort!(select!(df_ans, col))
+
+# # idx_ys0 = filter_with(d[:ys0], (s=set[:ds], g=set[:ds]))[:,1:4]
+
+# # df_sum = transform_over(innerjoin(df, maps[:demand], on=:s), :s; digits=false)
+# # df_ans = df / df_sum
+
+
+# # sort!(select!(df_sum, col))

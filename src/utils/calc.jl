@@ -172,15 +172,23 @@ function transform_over(
 
     df = transform(groupby(df, idx_by), val .=> fun .=> val)
 
-    [df[!,ii] .= round.(df[:,ii]; digits=digits)
-        for ii in find_oftype(df[:,val], AbstractFloat)]
+    if digits!==false
+        [df[!,ii] .= round.(df[:,ii]; digits=digits)
+            for ii in find_oftype(df[:,val], AbstractFloat)]
+    end
+
     [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
     return df[:,cols_out]
 end
 
 
-function transform_over(df::DataFrame, col::Symbol; fun::Function = sum)
-    return transform_over(df, ensurearray(col); fun = fun)
+function transform_over(
+    df::DataFrame,
+    col::Symbol;
+    fun::Function=sum,
+    digits=SLiDE.DEFAULT_ROUND_DIGITS,
+)
+    return transform_over(df, ensurearray(col); fun=fun, digits=digits)
 end
 
 transform_over(df, col::Any) = df
