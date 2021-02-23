@@ -1,4 +1,5 @@
 include("Add.jl")
+include("Combine.jl")
 include("Drop.jl")
 include("Describe.jl")
 include("Group.jl")
@@ -10,8 +11,9 @@ include("Rename.jl")
 include("Replace.jl")
 include("Match.jl")
 include("Stack.jl")
+include("Deselect.jl")
+include("OrderedGroup.jl")
 
-export get_axis
 export get_col
 export get_file
 export get_from
@@ -24,7 +26,6 @@ export get_to
 export get_type
 export get_val
 export get_var
-export set_axis!
 export set_col!
 export set_file!
 export set_from!

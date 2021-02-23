@@ -1,0 +1,102 @@
+[
+    {
+        "struct_name": "SetInput",
+        "docstring": "Read .csv file with specific column names",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "input file name",
+                "data_type": "String"
+            },
+            {
+                "name": "descriptor",
+                "comment": "file descriptor",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "File"
+    },
+    {
+        "struct_name": "DataInput",
+        "docstring": "Read .csv file with specific column names",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "input file name",
+                "data_type": "String"
+            },
+            {
+                "name": "descriptor",
+                "comment": "file descriptor",
+                "data_type": "String"
+            },
+            {
+                "name": "col",
+                "comment": "data column names",
+                "data_type": "Array{Symbol,1}"
+            }
+        ],
+        "supertype": "File"
+    },
+    {
+        "struct_name": "CSVInput",
+        "docstring": "Read .csv file",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "input file name",
+                "data_type": "String"
+            },
+            {
+                "name": "descriptor",
+                "comment": "file descriptor",
+                "data_type": "String"
+            }
+        ],
+        "supertype": "File"
+    },
+    {
+        "struct_name": "GAMSInput",
+        "docstring": "Read .map or .set file",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "input file name",
+                "data_type": "String"
+            },
+            {
+                "name": "col",
+                "comment": "column names",
+                "data_type": "Array{Symbol,1}"
+            }
+        ],
+        "supertype": "File"
+    },
+    {
+        "struct_name": "XLSXInput",
+        "docstring": "Read .xlsx file.",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "input file name",
+                "data_type": "String"
+            },
+            {
+                "name": "sheet",
+                "comment": "input sheet name",
+                "data_type": "String"
+            },
+            {
+                "name": "range",
+                "comment": "input sheet range",
+                "data_type": "String"
+            },
+            {
+                "name": "descriptor",
+                "comment": "file descriptor",
+                "data_type": "String"
+            }
+        ],
+        "supertype": "File"
+    }
+]

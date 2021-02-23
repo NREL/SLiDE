@@ -1,0 +1,8 @@
+Path: [data, input]
+
+Input:
+  cfs: cfs_state.csv
+  gsp: gsp_state.csv
+  pce: pce.csv
+  sgf: sgf.csv
+  utd: utd.csv

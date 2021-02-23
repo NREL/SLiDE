@@ -1,15 +1,14 @@
 # .gitignore
 **/.DS_Store
-**/scratch
+**/scratch*
+**/data*/
 .git/
 .vscode/
 
 Manifest.toml
 
 admin/
-data/
 dev/
 calibrate/
-model/data_temp/*.csv
-
 docs/build/
+deps/*.log

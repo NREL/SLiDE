@@ -3,7 +3,7 @@ This file is auto-generated. Do not edit.
 =#
 """
     mutable struct Map <: Edit
-        file::String
+        file::Any
         from::Array{Symbol,1}
         to::Array{Symbol,1}
         input::Array{Symbol,1}
@@ -14,7 +14,7 @@ This file is auto-generated. Do not edit.
 Define an `output` column containing values based on those in an `input` column. The mapping columns `from` -> `to` are contained in a .csv `file` in the coremaps directory. The columns `input` and `from` should contain the same values, as should `output` and `to`.
 
 # Arguments
-- `file::String`: mapping .csv file name in the coremaps directory
+- `file::Any`: mapping .csv file name in the coremaps directory
 - `from::Array{Symbol,1}`: name of the mapping column containing input values
 - `to::Array{Symbol,1}`: name of the mapping column containing output values
 - `input::Array{Symbol,1}`: name of the input column to map
@@ -23,7 +23,7 @@ Define an `output` column containing values based on those in an `input` column.
 """
 mutable struct Map <: Edit
     "mapping .csv file name in the coremaps directory"
-    file::String
+    file::Any
     "name of the mapping column containing input values"
     from::Array{Symbol,1}
     "name of the mapping column containing output values"
