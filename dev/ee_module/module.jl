@@ -61,11 +61,12 @@ bn[:pctgen][!,:value] /= 100
 [global bn2[k][[x in set[:e] for x in bn2[k][:,:g]], :value] *= 10 for k in [:md0,:cd0,:id0]];
 [global bn2[k][bn2[k][:,:g].=="ele",:value] *= 10 for k in [:x0,:m0]]
 
-
 bn2[:ys0][.&(
     [x in set[:e] for x in bn2[:ys0][:,:g]],
     bn2[:ys0][:,:s].==bn2[:ys0][:,:g],
 ),:value] *= 10
+
+SLiDE._disagg_hhadj!(bn2)
 
 # # # ----- ENERGY -----------------------------------------------------------------------------
 # # # Calculate elegen and benchmark. It works! Yay!
@@ -97,14 +98,12 @@ d[:ed0] = _module_ed0!(d, set, maps)
 d[:emarg0] = _module_emarg0!(d, set, maps)
 d[:ned0] = _module_ned0!(d)
 
-parameters = collect(keys(SLiDE.build_parameters("parameters")))
-[_disagg_with_shrgas!(d, maps, set, k) for k in parameters]
+_disagg_with_shrgas!(d, set, maps)
 
 d[:mrgshr] = _module_mrgshr!(d, set)
 
 d1 = copy(d)
 
-# d2 = Dict()
 _module_md0!(d, set)
 _module_cd0!(d)
 _module_ys0!(d, set, maps)
@@ -117,54 +116,53 @@ SLiDE._disagg_hhadj!(d)
 
 d2 = Dict(k => d[k] for k in [parameters;:inpshr])
 
-# k=:id0; d2[k] = _module_zero_prod!(d2,k)
-# k=:x0;  d2[k] = _module_zero_prod!(d2,k)
+# # k=:id0; d2[k] = _module_zero_prod!(d2,k)
+# # k=:x0;  d2[k] = _module_zero_prod!(d2,k)
 
-# k=:ld0; d2[k] = _module_zero_prod!(d,k)
-# k=:kd0; d2[k] = _module_zero_prod!(d,k)
-# k=:ty0; d2[k] = _module_zero_prod!(d,k)
-# k=:s0;  d2[k] = _module_zero_prod!(d,k)
-# k=:xd0; d2[k] = _module_zero_prod!(d,k)
-# k=:xn0; d2[k] = _module_zero_prod!(d,k)
-# k=:rx0; d2[k] = _module_zero_prod!(d,k)
+# # k=:ld0; d2[k] = _module_zero_prod!(d,k)
+# # k=:kd0; d2[k] = _module_zero_prod!(d,k)
+# # k=:ty0; d2[k] = _module_zero_prod!(d,k)
+# # k=:s0;  d2[k] = _module_zero_prod!(d,k)
+# # k=:xd0; d2[k] = _module_zero_prod!(d,k)
+# # k=:xn0; d2[k] = _module_zero_prod!(d,k)
+# # k=:rx0; d2[k] = _module_zero_prod!(d,k)
 
 
+# # d2[:inpshr] = copy(d[:inpshr])
 
-# d2[:inpshr] = copy(d[:inpshr])
-
-# some md0
+# # some md0
 dcomp = benchmark_against(d1, bn)
 dcomp1 = benchmark_against(d1, bn1)
 dcomp2 = benchmark_against(d2, merge(bn2, bn))
 
 
 
-# # # Could maybe figure out the crossjoin situation --
-# # # what do we do if some of the columns overlap but others don't?
-# # # CHECK THIS by looking at disagg and how we cross join regions and whatnot.
-# # # I think this really becomes an issue when we have multiple columns that don't overlap.
-# # # LIKE WE DO FOR FILLING ZEROS WHEN WE UNSTACK? -- FOR ALL OF IT. YAY!
+# # # # Could maybe figure out the crossjoin situation --
+# # # # what do we do if some of the columns overlap but others don't?
+# # # # CHECK THIS by looking at disagg and how we cross join regions and whatnot.
+# # # # I think this really becomes an issue when we have multiple columns that don't overlap.
+# # # # LIKE WE DO FOR FILLING ZEROS WHEN WE UNSTACK? -- FOR ALL OF IT. YAY!
 
 
-# # consumer expeniture survey (CEX - Tom has done this)
-# # look at expenditure by household and break out by race.
-# # if ACS responded to CEX, what would they say?
-# # did this work for the Citizen's climate lobby
-# # data to break out households by demographics, race -- so we can flexibly 
-# # cq climate justice webstie -- some of the info from lead
-# # it's going to look like ej screen?
+# # # consumer expeniture survey (CEX - Tom has done this)
+# # # look at expenditure by household and break out by race.
+# # # if ACS responded to CEX, what would they say?
+# # # did this work for the Citizen's climate lobby
+# # # data to break out households by demographics, race -- so we can flexibly 
+# # # cq climate justice webstie -- some of the info from lead
+# # # it's going to look like ej screen?
 
-# # # # !!!! Should just update in benchmark. This always seems to cause issues.
-# # d_comp = Dict()
-# # seds_comp = merge(seds_out, bn_int)
+# # # # # !!!! Should just update in benchmark. This always seems to cause issues.
+# # # d_comp = Dict()
+# # # seds_comp = merge(seds_out, bn_int)
 
-# # seds_out_comp = Dict()
-# # for k in intersect(keys(d),keys(seds_comp))
-# #     local col = intersect(propertynames(d[k]), propertynames(seds_comp[k]))
-# #     global d_comp[k] = select(d[k], col)
-# #     global seds_out_comp[k] = select(seds_comp[k], col)    
-# # end
+# # # seds_out_comp = Dict()
+# # # for k in intersect(keys(d),keys(seds_comp))
+# # #     local col = intersect(propertynames(d[k]), propertynames(seds_comp[k]))
+# # #     global d_comp[k] = select(d[k], col)
+# # #     global seds_out_comp[k] = select(seds_comp[k], col)    
+# # # end
 
-# # # seds_out_comp[:ed0][!,:value] .*= 10
+# # # # seds_out_comp[:ed0][!,:value] .*= 10
 
-# # d_bench = benchmark_against(d_comp, seds_out_comp; tol=1E-4)
+# # # d_bench = benchmark_against(d_comp, seds_out_comp; tol=1E-4)

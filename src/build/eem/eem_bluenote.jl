@@ -353,7 +353,7 @@ end
 
 """
 """
-function _scale_shrgas!(d::Dict, maps::Dict, set::Dict, on)
+function _scale_shrgas!(d::Dict, set::Dict, maps::Dict, on)
     key = Tuple([:shrgas;on])
     if !haskey(d,key)
         d[key] = SLiDE._scale_extend(d[:shrgas], maps[:cng], set[:sector], on)
@@ -364,15 +364,30 @@ end
 
 """
 """
-function _disagg_with_shrgas!(d::Dict, maps::Dict, set::Dict, key::Symbol)
+function _disagg_with_shrgas!(d, set, maps)
+    parameters = collect(keys(SLiDE.build_parameters("parameters")))
+    [_disagg_with_shrgas!(d, set, maps, k) for k in parameters]
+
+    # Update saved sectors.
+    SLiDE._set_sector!(set, unique(d[:ys0][:,:s]))
+
+    maps[:demand] = filter_with(maps[:demand], (s=set[:s],))
+
+    return d, set, maps
+end
+
+
+"""
+"""
+function _disagg_with_shrgas!(d::Dict, set::Dict, maps::Dict, key::Symbol)
     taxes = [:ta0,:tm0,:ty0]
     on = SLiDE._find_sector(d[key])
 
     if !isempty(on)
         d[key] = if key in taxes
-            SLiDE.scale_with_map(d[key], _scale_shrgas!(d, maps, set, on), on; key=key)
+            SLiDE.scale_with_map(d[key], _scale_shrgas!(d, set, maps, on), on; key=key)
         else
-            SLiDE.scale_with_share(d[key], _scale_shrgas!(d, maps, set, on), on; key=key)
+            SLiDE.scale_with_share(d[key], _scale_shrgas!(d, set, maps, on), on; key=key)
         end
     end
 
