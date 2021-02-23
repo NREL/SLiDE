@@ -129,6 +129,14 @@ function filter_with(df::DataFrame, set::DataFrame; drop=false)
 end
 
 
+function filter_with(df::DataFrame, idx::InvertedIndex{DataFrame})
+    idx = idx.skip
+    on = intersect(propertynames(df), propertynames(idx))
+    df = antijoin(df, idx, on=on)
+    return df
+end
+
+
 """
     split_with(df::DataFrame, splitter)
 This function separates `df` into two DataFrames, `df_in` and `df_out`.

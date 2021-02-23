@@ -58,7 +58,9 @@ bn[:ned0][!,:value]   *= 10
 bn[:pctgen][!,:value] /= 100
 
 # Fix some errors in bn2 output values.
-[global bn2[k][[x in set[:e] for x in bn2[k][:,:g]], :value] *= 10 for k in [:md0,:cd0]];
+[global bn2[k][[x in set[:e] for x in bn2[k][:,:g]], :value] *= 10 for k in [:md0,:cd0,:id0]];
+[global bn2[k][bn2[k][:,:g].=="ele",:value] *= 10 for k in [:x0,:m0]]
+
 
 bn2[:ys0][.&(
     [x in set[:e] for x in bn2[:ys0][:,:g]],
@@ -102,15 +104,39 @@ d[:mrgshr] = _module_mrgshr!(d, set)
 
 d1 = copy(d)
 
-d2 = Dict()
-d2[:md0] = _module_md0!(d, set)
-d2[:cd0] = _module_cd0!(d)
-d2[:ys0] = _module_ys0!(d, set, maps)
+# d2 = Dict()
+_module_md0!(d, set)
+_module_cd0!(d)
+_module_ys0!(d, set, maps)
+_module_id0!(d, set, maps)
+_module_m0!(d)
+_module_x0!(d)
+_module_zero_prod!(d)
+
+SLiDE._disagg_hhadj!(d)
+
+d2 = Dict(k => d[k] for k in [parameters;:inpshr])
+
+# k=:id0; d2[k] = _module_zero_prod!(d2,k)
+# k=:x0;  d2[k] = _module_zero_prod!(d2,k)
+
+# k=:ld0; d2[k] = _module_zero_prod!(d,k)
+# k=:kd0; d2[k] = _module_zero_prod!(d,k)
+# k=:ty0; d2[k] = _module_zero_prod!(d,k)
+# k=:s0;  d2[k] = _module_zero_prod!(d,k)
+# k=:xd0; d2[k] = _module_zero_prod!(d,k)
+# k=:xn0; d2[k] = _module_zero_prod!(d,k)
+# k=:rx0; d2[k] = _module_zero_prod!(d,k)
+
+
+
+# d2[:inpshr] = copy(d[:inpshr])
 
 # some md0
-dcomp = benchmark_against(d1, bn; tol=1e-5)
-dcomp1 = benchmark_against(d1, bn1; tol=1e-5)
-dcomp2 = benchmark_against(d2, bn2; tol=1e-5)
+dcomp = benchmark_against(d1, bn)
+dcomp1 = benchmark_against(d1, bn1)
+dcomp2 = benchmark_against(d2, merge(bn2, bn))
+
 
 
 # # # Could maybe figure out the crossjoin situation --

@@ -130,12 +130,6 @@ function _module_pe0!(d::Dict, set::Dict)
     df = indexjoin(df_p, df_pedef; id=[:value,:pedef], fillmissing=false)
     df = edit_with(df, Replace(:value, missing, "pedef value"))
 
-    # df = indexjoin(df_p, df_pedef; id=[:p,:pedef], fillmissing=false)
-    # ii = .!ismissing.(df[:,:p])
-
-    # df[!,:value] .= df[:,:pedef]
-    # df[ii,:value] .= df[ii,:p]
-
     # Use annual EIA data for crude oil averages.
     df_cprice = _module_cprice!(d, maps)
 
@@ -148,24 +142,6 @@ function _module_pe0!(d::Dict, set::Dict)
 
     df_cprice = crossjoin(df_cprice, DataFrame(src="cru",sec=set[:demsec]))
     df_cprice = vcat(df_avg, df_cprice)
-
-    # df_r = combine_over(df_cprice, :r; fun=Statistics.mean)
-    # 
-    # df_q = filter_with(df_energy, (src="cru", pq="q"); drop=:pq)
-    # df_q[!,:value] .= max.(df_q[:,:value], 0)
-    # dropzero!(df_q)
-
-    # df_idx = indexjoin(df_q, crossjoin(df_cprice, df_demsec);
-    #     id=[:q,:cprice], indicator=true, skipindex=:units)
-    # ii = .!df_idx[:,:cprice] .* df_idx[:,:q];
-
-    # idx_cprice = df_idx[.!ii,idx[1:end - 1]];
-    # idx_r = df_idx[ii,idx[1:end - 1]];
-
-    # df_cprice = indexjoin(idx_cprice, df_cprice; kind=:left)
-    # df_r = indexjoin(idx_r, df_r; kind=:left)
-
-    # df_cru = [df_cprice; df_r]
 
     d[:pe0] = [df[:,col]; df_cprice[:,col]]
 
@@ -453,16 +429,6 @@ function _module_md0!(d::Dict, set::Dict)
 
     d[:md0] = dropzero(vcat(df_out, df; cols=:intersect))
     return d[:md0]
-
-    # x = [Rename(:src,:g); Deselect([:units], "==")]
-    # splitter = DataFrame(g=set[:e])
-
-    # df, df_out = split_with(copy(d[:md0]), DataFrame(col=>set[:e],))
-    
-    # df = d[:mrgshr] * combine_over(edit_with(d[:emarg0], x), :sec)
-
-    # d[:md0] = dropzero(vcat(df_out, df))
-    # return d[:md0]
 end
 
 
@@ -534,6 +500,117 @@ function _module_ys0!(d::Dict, set::Dict, maps::Dict)
     # FINALLY, add this back to ys0.
     d[:ys0] = dropzero(vcat(df_out[:,1:end-2], df))
     return d[:ys0]
+end
+
+
+"""
+"""
+function _module_inpshr!(d::Dict, set::Dict, maps::Dict)
+    if !haskey(d, :inpshr)
+        x = unique(d[:id0][:,:g])
+        x_idx = [Deselect([:g,:units,:value], "=="); Rename(:src,:g)]
+
+        idx_pctgen = edit_with(d[:pctgen][d[:pctgen][:,:value].>0.01, :], x_idx)
+        idx_ys0 = edit_with(filter_with(d[:ys0], DataFrame(s=x, g=x)), x_idx)
+        idx_ed0 = edit_with(d[:ed0], x_idx)
+
+        idx_shr = filter_with(innerjoin(idx_pctgen, maps[:demand], on=:sec), (s=x,))
+        idx_shr_avg = indexjoin(idx_shr, idx_ys0, idx_ed0; kind=:inner)
+
+        # Set up to average. Filter id0, fill it with zeros, and map both to demand sectors.
+        df = filter_with(copy(d[:id0]), (g=set[:e],))
+        df0 = fill_zero(df)
+
+        df_sec = indexjoin(df, maps[:demand]; kind=:inner)
+        df0_sec = indexjoin(df0, maps[:demand]; kind=:inner)
+        
+        # Calculate input share.
+        df_shr = df_sec / transform_over(df_sec, :s; digits=false)
+        df_shr = filter_with(idx_shr, df_shr)
+        
+        # Adjust idx_shr_avg to remove indices for which df is already defined.
+        idx_shr_avg = antijoin(idx_shr_avg, df_shr,
+            on=intersect(propertynames(idx_shr_avg), propertynames(df_shr)))
+        
+        # Calculate the average using the FILLED version of the DataFrames.
+        df_shr_avg = transform_over(df0, :r; digits=false) / transform_over(df0_sec, [:r,:s]; digits=false)
+        df_shr_avg = filter_with(dropzero(df_shr_avg), idx_shr_avg)
+
+        d[:inpshr] = vcat(df_shr, df_shr_avg)
+    end
+    return d[:inpshr]
+end
+
+
+"""
+"""
+function _module_id0!(d::Dict, set::Dict, maps::Dict)
+    df, df_out = split_with(d[:id0], (g=set[:e],))
+
+    df_inpshr = _module_inpshr!(d, set, maps)
+    df_ed0 = edit_with(d[:ed0], [Rename(:src,:g), Deselect([:units],"==")])
+
+    df = combine_over(dropzero(df_ed0 * df_inpshr), :sec; digits=false)
+    d[:id0] = vcat(df_out, df)
+    return d[:id0]
+end
+
+
+"""
+"""
+function _module_x0!(d::Dict)
+    x = [Add(:g,"ele"), Deselect([:units],"==")]
+
+    df, df_out = split_with(d[:x0], (g="ele",))
+    df = edit_with(filter_with(d[:trdele], (t="exports",); drop=true), x)
+
+    d[:x0] = vcat(df_out, df)
+    return d[:x0]
+end
+
+
+"""
+"""
+function _module_m0!(d::Dict)
+    x = [Add(:g,"ele"), Deselect([:units],"==")]
+    
+    df, df_out = split_with(d[:m0], (g="ele",))
+    df = edit_with(filter_with(d[:trdele], (t="imports",); drop=true), x)
+
+    d[:m0] = vcat(df_out, df)
+    return d[:m0]
+end
+
+
+"""
+"""
+function _module_zero_prod!(d::Dict, on)
+    key = Tuple([:zero_prod;on])
+    if !haskey(d,key)
+        idx_zero = fill_zero(combine_over(filter_with(d[:ys0], (s="ele",)), :g))
+        idx_zero = idx_zero[idx_zero[:,:value].==0.0, 1:end-1]
+
+        # Rename if appropriate.
+        if isempty(intersect(propertynames(idx_zero), ensurearray(on)))
+            idx_zero = edit_with(idx_zero, Rename.(:s,on))
+        end
+
+        d[key] = idx_zero
+    end
+    return d[key]
+end
+
+
+function _module_zero_prod!(d::Dict, key::Symbol)
+    on = SLiDE._find_sector(d[key])
+    d[key] = filter_with(d[key], Not(_module_zero_prod!(d, on)))
+    return d[key]
+end
+
+
+function _module_zero_prod!(d::Dict)
+    [_module_zero_prod!(d,k) for k in [:ld0,:kd0,:ty0,:id0,:s0,:xd0,:xn0,:x0,:rx0]]
+    return d
 end
 
 
