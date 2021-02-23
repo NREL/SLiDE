@@ -43,6 +43,48 @@ end
 
 
 """
+# Examples
+
+If given a DataFrame, return a Tuple of DataFrame columns in the order
+(aggregate-level, disaggregate-level). This is determined from the number of unique entries
+in each column under the assumption that the aggregate-level will have fewer unique entries.
+
+```jldoctest
+df = DataFrame(s="cng", src=["cru","gas"])
+SLiDE._find_scheme(df)
+
+# output
+
+(:s, :src)
+```
+
+If given a DataFrame `df` and a mapping DataFrame `dfmap`, find the columns to map (from,to)
+based on the overlap in propertynames. If there is no overlap in propertynames,
+look for overlap in values.
+
+```jldoctest
+df = DataFrame(s = ["cng", "col", "ele", "oil"], src = ["ind","ind","ele","ref"])
+dfmap = DataFrame(aggr="cng", disagg=["cru","gas"])
+SLiDE._find_scheme(df, dfmap)
+
+# output
+
+(:s => :aggr, :disagg)
+```
+
+If given a DataFrame and a set to scale FROM, return the DataFrame propertynames
+that will be scaled (from, to). This is determined from the overlap of `df` with the input
+`set`, such that we scale FROM the column that does overlap TO the column that does not.
+
+```jldoctest
+df = DataFrame(s="cng", src=["cru","gas"])
+set = ["cng", "col", "con", "eint", "ele", "oil", "ommf", "osrv", "roe", "trn"]
+SLiDE._find_scheme(df, set)
+
+# output
+
+(:s, :src)
+```
 """
 function _find_scheme(df::DataFrame)
 
@@ -64,12 +106,27 @@ end
 
 
 function _find_scheme(df, dfmap::DataFrame)
-    idx = findindex(df)
-    idxmap = findindex(dfmap)
+    idx = sort(findindex(df))
+    idxmap = sort(findindex(dfmap))
 
-    from = sort(intersect(idx, idxmap))
-    to = sort(setdiff(idxmap, from))
+    from = intersect(idx, idxmap)
+    # on = from
 
+    # If there is NO overlap in names, look for overlap in values.
+    # !!!! This will might cause weirdness if multiple columns in df map to dfmap,
+    # but this shouldn't be too bad to address later.
+    if isempty(from)
+        col = unique.(eachcol(df[:,idx]))
+        from = [k => kmap for (k,c) in zip(idx,col) for (kmap,cmap) in zip(idxmap, eachcol(dfmap))
+            if !isempty(intersect(c,cmap))]
+        # on = getindex.(x,1)
+        # from = unique(getindex.(x,2))
+        to = setdiff(idxmap, getindex.(from,2))
+    else
+        to = setdiff(idxmap, from)
+    end
+
+    # Flatten lists.
     if length(from) == 1
         from, to = from[1], to[1]
     end
