@@ -249,17 +249,24 @@ end
 """
 function _calibration_set!(set)
     # !!!! replace in usage.
-    !(:i in keys(set)) && (set[:i] = set[:g])
-    !(:j in keys(set)) && (set[:j] = set[:s])
+    !haskey(set, :i) && (set[:i] = set[:g])
+    !haskey(set, :j) && (set[:j] = set[:s])
 
-    !((:i,:j)  in keys(set)) && add_permutation!(set, (:i,:j))
-    !((:j,:i)  in keys(set)) && add_permutation!(set, (:j,:i))
-    !((:i,:m)  in keys(set)) && add_permutation!(set, (:i,:m))
-    !((:m,:i)  in keys(set)) && add_permutation!(set, (:m,:i))
-    !((:i,:fd) in keys(set)) && add_permutation!(set, (:i,:fd))
-    !((:va,:j) in keys(set)) && add_permutation!(set, (:va,:j))
+    !haskey(set, (:r,:g)) && SLiDE.add_permutation!(set, (:r,:g))
+    !haskey(set, (:r,:s)) && SLiDE.add_permutation!(set, (:r,:s))
+    !haskey(set, (:r,:g,:s)) && SLiDE.add_permutation!(set, (:r,:g,:s))
+    !haskey(set, (:r,:s,:g)) && SLiDE.add_permutation!(set, (:r,:s,:g))
+    !haskey(set, (:r,:g,:m)) && SLiDE.add_permutation!(set, (:r,:g,:m))
+    !haskey(set, (:r,:m,:g)) && SLiDE.add_permutation!(set, (:r,:m,:g))
+    
+    !haskey(set, (:i,:j)) && SLiDE.add_permutation!(set, (:i,:j))
+    !haskey(set, (:j,:i)) && SLiDE.add_permutation!(set, (:j,:i))
+    !haskey(set, (:i,:m)) && SLiDE.add_permutation!(set, (:i,:m))
+    !haskey(set, (:m,:i)) && SLiDE.add_permutation!(set, (:m,:i))
+    !haskey(set, (:i,:fd)) && SLiDE.add_permutation!(set, (:i,:fd))
+    !haskey(set, (:va,:j)) && SLiDE.add_permutation!(set, (:va,:j))
 
-    if !(:cal in keys(set))
+    if !haskey(set,:cal)
         set[:cal] = Symbol.(read_file([SLIDE_DIR,"src","build","parameters"],
             SetInput("list_calibrate.csv", :cal)))
     end
