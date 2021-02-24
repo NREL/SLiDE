@@ -86,6 +86,7 @@ export ensurearray
 export ensuretuple
 export ensurefinite
 export find_oftype
+export getzero
 # export isarray
 # export istype
 export permute
