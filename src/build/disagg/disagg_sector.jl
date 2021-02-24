@@ -310,5 +310,5 @@ end
 """
 This function returns a list of sector indices found in the input DataFrame or list.
 """
-_find_sector(col::Array{Symbol,1}) = intersect([:g,:s], col)
+_find_sector(col::Array{Symbol,1}) = intersect(col, [:g,:s])
 _find_sector(df::DataFrame) = _find_sector(propertynames(df))

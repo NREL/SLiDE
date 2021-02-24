@@ -141,6 +141,7 @@ md_{yr,r,m,g} = mrgshr_{yr,r,m,g} \cdot \sum_{sec} emrg_{yr,r,src\rightarrow g, 
 \right\}
 ```
 
+## m0
 ```math
 \tilde{m}_{yr,r,g=ele}
 = \left\{
@@ -148,9 +149,18 @@ md_{yr,r,m,g} = mrgshr_{yr,r,m,g} \cdot \sum_{sec} emrg_{yr,r,src\rightarrow g, 
 \right\}
 ```
 
+## x0
 ```math
 \tilde{x}_{yr,r,g=ele}
 = \left\{
     trdele \left(yr,r,t\right) \;\vert\; yr,\, r,\, t=exports
 \right\}
 ```
+
+## ys0
+
+
+## inpshr
+
+
+## id0

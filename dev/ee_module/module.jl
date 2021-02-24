@@ -9,6 +9,7 @@ include(joinpath(f_dev,"module_constants.jl"))
 
 f_eem = joinpath(SLIDE_DIR,"src","build","eem")
 include(joinpath(f_eem,"eem_bluenote.jl"))
+include(joinpath(SLIDE_DIR,"src/build/disagg/disagg_energy.jl"))
 
 f_bench = joinpath("dev","readfiles")
 
@@ -17,9 +18,13 @@ bn = merge(
     read_from(joinpath(f_bench, "8b_bluenote_electricity.yml"); run_bash=true),
     read_from(joinpath(f_bench, "8b_bluenote_emissions.yml"); run_bash=true),
     read_from(joinpath(f_bench, "8b_bluenote_share.yml"); run_bash=true),
+    # read_from(joinpath(f_bench, "8b_bluenote_check.yml"); run_bash=true),
+    read_from("dev/windc_1.0/4_eem/8b_bluenote_chk"; run_bash=true),
 )
-bn1 = read_from(joinpath(f_bench, "8b_bluenote1_shrgas.yml"))
-bn2 = read_from(joinpath(f_bench, "8b_bluenote2_unfiltered.yml"))
+
+bn1 = read_from(joinpath(f_bench, "8b_bluenote1_shrgas.yml"); run_bash=true)
+bn2 = read_from(joinpath(f_bench, "8b_bluenote2_unfiltered.yml"); run_bash=true)
+bn3 = read_from(joinpath(f_bench, "8b_bluenote3_filtered.yml"); run_bash=true)
 
 # # # # seds_out[:energy] = sort(select(
 # # # #         indexjoin(seds_out[:energy], maps[:pq], maps[:units_base]; kind=:left),
@@ -41,8 +46,6 @@ bn2 = read_from(joinpath(f_bench, "8b_bluenote2_unfiltered.yml"))
 d_aggr = read_from("data/state_model/build/aggregate")
 d_eem, set, maps = eem("state_model")
 
-maps[:og] = DataFrame(:s=>"cng", :src=>set[:as])
-
 d = merge!(Dict(), d_eem, d_aggr)
 SLiDE._set_sector!(set, unique(d[:ys0][:,:s]))
 
@@ -50,23 +53,30 @@ SLiDE._set_sector!(set, unique(d[:ys0][:,:s]))
 # Address some discrepancies in energy values.
 bn[:trdele] = edit_with(bn[:trdele], Replace.(:t,["imp","exp"],["imports","exports"]))
 
-bn[:netgen][bn[:netgen][:,:dataset].=="seds",:value] *= 10
-bn[:trdele][!,:value] *= 10
-bn[:ed0][!,:value]    *= 10
-bn[:emarg0][!,:value] *= 10
-bn[:ned0][!,:value]   *= 10
+# bn[:netgen][bn[:netgen][:,:dataset].=="seds",:value] *= 10
+# bn[:trdele][!,:value] *= 10
+# bn[:ed0][!,:value]    *= 10
+# bn[:emarg0][!,:value] *= 10
+# bn[:ned0][!,:value]   *= 10
 bn[:pctgen][!,:value] /= 100
 
 # Fix some errors in bn2 output values.
-[global bn2[k][[x in set[:e] for x in bn2[k][:,:g]], :value] *= 10 for k in [:md0,:cd0,:id0]];
-[global bn2[k][bn2[k][:,:g].=="ele",:value] *= 10 for k in [:x0,:m0]]
+function correct_bluenote!(d)
+    [d[k][[x in set[:e] for x in d[k][:,:g]], :value] *= 10 for k in [:md0,:cd0,:id0]]
+    [d[k][d[k][:,:g].=="ele",:value] *= 10 for k in [:x0,:m0]]
 
-bn2[:ys0][.&(
-    [x in set[:e] for x in bn2[:ys0][:,:g]],
-    bn2[:ys0][:,:s].==bn2[:ys0][:,:g],
-),:value] *= 10
+    d[:ys0][.&(
+        [x in set[:e] for x in d[:ys0][:,:g]],
+        d[:ys0][:,:s].==d[:ys0][:,:g],
+    ),:value] *= 10
 
-SLiDE._disagg_hhadj!(bn2)
+    SLiDE._disagg_hhadj!(d)
+    return d
+end
+
+# bn2 = correct_bluenote!(bn2)
+# bn3 = correct_bluenote!(bn3)
+# delete!(bn3, :hhadj)
 
 # # # ----- ENERGY -----------------------------------------------------------------------------
 # # # Calculate elegen and benchmark. It works! Yay!
@@ -98,44 +108,18 @@ d[:ed0] = _module_ed0!(d, set, maps)
 d[:emarg0] = _module_emarg0!(d, set, maps)
 d[:ned0] = _module_ned0!(d)
 
-_disagg_with_shrgas!(d, set, maps)
-
-d[:mrgshr] = _module_mrgshr!(d, set)
-
 d1 = copy(d)
 
-_module_md0!(d, set)
-_module_cd0!(d)
-_module_ys0!(d, set, maps)
-_module_id0!(d, set, maps)
-_module_m0!(d)
-_module_x0!(d)
-_module_zero_prod!(d)
+disagg_energy!(d, set, maps)
 
-SLiDE._disagg_hhadj!(d)
+parameters = collect(keys(SLiDE.build_parameters("parameters")))
+# d2 = Dict(k => d[k] for k in [parameters;:inpshr])
+d3 = Dict(k => d[k] for k in parameters)
 
-d2 = Dict(k => d[k] for k in [parameters;:inpshr])
-
-# # k=:id0; d2[k] = _module_zero_prod!(d2,k)
-# # k=:x0;  d2[k] = _module_zero_prod!(d2,k)
-
-# # k=:ld0; d2[k] = _module_zero_prod!(d,k)
-# # k=:kd0; d2[k] = _module_zero_prod!(d,k)
-# # k=:ty0; d2[k] = _module_zero_prod!(d,k)
-# # k=:s0;  d2[k] = _module_zero_prod!(d,k)
-# # k=:xd0; d2[k] = _module_zero_prod!(d,k)
-# # k=:xn0; d2[k] = _module_zero_prod!(d,k)
-# # k=:rx0; d2[k] = _module_zero_prod!(d,k)
-
-
-# # d2[:inpshr] = copy(d[:inpshr])
-
-# # some md0
 dcomp = benchmark_against(d1, bn)
-dcomp1 = benchmark_against(d1, bn1)
-dcomp2 = benchmark_against(d2, merge(bn2, bn))
-
-
+# dcomp1 = benchmark_against(d1, bn1)
+# dcomp2 = benchmark_against(d2, merge(bn2, bn))
+dcomp3 = benchmark_against(d3, bn3)
 
 # # # # Could maybe figure out the crossjoin situation --
 # # # # what do we do if some of the columns overlap but others don't?
