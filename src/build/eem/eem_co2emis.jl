@@ -24,7 +24,7 @@ function eem_co2emis!(d::Dict, set::Dict, maps::Dict)
     id = [:btu,:co2perbtu] => :value
     
     col = propertynames(d[:energy])
-    df = filter_with(d[:energy], (src=set[:e], sec=set[:sec], units="trillion btu"))
+    df = filter_with(d[:energy], (src=set[:e], sec=set[:sec], units=BTU))
     df = operate_over(df, maps[:co2perbtu]; id=id, units=maps[:operate])
 
     df[!,:value] .= df[!,:factor] .* df[!,:co2perbtu] .* df[!,:btu]

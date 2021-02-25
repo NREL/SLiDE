@@ -17,7 +17,8 @@ function disagg_energy!(d, set, maps)
     # Update household disaggregation.
     SLiDE._disagg_hhadj!(d)
 
-    drop_small!(d)
+    # Need to keep small values until after we've built emissions info.
+    # drop_small!(d)
     
     return d, set, maps
 end

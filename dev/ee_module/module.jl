@@ -1,3 +1,13 @@
+# Things that can be done better:
+#   1. Mapping with renaming.
+#   2. Operations over dataframes where not all units map -- should probably filter input so this isn't a problem.
+#   3. Operations over dataframes where one has units and another doesn't [_module_co2emiss]
+#   4. Use this on the condition that another index exists/doesn't exist [ex: ys0 on some p*0 calculations].
+#   5. If NaN, use a different average.
+#   6. Sometimes fill zeros, sometimes don't? [ex: inpshr]
+#   7. How similar is bn[:co2emiss] to bn[:co2emis]?
+#   8. When are there missings after indexjoin?
+
 using SLiDE
 using DataFrames
 import CSV
@@ -5,10 +15,12 @@ import Statistics
 
 # Include development utilities.
 f_dev = joinpath(SLIDE_DIR,"dev","ee_module")
-include(joinpath(f_dev,"module_constants.jl"))
+# include(joinpath(f_dev,"inpshr.jl"))
 
 f_eem = joinpath(SLIDE_DIR,"src","build","eem")
+
 include(joinpath(f_eem,"eem_bluenote.jl"))
+include(joinpath(f_eem,"build_emissions.jl"))
 include(joinpath(SLIDE_DIR,"src/build/disagg/disagg_energy.jl"))
 
 f_bench = joinpath("dev","readfiles")
@@ -110,16 +122,24 @@ d[:ned0] = _module_ned0!(d)
 
 d1 = copy(d)
 
+
 disagg_energy!(d, set, maps)
+build_emissions!(d, set, maps)
+drop_small!(d)
 
-parameters = collect(keys(SLiDE.build_parameters("parameters")))
+# dxadj = vcat(DataFrame(g=set[:e], s="ele"), DataFrame(g="cru", s="oil"));
+# dfbn = filter_with(bn[:secco2], Not(idxadj))
+
+
+
+# parameters = collect(keys(SLiDE.build_parameters("parameters")))
 # d2 = Dict(k => d[k] for k in [parameters;:inpshr])
-d3 = Dict(k => d[k] for k in parameters)
+# d3 = Dict(k => d[k] for k in parameters)
 
-dcomp = benchmark_against(d1, bn)
+# dcomp = benchmark_against(d1, bn)
 # dcomp1 = benchmark_against(d1, bn1)
 # dcomp2 = benchmark_against(d2, merge(bn2, bn))
-dcomp3 = benchmark_against(d3, bn3)
+# dcomp3 = benchmark_against(d3, bn3)
 
 # # # # Could maybe figure out the crossjoin situation --
 # # # # what do we do if some of the columns overlap but others don't?
