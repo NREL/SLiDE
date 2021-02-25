@@ -7,6 +7,16 @@ const BUILD_STEPS = ["partition", "share", "calibrate", "disagg"];
 const PARAM_DIR = "parameters"
 const SET_DIR = "sets"
 
+# UNITS
+const BTU = "trillion btu"
+const KWH = "billion kilowatthours"
+const USD = "billions of us dollars (USD)"
+const USD_PER_KWH = "us dollars (USD) per thousand kilowatthour"
+const USD_PER_BTU = "us dollars (USD) per million btu"
+const BTU_PER_BARREL = "million btu per barrel"
+const POPULATION = "thousand"
+const CHAINED_USD = "millions of chained 2009 us dollars (USD)"
+
 # CALIBRATION
 const DEFAULT_PENALTY_NOKEY = 1e4
 const DEFAULT_CALIBRATE_LOWER_BOUND = 0.1
