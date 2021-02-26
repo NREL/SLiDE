@@ -179,14 +179,14 @@ export SUB_ELAST
 export TRANS_ELAST
 export MODEL_LOWER_BOUND
 
-global BTU
-global KWH
-global USD
-global USD_PER_KWH
-global USD_PER_BTU
-global BTU_PER_BARREL
-global POPULATION
-global CHAINED_USD
+export BTU
+export KWH
+export USD
+export USD_PER_KWH
+export USD_PER_BTU
+export BTU_PER_BARREL
+export POPULATION
+export CHAINED_USD
 
 # TYPES
 include(joinpath("parse", "generated_check", "includes.jl"))

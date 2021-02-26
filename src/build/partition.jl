@@ -48,10 +48,10 @@ function partition(
     
     _partition_mrg0!(d, set)
     _partition_md0!(d, set)  # mrg0, trn0
-    _partition_ms0!(d)       # mrg0, trn0
+    _partition_ms0!(d, set)  # mrg0, trn0
     
     # _partition_fs0!(d)       # fd0
-    _partition_s0!(d)        # ys0
+    _partition_s0!(d, set)     # ys0
     
     _partition_y0!(d, set)   # ms0, fs0, ys0
     _partition_a0!(d, set)   # fd0, id0
@@ -146,6 +146,18 @@ function _partition_io!(d::Dict, set::Dict)
 end
 
 
+function _partition_ys0!(d::Dict, set::Dict)
+    !haskey(d, :ys0) && _partition_io!(d, set)
+    return d[:ys0]
+end
+
+
+function _partition_id0!(d::Dict, set::Dict)
+    !haskey(d, :id0) && _partition_io!(d, set)
+    return d[:id0]
+end
+
+
 """
 `a(yr,g)`, Armington supply
 
@@ -154,9 +166,14 @@ end
 ```
 """
 function _partition_a0!(d::Dict, set::Dict)
-    println("  Partitioning a0, Armington supply")
-    d[:a0] = combine_over(d[:fd0], :fd) + combine_over(d[:id0], :s)
-    d[:a0] = _remove_imrg(d[:a0], :g => set[:imrg])
+    if !haskey(d,:a0)
+        _partition_fs0!(d, set)
+        _partition_id0!(d, set)
+
+        println("  Partitioning a0, Armington supply")
+        d[:a0] = combine_over(d[:fd0], :fd) + combine_over(d[:id0], :s)
+        d[:a0] = _remove_imrg(d[:a0], :g => set[:imrg])
+    end
     return d[:a0]
 end
 
@@ -170,8 +187,10 @@ end
 ```
 """
 function _partition_bop!(d::Dict, set::Dict)
-    println("  Partitioning bopdef0, balance of payments deficit")
-    d[:bopdef] = fill_zero((yr = set[:yr], ))
+    if !haskey(d,:bopdef)
+        println("  Partitioning bopdef0, balance of payments deficit")
+        d[:bopdef] = fill_zero((yr=set[:yr], ))
+    end
     return d[:bopdef]
 end
 
@@ -185,8 +204,10 @@ end
 ```
 """
 function _partition_cif0!(d::Dict, set::Dict)
-    println("  Partitioning CIF/FOB adjustments on imports")
-    d[:cif0] = filter_with(d[:supply], (g = set[:g], s = "ciffob"); drop = true)
+    if !haskey(d, :cif0)
+        println("  Partitioning CIF/FOB adjustments on imports")
+        d[:cif0] = filter_with(d[:supply], (g=set[:g], s="ciffob"); drop=true)
+    end
     return d[:cif0]
 end
 
@@ -200,9 +221,11 @@ end
 ```
 """
 function _partition_duty0!(d::Dict, set::Dict)
-    println("  Partitioning duty0, import duties")
-    d[:duty0] = filter_with(d[:supply], (g = set[:g], s = "duties"); drop = true)
-    d[:duty0] = _remove_imrg(d[:duty0], :g => set[:imrg])
+    if !haskey(d, :duty0)
+        println("  Partitioning duty0, import duties")
+        d[:duty0] = filter_with(d[:supply], (g=set[:g], s="duties"); drop=true)
+        d[:duty0] = _remove_imrg(d[:duty0], :g => set[:imrg])
+    end
     return d[:duty0]
 end
 
@@ -256,15 +279,15 @@ end
 ```
 """
 function _partition_fd0!(d::Dict, set::Dict)
-    println("  Partitioning fd0, final demand")
-    d[:fd0] = filter_with(d[:use], (g = set[:g],  s = set[:fd]))
-    d[:fd0] = edit_with(d[:fd0], Rename(:s, :fd))
+    !haskey(d,:fd0) && _partition_fd!(d, set)
+    # println("  Partitioning fd0, final demand")
+    # d[:fd0] = filter_with(d[:use], (g=set[:g], s=set[:fd]))
+    # d[:fd0] = edit_with(d[:fd0], Rename(:s, :fd))
     return d[:fd0]
 end
 
 
 """
-`fd(yr,g,fd)`, final demand, and
 `fs(yr,g)`, household supply
 
 ```math
@@ -274,11 +297,13 @@ end
 \\tilde{fs}_{yr,g} = - \\min\\left\\{0, \\tilde{fs}_{yr,g} \\right\\}
 ```
 """
-function _partition_fs0!(d::Dict)
-    println("  Partitioning fs0, household supply")
-    d[:fs0] = filter_with(d[:fd0], (fd=["pce","C"],); drop=true)
-    d[:fs0][!,:value] .= - min.(d[:fs0][:,:value], 0)
-    return dropzero!(d[:fs0])
+function _partition_fs0!(d::Dict, set::Dict)
+    !haskey(d, :fs0) && _partition_fd!(d, set)
+    # println("  Partitioning fs0, household supply")
+    # d[:fs0] = filter_with(d[:fd0], (fd=["pce","C"],); drop=true)
+    # d[:fs0][!,:value] .= - min.(d[:fs0][:,:value], 0)
+    # return dropzero!(d[:fs0])
+    return d[:fs0]
 end
 
 
@@ -298,14 +323,18 @@ Adjust transport margins according to CIF/FOB adjustments:
 ```
 """
 function _partition_m0!(d::Dict, set::Dict)
-    println("  Partitioning m0, imports")
-    d[:m0]  = filter_with(d[:supply], (g=set[:g], s="imports"); drop = true)
+    if !haskey(d, :m0)
+        _partition_cif0!(d, set)
 
-    # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
-    # Insurance imports are specified as net of adjustments.
-    if d[:sector]==:summary
-        d[:m0] += filter_with(d[:cif0], (g = "ins",))
-        d[:m0] = _remove_imrg(d[:m0], :g => set[:imrg])
+        println("  Partitioning m0, imports")
+        d[:m0] = filter_with(d[:supply], (g=set[:g], s="imports"); drop=true)
+
+        # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
+        # Insurance imports are specified as net of adjustments.
+        if d[:sector]==:summary
+            d[:m0] += filter_with(d[:cif0], (g="ins",))
+            d[:m0] = _remove_imrg(d[:m0], :g => set[:imrg])
+        end
     end
     return d[:m0]
 end
@@ -327,12 +356,17 @@ end
 ```
 """
 function _partition_md0!(d::Dict, set::Dict)
-    println("  Partitioning md0, margin demand")
-    d[:md0] = [edit_with(d[:mrg0], Add(:m, "trd")); edit_with(d[:trn0], Add(:m, "trn"))]
-    d[:md0] = sort(d[:md0][:,[:yr,:m,:g,:value]])
-    d[:md0] = _remove_imrg(d[:md0], :g => set[:imrg])
+    if !haskey(d, :md0)
+        _partition_mrg0!(d, set)
+        _partition_trn0!(d, set)
 
-    d[:md0][!,:value] .= max.(d[:md0][:,:value], 0)
+        println("  Partitioning md0, margin demand")
+        d[:md0] = [edit_with(d[:mrg0], Add(:m, "trd")); edit_with(d[:trn0], Add(:m, "trn"))]
+        d[:md0] = sort(d[:md0][:,[:yr,:m,:g,:value]])
+        d[:md0] = _remove_imrg(d[:md0], :g => set[:imrg])
+
+        d[:md0][!,:value] .= max.(d[:md0][:,:value], 0)
+    end
     return d[:md0]
 end
 
@@ -352,12 +386,18 @@ end
 \\end{aligned}
 ```
 """
-function _partition_ms0!(d::Dict)
-    println("  Partitioning ms0, margin supply")
-    d[:ms0] = [edit_with(d[:mrg0], Add(:m, "trd")); edit_with(d[:trn0], Add(:m, "trn"))]
-    d[:ms0] = sort(d[:ms0][:,[:yr,:g,:m,:value]])
+function _partition_ms0!(d::Dict, set::Dict)
+    if !haskey(d, :ms0)
+        _partition_mrg0!(d, set)
+        _partition_trn0!(d, set)
 
-    d[:ms0][!,:value] .= max.(-d[:ms0][:,:value], 0)
+        println("  Partitioning ms0, margin supply")
+        d[:ms0] = [edit_with(d[:mrg0], Add(:m, "trd")); edit_with(d[:trn0], Add(:m, "trn"))]
+        d[:ms0] = sort(d[:ms0][:,[:yr,:g,:m,:value]])
+
+        d[:ms0][!,:value] .= max.(-d[:ms0][:,:value], 0)
+    end
+
     return d[:ms0]
 end
 
@@ -371,8 +411,11 @@ end
 ```
 """
 function _partition_mrg0!(d::Dict, set::Dict)
-    println("  Partitioning mrg0, trade margins")
-    d[:mrg0] = filter_with(d[:supply], (g = set[:g], s = "margins"); drop = true)
+    if !haskey(d, :mrg0)
+        println("  Partitioning mrg0, trade margins")
+        d[:mrg0] = filter_with(d[:supply], (g=set[:g], s="margins"); drop=true)
+    end
+
     return d[:mrg0]
 end
 
@@ -384,9 +427,14 @@ end
 \\tilde{s}_{yr,s} = \\sum_{g}\\tilde{ys}_{yr,s,g}
 ```
 """
-function _partition_s0!(d::Dict)
-    println("  Partitioning s0, aggregate supply")
-    d[:s0] = edit_with(combine_over(d[:ys0], :g), Rename(:s,:g))
+function _partition_s0!(d::Dict, set::Dict)
+    if !haskey(d,:s0)
+        _partition_ys0!(d, set)
+
+        println("  Partitioning s0, aggregate supply")
+        d[:s0] = edit_with(combine_over(d[:ys0], :g), Rename(:s,:g))
+    end
+
     return d[:s0]
 end
 
@@ -406,10 +454,12 @@ Treat negative inputs as outputs:
 ```
 """
 function _partition_sbd0!(d::Dict, set::Dict)
-    println("  Partitioning sbd0, subsidies on products")
-    d[:sbd0] = filter_with(d[:supply], (g = set[:g], s = "subsidies"); drop = true)
-    d[:sbd0] = _remove_imrg(d[:sbd0], :g => set[:imrg])
-    d[:sbd0][!,:value] *= -1
+    if !haskey(d,:sbd0)
+        println("  Partitioning sbd0, subsidies on products")
+        d[:sbd0] = filter_with(d[:supply], (g=set[:g], s="subsidies"); drop=true)
+        d[:sbd0] = _remove_imrg(d[:sbd0], :g => set[:imrg])
+        d[:sbd0][!,:value] *= -1
+    end
     return d[:sbd0]
 end
 
@@ -422,12 +472,14 @@ end
 ```
 """
 function _partition_ta0!(d::Dict, set::Dict)
-    println("  Partitioning ta0(yr,g), import tariffs")
-    !(:tax0 in keys(d)) && _partition_tax0!(d, set)
-    !(:sbd0 in keys(d)) && _partition_sbd0!(d, set)
+    if !haskey(d, :ta0)
+        println("  Partitioning ta0(yr,g), import tariffs")
+        !haskey(d, :tax0) && _partition_tax0!(d, set)
+        !haskey(d, :sbd0) && _partition_sbd0!(d, set)
 
-    d[:ta0] = dropnan((d[:tax0] - d[:sbd0]) / d[:a0])
-    # d[:ta0] = edit_with(d[:ta0], Replace(:units, "billions of us dollars (USD)", "USD/USD"))
+        d[:ta0] = dropnan((d[:tax0] - d[:sbd0]) / d[:a0])
+        # d[:ta0] = edit_with(d[:ta0], Replace(:units, "billions of us dollars (USD)", "USD/USD"))
+    end
     return d[:ta0]
 end
 
@@ -441,9 +493,11 @@ end
 ```
 """
 function _partition_tax0!(d::Dict, set::Dict)
-    println("  Partitioning tax0, taxes on products")
-    d[:tax0] = filter_with(d[:supply], (g = set[:g], s = "tax"); drop = true)
-    d[:tax0] = _remove_imrg(d[:tax0], :g => set[:imrg])
+    if !haskey(d, :tax0)
+        println("  Partitioning tax0, taxes on products")
+        d[:tax0] = filter_with(d[:supply], (g=set[:g], s="tax"); drop=true)
+        d[:tax0] = _remove_imrg(d[:tax0], :g => set[:imrg])
+    end
     return d[:tax0]
 end
 
@@ -456,10 +510,14 @@ end
 ```
 """
 function _partition_tm0!(d::Dict, set::Dict)
-    println("  Partitioning tm0, tax net subsidy rate on intermediate demand")
-    !(:duty0 in keys(d)) && _partition_duty0!(d, set)
-    d[:tm0] = dropnan(d[:duty0] / d[:m0])
-    # d[:tm0] = edit_with(d[:tm0], Replace(:units, "billions of us dollars (USD)", "USD/USD"))
+    if !haskey(d, :tm0)
+        println("  Partitioning tm0, tax net subsidy rate on intermediate demand")
+        !haskey(d, :duty0) && _partition_duty0!(d, set)
+        !haskey(d, :m0) && _partition_m0!(d, set)
+
+        d[:tm0] = dropnan(d[:duty0] / d[:m0])
+        # d[:tm0] = edit_with(d[:tm0], Replace(:units, "billions of us dollars (USD)", "USD/USD"))
+    end
     return d[:tm0]
 end
 
@@ -478,12 +536,16 @@ end
 ```
 """
 function _partition_trn0!(d::Dict, set::Dict)
-    println("  Partitioning trn0, transportation costs")
-    d[:trn0]  = filter_with(d[:supply], (g = set[:g], s = "trncost"); drop = true)
-    
-    # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
-    # Insurance imports are specified as net of adjustments.
-    d[:trn0] += edit_with(d[:cif0], Drop(:g,"ins","=="))
+    if !haskey(d, :trn0)
+        _partition_cif0!(d, set)
+
+        println("  Partitioning trn0, transportation costs")
+        d[:trn0]  = filter_with(d[:supply], (g=set[:g], s="trncost"); drop=true)
+        
+        # Adjust transport margins for transport sectors according to CIF/FOB adjustments.
+        # Insurance imports are specified as net of adjustments.
+        d[:trn0] += edit_with(d[:cif0], Drop(:g,"ins","=="))
+    end
     return d[:trn0]
 end
 
@@ -503,10 +565,12 @@ Treat negative inputs as outputs:
 ```
 """
 function _partition_ts0!(d::Dict, set::Dict)
-    println("  Partitioning ts0, taxes and subsidies")
-    d[:ts0] = filter_with(d[:use], (g = set[:ts], s = set[:s]))
-    d[:ts0] = edit_with(d[:ts0], Rename(:g, :ts))
-    d[:ts0][d[:ts0][:,:ts] .== "subsidies", :value] *= -1  # treat negative inputs as outputs
+    if !haskey(d, :ts0)
+        println("  Partitioning ts0, taxes and subsidies")
+        d[:ts0] = filter_with(d[:use], (g=set[:ts], s=set[:s]))
+        d[:ts0] = edit_with(d[:ts0], Rename(:g, :ts))
+        d[:ts0][d[:ts0][:,:ts] .== "subsidies", :value] *= -1  # treat negative inputs as outputs
+    end
     return d[:ts0]
 end
 
@@ -520,9 +584,11 @@ end
 ```
 """
 function _partition_va0!(d::Dict, set::Dict)
-    println("  Partitioning va0, value added")
-    d[:va0] = filter_with(d[:use], (g = set[:va], s = set[:s]))
-    d[:va0] = edit_with(d[:va0], Rename(:g, :va))
+    if !haskey(d, :va0)
+        println("  Partitioning va0, value added")
+        d[:va0] = filter_with(d[:use], (g=set[:va], s=set[:s]))
+        d[:va0] = edit_with(d[:va0], Rename(:g, :va))
+    end
     return d[:va0]
 end
 
@@ -536,9 +602,11 @@ end
 ```
 """
 function _partition_x0!(d::Dict, set::Dict)
-    println("  Partitioning x0, exports of goods and services")
-    d[:x0] = filter_with(d[:use], (g = set[:g], s = "exports"); drop = true)
-    d[:x0] = _remove_imrg(d[:x0], :g => set[:imrg])
+    if !haskey(d, :x0)
+        println("  Partitioning x0, exports of goods and services")
+        d[:x0] = filter_with(d[:use], (g=set[:g], s="exports"); drop=true)
+        d[:x0] = _remove_imrg(d[:x0], :g => set[:imrg])
+    end
     return d[:x0]
 end
 
@@ -553,14 +621,19 @@ from which some may be exported. Net out margin supply from output."
 ```
 """
 function _partition_y0!(d::Dict, set::Dict)
-    println("  Partitioning y0, gross output")
+    if !haskey(d, :y0)
+        _partition_ys0!(d, set)
+        _partition_fs0!(d, set)
+        _partition_ms0!(d, set)
+        
+        println("  Partitioning y0, gross output")
+        d[:y0] = if d[:sector]==:summary
+            combine_over(d[:ys0], :s) + d[:fs0] - combine_over(d[:ms0], :m)
+        elseif d[:sector]==:detail
+            combine_over(d[:ys0], :s) + d[:fs0]
+        end
 
-    d[:y0] = if d[:sector]==:summary
-        combine_over(d[:ys0], :s) + d[:fs0] - combine_over(d[:ms0], :m)
-    elseif d[:sector]==:detail
-        combine_over(d[:ys0], :s) + d[:fs0]
+        d[:y0] = _remove_imrg(d[:y0], :g => set[:imrg])
     end
-
-    d[:y0] = _remove_imrg(d[:y0], :g => set[:imrg])
     return d[:y0]
 end
