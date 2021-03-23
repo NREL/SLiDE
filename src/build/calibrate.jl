@@ -252,6 +252,7 @@ function _calibration_set!(set)
     !haskey(set, :i) && (set[:i] = set[:g])
     !haskey(set, :j) && (set[:j] = set[:s])
 
+    !haskey(set, (:r,:m)) && SLiDE.add_permutation!(set, (:r,:m))
     !haskey(set, (:r,:g)) && SLiDE.add_permutation!(set, (:r,:g))
     !haskey(set, (:r,:s)) && SLiDE.add_permutation!(set, (:r,:s))
     !haskey(set, (:r,:g,:s)) && SLiDE.add_permutation!(set, (:r,:g,:s))

@@ -12,15 +12,15 @@
 
 Manifest.toml
 
-admin/
-calibrate/
-# dev/
-deps/*.log
-docs/build/
-examples/
-test
+/admin/
+/calibrate/
+# /dev/
+/deps/*.log
+/docs/build/
+/examples/
+/test
 
-dev/*.jl
+# dev/*.jl
 dev/bluenote_sets
 dev/buildstream
 dev/experiments
