@@ -1,276 +1,183 @@
-"""
-    calibrate(d::Dict, set::Dict; save_build=true, overwrite=false)
-    calibrate(year::Int, d::Dict, set::Dict)
-
-# Arguments
-- `d::Dict` of DataFrames containing the model data.
-- `set::Dict` of Arrays describing region, sector, final demand, etc.
-- `year::Int`: year for which to perform calibration
-
-# Keywords
-- `save_build = true`
-- `overwrite = false`
-See [`SLiDE.build`](@ref) for keyword argument descriptions.
-
-# Returns
-- `d::Dict` of DataFrames containing the model data at the calibration step.
-"""
-function calibrate(
+function calibrate_national(
     dataset::String,
-    d::Dict,
+    io::Dict,
     set::Dict;
-    save_build::Bool=DEFAULT_SAVE_BUILD,
-    overwrite::Bool=DEFAULT_OVERWRITE,
-    penalty_nokey::AbstractFloat=DEFAULT_PENALTY_NOKEY,
+    save_build::Bool=SLiDE.DEFAULT_SAVE_BUILD,
+    overwrite::Bool=SLiDE.DEFAULT_OVERWRITE,
+    penalty_nokey::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
 )
-    CURR_STEP = "calibrate"
+    subset = "calibrate"
 
     # If there is already calibration data, read it and return.
-    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
+    d_read = SLiDE.read_build(dataset, subset; overwrite=overwrite)
     !(isempty(d_read)) && (return d_read)
     
-    # Copy the relevant input DataFrames before making any changes.
-    _calibration_set!(set)
-    d = Dict(k => copy(d[k]) for k in set[:cal])
-    
     # Initialize a DataFrame to contain results and do the calibration iteratively.
-    cal = Dict(k => DataFrame() for k in set[:cal])
+    cal = Dict(k => DataFrame() for k in list_parameters!(set, :calibrate))
 
     for year in set[:yr]
-        cal_yr = calibrate(year, d, set; penalty_nokey = penalty_nokey)
-        [cal[k] = [cal[k]; cal_yr[k]] for k in set[:cal]]
+        cal_yr = calibrate_national(io, set, year; penalty_nokey=penalty_nokey)
+        [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
     end
+    
+    # If no DataFrame was returned by the annual calibrations, replace this with the input.
+    [cal[k] = io[k] for (k,df) in cal if isempty(df)]
 
-    write_build!(dataset, CURR_STEP, cal; save_build = save_build)
+    SLiDE.write_build!(dataset, subset, cal; save_build=save_build)
     return cal
 end
 
 
-function calibrate(
-    year::Int,
+function calibrate_national(
     io::Dict,
-    set::Dict;
+    set::Dict,
+    year::Int;
     penalty_nokey::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
+    # multipliers for lower and upper bound relative
+    # to each respective variables reference parameter
+    lower_bound = SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND,
+    upper_bound = SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND,
 )
     @info("Calibrating $year data")
 
-    # Prepare the data and initialize the model.
-    SLiDE._calibration_set!(set)
-    cal = SLiDE._national_calibration_input(io, set, year)
-    # (cal, idx) = SLiDE._calibration_input(year, io, set);
-    calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time" => 60.0))
+    # Save relevant sets to simplify things a little.
+    S, G, M, VA, FD = set[:s], set[:g], set[:m], set[:va], set[:fd]
     
-    @variable(calib, ys0_est[j in set[:j], i in set[:i]]   >= 0, start = cal[:ys0][j,i]);
-    @variable(calib, fs0_est[i in set[:i]]                 >= 0, start = 0);
-    @variable(calib, ms0_est[i in set[:i], m in set[:m]]   >= 0, start = 0);
-    @variable(calib, y0_est[i in set[:i]]                  >= 0, start = 0);
-    @variable(calib, id0_est[i in set[:i],j in set[:j]]    >= 0, start = 0);
-    @variable(calib, fd0_est[i in set[:i], fd in set[:fd]] >= 0, start = 0);
-    @variable(calib, va0_est[va in set[:va], j in set[:j]] >= 0, start = 0);
-    @variable(calib, a0_est[i in set[:i]]                  >= 0, start = 0);
-    @variable(calib, x0_est[i in set[:i]]                  >= 0, start = 0);
-    @variable(calib, m0_est[i in set[:i]]                  >= 0, start = 0);
-    @variable(calib, md0_est[m in set[:m], i in set[:i]]   >= 0, start = 0);
+    SLiDE._calibration_set!(set; final_demand=true, value_added=true)
+    d = SLiDE._national_calibration_input(io, set, year;
+        lower_bound=lower_bound,
+        upper_bound=upper_bound,
+    )
+    
+    calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time"=>60.0))
+    
+    @variables(calib, begin
+        fd0[g in G, fd in FD], (start=d[:fd0][g,fd], lower_bound=d[:fd0_lb][g,fd], upper_bound=d[:fd0_ub][g,fd])
+        va0[va in VA, s in S], (start=d[:va0][va,s], lower_bound=d[:va0_lb][va,s], upper_bound=d[:va0_ub][va,s])
+        id0[g in G, s in S], (start=d[:id0][g,s], lower_bound=d[:id0_lb][g,s], upper_bound=d[:id0_ub][g,s])
+        ys0[s in S, g in G], (start=d[:ys0][s,g], lower_bound=d[:ys0_lb][s,g], upper_bound=d[:ys0_ub][s,g])
+        md0[m in M, g in G], (start=d[:md0][m,g], lower_bound=d[:md0_lb][m,g], upper_bound=d[:md0_ub][m,g])
+        ms0[g in G, m in M], (start=d[:ms0][g,m], lower_bound=d[:ms0_lb][g,m], upper_bound=d[:ms0_ub][g,m])
+        a0[g in G],  (start=d[:a0][g], lower_bound=d[:a0_lb][g],  upper_bound=d[:a0_ub][g])
+        m0[g in G],  (start=d[:m0][g], lower_bound=d[:m0_lb][g],  upper_bound=d[:m0_ub][g])
+        x0[g in G],  (start=d[:x0][g], lower_bound=d[:x0_lb][g],  upper_bound=d[:x0_ub][g])
+        y0[g in G],  (start=d[:y0][g], lower_bound=d[:y0_lb][g],  upper_bound=d[:y0_ub][g])
+        fs0[g in G], (start=d[:fs0][g],lower_bound=d[:fs0_lb][g], upper_bound=d[:fs0_ub][g])
+    end)
 
     # --- DEFINE CONSTRAINTS ---------------------------------------------------------------
-    @constraint(calib,mkt_py[i in set[:i]],
-        sum(ys0_est[j,i] for j in set[:j]) + fs0_est[i] ==
-        sum(ms0_est[i,m] for m in set[:m]) + y0_est[i]
-    );
+    # Market clearing conditions
+    @constraints(calib, begin
+        mkt_py[g in G], sum(ys0[s,g] for s in S) + fs0[g] == sum(ms0[g,m] for m in set[:m]) + y0[g]
+        mkt_pa[g in G], a0[g] == sum(id0[g,s] for s in S) + sum(fd0[g,fd] for fd in FD)
+        mkt_pm[m in set[:m]], sum(ms0[g,m] for g in G) == sum(md0[m,g] for g in G)
+    end)
 
-    @constraint(calib,mkt_pa[i in set[:i]],
-        a0_est[i] ==
-        sum(id0_est[i,j] for j in set[:j]) + sum(fd0_est[i,fd] for fd in set[:fd])
-    );
-
-    @constraint(calib,mkt_pm[m in set[:m]],
-        sum(ms0_est[i,m] for i in set[:i]) ==
-        sum(md0_est[m,i] for i in set[:i])
-    );
-
-    @constraint(calib,prf_y[j in set[:j]],
-        sum(ys0_est[j,i] for i in set[:i]) ==
-        sum(id0_est[i,j] for i in set[:i]) + sum(va0_est[va,j] for va in set[:va])
-    );
-
-    @constraint(calib,prf_a[i in set[:i]],
-        a0_est[i] * (1 - cal[:ta0][i]) + x0_est[i] ==
-        y0_est[i] + m0_est[i] * (1 + cal[:tm0][i]) + sum(md0_est[m,i] for m in set[:m])
-    );
-
+    # Zero profit conditions
+    @constraints(calib, begin
+        prf_y[s in S], sum(ys0[s,g] for g in G) == sum(id0[g,s] for g in G) + sum(va0[va,s] for va in VA)
+        prf_a[g in G], a0[g] * (1 - d[:ta0][g]) + x0[g] == y0[g] + m0[g] * (1 + d[:tm0][g]) + sum(md0[m,g] for m in set[:m])
+    end)
+    
     # --- DEFINE OBJECTIVE -----------------------------------------------------------------
-    @objective(calib,Min,
-        + sum(abs(cal[:ys0][j,i]) * (ys0_est[j,i] / cal[:ys0][j,i]   - 1)^2 for (j,i)  in set[:j,:i]  if cal[:ys0][j,i]  != 0)
-        + sum(abs(cal[:id0][i,j]) * (id0_est[i,j] / cal[:id0][i,j]   - 1)^2 for (i,j)  in set[:i,:j]  if cal[:id0][i,j]  != 0)
-        + sum(abs(cal[:fs0][i])   * (fs0_est[i]/ cal[:fs0][i]        - 1)^2 for  i     in set[:i]     if cal[:fs0][i]    != 0)
-        + sum(abs(cal[:ms0][i,m]) * (ms0_est[i,m]/ cal[:ms0][i,m]    - 1)^2 for (i,m)  in set[:i,:m]  if cal[:ms0][i,m]  != 0)
-        + sum(abs(cal[:y0][i])    * (y0_est[i]/ cal[:y0][i]          - 1)^2 for  i     in set[:i]     if cal[:y0][i]     != 0)
-        + sum(abs(cal[:fd0][i,fd])* (fd0_est[i,fd] / cal[:fd0][i,fd] - 1)^2 for (i,fd) in set[:i,:fd] if cal[:fd0][i,fd] != 0)
-        + sum(abs(cal[:va0][va,j])* (va0_est[va,j] / cal[:va0][va,j] - 1)^2 for (va,j) in set[:va,:j] if cal[:va0][va,j] != 0)
-        + sum(abs(cal[:a0][i])    * (a0_est[i] / cal[:a0][i]         - 1)^2 for  i     in set[:i]     if cal[:a0][i]     != 0)
-        + sum(abs(cal[:x0][i])    * (x0_est[i] / cal[:x0][i]         - 1)^2 for  i     in set[:i]     if cal[:x0][i]     != 0)
-        + sum(abs(cal[:m0][i])    * (m0_est[i] / cal[:m0][i]         - 1)^2 for  i     in set[:i]     if cal[:m0][i]     != 0)
-        + sum(abs(cal[:md0][m,i]) * (md0_est[m,i] / cal[:md0][m,i]   - 1)^2 for (m,i)  in set[:m,:i]  if cal[:md0][m,i]  != 0)
-
+    @objective(calib, Min,
+        + sum(abs(d[:fd0][g,fd])* (fd0[g,fd]/d[:fd0][g,fd] - 1)^2 for (g,fd) in set[:g,:fd] if d[:fd0][g,fd] != 0)
+        + sum(abs(d[:va0][va,s])* (va0[va,s]/d[:va0][va,s] - 1)^2 for (va,s) in set[:va,:s] if d[:va0][va,s] != 0)
+        + sum(abs(d[:id0][g,s]) * (id0[g,s]/d[:id0][g,s] - 1)^2 for (g,s) in set[:g,:s] if d[:id0][g,s] != 0)
+        + sum(abs(d[:ys0][s,g]) * (ys0[s,g]/d[:ys0][s,g] - 1)^2 for (s,g) in set[:s,:g] if d[:ys0][s,g] != 0)
+        + sum(abs(d[:ms0][g,m]) * (ms0[g,m]/d[:ms0][g,m] - 1)^2 for (g,m) in set[:g,:m] if d[:ms0][g,m] != 0)
+        + sum(abs(d[:md0][m,g]) * (md0[m,g]/d[:md0][m,g] - 1)^2 for (m,g) in set[:m,:g] if d[:md0][m,g] != 0)
+        + sum(abs(d[:fs0][g]) * (fs0[g]/d[:fs0][g] - 1)^2 for g in G if d[:fs0][g] != 0)
+        + sum(abs(d[:a0][g])  * (a0[g] /d[:a0][g]  - 1)^2 for g in G if d[:a0][g]  != 0)
+        + sum(abs(d[:m0][g])  * (m0[g] /d[:m0][g]  - 1)^2 for g in G if d[:m0][g]  != 0)
+        + sum(abs(d[:x0][g])  * (x0[g] /d[:x0][g]  - 1)^2 for g in G if d[:x0][g]  != 0)
+        + sum(abs(d[:y0][g])  * (y0[g] /d[:y0][g]  - 1)^2 for g in G if d[:y0][g]  != 0)
     + penalty_nokey * (
-        + sum(ys0_est[j,i]  for (j,i)  in set[:j,:i]  if cal[:ys0][j,i]  == 0)
-        + sum(id0_est[i,j]  for (i,j)  in set[:i,:j]  if cal[:id0][i,j]  == 0)
-        + sum(fs0_est[i]    for  i     in set[:i]     if cal[:fs0][i]    == 0)
-        + sum(ms0_est[i,m]  for (i,m)  in set[:i,:m]  if cal[:ms0][i,m]  == 0)
-        + sum(y0_est[i]     for  i     in set[:i]     if cal[:y0][i]     == 0)
-        + sum(fd0_est[i,fd] for (i,fd) in set[:i,:fd] if cal[:fd0][i,fd] == 0)
-        + sum(va0_est[va,j] for (va,j) in set[:va,:j] if cal[:va0][va,j] == 0)
-        + sum(a0_est[i]     for  i     in set[:i]     if cal[:a0][i]     == 0)
-        + sum(x0_est[i]     for  i     in set[:i]     if cal[:x0][i]     == 0)
-        + sum(m0_est[i]     for  i     in set[:i]     if cal[:m0][i]     == 0)
-        + sum(md0_est[m,i]  for (m,i)  in set[:m,:i]  if cal[:md0][m,i]  == 0)
+        + sum(fd0[g,fd] for (g,fd) in set[:g,:fd] if d[:fd0][g,fd] == 0)
+        + sum(va0[va,s] for (va,s) in set[:va,:s] if d[:va0][va,s] == 0)
+        + sum(id0[g,s] for (g,s) in set[:g,:s] if d[:id0][g,s] == 0)
+        + sum(ys0[s,g] for (s,g) in set[:s,:g] if d[:ys0][s,g] == 0)
+        + sum(ms0[g,m] for (g,m) in set[:g,:m] if d[:ms0][g,m] == 0)
+        + sum(md0[m,g] for (m,g) in set[:m,:g] if d[:md0][m,g] == 0)
+        + sum(fs0[g] for g in G if d[:fs0][g] == 0)
+        + sum(a0[g]  for g in G if d[:a0][g]  == 0)
+        + sum(m0[g]  for g in G if d[:m0][g]  == 0)
+        + sum(x0[g]  for g in G if d[:x0][g]  == 0)
+        + sum(y0[g]  for g in G if d[:y0][g]  == 0)
         )
-    );
-
-    # --- SET START VALUE ------------------------------------------------------------------
-    # [set_start_value(ys0_est[j,i], cal[:ys0][j,i])  for (j,i)  in set[:j,:i]  ]
-    [set_start_value(id0_est[i,j], cal[:id0][i,j])  for (i,j)  in set[:i,:j]  ]
-    [set_start_value(fs0_est[i],   cal[:fs0][i])    for  i     in set[:i]     ]
-    [set_start_value(ms0_est[i,m], cal[:ms0][i,m])  for (i,m)  in set[:i,:m]  ]
-    [set_start_value(y0_est[i],    cal[:y0][i])     for  i     in set[:i]     ]
-    [set_start_value(fd0_est[i,fd],cal[:fd0][i,fd]) for (i,fd) in set[:i,:fd] ]
-    [set_start_value(va0_est[va,j],cal[:va0][va,j]) for (va,j) in set[:va,:j] ]
-    [set_start_value(a0_est[i],    cal[:a0][i])     for  i     in set[:i]     ]
-    [set_start_value(x0_est[i],    cal[:x0][i])     for  i     in set[:i]     ]
-    [set_start_value(m0_est[i],    cal[:m0][i])     for  i     in set[:i]     ]
-    [set_start_value(md0_est[m,i], cal[:md0][m,i])  for (m,i)  in set[:m,:i]  ]
-
-    # --- SET BOUNDS -----------------------------------------------------------------------
-    # multipliers for lower and upper bound relative
-    # to each respective variables reference parameter
-    lb = SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND
-    ub = SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND
-
-    [set_lower_bound(ys0_est[j,i], max(0, lb * cal[:ys0][j,i]))  for (j,i)  in set[:j,:i]  ]
-    [set_lower_bound(id0_est[i,j], max(0, lb * cal[:id0][i,j]))  for (i,j)  in set[:i,:j]  ]
-    [set_lower_bound(fs0_est[i],   max(0, lb * cal[:fs0][i]))    for  i     in set[:i]     ]
-    [set_lower_bound(ms0_est[i,m], max(0, lb * cal[:ms0][i,m]))  for (i,m)  in set[:i,:m]  ]
-    [set_lower_bound(y0_est[i],    max(0, lb * cal[:y0][i]))     for  i     in set[:i]     ]
-    [set_lower_bound(fd0_est[i,fd],max(0, lb * cal[:fd0][i,fd])) for (i,fd) in set[:i,:fd] ]
-    [set_lower_bound(va0_est[va,j],max(0, lb * cal[:va0][va,j])) for (va,j) in set[:va,:j] ]
-    [set_lower_bound(a0_est[i],    max(0, lb * cal[:a0][i]))     for  i     in set[:i]     ]
-    [set_lower_bound(x0_est[i],    max(0, lb * cal[:x0][i]))     for  i     in set[:i]     ]
-    [set_lower_bound(m0_est[i],    max(0, lb * cal[:m0][i]))     for  i     in set[:i]     ]
-    [set_lower_bound(md0_est[m,i], max(0, lb * cal[:md0][m,i]))  for (m,i)  in set[:m,:i]  ]
-
-    [set_upper_bound(ys0_est[j,i], abs(ub * cal[:ys0][j,i]))  for (i,j)  in set[:i,:j]  ]
-    [set_upper_bound(id0_est[i,j], abs(ub * cal[:id0][i,j]))  for (i,j)  in set[:i,:j]  ]
-    [set_upper_bound(fs0_est[i],   abs(ub * cal[:fs0][i]))    for  i     in set[:i]     ]
-    [set_upper_bound(ms0_est[i,m], abs(ub * cal[:ms0][i,m]))  for (i,m)  in set[:i,:m]  ]
-    [set_upper_bound(y0_est[i],    abs(ub * cal[:y0][i]))     for  i     in set[:i]     ]
-    [set_upper_bound(fd0_est[i,fd],abs(ub * cal[:fd0][i,fd])) for (i,fd) in set[:i,:fd] ]
-    [set_upper_bound(va0_est[va,j],abs(ub * cal[:va0][va,j])) for (va,j) in set[:va,:j] ]
-    [set_upper_bound(a0_est[i],    abs(ub * cal[:a0][i]))     for  i     in set[:i]     ]
-    [set_upper_bound(x0_est[i],    abs(ub * cal[:x0][i]))     for  i     in set[:i]     ]
-    [set_upper_bound(m0_est[i],    abs(ub * cal[:m0][i]))     for  i     in set[:i]     ]
-    [set_upper_bound(md0_est[m,i], abs(ub * cal[:md0][m,i]))  for (m,i)  in set[:m,:i]  ]
-
+    )
+    
     # Fix "certain parameters" to their original values: fs0, va0, m0.
-    [fix(fs0_est[i],    cal[:fs0][i],    force=true) for  i     in set[:i]     ]
-    [fix(va0_est[va,j], cal[:va0][va,j], force=true) for (va,j) in set[:va,:j] ]
-    [fix(m0_est[i],     cal[:m0][i],     force=true) for  i     in set[:i]     ]
+    fix!(calib, d, set, :va0, (:va,:s))
+    fix!(calib, d, set, [:fs0,:m0], :g)
     
     # Fix other/use sector output to zero.
-    [fix(ys0_est[j,i], 0, force = true) for j in set[:oth,:use] for i in set[:i]]
+    fix!(calib, d, :ys0, [set[:oth,:use], G]; value=0)
     
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     JuMP.optimize!(calib)
 
-    # # Populate resultant Dictionary.
-    # cal = Dict(k => filter_with(io[k], (yr = year,); drop = true) for k in [:ta0,:tm0])
-    # cal[:ys0] = convert_type(DataFrame, ys0_est; cols=idx[:ys0])
-    # cal[:fs0] = convert_type(DataFrame, fs0_est; cols=idx[:fs0])
-    # cal[:ms0] = convert_type(DataFrame, ms0_est; cols=idx[:ms0])
-    # cal[:y0]  = convert_type(DataFrame, y0_est;  cols=idx[:y0])
-    # cal[:id0] = convert_type(DataFrame, id0_est; cols=idx[:id0])
-    # cal[:fd0] = convert_type(DataFrame, fd0_est; cols=idx[:fd0])
-    # cal[:va0] = convert_type(DataFrame, va0_est; cols=idx[:va0])
-    # cal[:a0]  = convert_type(DataFrame, a0_est;  cols=idx[:a0])
-    # cal[:x0]  = convert_type(DataFrame, x0_est;  cols=idx[:x0])
-    # cal[:m0]  = convert_type(DataFrame, m0_est;  cols=idx[:m0])
-    # cal[:md0] = convert_type(DataFrame, md0_est; cols=idx[:md0])
-
-    # # Add the year back to the DataFrame and return.
-    # x = Add(:yr, year)
-    # [cal[k] = edit_with(df, x)[:, [:yr; idx[k]; :value]] for (k, df) in cal]
-    return calib
+    return _calibration_output(calib, set, year; region=false)
+    # return calib
 end
 
 
 """
-    _calibration_input(year::Int, d::Dict, set::Dict)
-This function prepares the input for the calibration routine:
-    1. Select parameters relevant to the calibration routine.
-    2. For all parameters except taxes (ta0, tm0), set negative values to zero.
-        In the case of final demand, only set negative values to zero for
-        `fd = pce`.
-    3. Fill all "missing" values with zeros to generate a complete dataset. This is relevant
-        to how the penalty for missing keys is applied in the objective function.
+This function prepares
+- Filling zeros
+- 
+
+```math
+\\begin{aligned}
+x = max\\left\\{0, x\\right\\}
+fd_{g,fd} = max\\{0, fd_{g,fd}\\}
+```
 
 # Arguments
-- `yr::Int`
-- `d::Dict{Symbol,DataFrame}` of input DataFrames.
+- `d::Dict{Symbol,DataFrame}`: all input *parameters*
+- `set::Dict`
+- `year::Int` overwhich to calibrate
 
 # Returns
-- `cal::Dict{Symbol,Dict}`
+- `d::Dict{Symbol, Dict}`: input *variables*. Input *variables* include all input parameters
+    with the exception of taxes (`ta0`,`tm0`,`ty0`).
 """
-function _calibration_input(year::Int, d::Dict{Symbol,DataFrame}, set::Dict)
-    param = Dict()
+function _national_calibration_input(d, set;
+    lower_bound=SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND,
+    upper_bound=SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND,
+    zero_negative::Bool=true,
+)
+    variables = setdiff(SLiDE.list_parameters!(set,:calibrate), SLiDE.list_parameters!(set,:taxes))
 
-    param[:cal] = set[:cal]
-    param[:tax] = [:ta0, :tm0]
-    param[:var] = setdiff(param[:cal], param[:tax])
+    # Fill zeros.
+    d = Dict(k => fill_zero(df; with=set) for (k,df) in d)
+    
+    # Handle negatives.
+    if haskey(d,:fd0)
+        SLiDE.zero_negative!(d[:fd0], :fd=>"pce")
+        SLiDE.zero_negative!(d[:fd0], :fd=>"C")
+    end
+    SLiDE.zero_negative!(d, setdiff(variables, [:fd0]))
 
-    # Isolate the current year.
-    d = Dict(k => fill_zero(filter_with(d[k], (yr=year,); drop=true); with=set)
-        for k in param[:cal])
+    # Set bounds.
+    SLiDE.set_lower_bound!(d, variables; factor=lower_bound, zero_negative=zero_negative)
+    SLiDE.set_upper_bound!(d, variables; factor=upper_bound, zero_negative=zero_negative)
 
-    # Save the DataFrame indices in correct order. This will be used to convert the
-    # calibration output back into DataFrames.
-    idx = Dict(k => findindex(df) for (k,df) in d)
-
-    # Set negative values to zero. In the case of final demand,
-    # only set negative values to zero for fd = pce.
-     d[:fd0][.&(d[:fd0][:,:fd] .== "pce", d[:fd0][:,:value] .< 0),:value] .= 0.0
-     d[:fd0][.&(d[:fd0][:,:fd] .== "C", d[:fd0][:,:value] .< 0),:value] .= 0.0
-    [d[k][d[k][:,:value] .< 0, :value] .= 0.0 for k in param[:var] if k !== :fd0]
-
-    # Convert the calibration input into DataFrames. Fill zeros for taxes; drop otherwise. 
-    cal = Dict(k => convert_type(Dict, d[k]) for k in param[:cal])
-    return (cal, idx)
+    d = Dict{Symbol,Dict}(k => convert_type(Dict, df) for (k,df) in d)
+    return d
 end
 
 
-"""
-"""
-function _calibration_set!(set)
-    # !!!! replace in usage.
-    !haskey(set, :i) && (set[:i] = set[:g])
-    !haskey(set, :j) && (set[:j] = set[:s])
-
-    !haskey(set, (:r,:m)) && SLiDE.add_permutation!(set, (:r,:m))
-    !haskey(set, (:r,:g)) && SLiDE.add_permutation!(set, (:r,:g))
-    !haskey(set, (:r,:s)) && SLiDE.add_permutation!(set, (:r,:s))
-    !haskey(set, (:r,:g,:s)) && SLiDE.add_permutation!(set, (:r,:g,:s))
-    !haskey(set, (:r,:s,:g)) && SLiDE.add_permutation!(set, (:r,:s,:g))
-    !haskey(set, (:r,:g,:m)) && SLiDE.add_permutation!(set, (:r,:g,:m))
-    !haskey(set, (:r,:m,:g)) && SLiDE.add_permutation!(set, (:r,:m,:g))
-    
-    !haskey(set, (:i,:j)) && SLiDE.add_permutation!(set, (:i,:j))
-    !haskey(set, (:j,:i)) && SLiDE.add_permutation!(set, (:j,:i))
-    !haskey(set, (:i,:m)) && SLiDE.add_permutation!(set, (:i,:m))
-    !haskey(set, (:m,:i)) && SLiDE.add_permutation!(set, (:m,:i))
-    !haskey(set, (:i,:fd)) && SLiDE.add_permutation!(set, (:i,:fd))
-    !haskey(set, (:va,:j)) && SLiDE.add_permutation!(set, (:va,:j))
-
-    if !haskey(set,:cal)
-        set[:cal] = Symbol.(read_file([SLIDE_DIR,"src","build","parameters"],
-            SetInput("list_calibrate.csv", :cal)))
-    end
-    return set
+function _national_calibration_input(d, set, year;
+    lower_bound=SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND,
+    upper_bound=SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND,
+    zero_negative::Bool=true,
+)
+    d = Dict(k => filter_with(df, (yr=year,); drop=true) for (k,df) in d)
+    d = _national_calibration_input(d, set;
+        lower_bound=lower_bound,
+        upper_bound=upper_bound,
+        zero_negative=zero_negative,
+    )
+    return d
 end
