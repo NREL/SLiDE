@@ -1,12 +1,3 @@
-using SLiDE
-using DataFrames
-using JuMP
-import Ipopt
-using Complementarity
-
-include(joinpath(SLIDE_DIR,"dev","ee_module","calibrate","setup.jl"))
-
-
 """
 """
 function _energy_calibration_input(d, set;
@@ -26,11 +17,12 @@ function _energy_calibration_input(d, set;
 
     # Set bounds.
     SLiDE.set_lower_bound!(d, setdiff(variables, [:ld0,:kd0,:yh0,:cd0]); factor=lower_bound)
-    SLiDE.set_upper_bound!(d, :id0; factor=upper_bound)
+    SLiDE.set_upper_bound!(d, :i0; factor=upper_bound)
 
     d = Dict{Symbol,Dict}(k => convert_type(Dict, df) for (k,df) in d)
     return d
 end
+
 
 function _energy_calibration_input(d, set, year;
     lower_bound::Real=NaN,
@@ -45,25 +37,25 @@ function _energy_calibration_input(d, set, year;
 end
 
 
-# """
-# """
-# function calibrate_energy(
-#     io::Dict,
-#     set::Dict,
-#     year::Int;
-#     penalty_nokey::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
-# )
+"""
+"""
+function calibrate_energy(
+    io::Dict,
+    set::Dict,
+    year::Int;
+    penalty_nokey::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
+    # !!!! define as SLiDE constants
+    lower_bound=0.25,
+    upper_bound=1.75,
+    lower_bound_seds = 0.75,
+    upper_bound_seds = 1.25,
+)
     @info("Calibrating $year data")
-    
-    lb = 0.25       # !!!! define as SLiDE constants and make kwargs
-    ub = 1.75
-    lb_seds = 0.75
-    ub_seds = 1.25
 
     SLiDE._calibration_set!(set; region=true, energy=true)
     d = _energy_calibration_input(io, set, year;
-        lower_bound=lb,
-        upper_bound=ub,
+        lower_bound=lower_bound,
+        upper_bound=upper_bound,
     )
 
     S, G, M, R = set[:s], set[:g], set[:m], set[:r]
@@ -79,10 +71,10 @@ end
         ld0[r in R, s in S], (start=d[:ld0][r,s], lower_bound=0)
         kd0[r in R, s in S], (start=d[:kd0][r,s], lower_bound=0)
         # trade
-        a0[r in R, g in G],  (start=d[:a0 ][r,g], lower_bound=lb*d[:a0_lb][r,g])
-        nd0[r in R, g in G], (start=d[:nd0][r,g], lower_bound=lb*d[:nd0_lb][r,g])
-        dd0[r in R, g in G], (start=d[:dd0][r,g], lower_bound=lb*d[:dd0_lb][r,g])
-        m0[r in R, g in G],  (start=d[:m0 ][r,g], lower_bound=lb*d[:m0_lb][r,g])
+        a0[r in R, g in G],  (start=d[:a0 ][r,g], lower_bound=d[:a0_lb][r,g])
+        nd0[r in R, g in G], (start=d[:nd0][r,g], lower_bound=d[:nd0_lb][r,g])
+        dd0[r in R, g in G], (start=d[:dd0][r,g], lower_bound=d[:dd0_lb][r,g])
+        m0[r in R, g in G],  (start=d[:m0 ][r,g], lower_bound=d[:m0_lb][r,g])
         # supply
         s0[r in R, g in G],  (start=d[:s0 ][r,g], lower_bound=d[:s0_lb][r,g])
         xd0[r in R, g in G], (start=d[:xd0][r,g], lower_bound=d[:xd0_lb][r,g])
@@ -92,7 +84,7 @@ end
         # demand
         yh0[r in R, g in G], (start=d[:yh0][r,g], lower_bound=0)
         cd0[r in R, g in G], (start=d[:cd0][r,g], lower_bound=0)
-        i0[r in R, g in G],  (start=d[:i0 ][r,g], lower_bound=d[:i0_lb][r,g], upper_bound=ub*d[:i0][r,g])
+        i0[r in R, g in G],  (start=d[:i0 ][r,g], lower_bound=d[:i0_lb][r,g], upper_bound=d[:i0_ub][r,g])
         g0[r in R, g in G] , (start=d[:g0 ][r,g], lower_bound=d[:g0_lb][r,g])
         # margin
         nm0[r in R, g in G, m in M], (start=d[:nm0][r,g,m], lower_bound=d[:nm0_lb][r,g,m])
@@ -126,7 +118,8 @@ end
         MARKET_PN[g in G], sum(xn0[r,g] for r in R) == sum(nm0[r,g,m] for (r,m) in set[:r,:m])
         MARKET_PFX, (
             sum(m0[r,g] for (r,g) in set[:r,:g]) ==
-            sum(bopdef0[r] + d[:hhadj][r] for r in R) + sum(x0[r,g] for (r,g) in set[:r,:g])
+            sum(bopdef0[r] + d[:hhadj][r] + sum(x0[r,g] for g in G) for r in R)
+            # sum(bopdef0[r] + d[:hhadj][r] for r in R) + sum(x0[r,g] for (r,g) in set[:r,:g])
         )
     end)
 
@@ -135,11 +128,12 @@ end
 
     # Income balance
     @constraint(calib, INCBAL[r in R],
-        sum(cd0[r,g] + g0[r,g] + i0[r,g] for g in G) ==
-        sum(yh0[r,g] + bopdef0[r] + d[:hhadj][r] for g in G)
+        sum(cd0[r,g] + g0[r,g] + i0[r,g] for g in G) == (
+        sum(yh0[r,g] for g in G) + bopdef0[r] + d[:hhadj][r]
         + sum(ld0[r,s]+kd0[r,s] for s in S)
         + sum(d[:ta0][r,g]*a0[r,g] + d[:tm0][r,g]*m0[r,g] for g in G)
         + sum(d[:ty0][r,s] * sum(ys0[r,s,g] for g in G) for s in S)
+        )
     )
 
     # Value share conditions
@@ -224,15 +218,15 @@ end
         )
     )
 
-    # ----- SET BOUNDS AND FIX ZEROS -----------------------------------------------------------
+    # ----- SET BOUNDS AND FIX ZEROS -------------------------------------------------------
     # Fix international electricity imports/exports to zero (subject to SEDS data).
-    SLiDE.fix_lower_bound!(calib, d, [:m0,:x0], [R,"ele"]; lower_bound=lb_seds, value=0)
+    SLiDE.fix_lower_bound!(calib, d, [:m0,:x0], [R,"ele"]; lower_bound=lower_bound_seds, value=0)
 
     # Adjust upper and lower bounds to allow SEDS data to shift.
-    SLiDE.set_bounds!(calib, d, set, :cd0, (:r,:e); lower_bound=lb_seds, upper_bound=ub_seds)
-    SLiDE.set_bounds!(calib, d, set, :ys0, (:r,:e,:e); lower_bound=lb_seds, upper_bound=ub_seds)
-    SLiDE.set_bounds!(calib, d, set, :id0, (:r,:e,:s); lower_bound=lb_seds, upper_bound=ub_seds)
-    SLiDE.set_bounds!(calib, d, set, :md0, (:r,:m,:e); lower_bound=lb_seds, upper_bound=ub_seds)
+    SLiDE.set_bounds!(calib, d, set, :cd0, (:r,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
+    SLiDE.set_bounds!(calib, d, set, :ys0, (:r,:e,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
+    SLiDE.set_bounds!(calib, d, set, :id0, (:r,:e,:s); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
+    SLiDE.set_bounds!(calib, d, set, :md0, (:r,:m,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
 
     # Restrict some parameters to zero.
     SLiDE.fix!(calib, d, set, :id0, (:r,:g,:e); value=0)
@@ -246,58 +240,56 @@ end
     SLiDE.fix!(calib, [:nd0,:xn0], [["ak","hi"],"ele"]; value=0)
 
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
-    # JuMP.optimize!(calib)
-    # return SLiDE._calibration_output(calib, set, year; region=true)
-#     return calib
-# end
+    JuMP.optimize!(calib)
+    return SLiDE._calibration_output(calib, set, year; region=true)
+end
 
 
-
-# ------------------------------------------------------------------------------------------
+# ----- JuMP SYNTAX (without SLiDE functions) ----------------------------------------------
 # @variables(calib, begin
 #     # production
-#     ys0[r in R, s in S, g in G], (start=d[:ys0][r,s,g], lower_bound=lb*d[:ys0][r,s,g])
-#     id0[r in R, s in G, g in S], (start=d[:id0][r,g,s], lower_bound=lb*d[:id0][r,g,s])
+#     ys0[r in R, s in S, g in G], (start=d[:ys0][r,s,g], lower_bound=lower_bound*d[:ys0][r,s,g])
+#     id0[r in R, s in G, g in S], (start=d[:id0][r,g,s], lower_bound=lower_bound*d[:id0][r,g,s])
 #     ld0[r in R, s in S], (start=d[:ld0][r,s], lower_bound=0)
 #     kd0[r in R, s in S], (start=d[:kd0][r,s], lower_bound=0)
 #     # trade
-#     a0[r in R, g in G],  (start=d[:a0 ][r,g], lower_bound=lb*d[:a0 ][r,g])
-#     nd0[r in R, g in G], (start=d[:nd0][r,g], lower_bound=lb*d[:nd0][r,g])
-#     dd0[r in R, g in G], (start=d[:dd0][r,g], lower_bound=lb*d[:dd0][r,g])
-#     m0[r in R, g in G],  (start=d[:m0 ][r,g], lower_bound=lb*d[:m0 ][r,g])
+#     a0[r in R, g in G],  (start=d[:a0 ][r,g], lower_bound=lower_bound*d[:a0 ][r,g])
+#     nd0[r in R, g in G], (start=d[:nd0][r,g], lower_bound=lower_bound*d[:nd0][r,g])
+#     dd0[r in R, g in G], (start=d[:dd0][r,g], lower_bound=lower_bound*d[:dd0][r,g])
+#     m0[r in R, g in G],  (start=d[:m0 ][r,g], lower_bound=lower_bound*d[:m0 ][r,g])
 #     # supply
-#     s0[r in R, g in G],  (start=d[:s0 ][r,g], lower_bound=lb*d[:s0 ][r,g])
-#     xd0[r in R, g in G], (start=d[:xd0][r,g], lower_bound=lb*d[:xd0][r,g])
-#     xn0[r in R, g in G], (start=d[:xn0][r,g], lower_bound=lb*d[:xn0][r,g])
-#     x0[r in R, g in G],  (start=d[:x0 ][r,g], lower_bound=lb*d[:x0 ][r,g])
-#     rx0[r in R, g in G], (start=d[:rx0][r,g], lower_bound=lb*d[:rx0][r,g])
+#     s0[r in R, g in G],  (start=d[:s0 ][r,g], lower_bound=lower_bound*d[:s0 ][r,g])
+#     xd0[r in R, g in G], (start=d[:xd0][r,g], lower_bound=lower_bound*d[:xd0][r,g])
+#     xn0[r in R, g in G], (start=d[:xn0][r,g], lower_bound=lower_bound*d[:xn0][r,g])
+#     x0[r in R, g in G],  (start=d[:x0 ][r,g], lower_bound=lower_bound*d[:x0 ][r,g])
+#     rx0[r in R, g in G], (start=d[:rx0][r,g], lower_bound=lower_bound*d[:rx0][r,g])
 #     # demand
 #     yh0[r in R, g in G], (start=d[:yh0][r,g], lower_bound=0)
 #     cd0[r in R, g in G], (start=d[:cd0][r,g], lower_bound=0)
-#     i0[r in R, g in G],  (start=d[:i0 ][r,g], lower_bound=lb*d[:i0 ][r,g], upper_bound=ub*d[:i0][r,g])
-#     g0[r in R, g in G] , (start=d[:g0 ][r,g], lower_bound=lb*d[:g0 ][r,g])
+#     i0[r in R, g in G],  (start=d[:i0 ][r,g], lower_bound=lower_bound*d[:i0 ][r,g], upper_bound=upper_bound*d[:i0][r,g])
+#     g0[r in R, g in G] , (start=d[:g0 ][r,g], lower_bound=lower_bound*d[:g0 ][r,g])
 #     # margin
-#     nm0[r in R, g in G, m in M], (start=d[:nm0][r,g,m], lower_bound=lb*d[:nm0][r,g,m])
-#     dm0[r in R, g in G, m in M], (start=d[:dm0][r,g,m], lower_bound=lb*d[:dm0][r,g,m])
-#     md0[r in R, m in M, g in G], (start=d[:md0][r,m,g], lower_bound=lb*d[:md0][r,m,g])
+#     nm0[r in R, g in G, m in M], (start=d[:nm0][r,g,m], lower_bound=lower_bound*d[:nm0][r,g,m])
+#     dm0[r in R, g in G, m in M], (start=d[:dm0][r,g,m], lower_bound=lower_bound*d[:dm0][r,g,m])
+#     md0[r in R, m in M, g in G], (start=d[:md0][r,m,g], lower_bound=lower_bound*d[:md0][r,m,g])
 #     # balance of payments
 #     bopdef0[r in R] >= 0, (start=d[:bopdef0][r])
 # end)
 
 # ----- SET BOUNDS AND FIX ZEROS -----------------------------------------------------------
 # Fix international electricity imports/exports to zero (subject to SEDS data).
-# [d[:x0][r,"ele"]>0 ? set_lower_bound(x0[r,"ele"], lb_seds*d[:x0][r,"ele"]) : fix(x0[r,"ele"],0,force=true) for r in R]
-# [d[:m0][r,"ele"]>0 ? set_lower_bound(m0[r,"ele"], lb_seds*d[:m0][r,"ele"]) : fix(m0[r,"ele"],0,force=true) for r in R]
+# [d[:x0][r,"ele"]>0 ? set_lower_bound(x0[r,"ele"], lower_bound_seds*d[:x0][r,"ele"]) : fix(x0[r,"ele"],0,force=true) for r in R]
+# [d[:m0][r,"ele"]>0 ? set_lower_bound(m0[r,"ele"], lower_bound_seds*d[:m0][r,"ele"]) : fix(m0[r,"ele"],0,force=true) for r in R]
 
 # Adjust upper and lower bounds to allow SEDS data to shift.
-# [set_lower_bound(cd0[r,e], lb_seds*d[:cd0][r,e]) for (r,e) in set[:r,:e]]
-# [set_upper_bound(cd0[r,e], ub_seds*d[:cd0][r,e]) for (r,e) in set[:r,:e]]
-# [set_lower_bound(ys0[r,e,e], lb_seds*d[:ys0][r,e,e]) for (r,e) in set[:r,:e]]
-# [set_upper_bound(ys0[r,e,e], ub_seds*d[:ys0][r,e,e]) for (r,e) in set[:r,:e]]
-# [set_lower_bound(id0[r,e,s], lb_seds*d[:id0][r,e,s]) for (r,e,s) in set[:r,:e,:s]]
-# [set_upper_bound(id0[r,e,s], ub_seds*d[:id0][r,e,s]) for (r,e,s) in set[:r,:e,:s]]
-# [set_lower_bound(md0[r,m,e], lb_seds*d[:md0][r,m,e]) for (r,m,e) in set[:r,:m,:e]]
-# [set_upper_bound(md0[r,m,e], ub_seds*d[:md0][r,m,e]) for (r,m,e) in set[:r,:m,:e]]
+# [set_lower_bound(cd0[r,e], lower_bound_seds*d[:cd0][r,e]) for (r,e) in set[:r,:e]]
+# [set_upper_bound(cd0[r,e], upper_bound_seds*d[:cd0][r,e]) for (r,e) in set[:r,:e]]
+# [set_lower_bound(ys0[r,e,e], lower_bound_seds*d[:ys0][r,e,e]) for (r,e) in set[:r,:e]]
+# [set_upper_bound(ys0[r,e,e], upper_bound_seds*d[:ys0][r,e,e]) for (r,e) in set[:r,:e]]
+# [set_lower_bound(id0[r,e,s], lower_bound_seds*d[:id0][r,e,s]) for (r,e,s) in set[:r,:e,:s]]
+# [set_upper_bound(id0[r,e,s], upper_bound_seds*d[:id0][r,e,s]) for (r,e,s) in set[:r,:e,:s]]
+# [set_lower_bound(md0[r,m,e], lower_bound_seds*d[:md0][r,m,e]) for (r,m,e) in set[:r,:m,:e]]
+# [set_upper_bound(md0[r,m,e], upper_bound_seds*d[:md0][r,m,e]) for (r,m,e) in set[:r,:m,:e]]
 
 # Restrict some parameters to zero.
 # [fix(id0[r,g,e], 0, force=true) for (r,g,e) in set[:r,:g,:e] if d[:id0][r,g,e]==0]
@@ -311,12 +303,3 @@ end
 # Set electricity imports from the national market to Alaska and Hawaii to zero.
 # [fix(nd0[r,"ele"], 0, force=true) for r in ["ak","hi"]]
 # [fix(xn0[r,"ele"], 0, force=true) for r in ["ak","hi"]]
-
-
-# julia> lower_bound(id0["md","col","col"])
-# lower_bound(id0["md","col","col"])
-# 0.0006215898015500071
-
-# julia> lower_bound(x0["ca","ele"])
-# 0.0063750000000000005
-# lower_bound(x0["ca","ele"])

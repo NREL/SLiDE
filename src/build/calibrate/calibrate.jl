@@ -46,7 +46,7 @@ function calibrate(
 end
 
 
-function SLiDE.calibrate(
+function calibrate(
     year::Int,
     io::Dict,
     set::Dict;
@@ -56,7 +56,8 @@ function SLiDE.calibrate(
 
     # Prepare the data and initialize the model.
     SLiDE._calibration_set!(set)
-    (cal, idx) = SLiDE._calibration_input(year, io, set);
+    cal = SLiDE._national_calibration_input(io, set, year)
+    # (cal, idx) = SLiDE._calibration_input(year, io, set);
     calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time" => 60.0))
     
     @variable(calib, ys0_est[j in set[:j], i in set[:i]]   >= 0, start = cal[:ys0][j,i]);
