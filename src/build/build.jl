@@ -44,18 +44,19 @@ function build(
 
     if |(isempty(d), isempty(set), overwrite)
         if isempty(set)
-            set = read_from(joinpath("src", "build", "readfiles", "setlist.yml"))
+            set = merge(Dict(), read_from(joinpath("src","build","readfiles","setlist.yml")))
             _set_sector!(set, set[:summary])
-            # [set[k] = set[:summary] for k in [:g,:s]]
             write_build(dataset, SET_DIR, set)
         end
         
-        io = merge(read_from(joinpath("src", "build", "readfiles", "input", "summary.yml")),
-            Dict(:sector => :summary))
+        io = merge(
+            read_from(joinpath("src","build","readfiles","input","summary.yml")),
+            Dict(:sector => :summary),
+        )
 
         io = partition(dataset, io, set; save_build=save_build, overwrite=overwrite)
         
-        cal = calibrate(dataset, io, set; save_build=save_build, overwrite=overwrite)
+        cal = calibrate_national(dataset, io, set; save_build=save_build, overwrite=overwrite)
         
         (shr, set) = share(dataset, Dict(:va0 => cal[:va0]), set;
             save_build=save_build, overwrite=overwrite)
