@@ -62,7 +62,7 @@ function calibrate_national(
         m0[g in G],  (start=d[:m0][g], lower_bound=d[:m0_lb][g],  upper_bound=d[:m0_ub][g])
         x0[g in G],  (start=d[:x0][g], lower_bound=d[:x0_lb][g],  upper_bound=d[:x0_ub][g])
         y0[g in G],  (start=d[:y0][g], lower_bound=d[:y0_lb][g],  upper_bound=d[:y0_ub][g])
-        fs0[g in G], (start=d[:fs0][g])
+        fs0[g in G], (start=d[:fs0][g],lower_bound=d[:fs0_lb][g], upper_bound=d[:fs0_ub][g])
     end)
 
     # --- DEFINE CONSTRAINTS ---------------------------------------------------------------

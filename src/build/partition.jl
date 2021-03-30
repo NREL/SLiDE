@@ -59,7 +59,9 @@ function partition(
     _partition_ta0!(d, set)  # a0, sbd0, tax0
     _partition_tm0!(d, set)  # duty0, m0
     
-    write_build!(dataset, CURR_STEP, d; save_build = save_build)
+    write_build!(dataset, CURR_STEP, d; save_build=save_build)
+    
+    haskey(d,:sector) && delete!(d,:sector)
     return d
 end
 
@@ -246,7 +248,7 @@ end
 \\begin{aligned}
 \\tilde{fs}_{yr,g} &= - \\min\\left\\{0, \\tilde{fs}_{yr,g} \\right\\}
 \\\\
-\\tilde{fd}_{yr,g,fd} &= \\max\\left\\{0, \\tilde{fd}_{yr,g,fd} \\right\\} \\;\\vert\\; yr,\\, g,\\, fd = pce \\right\\}
+\\tilde{fd}_{yr,g,fd} &= \\max\\left\\{0, \\tilde{fd}_{yr,g,fd} \\right\\}
 \\end{aligned}
 ```
 """

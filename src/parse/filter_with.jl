@@ -154,14 +154,33 @@ in the operation.
 - `df_out::DataFrame`: slice of `df` **not** found in `splitter` by
     [`DataFrames.antijoin`](https://dataframes.juliadata.org/stable/lib/functions/#DataFrames.antijoin)
 """
-function split_with(df::DataFrame, splitter::DataFrame)
+function split_with(df::DataFrame, splitter::DataFrame; drop=false)
     idx_join = intersect(propertynames(df), propertynames(splitter))
     df_in = innerjoin(df, splitter, on=idx_join)
     df_out = antijoin(df, splitter, on=idx_join)
+
+    # if drop !== false
+    #     drop = idx_join
+    # end
+    # return drop_filter(df_in; drop=drop), drop_filter(df_out; drop=drop)
     return df_in, df_out
 end
 
-split_with(df::DataFrame, splitter::NamedTuple) = split_with(df, DataFrame(permute(splitter)))
+function split_with(df::DataFrame, splitter::NamedTuple; drop=false)
+    return split_with(df, DataFrame(permute(splitter)); drop=drop)
+end
+
+
+# function drop_filter(df, col; drop=false)
+#     if drop !== false
+#         idx_drop = setdiff(SLiDE._find_constant(df[:,findindex(df)]), propertynames_with(df,:units))
+#         drop !== true && intersect!(idx_drop, ensurearray(drop))
+#         setdiff!(col, idx_drop)
+#     end
+#     return select(df, col)
+# end
+
+# drop_filter(df; drop=false) = drop_filter(df, propertynames(df); drop=drop)
 
 
 """

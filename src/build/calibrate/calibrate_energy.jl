@@ -229,7 +229,7 @@ function calibrate_energy(
     SLiDE.set_bounds!(calib, d, set, :ys0, (:r,:e,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
     SLiDE.set_bounds!(calib, d, set, :id0, (:r,:e,:s); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
     SLiDE.set_bounds!(calib, d, set, :md0, (:r,:m,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
-
+    
     # Restrict some parameters to zero.
     SLiDE.fix!(calib, d, set, :id0, (:r,:g,:e); value=0)
     SLiDE.fix!(calib, d, set, :ys0, (:r,:e,:g); value=0)
@@ -240,7 +240,7 @@ function calibrate_energy(
     # Set electricity imports from the national market to Alaska and Hawaii to zero.
     # !!!! This could go elsewhere in the energy build stream (like disaggregation)
     SLiDE.fix!(calib, [:nd0,:xn0], [["ak","hi"],"ele"]; value=0)
-    
+
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     if optimize
         JuMP.optimize!(calib)
