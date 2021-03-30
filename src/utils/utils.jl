@@ -251,12 +251,22 @@ the function will produce an error.
 - `x::Tuple{Symbol,1}`: set keys to permute
 """
 function add_permutation!(set::Dict, x::Tuple)
-    if !(x in keys(set))
+    if !haskey(set, x)
         missing_keys = setdiff(ensurearray(x), keys(set))
         if !isempty(missing_keys)
             @error("Cannot create a composite $x. Key(s) $missing_keys missing from set.")
         end
-        set[x] = sort(permute([[set[k] for k in x]...,]))
+        if length(x) == length(unique(x))
+            lst = permute([[set[k] for k in x]...,])
+        else
+            tmp = unique(transform_over(DataFrame(x=ensurearray(x), num=true), :num))
+            lst = [row[:num]==1 ? set[row[:x]] : vcat.(fill(set[row[:x]],Int(row[:num]))...)
+                for row in eachrow(tmp)]
+            lst = permute(lst)
+            lst = [Tuple(vcat(ensurearray(x)...)) for x in lst]
+        end
+
+        set[x] = sort(lst)
         end
     return set[x]
 end

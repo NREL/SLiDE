@@ -43,12 +43,14 @@ function calibrate_energy(
     io::Dict,
     set::Dict,
     year::Int;
-    penalty_nokey::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
+    # zeropenalty::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
+    zeropenalty::AbstractFloat=1E7,
     # !!!! define as SLiDE constants
     lower_bound=0.25,
     upper_bound=1.75,
     lower_bound_seds = 0.75,
     upper_bound_seds = 1.25,
+    optimize::Bool=true,
 )
     @info("Calibrating $year data")
 
@@ -189,7 +191,7 @@ function calibrate_energy(
         + sum(abs(d[:dm0][r,g,m]) * (dm0[r,g,m]/d[:dm0][r,g,m] - 1)^2 for (r,g,m) in set[:r,:g,:m] if d[:dm0][r,g,m] != 0)
         + sum(abs(d[:md0][r,m,g]) * (md0[r,m,g]/d[:md0][r,m,g] - 1)^2 for (r,m,g) in set[:r,:m,:g] if d[:md0][r,m,g] != 0)
 
-    + penalty_nokey * (
+    + zeropenalty * (
         # production
         + sum(ys0[r,s,g] for (r,s,g) in set[:r,:s,:g] if d[:ys0][r,s,g] == 0)
         + sum(id0[r,g,s] for (r,g,s) in set[:r,:g,:s] if d[:id0][r,g,s] == 0)
@@ -238,10 +240,14 @@ function calibrate_energy(
     # Set electricity imports from the national market to Alaska and Hawaii to zero.
     # !!!! This could go elsewhere in the energy build stream (like disaggregation)
     SLiDE.fix!(calib, [:nd0,:xn0], [["ak","hi"],"ele"]; value=0)
-
+    
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
-    JuMP.optimize!(calib)
-    return SLiDE._calibration_output(calib, set, year; region=true)
+    if optimize
+        JuMP.optimize!(calib)
+        return SLiDE._calibration_output(calib, set, year; region=true)
+    else
+        return calib
+    end
 end
 
 
