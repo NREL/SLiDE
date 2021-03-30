@@ -46,20 +46,20 @@ function calibrate(
 end
 
 
-function calibrate(
+function SLiDE.calibrate(
     year::Int,
     io::Dict,
     set::Dict;
-    penalty_nokey::AbstractFloat=DEFAULT_PENALTY_NOKEY,
+    penalty_nokey::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
 )
     @info("Calibrating $year data")
 
     # Prepare the data and initialize the model.
-    _calibration_set!(set)
-    (cal, idx) = _calibration_input(year, io, set);
+    SLiDE._calibration_set!(set)
+    (cal, idx) = SLiDE._calibration_input(year, io, set);
     calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time" => 60.0))
     
-    @variable(calib, ys0_est[j in set[:j], i in set[:i]]   >= 0, start = 0);
+    @variable(calib, ys0_est[j in set[:j], i in set[:i]]   >= 0, start = cal[:ys0][j,i]);
     @variable(calib, fs0_est[i in set[:i]]                 >= 0, start = 0);
     @variable(calib, ms0_est[i in set[:i], m in set[:m]]   >= 0, start = 0);
     @variable(calib, y0_est[i in set[:i]]                  >= 0, start = 0);
@@ -127,7 +127,7 @@ function calibrate(
     );
 
     # --- SET START VALUE ------------------------------------------------------------------
-    [set_start_value(ys0_est[j,i], cal[:ys0][j,i])  for (j,i)  in set[:j,:i]  ]
+    # [set_start_value(ys0_est[j,i], cal[:ys0][j,i])  for (j,i)  in set[:j,:i]  ]
     [set_start_value(id0_est[i,j], cal[:id0][i,j])  for (i,j)  in set[:i,:j]  ]
     [set_start_value(fs0_est[i],   cal[:fs0][i])    for  i     in set[:i]     ]
     [set_start_value(ms0_est[i,m], cal[:ms0][i,m])  for (i,m)  in set[:i,:m]  ]
@@ -142,8 +142,8 @@ function calibrate(
     # --- SET BOUNDS -----------------------------------------------------------------------
     # multipliers for lower and upper bound relative
     # to each respective variables reference parameter
-    lb = DEFAULT_CALIBRATE_LOWER_BOUND
-    ub = DEFAULT_CALIBRATE_UPPER_BOUND
+    lb = SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND
+    ub = SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND
 
     [set_lower_bound(ys0_est[j,i], max(0, lb * cal[:ys0][j,i]))  for (j,i)  in set[:j,:i]  ]
     [set_lower_bound(id0_est[i,j], max(0, lb * cal[:id0][i,j]))  for (i,j)  in set[:i,:j]  ]
@@ -180,24 +180,24 @@ function calibrate(
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     JuMP.optimize!(calib)
 
-    # Populate resultant Dictionary.
-    cal = Dict(k => filter_with(io[k], (yr = year,); drop = true) for k in [:ta0,:tm0])
-    cal[:ys0] = convert_type(DataFrame, ys0_est; cols=idx[:ys0])
-    cal[:fs0] = convert_type(DataFrame, fs0_est; cols=idx[:fs0])
-    cal[:ms0] = convert_type(DataFrame, ms0_est; cols=idx[:ms0])
-    cal[:y0]  = convert_type(DataFrame, y0_est;  cols=idx[:y0])
-    cal[:id0] = convert_type(DataFrame, id0_est; cols=idx[:id0])
-    cal[:fd0] = convert_type(DataFrame, fd0_est; cols=idx[:fd0])
-    cal[:va0] = convert_type(DataFrame, va0_est; cols=idx[:va0])
-    cal[:a0]  = convert_type(DataFrame, a0_est;  cols=idx[:a0])
-    cal[:x0]  = convert_type(DataFrame, x0_est;  cols=idx[:x0])
-    cal[:m0]  = convert_type(DataFrame, m0_est;  cols=idx[:m0])
-    cal[:md0] = convert_type(DataFrame, md0_est; cols=idx[:md0])
+    # # Populate resultant Dictionary.
+    # cal = Dict(k => filter_with(io[k], (yr = year,); drop = true) for k in [:ta0,:tm0])
+    # cal[:ys0] = convert_type(DataFrame, ys0_est; cols=idx[:ys0])
+    # cal[:fs0] = convert_type(DataFrame, fs0_est; cols=idx[:fs0])
+    # cal[:ms0] = convert_type(DataFrame, ms0_est; cols=idx[:ms0])
+    # cal[:y0]  = convert_type(DataFrame, y0_est;  cols=idx[:y0])
+    # cal[:id0] = convert_type(DataFrame, id0_est; cols=idx[:id0])
+    # cal[:fd0] = convert_type(DataFrame, fd0_est; cols=idx[:fd0])
+    # cal[:va0] = convert_type(DataFrame, va0_est; cols=idx[:va0])
+    # cal[:a0]  = convert_type(DataFrame, a0_est;  cols=idx[:a0])
+    # cal[:x0]  = convert_type(DataFrame, x0_est;  cols=idx[:x0])
+    # cal[:m0]  = convert_type(DataFrame, m0_est;  cols=idx[:m0])
+    # cal[:md0] = convert_type(DataFrame, md0_est; cols=idx[:md0])
 
-    # Add the year back to the DataFrame and return.
-    x = Add(:yr, year)
-    [cal[k] = edit_with(df, x)[:, [:yr; idx[k]; :value]] for (k, df) in cal]
-    return cal
+    # # Add the year back to the DataFrame and return.
+    # x = Add(:yr, year)
+    # [cal[k] = edit_with(df, x)[:, [:yr; idx[k]; :value]] for (k, df) in cal]
+    return calib
 end
 
 
