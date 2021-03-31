@@ -108,8 +108,8 @@ function calibrate_national(
     )
     
     # Fix "certain parameters" to their original values: fs0, va0, m0.
-    fix!(calib, d, set, :va0, (:va,:s))
-    fix!(calib, d, set, [:fs0,:m0], :g)
+    fix!(calib, d, :va0, set, (:va,:s))
+    fix!(calib, d, [:fs0,:m0], set, :g)
     
     # Fix other/use sector output to zero.
     fix!(calib, d, :ys0, [set[:oth,:use], G]; value=0)

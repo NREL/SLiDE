@@ -225,18 +225,18 @@ function calibrate_energy(
     SLiDE.fix_lower_bound!(calib, d, [:m0,:x0], [R,"ele"]; lower_bound=lower_bound_seds, value=0)
 
     # Adjust upper and lower bounds to allow SEDS data to shift.
-    SLiDE.set_bounds!(calib, d, set, :cd0, (:r,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
-    SLiDE.set_bounds!(calib, d, set, :ys0, (:r,:e,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
-    SLiDE.set_bounds!(calib, d, set, :id0, (:r,:e,:s); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
-    SLiDE.set_bounds!(calib, d, set, :md0, (:r,:m,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
+    SLiDE.set_bounds!(calib, d, :cd0, set, (:r,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
+    SLiDE.set_bounds!(calib, d, :ys0, set, (:r,:e,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
+    SLiDE.set_bounds!(calib, d, :id0, set, (:r,:e,:s); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
+    SLiDE.set_bounds!(calib, d, :md0, set, (:r,:m,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
     
     # Restrict some parameters to zero.
-    SLiDE.fix!(calib, d, set, :id0, (:r,:g,:e); value=0)
-    SLiDE.fix!(calib, d, set, :ys0, (:r,:e,:g); value=0)
-    SLiDE.fix!(calib, d, set, :md0, (:r,:m,:g); value=0)
-    SLiDE.fix!(calib, d, set, [:nm0,:dm0], (:r,:g,:m); value=0)
-    SLiDE.fix!(calib, d, set, [:rx0,:yh0], (:r,:g); value=0)
-
+    SLiDE.fix!(calib, d, :id0, set, (:r,:g,:e); value=0)
+    SLiDE.fix!(calib, d, :ys0, set, (:r,:e,:g); value=0)
+    SLiDE.fix!(calib, d, :md0, set, (:r,:m,:g); value=0)
+    SLiDE.fix!(calib, d, [:nm0,:dm0], set, (:r,:g,:m); value=0)
+    SLiDE.fix!(calib, d, [:rx0,:yh0], set, (:r,:g); value=0)
+    
     # Set electricity imports from the national market to Alaska and Hawaii to zero.
     # !!!! This could go elsewhere in the energy build stream (like disaggregation)
     SLiDE.fix!(calib, [:nd0,:xn0], [["ak","hi"],"ele"]; value=0)

@@ -28,7 +28,7 @@ partition
 ### Calibrate
 
 ```@docs
-calibrate
+calibrate_national
 ```
 
 ### Share

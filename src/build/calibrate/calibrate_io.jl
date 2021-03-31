@@ -55,3 +55,28 @@ function _calibration_output(model::Model, set::Dict, year::Int; region::Bool=fa
 
     return d
 end
+
+
+"""
+"""
+function describe_parameters!(set::Dict, subset::Symbol)
+    if !haskey(set, subset)
+        set[subset] = SLiDE.build_parameters("$subset")
+    end
+    return set[subset]
+end
+
+
+"""
+"""
+function list_parameters!(set::Dict, subset::Symbol)
+    subset_list = append(subset,:list)
+    if !haskey(set, subset_list)
+        set[subset_list] = if subset==:taxes
+            [:ta0,:ty0,:tm0]
+        else
+            collect(keys(describe_parameters!(set, subset)))
+        end
+    end
+    return set[subset_list]
+end

@@ -8,7 +8,7 @@ Otherwise, it will read BEA supply/use data from the `/SLIDE_DIR/data/input/` di
 
 Then, execute the four steps of the SLiDE buildstream by executing the following functions:
 1. [`SLiDE.partition`](@ref)
-2. [`SLiDE.calibrate`](@ref)
+2. [`SLiDE.calibrate_national`](@ref)
 3. [`SLiDE.share`](@ref)
 4. [`SLiDE.disagg`](@ref)
 
@@ -253,7 +253,7 @@ end
     (set, parameter, or build step)
 
 # Returns
-- `d::Dict{Symbol,`[`SLiDE.Parameter`](@ref)`}` of Parameters relevant to the specified data
+- `d::Dict{Symbol,`[`Parameter`](@ref)`}` of Parameters relevant to the specified data
     subset. The dictionary key is consistent the value's field `parameter`.
 """
 function build_parameters(subset::String)
