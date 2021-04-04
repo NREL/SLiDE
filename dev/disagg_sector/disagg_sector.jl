@@ -11,7 +11,7 @@ dis_in = merge(
     read_from(joinpath(f_read,"6_sectordisagg_int_share.yml")),
 )
 # dis_out = read_from(joinpath(f_read,"6_sectordisagg_out.yml"); run_bash=false)
-# agg_out = read_from(joinpath(f_read,"7_aggr_out.yml"); run_bash=true)
+agg_out = read_from(joinpath(f_read,"7_aggr_out.yml"); run_bash=true)
 
 # ------------------------------------------------------------------------------------------
 # Read original build stream output from WiNDC results so we can be completely consistent

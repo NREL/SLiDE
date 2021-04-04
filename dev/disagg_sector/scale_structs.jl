@@ -255,34 +255,51 @@ end
 map_scheme(factor::Factor, index::Index) = _map_scheme(factor.data, index.data)
 map_scheme(index::Index, factor::Factor) = map_scheme(factor, index)
 
-function map_scheme(x::T, df::DataFrame) where T <: Scale
+function map_scheme(x::Factor, df::DataFrame)
     return _map_scheme(df, x.data[:,[x.from;x.to]], x.on)
 end
 
+map_scheme(x::Index, df::DataFrame) = _map_scheme(df, x.data)
+
 
 """
-    _map_scheme(df, dfmap)
+    _map_scheme(df, dfmap, on)
+Internal support for [`SLiDE.map_scheme`](@ref) to avoid confusion over DataFrame inputs.
+
+# Arguments
+- `df::DataFrame` of column(s) to scale
+- `dfmap::DataFrame` of mapping columns
+- `on::Symbol` or `on::Array{Symbol,1}`: columns in `df` that will be mapped
+
+# Returns
+- `from::Symbol` or `from::Array{Symbol,1}`: `dfmap` columns that overlap with `df`
+- `to::Symbol` or `to::Array{Symbol,1}`: `dfmap` columns that do not overlap with `df`
+- `on::Symbol` or `on::Array{Symbol,1}`: columns in `df` that will be mapped
 """
 function _map_scheme(df::DataFrame, dfmap::DataFrame)
-    idx = findindex(df)
+    on = findindex(df)
     lstmap = unique(vcat(eachcol(dfmap)...))
     
-    on = [x for x in idx if !isempty(intersect(df[:,x],lstmap))]
+    on = [x for x in on if !isempty(intersect(df[:,x],lstmap))]
 
-    from, to = _map_scheme(df, dfmap, on)
+    from, to, on = _map_scheme(df, dfmap, on)
     return from, to, (length(on)==1 ? on[1] : on)
 end
 
-function _map_scheme(df::DataFrame, dfmap::DataFrame, idx)
+function _map_scheme(df::DataFrame, dfmap::DataFrame, on)
     idxmap = ensurearray(map_direction(dfmap))
     dfmap = drop_identity(dfmap, idxmap)
-    df = unique(df[:,ensurearray(idx)])
+    df = unique(df[:,ensurearray(on)])
 
     dmap = Dict(k => unique(dfmap[:,ensurearray(k)]) for k in idxmap)
-    any_overlap = Dict(size(antijoin(dmap[k], df, on=Pair.(k, idx)),1) !== size(dmap[k],1) => k
-        for k in idxmap)
+    dinner = Dict(k => innerjoin(dmap[k], df, on=Pair.(k, on)) for k in idxmap)
+
+    # Find out which mapping index/indices overlap(s) most with df.
+    # Higher overlap -> from, lower overlap -> to.
+    noverlap = [(size(dinner[k],1), k ) for k in idxmap]
+    sort!(noverlap; rev=true)
     
-    return any_overlap[true], any_overlap[false], idx
+    return getindex(noverlap[1],2), getindex(noverlap[2],2), on
 end
 
 
@@ -318,7 +335,6 @@ end
 
 """
     filter_with!(factor::Factor, lst::AbstractArray)
-!!!!
 
     filter_with!(index::Index, factor::Factor)
 
@@ -371,6 +387,26 @@ end
 
 
 """
+    compound_for!(x::Factor, col)
+    compound_for!(x::Factor, col, lst::AbstractArray)
+    compound_for!(x::Factor, df::DataFrame, lst::AbstractArray)
+This function maps `x.data` to disaggregate variables (`ys0`, `id0`) that include both
+goods and sectors:
+
+```math
+\\tilde{\\delta}_{yr,gg \\rightarrow g, ss \\rightarrow s} =
+    \\tilde{\\delta}_{yr,gg \\rightarrow g} \\cdot \\tilde{\\delta}_{yr, ss \\rightarrow s}
+```
+
+where ``gg``, ``ss`` represent aggregate-level goods and sectors
+and ``g``, ``s`` represent disaggregate-level goods and sectors.
+
+In the case that we are sharing across both goods and sectors in one data set, this function
+generates a dataframe with these sharing parameters through the following process:
+1. Multiply shares for all (``gg\\rightarrow g``,``ss\\rightarrow s``) combinations.
+2. Address the case of when aggregate-level goods and sectors are the same (``gg=ss``):
+    - If ``g = s``, sum all of the share values.
+    - If ``g\\neq s``, drop these values.
 """
 function compound_for!(x::Factor, col::AbstractArray, lst::AbstractArray)
     if length(col)>2
@@ -445,6 +481,9 @@ compound_for!(x::Factor, col::Missing, lst::AbstractArray) = missing
 
 
 """
+    compound_for(x::Factor, df::DataFrame, lst::AbstractArray)
+    compound_for(x::Factor, df::DataFrame, lst::AbstractArray)
+    compound_for(x::T, col::Symbol) where T<:Scale
 """
 compound_for(x::Factor, df::DataFrame, lst::AbstractArray) = compound_for!(copy(x), df, lst)
 compound_for(x::Factor, col, lst::AbstractArray) = compound_for!(copy(x), col, lst)
@@ -452,6 +491,7 @@ compound_for(x::T, col::Symbol) where T <: Scale = compound_for!(copy(x), col)
 
 
 """
+    compound_sector!(d, set, var; factor_id)
 """
 function compound_sector!(d::Dict, set::Dict, var::Symbol; factor_id::Symbol=:factor)
     df = d[var]
@@ -471,6 +511,7 @@ end
 
 
 """
+    scale_with(df, x)
 """
 function scale_with(df::DataFrame, x::Factor)
     # Preserve indices that will not be scaled.
@@ -483,7 +524,7 @@ function scale_with(df::DataFrame, x::Factor)
     df[!,:value] .*= df[:,:share]
 
     # If we are aggregating, sum.
-    x.direction == :aggregate && (df = combine_over(df, :dummy))
+    # x.direction == :aggregate && (df = combine_over(df, :dummy))
 
     return vcat(select(df, Not(:share)), df_ones)
 end
@@ -501,6 +542,7 @@ scale_with(df::DataFrame, x::Missing) = df
 
 
 """
+    scale_sector!(d, set, x; kwargs...)
 """
 function scale_sector!(d::Dict, set::Dict, x::Factor; factor_id=:factor)
     d[factor_id] = x

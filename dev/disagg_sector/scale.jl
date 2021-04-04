@@ -1,11 +1,11 @@
 using SLiDE, DataFrames
-
 include(joinpath(SLIDE_DIR,"dev","disagg_sector","scale_structs.jl"))
 
 # Check...
 f_read = joinpath(SLIDE_DIR,"dev","readfiles")
 dis_in = read_from(joinpath(f_read,"6_sectordisagg_int_share.yml"))
 dis_out = read_from(joinpath(f_read,"6_sectordisagg_out.yml"))
+agg_out = read_from(joinpath(f_read,"7_aggr_out.yml"))
 
 set = read_from(joinpath("src","build","readfiles","setlist.yml"))
 din = read_from(joinpath(f_read,"5_disagg_out.yml"); run_bash=false)
@@ -16,13 +16,14 @@ set[:sector] = unique(dfmap[:,:disagg])
 
 # Filter years -> [2007,2012]
 dis_out = Dict(k => filter_with(df, (yr=[2007,2012],)) for (k,df) in dis_out)
+agg_out = Dict(k => filter_with(df, (yr=[2007,2012],)) for (k,df) in agg_out)
 din = Dict{Any,Any}(k => filter_with(df, (yr=[2007,2012],)) for (k,df) in din)
 
 set = merge(Dict(), set)
 d = merge(Dict(), copy(din))
 
-# # ----- SHARE SECTOR -----------------------------------------------------------------------
-# # function share_sector(d::Dict, set::Dict)
+# # # # ----- SHARE SECTOR -----------------------------------------------------------------------
+# # # # function share_sector(d::Dict, set::Dict)
     path = joinpath(SLIDE_DIR,"data","coremaps","scale","sector","bluenote.csv")
     dfmap = read_file(path)[:,1:2]
 
@@ -41,15 +42,21 @@ d = merge(Dict(), copy(din))
     index = Index(dfmap)
     lst = copy(set[:sector])
 
-    # 
+    
     set_scheme!(factor, index)
     share_with!(factor, index)
     filter_with!(factor, index, lst)
 
-#     return factor
-# end
+# #     return factor
+# # end
 
 # ----- DISAGGREGATE SECTOR ----------------------------------------------------------------
 scale_sector!(d, set, factor)
-
 dcomp = benchmark_against(d, dis_out)
+
+
+path = joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem_pmt.csv")
+dfmap = read_file(path)[:,1:2]
+
+index = Index(dfmap)
+set_scheme!(index, DataFrame(g=set[:sector]))
