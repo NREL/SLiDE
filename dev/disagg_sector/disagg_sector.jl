@@ -6,10 +6,10 @@ import Statistics
 dataset = "state_model"
 f_read = joinpath(SLIDE_DIR,"dev","readfiles")
 
-# dis_in = merge(
-#     read_from(joinpath(f_read,"6_sectordisagg_int.yml"); run_bash=false),
-#     read_from(joinpath(f_read,"6_sectordisagg_int_share.yml")),
-# )
+dis_in = merge(
+    # read_from(joinpath(f_read,"6_sectordisagg_int.yml"); run_bash=false),
+    read_from(joinpath(f_read,"6_sectordisagg_int_share.yml")),
+)
 # dis_out = read_from(joinpath(f_read,"6_sectordisagg_out.yml"); run_bash=false)
 # agg_out = read_from(joinpath(f_read,"7_aggr_out.yml"); run_bash=true)
 

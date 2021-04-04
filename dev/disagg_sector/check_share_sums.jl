@@ -1,3 +1,6 @@
+# Here, we're looking at the original BEA make-use tables at the detail level,
+# mapping to summary, and summing shares to see if they initially add up to one.
+
 function compare_total(d::Dict, key::Symbol)
     df = indexjoin(d[key],d[append(key,:det)]; id=[:summary,:detail])
     df[!,:diff] .= df[:,:summary] .- df[:,:detail]
