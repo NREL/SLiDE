@@ -83,6 +83,10 @@ end
 
 
 # ------------------------------------------------------------------------------------------
+list_unique(df::DataFrame) = unique(vcat(eachcol(df)...))
+list_unique(df::DataFrame, idx::AbstractArray) = list_unique(df[:,idx])
+list_unique(df::DataFrame, idx::Symbol) = unique(df[:,idx])
+
 
 """
 """
@@ -278,7 +282,7 @@ Internal support for [`SLiDE.map_scheme`](@ref) to avoid confusion over DataFram
 """
 function _map_scheme(df::DataFrame, dfmap::DataFrame)
     on = findindex(df)
-    lstmap = unique(vcat(eachcol(dfmap)...))
+    lstmap = list_unique(dfmap)
     
     on = [x for x in on if !isempty(intersect(df[:,x],lstmap))]
 
@@ -387,6 +391,22 @@ end
 
 
 """
+    compound_for(x::Factor, df::DataFrame, lst::AbstractArray)
+    compound_for(x::Factor, df::DataFrame, lst::AbstractArray)
+    compound_for(x::T, col::Symbol) where T<:Scale
+"""
+function compound_for(x::T, df::DataFrame, lst::AbstractArray) where T <: Scale
+    return compound_for!(copy(x), df, lst)
+end
+
+function compound_for(x::T, col, lst::AbstractArray) where T <: Scale
+    return compound_for!(copy(x), col, lst)
+end
+
+compound_for(x::T, col::Symbol) where T <: Scale = compound_for!(copy(x), col)
+
+
+"""
     compound_for!(x::Factor, col)
     compound_for!(x::Factor, col, lst::AbstractArray)
     compound_for!(x::Factor, df::DataFrame, lst::AbstractArray)
@@ -408,7 +428,7 @@ generates a dataframe with these sharing parameters through the following proces
     - If ``g = s``, sum all of the share values.
     - If ``g\\neq s``, drop these values.
 """
-function compound_for!(x::Factor, col::AbstractArray, lst::AbstractArray)
+function compound_for!(x::T, col::AbstractArray, lst::AbstractArray) where T <: Scale
     if length(col)>2
         @error("Can only compound, at most, two columns.")
     elseif length(col)==1
@@ -424,48 +444,27 @@ function compound_for!(x::Factor, col::AbstractArray, lst::AbstractArray)
         x.to = append.(x.to, col)
         x.on = col
 
-        # Compound with ones.
-        df_ones = vcat([edit_with(df, xedit[fwd]) * edit_with(df_ones, xedit[rev])
-            for (fwd,rev) in zip(col, reverse(col))]...)
-
-        # Compound non-ones.
-        df = edit_with(df, xedit[col[1]]) * edit_with(df, xedit[col[2]])
-
-        # In the case that (g,s) are the same at the aggregate level, if...
-        #   1. (g,s) are the SAME at the disaggregate level, sum all of the share values.
-        #   2. (g,s) are DIFFERENT at the disaggregate level, drop these.
-        # Split df based on whether (g,s) are the same at the aggregate level.
-        agg, dis = map_direction(df[:, [x.from;x.to]])
-        splitter = DataFrame(fill(unique(df[:,agg[1]]), length(agg)), agg)
-
-        df_same, df_diff = split_with(df, splitter)
-
-        # Sum over (g) at the disaggregate level, keeping only the rows for which
-        # (g,s) are the same at this level.
-        df_same = transform_over(df_same, dis[1])
-        ii_same = SLiDE._find_constant.(eachrow(df_same[:,dis]))
-        df_same = df_same[ii_same,:]
-
-        df = vcat(df_same, df_diff)
-
-        x.data = select(vcat(df,df_ones), [x.index;x.from;x.to;:value])
+        x.data = _compound_with(x, df, df_ones, xedit)
     end
     return x
 end
 
-
-function compound_for!(x::Factor, df::DataFrame, lst)
+function compound_for!(x::T, df::DataFrame, lst) where T <: Scale
     compound_for!(x, findindex(df), lst)
     set_scheme!(x, df)
     return x
 end
 
+function compound_for!(x::T, df::DataFrame) where T <: Scale
+    idx = findindex(df)
+    compound_for!(x, df[:,idx], list_unique(df,idx))
+    return x
+end
 
 function compound_for!(x::T, col::Symbol) where T <: Scale
     x.on = col
     return x
 end
-
 
 function compound_for!(x::Index, col::AbstractArray)
     if length(col)==1
@@ -476,24 +475,52 @@ function compound_for!(x::Index, col::AbstractArray)
     return x
 end
 
-compound_for!(x::Factor, col::Symbol, lst::AbstractArray) = compound_for!(x, col)
-compound_for!(x::Factor, col::Missing, lst::AbstractArray) = missing
+compound_for!(x::T, col::Symbol, lst::AbstractArray) where T <: Scale = compound_for!(x, col)
+compound_for!(x::T, col::Missing, lst::AbstractArray)  where T <: Scale = missing
 
 
 """
-    compound_for(x::Factor, df::DataFrame, lst::AbstractArray)
-    compound_for(x::Factor, df::DataFrame, lst::AbstractArray)
-    compound_for(x::T, col::Symbol) where T<:Scale
+Helper function to handle the differing treatment of compounding Index and Factor data.
 """
-compound_for(x::Factor, df::DataFrame, lst::AbstractArray) = compound_for!(copy(x), df, lst)
-compound_for(x::Factor, col, lst::AbstractArray) = compound_for!(copy(x), col, lst)
-compound_for(x::T, col::Symbol) where T <: Scale = compound_for!(copy(x), col)
+function _compound_with(x::Factor, df::DataFrame, df_ones::DataFrame, xedit::Dict)
+    df_ones = vcat([edit_with(df, xedit[fwd]) * edit_with(df_ones, xedit[rev])
+        for (fwd,rev) in zip(x.on, reverse(x.on))]...)
+    
+    df = edit_with(df, xedit[x.on[1]]) * edit_with(df, xedit[x.on[2]])
+
+    # In the case that (g,s) are the same at the aggregate level, if...
+    #   1. (g,s) are the SAME at the disaggregate level, sum all of the share values.
+    #   2. (g,s) are DIFFERENT at the disaggregate level, drop these.
+    # Split df based on whether (g,s) are the same at the aggregate level.
+    agg, dis = map_direction(df[:, [x.from;x.to]])
+    splitter = DataFrame(fill(unique(df[:,agg[1]]), length(agg)), agg)
+    df_same, df_diff = split_with(df, splitter)
+
+    # Sum over (g) at the disaggregate level, keeping only the rows for which
+    # (g,s) are the same at this level.
+    df_same = transform_over(df_same, dis[1])
+    ii_same = SLiDE._find_constant.(eachrow(df_same[:,dis]))
+    df_same = df_same[ii_same,:]
+
+    df = vcat(df_same, df_diff)
+    return select(vcat(df,df_ones), [x.index;x.from;x.to;:value])
+end
+
+
+function _compound_with(x::Index, df::DataFrame, df_ones::DataFrame, xedit::Dict)
+    df_ones = vcat([crossjoin(edit_with(df, xedit[fwd]), edit_with(df_ones, xedit[rev]))
+        for (fwd,rev) in zip(x.on, reverse(x.on))]...)
+
+    df = crossjoin(edit_with(df, xedit[x.on[1]]), edit_with(df, xedit[x.on[2]]))
+
+    return vcat(df, df_ones; cols=:intersect)
+end
 
 
 """
-    compound_sector!(d, set, var; factor_id)
+    compound_sector!(d, set, var; scale_id)
 """
-function compound_sector!(d::Dict, set::Dict, var::Symbol; factor_id::Symbol=:factor)
+function compound_sector!(d::Dict, set::Dict, var::Symbol; scale_id::Symbol=:factor)
     df = d[var]
     col = find_sector(df)
     lst = set[:sector]
@@ -501,63 +528,10 @@ function compound_sector!(d::Dict, set::Dict, var::Symbol; factor_id::Symbol=:fa
     if ismissing(col)
         return missing
     else
-        key = SLiDE._inp_key(factor_id,col)
+        key = SLiDE._inp_key(scale_id,col)
         if !haskey(d, key)
-            d[key] = compound_for(d[factor_id], df[:, ensurearray(col)], lst)
+            d[key] = compound_for(d[scale_id], df[:, ensurearray(col)], lst)
         end
         return d[key]
     end
-end
-
-
-"""
-    scale_with(df, x)
-"""
-function scale_with(df::DataFrame, x::Factor)
-    # Preserve indices that will not be scaled.
-    df_ones = filter_with(df, Not(x))
-    
-    # Map and calculate share.
-    df = edit_with(df,
-        Map(x.data, [x.index;x.from], [x.to;:value], [x.index;x.on], [x.on;:share], :inner)
-    )
-    df[!,:value] .*= df[:,:share]
-
-    # If we are aggregating, sum.
-    # x.direction == :aggregate && (df = combine_over(df, :dummy))
-
-    return vcat(select(df, Not(:share)), df_ones)
-end
-
-
-function scale_with(df::DataFrame, x::Index)
-    # Preserve indices that will not be scaled.
-    df_ones = filter_with(df, Not(x))
-
-    df = edit_with(df, Map(x.data, [x.from;], [x.to;], [x.on;], [x.on;], :inner))
-    return vcat(df, df_ones)
-end
-
-scale_with(df::DataFrame, x::Missing) = df
-
-
-"""
-    scale_sector!(d, set, x; kwargs...)
-"""
-function scale_sector!(d::Dict, set::Dict, x::Factor; factor_id=:factor)
-    d[factor_id] = x
-
-    parameters = SLiDE.list_parameters!(set, :parameters)
-    taxes = SLiDE.list_parameters!(set, :taxes)
-    variables = setdiff(parameters, taxes)
-
-    for k in parameters
-        println(k)
-        x = compound_sector!(d, set, k; factor_id=factor_id)
-        k in taxes && (x = convert_type(Index, x))
-
-        d[k] = scale_with(d[k], x)
-    end
-
-    return d
 end
