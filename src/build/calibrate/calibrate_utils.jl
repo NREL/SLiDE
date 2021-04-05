@@ -1,7 +1,6 @@
 """
     set_lower_bound!(d::Dict{Symbol,DataFrame}, var)
     set_lower_bound!(model::JuMP.Model, d::Dict{Symbol,Dict}, var, idx; kwargs...)
-
 This function adds a lower bound to the DataType given in the method's first argument,
 as calculated by [`SLiDE._lower_bound`](@ref)
 
@@ -82,7 +81,6 @@ end
 
 """
 Calculates a lower bound on `x`:
-
     ```math
     x_{lower} =
     \\begin{cases}
@@ -97,7 +95,6 @@ Calculates a lower bound on `x`:
 - `df::DataFrame` for which to  calculate  lower bounds
 
 # Keyword Arguments
-
 - `factor::Real=NaN` to use to calculate lower bound.
 - `value::Real=NaN`: If a value is given, set lower bound to this value.
 - `allow_negative::Bool=true`: Do we want to set negative values to zero?
@@ -135,7 +132,6 @@ end
 """
     set_upper_bound!(d::Dict{Symbol,DataFrame}, var)
     set_upper_bound!(model::JuMP.Model, d::Dict, var, idx; kwargs...)
-
 This function adds a upper bound to the DataType given in the method's first argument,
 as calculated by [`SLiDE._upper_bound`](@ref)
 
@@ -156,7 +152,6 @@ as calculated by [`SLiDE._upper_bound`](@ref)
 
 # Returns
 Method's first argument with the addition of a upper bound:
-
 - `model::JuMP.Model`, with specified variable(s)' upper bounds set over the
     given index/indices, **OR**
 - `d::Dict`, with key(s) `:var_id => ` calculated upper bound
@@ -211,8 +206,7 @@ end
 
 
 """
-Calculates an upper bound on `x`:
-
+This function calculates an upper bound on `x`:
     ```math
     x_{upper} =
     \\begin{cases}
@@ -263,13 +257,11 @@ This function sets negative values to zero.
 # Arguments
     zero_negative!(d)
     zero_negative!(d, var)
-
 - `d::Dict{Symbol,DataFrame}` to edit
 - `var::Symbol` or `var::AbstractArray`: variable or list of variables to edit
     
     zero_negative!(df)
     zero_negative!(df, subset)
-
 - `df::DataFrame` to edit
 - `subset::Pair`: If given, only zero negative values for this `idx => value` pair.
 
@@ -300,7 +292,6 @@ end
 
 """
     set_bounds!(model::JuMP.Model, d::Dict, var, idx; kwargs...)
-
 This function sets upper and lower bound on the specified model variables.
 
 # Arguments
@@ -353,7 +344,6 @@ end
     fix!(model, d, var, idx; kwargs...)
     fix!(model, d, var, set, idx; kwargs...)
     fix!(model, var, set, idx; kwargs...)
-
 This function fixes a `JuMP.Model` variable to either a value specified in a Dict `d` or a
 scalar value using `JuMP.fix`.
 
@@ -465,17 +455,15 @@ end
     fix_lower_bound!(model, d, var, idx; kwargs...)
     fix_lower_bound!(model, d, var, set, idx; kwargs...)
     fix_lower_bound!(model, var, set, idx; kwargs...)
-
 This function fixes a model variable `model[var][idx]` if it meets the specified condition
 (`d[var][idx]==value`), or sets its lower bound using the input `factor`.
-
-```
+    ```
     if d[var][idx] == value
         fix!(model, d, var, idx)
     else
         set_lower_bound!(model, d, var, idx; factor=lower_bound)
     end
-```
+    ```
 
 # Arguments
 - `model::JuMP.Model` to update

@@ -12,7 +12,7 @@ function _calibration_set!(set;
         add_permutation!(set, (:r,:s,:g))
         add_permutation!(set, (:r,:g,:m))
         add_permutation!(set, (:r,:m,:g))
-
+        
         if energy
             set[:eneg] = ["col","ele","oil"]
             add_permutation!(set, (:r,:e))
@@ -60,6 +60,7 @@ end
 """
 """
 function describe_parameters!(set::Dict, subset::Symbol)
+    # !!!! reorganize?
     if !haskey(set, subset)
         set[subset] = SLiDE.build_parameters("$subset")
     end

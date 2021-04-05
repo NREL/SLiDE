@@ -146,10 +146,6 @@ export share_sector!
 export disaggregate_sector!
 export aggregate_sector!
 
-# # SCALE
-# export scale_with_map
-# export scale_with_share
-
 # ENERGY ENVIRONMENT MODULE
 export eem
 export eem_elegen!
@@ -234,9 +230,7 @@ include(joinpath("build", "share", "share_sgf.jl"))
 include(joinpath("build", "share", "share_utd.jl"))
 include(joinpath("build", "share", "share_sector.jl"))
 include(joinpath("build", "disagg", "disagg_region.jl"))
-# include(joinpath("build", "disagg", "disagg_sector.jl"))
 
-# include(joinpath("build", "scale.jl"))
 include(joinpath("scale", "constructors.jl"))
 include(joinpath("scale", "scale_sector.jl"))
 include(joinpath("scale", "scale_with.jl"))

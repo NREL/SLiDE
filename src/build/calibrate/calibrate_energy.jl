@@ -48,8 +48,8 @@ function calibrate_energy(
     # !!!! define as SLiDE constants
     lower_bound=0.25,
     upper_bound=1.75,
-    lower_bound_seds = 0.75,
-    upper_bound_seds = 1.25,
+    lower_bound_seds=0.75,
+    upper_bound_seds=1.25,
     optimize::Bool=true,
 )
     @info("Calibrating $year data")
