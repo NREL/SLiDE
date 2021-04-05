@@ -5,7 +5,6 @@ version = "0.1.0"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
 Complementarity = "a9b2a840-c9d5-5181-a245-8df664c2d6e7"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"

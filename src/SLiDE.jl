@@ -8,7 +8,8 @@ module SLiDE
 #################################################################################
 # IMPORTS
 import CSV
-import Combinatorics
+# import Combinatorics
+import Complementarity;     using Complementarity
 import DataFrames;          using DataFrames
 import Dates
 import DelimitedFiles;      using DelimitedFiles
