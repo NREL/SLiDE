@@ -38,6 +38,10 @@ const SLIDE_DIR = abspath(joinpath(dirname(Base.find_package("SLiDE")), ".."))
 export SLIDE_DIR
 
 # EXPORTS
+export EconomicSystemsType
+export DataStream
+
+export Edit
 export Add
 export Concatenate
 export Combine
@@ -55,22 +59,22 @@ export Rename
 export Replace
 export Stack
 
+export File
 export SetInput
 export CSVInput
 export GAMSInput
 export XLSXInput
 export DataInput
 
+export Check
 export FileInput
 
+export CGE
 export Parameter
 
-export EconomicSystemsType
-export CGE
-export DataStream
-export Check
-export Edit
-export File
+export Scale
+export Weighting
+export Mapping
 
 # UTILITIES
 export append
@@ -173,6 +177,9 @@ abstract type Check <: DataStream end
 
 abstract type CGE <: EconomicSystemsType end
 
+abstract type Scale <: EconomicSystemsType end
+
+
 # CONSTANTS
 include("definitions.jl")
 export SUB_ELAST
@@ -194,6 +201,8 @@ include(joinpath("parse", "generated_edit", "includes.jl"))
 include(joinpath("parse", "generated_file", "includes.jl"))
 
 include(joinpath("model", "generated_cge", "includes.jl"))
+
+include(joinpath("scale", "generated_scale", "includes.jl"))
 
 # UTILITIES
 include(joinpath("utils", "calc.jl"))

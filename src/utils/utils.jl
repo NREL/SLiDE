@@ -18,6 +18,13 @@ Base.broadcastable(x::InvertedIndex{T}) where {T <: Any} = [x];
 
 
 """
+Extends copy to Weighting and Mapping
+"""
+Base.copy(x::Weighting) = Weighting(copy(x.data), x.constant, x.from, x.to, x.on, x.direction)
+Base.copy(x::Mapping) = Mapping(copy(x.data), x.from, x.to, x.on, x.direction)
+
+
+"""
     Base.split(x::Missing)
     Base.split(x::Number)
 Extends `split` to ignore missing fields.
@@ -176,6 +183,10 @@ convert_type(::Type{UnitRange}, x::Any) = convert_type(UnitRange, ensurearray(x)
 
 convert_type(::Type{DataFrame}, x::NamedTuple) = DataFrame(permute(x))
 convert_type(::Type{T}, x::T) where T = x
+
+function convert_type(::Type{Mapping}, x::Weighting)
+    return Mapping(unique(x.data[:,[x.from;x.to]]), x.from, x.to, x.on, x.direction)
+end
 
 # [@printf("%-8s %s\n", T, fieldpropertynames(T)[T.types .== Any]) for T in subtypes(Edit) if Any in T.types]
 

@@ -1,21 +1,21 @@
 """
     scale_with(df, x)
 """
-function scale_with(df::DataFrame, x::Factor)
+function scale_with(df::DataFrame, x::Weighting)
     # Save unaffected indices. Map the others and calculate share.
     df_ones = filter_with(df, Not(x))
     df = edit_with(df,
-        Map(x.data, [x.index;x.from], [x.to;:value], [x.index;x.on], [x.on;:share], :inner)
+        Map(x.data, [x.constant;x.from], [x.to;:value], [x.constant;x.on], [x.on;:share], :inner)
     )
     df[!,:value] .*= df[:,:share]
 
     # Sum if aggregating.
-    x.direction == :aggregate && (df = combine_over(df, :dummy))    
+    x.direction == :aggregate && (df = combine_over(df, :dummy))
     return vcat(select(df, Not(:share)), df_ones)
 end
 
 
-function scale_with(df::DataFrame, x::Index)    
+function scale_with(df::DataFrame, x::Mapping)    
     # Save unaffected indices. Map the others.
     df_ones = filter_with(df, Not(x))
     df = edit_with(df, Map(x.data, [x.from;], [x.to;], [x.on;], [x.on;], :inner))
@@ -32,7 +32,7 @@ scale_with(df::DataFrame, x::Missing) = df
 """
     scale_sector!(d, set, x; kwargs...)
 """
-function scale_sector!(d::Dict, set::Dict, x::Factor;
+function scale_sector!(d::Dict, set::Dict, x::Weighting;
     scale_id=:disaggregate,
 )
     # !!!! THIS ONLY WORKS FOR DISAGGREGATION
@@ -47,7 +47,7 @@ function scale_sector!(d::Dict, set::Dict, x::Factor;
         x = compound_sector!(d, set, k; scale_id=scale_id)
         
         # If we're disaggregating taxes, only map.
-        k in taxes && (x = convert_type(Index, x))
+        k in taxes && (x = convert_type(Mapping, x))
         d[k] = scale_with(d[k], x)
     end
 
@@ -55,7 +55,7 @@ function scale_sector!(d::Dict, set::Dict, x::Factor;
 end
 
 
-function scale_sector!(d::Dict, set::Dict, x::Index;
+function scale_sector!(d::Dict, set::Dict, x::Mapping;
     scale_id=:aggregate,
 )
     d[scale_id] = x
@@ -73,7 +73,7 @@ function scale_sector!(d::Dict, set::Dict, x::Index;
 end
 
 
-function scale_sector!(d::Dict, set::Dict, x::Index, var::AbstractArray;
+function scale_sector!(d::Dict, set::Dict, x::Mapping, var::AbstractArray;
     scale_id=missing,
 )
     d[scale_id] = x
@@ -136,7 +136,7 @@ and ``g``, ``s`` represent aggregate-level goods and sectors.
 - `d[tax]::DataFrame`: mapped tax parameter
 - `d[key]::DataFrame`: mapped scaling parameter
 """
-function aggregate_tax_with!(d::Dict, set::Dict, x::Index, tax::Symbol, key::Symbol;
+function aggregate_tax_with!(d::Dict, set::Dict, x::Mapping, tax::Symbol, key::Symbol;
     scale_id=:scale,
 )
     sector = setdiff(propertynames(d[key]), propertynames(d[tax]))

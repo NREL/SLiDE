@@ -1,11 +1,11 @@
-function iscomplete(index::Index, lst::AbstractArray)
-    df = DataFrame(index.on => lst)
-    return isempty(antijoin(index.data, df, on=Pair.(index.from, index.on)))
+function iscomplete(mapping::Mapping, lst::AbstractArray)
+    df = DataFrame(mapping.on => lst)
+    return isempty(antijoin(mapping.data, df, on=Pair.(mapping.from, mapping.on)))
 end
 
-function find_set(index::Index, set::Dict, levels::AbstractArray)
-    df = vcat([DataFrame(index.on => set[k], :set => k) for k in levels]...)
-    df = innerjoin(index.data, df, on=Pair.(index.from, index.on))
+function find_set(mapping::Mapping, set::Dict, levels::AbstractArray)
+    df = vcat([DataFrame(mapping.on => set[k], :set => k) for k in levels]...)
+    df = innerjoin(mapping.data, df, on=Pair.(mapping.from, mapping.on))
     return unique(df[:,:set])
 end
 
@@ -29,15 +29,15 @@ function share_sector!(d, set;
     df = select(det[:y0], Not(:units));
 
     # Initialize scaling information.
-    factor = Factor(df)
-    index = Index(dfmap)
+    weighting = Weighting(df)
+    mapping = Mapping(dfmap)
     lst = copy(set[:sector])
     
-    set_scheme!(factor, index)
-    share_with!(factor, index)
-    filter_with!(factor, index, lst)    # what if we only have summary OR detail-level lst?
+    set_scheme!(weighting, mapping)
+    share_with!(weighting, mapping)
+    filter_with!(weighting, mapping, lst)    # what if we only have summary OR detail-level lst?
 
-    d[:sector] = factor
+    d[:sector] = weighting
     return d[:sector]
 end
 
@@ -45,8 +45,8 @@ end
 """
 """
 function disaggregate_sector!(d::Dict, set::Dict)
-    factor = share_sector!(d, set)
-    scale_sector!(d, set, factor)
+    weighting = share_sector!(d, set)
+    scale_sector!(d, set, weighting)
     return d
 end
 
@@ -61,25 +61,25 @@ end
 
 
 function aggregate_with!(d::Dict, set::Dict, dfmap::DataFrame)
-    # Define an index and its scheme to map from the current sectoral set.
+    # Store dfmap as `Mapping` and set scheme based on the current sectoral set.
     # After the build stream, this *should* be equivalent to the summary-level set.
-    index = Index(dfmap)
-    set_scheme!(index, DataFrame(g=set[:sector]))
+    mapping = Mapping(dfmap)
+    set_scheme!(mapping, DataFrame(g=set[:sector]))
 
     # If scaling FROM ANY detail-level codes, disaggregate summary- to detail-level
     # (or a hybrid of the two).
-    if !iscomplete(index, set[:sector])
+    if !iscomplete(mapping, set[:sector])
         println("INCOMPLETE")
-        SLiDE._set_sector!(set, index.data[:,index.from])
-        # !!!! Verify that only summary- and detail-level codes are represented in index.from
-        # find_set(index, set, [:detail,:summary])
+        SLiDE._set_sector!(set, mapping.data[:,mapping.from])
+        # !!!! Verify that only summary- and detail-level codes are represented in mapping.from
+        # find_set(mapping, set, [:detail,:summary])
         disaggregate_sector!(d, set)
     else
-        SLiDE._set_sector!(set, index.data[:,index.from])
+        SLiDE._set_sector!(set, mapping.data[:,mapping.from])
     end
     
     dis = copy(d)
-    scale_sector!(d, set, index; scale_id=:eem)
+    scale_sector!(d, set, mapping; scale_id=:eem)
     agg = copy(d)
 
     return dis, agg

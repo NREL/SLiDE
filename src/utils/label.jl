@@ -27,6 +27,7 @@ _inp_key(x::SetInput) = length(split(x.descriptor)) > 1 ? Tuple(split(x.descript
 _inp_key(x::T) where {T <: File} = Symbol(x.descriptor)
 _inp_key(x::Parameter) = Symbol(x.parameter)
 _inp_key(x::String) = convert_type(Symbol, splitext(splitdir(x)[end])[1])
+_inp_key(x::Symbol, col) = SLiDE._inp_key([x;col])
 
 
 """

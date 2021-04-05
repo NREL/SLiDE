@@ -20,41 +20,41 @@ function impute_mean(df, col; weight=DataFrame(), condition=DataFrame())
     return indexjoin(condition, dfavg; kind=kind)
 end
 
-# --------------------------------------------------------------
-# shrgas
-# df = copy(d[:prodval])
-# df = df / transform_over(df, :src)
-# col = :r
+# # --------------------------------------------------------------
+# # shrgas
+# # df = copy(d[:prodval])
+# # df = df / transform_over(df, :src)
+# # col = :r
 
-# # dfweight = 
-# condition = crossjoin(
-#     filter_with(combine_over(d[:ys0], :g), (s="cng",); drop=true)[:,1:end-1],
-#     DataFrame(src=unique(df[:,:src])),
-# )
+# # # dfweight = 
+# # condition = crossjoin(
+# #     filter_with(combine_over(d[:ys0], :g), (s="cng",); drop=true)[:,1:end-1],
+# #     DataFrame(src=unique(df[:,:src])),
+# # )
 
-# df = impute_mean(df, col; condition=condition)
+# # df = impute_mean(df, col; condition=condition)
 
-# df = df / combine_over(df, :src)
-# df = select(df, Not(:units))
+# # df = df / combine_over(df, :src)
+# # df = select(df, Not(:units))
 
 
-# --------------------------------------------------------------
-var = :pq
-val = [:units,:value]
+# # --------------------------------------------------------------
+# var = :pq
+# val = [:units,:value]
 
-splitter = DataFrame(permute((src=[set[:ff];"ele"], sec=set[:demsec], pq=["p","q"])))
-splitter = indexjoin(splitter, maps[:pq]; kind=:left)
-idx = [:yr,:r,:src]
+# splitter = DataFrame(permute((src=[set[:ff];"ele"], sec=set[:demsec], pq=["p","q"])))
+# splitter = indexjoin(splitter, maps[:pq]; kind=:left)
+# idx = [:yr,:r,:src]
 
-df, df_out = split_with(copy(d[:energy]), splitter);
+# df, df_out = split_with(copy(d[:energy]), splitter);
 
-# p, q = split_with(df, (pq="p",); drop=true)
+# # p, q = split_with(df, (pq="p",); drop=true)
 
-# df[!,:pq] .= df[:,:p] .* df[:,:q]
-# pedef = combine_over(df,:sec)
-# pedef[!,:value] .= pedef[:,:pq] ./ pedef[:,:q]
-# pedef[!,:units] .= pedef[:,:units_p]
+# # df[!,:pq] .= df[:,:p] .* df[:,:q]
+# # pedef = combine_over(df,:sec)
+# # pedef[!,:value] .= pedef[:,:pq] ./ pedef[:,:q]
+# # pedef[!,:units] .= pedef[:,:units_p]
 
-# idx = intersect(findindex(pedef), propertynames(df_out))
+# # idx = intersect(findindex(pedef), propertynames(df_out))
 
-# --------------------------------------------------------------
+# # --------------------------------------------------------------

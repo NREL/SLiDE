@@ -1,85 +1,34 @@
-abstract type Scale <: EconomicSystemsType end
-# abstract type Share <: Scale end
-# abstract type Map <: Scale end
-
-mutable struct Index <: Scale
-    data::DataFrame
-    from::Union{Symbol,Array{Symbol,1}}
-    to::Union{Symbol,Array{Symbol,1}}
-    on::Union{Symbol,Array{Symbol,1}}
-    direction::Symbol
-end
-
-function Index(; data, from, to, on, direction, )
-    Index(data, from, to, on, direction, )
-end
-
-mutable struct Factor <: Scale
-    data::DataFrame
-    index::Array{Symbol,1}
-    from::Union{Symbol,Array{Symbol,1}}
-    to::Union{Symbol,Array{Symbol,1}}
-    on::Union{Symbol,Array{Symbol,1}}
-    direction::Symbol
-end
-
-function Factor(; data, index, from, to, on, direction, )
-    Factor(data, index, from, to, on, direction, )
-end
-
-
-# ------------------------------------------------------------------------------------------
-
-
 """
 """
-function Factor(data::DataFrame;
-    index=[:undef],
+function SLiDE.Weighting(data::DataFrame;
+    constant=[:undef],
     from=:undef,
     to=:undef,
     on=:undef,
     direction=:undef,
 )
-    return Factor(data, index, from, to, on, direction)
+    return Weighting(data, constant, from, to, on, direction)
 end
 
 
 """
 """
-function Index(data::DataFrame; from=:undef, to=:undef, on=:undef, direction=:undef)
-    return Index(data, from, to, on, direction)
+function SLiDE.Mapping(data::DataFrame; from=:undef, to=:undef, on=:undef, direction=:undef)
+    return Mapping(data, from, to, on, direction)
 end
 
 
 # ------------------------------------------------------------------------------------------
 
-"""
-Extends copy to Factor and Index
-"""
-Base.copy(x::Factor) = Factor(copy(x.data), x.index, x.from, x.to, x.on, x.direction)
-Base.copy(x::Index) = Index(copy(x.data), x.from, x.to, x.on, x.direction)
-
-SLiDE._inp_key(x::AbstractArray) = Tuple(x)
-SLiDE._inp_key(x::Symbol, col) = SLiDE._inp_key([x;col])
 
 
-function SLiDE.convert_type(::Type{Index}, x::Factor)
-    return Index(unique(x.data[:,[x.from;x.to]]), x.from, x.to, x.on, x.direction)
-end
 
 
-function SLiDE.filter_with(df::DataFrame, x::InvertedIndex{Factor})
-    x = x.skip
-    df_not = antijoin(df, x.data[:,[x.index;x.from]],
-        on=Pair.([x.index;x.on],[x.index;x.from]))
-    return df_not
-end
 
-function SLiDE.filter_with(df::DataFrame, x::InvertedIndex{Index})
-    x = x.skip
-    df_not = antijoin(df, x.data[:,ensurearray(x.from)], on=Pair.(x.on,x.from))
-    return df_not
-end
+
+
+
+
 
 
 # ------------------------------------------------------------------------------------------
@@ -105,15 +54,15 @@ drop_identity(df, idx::Tuple) = drop_identity(df, ensurearray(idx))
 
 """
 """
-function map_identity(x::Index, lst::AbstractArray)
+function map_identity(x::Mapping, lst::AbstractArray)
     col = propertynames(x.data)
     lst_ones = setdiff(lst, vcat(values.(eachcol(x.data))...))
     return DataFrame(fill(lst_ones, size(col)), col)
 end
 
-function map_identity(x::Factor, lst::AbstractArray)
-    df_ones = map_identity(convert_type(Index,x), lst)
-    df_index = unique(x.data[:,ensurearray(x.index)])
+function map_identity(x::Weighting, lst::AbstractArray)
+    df_ones = map_identity(convert_type(Mapping,x), lst)
+    df_index = unique(x.data[:,ensurearray(x.constant)])
     return edit_with(crossjoin(df_index, df_ones), Add.(:value,1.0))
 end
 
@@ -146,22 +95,22 @@ find_sector(df::DataFrame) = find_sector(propertynames(df))
 
 
 """
-Defines [`SLiDE.Factor`](@ref) field `index` if `on` is already defined.
+Defines [`SLiDE.Weighting`](@ref) field `constant` if `on` is already defined.
 """
-function set_index!(x::Factor)
+function set_constant!(x::Weighting)
     idx = findindex(x.data)
     field = ensurearray(x.on)
-    !isempty(intersect(idx, field)) && (x.index = setdiff(idx, field))
+    !isempty(intersect(idx, field)) && (x.constant = setdiff(idx, field))
     return x
 end
 
 
 """
-Defines [`SLiDE.Factor`](@ref) field `on` if `index` is already defined.
+Defines [`SLiDE.Weighting`](@ref) field `on` if `constant` is already defined.
 """
-function set_on!(x::Factor)
+function set_on!(x::Weighting)
     idx = findindex(x.data)
-    field = x.index
+    field = x.constant
     !isempty(intersect(idx, field)) && (x.on = setdiff(idx, field))
     return x
 end
@@ -216,33 +165,33 @@ end
 
 
 """
-    set_scheme!(index::Index)
-Defines `Index` and/or `Factor` fields `from` and `to` if `direction` is already defined
+    set_scheme!(mapping::Mapping)
+Defines `Mapping` and/or `Weighting` fields `from` and `to` if `direction` is already defined
 
-    set_scheme!(index::Index, factor::Factor)
-    set_scheme!(factor::Factor, index::Index)
-Defines `Index` and/or `Factor` fields `from` and `to` !!!!
+    set_scheme!(mapping::Mapping, weighting::Weighting)
+    set_scheme!(weighting::Weighting, mapping::Mapping)
+Defines `Mapping` and/or `Weighting` fields `from` and `to` !!!!
 """
-function set_scheme!(factor::Factor, index::Index)
+function set_scheme!(weighting::Weighting, mapping::Mapping)
     # Mapping
-    from, to, on = map_scheme(factor, index)
-    factor.from, factor.to, factor.on = from, to, on
-    index.from, index.to, index.on = from, to, on
+    from, to, on = map_scheme(weighting, mapping)
+    weighting.from, weighting.to, weighting.on = from, to, on
+    mapping.from, mapping.to, mapping.on = from, to, on
     
     # Direction -- DO NOT change from, to fields. These are determined based on overlap
-    # between factor and index data.
-    set_direction!(index)
-    factor.direction = index.direction
+    # between weighting and mapping data.
+    set_direction!(mapping)
+    weighting.direction = mapping.direction
 
-    # Index
-    set_index!(factor)
-    return factor, index
+    # Mapping
+    set_constant!(weighting)
+    return weighting, mapping
 end
 
 
-function set_scheme!(index::Index, factor::Factor)
-    factor, index = set_scheme!(factor, index)
-    return index, factor
+function set_scheme!(mapping::Mapping, weighting::Weighting)
+    weighting, mapping = set_scheme!(weighting, mapping)
+    return mapping, weighting
 end
 
 
@@ -256,14 +205,14 @@ end
 """
     map_scheme(df)
 """
-map_scheme(factor::Factor, index::Index) = _map_scheme(factor.data, index.data)
-map_scheme(index::Index, factor::Factor) = map_scheme(factor, index)
+map_scheme(weighting::Weighting, mapping::Mapping) = _map_scheme(weighting.data, mapping.data)
+map_scheme(mapping::Mapping, weighting::Weighting) = map_scheme(weighting, mapping)
 
-function map_scheme(x::Factor, df::DataFrame)
+function map_scheme(x::Weighting, df::DataFrame)
     return _map_scheme(df, x.data[:,[x.from;x.to]], x.on)
 end
 
-map_scheme(x::Index, df::DataFrame) = _map_scheme(df, x.data)
+map_scheme(x::Mapping, df::DataFrame) = _map_scheme(df, x.data)
 
 
 """
@@ -308,22 +257,22 @@ end
 
 
 """
-    share_with!(factor::Factor, index::Index)
-Returns `factor` with `factor.data::DataFrame` shared using [`SLiDE.share_with`](@ref)
+    share_with!(weighting::Weighting, mapping::Mapping)
+Returns `weighting` with `weighting.data::DataFrame` shared using [`SLiDE.share_with`](@ref)
 """
-function share_with!(factor::Factor, index::Index)
-    factor.data = select(
-        share_with(factor.data, index),
-        [factor.index; factor.from; factor.to; findvalue(factor.data)],
+function share_with!(weighting::Weighting, mapping::Mapping)
+    weighting.data = select(
+        share_with(weighting.data, mapping),
+        [weighting.constant; weighting.from; weighting.to; findvalue(weighting.data)],
     )
-    return factor
+    return weighting
 end
 
 
 """
-    share_with(df::DataFrame, x::Index)
+    share_with(df::DataFrame, x::Mapping)
 """
-function share_with(df::DataFrame, x::Index)
+function share_with(df::DataFrame, x::Mapping)
     df = edit_with(df, [
         Rename(x.on, x.from);
         Map(x.data, [x.from;], [x.to;], [x.from;], [x.to;], :inner);
@@ -338,61 +287,61 @@ end
 
 
 """
-    filter_with!(factor::Factor, lst::AbstractArray)
+    filter_with!(weighting::Weighting, lst::AbstractArray)
 
-    filter_with!(index::Index, factor::Factor)
+    filter_with!(mapping::Mapping, weighting::Weighting)
 
 
-    filter_with!(index::Index, factor::Factor, lst::AbstractArray)
-    filter_with!(factor::Factor, index::Index, lst::AbstractArray)
+    filter_with!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
+    filter_with!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
 Apply the above methods sequentially and returns all input arguments in the order in which
 they are given.
 """
-function filter_with!(factor::Factor, lst::AbstractArray)
-    agg, dis = map_direction(factor)
+function filter_with!(weighting::Weighting, lst::AbstractArray)
+    agg, dis = map_direction(weighting)
 
-    dftmp = combine_over(factor.data, dis)
+    dftmp = combine_over(weighting.data, dis)
     if !all(dftmp[:,:value].==1.0)
         @error("Shares must sum to 1.")
     end
 
-    dfdis = filter_with(factor.data, Dict(dis=>lst,))
+    dfdis = filter_with(weighting.data, Dict(dis=>lst,))
     
     dfagg = fill_with(unique(select(dfdis, Not(dis))), 1.0)
     dfagg = dfagg - combine_over(dfdis, dis)
     dfagg[!,dis] .= dfagg[:,agg]
     
-    factor.data = vcat(dfdis,dfagg)
+    weighting.data = vcat(dfdis,dfagg)
 
     # Update x to add any aggregate-level sectors that were not already included,
     # but for which a disaggregate-level code exists.
-    lst_new = setdiff(factor.data[:,agg], lst)
+    lst_new = setdiff(weighting.data[:,agg], lst)
     [push!(lst, x) for x in lst_new]
 
-    return factor, lst
+    return weighting, lst
 end
 
-function filter_with!(index::Index, factor::Factor)
-    col = intersect(propertynames(factor.data), propertynames(index.data))
-    index.data = unique(factor.data[:,col])
-    return index
+function filter_with!(mapping::Mapping, weighting::Weighting)
+    col = intersect(propertynames(weighting.data), propertynames(mapping.data))
+    mapping.data = unique(weighting.data[:,col])
+    return mapping
 end
 
-function filter_with!(factor::Factor, index::Index, lst::AbstractArray)
-    factor, lst = filter_with!(factor, lst)
-    index = filter_with!(index, factor)
-    return factor, index, lst
+function filter_with!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
+    weighting, lst = filter_with!(weighting, lst)
+    mapping = filter_with!(mapping, weighting)
+    return weighting, mapping, lst
 end
 
-function filter_with!(index::Index, factor::Factor, lst::AbstractArray)
-    factor, index, lst = filter_with!(factor, index, lst)
-    return index, factor, lst
+function filter_with!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
+    weighting, mapping, lst = filter_with!(weighting, mapping, lst)
+    return mapping, weighting, lst
 end
 
 
 """
-    compound_for(x::Factor, df::DataFrame, lst::AbstractArray)
-    compound_for(x::Factor, df::DataFrame, lst::AbstractArray)
+    compound_for(x::Weighting, df::DataFrame, lst::AbstractArray)
+    compound_for(x::Weighting, df::DataFrame, lst::AbstractArray)
     compound_for(x::T, col::Symbol) where T<:Scale
 """
 function compound_for(x::T, df::DataFrame, lst::AbstractArray) where T <: Scale
@@ -407,9 +356,9 @@ compound_for(x::T, col::Symbol) where T <: Scale = compound_for!(copy(x), col)
 
 
 """
-    compound_for!(x::Factor, col)
-    compound_for!(x::Factor, col, lst::AbstractArray)
-    compound_for!(x::Factor, df::DataFrame, lst::AbstractArray)
+    compound_for!(x::Weighting, col)
+    compound_for!(x::Weighting, col, lst::AbstractArray)
+    compound_for!(x::Weighting, df::DataFrame, lst::AbstractArray)
 This function maps `x.data` to disaggregate variables (`ys0`, `id0`) that include both
 goods and sectors:
 
@@ -466,11 +415,11 @@ function compound_for!(x::T, col::Symbol) where T <: Scale
     return x
 end
 
-function compound_for!(x::Index, col::AbstractArray)
+function compound_for!(x::Mapping, col::AbstractArray)
     if length(col)==1
         compound_for!(x, col[1])
     else
-        @error("Can only compound type Index for one column (by renaming)")
+        @error("Can only compound type Mapping for one column (by renaming)")
     end
     return x
 end
@@ -480,9 +429,9 @@ compound_for!(x::T, col::Missing, lst::AbstractArray)  where T <: Scale = missin
 
 
 """
-Helper function to handle the differing treatment of compounding Index and Factor data.
+Helper function to handle the differing treatment of compounding Mapping and Weighting data.
 """
-function _compound_with(x::Factor, df::DataFrame, df_ones::DataFrame, xedit::Dict)
+function _compound_with(x::Weighting, df::DataFrame, df_ones::DataFrame, xedit::Dict)
     df_ones = vcat([edit_with(df, xedit[fwd]) * edit_with(df_ones, xedit[rev])
         for (fwd,rev) in zip(x.on, reverse(x.on))]...)
     
@@ -503,11 +452,11 @@ function _compound_with(x::Factor, df::DataFrame, df_ones::DataFrame, xedit::Dic
     df_same = df_same[ii_same,:]
 
     df = vcat(df_same, df_diff)
-    return select(vcat(df,df_ones), [x.index;x.from;x.to;:value])
+    return select(vcat(df,df_ones), [x.constant;x.from;x.to;:value])
 end
 
 
-function _compound_with(x::Index, df::DataFrame, df_ones::DataFrame, xedit::Dict)
+function _compound_with(x::Mapping, df::DataFrame, df_ones::DataFrame, xedit::Dict)
     df_ones = vcat([crossjoin(edit_with(df, xedit[fwd]), edit_with(df_ones, xedit[rev]))
         for (fwd,rev) in zip(x.on, reverse(x.on))]...)
 
@@ -520,7 +469,7 @@ end
 """
     compound_sector!(d, set, var; scale_id)
 """
-function compound_sector!(d::Dict, set::Dict, var::Symbol; scale_id::Symbol=:factor)
+function compound_sector!(d::Dict, set::Dict, var::Symbol; scale_id::Symbol=:weighting)
     df = d[var]
     col = find_sector(df)
     lst = set[:sector]

@@ -1,8 +1,10 @@
 using SLiDE, DataFrames
+
 f_dev = joinpath(SLIDE_DIR,"dev","disagg_sector")
 include(joinpath(f_dev,"scale_structs.jl"))
 include(joinpath(f_dev,"packaged.jl"))
 include(joinpath(f_dev,"scale_with.jl"))
+
 
 # Check...
 f_read = joinpath(SLIDE_DIR,"dev","readfiles")
@@ -20,6 +22,7 @@ dfmap = read_file(path)[:,1:2]
 dis_out = Dict(k => filter_with(df, (yr=[2007,2012],)) for (k,df) in dis_out)
 agg_out = Dict(k => filter_with(df, (yr=[2007,2012],)) for (k,df) in agg_out if :yr in propertynames(df))
 din = Dict{Any,Any}(k => filter_with(df, (yr=[2007,2012],)) for (k,df) in din)
+
 
 # Read things.
 set = merge(Dict(), setin)
@@ -40,7 +43,7 @@ agg_comp = benchmark_against(agg, agg_out)
 # path = joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem_pmt.csv")
 # dfmap = read_file(path)[:,1:2]
 
-# index = Index(dfmap)
+# index = Mapping(dfmap)
 # set_scheme!(index, DataFrame(g=set[:sector]))
 
 # scale_sector!(d, set, index; factor_id=:eem)

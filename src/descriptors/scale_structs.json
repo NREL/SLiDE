@@ -1,0 +1,71 @@
+[
+    {
+        "struct_name": "Weighting",
+        "docstring": "Store mapping AND weighting information for scaling.",
+        "fields": [
+            {
+                "name": "data",
+                "comment": "input file name",
+                "data_type": "DataFrame"
+            },
+            {
+                "name": "constant",
+                "comment": "`data` columns that are included in but not changed by the mapping process",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "from",
+                "comment": "`data` columns that overlap with `on`",
+                "data_type": "Union{Symbol,Array{Symbol,1}}"
+            },
+            {
+                "name": "to",
+                "comment": "`data` columns that DO NOT overlap with `on`",
+                "data_type": "Union{Symbol,Array{Symbol,1}}"
+            },
+            {
+                "name": "on",
+                "comment": "columns that can be mapped with `data`",
+                "data_type": "Union{Symbol,Array{Symbol,1}}"
+            },
+            {
+                "name": "direction",
+                "comment": "indicator describing whether to aggregate/disaggregate",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Scale"
+    },
+    {
+        "struct_name": "Mapping",
+        "docstring": "Store mapping information for scaling. This should NOT include any multiplication factors.",
+        "fields": [
+            {
+                "name": "data",
+                "comment": "input file name",
+                "data_type": "DataFrame"
+            },
+            {
+                "name": "from",
+                "comment": "`data` columns that overlap with `on`",
+                "data_type": "Union{Symbol,Array{Symbol,1}}"
+            },
+            {
+                "name": "to",
+                "comment": "`data` columns that DO NOT overlap with `on`",
+                "data_type": "Union{Symbol,Array{Symbol,1}}"
+            },
+            {
+                "name": "on",
+                "comment": "columns that can be mapped with `data`",
+                "data_type": "Union{Symbol,Array{Symbol,1}}"
+            },
+            {
+                "name": "direction",
+                "comment": "indicator describing whether to aggregate/disaggregate",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Scale"
+    }
+]

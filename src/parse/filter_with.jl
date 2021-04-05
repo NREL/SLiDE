@@ -137,6 +137,21 @@ function filter_with(df::DataFrame, idx::InvertedIndex{DataFrame})
 end
 
 
+function filter_with(df::DataFrame, x::InvertedIndex{Weighting})
+    x = x.skip
+    df_not = antijoin(df, x.data[:,[x.constant;x.from]],
+        on=Pair.([x.constant;x.on],[x.constant;x.from]))
+    return df_not
+end
+
+
+function filter_with(df::DataFrame, x::InvertedIndex{Mapping})
+    x = x.skip
+    df_not = antijoin(df, x.data[:,ensurearray(x.from)], on=Pair.(x.on,x.from))
+    return df_not
+end
+
+
 """
     split_with(df::DataFrame, splitter)
 This function separates `df` into two DataFrames, `df_in` and `df_out`.
