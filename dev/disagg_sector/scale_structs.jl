@@ -20,17 +20,6 @@ end
 
 # ------------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
 # ------------------------------------------------------------------------------------------
 list_unique(df::DataFrame) = unique(vcat(eachcol(df)...))
 list_unique(df::DataFrame, idx::AbstractArray) = list_unique(df[:,idx])
@@ -469,17 +458,19 @@ end
 """
     compound_sector!(d, set, var; scale_id)
 """
-function compound_sector!(d::Dict, set::Dict, var::Symbol; scale_id::Symbol=:weighting)
+function compound_sector!(d::Dict, set::Dict, var::Symbol; scale_id=missing)
     df = d[var]
-    col = find_sector(df)
-    lst = set[:sector]
+    sector = find_sector(df)
 
-    if ismissing(col)
+    if ismissing(sector)
         return missing
     else
-        key = SLiDE._inp_key(scale_id,col)
-        if !haskey(d, key)
-            d[key] = compound_for(d[scale_id], df[:, ensurearray(col)], lst)
+        key = SLiDE._inp_key(scale_id, sector)
+        # If the key does not already exist in the DataFrame, compound for the DataFrame
+        # (with sector columns only) to run set_scheme! and update direction.
+        # If the key exists, but is the wrong type (Weighting vs. Mapping), re-compound.
+        if !haskey(d, key) || typeof(d[scale_id]) !== typeof(d[key])
+            d[key] = compound_for(d[scale_id], df[:, ensurearray(sector)], set[:sector])
         end
         return d[key]
     end

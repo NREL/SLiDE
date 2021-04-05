@@ -11,9 +11,9 @@ end
 
 
 """
-    share_sector!(d, set)
+    share_sector()
 """
-function share_sector!(d, set;
+function share_sector( ;
     path::String=joinpath(SLIDE_DIR,"data","coremaps","scale","sector","bluenote.csv"),
 )
     dfmap = read_file(path)[:,1:2]
@@ -25,19 +25,38 @@ function share_sector!(d, set;
         Dict(:sector=>:detail),
     )
     SLiDE._partition_y0!(det, set_det)
-
-    df = select(det[:y0], Not(:units));
-
+    df = select(det[:y0], Not(:units))
+    
     # Initialize scaling information.
     weighting = Weighting(df)
     mapping = Mapping(dfmap)
-    lst = copy(set[:sector])
     
     set_scheme!(weighting, mapping)
     share_with!(weighting, mapping)
-    filter_with!(weighting, mapping, lst)    # what if we only have summary OR detail-level lst?
 
+    return weighting, mapping
+end
+
+
+function share_sector(lst::AbstractArray;
+    path::String=joinpath(SLIDE_DIR,"data","coremaps","scale","sector","bluenote.csv"),
+)
+    weighting, mapping = share_sector(; path=path)
+    filter_with!(weighting, mapping, lst)
+    return weighting, mapping, lst
+end
+
+
+"""
+"""
+function share_sector!(d, set;
+    path::String=joinpath(SLIDE_DIR,"data","coremaps","scale","sector","bluenote.csv"),
+)
+    # Need to make sure set[:sector] !== set[:summary]
+    weighting, mapping, lst = share_sector(set[:sector]; path=path)
     d[:sector] = weighting
+
+    SLiDE._set_sector!(set, lst)
     return d[:sector]
 end
 
@@ -46,7 +65,7 @@ end
 """
 function disaggregate_sector!(d::Dict, set::Dict)
     weighting = share_sector!(d, set)
-    scale_sector!(d, set, weighting)
+    disaggregate_sector!(d, set, weighting)
     return d
 end
 
@@ -79,7 +98,7 @@ function aggregate_with!(d::Dict, set::Dict, dfmap::DataFrame)
     end
     
     dis = copy(d)
-    scale_sector!(d, set, mapping; scale_id=:eem)
+    aggregate_sector!(d, set, mapping; scale_id=:eem)
     agg = copy(d)
 
     return dis, agg

@@ -30,35 +30,31 @@ scale_with(df::DataFrame, x::Missing) = df
 
 
 """
-    scale_sector!(d, set, x; kwargs...)
+    disaggregate_sector!(d, set, x; kwargs...)
 """
-function scale_sector!(d::Dict, set::Dict, x::Weighting;
+function disaggregate_sector!(d::Dict, set::Dict, x::Weighting;
     scale_id=:disaggregate,
 )
-    # !!!! THIS ONLY WORKS FOR DISAGGREGATION
-    # MAKE IT LIKE "X::INDEX -> AGGREGATE"
-    d[scale_id] = x
+    !haskey(d, scale_id) && push!(d, scale_id=>x)
 
     parameters = SLiDE.list_parameters!(set, :parameters)
     taxes = SLiDE.list_parameters!(set, :taxes)
     variables = setdiff(parameters, taxes)
 
-    for k in parameters
-        x = compound_sector!(d, set, k; scale_id=scale_id)
-        
-        # If we're disaggregating taxes, only map.
-        k in taxes && (x = convert_type(Mapping, x))
-        d[k] = scale_with(d[k], x)
-    end
-
+    x_tax = convert_type(Mapping, x)
+    scale_sector!(d, set, x, variables; scale_id=scale_id)
+    scale_sector!(d, set, x_tax, taxes; scale_id=scale_id)
     return d
 end
 
 
-function scale_sector!(d::Dict, set::Dict, x::Mapping;
+"""
+    aggregate_sector!(d, set, x; kwargs...)
+"""
+function aggregate_sector!(d::Dict, set::Dict, x::Mapping;
     scale_id=:aggregate,
 )
-    d[scale_id] = x
+    !haskey(d, scale_id) && push!(d, scale_id=>x)
     parameters = SLiDE.list_parameters!(set, :parameters)
 
     # Aggregate taxes.
@@ -73,16 +69,46 @@ function scale_sector!(d::Dict, set::Dict, x::Mapping;
 end
 
 
-function scale_sector!(d::Dict, set::Dict, x::Mapping, var::AbstractArray;
-    scale_id=missing,
-)
-    d[scale_id] = x
+"""
+    scale_sector!(d, set, x)
+"""
+function scale_sector!(d::Dict, set::Dict, x::T; scale_id=missing) where T <: Scale
+    scale_id = SLiDE._inp_key(scale_id, x)
 
-    for k in var
-        x = compound_sector!(d, set, k; scale_id=scale_id)
-        d[k] = scale_with(d[k], x)
+    d = if x.direction==:aggregate
+        aggregate_sector!(d, set, x; scale_id=scale_id)
+    elseif x.direction==:disaggregate
+        disaggregate_sector!(d, set, x; scale_id=scale_id)
     end
+    return d
+end
 
+
+function scale_sector!(d::Dict, set::Dict, x::Weighting, var::Symbol; scale_id=missing)
+    scale_id = SLiDE._inp_key(scale_id, x)
+    !haskey(d, scale_id) && push!(d, scale_id=>x)
+    
+    x = compound_sector!(d, set, var; scale_id=scale_id)
+
+    d[var] = scale_with(d[var], x)
+    return d[var]
+end
+
+function scale_sector!(d::Dict, set::Dict, x::Mapping, var::Symbol; scale_id=missing)
+    scale_id = SLiDE._inp_key(scale_id, x)
+    !haskey(d, scale_id) && push!(d, scale_id=>x)
+
+    x = compound_sector!(d, set, var; scale_id=scale_id)
+
+    if !ismissing(x)
+        x = convert_type(Mapping, x)
+        d[var] = scale_with(d[var], x)
+    end
+    return d[var]
+end
+
+function scale_sector!(d::Dict, set::Dict, x::T, var; scale_id=missing) where T <: Scale
+    [scale_sector!(d, set, x, v; scale_id=scale_id) for v in var]
     return d
 end
 
@@ -137,8 +163,9 @@ and ``g``, ``s`` represent aggregate-level goods and sectors.
 - `d[key]::DataFrame`: mapped scaling parameter
 """
 function aggregate_tax_with!(d::Dict, set::Dict, x::Mapping, tax::Symbol, key::Symbol;
-    scale_id=:scale,
+    scale_id=missing,
 )
+    scale_id = SLiDE._inp_key(scale_id, x)
     sector = setdiff(propertynames(d[key]), propertynames(d[tax]))
 
     d[tax] = d[tax] * combine_over(d[key], sector)

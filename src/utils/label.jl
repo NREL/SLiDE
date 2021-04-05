@@ -23,12 +23,14 @@ function _inp_key(x::AbstractArray)
     return x
 end
 
+# _inp_key(x) = convert_type(Symbol, x)
 _inp_key(x::SetInput) = length(split(x.descriptor)) > 1 ? Tuple(split(x.descriptor)) : x.descriptor
 _inp_key(x::T) where {T <: File} = Symbol(x.descriptor)
 _inp_key(x::Parameter) = Symbol(x.parameter)
 _inp_key(x::String) = convert_type(Symbol, splitext(splitdir(x)[end])[1])
-_inp_key(x::Symbol, col) = SLiDE._inp_key([x;col])
 
+_inp_key(x...) = _inp_key(vcat(ensurearray.(x)...))
+_inp_key(id, x::T) where T <: Scale = ismissing(id) ? x.direction : id
 
 """
 If no id is specified, default to `id = [x1,x2,...,xN]`
