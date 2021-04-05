@@ -5,16 +5,16 @@
 function scale_with_share(df::DataFrame, dfmap::DataFrame, on; key=missing)
     if !isempty(ensurearray(on))
         idx = setdiff(intersect(findindex(df), propertynames(dfmap)), on)
-        from, to = _find_scheme(select(df,Not(idx)), select(dfmap,Not(idx)))
+        from, to = SLiDE._find_scheme(df, dfmap, on)
         _print_scale_status(from, to; key=key)
-
+        
         # Split the DataFrame based on what needs editing and what doesn't (df_ones).
         # If df maps completely to dfmap, df_ones will be empty.
         df_ones = antijoin(df, unique(dfmap[:,ensurearray(from)]), on=from)
         df = edit_with(df, Map(dfmap, [idx;from], [to;:value], [idx;on], [on;:share], :inner))
 
         df[!,:value] .= df[:,:value] .* df[:,:share]
-
+        
         df = vcat(df_ones, df; cols=:intersect)
     end
 
@@ -87,9 +87,11 @@ SLiDE._find_scheme(df, set)
 ```
 """
 function _find_scheme(df::DataFrame)
-
-    col = sort(propertynames(df))
-    nn_col = sort(SLiDE.nunique(df[:,col]))
+    # Sort in case there are sets of aggregate- and disaggregate-level information.
+    # !!!! Does this (^) ever come up? Should it? Or does it just mess us up?
+    col = sort(setdiff(findindex(df), [:yr]))
+    # col = findindex(df)
+    nn_col = SLiDE.nunique(df[:,col])
     nn_unique = unique(nn_col)
 
     # If there is only ONE column on each the aggregate and disaggregate level...
@@ -97,8 +99,9 @@ function _find_scheme(df::DataFrame)
         ii = sortperm(nn_unique)
         agg, dis = col[ii[1]], col[ii[end]]
     else
-        scheme = [col[nn_col.==nn] for nn in nn_unique]
-        agg, dis = sort(scheme[1]), sort(scheme[end])
+        scheme = [col[nn_col.==nn] for nn in sort(nn_unique)]
+        # agg, dis = sort(scheme[1]), sort(scheme[end])
+        agg, dis = scheme[1], scheme[end]
     end
     
     return agg, dis
@@ -106,44 +109,65 @@ end
 
 
 function _find_scheme(df, dfmap::DataFrame)
-    idx = sort(findindex(df))
-    idxmap = sort(findindex(dfmap))
+    idx = setdiff(findindex(df), [:yr])
+    idxmap = setdiff(findindex(dfmap), [:yr])
 
-    from = intersect(idx, idxmap)
+    # from = intersect(idxmap, idx)
     # on = from
 
     # If there is NO overlap in names, look for overlap in values.
     # !!!! This will might cause weirdness if multiple columns in df map to dfmap,
     # but this shouldn't be too bad to address later.
-    if isempty(from)
+    # if isempty(from)
+        dfmap = dfmap[SLiDE.nunique.(eachrow(dfmap[:,idxmap])).==length(idxmap), idxmap]
+
         col = unique.(eachcol(df[:,idx]))
-        from = [k => kmap for (k,c) in zip(idx,col) for (kmap,cmap) in zip(idxmap, eachcol(dfmap))
-            if !isempty(intersect(c,cmap))]
+        colmap = unique.(skipmissing.(eachcol(dfmap)))
+        from = [k => kmap for (k,c) in zip(idx,col) for (kmap,cmap) in zip(idxmap, colmap)
+            if !isempty(intersect(cmap,c))]
         # on = getindex.(x,1)
         # from = unique(getindex.(x,2))
         to = setdiff(idxmap, getindex.(from,2))
-    else
-        to = setdiff(idxmap, from)
-    end
+    # else
+    #     to = setdiff(idxmap, from)
+    # end
 
     # Flatten lists.
     if length(from) == 1
         from, to = from[1], to[1]
     end
 
+    # if 
+
     return from, to
 end
 
 
-function _find_scheme(df, set::AbstractArray)
+function SLiDE._find_scheme(df, dfmap::DataFrame, col)
+    idx = setdiff(intersect(findindex(df), propertynames(dfmap)), col)
+    from, to = SLiDE._find_scheme(select(df,Not(idx)), select(dfmap,Not(idx)))
+
+    return from, to
+end
+
+
+function _find_scheme(df, x::AbstractArray)
     # Determine which column overlaps completely with the set.
     # We will scale from/to using this scheme.
-    col = propertynames(df)
-    ii = length.([intersect(set, col) for col in eachcol(df)]) .== SLiDE.nunique(df)
+    col = setdiff(findindex(df), [:yr])
 
-    aggr = propertynames(df)[ii][1]
-    disagg = propertynames(df)[.!ii][1]
-    return aggr, disagg
+    ii = length.([intersect(x, c) for c in eachcol(df[:,col])]) .== SLiDE.nunique(df[:,col])
+    
+    if all(ii)
+        ii = sortperm(SLiDE.nunique(df[:,col]))
+        aggr = col[ii[1]]
+        dis = col[ii[end]]
+    else
+        aggr = col[ii][1]
+        dis = col[.!ii][1]
+    end
+
+    return aggr, dis
 end
 
 
@@ -159,14 +183,31 @@ function _extend_over(df::DataFrame, set::AbstractArray, col::Symbol; add_id=fal
 end
 
 
-function _extend_over(df::DataFrame, set::AbstractArray)
+function SLiDE._extend_over(df::DataFrame, set::AbstractArray)
     # Determine which column overlaps completely with the set.
     # We will scale from/to using this scheme.
-    from, to = _find_scheme(df, set)
-    # x = add_id ? Rename.([from;to], SLiDE._add_id.([from;to], col; replace=from)) : Rename(from,col)
+    from, to = SLiDE._find_scheme(df, set)
 
-    df = leftjoin(DataFrame(from=>set), df, on=from)
-    return edit_with(df, Replace(to, missing, "$from value"))
+    val = unique.(eachcol(dropmissing(df)[:,findindex(df)]))
+    ii = .!isempty.([intersect(set, v) for v in val])
+    xdiff = setdiff(set, vcat(val...))
+
+    colmap = [from;to]
+    dfmap = DataFrame(fill(xdiff, length(colmap)), colmap)
+
+    if size(dfmap,2) !== size(df,2)
+        idx = setdiff(findindex(df), colmap)
+        dfadd = unique(df[:,idx])
+        dfadd[!,findvalue(df)[1]] .= 1.0
+
+        dfmap = crossjoin(dfmap, dfadd)
+    end
+
+    return vcat(df, dfmap)
+
+    # x = add_id ? Rename.([from;to], SLiDE._add_id.([from;to], col; replace=from)) : Rename(from,col)
+    # df = leftjoin(DataFrame(from=>set), df, on=from)
+    # return edit_with(df, Replace(to, missing, "$from value"))
 end
 
 
@@ -183,9 +224,9 @@ end
 
 """
 """
-_scale_extend(df, dfmap, set, col::Symbol) = _scale_with(df, dfmap, col)
+_scale_extend(df::DataFrame, dfmap::DataFrame, set::AbstractArray, col::Symbol) = _scale_with(df, dfmap, col)
 
-function _scale_extend(df, dfmap, set, col::AbstractArray)
+function _scale_extend(df::DataFrame, dfmap::DataFrame, set::AbstractArray, col::AbstractArray)
     if length(col) == 1
         df = _scale_extend(df, dfmap, set, col[1])
     else

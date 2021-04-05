@@ -142,12 +142,12 @@ export share
 export disagg
 
 export share_sector!
-export disagg_sector!
+export disaggregate_sector!
 export aggregate_sector!
 
-# SCALE
-export scale_with_map
-export scale_with_share
+# # SCALE
+# export scale_with_map
+# export scale_with_share
 
 # ENERGY ENVIRONMENT MODULE
 export eem
@@ -219,7 +219,7 @@ include(joinpath("parse", "read_file.jl"))
 include(joinpath("parse", "run_yaml.jl"))
 include(joinpath("parse", "check_data.jl"))
 
-include(joinpath("build", "aggregate.jl"))
+# include(joinpath("build", "aggregate.jl"))
 include(joinpath("build", "build.jl"))
 include(joinpath("build", "partition.jl"))
 include(joinpath("build", "calibrate", "calibrate_io.jl"))
@@ -233,9 +233,12 @@ include(joinpath("build", "share", "share_sgf.jl"))
 include(joinpath("build", "share", "share_utd.jl"))
 include(joinpath("build", "share", "share_sector.jl"))
 include(joinpath("build", "disagg", "disagg_region.jl"))
-include(joinpath("build", "disagg", "disagg_sector.jl"))
+# include(joinpath("build", "disagg", "disagg_sector.jl"))
 
-include(joinpath("build", "scale.jl"))
+# include(joinpath("build", "scale.jl"))
+include(joinpath("scale", "constructors.jl"))
+include(joinpath("scale", "scale_sector.jl"))
+include(joinpath("scale", "scale_with.jl"))
 
 include(joinpath("build", "eem", "eem.jl"))
 include(joinpath("build", "eem", "eem_elegen.jl"))

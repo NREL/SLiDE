@@ -45,7 +45,7 @@ function build(
     if |(isempty(d), isempty(set), overwrite)
         if isempty(set)
             set = merge(Dict(), read_from(joinpath("src","build","readfiles","setlist.yml")))
-            _set_sector!(set, set[:summary])
+            set_sector!(set, set[:summary])
             write_build(dataset, SET_DIR, set)
         end
         
@@ -270,4 +270,12 @@ function build_parameters(subset::String)
     end
     
     return d
+end
+
+
+"""
+"""
+function set_sector!(set::Dict, x::AbstractArray)
+    [set[k] = x for k in [:s,:g,:sector]]
+    return set
 end

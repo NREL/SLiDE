@@ -157,7 +157,7 @@ function _disagg_sector_map(
         else
             (from,to) = (scheme[1], scheme[2])
         end
-
+        
         # Map from the sectoral sharing DataFrame (aggregate -> (disagg,value)) while renaming
         # the sector in the input DataFrame.
         df = edit_with(df, Map(dfmap,ensurearray(from),ensurearray(to),on,on,:inner))
@@ -291,7 +291,7 @@ function _map_for(df::DataFrame, col::Array{Symbol,1}; scheme=:aggr=>:disagg)
 
     # Are there any sector names already in df? If so, save this for renaming later.
     sec = intersect(SLiDE._find_sector(df), [from;to])
-
+    
     if length(col) > 1
         df = indexjoin(fill(copy(df),length(col)); id=col, skipindex=[from,to])
 

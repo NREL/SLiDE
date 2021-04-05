@@ -1,56 +1,39 @@
 """
-    scale_with(df, x)
-"""
-function scale_with(df::DataFrame, x::Weighting)
-    # Save unaffected indices. Map the others and calculate share.
-    df_ones = filter_with(df, Not(x))
-    df = edit_with(df,
-        Map(x.data, [x.constant;x.from], [x.to;:value], [x.constant;x.on], [x.on;:share], :inner)
-    )
-    df[!,:value] .*= df[:,:share]
-
-    # Sum if aggregating.
-    x.direction == :aggregate && (df = combine_over(df, :dummy))
-    return vcat(select(df, Not(:share)), df_ones)
-end
-
-
-function scale_with(df::DataFrame, x::Mapping)    
-    # Save unaffected indices. Map the others.
-    df_ones = filter_with(df, Not(x))
-    df = edit_with(df, Map(x.data, [x.from;], [x.to;], [x.on;], [x.on;], :inner))
-
-    # Sum if aggregating.
-    x.direction == :aggregate && (df = combine_over(df, :dummy; digits=false))
-    return vcat(df, df_ones)
-end
-
-
-scale_with(df::DataFrame, x::Missing) = df
-
-
-"""
-    disaggregate_sector!(d, set, x; kwargs...)
-"""
-function disaggregate_sector!(d::Dict, set::Dict, x::Weighting;
-    scale_id=:disaggregate,
-)
-    !haskey(d, scale_id) && push!(d, scale_id=>x)
-
-    parameters = SLiDE.list_parameters!(set, :parameters)
-    taxes = SLiDE.list_parameters!(set, :taxes)
-    variables = setdiff(parameters, taxes)
-
-    x_tax = convert_type(Mapping, x)
-    scale_sector!(d, set, x, variables; scale_id=scale_id)
-    scale_sector!(d, set, x_tax, taxes; scale_id=scale_id)
-    return d
-end
-
-
-"""
     aggregate_sector!(d, set, x; kwargs...)
 """
+function aggregate_sector!(d::Dict, set::Dict;
+    path::String=joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem_pmt.csv"),
+)
+    return aggregate_sector!(d, set, read_file(path)[:,1:2])
+end
+
+
+function aggregate_sector!(d::Dict, set::Dict, dfmap::DataFrame)
+    # Store dfmap as `Mapping` and set scheme based on the current sectoral set.
+    # After the build stream, this *should* be equivalent to the summary-level set.
+    mapping = Mapping(dfmap)
+    set_scheme!(mapping, DataFrame(g=set[:sector]))
+
+    # If scaling FROM ANY detail-level codes, disaggregate summary- to detail-level
+    # (or a hybrid of the two).
+    if !iscomplete(mapping, set[:sector])
+        println("INCOMPLETE")
+        SLiDE.set_sector!(set, mapping.data[:,mapping.from])
+        # !!!! Verify that only summary- and detail-level codes are represented in mapping.from
+        # find_set(mapping, set, [:detail,:summary])
+        disaggregate_sector!(d, set)
+    else
+        SLiDE.set_sector!(set, mapping.data[:,mapping.from])
+    end
+    
+    dis = copy(d)
+    aggregate_sector!(d, set, mapping; scale_id=:eem)
+    agg = copy(d)
+    
+    return dis, agg
+end
+
+
 function aggregate_sector!(d::Dict, set::Dict, x::Mapping;
     scale_id=:aggregate,
 )
@@ -65,6 +48,31 @@ function aggregate_sector!(d::Dict, set::Dict, x::Mapping;
     # Aggregate remaining variables.
     variables = setdiff(parameters, vcat(ensurearray.(taxes)...))
     scale_sector!(d, set, x, variables; scale_id=scale_id)
+    return d
+end
+
+
+"""
+    disaggregate_sector!(d, set, x; kwargs...)
+"""
+function disaggregate_sector!(d::Dict, set::Dict)
+    weighting = share_sector!(d, set)
+    disaggregate_sector!(d, set, weighting)
+    return d
+end
+
+function disaggregate_sector!(d::Dict, set::Dict, x::Weighting;
+    scale_id=:disaggregate,
+)
+    !haskey(d, scale_id) && push!(d, scale_id=>x)
+
+    parameters = SLiDE.list_parameters!(set, :parameters)
+    taxes = SLiDE.list_parameters!(set, :taxes)
+    variables = setdiff(parameters, taxes)
+
+    x_tax = convert_type(Mapping, x)
+    scale_sector!(d, set, x, variables; scale_id=scale_id)
+    scale_sector!(d, set, x_tax, taxes; scale_id=scale_id)
     return d
 end
 
@@ -173,4 +181,43 @@ function aggregate_tax_with!(d::Dict, set::Dict, x::Mapping, tax::Symbol, key::S
     d[tax] = d[tax] / combine_over(d[key], sector)
 
     return dropzero!(dropnan!(d[tax])), d[key]
+end
+
+
+"""
+    compound_sector!(d, set, var; scale_id)
+"""
+function compound_sector!(d::Dict, set::Dict, var::Symbol; scale_id=missing)
+    df = d[var]
+    sector = find_sector(df)
+
+    if ismissing(sector)
+        return missing
+    else
+        key = SLiDE._inp_key(scale_id, sector)
+        # If the key does not already exist in the DataFrame, compound for the DataFrame
+        # (with sector columns only) to run set_scheme! and update direction.
+        # If the key exists, but is the wrong type (Weighting vs. Mapping), re-compound.
+        if !haskey(d, key) || typeof(d[scale_id]) !== typeof(d[key])
+            d[key] = compound_for(d[scale_id], df[:, ensurearray(sector)], set[:sector])
+        end
+        return d[key]
+    end
+end
+
+
+"""
+"""
+function iscomplete(mapping::Mapping, lst::AbstractArray)
+    df = DataFrame(mapping.on => lst)
+    return isempty(antijoin(mapping.data, df, on=Pair.(mapping.from, mapping.on)))
+end
+
+
+"""
+"""
+function find_set(mapping::Mapping, set::Dict, levels::AbstractArray)
+    df = vcat([DataFrame(mapping.on => set[k], :set => k) for k in levels]...)
+    df = innerjoin(mapping.data, df, on=Pair.(mapping.from, mapping.on))
+    return unique(df[:,:set])
 end

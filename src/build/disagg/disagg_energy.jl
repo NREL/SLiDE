@@ -42,7 +42,7 @@ function _disagg_with_shrgas!(d, set, maps)
     [_disagg_with_shrgas!(d, set, maps, k) for k in parameters]
 
     # Update saved sectors.
-    SLiDE._set_sector!(set, unique(d[:ys0][:,:s]))
+    SLiDE.set_sector!(set, unique(d[:ys0][:,:s]))
 
     maps[:demand] = filter_with(maps[:demand], (s=set[:s],))
 

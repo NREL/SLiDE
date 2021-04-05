@@ -18,9 +18,8 @@ function SLiDE.Mapping(data::DataFrame; from=:undef, to=:undef, on=:undef, direc
 end
 
 
-# ------------------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------------------
+"""
+"""
 list_unique(df::DataFrame) = unique(vcat(eachcol(df)...))
 list_unique(df::DataFrame, idx::AbstractArray) = list_unique(df[:,idx])
 list_unique(df::DataFrame, idx::Symbol) = unique(df[:,idx])
@@ -54,9 +53,6 @@ function map_identity(x::Weighting, lst::AbstractArray)
     df_index = unique(x.data[:,ensurearray(x.constant)])
     return edit_with(crossjoin(df_index, df_ones), Add.(:value,1.0))
 end
-
-
-# ------------------------------------------------------------------------------------------
 
 
 """
@@ -246,89 +242,6 @@ end
 
 
 """
-    share_with!(weighting::Weighting, mapping::Mapping)
-Returns `weighting` with `weighting.data::DataFrame` shared using [`SLiDE.share_with`](@ref)
-"""
-function share_with!(weighting::Weighting, mapping::Mapping)
-    weighting.data = select(
-        share_with(weighting.data, mapping),
-        [weighting.constant; weighting.from; weighting.to; findvalue(weighting.data)],
-    )
-    return weighting
-end
-
-
-"""
-    share_with(df::DataFrame, x::Mapping)
-"""
-function share_with(df::DataFrame, x::Mapping)
-    df = edit_with(df, [
-        Rename(x.on, x.from);
-        Map(x.data, [x.from;], [x.to;], [x.from;], [x.to;], :inner);
-    ])
-
-    if x.direction==:aggregate
-        agg, dis = map_direction(x)
-        df = df / combine_over(df, dis)
-    end
-    return df
-end
-
-
-"""
-    filter_with!(weighting::Weighting, lst::AbstractArray)
-
-    filter_with!(mapping::Mapping, weighting::Weighting)
-
-
-    filter_with!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
-    filter_with!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
-Apply the above methods sequentially and returns all input arguments in the order in which
-they are given.
-"""
-function filter_with!(weighting::Weighting, lst::AbstractArray)
-    agg, dis = map_direction(weighting)
-
-    dftmp = combine_over(weighting.data, dis)
-    if !all(dftmp[:,:value].==1.0)
-        @error("Shares must sum to 1.")
-    end
-
-    dfdis = filter_with(weighting.data, Dict(dis=>lst,))
-    
-    dfagg = fill_with(unique(select(dfdis, Not(dis))), 1.0)
-    dfagg = dfagg - combine_over(dfdis, dis)
-    dfagg[!,dis] .= dfagg[:,agg]
-    
-    weighting.data = vcat(dfdis,dfagg)
-
-    # Update x to add any aggregate-level sectors that were not already included,
-    # but for which a disaggregate-level code exists.
-    lst_new = setdiff(weighting.data[:,agg], lst)
-    [push!(lst, x) for x in lst_new]
-
-    return weighting, lst
-end
-
-function filter_with!(mapping::Mapping, weighting::Weighting)
-    col = intersect(propertynames(weighting.data), propertynames(mapping.data))
-    mapping.data = unique(weighting.data[:,col])
-    return mapping
-end
-
-function filter_with!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
-    weighting, lst = filter_with!(weighting, lst)
-    mapping = filter_with!(mapping, weighting)
-    return weighting, mapping, lst
-end
-
-function filter_with!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
-    weighting, mapping, lst = filter_with!(weighting, mapping, lst)
-    return mapping, weighting, lst
-end
-
-
-"""
     compound_for(x::Weighting, df::DataFrame, lst::AbstractArray)
     compound_for(x::Weighting, df::DataFrame, lst::AbstractArray)
     compound_for(x::T, col::Symbol) where T<:Scale
@@ -452,26 +365,4 @@ function _compound_with(x::Mapping, df::DataFrame, df_ones::DataFrame, xedit::Di
     df = crossjoin(edit_with(df, xedit[x.on[1]]), edit_with(df, xedit[x.on[2]]))
 
     return vcat(df, df_ones; cols=:intersect)
-end
-
-
-"""
-    compound_sector!(d, set, var; scale_id)
-"""
-function compound_sector!(d::Dict, set::Dict, var::Symbol; scale_id=missing)
-    df = d[var]
-    sector = find_sector(df)
-
-    if ismissing(sector)
-        return missing
-    else
-        key = SLiDE._inp_key(scale_id, sector)
-        # If the key does not already exist in the DataFrame, compound for the DataFrame
-        # (with sector columns only) to run set_scheme! and update direction.
-        # If the key exists, but is the wrong type (Weighting vs. Mapping), re-compound.
-        if !haskey(d, key) || typeof(d[scale_id]) !== typeof(d[key])
-            d[key] = compound_for(d[scale_id], df[:, ensurearray(sector)], set[:sector])
-        end
-        return d[key]
-    end
 end

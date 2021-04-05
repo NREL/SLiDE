@@ -1,9 +1,9 @@
 using SLiDE, DataFrames
 
-f_dev = joinpath(SLIDE_DIR,"dev","disagg_sector")
-include(joinpath(f_dev,"scale_structs.jl"))
-include(joinpath(f_dev,"packaged.jl"))
-include(joinpath(f_dev,"scale_with.jl"))
+# f_dev = joinpath(SLIDE_DIR,"dev","disagg_sector")
+# include(joinpath(f_dev,"scale_structs.jl"))
+# include(joinpath(f_dev,"packaged.jl"))
+# include(joinpath(f_dev,"scale_with.jl"))
 
 
 # Check...
@@ -23,13 +23,12 @@ dis_out = Dict(k => filter_with(df, (yr=[2007,2012],)) for (k,df) in dis_out)
 agg_out = Dict(k => filter_with(df, (yr=[2007,2012],)) for (k,df) in agg_out if :yr in propertynames(df))
 din = Dict{Any,Any}(k => filter_with(df, (yr=[2007,2012],)) for (k,df) in din)
 
-
 # Read things.
 set = merge(Dict(), setin)
 d = merge(Dict(), copy(din))
-SLiDE._set_sector!(set, set[:summary])
+SLiDE.set_sector!(set, set[:summary])
 
-dis, agg = aggregate_with!(d, set)
+dis, agg = aggregate_sector!(d, set)
 
 dis_comp = benchmark_against(dis, dis_out)
 agg_comp = benchmark_against(agg, agg_out)
