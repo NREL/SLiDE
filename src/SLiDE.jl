@@ -71,6 +71,7 @@ export Check
 export FileInput
 
 export CGE
+export Dataset
 export Parameter
 
 export Scale
@@ -137,20 +138,20 @@ export benchmark_against
 
 # BUILD
 export build
-export partition
+export partition_national
 export calibrate_national
-export share
-export disagg
+export share_region
+export disaggregate_region
 
 export share_sector!
 export disaggregate_sector!
 export aggregate_sector!
 
 # ENERGY ENVIRONMENT MODULE
-export eem
-export eem_elegen!
-export eem_energy!
-export eem_co2emis!
+export partition_eem
+export partition_elegen!
+export partition_energy!
+export partition_co2emis!
 
 # MODEL
 export model_input
@@ -203,11 +204,12 @@ include(joinpath("scale", "generated_scale", "includes.jl"))
 
 # UTILITIES
 include(joinpath("utils", "calc.jl"))
+include(joinpath("utils", "constructors.jl"))
 include(joinpath("utils", "fill_zero.jl"))
+include(joinpath("utils", "impute.jl"))
 include(joinpath("utils", "indexjoin.jl"))
 include(joinpath("utils", "label.jl"))
 include(joinpath("utils", "utils.jl"))
-include(joinpath("utils", "impute.jl"))
 
 include(joinpath("parse", "edit_with.jl"))
 include(joinpath("parse", "filter_with.jl"))
@@ -218,11 +220,11 @@ include(joinpath("parse", "check_data.jl"))
 
 # include(joinpath("build", "aggregate.jl"))
 include(joinpath("build", "build.jl"))
-include(joinpath("build", "partition.jl"))
+include(joinpath("build", "partition", "partition_national.jl"))
 include(joinpath("build", "calibrate", "calibrate_io.jl"))
 include(joinpath("build", "calibrate", "calibrate_utils.jl"))
 include(joinpath("build", "calibrate", "calibrate_national.jl"))
-include(joinpath("build", "share", "share.jl"))
+include(joinpath("build", "share", "share_region.jl"))
 include(joinpath("build", "share", "share_cfs.jl"))
 include(joinpath("build", "share", "share_gsp.jl"))
 include(joinpath("build", "share", "share_pce.jl"))
@@ -235,10 +237,10 @@ include(joinpath("scale", "constructors.jl"))
 include(joinpath("scale", "scale_sector.jl"))
 include(joinpath("scale", "scale_with.jl"))
 
-include(joinpath("build", "eem", "eem.jl"))
-include(joinpath("build", "eem", "eem_elegen.jl"))
-include(joinpath("build", "eem", "eem_energy.jl"))
-include(joinpath("build", "eem", "eem_co2emis.jl"))
+include(joinpath("build", "partition", "partition_eem.jl"))
+include(joinpath("build", "partition", "partition_elegen.jl"))
+include(joinpath("build", "partition", "partition_energy.jl"))
+include(joinpath("build", "partition", "partition_co2emis.jl"))
 
 include(joinpath("model", "model_input.jl"))
 

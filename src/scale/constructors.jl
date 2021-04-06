@@ -1,25 +1,5 @@
 """
 """
-function SLiDE.Weighting(data::DataFrame;
-    constant=[:undef],
-    from=:undef,
-    to=:undef,
-    on=:undef,
-    direction=:undef,
-)
-    return Weighting(data, constant, from, to, on, direction)
-end
-
-
-"""
-"""
-function SLiDE.Mapping(data::DataFrame; from=:undef, to=:undef, on=:undef, direction=:undef)
-    return Mapping(data, from, to, on, direction)
-end
-
-
-"""
-"""
 list_unique(df::DataFrame) = unique(vcat(eachcol(df)...))
 list_unique(df::DataFrame, idx::AbstractArray) = list_unique(df[:,idx])
 list_unique(df::DataFrame, idx::Symbol) = unique(df[:,idx])

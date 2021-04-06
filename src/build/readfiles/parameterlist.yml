@@ -1,6 +1,7 @@
 Path: [src,build,parameters]
 
 SetInput:
+  - {descriptor: scale,      name: list_model.csv}
   - {descriptor: partition,  name: list_calibrate.csv}
   - {descriptor: calibrate,  name: list_calibrate.csv}
   - {descriptor: share,      name: list_share.csv}

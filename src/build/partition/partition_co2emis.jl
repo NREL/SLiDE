@@ -16,7 +16,7 @@ Use SEDS data to calculate emissions by sectoral use where possible:
 
 Use EPA emissions data for total emissions by source.
 """
-function eem_co2emis!(d::Dict, set::Dict, maps::Dict)
+function partition_co2emis!(d::Dict, set::Dict, maps::Dict)
     println("  Generating emissions data set")
 
     _set_co2dim!(d, set)    # !!!! is this where this is relevant?

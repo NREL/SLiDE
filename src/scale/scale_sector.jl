@@ -17,7 +17,6 @@ function aggregate_sector!(d::Dict, set::Dict, dfmap::DataFrame)
     # If scaling FROM ANY detail-level codes, disaggregate summary- to detail-level
     # (or a hybrid of the two).
     if !iscomplete(mapping, set[:sector])
-        println("INCOMPLETE")
         SLiDE.set_sector!(set, mapping.data[:,mapping.from])
         # !!!! Verify that only summary- and detail-level codes are represented in mapping.from
         # find_set(mapping, set, [:detail,:summary])
@@ -26,11 +25,10 @@ function aggregate_sector!(d::Dict, set::Dict, dfmap::DataFrame)
         SLiDE.set_sector!(set, mapping.data[:,mapping.from])
     end
     
-    dis = copy(d)
     aggregate_sector!(d, set, mapping; scale_id=:eem)
-    agg = copy(d)
+    set_sector!(set, unique(mapping.data[:,mapping.to]))
     
-    return dis, agg
+    return d, set
 end
 
 

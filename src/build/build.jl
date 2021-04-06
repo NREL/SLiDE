@@ -7,10 +7,10 @@ and return those values.
 Otherwise, it will read BEA supply/use data from the `/SLIDE_DIR/data/input/` directory.
 
 Then, execute the four steps of the SLiDE buildstream by executing the following functions:
-1. [`SLiDE.partition`](@ref)
+1. [`SLiDE.partition_national`](@ref)
 2. [`SLiDE.calibrate_national`](@ref)
-3. [`SLiDE.share`](@ref)
-4. [`SLiDE.disagg`](@ref)
+3. [`SLiDE.share_region`](@ref)
+4. [`SLiDE.disaggregate_region`](@ref)
 
 This information will be saved in the following structure:
 
@@ -31,202 +31,165 @@ This information will be saved in the following structure:
 - `d::Dict{Symbol,DataFrame}` of model parameters
 - `set::Dict{Any,Array}` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
-function build(
-    dataset::String=DEFAULT_DATASET;
-    # version::String="1.0.1",
-    save_build::Bool=DEFAULT_SAVE_BUILD,
-    overwrite::Bool=DEFAULT_OVERWRITE,
-    map_fdcat::Bool=false,
-)
+function build(dataset::Dataset)
+    d = read_build(dataset)
+    set = read_set(dataset)
+    
+    if dataset.step=="input"
+        d, set = partition_national(dataset, d, set)
+        d = calibrate_national(dataset, d, set)
+        d, set = share_region(dataset, d, set)
+        d, set = disaggregate_region(dataset, d, set)
 
-    d = read_build(dataset, PARAM_DIR; overwrite=overwrite)
-    set = read_build(dataset, SET_DIR; overwrite=overwrite)
-
-    if |(isempty(d), isempty(set), overwrite)
-        if isempty(set)
-            set = merge(Dict(), read_from(joinpath("src","build","readfiles","setlist.yml")))
-            set_sector!(set, set[:summary])
-            write_build(dataset, SET_DIR, set)
-        end
-        
-        io = merge(
-            read_from(joinpath("src","build","readfiles","input","summary.yml")),
-            Dict(:sector => :summary),
-        )
-
-        io = partition(dataset, io, set; save_build=save_build, overwrite=overwrite)
-
-        cal = calibrate_national(dataset, io, set; save_build=save_build, overwrite=overwrite)
-        
-        (shr, set) = share(dataset, Dict(:va0 => cal[:va0]), set;
-            save_build=save_build, overwrite=overwrite)
-
-        (d, set) = disagg(dataset, merge(cal, shr), set;
-            save_build=save_build, overwrite=overwrite)
-
-        write_build!(dataset, PARAM_DIR, d)
-        filter_build!(SET_DIR, set)
+        write_build!(set!(dataset; step=SLiDE.SET_DIR), set)
     end
-    return (d, set)
+
+    return d, set
 end
 
 
 """
-    sub_path(dataset::String, subset::String; kwargs...)
-
-# Arguments
-- `dataset::String`: Dataset identifier
-- `subset::String`: Internally-passed parameter indicating the type of information to save
-    (set, parameter, or build step)
-
-# Returns
-- `path::String`: Standardized location indicating where to save intermediate files.
-    Here, `/path/to/dataset` is returned by [`SLiDE.data_path`](@ref)
-    - If saving build steps: `/path/to/dataset/build/<build_step>`. For the For the four build
-        steps, these are: partition, calibrate, share, and build.
-    - Model input parameters: `/path/to/dataset/parameters`
-    - Parameter indices: `/path/to/dataset/sets`
+    datapath()
 """
-function sub_path(dataset::String, subset::String)
-    path = data_path(dataset)
-    (subset in BUILD_STEPS) && (path = joinpath(path, "build"))
-    return joinpath(path, subset)
+function datapath(dataset::Dataset)
+    path = joinpath(datapath(),dataset.name,dataset.build)
+    path = if dataset.step in [SLiDE.PARAM_DIR, SLiDE.SET_DIR]
+        joinpath(path, dataset.step)
+    else
+        joinpath(path, SLiDE._development(dataset.step))
+    end
+    return path
 end
 
-
-"""
-    data_path(dataset::String)
-
-# Arguments
-- `dataset::String`: Dataset identifier
-
-# Returns
-- `dir::String = /path/to/dataset`
-    - `SLIDE_DIR` is the path to the location of the SLiDE.jl package on the user's machine.
-    - The default dataset identifier is `state_model`. This dataset includes all
-        U.S. states and summary-level sectors and goods.
-"""
-function data_path(dataset::String)
-    joinpath(SLIDE_DIR, "data", dataset)
-end
+datapath() = joinpath(SLIDE_DIR,"data")
 
 
 """
-    write_build(dataset::String, subset::String, d::Dict; kwargs...)
-This function filters the contents of the input dictionary `d` to include only relevant
-files using [`SLiDE.filter_build!`](@ref) and writes set lists and parameter DataFrames to
-csv files in the directory named by [`SLiDE.sub_path`](@ref) and named for their associated
-dictionary key.
-
-# Arguments
-- `dataset::String`: Dataset identifier
-- `subset::String`: Internally-passed parameter indicating the type of information to save
-    (set, parameter, or build step)
-- `d::Dict` of information to write
-
-# Returns
-- `d::Dict`: filtered dictionary
 """
-function write_build!(
-    dataset::String,
-    subset::String,
-    d::Dict;
-    save_build::Bool=DEFAULT_SAVE_BUILD
-)
-    
-    [sort!(dropzero!(d[k])) for k in keys(d) if typeof(d[k]) == DataFrame]
-    d_write = filter_build!(subset, d)
-    
-    if isempty(d_write)
-        @warn("Skipping writing empty Dictionary")
-    elseif (subset in BUILD_STEPS && save_build) || !(subset in BUILD_STEPS)
-        path = sub_path(dataset, subset)
-        
-        !isdir(path) && mkpath(path)
-        @info("Saving $subset in $path")
-        
-        for k in keys(d_write)
-            println("  Writing $k")
-            
-            if typeof(d_write[k]) == DataFrame
-                CSV.write(joinpath(path, "$k.csv"), d_write[k])
-            elseif typeof(d_write[k]) <: AbstractArray
-                CSV.write(joinpath(path, "$k.csv"), DataFrame(k=d_write[k]))
-            end
-            # typeof(d_write[k]) == DataFrame && CSV.write(joinpath(path, "$k.csv"), d_write[k])
+function write_build!(dataset::Dataset, d::Dict)
+    d_write = SLiDE.filter_build!(dataset, d)
+
+    if !isempty(d_write)
+        if (dataset.step in SLiDE.BUILD_STEPS && dataset.save_build) ||
+                !(dataset.step in SLiDE.BUILD_STEPS)
+            path = datapath(dataset)
+            !isdir(path) && mkpath(path)
+
+            [write_build(path, k, v) for (k,v) in d_write]
         end
     end
     return d
 end
 
 
-function write_build(
-    dataset::String,
-    subset::String,
-    d::Dict;
-    save_build::Bool=DEFAULT_SAVE_BUILD
-)
-    write_build!(dataset, subset, copy(d); save_build=save_build)
+"""
+"""
+function write_build(path, k, df::DataFrame)
+    println("  Writing $k")
+    CSV.write(joinpath(path,"$k.csv"), df)
 end
 
+function write_build(path, k, v::AbstractArray)
+    println("  Writing $k")
+    CSV.write(joinpath(path,"$k.csv"), DataFrame(k=>v))
+end
+
+write_build(path, k, v) = nothing
+
 
 """
-    read_build(dataset::String, subset::String; kwargs...)
-This function reads data from the specified `subset` if this information has previously been
-generated and saved.
-
-# Arguments
-- `dataset::String`: Dataset identifier
-- `subset::String`: Internally-passed parameter indicating the type of information to save
-    (set, parameter, or build step)
-
-# Keywords
-- `overwrite::Bool = true`: If the user would like to re-generate the `subset` of data in 
-    specified `dataset`, delete the directory. The information must now be re-calculated
-    to repopulate the subset directory.
-
-# Returns
-- `d::Dict{Symbol,DataFrame}` if reading parameters or `d::Dict{Any,Array}` if reading sets
+    read_set()
 """
-function read_build(dataset::String, subset::String; overwrite::Bool=DEFAULT_OVERWRITE)
-    path = sub_path(dataset, subset)
-    if overwrite == true && isdir(path)
-        @info("Deleting $path to overwrite data.")
-        rm(path; recursive=true)
-        return Dict()
-    end
+function read_set(dataset::Dataset)
+    set = read_set(dataset, "io")
+    dataset.eem && merge!(set, read_set(dataset, "eem"))
+    return set
+end
 
-    if !isdir(path)
-        @info("$path not found.")
-        return Dict()
+function read_set(build::String; sector=:summary)
+    println("READING FROM READFILES")
+    READ_DIR = joinpath(SLIDE_DIR,"src","build","readfiles")
+    set = read_from(joinpath(READ_DIR,"setlist_$build.yml"))
+
+    (build=="io" && !haskey(set, :sector)) && SLiDE.set_sector!(set, set[sector])
+
+    return Dict{Any,Any}(set)
+end
+
+function SLiDE.read_set(dataset::Dataset, build::String)
+    path = SLiDE.datapath(SLiDE.set!(copy(dataset); build=build, step=SLiDE.SET_DIR))
+    if isdir(path)
+        set = read_from(path)
+        set = Dict(k => df[:,1] for (k,df) in set)
     else
-        d = read_from(path)
-        subset == SET_DIR && (d = Dict{Any,Array{T,1} where T}(k => df[:,1] for (k, df) in d))
-        return d
+        set = SLiDE.read_set(build; sector=dataset.sector)
     end
+
+    build=="io" && SLiDE.set_sector!(set, set[:sector])
+    return Dict{Any,Any}(set)
 end
 
 
 """
-    filter_build!(subset::String, d::Dict; kwargs...)
-This function filters `d` to contain only keys relevant to the specified `subset`.
+"""
+function read_build(dataset::Dataset)
+    path = datapath(dataset)
+
+    d = Dict()
+    if isdir(path)
+        merge!(d, read_from(path))
+    else
+        merge!(d, read_input!(dataset))
+    end
+    return d
+end
+
+
+function read_map()
+    path = joinpath(SLIDE_DIR,"src","build","readfiles")
+    return read_from(joinpath(path, "maplist.yml"))
+end
+
+
+"""
+"""
+function read_input!(dataset::Dataset)
+    d = Dict()
+    
+    if dataset.build=="io"
+        path = joinpath(SLIDE_DIR,"src","build","readfiles","input")
+        dataset.step==PARAM_DIR && set!(dataset; step="partition")
+        dataset.step=="partition" && (path = joinpath(path, "$(dataset.sector).yml"))
+        dataset.step=="share" && (path = joinpath(path, "share.yml"))
+
+        if isfile(path)
+            merge!(d, read_from(path))
+            [d[k] = edit_with(df, Deselect([:units],"==")) for (k,df) in d]
+
+            dataset.step=="partition" && push!(d, :sector=>dataset.sector)
+            dataset.step = "input"
+        end
+    elseif dataset.build=="eem"
+        if dataset.step=="partition"
+            d = read_from(joinpath(SLIDE_DIR,"data","input","eia"))
+        end
+    end
+    return d
+end
+
+
+"""
+    filter_build!(dataset::String, d::Dict)
+This function filters `d` to contain only keys relevant to the specified `dataset`.
 This avoids cluttering a saved directory with superfluous parameters that may have been
 calculated at intermediate steps.
 
 If filtering DataFrames, this reorders the DataFrame indices. This is important when
 importing parameters into JuMP models when calibrating or modeling.
-
-# Arguments
-- `subset::String`: Internally-passed parameter indicating the type of information to save
-    (set, parameter, or build step)
-- `d::Dict` of DataFrames containing data for the specified data subset
-
-# Returns
-- `d::Dict` filtered to include only relevant parameters.
 """
-function filter_build!(subset::String, d::Dict)
-    lst = build_parameters(subset)
-    return _filter_with!(d, lst)
+function filter_build!(dataset::Dataset, d::Dict)
+    lst = SLiDE.describe_parameters(dataset)
+    return SLiDE._filter_with!(d, lst)
 end
 
 
@@ -235,6 +198,7 @@ end
 function _filter_with!(d::Dict, lst::Dict{Symbol,Parameter})
     keep = Dict(k => haskey(lst, k) for k in keys(d))
     [keep[k] ? select!(d[k], lst[k]) : delete!(d, k) for k in keys(d)]
+    [sort!(dropzero!(d[k])) for k in keys(d)]
     return d
 end
 
@@ -246,30 +210,57 @@ end
 
 
 """
-    build_parameters(subset::String)
+    describe_parameters(step::String)
 
 # Arguments
-- `subset::String`: Internally-passed parameter indicating the type of information to save
+- `step::String`: Internally-passed parameter indicating the type of information to save
     (set, parameter, or build step)
 
 # Returns
 - `d::Dict{Symbol,`[`Parameter`](@ref)`}` of Parameters relevant to the specified data
-    subset. The dictionary key is consistent the value's field `parameter`.
+    step. The dictionary key is consistent the value's field `parameter`.
 """
-function build_parameters(subset::String)
-    subset = convert_type(Symbol, subset)
+function describe_parameters(step::String)
+    step = convert_type(Symbol, step)
     lst = read_from(joinpath(SLIDE_DIR, "src", "build", "readfiles", "parameterlist.yml"))
 
-    !haskey(lst, subset) && (return nothing)
+    !haskey(lst, step) && (return nothing)
 
     df = read_file(joinpath(SLIDE_DIR, "src", "build", "parameters", "define.csv"))
-    df = innerjoin(DataFrame(parameter=lst[subset]), df, on=:parameter)
+    df = innerjoin(DataFrame(parameter=lst[step]), df, on=:parameter)
 
-    d = if isempty(df); convert_type.(Symbol, lst[subset])
+    d = if isempty(df); convert_type.(Symbol, lst[step])
     else;               load_from(Dict{Parameter}, df)
     end
     
     return d
+end
+
+describe_parameters(dataset::Dataset) = describe_parameters(dataset.step)
+
+
+"""
+"""
+function describe_parameters!(set::Dict, step::Symbol)
+    if !haskey(set, step)
+        set[step] = SLiDE.describe_parameters("$step")
+    end
+    return set[step]
+end
+
+
+"""
+"""
+function list_parameters!(set::Dict, step::Symbol)
+    step_list = append(step,:list)
+    if !haskey(set, step_list)
+        set[step_list] = if step==:taxes
+            [:ta0,:ty0,:tm0]
+        else
+            collect(keys(describe_parameters!(set, step)))
+        end
+    end
+    return set[step_list]
 end
 
 

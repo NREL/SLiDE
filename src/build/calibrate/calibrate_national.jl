@@ -15,32 +15,26 @@ See [`SLiDE.build`](@ref) for keyword argument descriptions.
 # Returns
 - `d::Dict` of DataFrames containing the model data at the calibration step.
 """
-function calibrate_national(
-    dataset::String,
-    io::Dict,
-    set::Dict;
-    save_build::Bool=SLiDE.DEFAULT_SAVE_BUILD,
-    overwrite::Bool=SLiDE.DEFAULT_OVERWRITE,
+function calibrate_national(dataset::Dataset, io::Dict, set::Dict;
     penalty_nokey::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
 )
-    subset = "calibrate"
+    set!(dataset; step="calibrate")
 
-    # If there is already calibration data, read it and return.
-    d_read = SLiDE.read_build(dataset, subset; overwrite=overwrite)
-    !(isempty(d_read)) && (return d_read)
-    
+    d_read = read_build(dataset)
+    !isempty(d_read) && return d_read
+
     # Initialize a DataFrame to contain results and do the calibration iteratively.
-    cal = Dict(k => DataFrame() for k in list_parameters!(set, :calibrate))
+    cal = Dict(k => DataFrame() for k in SLiDE.list_parameters!(set, :calibrate))
 
     for year in set[:yr]
         cal_yr = calibrate_national(io, set, year; penalty_nokey=penalty_nokey)
         [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
     end
-    
+
     # If no DataFrame was returned by the annual calibrations, replace this with the input.
     [cal[k] = io[k] for (k,df) in cal if isempty(df)]
 
-    SLiDE.write_build!(dataset, subset, cal; save_build=save_build)
+    SLiDE.write_build!(dataset, cal)
     return cal
 end
 

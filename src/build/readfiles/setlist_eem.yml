@@ -1,0 +1,11 @@
+Path: [data, coresets, eem]
+
+SetInput:
+  - {descriptor: as,     name: as.csv}
+  - {descriptor: demsec, name: demsec.csv}
+  - {descriptor: e,      name: e.csv}
+  - {descriptor: ed,     name: ed.csv}
+  - {descriptor: fds_e,  name: fds_e.csv}
+  - {descriptor: ff,     name: ff.csv}
+  - {descriptor: sec,    name: sec.csv}
+  - {descriptor: src,    name: src.csv}

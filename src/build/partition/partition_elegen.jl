@@ -15,7 +15,7 @@ For fossil fuels, use heatrate to convert as follows:
       {\\bar{heatrate}_{yr,src} \\text{ [btu/kWh]}}
 ```
 """
-function eem_elegen!(d::Dict, maps::Dict)
+function partition_elegen!(d::Dict, maps::Dict)
     println("  Generating electricity data set")
 
     id = [:elegen,:heatrate] => :elegen

@@ -30,36 +30,6 @@ scale_with(df::DataFrame, x::Missing) = df
 
 
 """
-    share_with!(weighting::Weighting, mapping::Mapping)
-Returns `weighting` with `weighting.data::DataFrame` shared using [`SLiDE.share_with`](@ref)
-"""
-function share_with!(weighting::Weighting, mapping::Mapping)
-    weighting.data = select(
-        share_with(weighting.data, mapping),
-        [weighting.constant; weighting.from; weighting.to; findvalue(weighting.data)],
-    )
-    return weighting
-end
-
-
-"""
-    share_with(df::DataFrame, x::Mapping)
-"""
-function share_with(df::DataFrame, x::Mapping)
-    df = edit_with(df, [
-        Rename(x.on, x.from);
-        Map(x.data, [x.from;], [x.to;], [x.from;], [x.to;], :inner);
-    ])
-
-    if x.direction==:aggregate
-        agg, dis = map_direction(x)
-        df = df / combine_over(df, dis)
-    end
-    return df
-end
-
-
-"""
     filter_with!(weighting::Weighting, lst::AbstractArray)
 
     filter_with!(mapping::Mapping, weighting::Weighting)

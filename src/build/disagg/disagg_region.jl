@@ -13,78 +13,75 @@ See [`SLiDE.build`](@ref) for keyword argument descriptions.
 # Returns
 - `d::Dict` of DataFrames containing the model data at the disaggregation step
 """
-function disagg(
-    dataset::String,
-    d::Dict,
-    set::Dict;
-    save_build::Bool = DEFAULT_SAVE_BUILD,
-    overwrite::Bool = DEFAULT_OVERWRITE
-    )
-    CURR_STEP = "disagg"
-
-    d = merge(d, Dict(
-        :r => fill_with((r = set[:r],), 1.0),
-        (:yr,:r,:g) => fill_with((yr = set[:yr], r = set[:r], g = set[:g]), 1.0)))
-
-    # If there is already disaggregation data, read it and return.
-    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
-    !(isempty(d_read)) && (return (d_read, set))
+function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
+    step = SLiDE.PARAM_DIR
     
-    # Run all disaggregation calculations.
-    _set_gm!(d, set)
-    
-    d[:region] = edit_with(d[:region], Rename(:g,:s))
-    _disagg_ys0!(d)
-    _disagg_id0!(d)
-    _disagg_ty0!(d, set)
-    _disagg_va0!(d, set)
-    _disagg_ld0!(d)
-    _disagg_kd0!(d)
+    set!(dataset; step=step)
+    d_read = read_build(dataset)
 
-    d[:region] = edit_with(d[:region], Rename(:s,:g))
-    _disagg_fdcat!(d)
-    _disagg_g0!(d)
-    _disagg_i0!(d)
-    _disagg_cd0!(d)
-    _disagg_c0!(d)
+    SLiDE._set_gm!(d, set)
+    # SLiDE.write_build!(set!(dataset; step=SET_DIR), Dict(k => set[:gm]))
 
-    d[:yh0_temp] = _disagg_yh0!(d)
-    _disagg_fe0!(d)
-    d[:x0_temp] = _disagg_x0!(d, set)
-    d[:s0_temp] = _disagg_s0!(d)
-    _disagg_a0!(d)
+    if dataset.step=="input"
 
-    _disagg_ta0!(d)
-    _disagg_tm0!(d)
+        d = merge(d, Dict(
+            :r => fill_with((r=set[:r],), 1.0),
+            (:yr,:r,:g) => fill_with((yr=set[:yr], r=set[:r], g=set[:g]), 1.0),
+        ))
 
-    _disagg_thetaa!(d)
-    _disagg_m0!(d)
-    _disagg_md0!(d)
-    d[:rx0_temp] = _disagg_rx0!(d)
+        d[:region] = edit_with(d[:region], Rename(:g,:s))
+        SLiDE._disagg_ys0!(d)
+        SLiDE._disagg_id0!(d)
+        SLiDE._disagg_ty0!(d, set)
+        SLiDE._disagg_va0!(d, set)
+        SLiDE._disagg_ld0!(d)
+        SLiDE._disagg_kd0!(d)
+        
+        d[:region] = edit_with(d[:region], Rename(:s,:g))
+        SLiDE._disagg_fdcat!(d)
+        SLiDE._disagg_g0!(d)
+        SLiDE._disagg_i0!(d)
+        SLiDE._disagg_cd0!(d)
+        SLiDE._disagg_c0!(d)
 
-    _disagg_diff!(d)
-    _apply_diff!(d, set)
+        d[:yh0_temp] = SLiDE._disagg_yh0!(d)
+        SLiDE._disagg_fe0!(d)
+        d[:x0_temp] = SLiDE._disagg_x0!(d, set)
+        d[:s0_temp] = SLiDE._disagg_s0!(d)
+        SLiDE._disagg_a0!(d)
+        SLiDE._disagg_ta0!(d)
+        SLiDE._disagg_tm0!(d)
 
-    _disagg_bop!(d)
-    _disagg_pt0!(d)
-    _disagg_dc0!(d)
+        SLiDE._disagg_thetaa!(d)
+        SLiDE._disagg_m0!(d)
+        SLiDE._disagg_md0!(d)
+        d[:rx0_temp] = SLiDE._disagg_rx0!(d)
 
-    _disagg_dd0!(d)
-    _disagg_nd0!(d)
+        SLiDE._disagg_diff!(d)
+        SLiDE._apply_diff!(d, set)
 
-    _disagg_dm0!(d)
-    _disagg_nm0!(d)
-    _disagg_xd0!(d)
-    _disagg_xn0!(d)
-    _disagg_hhadj!(d)
+        SLiDE._disagg_bop!(d)
+        SLiDE._disagg_pt0!(d)
+        SLiDE._disagg_dc0!(d)
 
-    # Should other
-    d[:xn0][d[:xn0][:,:value] .< 1e-8,:value] .= 0;
-    d[:xd0][d[:xd0][:,:value] .< 1e-8,:value] .= 0;
+        SLiDE._disagg_dd0!(d)
+        SLiDE._disagg_nd0!(d)
 
-    write_build!(dataset, CURR_STEP, d; save_build = save_build)
-    write_build!(dataset, SET_DIR, Dict(k => set[k] for k in [:gm]))
-    return (d, set)
+        SLiDE._disagg_dm0!(d)
+        SLiDE._disagg_nm0!(d)
+        SLiDE._disagg_xd0!(d)
+        SLiDE._disagg_xn0!(d)
+        SLiDE._disagg_hhadj!(d)
+
+        # Should other
+        d[:xn0][d[:xn0][:,:value] .< 1e-8,:value] .= 0;
+        d[:xd0][d[:xd0][:,:value] .< 1e-8,:value] .= 0;
+        
+        SLiDE.write_build!(set!(dataset; step=step), d)
+        return d, set
+    else
+        return d_read, set
+    end
 end
 
 

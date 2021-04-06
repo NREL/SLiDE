@@ -1,5 +1,47 @@
 [
     {
+        "struct_name": "Dataset",
+        "docstring": "",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "",
+                "data_type": "String"
+            },
+            {
+                "name": "build",
+                "comment": "",
+                "data_type": "String"
+            },
+            {
+                "name": "step",
+                "comment": "",
+                "data_type": "String"
+            },
+            {
+                "name": "sector",
+                "comment": "",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "eem",
+                "comment": "",
+                "data_type": "Bool"
+            },
+            {
+                "name": "save_build",
+                "comment": "",
+                "data_type": "Bool"
+            },
+            {
+                "name": "overwrite",
+                "comment": "",
+                "data_type": "Bool"
+            }
+        ],
+        "supertype": "CGE"
+    },
+    {
         "struct_name": "Parameter",
         "docstring": "Information about CGE parameters used in the model.",
         "fields": [

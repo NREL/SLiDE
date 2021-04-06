@@ -13,56 +13,37 @@ See [`SLiDE.build`](@ref) for keyword argument descriptions.
 # Returns
 - `d::Dict` of DataFrames containing the model data at the
 """
-function partition(
-    dataset::String,
-    d::Dict,
-    set::Dict;
-    version::String=DEFAULT_VERSION,
-    save_build::Bool=DEFAULT_SAVE_BUILD,
-    overwrite::Bool=DEFAULT_OVERWRITE,
-    map_fdcat::Bool=false,
-)
-    # !!!! different for "detailed" sector as not to overwrite.
-    CURR_STEP = "partition"
-    
-    # If there is already partition data, read it and return.
-    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
-    !(isempty(d_read)) && (return d_read)
-    
-    x = Deselect([:units],"==")
-    [d[k] = edit_with(filter_with(d[k], (yr=set[:yr],)), x) for k in [:supply,:use]]
+function partition_national(dataset::Dataset, d::Dict, set::Dict; map_fdcat::Bool=false)
+    if dataset.step=="input"
+        set!(dataset; step="partition")
+        [d[k] = filter_with(d[k], (yr=set[:yr],)) for k in [:supply,:use]]
 
-    map_fdcat && _filter_use!(d,set)
+        map_fdcat && _filter_use!(d,set)
 
-    _partition_io!(d, set)
-    _partition_fd!(d, set)
+        SLiDE._partition_io!(d, set)
+        SLiDE._partition_fd!(d, set)
+        SLiDE._partition_va0!(d, set)
+        SLiDE._partition_x0!(d, set)
+        SLiDE._partition_m0!(d, set)
+        SLiDE._partition_md0!(d, set)
+        SLiDE._partition_ms0!(d, set)
+        SLiDE._partition_y0!(d, set)
+        SLiDE._partition_a0!(d, set)
+        SLiDE._partition_ta0!(d, set)
+        SLiDE._partition_tm0!(d, set)
 
-    # _partition_fd0!(d, set)
-    _partition_ts0!(d, set)
-    _partition_va0!(d, set)
-    _partition_x0!(d, set)
+        SLiDE.write_build!(dataset, d)
+    end
+    return d, set
+end
+
+
+function partition_national(dataset::Dataset; map_fdcat::Bool=false)
+    set!(dataset; step="partition")
+    d = read_build(dataset)
+    set = read_set(dataset)
     
-    _partition_cif0!(d, set)
-    _partition_m0!(d, set)   # cif0
-    _partition_trn0!(d, set) # cif0
-    
-    _partition_mrg0!(d, set)
-    _partition_md0!(d, set)  # mrg0, trn0
-    _partition_ms0!(d, set)  # mrg0, trn0
-    
-    # _partition_fs0!(d)       # fd0
-    _partition_s0!(d, set)     # ys0
-    
-    _partition_y0!(d, set)   # ms0, fs0, ys0
-    _partition_a0!(d, set)   # fd0, id0
-    
-    _partition_ta0!(d, set)  # a0, sbd0, tax0
-    _partition_tm0!(d, set)  # duty0, m0
-    
-    write_build!(dataset, CURR_STEP, d; save_build=save_build)
-    
-    haskey(d,:sector) && delete!(d,:sector)
-    return d
+    return partition_national(dataset, d, set; map_fdcat=map_fdcat)
 end
 
 

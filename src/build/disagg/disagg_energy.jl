@@ -38,7 +38,7 @@ end
 """
 """
 function _disagg_with_shrgas!(d, set, maps)
-    parameters = collect(keys(SLiDE.build_parameters("parameters")))
+    parameters = collect(keys(SLiDE.describe_parameters("parameters")))
     [_disagg_with_shrgas!(d, set, maps, k) for k in parameters]
 
     # Update saved sectors.
@@ -307,7 +307,7 @@ end
 """
 function drop_small!(d; digits=5)
     taxes = [:ta0, :tm0, :ty0]
-    parameters = collect(keys(SLiDE.build_parameters("parameters")))
+    parameters = collect(keys(SLiDE.describe_parameters("parameters")))
 
     [d[k] = drop_small(d[k]; digits=digits, key=k) for k in setdiff(parameters,taxes)]
     return d

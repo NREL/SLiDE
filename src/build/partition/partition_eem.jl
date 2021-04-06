@@ -1,4 +1,74 @@
 """
+This function prepares SEDS energy data for the EEM.
+
+# Returns
+- `d::Dict` of EIA data from the SLiDE input files,
+    with the addition of the following data sets describing:
+    1. Electricity - [`eem_elegen!`](@ref)
+    1. Energy - [`eem_energy!`](@ref)
+    3. CO2 Emissions - [`eem_co2emis!`](@ref)
+"""
+function partition_eem(dataset::Dataset, d::Dict, set::Dict)
+    set!(dataset; build="eem", step="partition")
+    maps = SLiDE.read_map()
+
+    d_read = SLiDE.read_input!(dataset)
+
+    if dataset.step=="input"
+        [d_read[k] = extrapolate_year(df, (yr=set[:yr],)) for (k,df) in d_read]
+        merge!(d, d_read)
+
+        SLiDE.partition_elegen!(d, maps)
+        SLiDE.partition_energy!(d, set, maps)
+        SLiDE.partition_co2emis!(d, set, maps)
+
+        d[:convfac] = _module_convfac(d)
+        d[:cprice] = _module_cprice!(d, maps)
+        d[:prodbtu] = _module_prodbtu!(d, set)
+        d[:pedef] = _module_pedef!(d, set)
+        d[:pe0] = _module_pe0!(d, set)
+        d[:ps0] = _module_ps0!(d)
+        d[:prodval] = _module_prodval!(d, set, maps)
+        d[:shrgas] = _module_shrgas!(d)
+        d[:netgen] = _module_netgen!(d)
+        d[:trdele] = _module_trdele!(d)
+        d[:pctgen] = _module_pctgen!(d, set)
+        d[:eq0] = _module_eq0!(d, set)
+        d[:ed0] = _module_ed0!(d, set, maps)
+        d[:emarg0] = _module_emarg0!(d, set, maps)
+        d[:ned0] = _module_ned0!(d)
+    else
+        merge!(d, d_read)
+    end
+        
+    return d, set, maps
+end
+
+
+# # https://link.springer.com/content/pdf/bbm%3A978-0-85729-829-4%2F1.pdf
+# function impute_mean(df, col; weight=DataFrame(), condition=DataFrame())
+#     if isempty(condition)
+#         condition, df = split_with(df, (value=NaN,))
+#         condition = condition[:, findindex(condition)]
+#         kind = :inner
+#     else
+#         idx = intersect(findindex(df), propertynames(condition))
+#         condition = antijoin(condition, df, on=idx)
+#         kind = :outer
+#     end
+
+#     # Calculate average.
+#     if isempty(weight)
+#         dfavg = combine_over(df, col; fun=Statistics.mean)
+#     else
+#         dfavg = combine_over(df * weight, col) / combine_over(weight, col)
+#     end
+    
+#     return indexjoin(condition, dfavg; kind=kind), df
+# end
+
+
+"""
 `convfac(yr,r)` [million btu per barrel],
 conversion factor for USD per barrel ``\\longrightarrow`` USD per million btu
 
@@ -10,7 +80,7 @@ conversion factor for USD per barrel ``\\longrightarrow`` USD per million btu
 ```
 """
 function _module_convfac(d::Dict)
-    return filter_with(d[:seds], (src="cru", sec="supply", units=BTU_PER_BARREL); drop=true)
+    return filter_with(d[:seds], (src="cru", sec="supply", units=BTU_PER_BARREL); drop=:sec)
 end
 
 
@@ -86,28 +156,22 @@ function _module_pedef!(d::Dict, set::Dict)
 
     splitter = DataFrame(permute((src=[set[:ff];"ele"], sec=set[:demsec], pq=["p","q"])))
     splitter = indexjoin(splitter, maps[:pq]; kind=:left)
-    idx = [:yr,:r,:src]
 
     df, df_out = split_fill_unstack(copy(d[:energy]), splitter, var, val);
 
     df[!,:pq] .= df[:,:p] .* df[:,:q]
-
-    pedef = combine_over(df,:sec)
-    pedef[!,:value] .= pedef[:,:pq] ./ pedef[:,:q]
-    pedef[!,:units] .= pedef[:,:units_p]
-
-    idx = intersect(findindex(pedef), propertynames(df_out))
+    
+    df = combine_over(df,:sec)
+    df[!,:value] .= df[:,:pq] ./ df[:,:q]
+    df[!,:units] .= df[:,:units_p]
     
     # For missing or NaN results, replace with the average. NaN values are a result of an
     # aggregate q = 0 (stored here in pedef), so use this to identify.
-    idx_r, pedef = split_with(pedef, (q=0.,))
+    idx = intersect(findindex(df), propertynames(df_out))
 
-    pedef_r = combine_over(pedef[:,[idx;:value]] * pedef[:,[idx;:q]], :r) /
-        combine_over(pedef[:,[idx;:q]], :r)
-    
-    pedef_r = indexjoin(idx_r[:,1:3], pedef_r; kind=:inner)
+    df_avg, df = impute_mean(df[:,[idx;:value]], :r; weight=df[:,[idx;:q]])
 
-    d[:pedef] = sort(vcat(pedef_r, pedef; cols=:intersect))
+    d[:pedef] = sort(vcat(df_avg, df; cols=:intersect))
     return d[:pedef]
 end
 
@@ -134,13 +198,9 @@ function _module_pe0!(d::Dict, set::Dict)
     df_cprice = _module_cprice!(d, maps)
 
     idx_q = filter_with(df_energy, (src="cru", pq="q"); drop=:pq)[:,1:end-2]
-    idx_avg = antijoin(idx_q, df_cprice,
-        on=intersect(propertynames(df_cprice),propertynames(idx_q)))
 
-    df_avg = combine_over(df_cprice, :r; fun=Statistics.mean)
-    df_avg = indexjoin(idx_avg, df_avg)
-
-    df_cprice = crossjoin(df_cprice, DataFrame(src="cru",sec=set[:demsec]))
+    df_avg, df_cprice = impute_mean(df_cprice, :r; condition=idx_q)
+    df_cprice = crossjoin(df_cprice, df_demsec)
     df_cprice = vcat(df_avg, df_cprice)
 
     d[:pe0] = [df[:,col]; df_cprice[:,col]]
@@ -194,13 +254,10 @@ function _module_shrgas!(d::Dict)
     
     # Define indices where we need to calculate an average (that present for ys0 but not for
     # prodval), calculate REGIONAL average, and apply that to the determined index.
-    idx_avg = antijoin(idx_ys0, df, on=propertynames(idx_ys0))
-
-    df_avg = combine_over(df, :r; fun=Statistics.mean)
-    df_avg = indexjoin(idx_avg, df_avg)
+    df_avg, df = impute_mean(df, :r; condition=idx_ys0)
+    df = vcat(df, df_avg)
 
     # Ensure all SECTORAL shares sum to one.
-    df = vcat(df, df_avg)
     df = df / combine_over(df, :src)
     d[:shrgas] = select(df, Not(:units))
 
@@ -218,7 +275,6 @@ function _module_netgen!(d::Dict)
     df = operate_over(df_ps0, df_netgen; id=[:usd_per_kwh,:kwh]=>:value, units=maps[:operate])
 
     df[!,:value] .= df[:,:factor] .* df[:,:usd_per_kwh] .* df[:,:kwh]
-    # df[:,:value] /= 10  # !!!!factor
 
     # IO data
     df_nd0 = filter_with(d[:nd0], (g="ele",); drop=true)

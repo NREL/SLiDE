@@ -4,25 +4,25 @@
 \\;\\vert\\; yr, \\, r, \\, e \\in src, \\, ed \\in sec \\right\\}
 ```
 
-[`SLiDE._eem_energy_supply`](@ref) adds supply information from the electricity
+[`SLiDE._partition_energy_supply`](@ref) adds supply information from the electricity
 generation dataset output by [`SLiDE.eem_elegen!`](@ref). The following functions are
 used to calculate values or make adjustments to values in the energy dataset.
 These operations must occur in the following order:
-1. [`SLiDE._eem_energy_ref`](@ref)
-2. [`SLiDE._eem_energy_ind`](@ref)
-3. [`SLiDE._eem_energy_price`](@ref)
+1. [`SLiDE._partition_energy_ref`](@ref)
+2. [`SLiDE._partition_energy_ind`](@ref)
+3. [`SLiDE._partition_energy_price`](@ref)
 """
-function eem_energy!(d::Dict, set::Dict, maps::Dict)
+function partition_energy!(d::Dict, set::Dict, maps::Dict)
     println("  Generating energy data set")
     
     df = copy(d[:seds])
     df = filter_with(df, (src=set[:e], sec=set[:ed],))
 
-    df_elegen = _eem_energy_supply(d)
+    df_elegen = _partition_energy_supply(d)
     
-    df = _eem_energy_ref(df, maps)
-    df = _eem_energy_ind(df, set, maps)
-    df = _eem_energy_price(df, set, maps)
+    df = _partition_energy_ref(df, maps)
+    df = _partition_energy_ind(df, set, maps)
+    df = _partition_energy_price(df, set, maps)
 
     df = vcat(df, df_elegen; cols=:intersect)
     df = indexjoin(df, filter_with(maps[:pq], (pq=["p","q"],)); kind=:inner)
@@ -37,7 +37,7 @@ end
 \\bar{supply}_{yr,r,src=ele} = \\sum_{src} \\bar{ele}_{yr,r,src}
 ```
 """
-function _eem_energy_supply(d::Dict)
+function _partition_energy_supply(d::Dict)
     idx = DataFrame(src="ele", sec="supply")
     df = combine_over(d[:elegen], :src)
     df = indexjoin(idx, df)
@@ -55,7 +55,7 @@ end
       {\\bar{ind}_{yr,r,src=ele} \\text{ [trillion btu]}}
 ```
 """
-function _eem_energy_ref(df::DataFrame, maps::Dict)
+function _partition_energy_ref(df::DataFrame, maps::Dict)
     var = [:sec,:base]
     val = [:units,:value]
 
@@ -81,7 +81,7 @@ end
 - \\bar{ref}_{yr,r,src=(ff,ele)}
 ```
 """
-function _eem_energy_ind(df::DataFrame, set::Dict, maps::Dict)
+function _partition_energy_ind(df::DataFrame, set::Dict, maps::Dict)
     var = :sec
     val = :value
     
@@ -111,11 +111,11 @@ end
 \\bar{ele}_{yr,r,sec} \\text{ [USD/thousand kWh]}
 &= 10^3 \\cdot
 \\dfrac{\\bar{ele}_{yr,r,sec} \\text{ [billion USD]}}
-      {\\bar{ele}_{yr,r,sec} \\text{ [thousand kWh]}}
+      {\\bar{ele}_{yr,r,sec} \\text{ [billion kWh]}}
 \\end{aligned}
 ```
 """
-function _eem_energy_price(df::DataFrame, set::Dict, maps::Dict)
+function _partition_energy_price(df::DataFrame, set::Dict, maps::Dict)
     var = :pq
     val = [:units,:value]
     id = [:v,:q]=>:p
