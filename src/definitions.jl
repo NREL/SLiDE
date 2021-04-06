@@ -7,6 +7,8 @@ const BUILD_STEPS = ["partition", "share", "calibrate", "disagg"];
 const PARAM_DIR = "parameters"
 const SET_DIR = "sets"
 
+const READ_DIR = joinpath(SLIDE_DIR,"src","build","readfiles")
+
 # UNITS
 const BTU = "trillion btu"
 const KWH = "billion kilowatthours"

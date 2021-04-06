@@ -1,4 +1,4 @@
-Path: [src,build,parameters]
+Path: [src,build,readfiles,parameters]
 
 SetInput:
   - {descriptor: scale,      name: list_model.csv}

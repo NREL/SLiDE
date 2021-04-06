@@ -222,11 +222,11 @@ end
 """
 function describe_parameters(step::String)
     step = convert_type(Symbol, step)
-    lst = read_from(joinpath(SLIDE_DIR, "src", "build", "readfiles", "parameterlist.yml"))
+    lst = read_from(joinpath(READ_DIR,"parameterlist.yml"))
 
     !haskey(lst, step) && (return nothing)
 
-    df = read_file(joinpath(SLIDE_DIR, "src", "build", "parameters", "define.csv"))
+    df = read_file(joinpath(READ_DIR,"parameters","define.csv"))
     df = innerjoin(DataFrame(parameter=lst[step]), df, on=:parameter)
 
     d = if isempty(df); convert_type.(Symbol, lst[step])
