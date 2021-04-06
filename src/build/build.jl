@@ -49,6 +49,18 @@ end
 
 
 """
+"""
+function build_eem(dataset, d, set)
+    d, set = aggregate_sector!(d, set)
+    d, set, maps = partition_eem(dataset, d, set)
+    d, set, maps = disaggregate_energy!(dataset, d, set, maps)
+    d, set = calibrate_energy(d, set)
+
+    return d, set
+end
+
+
+"""
     datapath()
 """
 function datapath(dataset::Dataset)
@@ -147,7 +159,7 @@ end
 
 function read_map()
     path = joinpath(SLIDE_DIR,"src","build","readfiles")
-    return read_from(joinpath(path, "maplist.yml"))
+    return Dict{Any,Any}(read_from(joinpath(path, "maplist.yml")))
 end
 
 
@@ -158,7 +170,7 @@ function read_input!(dataset::Dataset)
     
     if dataset.build=="io"
         path = joinpath(SLIDE_DIR,"src","build","readfiles","input")
-        dataset.step==PARAM_DIR && set!(dataset; step="partition")
+        dataset.step==SLiDE.PARAM_DIR && set!(dataset; step="partition")
         dataset.step=="partition" && (path = joinpath(path, "$(dataset.sector).yml"))
         dataset.step=="share" && (path = joinpath(path, "share.yml"))
 
@@ -174,6 +186,7 @@ function read_input!(dataset::Dataset)
             d = read_from(joinpath(SLIDE_DIR,"data","input","eia"))
         end
     end
+    dataset.step = "input"
     return d
 end
 

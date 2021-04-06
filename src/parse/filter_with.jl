@@ -661,24 +661,24 @@ function getzero(df; digits=false)
 end
 
 
-"""
-"""
-function drop_small(df, col; digits=5)
-    df = drop_small_average(df, col; digits=digits)
-    df = drop_small_value(df; digits=digits*2)
-    return df
-end
+# """
+# """
+# function drop_small(df, col; digits=5)
+#     df = drop_small_average(df, col; digits=digits)
+#     df = drop_small_value(df; digits=digits*2)
+#     return df
+# end
 
 
-"""
-"""
-function drop_small_average(df, col; digits=5)
-    idx = df / combine_over(df, col; fun=Statistics.mean, digits=false)
-    idx = getzero(idx; digits=digits)
-    return filter_with(df, Not(idx))
-end
+# """
+# """
+# function drop_small_average(df, col; digits=5)
+#     idx = df / combine_over(df, col; fun=Statistics.mean, digits=false)
+#     idx = getzero(idx; digits=digits)
+#     return filter_with(df, Not(idx))
+# end
 
 
-"""
-"""
-drop_small_value(df; digits=7) = dropzero(SLiDE.round!(df; digits=digits))
+# """
+# """
+# drop_small_value(df; digits=7) = dropzero(SLiDE.round!(df; digits=digits))

@@ -9,63 +9,40 @@ This function prepares SEDS energy data for the EEM.
     3. CO2 Emissions - [`eem_co2emis!`](@ref)
 """
 function partition_eem(dataset::Dataset, d::Dict, set::Dict)
-    set!(dataset; build="eem", step="partition")
+    SLiDE.set!(dataset; build="eem", step="partition")
     maps = SLiDE.read_map()
 
     d_read = SLiDE.read_input!(dataset)
 
     if dataset.step=="input"
-        [d_read[k] = extrapolate_year(df, (yr=set[:yr],)) for (k,df) in d_read]
+        [d_read[k] = SLiDE.extrapolate_year(df, (yr=set[:yr],)) for (k,df) in d_read]
         merge!(d, d_read)
 
         SLiDE.partition_elegen!(d, maps)
         SLiDE.partition_energy!(d, set, maps)
         SLiDE.partition_co2emis!(d, set, maps)
 
-        d[:convfac] = _module_convfac(d)
-        d[:cprice] = _module_cprice!(d, maps)
-        d[:prodbtu] = _module_prodbtu!(d, set)
-        d[:pedef] = _module_pedef!(d, set)
-        d[:pe0] = _module_pe0!(d, set)
-        d[:ps0] = _module_ps0!(d)
-        d[:prodval] = _module_prodval!(d, set, maps)
-        d[:shrgas] = _module_shrgas!(d)
-        d[:netgen] = _module_netgen!(d)
-        d[:trdele] = _module_trdele!(d)
-        d[:pctgen] = _module_pctgen!(d, set)
-        d[:eq0] = _module_eq0!(d, set)
-        d[:ed0] = _module_ed0!(d, set, maps)
-        d[:emarg0] = _module_emarg0!(d, set, maps)
-        d[:ned0] = _module_ned0!(d)
+        d[:convfac] = SLiDE._module_convfac(d)
+        d[:cprice] = SLiDE._module_cprice!(d, maps)
+        d[:prodbtu] = SLiDE._module_prodbtu!(d, set)
+        d[:pedef] = SLiDE._module_pedef!(d, set, maps)
+        d[:pe0] = SLiDE._module_pe0!(d, set, maps)
+        d[:ps0] = SLiDE._module_ps0!(d)
+        d[:prodval] = SLiDE._module_prodval!(d, set, maps)
+        d[:shrgas] = SLiDE._module_shrgas!(d)
+        d[:netgen] = SLiDE._module_netgen!(d, maps)
+        d[:trdele] = SLiDE._module_trdele!(d)
+        d[:pctgen] = SLiDE._module_pctgen!(d, set)
+        d[:eq0] = SLiDE._module_eq0!(d, set)
+        d[:ed0] = SLiDE._module_ed0!(d, set, maps)
+        d[:emarg0] = SLiDE._module_emarg0!(d, set, maps)
+        d[:ned0] = SLiDE._module_ned0!(d)
     else
         merge!(d, d_read)
     end
         
     return d, set, maps
 end
-
-
-# # https://link.springer.com/content/pdf/bbm%3A978-0-85729-829-4%2F1.pdf
-# function impute_mean(df, col; weight=DataFrame(), condition=DataFrame())
-#     if isempty(condition)
-#         condition, df = split_with(df, (value=NaN,))
-#         condition = condition[:, findindex(condition)]
-#         kind = :inner
-#     else
-#         idx = intersect(findindex(df), propertynames(condition))
-#         condition = antijoin(condition, df, on=idx)
-#         kind = :outer
-#     end
-
-#     # Calculate average.
-#     if isempty(weight)
-#         dfavg = combine_over(df, col; fun=Statistics.mean)
-#     else
-#         dfavg = combine_over(df * weight, col) / combine_over(weight, col)
-#     end
-    
-#     return indexjoin(condition, dfavg; kind=kind), df
-# end
 
 
 """
@@ -96,7 +73,7 @@ end
 """
 function _module_cprice!(d::Dict, maps::Dict)
     id = [:usd_per_barrel,:btu_per_barrel] => :usd_per_btu
-    df = _module_convfac(d)
+    df = SLiDE._module_convfac(d)
     col = propertynames(df)
 
     df = operate_over(d[:crude_oil], df; id=id, units=maps[:operate])
@@ -150,7 +127,7 @@ Average energy demand price ``\\tilde{pedef}_{yr,r,src}`` and its regional avera
       {\\sum_{r} \\sum_{sec} \\tilde{q}_{yr,r,src,sec}}
 ```
 """
-function _module_pedef!(d::Dict, set::Dict)
+function _module_pedef!(d::Dict, set::Dict, maps::Dict)
     var = :pq
     val = [:units,:value]
 
@@ -169,7 +146,7 @@ function _module_pedef!(d::Dict, set::Dict)
     # aggregate q = 0 (stored here in pedef), so use this to identify.
     idx = intersect(findindex(df), propertynames(df_out))
 
-    df_avg, df = impute_mean(df[:,[idx;:value]], :r; weight=df[:,[idx;:q]])
+    df_avg, df = SLiDE.impute_mean(df[:,[idx;:value]], :r; weight=df[:,[idx;:q]])
 
     d[:pedef] = sort(vcat(df_avg, df; cols=:intersect))
     return d[:pedef]
@@ -178,7 +155,7 @@ end
 
 """
 """
-function _module_pe0!(d::Dict, set::Dict)
+function _module_pe0!(d::Dict, set::Dict, maps::Dict)
     df_demsec = DataFrame(sec=set[:demsec])
     df_energy = filter_with(d[:energy], (src=set[:e], sec=set[:demsec]))
 
@@ -195,11 +172,11 @@ function _module_pe0!(d::Dict, set::Dict)
     df = edit_with(df, Replace(:value, missing, "pedef value"))
 
     # Use annual EIA data for crude oil averages.
-    df_cprice = _module_cprice!(d, maps)
+    df_cprice = SLiDE._module_cprice!(d, maps)
 
     idx_q = filter_with(df_energy, (src="cru", pq="q"); drop=:pq)[:,1:end-2]
 
-    df_avg, df_cprice = impute_mean(df_cprice, :r; condition=idx_q)
+    df_avg, df_cprice = SLiDE.impute_mean(df_cprice, :r; condition=idx_q)
     df_cprice = crossjoin(df_cprice, df_demsec)
     df_cprice = vcat(df_avg, df_cprice)
 
@@ -254,7 +231,7 @@ function _module_shrgas!(d::Dict)
     
     # Define indices where we need to calculate an average (that present for ys0 but not for
     # prodval), calculate REGIONAL average, and apply that to the determined index.
-    df_avg, df = impute_mean(df, :r; condition=idx_ys0)
+    df_avg, df = SLiDE.impute_mean(df, :r; condition=idx_ys0)
     df = vcat(df, df_avg)
 
     # Ensure all SECTORAL shares sum to one.
@@ -267,7 +244,7 @@ end
 
 """
 """
-function _module_netgen!(d::Dict)
+function _module_netgen!(d::Dict, maps::Dict)
     # SEDS data
     df_ps0 = filter_with(d[:ps0], (src="ele",); drop=true)
     df_netgen = filter_with(d[:seds], (src="ele", sec="netgen", units=KWH); drop=true)
@@ -353,8 +330,8 @@ end
 function _module_ed0!(d::Dict, set::Dict, maps::Dict)
     id = [:usd_per_x,:x] => :usd
     
-    idx_p = _index_src_sec_pq!(d, set, maps, (:e,:demsec,:p))
-    idx_q = _index_src_sec_pq!(d, set, maps, (:e,:demsec,:q))
+    idx_p = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:p))
+    idx_q = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:q))
 
     df_p = fill_zero(d[:pe0]; with=idx_p)
     df_q = fill_zero(d[:eq0]; with=idx_q)
@@ -378,8 +355,8 @@ end
 function _module_emarg0!(d::Dict, set::Dict, maps::Dict)
     id = [:usd_per_x,:x] => :usd
 
-    idx_p = _index_src_sec_pq!(d, set, maps, (:e,:demsec,:p))
-    idx_q = _index_src_sec_pq!(d, set, maps, (:e,:demsec,:q))
+    idx_p = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:p))
+    idx_q = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:q))
 
     df_p = d[:pe0] - d[:ps0]
 
@@ -427,7 +404,7 @@ function _index_src_sec_pq!(d, set, maps, key::Tuple)
     if !haskey(d, key)
         (src,sec,pq) = key
         x = key => (src=set[src], sec=set[sec], pq=string(pq))
-        _index_src_sec_pq!(d, maps, x)
+        SLiDE._index_src_sec_pq!(d, maps, x)
     end
     return d[key]
 end

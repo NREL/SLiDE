@@ -30,11 +30,12 @@ function share_sector(set::Dict;
     df = SLiDE._partition_y0!(det, set_det)
     
     # Initialize scaling information.
-    weighting = Weighting(df)
-    mapping = Mapping(dfmap)
+    weighting, mapping = SLiDE.share_with(Weighting(df), Mapping(dfmap))
+    # weighting = Weighting(df)
+    # mapping = Mapping(dfmap)
     
-    SLiDE.set_scheme!(weighting, mapping)
-    SLiDE.share_with!(weighting, mapping)
+    # SLiDE.set_scheme!(weighting, mapping)
+    # SLiDE.share_with!(weighting, mapping)
     
     weighting.data = SLiDE.map_year(weighting.data, set[:yr])
 
@@ -52,21 +53,15 @@ end
 
 
 """
-    share_with!(weighting::Weighting, mapping::Mapping)
-Returns `weighting` with `weighting.data::DataFrame` shared using [`SLiDE.share_with`](@ref)
+    share_with(df::DataFrame, x::Mapping)
 """
-function share_with!(weighting::Weighting, mapping::Mapping)
-    weighting.data = select(
-        share_with(weighting.data, mapping),
-        [weighting.constant; weighting.from; weighting.to; findvalue(weighting.data)],
-    )
-    return weighting
+function share_with(weighting::Weighting, mapping::Mapping)    
+    SLiDE.set_scheme!(weighting, mapping)
+    SLiDE.share_with!(weighting, mapping)
+    return weighting, mapping
 end
 
 
-"""
-    share_with(df::DataFrame, x::Mapping)
-"""
 function share_with(df::DataFrame, x::Mapping)
     df = edit_with(df, [
         Rename(x.on, x.from);
@@ -78,4 +73,17 @@ function share_with(df::DataFrame, x::Mapping)
         df = df / combine_over(df, dis)
     end
     return df
+end
+
+
+"""
+    share_with!(weighting::Weighting, mapping::Mapping)
+Returns `weighting` with `weighting.data::DataFrame` shared using [`SLiDE.share_with`](@ref)
+"""
+function share_with!(weighting::Weighting, mapping::Mapping)
+    weighting.data = select(
+        share_with(weighting.data, mapping),
+        [weighting.constant; weighting.from; weighting.to; findvalue(weighting.data)],
+    )
+    return weighting
 end

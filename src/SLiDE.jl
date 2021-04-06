@@ -152,6 +152,7 @@ export partition_eem
 export partition_elegen!
 export partition_energy!
 export partition_co2emis!
+export disaggregate_energy!
 
 # MODEL
 export model_input
@@ -232,6 +233,7 @@ include(joinpath("build", "share", "share_sgf.jl"))
 include(joinpath("build", "share", "share_utd.jl"))
 include(joinpath("build", "share", "share_sector.jl"))
 include(joinpath("build", "disagg", "disagg_region.jl"))
+include(joinpath("build", "disagg", "disagg_energy.jl"))
 
 include(joinpath("scale", "constructors.jl"))
 include(joinpath("scale", "scale_sector.jl"))

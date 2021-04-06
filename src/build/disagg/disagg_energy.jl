@@ -1,11 +1,12 @@
-function disagg_energy!(d, set, maps)
+function disaggregate_energy!(dataset, d, set, maps)
 
-    # Disaggregate all using shrgas.
-    _disagg_with_shrgas!(d, set, maps)
+    # Disaggregate.
+    _disaggregate_cng!(d, set, maps)
+    _disagg_energy_fvs!(d)
 
     # Make individual adjustments.
     _disagg_energy_md0!(d, set)
-    _disagg_energy_cd0!(d)
+    _disagg_energy_cd0!(d, set)
     _disagg_energy_ys0!(d, set, maps)
     _disagg_energy_id0!(d, set, maps)
     _disagg_energy_m0!(d)
@@ -24,48 +25,78 @@ function disagg_energy!(d, set, maps)
 end
 
 
-"""
-"""
-function _scale_shrgas!(d::Dict, set::Dict, maps::Dict, on)
-    key = Tuple([:shrgas;on])
-    if !haskey(d,key)
-        d[key] = SLiDE._scale_extend(d[:shrgas], maps[:cng], set[:sector], on)
-    end
-    return d[key]
+function _disaggregate_cng!(d, set, maps)
+    weighting, mapping = SLiDE.share_with(Weighting(d[:shrgas]), Mapping(maps[:cng]))
+    weighting.data = fill_zero(weighting.data)
+    disaggregate_sector!(d, set, weighting)
+
+    parameters = SLiDE.list_parameters!(set, :parameters)
+    [dropzero!(d[k]) for k in parameters]
+
+    SLiDE.set_sector!(set, unique(d[:ys0][:,:g]))
+
+    return d, set
 end
 
 
 """
 """
-function _disagg_with_shrgas!(d, set, maps)
-    parameters = collect(keys(SLiDE.describe_parameters("parameters")))
-    [_disagg_with_shrgas!(d, set, maps, k) for k in parameters]
+function _disagg_energy_fvs(d::Dict, key::Symbol)
+    df = d[key] / combine_over(d[:ys0],:g; digits=false)
+    col = propertynames(df)
 
-    # Update saved sectors.
-    SLiDE.set_sector!(set, unique(d[:ys0][:,:s]))
+    df = edit_with(df, Add(:parameter, "$key"))
+    return select!(df, insert!(col, length(col), :parameter))
+end
 
-    maps[:demand] = filter_with(maps[:demand], (s=set[:s],))
-
-    return d, set, maps
+function _disagg_energy_fvs!(d::Dict)
+    d[:fvs] = vcat([_disagg_energy_fvs(d,key) for key in [:kd0,:ld0]]...)
+    return d[:fvs]
 end
 
 
-"""
-"""
-function _disagg_with_shrgas!(d::Dict, set::Dict, maps::Dict, key::Symbol)
-    taxes = [:ta0,:tm0,:ty0]
-    on = SLiDE._find_sector(d[key])
+# """
+# """
+# function _scale_shrgas!(d::Dict, set::Dict, maps::Dict, on)
+#     key = Tuple([:shrgas;on])
+#     if !haskey(d,key)
+#         d[key] = SLiDE._scale_extend(d[:shrgas], maps[:cng], set[:sector], on)
+#     end
+#     return d[key]
+# end
 
-    if !isempty(on)
-        d[key] = if key in taxes
-            SLiDE.scale_with_map(d[key], _scale_shrgas!(d, set, maps, on), on; key=key)
-        else
-            SLiDE.scale_with_share(d[key], _scale_shrgas!(d, set, maps, on), on; key=key)
-        end
-    end
 
-    return d[key]
-end
+# """
+# """
+# function _disagg_with_shrgas!(d, set, maps)
+#     parameters = collect(keys(SLiDE.describe_parameters("parameters")))
+#     [_disagg_with_shrgas!(d, set, maps, k) for k in parameters]
+
+#     # Update saved sectors.
+#     SLiDE.set_sector!(set, unique(d[:ys0][:,:s]))
+
+#     maps[:demand] = filter_with(maps[:demand], (s=set[:s],))
+
+#     return d, set, maps
+# end
+
+
+# """
+# """
+# function _disagg_with_shrgas!(d::Dict, set::Dict, maps::Dict, key::Symbol)
+#     taxes = [:ta0,:tm0,:ty0]
+#     on = SLiDE.find_sector(d[key])
+
+#     if !isempty(on)
+#         d[key] = if key in taxes
+#             SLiDE.scale_with_map(d[key], _scale_shrgas!(d, set, maps, on), on; key=key)
+#         else
+#             SLiDE.scale_with_share(d[key], _scale_shrgas!(d, set, maps, on), on; key=key)
+#         end
+#     end
+
+#     return d[key]
+# end
 
 
 """
@@ -107,7 +138,7 @@ md_{yr,r,m,g} = mrgshr_{yr,r,m,g} \\cdot \\sum_{sec} emrg_{yr,r,src\\rightarrow 
 """
 function _disagg_energy_md0!(d::Dict, set::Dict)
     df = d[:md0]
-    g = SLiDE._find_sector(df)[1]
+    g = SLiDE.find_sector(df)
 
     df, df_out = split_with(df, DataFrame(g=>set[:e],))
     
@@ -129,9 +160,9 @@ end
 \\right\\}
 ```
 """
-function _disagg_energy_cd0!(d::Dict)
+function _disagg_energy_cd0!(d::Dict, set::Dict)
     df = d[:cd0]
-    g = SLiDE._find_sector(df)[1]
+    g = SLiDE.find_sector(df)
 
     df, df_out = split_with(df, DataFrame(g=>set[:e],))
 
@@ -148,7 +179,7 @@ end
 """
 function _disagg_energy_ys0!(d::Dict, set::Dict, maps::Dict)
     x = set[:e]
-    idx = SLiDE._find_sector(d[:ys0])
+    idx = SLiDE.find_sector(d[:ys0])
     df, df_out = split_with(d[:ys0], DataFrame(s=x, g=x))
 
     # -----
@@ -273,33 +304,23 @@ end
 
 """
 """
-function _disagg_energy_zero_prod!(d::Dict, on)
-    key = Tuple([:zero_prod;on])
-    if !haskey(d,key)
-        idx_zero = fill_zero(combine_over(filter_with(d[:ys0], (s="ele",)), :g))
-        idx_zero = getzero(idx_zero)
-
-        # Rename if appropriate.
-        if isempty(intersect(propertynames(idx_zero), ensurearray(on)))
-            idx_zero = edit_with(idx_zero, Rename.(:s,on))
-        end
-
-        d[key] = idx_zero
-    end
-    return d[key]
-end
-
-
-function _disagg_energy_zero_prod!(d::Dict, key::Symbol)
-    on = SLiDE._find_sector(d[key])
-    d[key] = filter_with(d[key], Not(_disagg_energy_zero_prod!(d, on)))
-    return d[key]
-end
-
-
 function _disagg_energy_zero_prod!(d::Dict)
-    [_disagg_energy_zero_prod!(d,k) for k in [:ld0,:kd0,:ty0,:id0,:s0,:xd0,:xn0,:x0,:rx0]]
+    idxzero = _disagg_energy_zero_prod(d)
+    [d[k] = _disagg_energy_zero_prod(d[k], idxzero) for k in [:ld0,:kd0,:ty0,:id0,:s0,:xd0,:xn0,:x0,:rx0]]
     return d
+end
+
+function _disagg_energy_zero_prod(d::Dict)
+    idx_zero = fill_zero(combine_over(filter_with(d[:ys0], (s="ele",)), :g))
+    return getzero(idx_zero)
+end
+
+function _disagg_energy_zero_prod(df::DataFrame, idxzero::DataFrame)
+    idxon = SLiDE.find_sector(idxzero)
+    if !(idxon in propertynames(df))
+        idxzero = edit_with(idxzero, Rename(idxon, SLiDE.find_sector(df)))
+    end
+    return filter_with(df, Not(idxzero))
 end
 
 
@@ -307,7 +328,7 @@ end
 """
 function drop_small!(d; digits=5)
     taxes = [:ta0, :tm0, :ty0]
-    parameters = collect(keys(SLiDE.describe_parameters("parameters")))
+    parameters = [SLiDE.list_parameters!(set, :parameters); :fvs; :netgen]
 
     [d[k] = drop_small(d[k]; digits=digits, key=k) for k in setdiff(parameters,taxes)]
     return d
@@ -317,7 +338,7 @@ end
 """
 """
 function drop_small(df; digits=5, key=missing)
-    sector = SLiDE._find_sector(df)
+    sector = SLiDE.find_sector(df)
     
     if !isempty(sector)
         col = setdiff(findindex(df), [:yr; sector[1]])
