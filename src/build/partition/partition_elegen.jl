@@ -16,18 +16,17 @@ For fossil fuels, use heatrate to convert as follows:
 ```
 """
 function partition_elegen!(d::Dict, maps::Dict)
-    println("  Generating electricity data set")
-
-    id = [:elegen,:heatrate] => :elegen
+    println("  Generating electricity data set: elegen(yr,r,src)")
 
     df = filter_with(d[:seds], maps[:elegen]; drop=:sec)
-    col = propertynames(df)
 
-    df = operate_over(df, d[:heatrate]; id=id, units=maps[:operate])
+    df = operate_over(df, d[:heatrate];
+        id=[:elegen,:heatrate] => :elegen,
+        units=maps[:operate]
+    )
     ii = df[:,:complete]
-
     df[ii,:value] .= df[ii,:factor] .* df[ii,:elegen] ./ df[ii,:heatrate]
     
-    d[:elegen] = df[:,col]
+    d[:elegen] = operation_output(df)
     return d[:elegen]
 end

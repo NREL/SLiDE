@@ -20,7 +20,7 @@ Base.broadcastable(x::InvertedIndex{T}) where {T <: Any} = [x];
 """
 Extends copy to Weighting and Mapping
 """
-Base.copy(x::Dataset) = Dataset(x.name, x.build, x.step, x.sector, x.eem, x.save_build, x.overwrite)
+Base.copy(x::Dataset) = Dataset(x.name, x.build, x.step, x.sector_level, x.eem, x.save_build, x.overwrite)
 Base.copy(x::Weighting) = Weighting(copy(x.data), x.constant, x.from, x.to, x.on, x.direction)
 Base.copy(x::Mapping) = Mapping(copy(x.data), x.from, x.to, x.on, x.direction)
 
@@ -271,11 +271,17 @@ function add_permutation!(set::Dict, x::Tuple)
         if length(x) == length(unique(x))
             lst = permute([[set[k] for k in x]...,])
         else
+            # Save the number of occurrances of each set in `tmp`. Then permute such that
+            # multiple entries of a single set will be coupled.
             tmp = unique(transform_over(DataFrame(x=ensurearray(x), num=true), :num))
             lst = [row[:num]==1 ? set[row[:x]] : vcat.(fill(set[row[:x]],Int(row[:num]))...)
                 for row in eachrow(tmp)]
-            lst = permute(lst)
-            lst = [Tuple(vcat(ensurearray(x)...)) for x in lst]
+                    
+            lst = if length(unique(x))==1
+                Tuple.(lst[1])
+            else
+                [Tuple(vcat(ensurearray(x)...)) for x in permute(lst)]
+            end
         end
 
         set[x] = sort(lst)

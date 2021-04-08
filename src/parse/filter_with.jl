@@ -136,13 +136,19 @@ function filter_with(df::DataFrame, idx::InvertedIndex{DataFrame})
     return df
 end
 
-
 function filter_with(df::DataFrame, x::InvertedIndex{Weighting})
     x = x.skip
-    df_not = antijoin(df, x.data[:,[x.constant;x.from]],
-        on=Pair.([x.constant;x.on],[x.constant;x.from]))
+    dfx = unique(x.data[:,ensurearray(x.from)])
+    df_not = antijoin(df, dfx, on=Pair.(x.on,x.from))
     return df_not
 end
+
+# function filter_with(df::DataFrame, x::InvertedIndex{Weighting})
+#     x = x.skip
+#     df_not = antijoin(df, x.data[:,[x.constant;x.from]],
+#         on=Pair.([x.constant;x.on],[x.constant;x.from]))
+#     return df_not
+# end
 
 
 function filter_with(df::DataFrame, x::InvertedIndex{Mapping})

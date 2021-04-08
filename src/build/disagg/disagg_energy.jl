@@ -1,102 +1,62 @@
 function disaggregate_energy!(dataset, d, set, maps)
+    step = "disaggregate"
+    d_read = read_build(set!(dataset; step=step))
 
-    # Disaggregate.
-    _disaggregate_cng!(d, set, maps)
-    _disagg_energy_fvs!(d)
+    if dataset.step=="input"
+        # Do some renaming here so we don't have to later.
+        [d[k] = edit_with(d[k], Rename(:src,:g)) for k in [:ed0,:emarg0,:pctgen]]
 
-    # Make individual adjustments.
-    _disagg_energy_md0!(d, set)
-    _disagg_energy_cd0!(d, set)
-    _disagg_energy_ys0!(d, set, maps)
-    _disagg_energy_id0!(d, set, maps)
-    _disagg_energy_m0!(d)
-    _disagg_energy_x0!(d)
+        # Disaggregate.
+        _disaggregate_cng!(d, set, maps)
+        _disagg_energy_fvs!(d)
 
-    # Zero production.
-    _disagg_energy_zero_prod!(d)
+        # Make individual adjustments.
+        _disagg_energy_md0!(d, set)
+        _disagg_energy_cd0!(d, set)
+        _disagg_energy_ys0!(d, set, maps)
+        _disagg_energy_id0!(d, set, maps)
+        _disagg_energy_m0!(d)
+        _disagg_energy_x0!(d)
 
-    # Update household disaggregation.
-    SLiDE._disagg_hhadj!(d)
+        # Zero production.
+        _disagg_energy_zero_prod!(d)
 
-    # Need to keep small values until after we've built emissions info.
-    # drop_small!(d)
+        # Update household disaggregation.
+        SLiDE._disagg_hhadj!(d)
+    end
     
     return d, set, maps
 end
 
 
+"""
+"""
 function _disaggregate_cng!(d, set, maps)
     weighting, mapping = SLiDE.share_with(Weighting(d[:shrgas]), Mapping(maps[:cng]))
-    weighting.data = fill_zero(weighting.data)
-    disaggregate_sector!(d, set, weighting)
-
-    parameters = SLiDE.list_parameters!(set, :parameters)
-    [dropzero!(d[k]) for k in parameters]
-
-    SLiDE.set_sector!(set, unique(d[:ys0][:,:g]))
-
+    disaggregate_sector!(d, set, weighting; scale_id=:cng)
+    maps[:demand] = filter_with(maps[:demand], (s=set[:sector],))
     return d, set
 end
 
 
 """
+`fvs`, initial factor value shares in production
+```math
+fvs_{yr,r,s,x} = \\dfrac{x_{yr,r,s}}{\\sum_{g}ys_{yr,r,s,g}}
+```
 """
-function _disagg_energy_fvs(d::Dict, key::Symbol)
-    df = d[key] / combine_over(d[:ys0],:g; digits=false)
-    col = propertynames(df)
-
-    df = edit_with(df, Add(:parameter, "$key"))
-    return select!(df, insert!(col, length(col), :parameter))
-end
-
 function _disagg_energy_fvs!(d::Dict)
+    println("  Calculating fvs, initial factor value shares in production")
     d[:fvs] = vcat([_disagg_energy_fvs(d,key) for key in [:kd0,:ld0]]...)
     return d[:fvs]
 end
 
-
-# """
-# """
-# function _scale_shrgas!(d::Dict, set::Dict, maps::Dict, on)
-#     key = Tuple([:shrgas;on])
-#     if !haskey(d,key)
-#         d[key] = SLiDE._scale_extend(d[:shrgas], maps[:cng], set[:sector], on)
-#     end
-#     return d[key]
-# end
-
-
-# """
-# """
-# function _disagg_with_shrgas!(d, set, maps)
-#     parameters = collect(keys(SLiDE.describe_parameters("parameters")))
-#     [_disagg_with_shrgas!(d, set, maps, k) for k in parameters]
-
-#     # Update saved sectors.
-#     SLiDE.set_sector!(set, unique(d[:ys0][:,:s]))
-
-#     maps[:demand] = filter_with(maps[:demand], (s=set[:s],))
-
-#     return d, set, maps
-# end
-
-
-# """
-# """
-# function _disagg_with_shrgas!(d::Dict, set::Dict, maps::Dict, key::Symbol)
-#     taxes = [:ta0,:tm0,:ty0]
-#     on = SLiDE.find_sector(d[key])
-
-#     if !isempty(on)
-#         d[key] = if key in taxes
-#             SLiDE.scale_with_map(d[key], _scale_shrgas!(d, set, maps, on), on; key=key)
-#         else
-#             SLiDE.scale_with_share(d[key], _scale_shrgas!(d, set, maps, on), on; key=key)
-#         end
-#     end
-
-#     return d[key]
-# end
+function _disagg_energy_fvs(d::Dict, key::Symbol)
+    df = d[key] / combine_over(d[:ys0],:g; digits=false)
+    col = propertynames(df)
+    df = edit_with(df, Add(:parameter, "$key"))
+    return select!(df, insert!(col, length(col), :parameter))
+end
 
 
 """
@@ -111,41 +71,37 @@ mrgshr_{yr,r,m,g=trd} &= 1 - mrgshr_{yr,r,m,g=trn}
 ```
 """
 function _disagg_energy_mrgshr!(d::Dict, set::Dict)
+    println("  Calculating mrgshr(yr,r,m,g=e)")
     if !haskey(d,:mrgshr)
-        var = :m
-        val = :value
+        var, val = :m, :value
         col = propertynames(d[:md0])
 
         df = filter_with(d[:md0], (g=set[:e],))
-
         df = df / combine_over(df, var; digits=false)
 
         df = unstack(df, var, val)
         df = fill_zero(df; with=(yr=set[:yr], r=set[:r], g=set[:e]))
-
         df[!,:trd] .= 1.0 .- df[:,:trn]
 
-        d[:mrgshr] = select(dropzero(SLiDE._stack(df, :m, :value)), col)
+        d[:mrgshr] = select(dropzero(SLiDE._stack(df, var, val)), col)
     end
     return d[:mrgshr]
 end
 
 
 """
+`md0(yr,r,m,g)`, margin demand
 ```math
 md_{yr,r,m,g} = mrgshr_{yr,r,m,g} \\cdot \\sum_{sec} emrg_{yr,r,src\\rightarrow g, sec}
 ```
 """
 function _disagg_energy_md0!(d::Dict, set::Dict)
-    df = d[:md0]
-    g = SLiDE.find_sector(df)
+    println("  Calculating md0(yr,r,m,g=e), margin demand")
 
-    df, df_out = split_with(df, DataFrame(g=>set[:e],))
+    df, df_out = split_with(d[:md0], DataFrame(g=set[:e],))
     
     df_mrgshr = _disagg_energy_mrgshr!(d, set)
-    df_emrg = edit_with(d[:emarg0], Rename(:src,g))
-
-    df = d[:mrgshr] * combine_over(df_emrg, :sec)
+    df = df_mrgshr * combine_over(d[:emarg0], :sec)
 
     d[:md0] = dropzero(vcat(df_out, df; cols=:intersect))
     return d[:md0]
@@ -153,6 +109,7 @@ end
 
 
 """
+`cd0(yr,r,g)`, national final consumption
 ```math
 \\tilde{cd}_{yr,r,g}
 = \\left\\{
@@ -161,16 +118,12 @@ end
 ```
 """
 function _disagg_energy_cd0!(d::Dict, set::Dict)
-    df = d[:cd0]
-    g = SLiDE.find_sector(df)
+    println("  Calculating cd0(yr,r,g=e), national final consumption")
+    df, df_out = split_with(d[:cd0], DataFrame(g=set[:e],))
 
-    df, df_out = split_with(df, DataFrame(g=>set[:e],))
+    df = filter_with(d[:ed0], (sec="res",); drop=true)
 
-    df_ed0 = edit_with(d[:ed0], Rename(:src,g))
-
-    df = filter_with(df_ed0, (sec="res",); drop=true)
     d[:cd0] = vcat(df_out, df; cols=:intersect)
-
     return d[:cd0]
 end
 
@@ -178,44 +131,39 @@ end
 """
 """
 function _disagg_energy_ys0!(d::Dict, set::Dict, maps::Dict)
+    println("  Calculating ys0(yr,r,s=e,g=e), regional sectoral output")
     x = set[:e]
-    idx = SLiDE.find_sector(d[:ys0])
     df, df_out = split_with(d[:ys0], DataFrame(s=x, g=x))
 
-    # -----
-    # Edit ele,cru,gas,col.
+    # (1) Calculate data for e = [ele,cru,gas,col].
     df_energy = filter_with(d[:energy], (src=x, sec="supply", pq="q"); drop=true)
-    df_ps = filter_with(d[:ps0], (src=x,))
+    df_ps0 = filter_with(d[:ps0], (src=x,))
 
-    df = operate_over(df_energy, df_ps;
+    df = operate_over(df_energy, df_ps0;
         id=[:x,:usd_per_x]=>:usd,
         units=maps[:operate], 
         fillmissing=0.0,
     )
-
     df[!,:value] .= df[:,:factor] .* df[:,:x] .* df[:,:usd_per_x]
+    operation_output!(df, Not(:units))
 
-    # -----
-    # Since we don't have ps0(oil), calculate (oil,oil) as a share of ned0.
-    x = Deselect([:units],"==")
-    df_energy = filter_with(edit_with(d[:energy], x), (src="cru", sec="ref", pq="q"); drop=true)
-    df_ned = filter_with(edit_with(d[:ned0], x), (src="oil",))
+    # (2) Since we don't have ps0(oil), calculate (oil,oil) as a share of ned0.
+    df_energy = filter_with(d[:energy], (src="cru", sec="ref", pq="q"); drop=true)
+    df_ned = filter_with(d[:ned0], (src="oil",))
 
     df_energy = df_energy / transform_over(df_energy, :r)
     df_ned = transform_over(combine_over(df_ned, :sec), :r)
 
-    df_oil = df_energy * df_ned
+    df_oil = select(df_energy, Not(:units)) * df_ned
 
-    # Add this back to df and adjust indices to get src -> (s,g).
-    df = edit_with(vcat(df, df_oil; cols=:intersect), Rename(:src,idx[1]))
-    df[!,idx[2]] .= df[:,idx[1]]
+    # (3) Add this back to df and adjust indices to get src -> (s,g).
+    df = edit_with(vcat(df, df_oil), Rename(:src,:g))
+    df[!,:s] .= df[:,:g]
 
-    # -----
-    # Make zero if production is zero.
-    xgen = "ele"
-    idxgen = filter_with(df[:,findindex(df)], (s=xgen,g=xgen); drop=:g)
+    # (4) Make zero if production is zero.
+    idxgen = filter_with(df[:,findindex(df)], (s="ele", g="ele"); drop=:g)
     df_out = indexjoin(df_out, idxgen; id=[:ys0,:generation], indicator=true)
-    df_out[.&(df_out[:,:s].==xgen, .!df_out[:,:generation]),:value] .= 0.0
+    df_out[.&(df_out[:,:s].=="ele", .!df_out[:,:generation]),:value] .= 0.0
 
     # FINALLY, add this back to ys0.
     d[:ys0] = dropzero(vcat(df_out[:,1:end-2], df))
@@ -227,15 +175,18 @@ end
 """
 function _disagg_energy_inpshr!(d::Dict, set::Dict, maps::Dict)
     if !haskey(d, :inpshr)
-        x = unique(d[:id0][:,:g])
-        x_idx = [Deselect([:g,:units,:value], "=="); Rename(:src,:g)]
+        x = set[:sector]
 
-        idx_pctgen = edit_with(d[:pctgen][d[:pctgen][:,:value].>0.01, :], x_idx)
-        idx_ys0 = edit_with(filter_with(d[:ys0], DataFrame(s=x, g=x)), x_idx)
-        idx_ed0 = edit_with(d[:ed0], x_idx)
+        # Save/define indices for which to perform these operations.
+        idx = Dict(
+            :shr => d[:pctgen][d[:pctgen][:,:value].>0.01, :],
+            :ys0 => select(filter_with(d[:ys0], DataFrame(s=x, g=x)), Not(:g)),
+            :ed0 => d[:ed0],
+        )
+        [idx[k] = select(df, Not(:value)) for (k,df) in idx]
 
-        idx_shr = filter_with(innerjoin(idx_pctgen, maps[:demand], on=:sec), (s=x,))
-        idx_shr_avg = indexjoin(idx_shr, idx_ys0, idx_ed0; kind=:inner)
+        idx[:shr] = innerjoin(idx[:shr], maps[:demand], on=:sec)
+        idx[:shr_avg] = indexjoin(values(idx)...; kind=:inner)
 
         # Set up to average. Filter id0, fill it with zeros, and map both to demand sectors.
         df = filter_with(copy(d[:id0]), (g=set[:e],))
@@ -245,16 +196,16 @@ function _disagg_energy_inpshr!(d::Dict, set::Dict, maps::Dict)
         df0_sec = indexjoin(df0, maps[:demand]; kind=:inner)
         
         # Calculate input share.
-        df_shr = df_sec / transform_over(df_sec, :s; digits=false)
-        df_shr = filter_with(idx_shr, df_shr)
+        df_shr = df_sec / transform_over(df_sec,:s; digits=false)
+        df_shr = filter_with(df_shr, idx[:shr])
         
-        # Adjust idx_shr_avg to remove indices for which df is already defined.
-        idx_shr_avg = antijoin(idx_shr_avg, df_shr,
-            on=intersect(propertynames(idx_shr_avg), propertynames(df_shr)))
+        # Adjust share average index to remove indices for which df is already defined.
+        idx[:shr_avg] = antijoin(idx[:shr_avg], df_shr, on=propertynames(idx[:shr_avg]))
         
         # Calculate the average using the FILLED version of the DataFrames.
-        df_shr_avg = transform_over(df0, :r; digits=false) / transform_over(df0_sec, [:r,:s]; digits=false)
-        df_shr_avg = filter_with(dropzero(df_shr_avg), idx_shr_avg)
+        df_shr_avg = transform_over(df0, :r; digits=false) /
+                transform_over(df0_sec, [:r,:s]; digits=false)
+        df_shr_avg = filter_with(dropzero(df_shr_avg), idx[:shr_avg])
 
         d[:inpshr] = vcat(df_shr, df_shr_avg)
     end
@@ -263,26 +214,28 @@ end
 
 
 """
+`id0(yr,r,g=ele,s)`, regional intermediate demand
 """
-function _disagg_energy_id0!(d::Dict, set::Dict, maps::Dict)
+function SLiDE._disagg_energy_id0!(d::Dict, set::Dict, maps::Dict)
+    println("  Calculating id0(yr,r,g=ele,s), regional intermediate demand")
     df, df_out = split_with(d[:id0], (g=set[:e],))
 
-    df_inpshr = _disagg_energy_inpshr!(d, set, maps)
-    df_ed0 = edit_with(d[:ed0], [Rename(:src,:g), Deselect([:units],"==")])
+    df_inpshr = SLiDE._disagg_energy_inpshr!(d, set, maps)
+    df = combine_over(dropzero(d[:ed0] * df_inpshr), :sec; digits=false)
 
-    df = combine_over(dropzero(df_ed0 * df_inpshr), :sec; digits=false)
     d[:id0] = vcat(df_out, df)
     return d[:id0]
 end
 
 
 """
+`x0(yr,r,g=ele)`, foreign exports
 """
 function _disagg_energy_x0!(d::Dict)
-    x = [Add(:g,"ele"), Deselect([:units],"==")]
-
+    println("  Calculating x0(yr,r,g=ele), foreign exports")
     df, df_out = split_with(d[:x0], (g="ele",))
-    df = edit_with(filter_with(d[:trdele], (t="exports",); drop=true), x)
+
+    df = filter_with(d[:trdele], (t="exports",); drop=true)
 
     d[:x0] = vcat(df_out, df)
     return d[:x0]
@@ -290,12 +243,13 @@ end
 
 
 """
+`m0(yr,r,g=ele)`, foreign imports
 """
 function _disagg_energy_m0!(d::Dict)
-    x = [Add(:g,"ele"), Deselect([:units],"==")]
-    
+    println("  Calculating m0(yr,r,g=ele), foreign imports")
     df, df_out = split_with(d[:m0], (g="ele",))
-    df = edit_with(filter_with(d[:trdele], (t="imports",); drop=true), x)
+
+    df = filter_with(d[:trdele], (t="imports",); drop=true)
 
     d[:m0] = vcat(df_out, df)
     return d[:m0]
@@ -326,11 +280,11 @@ end
 
 """
 """
-function drop_small!(d; digits=5)
+function drop_small!(d, set; digits=5)
     taxes = [:ta0, :tm0, :ty0]
     parameters = [SLiDE.list_parameters!(set, :parameters); :fvs; :netgen]
 
-    [d[k] = drop_small(d[k]; digits=digits, key=k) for k in setdiff(parameters,taxes)]
+    [d[k] = SLiDE.drop_small(d[k]; digits=digits, key=k) for k in setdiff(parameters,taxes)]
     return d
 end
 
@@ -338,14 +292,14 @@ end
 """
 """
 function drop_small(df; digits=5, key=missing)
-    sector = SLiDE.find_sector(df)
+    sector = ensurearray(SLiDE.find_sector(df))
     
     if !isempty(sector)
         col = setdiff(findindex(df), [:yr; sector[1]])
         !ismissing(key) && println("\tDropping small values from $key\t", col)
 
-        df = drop_small_average(df, col; digits=digits)
-        df = drop_small_value(df; digits=digits+2)
+        df = SLiDE.drop_small_average(df, col; digits=digits)
+        df = SLiDE.drop_small_value(df; digits=digits+2)
     end
     
     return df
@@ -370,3 +324,16 @@ end
 
 # _drop_small_value(df, small::Float64) = edit_with(df, Drop.(findvalue(df), small, "<"))
 # _drop_small_value(df, digits::Int) = _drop_small_value(df, 1/(10^(digits+1)))
+
+
+
+function operation_propertynames(df::DataFrame)
+    idx = findindex(df)
+    return [setdiff(idx[.!occursin.(:_, idx)], [:operation]); :value]
+end
+
+operation_output(df::DataFrame) = select(df, operation_propertynames(df))
+operation_output(df::DataFrame, x::InvertedIndex) = select(operation_output(df), x)
+
+operation_output!(df::DataFrame) = select!(df, operation_propertynames(df))
+operation_output!(df::DataFrame, x::InvertedIndex) = select!(operation_output!(df), x)

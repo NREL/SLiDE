@@ -1,19 +1,19 @@
 function Dataset(name;
     build="io",
     step=PARAM_DIR,
-    sector=:summary,
+    sector_level=:summary,
     eem=false,
     save_build=false,
     overwrite=false,
 )
-    return Dataset(name, build, step, sector, eem, save_build, overwrite)
+    return Dataset(name, build, step, sector_level, eem, save_build, overwrite)
 end
 
 function set!(dataset::Dataset;
     name=missing,
     build=missing,
     step=missing,
-    sector=missing,
+    sector_level=missing,
     eem=missing,
     save_build=missing,
     overwrite=missing,
@@ -22,9 +22,9 @@ function set!(dataset::Dataset;
     !ismissing(name) && set_name!(dataset, name)
     !ismissing(step) && set_step!(dataset, step)
     !ismissing(build) && set_build!(dataset, build)
-    !ismissing(sector) && set_sector!(dataset, sector)
     !ismissing(overwrite) && set_overwrite!(dataset, overwrite)
     !ismissing(save_build) && set_save_build!(dataset, save_build)
+    !ismissing(sector_level) && set_sector_level!(dataset, sector_level)
     return dataset
 end
 

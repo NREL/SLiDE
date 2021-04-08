@@ -16,25 +16,27 @@ See [`SLiDE.build`](@ref) for keyword argument descriptions.
 - `d::Dict` of DataFrames containing the model data at the calibration step.
 """
 function calibrate_national(dataset::Dataset, io::Dict, set::Dict;
-    penalty_nokey::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
+    zeropenalty::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
 )
-    set!(dataset; step="calibrate")
+    step = "calibrate"
+    cal = SLiDE.read_build(SLiDE.set!(dataset; step=step))
 
-    d_read = read_build(dataset)
-    !isempty(d_read) && return d_read
+    if dataset.step=="input"
+        # Initialize a DataFrame to contain results and do the calibration iteratively.
+        SLiDE.set!(dataset; step=step)
+        cal = Dict(k => DataFrame() for k in SLiDE.list_parameters!(set, dataset))
 
-    # Initialize a DataFrame to contain results and do the calibration iteratively.
-    cal = Dict(k => DataFrame() for k in SLiDE.list_parameters!(set, :calibrate))
+        for year in set[:yr]
+            cal_yr = calibrate_national(io, set, year; zeropenalty=zeropenalty)
+            [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
+        end
 
-    for year in set[:yr]
-        cal_yr = calibrate_national(io, set, year; penalty_nokey=penalty_nokey)
-        [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
+        # If no DataFrame was returned by the annual calibrations, replace this with the input.
+        [cal[k] = io[k] for (k,df) in cal if isempty(df)]
+
+        SLiDE.write_build!(dataset, cal)
     end
-
-    # If no DataFrame was returned by the annual calibrations, replace this with the input.
-    [cal[k] = io[k] for (k,df) in cal if isempty(df)]
-
-    SLiDE.write_build!(dataset, cal)
+    
     return cal
 end
 
@@ -43,7 +45,7 @@ function calibrate_national(
     io::Dict,
     set::Dict,
     year::Int;
-    penalty_nokey::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
+    zeropenalty::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
     # multipliers for lower and upper bound relative
     # to each respective variables reference parameter
     lower_bound = SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND,
@@ -103,7 +105,7 @@ function calibrate_national(
         + sum(abs(d[:m0][g])  * (m0[g] /d[:m0][g]  - 1)^2 for g in G if d[:m0][g]  != 0)
         + sum(abs(d[:x0][g])  * (x0[g] /d[:x0][g]  - 1)^2 for g in G if d[:x0][g]  != 0)
         + sum(abs(d[:y0][g])  * (y0[g] /d[:y0][g]  - 1)^2 for g in G if d[:y0][g]  != 0)
-    + penalty_nokey * (
+    + zeropenalty * (
         + sum(fd0[g,fd] for (g,fd) in set[:g,:fd] if d[:fd0][g,fd] == 0)
         + sum(va0[va,s] for (va,s) in set[:va,:s] if d[:va0][va,s] == 0)
         + sum(id0[g,s] for (g,s) in set[:g,:s] if d[:id0][g,s] == 0)
@@ -119,17 +121,16 @@ function calibrate_national(
     )
     
     # Fix "certain parameters" to their original values: fs0, va0, m0.
-    fix!(calib, d, :va0, set, (:va,:s))
-    fix!(calib, d, [:fs0,:m0], set, :g)
+    SLiDE.fix!(calib, d, :va0, set, (:va,:s))
+    SLiDE.fix!(calib, d, [:fs0,:m0], set, :g)
     
     # Fix other/use sector output to zero.
-    fix!(calib, d, :ys0, [set[:oth,:use], G]; value=0)
+    SLiDE.fix!(calib, d, :ys0, [set[:oth,:use], G]; value=0)
     
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     JuMP.optimize!(calib)
 
-    return _calibration_output(calib, set, year; region=false)
-    # return calib
+    return SLiDE._calibration_output(calib, set, year; region=false)
 end
 
 

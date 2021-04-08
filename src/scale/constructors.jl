@@ -114,16 +114,19 @@ function map_direction(df::DataFrame)
     return agg, dis
 end
 
+map_direction(x::Mapping) = map_direction(x.data)
+map_direction(x::Weighting) = map_direction(convert_type(Mapping, x))
 
-function map_direction(x::T) where T <: Scale
-    return x.direction == :disaggregate ? (x.from, x.to) : (x.to, x.from)
-end
+# function map_direction(x::T) where T <: Scale
+#     return x.direction == :disaggregate ? (x.from, x.to) : (x.to, x.from)
+# end
 
 
 """
 """
 function set_direction!(x::T) where T <: Scale
-    agg, dis = map_direction(x.data[:, [x.from;x.to]])
+    # agg, dis = map_direction(x.data[:, [x.from;x.to]])
+    agg, dis = map_direction(x)
     x.direction = (x.from==agg && x.to==dis) ? :disaggregate : :aggregate
     return x.direction
 end
@@ -323,6 +326,9 @@ function _compound_with(x::Weighting, df::DataFrame, df_ones::DataFrame, xedit::
     #   1. (g,s) are the SAME at the disaggregate level, sum all of the share values.
     #   2. (g,s) are DIFFERENT at the disaggregate level, drop these.
     # Split df based on whether (g,s) are the same at the aggregate level.
+    # Note: using map_direction on df, not x, since df has already been compounded and
+    #   x.data has not yet been updated to have the same dimensions.
+    #   x.from and x.to HAVE been updated and are safe to use.
     agg, dis = map_direction(df[:, [x.from;x.to]])
     splitter = DataFrame(fill(unique(df[:,agg[1]]), length(agg)), agg)
     df_same, df_diff = split_with(df, splitter)

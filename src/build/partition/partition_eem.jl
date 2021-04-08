@@ -37,6 +37,10 @@ function partition_eem(dataset::Dataset, d::Dict, set::Dict)
         d[:ed0] = SLiDE._module_ed0!(d, set, maps)
         d[:emarg0] = SLiDE._module_emarg0!(d, set, maps)
         d[:ned0] = SLiDE._module_ned0!(d)
+
+        # Drop units if they're not used later.
+        x = Deselect([:units],"==")
+        [d[k] = edit_with(d[k],x) for k in [:ed0,:emarg0,:ned0,:trdele,:pctgen]]
     else
         merge!(d, d_read)
     end
@@ -57,6 +61,7 @@ conversion factor for USD per barrel ``\\longrightarrow`` USD per million btu
 ```
 """
 function _module_convfac(d::Dict)
+    println("  Partitioning convfac(yr,r), conversion factor for USD per barrel")
     return filter_with(d[:seds], (src="cru", sec="supply", units=BTU_PER_BARREL); drop=:sec)
 end
 
@@ -72,20 +77,21 @@ end
 ```
 """
 function _module_cprice!(d::Dict, maps::Dict)
-    id = [:usd_per_barrel,:btu_per_barrel] => :usd_per_btu
-    df = SLiDE._module_convfac(d)
-    col = propertynames(df)
+    println("  Partitioning cprice(yr,r), crude oil price")
 
-    df = operate_over(d[:crude_oil], df; id=id, units=maps[:operate])
-
+    df = operate_over(d[:crude_oil], SLiDE._module_convfac(d);
+        id=[:usd_per_barrel,:btu_per_barrel]=>:usd_per_btu,
+        units=maps[:operate],
+    )
     df[!,:value] .= df[:,:factor] .* df[:,:usd_per_barrel] ./ df[:,:btu_per_barrel]
 
-    d[:cprice] = df[:,col]
+    d[:cprice] = operation_output(df)
     return d[:cprice]
 end
 
 
 """
+`prodbtu(yr,r,src)`
 ```math
 \\tilde{prodbtu}_{yr,r} \\text{ [trillion btu]}
 = \\left\\{
@@ -94,6 +100,7 @@ end
 ```
 """
 function _module_prodbtu!(d::Dict, set::Dict)
+    println("  Partitioning prodbtu(yr,r,src)")
     d[:prodbtu] = filter_with(d[:seds], (src=set[:as], sec="supply", units=BTU); drop=:sec)
     return d[:prodbtu]
 end
@@ -128,8 +135,8 @@ Average energy demand price ``\\tilde{pedef}_{yr,r,src}`` and its regional avera
 ```
 """
 function _module_pedef!(d::Dict, set::Dict, maps::Dict)
-    var = :pq
-    val = [:units,:value]
+    println("  Partitioning pedef(yr,r,src), average energy demand price")
+    var, val = :pq, [:units,:value]
 
     splitter = DataFrame(permute((src=[set[:ff];"ele"], sec=set[:demsec], pq=["p","q"])))
     splitter = indexjoin(splitter, maps[:pq]; kind=:left)
@@ -156,6 +163,7 @@ end
 """
 """
 function _module_pe0!(d::Dict, set::Dict, maps::Dict)
+    println("  Partitioning pe0(yr,r,src,sec)")
     df_demsec = DataFrame(sec=set[:demsec])
     df_energy = filter_with(d[:energy], (src=set[:e], sec=set[:demsec]))
 
@@ -187,10 +195,15 @@ end
 
 
 """
+\\begin{aligned}
+ps_{r,src} &= \\sum_{r,sec} pe_{yr,r,src,sec}
+\\\\
+ps_{r,src=cru} &= \\frac{1}{2}ps_{r,src=oil}
+\\end{aligned}
 """
 function _module_ps0!(d::Dict)
-    var = :src
-    val = [:units,:value]
+    println("  Partitioning ps0(yr,src)")
+    var, val = :src, [:units,:value]
     splitter = DataFrame(src=["cru","oil"])
 
     df = combine_over(d[:pe0], [:r,:sec]; fun=Statistics.minimum)
@@ -204,22 +217,29 @@ end
 
 
 """
+`prodval(yr,r,src)`
 """
 function _module_prodval!(d::Dict, set::Dict, maps::Dict)
-    id = [:usd_per_btu,:btu]=>:usd
-    col = propertynames(d[:prodbtu])
-    df = filter_with(d[:ps0], (src=set[:as],))
+    println("  Partitioning prodval(yr,r,src)")
+    
+    df_ps0 = filter_with(d[:ps0], (src=set[:as],))
 
-    df = operate_over(df, d[:prodbtu]; id=id, units=maps[:operate])
+    df = operate_over(df_ps0, d[:prodbtu];
+        id=[:usd_per_btu,:btu]=>:usd,
+        units=maps[:operate],
+    )
     df[!,:value] .= df[:,:factor] .* df[:,:usd_per_btu] .* df[:,:btu]
-    d[:prodval] = select(df, col)
+    
+    d[:prodval] = operation_output(df)
     return d[:prodval]
 end
 
 
 """
+`shrgas(yr,r,src)`
 """
 function _module_shrgas!(d::Dict)
+    println("  Partitioning shrgas(yr,r,src)")
     df = copy(d[:prodval])
     df = df / transform_over(df, :src)
 
@@ -243,32 +263,39 @@ end
 
 
 """
+`netgen(yr,r), net interstate electricity flow`
 """
 function _module_netgen!(d::Dict, maps::Dict)
-    # SEDS data
+    println("  Partitioning netgen(yr,r), net interstate electricity flow")
+    # (1) Calculate for SEDS data
     df_ps0 = filter_with(d[:ps0], (src="ele",); drop=true)
     df_netgen = filter_with(d[:seds], (src="ele", sec="netgen", units=KWH); drop=true)
 
-    df = operate_over(df_ps0, df_netgen; id=[:usd_per_kwh,:kwh]=>:value, units=maps[:operate])
-
+    df = operate_over(df_ps0, df_netgen;
+        id=[:usd_per_kwh,:kwh]=>:value,
+        units=maps[:operate],
+    )
     df[!,:value] .= df[:,:factor] .* df[:,:usd_per_kwh] .* df[:,:kwh]
+    operation_output!(df)
 
-    # IO data
+    # (2) Calculate for IO data.
     df_nd0 = filter_with(d[:nd0], (g="ele",); drop=true)
     df_xn0 = filter_with(d[:xn0], (g="ele",); drop=true)
     df_io = df_nd0 - df_xn0
 
-    # Label the data by its source and concatenate.
+    # (3) Label the data by its source and concatenate.
     df_seds = edit_with(df, Add(:dataset,"seds"))
     df_io = edit_with(df_io, [Add(:dataset,"io"), Add(:units, KWH)])
 
-    col = propertynames(df_netgen)
-    insert!(col, length(col)-1, :dataset)
-    d[:netgen] = sort(vcat(df_seds[:,col], df_io[:,col]))
+    # col = propertynames(df_netgen)
+    # insert!(col, length(col)-1, :dataset)
+    # d[:netgen] = sort(vcat(df_seds[:,col], df_io[:,col]))
+    d[:netgen] = vcat(df_seds, df_io)
 end
 
 
 """
+`trdele(yr,r,g=ele,t)`, electricity imports-exports to/from U.S.
 ```math
 \\tilde{trdele}_{yr,r,t} \\text{ [billion usd]}
 = \\left\\{
@@ -277,8 +304,9 @@ end
 ```
 """
 function _module_trdele!(d::Dict)
-    df = filter_with(d[:seds], (src="ele", sec=["imports","exports"], units=USD); drop=:src)
-    d[:trdele] = edit_with(df, [Rename(:src,:g), Rename(:sec,:t)])
+    println("  Partitioning trdele(yr,r,g=ele,t), electricity imports-exports to/from U.S.")
+    df = filter_with(d[:seds], (src="ele", sec=["imports","exports"], units=USD))
+    d[:trdele] = edit_with(df, Rename.([:src,:sec],[:g,:t]))
     return d[:trdele]
 end
 
@@ -286,9 +314,9 @@ end
 """
 """
 function _module_pctgen!(d::Dict, set::Dict)
+    println("  Partitioning pctgen(yr,r,src,sec)")
     df_ele = copy(d[:elegen])
     df_ele = df_ele / transform_over(df_ele, :src)
-
     df_ele = filter_with(df_ele, (src=set[:ff],))
 
     df_oth = fill_with((
@@ -313,6 +341,7 @@ end
 ```
 """
 function _module_eq0!(d::Dict, set::Dict)
+    println("  Partitioning eq0(yr,r,src,sec)")
     df = filter_with(d[:energy], (src=set[:e], sec=set[:demsec], pq="q"); drop=true)
     df[!,:value] = max.(0, df[:,:value])
     d[:eq0] = dropzero(df)
@@ -328,19 +357,21 @@ end
 ```
 """
 function _module_ed0!(d::Dict, set::Dict, maps::Dict)
-    id = [:usd_per_x,:x] => :usd
-    
+    println("  Partitioning ed0(yr,r,src,sec)")
     idx_p = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:p))
     idx_q = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:q))
 
     df_p = fill_zero(d[:pe0]; with=idx_p)
     df_q = fill_zero(d[:eq0]; with=idx_q)
-    col = propertynames(df_p)
 
-    df = operate_over(df_p, df_q; id=id, units=maps[:operate], fillmissing=false)
+    df = operate_over(df_p, df_q;
+        id=[:usd_per_x,:x]=>:usd,
+        units=maps[:operate],
+        fillmissing=false,
+    )
     df[!,:value] .= df[:,:factor] .* df[:,:usd_per_x] .* df[:,:x]
 
-    d[:ed0] = dropzero(df[:,col])
+    d[:ed0] = dropzero(SLiDE.operation_output(df))
     return d[:ed0]
 end
 
@@ -353,22 +384,24 @@ end
 ```
 """
 function _module_emarg0!(d::Dict, set::Dict, maps::Dict)
-    id = [:usd_per_x,:x] => :usd
-
+    println("  Partitioning emarg0(yr,r,src,sec)")
     idx_p = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:p))
     idx_q = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:q))
 
     df_p = d[:pe0] - d[:ps0]
-
+    
     df_p = fill_zero(df_p; with=idx_p)
     df_q = fill_zero(d[:eq0]; with=idx_q)
-    col = propertynames(df_p)
 
-    df = operate_over(df_p, df_q; id=id, units=maps[:operate], fillmissing=false)
+    df = operate_over(df_p, df_q;
+        id=[:usd_per_x,:x]=>:usd,
+        units=maps[:operate],
+        fillmissing=false,
+    )
     df[!,:value] .= df[:,:factor] .* df[:,:usd_per_x] .* df[:,:x]
+    operation_output!(df)
 
-    d[:emarg0] = df[abs.(df[:,:value]).>=1e-8, col]
-
+    d[:emarg0] = df[abs.(df[:,:value]).>=1e-8, :] # !!!! drop_small?
     return d[:emarg0]
 end
 
@@ -379,6 +412,7 @@ end
 ```
 """
 function _module_ned0!(d::Dict)
+    println("  Partitioning ned0(yr,r,src,sec)")
     d[:ned0] = d[:ed0] - d[:emarg0]
     return d[:ned0]
 end

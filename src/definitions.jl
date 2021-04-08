@@ -7,7 +7,12 @@ const BUILD_STEPS = ["partition", "share", "calibrate", "disagg"];
 const PARAM_DIR = "parameters"
 const SET_DIR = "sets"
 
+const DATA_DIR = joinpath(SLIDE_DIR,"data")
 const READ_DIR = joinpath(SLIDE_DIR,"src","build","readfiles")
+
+# FILES
+const SCALE_BLUENOTE_IO = joinpath(DATA_DIR,"coremaps","scale","sector","bluenote.csv")
+const SCALE_EEM_IO = joinpath(DATA_DIR,"coremaps","scale","sector","eem_pmt.csv")
 
 # UNITS
 const BTU = "trillion btu"

@@ -273,13 +273,13 @@ This function reads information as specified by the path argument.
 """
 function read_from(path::String; ext=".csv", run_bash::Bool=false)
     d = if any(occursin.([".yml",".yaml"], path))
-        _read_from_yaml(path; run_bash=run_bash)
+        SLiDE._read_from_yaml(path; run_bash=run_bash)
     elseif isdir(path)
-        _read_from_dir(path; ext=ext, run_bash=run_bash)
+        SLiDE._read_from_dir(path; ext=ext, run_bash=run_bash)
     else
         @error("Cannot read from $path. Function input must point to an existing directory or yaml file.")
     end
-    return d
+    return Dict{Any,Any}(d)
 end
 
 

@@ -15,8 +15,7 @@ See [`SLiDE.build`](@ref) for keyword argument descriptions.
 """
 function share_region(dataset::Dataset, d::Dict, set::Dict)
     step = "share"
-    set!(dataset; step=step)
-    d_read = read_build(dataset)
+    d_read = read_build(set!(dataset; step=step))
 
     if dataset.step=="input"
         [d_read[k] = filter_with(df, set; extrapolate=true) for (k,df) in d_read]

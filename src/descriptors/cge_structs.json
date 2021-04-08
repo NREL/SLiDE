@@ -5,37 +5,37 @@
         "fields": [
             {
                 "name": "name",
-                "comment": "",
+                "comment": "dataset identifier",
                 "data_type": "String"
             },
             {
                 "name": "build",
-                "comment": "",
+                "comment": "Current step of the buildstream process: `io` or `eem`",
                 "data_type": "String"
             },
             {
                 "name": "step",
-                "comment": "",
+                "comment": "Current substep of the buildstream. If `build=io`, these steps are `partition, calibrate, share, disaggregate`. If `build=eem`, these steps are ...",
                 "data_type": "String"
             },
             {
-                "name": "sector",
-                "comment": "",
+                "name": "sector_level",
+                "comment": "Aggregation level to use when reading BEA supply/use data.",
                 "data_type": "Symbol"
             },
             {
                 "name": "eem",
-                "comment": "",
+                "comment": "Flag indicating whether to include the Energy-Environment module. If `eem=true`, first build `io` supply/use data. Then build `eem` data.",
                 "data_type": "Bool"
             },
             {
                 "name": "save_build",
-                "comment": "",
+                "comment": "Flag indicating decides whether to save the information at each build step. Setting `save_build=true` will add directories in the locations returned by [`SLiDE.datapath`](@ref). This feature is particularly helpful for buildstream debugging.",
                 "data_type": "Bool"
             },
             {
                 "name": "overwrite",
-                "comment": "",
+                "comment": "If data exists, do not read it. Build the data from scratch.",
                 "data_type": "Bool"
             }
         ],

@@ -17,12 +17,14 @@ end
 function _partition_co2emiss!(d::Dict, maps::Dict)
     if !haskey(d, :co2emiss)
         df_btu = filter_with(d[:eq0], (units=BTU,))
-        col = propertynames(df_btu)
 
-        df = operate_over(df_btu, maps[:co2perbtu]; id=[:btu,:co2_per_btu]=>:co2, units=maps[:operate])
+        df = operate_over(df_btu, maps[:co2perbtu];
+            id=[:btu,:co2_per_btu]=>:co2,
+            units=maps[:operate],
+        )
         df[!,:value] .= df[:,:factor] .* df[:,:co2_per_btu] .* df[:,:btu]
 
-        d[:co2emiss] = select(df,col)
+        d[:co2emiss] = operation_output(df)
     end
 
     return d[:co2emiss]

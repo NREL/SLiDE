@@ -1,9 +1,7 @@
 """
     share_sector!()
 """
-function share_sector!(d, set;
-    path::String=joinpath(SLIDE_DIR,"data","coremaps","scale","sector","bluenote.csv"),
-)
+function share_sector!(d, set; path::String=SCALE_BLUENOTE_IO)
     @info("Sharing sector.")
     
     # Need to make sure set[:sector] !== set[:summary]
@@ -18,14 +16,12 @@ end
 """
     share_sector(set::Dict)
 """
-function share_sector(set::Dict;
-    path::String=joinpath(SLIDE_DIR,"data","coremaps","scale","sector","bluenote.csv"),
-)
+function share_sector(set::Dict; path::String=SCALE_BLUENOTE_IO)
     dfmap = read_file(path)[:,1:2]
 
     # Get the detail-level info so we can disaggregate.
     set_det = SLiDE.read_set("io"; sector=:detail)
-    det = SLiDE.read_input!(Dataset(""; step="partition", sector=:detail))
+    det = SLiDE.read_input!(Dataset(""; step="partition", sector_level=:detail))
 
     df = SLiDE._partition_y0!(det, set_det)
     
@@ -37,15 +33,14 @@ function share_sector(set::Dict;
     # SLiDE.set_scheme!(weighting, mapping)
     # SLiDE.share_with!(weighting, mapping)
     
+    # !!!! MAP YEAR WHEN COMPOUNDING
     weighting.data = SLiDE.map_year(weighting.data, set[:yr])
 
     return weighting, mapping
 end
 
 
-function share_sector(set::Dict, lst::AbstractArray;
-    path::String=joinpath(SLIDE_DIR,"data","coremaps","scale","sector","bluenote.csv"),
-)
+function share_sector(set::Dict, lst::AbstractArray; path::String=SCALE_BLUENOTE_IO)
     weighting, mapping = share_sector(set; path=path)
     filter_with!(weighting, mapping, lst)
     return weighting, mapping, lst

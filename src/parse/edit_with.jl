@@ -310,12 +310,7 @@ end
 
 # ----- EDIT FROM FILE ---------------------------------------------------------------------
 
-function edit_with(
-    df::DataFrame,
-    y::Dict{Any,Any},
-    file::T;
-    print_status::Bool=false) where T <: File
-
+function edit_with(df::DataFrame, y::Dict, file::T; print_status::Bool=false) where T <: File
     # Specify the order in which edits must occur and which of these edits are included
     # in the yaml file of defined edits.
     EDITS = ["Deselect", "Rename", "OrderedGroup", "Group", "Concatenate", "Match", "Melt",
@@ -326,20 +321,13 @@ function edit_with(
 end
 
 
-function edit_with(
-    file::T,
-    y::Dict{Any,Any};
-    print_status::Bool=false) where T <: File
-    
+function edit_with(file::T, y::Dict; print_status::Bool=false) where T <: File
     df = read_file(y["PathIn"], file; remove_notes=true)
     return edit_with(df, y, file)
 end
 
 
-function edit_with(
-    files::Array{T},
-    y::Dict{Any,Any};
-    print_status::Bool=false) where T <: File
+function edit_with(files::Array{T}, y::Dict; print_status::Bool=false) where T <: File
     
     df = vcat([edit_with(file, y; print_status=print_status) for file in files]...; cols=:union)
     
@@ -355,7 +343,7 @@ function edit_with(
 end
 
 
-function edit_with(y::Dict{Any,Any}; print_status::Bool=false)
+function edit_with(y::Dict; print_status::Bool=false)
     # Find all dictionary keys corresponding to file names and save these in a list to
     # read, edit, and concattenate.
     files = ensurearray(values(find_oftype(y, File)))
@@ -385,7 +373,7 @@ Returns the edited DataFrame, stored in a nicely-sorted order. This is most help
 mapping and developing. Sorting isn't *necessary* and we could remove this function to save
 some time for users.
 """
-function _sort_datastream(df::DataFrame, y::Dict{Any,Any})
+function _sort_datastream(df::DataFrame, y::Dict)
     sorting = "Sort" in keys(y) ? y["Sort"] : true
 
     sorting == false && (return df)

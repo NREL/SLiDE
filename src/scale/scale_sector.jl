@@ -2,7 +2,7 @@
     aggregate_sector!(d, set, x; kwargs...)
 """
 function aggregate_sector!(d::Dict, set::Dict;
-    path::String=joinpath(SLIDE_DIR,"data","coremaps","scale","sector","eem_pmt.csv"),
+    path::String=SCALE_EEM_IO,
 )
     return aggregate_sector!(d, set, read_file(path)[:,1:2])
 end
@@ -12,12 +12,14 @@ function aggregate_sector!(d::Dict, set::Dict, dfmap::DataFrame)
     # Store dfmap as `Mapping` and set scheme based on the current sectoral set.
     # After the build stream, this *should* be equivalent to the summary-level set.
     mapping = Mapping(dfmap)
-    set_scheme!(mapping, DataFrame(g=set[:sector]))
+    SLiDE.set_scheme!(mapping, DataFrame(g=set[:sector]))
 
     # If scaling FROM ANY detail-level codes, disaggregate summary- to detail-level
     # (or a hybrid of the two).
     if !iscomplete(mapping, set[:sector])
+        # Need to set sector to whatever the goal is here before SCALING.
         SLiDE.set_sector!(set, mapping.data[:,mapping.from])
+
         # !!!! Verify that only summary- and detail-level codes are represented in mapping.from
         # find_set(mapping, set, [:detail,:summary])
         disaggregate_sector!(d, set)
@@ -26,7 +28,6 @@ function aggregate_sector!(d::Dict, set::Dict, dfmap::DataFrame)
     end
     
     aggregate_sector!(d, set, mapping; scale_id=:eem)
-    set_sector!(set, unique(mapping.data[:,mapping.to]))
     
     return d, set
 end
@@ -41,11 +42,15 @@ function aggregate_sector!(d::Dict, set::Dict, x::Mapping;
     # Aggregate taxes.
     # Their associated scaling parameters will be aggregated in the process.
     taxes = [(:ta0,:a0), (:tm0,:m0), (:ty0,:ys0)]
-    [aggregate_tax_with!(d, set, x, tax, key; scale_id=scale_id) for (tax,key) in taxes]
+    [SLiDE.aggregate_tax_with!(d, set, x, tax, key; scale_id=scale_id) for (tax,key) in taxes]
     
     # Aggregate remaining variables.
     variables = setdiff(parameters, vcat(ensurearray.(taxes)...))
-    scale_sector!(d, set, x, variables; scale_id=scale_id)
+    SLiDE.scale_sector!(d, set, x, variables; scale_id=scale_id)
+
+    # Update sector to match. Using d[id,g,s] in case scheme was updated by compound_for
+    # SLiDE.set_sector!(set, x)
+    SLiDE.set_sector!(set, d[scale_id,:g,:s])
     return d
 end
 
@@ -59,9 +64,7 @@ function disaggregate_sector!(d::Dict, set::Dict)
     return d
 end
 
-function disaggregate_sector!(d::Dict, set::Dict, x::Weighting;
-    scale_id=:disaggregate,
-)
+function disaggregate_sector!(d::Dict, set::Dict, x::Weighting; scale_id=:disaggregate)
     !haskey(d, scale_id) && push!(d, scale_id=>x)
 
     parameters = SLiDE.list_parameters!(set, :parameters)
@@ -69,8 +72,12 @@ function disaggregate_sector!(d::Dict, set::Dict, x::Weighting;
     variables = setdiff(parameters, taxes)
 
     x_tax = convert_type(Mapping, x)
-    scale_sector!(d, set, x, variables; scale_id=scale_id)
-    scale_sector!(d, set, x_tax, taxes; scale_id=scale_id)
+    SLiDE.scale_sector!(d, set, x, variables; scale_id=scale_id)
+    SLiDE.scale_sector!(d, set, x_tax, taxes; scale_id=scale_id)
+
+    # Update sector to match. Using d[id,g,s] in case scheme was updated by compound_for
+    # set_sector!(set, x)
+    set_sector!(set, d[scale_id,:g,:s])
     return d
 end
 

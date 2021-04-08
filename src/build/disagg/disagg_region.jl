@@ -15,15 +15,12 @@ See [`SLiDE.build`](@ref) for keyword argument descriptions.
 """
 function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
     step = SLiDE.PARAM_DIR
-    
-    set!(dataset; step=step)
-    d_read = read_build(dataset)
+    d_read = read_build(set!(dataset; step=step))
 
     SLiDE._set_gm!(d, set)
     # SLiDE.write_build!(set!(dataset; step=SET_DIR), Dict(k => set[:gm]))
 
     if dataset.step=="input"
-
         d = merge(d, Dict(
             :r => fill_with((r=set[:r],), 1.0),
             (:yr,:r,:g) => fill_with((yr=set[:yr], r=set[:r], g=set[:g]), 1.0),
@@ -72,12 +69,11 @@ function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
         SLiDE._disagg_xd0!(d)
         SLiDE._disagg_xn0!(d)
         SLiDE._disagg_hhadj!(d)
-
-        # Should other
+        
+        # Should we drop other small parameters, too?
         d[:xn0][d[:xn0][:,:value] .< 1e-8,:value] .= 0;
         d[:xd0][d[:xd0][:,:value] .< 1e-8,:value] .= 0;
-        
-        SLiDE.write_build!(set!(dataset; step=step), d)
+
         return d, set
     else
         return d_read, set
@@ -99,6 +95,7 @@ function _disagg_ys0!(d::Dict)
     d[:ys0] = d[:region] * d[:ys0]
     return d[:ys0]
 end
+
 
 """
 `id(yr,r,g,s)`, regional intermediate demand
@@ -238,7 +235,6 @@ end
 
 """
 `cd0(yr,r,g)`, national final consumption
-
 ```math
 \\bar{cd}_{yr,r,g} = \\alpha_{yr,r,g}^{pce} \\sum_{C \\in fd} \\tilde{fd}_{yr,g,fd}
 ```
@@ -381,7 +377,6 @@ end
 
 """
 `thetaa(yr,r,g)`, share of regional absorption
-
 ```math
 \\alpha_{yr,r,g}^{abs} = \\frac{\\bar{a}_{yr,r,g}}{\\sum_{rr}\\bar{a}_{yr,r,g}}
 ```
@@ -394,8 +389,7 @@ end
 
 
 """
-`m0(yr,r,g)`, foreign Imports
-
+`m0(yr,r,g)`, foreign imports
 ```math
 \\bar{m}_{yr,r,g} = \\alpha_{yr,r,g}^{abs} \\tilde{m}_{yr,g}
 ```
@@ -409,7 +403,6 @@ end
 
 """
 `md0(yr,r,m,g)`, margin demand
-
 ```math
 \\bar{md}_{yr,r,m,g} = \\alpha_{yr,r,g}^{abs} \\tilde{md}_{yr,m,g}
 ```
@@ -423,7 +416,6 @@ end
 
 """
 `rx0(yr,r,g)`, re-exports
-
 ```math
 \\bar{rx}_{yr,r,g} = \\bar{x}_{yr,r,g} - \\bar{s}_{yr,r,g}
 ```

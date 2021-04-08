@@ -13,7 +13,7 @@ These operations must occur in the following order:
 3. [`SLiDE._partition_energy_price`](@ref)
 """
 function partition_energy!(d::Dict, set::Dict, maps::Dict)
-    println("  Generating energy data set")
+    println("  Generating energy data set: energy(yr,r,src,sec)")
     
     df = copy(d[:seds])
     df = filter_with(df, (src=set[:e], sec=set[:ed],))
@@ -116,10 +116,8 @@ end
 ```
 """
 function _partition_energy_price(df::DataFrame, set::Dict, maps::Dict)
-    var = :pq
-    val = [:units,:value]
-    id = [:v,:q]=>:p
-
+    var, val = :pq, [:units,:value]
+    
     splitter = vcat(
         DataFrame(permute((src=set[:ff], sec="ele",     pq=["p","q","v"]))),
         DataFrame(permute((src="ele",    sec=set[:sec], pq=["p","q","v"]))),
@@ -129,16 +127,17 @@ function _partition_energy_price(df::DataFrame, set::Dict, maps::Dict)
     df, df_out = split_fill_unstack(df, splitter, var, val)
     col = propertynames(df)
 
-    df = operate_over(df; id=id, units=maps[:operate])
+    df = operate_over(df;
+        id=[:v,:q]=>:p,
+        units=maps[:operate],
+    )
 
     # Save the reported price. If no price was reported, use the calculated value instead.
     df[!,:reported] .= df[:,:p]
     df[!,:calculated] .= df[:,:factor] .* df[:,:v] ./ df[:,:q]
 
-    ii = isfinite.(df[:,:calculated]);
-    df[ii,:p] .= df[ii,:calculated];
+    ii = isfinite.(df[:,:calculated])
+    df[ii,:p] .= df[ii,:calculated]
 
-    df = stack_append(df[:,col], df_out, var, val; ensure_finite=false)
-
-    return df
+    return stack_append(df[:,col], df_out, var, val; ensure_finite=false)
 end
