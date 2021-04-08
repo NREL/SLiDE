@@ -19,7 +19,7 @@ execute the four steps of the SLiDE buildstream via the following functions:
 - `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
 function build(dataset::Dataset)
-    set!(dataset; build="io")
+    set!(dataset; build="io", step=PARAM_DIR)
     overwrite(dataset)
 
     # !!!! PRINT DATASET INFO TO FILE IN DATA/NAME DIRECTORY
@@ -35,6 +35,28 @@ function build(dataset::Dataset)
         write_build!(set!(dataset; step=SLiDE.PARAM_DIR), d)
         write_build!(set!(dataset; step=SLiDE.SET_DIR), set)
     end
+
+    return d, set
+end
+
+
+function build(name::String=SLiDE.DEFAULT_DATASET;
+    overwrite=SLiDE.DEFAULT_OVERWRITE,
+    save_build=SLiDE.DEFAULT_SAVE_BUILD,
+)
+    return build(Dataset(name; overwrite=overwrite, save_build=save_build))
+end
+
+
+"""
+"""
+function build_eem(dataset::Dataset, d::Dict, set::Dict)
+    SLiDE.set!(dataset; build="eem", step=PARAM_DIR)
+    merge!(set, SLiDE.read_set(dataset, "eem"))
+
+    d, set = aggregate_sector!(d, set)
+    d, set, maps = partition_eem(dataset, d, set)
+    d, set, maps = disaggregate_energy!(dataset, d, set, maps)
 
     return d, set
 end

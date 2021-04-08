@@ -44,7 +44,7 @@ function partition_eem(dataset::Dataset, d::Dict, set::Dict)
     else
         merge!(d, d_read)
     end
-        
+    
     return d, set, maps
 end
 
@@ -389,7 +389,7 @@ function _module_emarg0!(d::Dict, set::Dict, maps::Dict)
     idx_q = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:q))
 
     df_p = d[:pe0] - d[:ps0]
-    
+
     df_p = fill_zero(df_p; with=idx_p)
     df_q = fill_zero(d[:eq0]; with=idx_q)
 

@@ -216,7 +216,7 @@ end
 """
 `id0(yr,r,g=ele,s)`, regional intermediate demand
 """
-function SLiDE._disagg_energy_id0!(d::Dict, set::Dict, maps::Dict)
+function _disagg_energy_id0!(d::Dict, set::Dict, maps::Dict)
     println("  Calculating id0(yr,r,g=ele,s), regional intermediate demand")
     df, df_out = split_with(d[:id0], (g=set[:e],))
 

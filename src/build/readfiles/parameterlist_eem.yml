@@ -2,8 +2,7 @@ Path: [src,build,readfiles,parameters]
 
 SetInput:
   - {descriptor: sets,       name: list_index.csv}
-  - {descriptor: partition,  name: list_bea.csv}
-  - {descriptor: calibrate,  name: list_bea.csv}
-  - {descriptor: share,      name: list_share.csv}
+  - {descriptor: scale,      name: list_model.csv}
+  - {descriptor: partition,  name: list_eia.csv}
   - {descriptor: disagg,     name: list_model.csv}
   - {descriptor: parameters, name: list_model.csv}
