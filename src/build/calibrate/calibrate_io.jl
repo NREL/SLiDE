@@ -14,7 +14,7 @@ function _calibration_set!(set;
         add_permutation!(set, (:r,:m,:g))
         
         if energy
-            set[:eneg] = ["col","ele","oil"]
+            set[:eneg] = ["col","ele","oil","cng","cru","gas"]
             add_permutation!(set, (:r,:e))
             add_permutation!(set, (:r,:e,:e))
             add_permutation!(set, (:r,:e,:g))
@@ -55,7 +55,6 @@ function _calibration_output(model::Model, set::Dict, year::Int; region::Bool=fa
     d = Dict{Symbol,DataFrame}()
     
     for k in lst
-        # println(k)
         idxmodel = setdiff(param[k].index, idxskip)
         df = dropzero(convert_type(DataFrame, model[k]; cols=idxmodel))
         d[k] = select(edit_with(df, Add(:yr, year)), [:yr; idxmodel; :value])

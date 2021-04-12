@@ -17,6 +17,9 @@ function _energy_calibration_input(d, set;
     [d[append(:fvs,k)] = filter_with(d[:fvs], (parameter=k,); drop=true) for k in ["ld0","kd0"]]
     d[:netgen] = filter_with(d[:netgen], (dataset="seds",); drop=true)
 
+    # Set some values to zero.
+    [d[k] = filter_with(d[k], Not(DataFrame(r=["ak","hi"],g="ele"))) for k in [:nd0,:xn0]]
+
     # Fill zeros.
     d = Dict(k => fill_zero(d[k]; with=set) for k in
         [parameters; append.(:fvs,[:ld0,:kd0]); append.(variables_nat,:nat); :netgen])
@@ -74,9 +77,9 @@ function calibrate_energy(
     )
 
     S, G, M, R = set[:s], set[:g], set[:m], set[:r]
-    SNAT = setdiff(S, set[:eneg])
+    SNAT = setdiff(S, set[:e])
 
-    calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time"=>60.0, "tol"=>1E-4))
+    calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time"=>120.0, "tol"=>1E-4))
 
     # ----- INITIALIZE VARIABLES -----------------------------------------------------------
     @variables(calib, begin
@@ -99,7 +102,7 @@ function calibrate_energy(
         # demand
         yh0[r in R, g in G], (start=d[:yh0][r,g], lower_bound=0)
         cd0[r in R, g in G], (start=d[:cd0][r,g], lower_bound=0)
-        i0[r in R, g in G],  (start=d[:i0 ][r,g], lower_bound=d[:i0_lb][r,g], upper_bound=d[:i0_ub][r,g])
+        i0[r in R, g in G],  (start=d[:i0 ][r,g], lower_bound=d[:i0_lb][r,g])
         g0[r in R, g in G] , (start=d[:g0 ][r,g], lower_bound=d[:g0_lb][r,g])
         # margin
         nm0[r in R, g in G, m in M], (start=d[:nm0][r,g,m], lower_bound=d[:nm0_lb][r,g,m])
@@ -108,6 +111,8 @@ function calibrate_energy(
         # balance of payments
         bopdef0[r in R] >= 0, (start=d[:bopdef0][r])
     end)
+
+    [set_upper_bound(i0[r,g], upper_bound*d[:i0][r,g]) for (r,g) in set[:r,:g] if d[:i0][r,g]!==0.0]
 
     # --- DEFINE CONSTRAINTS ---------------------------------------------------------------
 
@@ -168,16 +173,9 @@ function calibrate_energy(
 
     # Net generation of electricity balancing
     if condition_netgen
-        # @constraints(calib, begin
-        #     NETGEN_POS[r in R; d[:netgen][r]>0], 0.8*d[:netgen][r] <= nd0[r,"ele"] - xn0[r,"ele"] <= 1.2*d[:netgen][r]
-        #     NETGEN_NEG[r in R; d[:netgen][r]<0], 1.2*d[:netgen][r] <= nd0[r,"ele"] - xn0[r,"ele"] <= 0.8*d[:netgen][r]
-        # end)
-
         @constraints(calib, begin
-            NETGEN_GPOS[r in R; d[:netgen][r] > 0], nd0[r,"ele"] - xn0[r,"ele"] >= 0.8*d[:netgen][r]
-            NETGEN_LPOS[r in R; d[:netgen][r] > 0], nd0[r,"ele"] - xn0[r,"ele"] <= 1.2*d[:netgen][r]
-            NETGEN_LNEG[r in R; d[:netgen][r] < 0], nd0[r,"ele"] - xn0[r,"ele"] <= 0.8*d[:netgen][r]
-            NETGEN_GNEG[r in R; d[:netgen][r] < 0], nd0[r,"ele"] - xn0[r,"ele"] >= 1.2*d[:netgen][r]
+            NETGEN_POS[r in R; d[:netgen][r]>0], 0.8*d[:netgen][r] <= nd0[r,"ele"] - xn0[r,"ele"] <= 1.2*d[:netgen][r]
+            NETGEN_NEG[r in R; d[:netgen][r]<0], 1.2*d[:netgen][r] <= nd0[r,"ele"] - xn0[r,"ele"] <= 0.8*d[:netgen][r]
         end)
     end
 
@@ -190,6 +188,7 @@ function calibrate_energy(
             NATIONAL_I0[s in SNAT], sum(i0[r,s] for r in R) == d[:i0_nat][s]
             NATIONAL_C0[s in SNAT], sum(cd0[r,s] for r in R) == d[:cd0_nat][s]
             NATIONAL_VA0[s in SNAT], sum(ld0[r,s] + kd0[r,s] for r in R) == d[:va0_nat][s]
+            NATIONAL_YS0[s in SNAT], sum(ys0[r,s,g] for (r,g) in set[:r,:g]) == sum(d[:ys0_nat][s,g] for g in G)
         end)
     end
 
@@ -253,30 +252,39 @@ function calibrate_energy(
 
     # ----- SET BOUNDS AND FIX ZEROS -------------------------------------------------------
     # Fix international electricity imports/exports to zero (subject to SEDS data).
-    SLiDE.fix_lower_bound!(calib, d, [:m0,:x0], [R,"ele"]; factor=lower_bound_seds, value=0)
+    # Fix international electricity imports/exports to zero (subject to SEDS data).
+    [d[:x0][r,"ele"]>0 ? set_lower_bound(x0[r,"ele"], lower_bound_seds*d[:x0][r,"ele"]) : fix(x0[r,"ele"],0,force=true) for r in R]
+    [d[:m0][r,"ele"]>0 ? set_lower_bound(m0[r,"ele"], lower_bound_seds*d[:m0][r,"ele"]) : fix(m0[r,"ele"],0,force=true) for r in R]
 
     # Adjust upper and lower bounds to allow SEDS data to shift.
-    SLiDE.set_bounds!(calib, d, :cd0, set, (:r,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
-    SLiDE.set_bounds!(calib, d, :ys0, set, (:r,:e,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
-    SLiDE.set_bounds!(calib, d, :id0, set, (:r,:e,:s); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
-    SLiDE.set_bounds!(calib, d, :md0, set, (:r,:m,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
-    
+    [set_lower_bound(cd0[r,e], lower_bound_seds*d[:cd0][r,e]) for (r,e) in set[:r,:e] if d[:cd0][r,e]!==0]
+    [set_lower_bound(ys0[r,e,e], lower_bound_seds*d[:ys0][r,e,e]) for (r,e) in set[:r,:e] if d[:ys0][r,e,e]!==0]
+    [set_lower_bound(id0[r,e,s], lower_bound_seds*d[:id0][r,e,s]) for (r,e,s) in set[:r,:e,:s] if d[:id0][r,e,s]!==0]
+    [set_lower_bound(md0[r,m,e], lower_bound_seds*d[:md0][r,m,e]) for (r,m,e) in set[:r,:m,:e] if d[:md0][r,m,e]!==0]
+
+    [set_upper_bound(cd0[r,e], upper_bound_seds*d[:cd0][r,e]) for (r,e) in set[:r,:e] if d[:cd0][r,e]!==0]
+    [set_upper_bound(ys0[r,e,e], upper_bound_seds*d[:ys0][r,e,e]) for (r,e) in set[:r,:e] if d[:ys0][r,e,e]!==0]
+    [set_upper_bound(id0[r,e,s], upper_bound_seds*d[:id0][r,e,s]) for (r,e,s) in set[:r,:e,:s] if d[:id0][r,e,s]!==0]
+    [set_upper_bound(md0[r,m,e], upper_bound_seds*d[:md0][r,m,e]) for (r,m,e) in set[:r,:m,:e] if d[:md0][r,m,e]!==0]
+
     # Restrict some parameters to zero.
-    SLiDE.fix!(calib, d, :id0, set, (:r,:g,:e); value=0)
-    SLiDE.fix!(calib, d, :ys0, set, (:r,:e,:g); value=0)
-    SLiDE.fix!(calib, d, :md0, set, (:r,:m,:g); value=0)
-    SLiDE.fix!(calib, d, [:nm0,:dm0], set, (:r,:g,:m); value=0)
-    SLiDE.fix!(calib, d, [:rx0,:yh0], set, (:r,:g); value=0)
-    
+    [fix(id0[r,g,e], 0, force=true) for (r,g,e) in set[:r,:g,:e] if d[:id0][r,g,e]==0]
+    [fix(ys0[r,e,g], 0, force=true) for (r,e,g) in set[:r,:e,:g] if d[:ys0][r,e,g]==0]
+    [fix(md0[r,m,g], 0, force=true) for (r,m,g) in set[:r,:m,:g] if d[:md0][r,m,g]==0]
+    [fix(nm0[r,g,m], 0, force=true) for (r,g,m) in set[:r,:g,:m] if d[:nm0][r,g,m]==0]
+    [fix(dm0[r,g,m], 0, force=true) for (r,g,m) in set[:r,:g,:m] if d[:dm0][r,g,m]==0]
+    [fix(rx0[r,g], 0, force=true) for (r,g) in set[:r,:g] if d[:rx0][r,g]==0]
+    [fix(yh0[r,g], 0, force=true) for (r,g) in set[:r,:g] if d[:yh0][r,g]==0]
+
     # Set electricity imports from the national market to Alaska and Hawaii to zero.
-    # !!!! This could go elsewhere in the energy build stream (like disaggregation)
-    SLiDE.fix!(calib, [:nd0,:xn0], [["ak","hi"],"ele"]; value=0)
+    [fix(nd0[r,"ele"], 0, force=true) for r in ["ak","hi"]]
+    [fix(xn0[r,"ele"], 0, force=true) for r in ["ak","hi"]]
 
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     if optimize
         JuMP.optimize!(calib)
         return calib
-        # cal = SLiDE._calibration_output(calib, set, year; region=true)
+        cal = SLiDE._calibration_output(calib, set, year; region=true)
         # [cal[k] = filter_with(io[k],(yr=year,); drop=true) for k in setdiff(keys(io),keys(cal))]
         # return Dict{Any,Any}(cal)
     else
