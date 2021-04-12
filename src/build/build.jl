@@ -51,13 +51,50 @@ end
 """
 """
 function build_eem(dataset::Dataset, d::Dict, set::Dict)
-    SLiDE.set!(dataset; build="eem", step=PARAM_DIR)
+    SLiDE.set!(dataset; build="eem", step=SLiDE.PARAM_DIR)
     merge!(set, SLiDE.read_set(dataset, "eem"))
 
-    d, set = aggregate_sector!(d, set)
-    d, set, maps = partition_eem(dataset, d, set)
-    d, set, maps = disaggregate_energy!(dataset, d, set, maps)
+    dwrite = Dict()
 
+    d, set = aggregate_sector!(d, set)
+    dwrite[:scale] = copy(d)
+
+    d, set, maps = partition_eem(dataset, d, set)
+    dwrite[:partition] = copy(d)
+
+    d, set, maps = disaggregate_energy!(dataset, d, set, maps)
+    dwrite[:disagg] = copy(d)
+
+    # Save all of the build steps.
+    stps = [:scale,:partition,:disagg]
+    path = SLiDE.datapath(dataset; directory_level=:build)
+
+    pth = Dict(k => joinpath(path,"_$k") for k in stps)
+    pth[:sets] = joinpath(path,"sets")
+
+    lst = Dict(
+        :sets => [
+            collect(keys(read_from("src/build/readfiles/setlist_io.yml")));
+            collect(keys(read_from("src/build/readfiles/setlist_eem.yml")));
+            :sector;
+        ],
+        :scale => Symbol.(read_file("src/build/readfiles/parameters/list_model.csv")[:,1]),
+        :partition => Symbol.(read_file("src/build/readfiles/parameters/list_eia.csv")[:,1]),
+    )
+    lst[:disagg] = [lst[:scale];:fvs;:netgen]
+
+    for stp in [stps;:sets]
+        !isdir(pth[stp]) && mkpath(pth[stp])
+        if stp==:sets
+            [CSV.write(joinpath(pth[stp],"$k.csv"), DataFrame(k=>set[k]))
+                for k in lst[stp] if k in keys(set)]
+        else
+            [CSV.write(joinpath(pth[stp],"$k.csv"), dwrite[stp][k])
+                for k in lst[stp] if k in keys(dwrite[stp])]
+        end
+    end
+
+    d = Dict(k=>d[k] for k in lst[:disagg])
     return d, set
 end
 

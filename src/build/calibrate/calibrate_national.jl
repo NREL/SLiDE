@@ -30,7 +30,7 @@ function calibrate_national(dataset::Dataset, io::Dict, set::Dict;
             cal_yr = calibrate_national(io, set, year; zeropenalty=zeropenalty)
             [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
         end
-
+        
         # If no DataFrame was returned by the annual calibrations, replace this with the input.
         [cal[k] = io[k] for (k,df) in cal if isempty(df)]
 

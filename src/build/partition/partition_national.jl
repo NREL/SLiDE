@@ -107,16 +107,16 @@ Treat negative inputs as outputs:
 ```
 """
 function _partition_io!(d::Dict, set::Dict)
-    println("  Partitioning id0 and ys0, supply/demand data.")
+    println("  Partitioning id0(yr,g,s) and ys0(yr,s,g), supply/demand data.")
     # (!!!!) filtering here assumes sector/good are the same.
     d[:id0] = filter_with(d[:use], set)
     d[:ys0] = filter_with(d[:supply], set)
 
     # In sectordisagg, the good/sector column names are switched...
-    if d[:sector]==:detail
-        x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
-        d[:ys0] = edit_with(d[:ys0], x)
-    end
+    # if d[:sector]==:detail
+    #     x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
+    #     d[:ys0] = edit_with(d[:ys0], x)
+    # end
     
     (d[:id0], d[:ys0]) = fill_zero(d[:id0], d[:ys0])
 
@@ -153,7 +153,7 @@ function _partition_a0!(d::Dict, set::Dict)
         _partition_fs0!(d, set)
         _partition_id0!(d, set)
 
-        println("  Partitioning a0, Armington supply")
+        println("  Partitioning a0(yr,g), Armington supply")
         d[:a0] = combine_over(d[:fd0], :fd) + combine_over(d[:id0], :s)
         d[:a0] = _remove_imrg(d[:a0], :g => set[:imrg])
     end
@@ -171,7 +171,7 @@ end
 """
 function _partition_bop!(d::Dict, set::Dict)
     if !haskey(d,:bopdef)
-        println("  Partitioning bopdef0, balance of payments deficit")
+        println("  Partitioning bopdef0(yr), balance of payments deficit")
         d[:bopdef] = fill_zero((yr=set[:yr], ))
     end
     return d[:bopdef]

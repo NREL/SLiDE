@@ -327,7 +327,7 @@ function set_bounds!(model::Model, d::Dict, var::Symbol, idx::AbstractArray;
 )
     [set_bounds!(model, d, var, x; lower_bound=lower_bound, upper_bound=upper_bound)
         for x in idx]
-    return model[idx]
+    return model
 end
 
 

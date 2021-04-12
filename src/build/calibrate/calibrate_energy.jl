@@ -4,16 +4,22 @@ function _energy_calibration_input(d, set;
     lower_bound::Real=NaN,
     upper_bound::Real=NaN,
 )
-    variables = setdiff(SLiDE.list_parameters!(set,:parameters), SLiDE.list_parameters!(set,:taxes))
+    parameters = SLiDE.list_parameters!(set,:parameters)
+    variables = setdiff(parameters, SLiDE.list_parameters!(set,:taxes))
+    variables_nat = [:ys0,:x0,:m0,:va0,:g0,:i0,:cd0]
+    
+    [d[k] = SLiDE.drop_small(copy(d[k])) for k in variables]
+    # ** Validated against bluenote
 
     # Calculate additional values for constraints.
     d[:va0] = d[:ld0] + d[:kd0]
-    [d[append(k,:nat)] = combine_over(d[k],:r) for k in [:ys0,:x0,:m0,:va0,:g0,:i0,:cd0]]
+    [d[append(k,:nat)] = combine_over(d[k],:r) for k in variables_nat]
     [d[append(:fvs,k)] = filter_with(d[:fvs], (parameter=k,); drop=true) for k in ["ld0","kd0"]]
     d[:netgen] = filter_with(d[:netgen], (dataset="seds",); drop=true)
 
     # Fill zeros.
-    d = Dict(k => fill_zero(df; with=set) for (k,df) in d)
+    d = Dict(k => fill_zero(d[k]; with=set) for k in
+        [parameters; append.(:fvs,[:ld0,:kd0]); append.(variables_nat,:nat); :netgen])
 
     # Set bounds.
     SLiDE.set_lower_bound!(d, setdiff(variables, [:ld0,:kd0,:yh0,:cd0]); factor=lower_bound)
@@ -50,6 +56,13 @@ function calibrate_energy(
     upper_bound=1.75,
     lower_bound_seds=0.75,
     upper_bound_seds=1.25,
+    condition_zero_profit::Bool=true,
+    condition_market::Bool=true,
+    condition_expdef::Bool=true,
+    condition_incbal::Bool=true,
+    condition_value_share::Bool=true,
+    condition_netgen::Bool=true,
+    condition_national::Bool=true,
     optimize::Bool=true,
 )
     @info("Calibrating $year data")
@@ -63,7 +76,7 @@ function calibrate_energy(
     S, G, M, R = set[:s], set[:g], set[:m], set[:r]
     SNAT = setdiff(S, set[:eneg])
 
-    calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time" => 60.0))
+    calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time"=>60.0, "tol"=>1E-4))
 
     # ----- INITIALIZE VARIABLES -----------------------------------------------------------
     @variables(calib, begin
@@ -99,68 +112,86 @@ function calibrate_energy(
     # --- DEFINE CONSTRAINTS ---------------------------------------------------------------
 
     # Zero profit conditions
-    @constraints(calib, begin
-        PROFIT_Y[r in R, s in S], (
-            (1 - d[:ty0][r,s]) * sum(ys0[r,s,g] for g in G) ==
-            ld0[r,s] + kd0[r,s] + sum(id0[r,g,s] for g in G)
-        )
-        PROFIT_A[r in R, g in G], (
-            (1 - d[:ta0][r,g]) * a0[r,g] + rx0[r,g] ==
-            (1 + d[:tm0][r,g]) * m0[r,g] + nd0[r,g] + dd0[r,g] + sum(md0[r,m,g] for m in M)
-        )
-        PROFIT_X[r in R, g in G], s0[r,g] + rx0[r,g] == x0[r,g] + xn0[r,g] + xd0[r,g]
-        PROFIT_MS[r in R, m in M], sum(nm0[r,s,m] + dm0[r,s,m] for s in S) == sum(md0[r,m,g] for g in G)
-    end)
+    if condition_zero_profit
+        @constraints(calib, begin
+            PROFIT_Y[r in R, s in S], (
+                (1 - d[:ty0][r,s]) * sum(ys0[r,s,g] for g in G) ==
+                ld0[r,s] + kd0[r,s] + sum(id0[r,g,s] for g in G)
+            )
+            PROFIT_A[r in R, g in G], (
+                (1 - d[:ta0][r,g])*a0[r,g] + rx0[r,g] ==
+                (1 + d[:tm0][r,g])*m0[r,g] + nd0[r,g] + dd0[r,g] + sum(md0[r,m,g] for m in M)
+            )
+            PROFIT_X[r in R, g in G], s0[r,g] + rx0[r,g] == x0[r,g] + xn0[r,g] + xd0[r,g]
+            PROFIT_MS[r in R, m in M], sum(nm0[r,s,m] + dm0[r,s,m] for s in S) == sum(md0[r,m,g] for g in G)
+        end)
+    end
 
     # Market clearing conditions
-    @constraints(calib, begin
-        MARKET_PY[r in R, g in G], s0[r,g]  == sum(ys0[r,s,g] for s in S) + yh0[r,g]
-        MARKET_PA[r in R, g in G], a0[r,g]  == sum(id0[r,g,s] for s in S) + cd0[r,g] + g0[r,g] + i0[r,g]
-        MARKET_PD[r in R, g in G], xd0[r,g] == sum(dm0[r,g,m] for m in M) + dd0[r,g]
-        MARKET_PN[g in G], sum(xn0[r,g] for r in R) == sum(nm0[r,g,m] for (r,m) in set[:r,:m])
-        MARKET_PFX, (
-            sum(m0[r,g] for (r,g) in set[:r,:g]) ==
-            sum(bopdef0[r] + d[:hhadj][r] + sum(x0[r,g] for g in G) for r in R)
-            # sum(bopdef0[r] + d[:hhadj][r] for r in R) + sum(x0[r,g] for (r,g) in set[:r,:g])
-        )
-    end)
+    if condition_market
+        @constraints(calib, begin
+            MARKET_PY[r in R, g in G], s0[r,g]  == sum(ys0[r,s,g] for s in S) + yh0[r,g]
+            MARKET_PA[r in R, g in G], a0[r,g]  == sum(id0[r,g,s] for s in S) + cd0[r,g] + g0[r,g] + i0[r,g]
+            MARKET_PD[r in R, g in G], xd0[r,g] == sum(dm0[r,g,m] for m in M) + dd0[r,g]
+            MARKET_PN[g in G], sum(xn0[r,g] for r in R) == sum(nd0[r,g] + sum(nm0[r,g,m] for m in M) for r in R)
+            MARKET_PFX, (
+                sum(m0[r,g] for (r,g) in set[:r,:g]) ==
+                sum(bopdef0[r] + d[:hhadj][r] + sum(x0[r,g] for g in G) for r in R)
+            )
+        end)
+    end
 
     # Gross exports > re-exports
-    @constraint(calib, EXPDEF[r in R, g in G], x0[r,g] >= rx0[r,g])
+    if condition_expdef
+        @constraint(calib, EXPDEF[r in R, g in G], x0[r,g] >= rx0[r,g])
+    end
 
     # Income balance
-    @constraint(calib, INCBAL[r in R],
-        sum(cd0[r,g] + g0[r,g] + i0[r,g] for g in G) == (
-        sum(yh0[r,g] for g in G) + bopdef0[r] + d[:hhadj][r]
-        + sum(ld0[r,s]+kd0[r,s] for s in S)
-        + sum(d[:ta0][r,g]*a0[r,g] + d[:tm0][r,g]*m0[r,g] for g in G)
-        + sum(d[:ty0][r,s] * sum(ys0[r,s,g] for g in G) for s in S)
+    if condition_incbal
+        @constraint(calib, INCBAL[r in R],
+            sum(cd0[r,g] + g0[r,g] + i0[r,g] for g in G) == (
+            sum(yh0[r,g] for g in G) + bopdef0[r] + d[:hhadj][r]
+            + sum(ld0[r,s]+kd0[r,s] for s in S)
+            + sum(d[:ta0][r,g]*a0[r,g] + d[:tm0][r,g]*m0[r,g] for g in G)
+            + sum(d[:ty0][r,s] * sum(ys0[r,s,g] for g in G) for s in S)
+            )
         )
-    )
+    end
 
     # Value share conditions
-    @constraints(calib, begin
-        LVSHR[r in R, s in S], ld0[r,s] >= 0.5*d[:fvs_ld0][r,s] * sum(ys0[r,s,g] for g in G)
-        KVSHR[r in R, s in S], kd0[r,s] >= 0.5*d[:fvs_kd0][r,s] * sum(ys0[r,s,g] for g in G)
-    end)
+    if condition_value_share
+        @constraints(calib, begin
+            LVSHR[r in R, s in S], ld0[r,s] >= 0.5*d[:fvs_ld0][r,s] * sum(ys0[r,s,g] for g in G)
+            KVSHR[r in R, s in S], kd0[r,s] >= 0.5*d[:fvs_kd0][r,s] * sum(ys0[r,s,g] for g in G)
+        end)
+    end
 
     # Net generation of electricity balancing
-    @constraints(calib, begin
-        NETGEN_GPOS[r in R; d[:netgen][r] > 0], nd0[r,"ele"] - xn0[r,"ele"] >= 0.8*d[:netgen][r]
-        NETGEN_LPOS[r in R; d[:netgen][r] > 0], nd0[r,"ele"] - xn0[r,"ele"] <= 1.2*d[:netgen][r]
-        NETGEN_LNEG[r in R; d[:netgen][r] < 0], nd0[r,"ele"] - xn0[r,"ele"] <= 0.8*d[:netgen][r]
-        NETGEN_GNEG[r in R; d[:netgen][r] < 0], nd0[r,"ele"] - xn0[r,"ele"] >= 1.2*d[:netgen][r]
-    end)
+    if condition_netgen
+        # @constraints(calib, begin
+        #     NETGEN_POS[r in R; d[:netgen][r]>0], 0.8*d[:netgen][r] <= nd0[r,"ele"] - xn0[r,"ele"] <= 1.2*d[:netgen][r]
+        #     NETGEN_NEG[r in R; d[:netgen][r]<0], 1.2*d[:netgen][r] <= nd0[r,"ele"] - xn0[r,"ele"] <= 0.8*d[:netgen][r]
+        # end)
+
+        @constraints(calib, begin
+            NETGEN_GPOS[r in R; d[:netgen][r] > 0], nd0[r,"ele"] - xn0[r,"ele"] >= 0.8*d[:netgen][r]
+            NETGEN_LPOS[r in R; d[:netgen][r] > 0], nd0[r,"ele"] - xn0[r,"ele"] <= 1.2*d[:netgen][r]
+            NETGEN_LNEG[r in R; d[:netgen][r] < 0], nd0[r,"ele"] - xn0[r,"ele"] <= 0.8*d[:netgen][r]
+            NETGEN_GNEG[r in R; d[:netgen][r] < 0], nd0[r,"ele"] - xn0[r,"ele"] >= 1.2*d[:netgen][r]
+        end)
+    end
 
     # Verify regional totals equal national totals.
-    @constraints(calib, begin
-        NATIONAL_X0[s in SNAT], sum(x0[r,s] for r in R) == d[:x0_nat][s]
-        NATIONAL_M0[s in SNAT], sum(m0[r,s] for r in R) == d[:m0_nat][s]
-        NATIONAL_G0[s in SNAT], sum(g0[r,s] for r in R) == d[:g0_nat][s]
-        NATIONAL_I0[s in SNAT], sum(i0[r,s] for r in R) == d[:i0_nat][s]
-        NATIONAL_C0[s in SNAT], sum(cd0[r,s] for r in R) == d[:cd0_nat][s]
-        NATIONAL_VA0[s in SNAT], sum(ld0[r,s] + kd0[r,s] for r in R) == d[:va0_nat][s]
-    end)
+    if condition_national
+        @constraints(calib, begin
+            NATIONAL_X0[s in SNAT], sum(x0[r,s] for r in R) == d[:x0_nat][s]
+            NATIONAL_M0[s in SNAT], sum(m0[r,s] for r in R) == d[:m0_nat][s]
+            NATIONAL_G0[s in SNAT], sum(g0[r,s] for r in R) == d[:g0_nat][s]
+            NATIONAL_I0[s in SNAT], sum(i0[r,s] for r in R) == d[:i0_nat][s]
+            NATIONAL_C0[s in SNAT], sum(cd0[r,s] for r in R) == d[:cd0_nat][s]
+            NATIONAL_VA0[s in SNAT], sum(ld0[r,s] + kd0[r,s] for r in R) == d[:va0_nat][s]
+        end)
+    end
 
     # --- DEFINE OBJECTIVE -----------------------------------------------------------------
     @objective(calib, Min,
@@ -222,7 +253,7 @@ function calibrate_energy(
 
     # ----- SET BOUNDS AND FIX ZEROS -------------------------------------------------------
     # Fix international electricity imports/exports to zero (subject to SEDS data).
-    SLiDE.fix_lower_bound!(calib, d, [:m0,:x0], [R,"ele"]; lower_bound=lower_bound_seds, value=0)
+    SLiDE.fix_lower_bound!(calib, d, [:m0,:x0], [R,"ele"]; factor=lower_bound_seds, value=0)
 
     # Adjust upper and lower bounds to allow SEDS data to shift.
     SLiDE.set_bounds!(calib, d, :cd0, set, (:r,:e); lower_bound=lower_bound_seds, upper_bound=upper_bound_seds)
@@ -244,12 +275,15 @@ function calibrate_energy(
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     if optimize
         JuMP.optimize!(calib)
-        return SLiDE._calibration_output(calib, set, year; region=true)
+        return calib
+        # cal = SLiDE._calibration_output(calib, set, year; region=true)
+        # [cal[k] = filter_with(io[k],(yr=year,); drop=true) for k in setdiff(keys(io),keys(cal))]
+        # return Dict{Any,Any}(cal)
     else
         return calib
     end
+    # return calib
 end
-
 
 # ----- JuMP SYNTAX (without SLiDE functions) ----------------------------------------------
 # @variables(calib, begin

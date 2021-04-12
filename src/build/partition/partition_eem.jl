@@ -39,8 +39,9 @@ function partition_eem(dataset::Dataset, d::Dict, set::Dict)
         d[:ned0] = SLiDE._module_ned0!(d)
 
         # Drop units if they're not used later.
-        x = Deselect([:units],"==")
-        [d[k] = edit_with(d[k],x) for k in [:ed0,:emarg0,:ned0,:trdele,:pctgen]]
+        # x = Deselect([:units],"==")
+        # [d[k] = edit_with(d[k],x) for k in [:ed0,:emarg0,:ned0,:trdele,:pctgen,:netgen]]
+        [select!(d[k], Not(:units)) for k in [:ed0,:emarg0,:ned0,:trdele,:pctgen,:netgen]]
     else
         merge!(d, d_read)
     end
@@ -285,11 +286,7 @@ function _module_netgen!(d::Dict, maps::Dict)
 
     # (3) Label the data by its source and concatenate.
     df_seds = edit_with(df, Add(:dataset,"seds"))
-    df_io = edit_with(df_io, [Add(:dataset,"io"), Add(:units, KWH)])
-
-    # col = propertynames(df_netgen)
-    # insert!(col, length(col)-1, :dataset)
-    # d[:netgen] = sort(vcat(df_seds[:,col], df_io[:,col]))
+    df_io = edit_with(df_io, [Add(:dataset,"io"), Add(:units, USD)])
     d[:netgen] = vcat(df_seds, df_io)
 end
 
