@@ -1,16 +1,11 @@
 """
-    calibrate_national(d::Dict, set::Dict; save_build=true, overwrite=false)
-    calibrate_national(year::Int, d::Dict, set::Dict)
+    calibrate_national(dataset::Dataset, io::Dict, set::Dict)
+    calibrate_national(io::Dict, set::Dict, year::Integer)
 
 # Arguments
 - `d::Dict` of DataFrames containing the model data.
 - `set::Dict` of Arrays describing region, sector, final demand, etc.
 - `year::Int`: year for which to perform calibration
-
-# Keywords
-- `save_build = true`
-- `overwrite = false`
-See [`SLiDE.build`](@ref) for keyword argument descriptions.
 
 # Returns
 - `d::Dict` of DataFrames containing the model data at the calibration step.
@@ -30,9 +25,6 @@ function calibrate_national(dataset::Dataset, io::Dict, set::Dict;
             cal_yr = calibrate_national(io, set, year; zeropenalty=zeropenalty)
             [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
         end
-        
-        # If no DataFrame was returned by the annual calibrations, replace this with the input.
-        [cal[k] = io[k] for (k,df) in cal if isempty(df)]
 
         SLiDE.write_build!(dataset, cal)
     end
@@ -77,19 +69,29 @@ function calibrate_national(
         y0[g in G],  (start=d[:y0][g], lower_bound=d[:y0_lb][g],  upper_bound=d[:y0_ub][g])
         fs0[g in G], (start=d[:fs0][g],lower_bound=d[:fs0_lb][g], upper_bound=d[:fs0_ub][g])
     end)
-
+    
     # --- DEFINE CONSTRAINTS ---------------------------------------------------------------
-    # Market clearing conditions
-    @constraints(calib, begin
-        mkt_py[g in G], sum(ys0[s,g] for s in S) + fs0[g] == sum(ms0[g,m] for m in set[:m]) + y0[g]
-        mkt_pa[g in G], a0[g] == sum(id0[g,s] for s in S) + sum(fd0[g,fd] for fd in FD)
-        mkt_pm[m in set[:m]], sum(ms0[g,m] for g in G) == sum(md0[m,g] for g in G)
-    end)
 
     # Zero profit conditions
     @constraints(calib, begin
-        prf_y[s in S], sum(ys0[s,g] for g in G) == sum(id0[g,s] for g in G) + sum(va0[va,s] for va in VA)
-        prf_a[g in G], a0[g] * (1 - d[:ta0][g]) + x0[g] == y0[g] + m0[g] * (1 + d[:tm0][g]) + sum(md0[m,g] for m in set[:m])
+        PROFIT_A[g in G], (
+            (1 - d[:ta0][g])*a0[g] + x0[g] ==
+            (1 + d[:tm0][g])*m0[g] + y0[g] + sum(md0[m,g] for m in M)
+        )
+        PROFIT_Y[s in S], (
+            sum(ys0[s,g] for g in G) ==
+            sum(id0[g,s] for g in G) + sum(va0[va,s] for va in VA)
+        )
+    end)
+
+    # Market clearing conditions
+    @constraints(calib, begin
+        MARKET_PY[g in G], (
+            sum(ms0[g,m] for m in M) + y0[g] ==
+            sum(ys0[s,g] for s in S) + fs0[g]
+        )
+        MARKET_PA[g in G], a0[g] == sum(id0[g,s] for s in S) + sum(fd0[g,fd] for fd in FD)
+        MARKET_PM[m in M], sum(ms0[g,m] for g in G) == sum(md0[m,g] for g in G)
     end)
     
     # --- DEFINE OBJECTIVE -----------------------------------------------------------------
@@ -129,13 +131,17 @@ function calibrate_national(
     
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     JuMP.optimize!(calib)
-
-    return SLiDE._calibration_output(calib, set, year; region=false)
+    
+    cal = SLiDE._calibration_output(calib, set, year; region=false)
+    [cal[k] = filter_with(io[k],(yr=year,)) for k in setdiff(keys(io),keys(cal))]
+    return cal
+    # return SLiDE._calibration_output(calib, set, year; region=false)
 end
 
 
 """
-    _calibration_input(year::Int, d::Dict, set::Dict)
+    _national_calibration_input(d::Dict, set::Dict, year::Int)
+    _national_calibration_input(d::Dict, set::Dict)
 This function prepares the input for the calibration routine:
 1. Select parameters relevant to the calibration routine.
 2. For all parameters except taxes (ta0, tm0), set negative values to zero.
@@ -154,8 +160,7 @@ This function prepares the input for the calibration routine:
 - `year::Int` overwhich to calibrate
 
 # Returns
-- `d::Dict{Symbol, Dict}`: input *variables*. Input *variables* include all input parameters
-    with the exception of taxes (`ta0`,`tm0`,`ty0`).
+- `d::Dict{Symbol, Dict}`: input *variables*
 """
 function _national_calibration_input(d, set;
     lower_bound=SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND,

@@ -420,7 +420,7 @@ end
 \\bar{rx}_{yr,r,g} = \\bar{x}_{yr,r,g} - \\bar{s}_{yr,r,g}
 ```
 """
-function _disagg_rx0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
+function _disagg_rx0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     if !(:diff in keys(d))
         println("  Disaggregating rx0(yr,r,g), re-exports")
         d[:rx0] = d[:x0] - d[:s0]
@@ -444,7 +444,7 @@ end
 \\bar{dc}_{yr,r,g} = \\bar{s}_{yr,r,g} - \\bar{x}_{yr,r,g} + \\bar{rx}_{yr,r,g}
 ```
 """
-function _disagg_dc0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
+function _disagg_dc0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     # (!!!!) name for this?
     d[:dc0] = dropmissing((d[:s0] - d[:x0] + d[:rx0]))
 
@@ -466,7 +466,7 @@ end
 \\end{aligned}
 ```
 """
-function _disagg_pt0(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
+function _disagg_pt0(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     df_pta0 = dropmissing(((d[:yr,:r,:g] - d[:ta0]) * d[:a0]) + d[:rx0])
     df_ptm0 = dropmissing(((d[:yr,:r,:g] + d[:tm0]) * d[:m0]) + combine_over(d[:md0], :m))
 
@@ -476,16 +476,16 @@ function _disagg_pt0(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
 end
 
 
-function _disagg_pt0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
-    d[:pt0] = _disagg_pt0(d, round_digits = round_digits)
+function _disagg_pt0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
+    d[:pt0] = _disagg_pt0(d, round_digits=round_digits)
     return d[:pt0]
 end
 
 
 "`diff`:"
-function _disagg_diff!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
+function _disagg_diff!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     # df = _disagg_pt0!(d)
-    df = _disagg_pt0(d; round_digits = DEFAULT_ROUND_DIGITS)
+    df = _disagg_pt0(d; round_digits=DEFAULT_ROUND_DIGITS)
 
     df[!,:value] .= - min.(0, df[:,:value])
     d[:diff] = dropzero!(df)
@@ -590,9 +590,9 @@ end
 \\bar{nd}_{yr,r,g} = \\bar{pt}_{yr,r,g} - \\bar{dd}_{yr,r,g}
 ```
 """
-function _disagg_nd0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
+function _disagg_nd0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     println("  Disaggregating nd(yr,r,g), regional demand from national market")
-    df_pt0 = _disagg_pt0(d; round_digits = false)
+    df_pt0 = _disagg_pt0(d; round_digits=false)
 
     d[:nd0] = df_pt0 - d[:dd0]
     # (round_digits !== false) && (d[:nd0][!,:value] .= round.(d[:nd0][:,:value]; digits = round_digits))
