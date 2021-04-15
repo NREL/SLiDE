@@ -227,17 +227,34 @@ write_build(path, k, v) = nothing
 """
     read_set()
 """
-function read_set(build::String; sector_level::Symbol=:summary)
-    # if !(build in ["eem","io"])
-    path = joinpath(READ_DIR,"setlist_$build.yml")
-    @info("Reading sets from $path.")
-    set = read_from(path)
-    if build=="io" && !haskey(set, :sector)
-        if haskey(set, sector_level)
-            SLiDE.set_sector!(set, set[sector_level])
-        # else
-        #     ERROR, SECTOR LEVEL NOT FOUND
+function SLiDE.read_set(build::String; sector_level::Symbol=:summary)
+    # If specifying io or eem, use default setlist yaml.
+    if build in ["eem","io"]
+        path = joinpath(READ_DIR,"setlist_$build.yml")
+        @info("Reading sets from $path.")
+        set = read_from(path)
+
+        # Define sectors from 
+        if build=="io" && !haskey(set, :sector)
+            if haskey(set, sector_level)
+                SLiDE.set_sector!(set, set[sector_level])
+            # else
+            #     !!!! ERROR, SECTOR LEVEL NOT FOUND
+            end
         end
+    
+    # If pointing to a path,
+    elseif isfile(build)
+        path = build
+        
+        if getindex(splitext(path),2) .== ".csv"
+            set = read_file(path)[:,1]
+        else
+            set = read_from(path)
+            [set[k] = df[:,1] for (k,df) in set if typeof(df)<:DataFrame]
+        end
+    # else
+    #     !!!! ERROR, MUST BE IO, EEM, OR POINT TO PATH
     end
     return set
 end

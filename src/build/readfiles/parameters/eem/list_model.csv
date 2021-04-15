@@ -1,4 +1,8 @@
 parameter
+# --- eem ---
+fvs
+netgen
+# --- io ---
 a0
 bopdef0
 c0
@@ -25,6 +29,3 @@ xd0
 xn0
 yh0
 ys0
-fe0
-thetaa
-va0
