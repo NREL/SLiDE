@@ -1,5 +1,5 @@
 """
-    calibrate_energy(io::Dict, set::Dict, year::Integer)
+    calibrate_regional(io::Dict, set::Dict, year::Integer)
 
 # Arguments
 - `d::Dict` of DataFrames containing the model data.
@@ -9,7 +9,7 @@
 # Returns
 - `d::Dict` of DataFrames containing the model data at the calibration step.
 """
-function calibrate_energy(
+function calibrate_regional(
     io::Dict,
     set::Dict,
     year::Int;
@@ -294,6 +294,7 @@ function _energy_calibration_input(d, set, ::Type{T};
     if T==Dict
         d = Dict(k => fill_zero(d[k]; with=set) for k in
             [parameters; append.(:fvs,[:ld0,:kd0]); append.(variables_nat,:nat); :netgen])
+            # !!!! if d is already filtered, this shouldn't be necessary.
     end
 
     SLiDE.set_lower_bound!(d, setdiff(variables, [:ld0,:kd0,:yh0,:cd0]); factor=lower_bound)
@@ -313,7 +314,7 @@ function _energy_calibration_input(d, set, year, ::Type{T};
     allow_negative::Bool=true,
 ) where T <: Union{DataFrame,Dict}
     d = Dict(k => filter_with(df, (yr=year,); drop=true) for (k,df) in d)
-    d = energy_calibration_input(d, set, T;
+    d = _energy_calibration_input(d, set, T;
         lower_bound=lower_bound,
         upper_bound=upper_bound,
         allow_negative=allow_negative,

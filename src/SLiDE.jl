@@ -138,7 +138,7 @@ export benchmark_against
 
 # BUILD
 export build
-export partition_national
+export partition_bea
 export calibrate_national
 export share_region
 export disaggregate_region
@@ -148,7 +148,7 @@ export disaggregate_sector!
 export aggregate_sector!
 
 # ENERGY ENVIRONMENT MODULE
-export partition_eem
+export partition_seds
 export partition_elegen!
 export partition_energy!
 export partition_co2emis!
@@ -220,11 +220,17 @@ include(joinpath("parse", "run_yaml.jl"))
 include(joinpath("parse", "check_data.jl"))
 
 include(joinpath("build", "build.jl"))
-include(joinpath("build", "partition", "partition_national.jl"))
+include(joinpath("build", "partition", "partition_bea.jl"))
+include(joinpath("build", "partition", "partition_seds.jl"))
+# include(joinpath("build", "partition", "partition_elegen.jl"))
+# include(joinpath("build", "partition", "partition_energy.jl"))
+# include(joinpath("build", "partition", "partition_co2emis.jl"))
+
 include(joinpath("build", "calibrate", "calibrate_io.jl"))
 include(joinpath("build", "calibrate", "calibrate_utils.jl"))
 include(joinpath("build", "calibrate", "calibrate_national.jl"))
-include(joinpath("build", "calibrate", "calibrate_energy.jl"))
+include(joinpath("build", "calibrate", "calibrate_regional.jl"))
+
 include(joinpath("build", "share", "share_region.jl"))
 include(joinpath("build", "share", "share_cfs.jl"))
 include(joinpath("build", "share", "share_gsp.jl"))
@@ -239,10 +245,6 @@ include(joinpath("scale", "constructors.jl"))
 include(joinpath("scale", "scale_sector.jl"))
 include(joinpath("scale", "scale_with.jl"))
 
-include(joinpath("build", "partition", "partition_eem.jl"))
-include(joinpath("build", "partition", "partition_elegen.jl"))
-include(joinpath("build", "partition", "partition_energy.jl"))
-include(joinpath("build", "partition", "partition_co2emis.jl"))
 
 include(joinpath("model", "model_input.jl"))
 

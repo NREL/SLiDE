@@ -17,13 +17,14 @@ end
     share_sector(set::Dict)
 """
 function share_sector(set::Dict; path::String=SCALE_BLUENOTE_IO)
+    sector_level = :detail
     dfmap = read_file(path)[:,1:2]
 
     # Get the detail-level info so we can disaggregate.
-    set_det = SLiDE.read_set("io"; sector=:detail)
-    det = SLiDE.read_input!(Dataset(""; step="partition", sector_level=:detail))
+    set_det = SLiDE.read_set("io"; sector_level=sector_level)
+    det = SLiDE.read_input!(Dataset(""; step="partition", sector_level=sector_level))
 
-    df = SLiDE._partition_y0!(det, set_det)
+    df = SLiDE._partition_y0!(det, set_det; sector_level=sector_level)
     
     # Initialize scaling information.
     weighting, mapping = SLiDE.share_with(Weighting(df), Mapping(dfmap))

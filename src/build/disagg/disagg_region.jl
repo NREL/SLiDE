@@ -16,9 +16,8 @@ See [`SLiDE.build`](@ref) for keyword argument descriptions.
 function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
     step = SLiDE.PARAM_DIR
     d_read = read_build(set!(dataset; step=step))
-
+    
     SLiDE._set_gm!(d, set)
-    # SLiDE.write_build!(set!(dataset; step=SET_DIR), Dict(k => set[:gm]))
 
     if dataset.step=="input"
         d = merge(d, Dict(

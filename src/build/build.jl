@@ -6,7 +6,7 @@ and return those values.
 
 Otherwise, it will read input data from the `/SLIDE_DIR/data/input/` directory and
 execute the four steps of the SLiDE buildstream via the following functions:
-1. [`SLiDE.partition_national`](@ref)
+1. [`SLiDE.partition_bea`](@ref)
 2. [`SLiDE.calibrate_national`](@ref)
 3. [`SLiDE.share_region`](@ref)
 4. [`SLiDE.disaggregate_region`](@ref)
@@ -27,7 +27,7 @@ function build(dataset::Dataset)
     set = SLiDE.read_set(dataset)
     
     if dataset.step=="input"
-        d, set = partition_national(dataset, d, set)
+        d, set = partition_bea(dataset, d, set)
         d = calibrate_national(dataset, d, set)
         d, set = share_region(dataset, d, set)
         d, set = disaggregate_region(dataset, d, set)
@@ -52,14 +52,14 @@ end
 """
 function build_eem(dataset::Dataset, d::Dict, set::Dict)
     SLiDE.set!(dataset; build="eem", step=SLiDE.PARAM_DIR)
-    merge!(set, SLiDE.read_set(dataset, "eem"))
+    merge!(set, SLiDE.read_set(dataset))
 
     dwrite = Dict()
 
     d, set = aggregate_sector!(d, set)
     dwrite[:scale] = copy(d)
 
-    d, set, maps = partition_eem(dataset, d, set)
+    d, set, maps = partition_seds(dataset, d, set)
     dwrite[:partition] = copy(d)
 
     d, set, maps = disaggregate_energy!(dataset, d, set, maps)
@@ -124,16 +124,6 @@ function overwrite(dataset::Dataset)
     end
     return nothing
 end
-
-
-# function build_eem(dataset, d, set)
-#     d, set = aggregate_sector!(d, set)
-#     d, set, maps = partition_eem(dataset, d, set)
-#     d, set, maps = disaggregate_energy!(dataset, d, set, maps)
-#     d, set = calibrate_energy(d, set)
-
-#     return d, set
-# end
 
 
 """
@@ -237,31 +227,29 @@ write_build(path, k, v) = nothing
 """
     read_set()
 """
-function read_set(dataset::Dataset)
-    set = read_set(dataset, "io")
-    dataset.eem && merge!(set, read_set(dataset, "eem"))
-    return set
-end
-
-function read_set(build::String; sector=:summary)
+function read_set(build::String; sector_level::Symbol=:summary)
+    # if !(build in ["eem","io"])
     path = joinpath(READ_DIR,"setlist_$build.yml")
-    set = read_from(path)
     @info("Reading sets from $path.")
-
-    (build=="io" && !haskey(set, :sector)) && SLiDE.set_sector!(set, set[sector])
+    set = read_from(path)
+    if build=="io" && !haskey(set, :sector)
+        if haskey(set, sector_level)
+            SLiDE.set_sector!(set, set[sector_level])
+        # else
+        #     ERROR, SECTOR LEVEL NOT FOUND
+        end
+    end
     return set
 end
 
-function read_set(dataset::Dataset, build::String)
-    path = SLiDE.datapath(SLiDE.set!(copy(dataset); build=build, step=SLiDE.SET_DIR))
-    if isdir(path)
-        set = read_from(path)
-        set = Dict{Any,Any}(k => df[:,1] for (k,df) in set)
-    else
-        set = SLiDE.read_set(build; sector=dataset.sector_level)
-    end
 
-    build=="io" && SLiDE.set_sector!(set, set[:sector])
+function read_set(dataset::Dataset)
+    path = SLiDE.datapath(SLiDE.set!(copy(dataset); step=SLiDE.SET_DIR))
+    set = if isdir(path)
+        Dict{Any,Any}(k => df[:,1] for (k,df) in read_from(path))
+    else
+        SLiDE.read_set(dataset.build; sector_level=dataset.sector_level)
+    end
     return set
 end
 
@@ -282,7 +270,6 @@ been generated, read *input* data using [`SLiDE.read_input!`](@ref).
 """
 function read_build(dataset::Dataset)
     path = datapath(dataset)
-
     d = Dict()
     if isdir(path)
         merge!(d, read_from(path))

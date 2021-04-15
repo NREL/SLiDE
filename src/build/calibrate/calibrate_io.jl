@@ -22,7 +22,7 @@ function _calibration_set!(set;
             add_permutation!(set, (:r,:e,:s))
             add_permutation!(set, (:r,:g,:e))
             add_permutation!(set, (:r,:m,:e))
-
+            
             add_permutation!(set, (:r,:nat))
         end
     else
