@@ -134,7 +134,7 @@ function _disagg_energy_ys0!(d::Dict, set::Dict, maps::Dict)
     println("  Calculating ys0(yr,r,s=e,g=e), regional sectoral output")
     x = set[:e]
     df, df_out = split_with(d[:ys0], DataFrame(s=x, g=x))
-
+    
     # (1) Calculate data for e = [ele,cru,gas,col].
     df_energy = filter_with(d[:energy], (src=x, sec="supply", pq="q"); drop=true)
     df_ps0 = filter_with(d[:ps0], (src=x,))
@@ -281,10 +281,10 @@ end
 """
 """
 function drop_small!(d, set; digits=5)
-    taxes = [:ta0, :tm0, :ty0]
-    parameters = [SLiDE.list_parameters!(set, :parameters); :fvs; :netgen]
+    variables = setdiff(keys(d), list("taxes"))
 
-    [d[k] = SLiDE.drop_small(d[k]; digits=digits, key=k) for k in setdiff(parameters,taxes)]
+    [d[k] = SLiDE.drop_small(d[k]; digits=digits, key=k) for k in variables
+        if typeof(d[k])==DataFrame]
     return d
 end
 

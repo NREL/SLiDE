@@ -117,7 +117,8 @@ function overwrite(dataset::Dataset)
         # If not, print a warning.
         elseif dataset.save_build
             num_development = sum(getindex.(readdir(path),1).=='_')
-            if dataset.build=="io" && num_development < 3
+            if isfile(joinpath(path, )) &&
+                    dataset.build=="io" && num_development < 3
                 @warn("Build stream steps missing for $(dataset.name)/$(dataset.build). Set overwrite=true to execute save_build=true.")
             end
         end
@@ -227,7 +228,7 @@ write_build(path, k, v) = nothing
 """
     read_set()
 """
-function SLiDE.read_set(build::String; sector_level::Symbol=:summary)
+function read_set(build::String; sector_level::Symbol=:summary)
     # If specifying io or eem, use default setlist yaml.
     if build in ["eem","io"]
         path = joinpath(READ_DIR,"setlist_$build.yml")
@@ -363,7 +364,7 @@ importing parameters into JuMP models when calibrating or modeling.
 - `d::Dict` of filtered data
 """
 function filter_build!(dataset::Dataset, d::Dict)
-    lst = SLiDE.describe_parameters(dataset)
+    lst = SLiDE.describe(dataset)
     return SLiDE._filter_with!(d, lst)
 end
 
@@ -394,8 +395,8 @@ end
 
 
 """
-    describe_parameters(dataset::Dataset)
-    describe_parameters(step)
+    describe!(set::Dict, dataset::Dataset)
+    describe(dataset::Dataset)
 
 # Arguments
 - `dataset::Dataset` or `step::String/Symbol` specifying the parameters to describe
@@ -404,52 +405,23 @@ end
 - `d::Dict{Symbol,`[`Parameter`](@ref)`}` of Parameters relevant to the specified data
     step. The dictionary key is consistent the value's field `parameter`.
 """
-function describe_parameters(step::Symbol)
-    lst = read_from(joinpath(READ_DIR,"parameterlist.yml"))
-
-    !haskey(lst, step) && (return nothing)
-
-    df = read_file(joinpath(READ_DIR,"parameters","define.csv"))
-    df = innerjoin(DataFrame(parameter=lst[step]), df, on=:parameter)
-
-    d = if isempty(df); convert_type.(Symbol, lst[step])
-    else;               load_from(Dict{Parameter}, df)
-    end
-    
-    return d
+function SLiDE.describe(dataset::Dataset)
+    lst = SLiDE.list(dataset)
+    df = read_file(joinpath(SLiDE.READ_DIR,"parameters","define.csv"))
+    df = innerjoin(DataFrame(parameter=string.(lst)), df, on=:parameter)
+    return isempty(df) ? lst : load_from(Dict{Parameter}, df)
 end
 
-describe_parameters(dataset::Dataset) = describe_parameters(dataset.step)
-describe_parameters(step::String) = describe_parameters(Symbol(step))
-
-
-"""
-    describe_parameters(dataset::Dataset)
-    describe_parameters(step)
-This function adds the parameters described by [`SLiDE.describe_parameters`](@ref) to set,
-identified by the key `:step`.
-
-# Arguments
-- `set::Dict` to update
-- `dataset::Dataset` or `step::String/Symbol` specifying the parameters to describe
-
-# Returns
-- `lst::AbstractArray` of parameters added to `set`
-"""
-function describe_parameters!(set::Dict, step::Symbol)
-    if !haskey(set, step)
-        set[step] = SLiDE.describe_parameters("$step")
-    end
-    return set[step]
+function describe!(set::Dict, dataset::Dataset)
+    key = Symbol.((dataset.build, dataset.step, :describe))
+    !haskey(set, key) && push!(set, key=>describe(dataset))
+    return set[key]
 end
 
-describe_parameters!(set::Dict, dataset::Dataset) = describe_parameters!(set, dataset.step)
-describe_parameters!(set::Dict, step::String) = describe_parameters!(set, Symbol(step))
-
 
 """
-    list_parameters!(set::Dict, dataset::Dataset)
-This function adds a list of the parameters described by [`SLiDE.describe_parameters`](@ref)
+    list!(set::Dict, dataset::Dataset)
+This function adds a list of the parameters described by [`SLiDE.describe`](@ref)
 to `set`, identified by the key `:step_list`.
 
 # Arguments
@@ -459,20 +431,23 @@ to `set`, identified by the key `:step_list`.
 # Returns
 - `lst::AbstractArray` of parameters added to `set`
 """
-list_parameters!(set::Dict, dataset::Dataset) = list_parameters!(set, Symbol(dataset.step))
-
-function list_parameters!(set::Dict, step::Symbol)
-    # !!!! should clear these before starting EEM. OR specify build step when saving.
-    # Let's just use method that takes dataset to avoid confusion here later.
-    step_list = append(step,:list)
-    if !haskey(set, step_list)
-        set[step_list] = if step==:taxes
-            [:ta0,:ty0,:tm0]
-        else
-            collect(keys(describe_parameters!(set, step)))
-        end
+function list(dataset::Dataset)
+    if dataset.step=="taxes"
+        return list("taxes")
+    else
+        step = Symbol(dataset.step)
+        tmp = read_from(joinpath(SLiDE.READ_DIR, "parameterlist_$(dataset.build).yml"))
+        return haskey(tmp, step) ? Symbol.(tmp[step][:,1]) : []
     end
-    return set[step_list]
+end
+
+list(x::String) = x=="taxes" ? [:ta0,:tm0,:ty0] : []
+
+
+function list!(set::Dict, dataset::Dataset)
+    key = Symbol.((dataset.build, dataset.step, :list))
+    !haskey(set, key) && push!(set, key=>list(dataset))
+    return set[key]
 end
 
 

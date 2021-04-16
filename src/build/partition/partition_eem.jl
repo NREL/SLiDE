@@ -8,7 +8,7 @@ This function prepares SEDS energy data for the EEM.
     1. Energy - [`eem_energy!`](@ref)
     3. CO2 Emissions - [`eem_co2emis!`](@ref)
 """
-function partition_eem(dataset::Dataset, d::Dict, set::Dict)
+function partition_seds(dataset::Dataset, d::Dict, set::Dict)
     SLiDE.set!(dataset; build="eem", step="partition")
     maps = SLiDE.read_map()
 

@@ -19,7 +19,7 @@ function calibrate_national(dataset::Dataset, io::Dict, set::Dict;
     if dataset.step=="input"
         # Initialize a DataFrame to contain results and do the calibration iteratively.
         SLiDE.set!(dataset; step=step)
-        cal = Dict(k => DataFrame() for k in SLiDE.list_parameters!(set, dataset))
+        cal = Dict(k => DataFrame() for k in list!(set, Dataset(""; build="io", step=step)))
 
         for year in set[:yr]
             cal_yr = calibrate_national(io, set, year; zeropenalty=zeropenalty)
@@ -135,7 +135,6 @@ function calibrate_national(
     cal = SLiDE._calibration_output(calib, set, year; region=false)
     [cal[k] = filter_with(io[k],(yr=year,)) for k in setdiff(keys(io),keys(cal))]
     return cal
-    # return SLiDE._calibration_output(calib, set, year; region=false)
 end
 
 
@@ -167,7 +166,7 @@ function _national_calibration_input(d, set;
     upper_bound=SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND,
     allow_negative::Bool=false,
 )
-    variables = setdiff(SLiDE.list_parameters!(set,:calibrate), SLiDE.list_parameters!(set,:taxes))
+    variables = setdiff(list!(set, Dataset(""; build="io", step="calibrate")), list("taxes"))
 
     # Fill zeros.
     d = Dict(k => fill_zero(df; with=set) for (k,df) in d)

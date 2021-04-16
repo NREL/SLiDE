@@ -1,2 +1,13 @@
 parameter
-sector
+gsp
+labor
+pce
+region
+rpc
+sgf
+utd
+# --- unused in subsequent step(s) ---
+# d0
+# mn0
+# mrt0
+# xn0

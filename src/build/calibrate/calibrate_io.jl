@@ -41,26 +41,19 @@ end
 
 """
 """
-function _calibration_output(model::Model, set::Dict, year::Int; region::Bool=false)
-    subset = :calibrate
+function _calibration_output(model::Model, set::Dict, year::Integer; region::Bool=false)
+    build = region ? "eem" : "io"
     idxskip = region ? [:yr,:fdcat] : [:yr,:r,:fdcat]
 
-    lst_calibrate = SLiDE.list_parameters!(set, subset)
-    lst_parameters = SLiDE.list_parameters!(set, :parameters)
-    lst = intersect(
-        [lst_calibrate; lst_parameters],
-        keys(model.obj_dict),
-    )
-    param = merge(
-        SLiDE.describe_parameters!(set, :calibrate),
-        SLiDE.describe_parameters!(set, :parameters),
-    )
-    d = Dict{Symbol,DataFrame}()
-    
-    for k in lst
-        idxmodel = setdiff(param[k].index, idxskip)
-        df = dropzero(convert_type(DataFrame, model[k]; cols=idxmodel))
-        d[k] = select(edit_with(df, Add(:yr, year)), [:yr; idxmodel; :value])
+    parameters = SLiDE.describe!(set, Dataset(""; build=build, step="calibrate"))
+
+    d = Dict()
+    for (k, parameter) in parameters
+        if haskey(model.obj_dict, k)
+            idxmodel = setdiff(parameter.index, idxskip)
+            df = dropzero(convert_type(DataFrame, model[k]; cols=idxmodel))
+            d[k] = select(edit_with(df, Add(:yr, year)), [:yr; idxmodel; :value])
+        end
     end
 
     return d

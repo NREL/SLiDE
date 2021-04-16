@@ -37,7 +37,7 @@ function aggregate_sector!(d::Dict, set::Dict, x::Mapping;
     scale_id=:aggregate,
 )
     !haskey(d, scale_id) && push!(d, scale_id=>x)
-    parameters = SLiDE.list_parameters!(set, :parameters)
+    parameters = list!(set, Dataset(""; build="io", step=PARAM_DIR))
 
     # Aggregate taxes.
     # Their associated scaling parameters will be aggregated in the process.
@@ -67,9 +67,8 @@ end
 function disaggregate_sector!(d::Dict, set::Dict, x::Weighting; scale_id=:disaggregate)
     !haskey(d, scale_id) && push!(d, scale_id=>x)
 
-    parameters = SLiDE.list_parameters!(set, :parameters)
-    taxes = SLiDE.list_parameters!(set, :taxes)
-    variables = setdiff(parameters, taxes)
+    taxes = list("taxes")
+    variables = setdiff(list!(set, Dataset(""; build="io", step=PARAM_DIR)), taxes)
 
     x_tax = convert_type(Mapping, x)
     SLiDE.scale_sector!(d, set, x, variables; scale_id=scale_id)

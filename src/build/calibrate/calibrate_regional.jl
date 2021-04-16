@@ -272,8 +272,7 @@ function _energy_calibration_input(d, set, ::Type{T};
 ) where T <: Union{DataFrame,Dict}
 
     # Filter the DataFrame.
-    parameters = SLiDE.list_parameters!(set,:parameters)
-    variables = setdiff(parameters, SLiDE.list_parameters!(set,:taxes))
+    variables = setdiff(list!(set, Dataset(""; build="eem", step="calibrate")), list("taxes"))
     variables_nat = [:ys0,:x0,:m0,:va0,:g0,:i0,:cd0]
     
     [d[k] = SLiDE.drop_small(copy(d[k])) for k in variables]
@@ -291,11 +290,10 @@ function _energy_calibration_input(d, set, ::Type{T};
     # If returning a dictionary, fill zeros and convert output to a dictionary.
     # Set upper and lower bounds regardless, but do so *after* filling zeros (if required)
     # to save some time.
-    if T==Dict
-        d = Dict(k => fill_zero(d[k]; with=set) for k in
-            [parameters; append.(:fvs,[:ld0,:kd0]); append.(variables_nat,:nat); :netgen])
+    T==Dict && [d[k] = fill_zero(df; with=set) for (k,df) in d]
+        # d = Dict(k => fill_zero(d[k]; with=set) for k in
+        #     [parameters; append.(:fvs,[:ld0,:kd0]); append.(variables_nat,:nat); :netgen])
             # !!!! if d is already filtered, this shouldn't be necessary.
-    end
 
     SLiDE.set_lower_bound!(d, setdiff(variables, [:ld0,:kd0,:yh0,:cd0]); factor=lower_bound)
     SLiDE.set_upper_bound!(d, :i0; factor=upper_bound)
