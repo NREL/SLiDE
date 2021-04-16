@@ -1,3 +1,18 @@
+function build(dataset::Dataset)
+    d, set = build_io(dataset)
+    d, set = build_eem(dataset, d, set)
+    return d, set
+end
+
+
+function build(name::String=SLiDE.DEFAULT_DATASET;
+    overwrite=SLiDE.DEFAULT_OVERWRITE,
+    save_build=SLiDE.DEFAULT_SAVE_BUILD,
+)
+    return build(Dataset(name; overwrite=overwrite, save_build=save_build))
+end
+
+
 """
     build(dataset::Dataset)
 This function will execute the SLiDE buildstream and generate the parameters necessary to
@@ -18,7 +33,7 @@ execute the four steps of the SLiDE buildstream via the following functions:
 - `d::Dict` of model parameters
 - `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
-function build(dataset::Dataset)
+function build_io(dataset::Dataset)
     set!(dataset; build="io", step=PARAM_DIR)
     overwrite(dataset)
 
@@ -40,61 +55,26 @@ function build(dataset::Dataset)
 end
 
 
-function build(name::String=SLiDE.DEFAULT_DATASET;
-    overwrite=SLiDE.DEFAULT_OVERWRITE,
-    save_build=SLiDE.DEFAULT_SAVE_BUILD,
-)
-    return build(Dataset(name; overwrite=overwrite, save_build=save_build))
-end
-
-
 """
 """
 function build_eem(dataset::Dataset, d::Dict, set::Dict)
-    SLiDE.set!(dataset; build="eem", step=SLiDE.PARAM_DIR)
-    merge!(set, SLiDE.read_set(dataset))
+    if dataset.eem==true
+        set!(dataset; build="eem", step=PARAM_DIR)
 
-    dwrite = Dict()
+        d = SLiDE.read_build(dataset)
+        set = SLiDE.read_set(dataset)
+        
+        if dataset.step=="input"
+            d, set = partition_bea(dataset, d, set)
+            d = calibrate_national(dataset, d, set)
+            d, set = share_region(dataset, d, set)
+            d, set = disaggregate_region(dataset, d, set)
 
-    d, set = aggregate_sector!(d, set)
-    dwrite[:scale] = copy(d)
-
-    d, set, maps = partition_seds(dataset, d, set)
-    dwrite[:partition] = copy(d)
-
-    d, set, maps = disaggregate_energy!(dataset, d, set, maps)
-    dwrite[:disagg] = copy(d)
-
-    # Save all of the build steps.
-    stps = [:scale,:partition,:disagg]
-    path = SLiDE.datapath(dataset; directory_level=:build)
-
-    pth = Dict(k => joinpath(path,"_$k") for k in stps)
-    pth[:sets] = joinpath(path,"sets")
-
-    lst = Dict(
-        :sets => [
-            collect(keys(read_from("src/build/readfiles/setlist_io.yml")));
-            collect(keys(read_from("src/build/readfiles/setlist_eem.yml")));
-            :sector;
-        ],
-        :scale => Symbol.(read_file("src/build/readfiles/parameters/list_model.csv")[:,1]),
-        :partition => Symbol.(read_file("src/build/readfiles/parameters/list_eia.csv")[:,1]),
-    )
-    lst[:disagg] = [lst[:scale];:fvs;:netgen]
-
-    for stp in [stps;:sets]
-        !isdir(pth[stp]) && mkpath(pth[stp])
-        if stp==:sets
-            [CSV.write(joinpath(pth[stp],"$k.csv"), DataFrame(k=>set[k]))
-                for k in lst[stp] if k in keys(set)]
-        else
-            [CSV.write(joinpath(pth[stp],"$k.csv"), dwrite[stp][k])
-                for k in lst[stp] if k in keys(dwrite[stp])]
+            write_build!(set!(dataset; step=SLiDE.PARAM_DIR), d)
+            write_build!(set!(dataset; step=SLiDE.SET_DIR), set)
         end
     end
 
-    d = Dict(k=>d[k] for k in lst[:disagg])
     return d, set
 end
 
@@ -405,7 +385,7 @@ end
 - `d::Dict{Symbol,`[`Parameter`](@ref)`}` of Parameters relevant to the specified data
     step. The dictionary key is consistent the value's field `parameter`.
 """
-function SLiDE.describe(dataset::Dataset)
+function describe(dataset::Dataset)
     lst = SLiDE.list(dataset)
     df = read_file(joinpath(SLiDE.READ_DIR,"parameters","define.csv"))
     df = innerjoin(DataFrame(parameter=string.(lst)), df, on=:parameter)

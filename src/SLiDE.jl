@@ -144,6 +144,7 @@ export share_region
 export disaggregate_region
 
 export share_sector!
+export scale_sector!
 export disaggregate_sector!
 export aggregate_sector!
 

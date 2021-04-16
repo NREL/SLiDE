@@ -25,9 +25,20 @@ const POPULATION = "thousand"
 const CHAINED_USD = "millions of chained 2009 us dollars (USD)"
 
 # CALIBRATION
-const DEFAULT_PENALTY_NOKEY = 1e4
-const DEFAULT_CALIBRATE_LOWER_BOUND = 0.1
-const DEFAULT_CALIBRATE_UPPER_BOUND = 5
+const DEFAULT_CALIBRATE_ZEROPENALTY = Dict(
+    :io => 1E4,
+    :eem => 1E7,
+)
+
+# Multipliers for lower and upper bound relative to each respective variables reference parameter
+const DEFAULT_CALIBRATE_BOUND = Dict(
+    (:io,:lower) => 0.1,
+    (:io,:upper) => 5,
+    (:eem,:lower) => 0.25,
+    (:eem,:upper) => 1.75,
+    (:eem,:lower_seds) => 0.75,
+    (:eem,:upper_seds) => 1.25,
+)
 
 # NUMERICAL
 const DEFAULT_TOL = 1e-6

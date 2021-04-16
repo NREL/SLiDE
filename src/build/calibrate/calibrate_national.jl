@@ -11,7 +11,9 @@
 - `d::Dict` of DataFrames containing the model data at the calibration step.
 """
 function calibrate_national(dataset::Dataset, io::Dict, set::Dict;
-    zeropenalty::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
+    zeropenalty=DEFAULT_CALIBRATE_ZEROPENALTY[:io],
+    lower_bound=DEFAULT_CALIBRATE_BOUND[:io,:lower],
+    upper_bound=DEFAULT_CALIBRATE_BOUND[:io,:upper],
 )
     step = "calibrate"
     cal = SLiDE.read_build(SLiDE.set!(dataset; step=step))
@@ -19,10 +21,14 @@ function calibrate_national(dataset::Dataset, io::Dict, set::Dict;
     if dataset.step=="input"
         # Initialize a DataFrame to contain results and do the calibration iteratively.
         SLiDE.set!(dataset; step=step)
-        cal = Dict(k => DataFrame() for k in list!(set, Dataset(""; build="io", step=step)))
+        cal = Dict(k => DataFrame() for k in list!(set, dataset))
 
         for year in set[:yr]
-            cal_yr = calibrate_national(io, set, year; zeropenalty=zeropenalty)
+            cal_yr = calibrate_national(io, set, year;
+                zeropenalty=zeropenalty,
+                lower_bound=lower_bound,
+                upper_bound=upper_bound,
+            )
             [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
         end
 
@@ -37,11 +43,9 @@ function calibrate_national(
     io::Dict,
     set::Dict,
     year::Int;
-    zeropenalty::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
-    # multipliers for lower and upper bound relative
-    # to each respective variables reference parameter
-    lower_bound = SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND,
-    upper_bound = SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND,
+    zeropenalty=DEFAULT_CALIBRATE_ZEROPENALTY[:io],
+    lower_bound=DEFAULT_CALIBRATE_BOUND[:io,:lower],
+    upper_bound=DEFAULT_CALIBRATE_BOUND[:io,:upper],
 )
     @info("Calibrating $year data")
 

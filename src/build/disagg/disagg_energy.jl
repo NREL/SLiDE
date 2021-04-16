@@ -23,6 +23,7 @@ function disaggregate_energy!(dataset, d, set, maps)
 
         # Update household disaggregation.
         SLiDE._disagg_hhadj!(d)
+        SLiDE.write_build!(SLiDE.set!(dataset; step=step), d)
     end
     
     return d, set, maps

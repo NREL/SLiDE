@@ -9,22 +9,53 @@
 # Returns
 - `d::Dict` of DataFrames containing the model data at the calibration step.
 """
+function calibrate_regional(dataset::Dataset, io::Dict, set::Dict;
+    zeropenalty=DEFAULT_CALIBRATE_ZEROPENALTY[:eem],
+    lower_bound=DEFAULT_CALIBRATE_BOUND[:eem,:lower],
+    upper_bound=DEFAULT_CALIBRATE_BOUND[:eem,:upper],
+    lower_bound_seds=DEFAULT_CALIBRATE_BOUND[:eem,:lower_seds],
+    upper_bound_seds=DEFAULT_CALIBRATE_BOUND[:eem,:upper_seds],
+)
+    step = "calibrate"
+    cal = read_build(set!(dataset; step=step))
+
+    if dataset.step=="input"
+        # Initialize a DataFrame to contain results and do the calibration iteratively.
+        set!(dataset; step=step)
+        cal = Dict(k => DataFrame() for k in list!(set, dataset))
+
+        for year in set[:yr]
+            cal_yr = calibrate_regional(io, set, year;
+                zeropenalty=zeropenalty,
+                lower_bound=lower_bound,
+                upper_bound=upper_bound,
+                lower_bound_seds=lower_bound_seds,
+                upper_bound_seds=upper_bound_seds,
+            )
+            [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
+        end
+
+        write_build!(dataset, cal)
+    end
+    
+    return cal
+end
+
+
 function calibrate_regional(
     io::Dict,
     set::Dict,
     year::Int;
-    # zeropenalty::AbstractFloat=SLiDE.DEFAULT_PENALTY_NOKEY,
-    zeropenalty::AbstractFloat=1E7,
-    # !!!! define as SLiDE constants
-    lower_bound=0.25,
-    upper_bound=1.75,
-    lower_bound_seds=0.75,
-    upper_bound_seds=1.25,
+    zeropenalty=DEFAULT_CALIBRATE_ZEROPENALTY[:eem],
+    lower_bound=DEFAULT_CALIBRATE_BOUND[:eem,:lower],
+    upper_bound=DEFAULT_CALIBRATE_BOUND[:eem,:upper],
+    lower_bound_seds=DEFAULT_CALIBRATE_BOUND[:eem,:lower_seds],
+    upper_bound_seds=DEFAULT_CALIBRATE_BOUND[:eem,:upper_seds],
     optimize::Bool=true,
 )
     @info("Calibrating $year data")
 
-    SLiDE._calibration_set!(set; region=true, energy=true)
+    _calibration_set!(set; region=true, energy=true)
     d = _energy_calibration_input(io, set, year, Dict;
         lower_bound=lower_bound,
         upper_bound=upper_bound,
@@ -231,9 +262,9 @@ function calibrate_regional(
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     if optimize
         JuMP.optimize!(calib)
-        return calib
-        cal = SLiDE._calibration_output(calib, set, year; region=true)
+        cal = _calibration_output(calib, set, year; region=true)
         [cal[k] = filter_with(io[k],(yr=year,)) for k in setdiff(keys(io),keys(cal))]
+        return cal
         # return Dict{Any,Any}(cal)
     else
         return calib
@@ -270,12 +301,10 @@ function _energy_calibration_input(d, set, ::Type{T};
     upper_bound::Real=NaN,
     allow_negative::Bool=true,
 ) where T <: Union{DataFrame,Dict}
-
-    # Filter the DataFrame.
-    variables = setdiff(list!(set, Dataset(""; build="eem", step="calibrate")), list("taxes"))
+    variables = setdiff(SLiDE.list!(set, Dataset(""; build="eem", step="calibrate")), SLiDE.list("taxes"))
     variables_nat = [:ys0,:x0,:m0,:va0,:g0,:i0,:cd0]
     
-    [d[k] = SLiDE.drop_small(copy(d[k])) for k in variables]
+    [d[k] = drop_small(copy(d[k])) for k in variables]
     # ** Validated against bluenote
 
     # Calculate additional values for constraints.
@@ -291,16 +320,11 @@ function _energy_calibration_input(d, set, ::Type{T};
     # Set upper and lower bounds regardless, but do so *after* filling zeros (if required)
     # to save some time.
     T==Dict && [d[k] = fill_zero(df; with=set) for (k,df) in d]
-        # d = Dict(k => fill_zero(d[k]; with=set) for k in
-        #     [parameters; append.(:fvs,[:ld0,:kd0]); append.(variables_nat,:nat); :netgen])
-            # !!!! if d is already filtered, this shouldn't be necessary.
 
-    SLiDE.set_lower_bound!(d, setdiff(variables, [:ld0,:kd0,:yh0,:cd0]); factor=lower_bound)
-    SLiDE.set_upper_bound!(d, :i0; factor=upper_bound)
+    set_lower_bound!(d, setdiff(variables, [:ld0,:kd0,:yh0,:cd0]); factor=lower_bound)
+    set_upper_bound!(d, :i0; factor=upper_bound)
 
-    if T==Dict
-        d = Dict{Symbol,Dict}(k => convert_type(Dict, df) for (k,df) in d)
-    end
+    T==Dict && [d[k] = convert_type(Dict,df) for (k,df) in d]
 
     return d
 end

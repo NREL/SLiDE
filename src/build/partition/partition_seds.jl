@@ -9,7 +9,8 @@ This function prepares SEDS energy data for the EEM.
     3. CO2 Emissions - [`eem_co2emis!`](@ref)
 """
 function partition_seds(dataset::Dataset, d::Dict, set::Dict)
-    SLiDE.set!(dataset; build="eem", step="partition")
+    step = "partition"
+    SLiDE.set!(dataset; build="eem", step=step)
     maps = SLiDE.read_map()
 
     d_read = SLiDE.read_input!(dataset)
@@ -20,33 +21,206 @@ function partition_seds(dataset::Dataset, d::Dict, set::Dict)
 
         SLiDE.partition_elegen!(d, maps)
         SLiDE.partition_energy!(d, set, maps)
-        SLiDE.partition_co2emis!(d, set, maps)
+        # SLiDE.partition_co2emis!(d, set, maps)
 
-        d[:convfac] = SLiDE._module_convfac(d)
-        d[:cprice] = SLiDE._module_cprice!(d, maps)
-        d[:prodbtu] = SLiDE._module_prodbtu!(d, set)
-        d[:pedef] = SLiDE._module_pedef!(d, set, maps)
-        d[:pe0] = SLiDE._module_pe0!(d, set, maps)
-        d[:ps0] = SLiDE._module_ps0!(d)
-        d[:prodval] = SLiDE._module_prodval!(d, set, maps)
-        d[:shrgas] = SLiDE._module_shrgas!(d)
-        d[:netgen] = SLiDE._module_netgen!(d, maps)
-        d[:trdele] = SLiDE._module_trdele!(d)
-        d[:pctgen] = SLiDE._module_pctgen!(d, set)
-        d[:eq0] = SLiDE._module_eq0!(d, set)
-        d[:ed0] = SLiDE._module_ed0!(d, set, maps)
-        d[:emarg0] = SLiDE._module_emarg0!(d, set, maps)
-        d[:ned0] = SLiDE._module_ned0!(d)
+        d[:convfac] = SLiDE._partition_convfac(d)
+        d[:cprice] = SLiDE._partition_cprice!(d, maps)
+        d[:prodbtu] = SLiDE._partition_prodbtu!(d, set)
+        d[:pedef] = SLiDE._partition_pedef!(d, set, maps)
+        d[:pe0] = SLiDE._partition_pe0!(d, set, maps)
+        d[:ps0] = SLiDE._partition_ps0!(d)
+        d[:prodval] = SLiDE._partition_prodval!(d, set, maps)
+        d[:shrgas] = SLiDE._partition_shrgas!(d)
+        d[:netgen] = SLiDE._partition_netgen!(d, maps)
+        d[:trdele] = SLiDE._partition_trdele!(d)
+        d[:pctgen] = SLiDE._partition_pctgen!(d, set)
+        d[:eq0] = SLiDE._partition_eq0!(d, set)
+        d[:ed0] = SLiDE._partition_ed0!(d, set, maps)
+        d[:emarg0] = SLiDE._partition_emarg0!(d, set, maps)
+        d[:ned0] = SLiDE._partition_ned0!(d)
 
         # Drop units if they're not used later.
-        # x = Deselect([:units],"==")
-        # [d[k] = edit_with(d[k],x) for k in [:ed0,:emarg0,:ned0,:trdele,:pctgen,:netgen]]
         [select!(d[k], Not(:units)) for k in [:ed0,:emarg0,:ned0,:trdele,:pctgen,:netgen]]
+        SLiDE.write_build!(SLiDE.set!(dataset; step=step), copy(d))
     else
         merge!(d, d_read)
     end
     
     return d, set, maps
+end
+
+
+"""
+Electricity generation by source.
+```math
+\\bar{ele}_{yr,r,src,sec} = \\left\\{seds\\left( yr,r,src,sec \\right)
+\\;\\vert\\; yr, \\, r, \\, (ff,re) \\in src, \\, sec = ele \\right\\}
+```
+For fossil fuels, use heatrate to convert as follows:
+```math
+\\bar{ele}_{yr,r,ff\\in src,sec} \\text{ [billion kWh]}
+= 10^3 \\cdot
+\\dfrac{\\bar{ele}_{yr,r,ff\\in src,sec} \\text{ [trillion btu]}}
+      {\\bar{heatrate}_{yr,src} \\text{ [btu/kWh]}}
+```
+"""
+function partition_elegen!(d::Dict, maps::Dict)
+    println("  Generating electricity data set: elegen(yr,r,src)")
+
+    df = filter_with(d[:seds], maps[:elegen]; drop=:sec)
+
+    df = operate_over(df, d[:heatrate];
+        id=[:elegen,:heatrate] => :elegen,
+        units=maps[:operate]
+    )
+    ii = df[:,:complete]
+    df[ii,:value] .= df[ii,:factor] .* df[ii,:elegen] ./ df[ii,:heatrate]
+    
+    d[:elegen] = operation_output(df)
+    return d[:elegen]
+end
+
+
+"""
+```math
+\\bar{energy}_{yr,r,src,sec} = \\left\\{seds\\left( yr,r,src,sec \\right)
+\\;\\vert\\; yr, \\, r, \\, e \\in src, \\, ed \\in sec \\right\\}
+```
+
+[`SLiDE._partition_energy_supply`](@ref) adds supply information from the electricity
+generation dataset output by [`SLiDE.eem_elegen!`](@ref). The following functions are
+used to calculate values or make adjustments to values in the energy dataset.
+These operations must occur in the following order:
+1. [`SLiDE._partition_energy_ref`](@ref)
+2. [`SLiDE._partition_energy_ind`](@ref)
+3. [`SLiDE._partition_energy_price`](@ref)
+"""
+function partition_energy!(d::Dict, set::Dict, maps::Dict)
+    println("  Generating energy data set: energy(yr,r,src,sec)")
+    
+    df = copy(d[:seds])
+    df = filter_with(df, (src=set[:e], sec=set[:ed],))
+
+    df_elegen = _partition_energy_supply(d)
+    
+    df = _partition_energy_ref(df, maps)
+    df = _partition_energy_ind(df, set, maps)
+    df = _partition_energy_price(df, set, maps)
+
+    df = vcat(df, df_elegen; cols=:intersect)
+    df = indexjoin(df, filter_with(maps[:pq], (pq=["p","q"],)); kind=:inner)
+    
+    d[:energy] = dropzero(df)
+    return d[:energy]
+end
+
+
+"""
+```math
+\\bar{supply}_{yr,r,src=ele} = \\sum_{src} \\bar{ele}_{yr,r,src}
+```
+"""
+function _partition_energy_supply(d::Dict)
+    idx = DataFrame(src="ele", sec="supply")
+    df = combine_over(d[:elegen], :src)
+    df = indexjoin(idx, df)
+    return select(df, propertynames(d[:seds]))
+end
+
+
+"""
+```math
+\\bar{ref}_{yr,r,src=ele} \\text{ [billion kWh]}
+=
+\\bar{ref}_{yr,r,src=ele} \\text{ [trillion btu]}
+\\cdot
+\\dfrac{\\bar{ind}_{yr,r,src=ele} \\text{ [billion kWh]}}
+      {\\bar{ind}_{yr,r,src=ele} \\text{ [trillion btu]}}
+```
+"""
+function _partition_energy_ref(df::DataFrame, maps::Dict)
+    var, val = [:sec,:base], [:units,:value]
+
+    splitter = DataFrame(permute((
+        src = "ele",
+        sec = ["ind","ref"],
+        base = ["btu","kwh"],
+    )))
+    splitter = indexjoin(splitter, maps[:units]; kind=:left)
+
+    df, df_out = split_fill_unstack(df, splitter, var, val)
+
+    df[!,:ref_kwh] .= df[:,:ref_btu] .* (df[:,:ind_kwh] ./ df[:,:ind_btu])
+
+    return stack_append(df, df_out, var, val; ensure_finite=false)
+end
+
+
+"""
+```math
+\\bar{ind}_{yr,r,src=(ff,ele)}
+= \\bar{ind}_{yr,r,src=(ff,ele)}
+- \\bar{ref}_{yr,r,src=(ff,ele)}
+```
+"""
+function _partition_energy_ind(df::DataFrame, set::Dict, maps::Dict)
+    var, val = :sec, :value
+    
+    splitter = DataFrame(permute((
+        src = [set[:ff];"ele"],
+        sec = ["ind","ref"],
+        pq = "q",
+    )))
+    splitter = indexjoin(splitter, maps[:pq]; kind=:inner)
+
+    df, df_out = split_fill_unstack(df, splitter, var, val)
+
+    df[!,:ind] .= df[:,:ind] .- df[:,:ref]
+
+    return stack_append(df, df_out, var, val)
+end
+
+
+"""
+```math
+\\begin{aligned}
+\\bar{ff}_{yr,r,sec=ele} \\text{ [USD/million btu]}
+&= 10^3 \\cdot
+\\dfrac{\\bar{ff}_{yr,r,sec=ele} \\text{ [billion USD]}}
+      {\\bar{ff}_{yr,r,sec=ele} \\text{ [trillion btu]}}
+\\\\
+\\bar{ele}_{yr,r,sec} \\text{ [USD/thousand kWh]}
+&= 10^3 \\cdot
+\\dfrac{\\bar{ele}_{yr,r,sec} \\text{ [billion USD]}}
+      {\\bar{ele}_{yr,r,sec} \\text{ [billion kWh]}}
+\\end{aligned}
+```
+"""
+function _partition_energy_price(df::DataFrame, set::Dict, maps::Dict)
+    var, val = :pq, [:units,:value]
+    
+    splitter = vcat(
+        DataFrame(permute((src=set[:ff], sec="ele",     pq=["p","q","v"]))),
+        DataFrame(permute((src="ele",    sec=set[:sec], pq=["p","q","v"]))),
+    )
+    splitter = indexjoin(splitter, maps[:pq]; kind=:left)
+
+    df, df_out = split_fill_unstack(df, splitter, var, val)
+    col = propertynames(df)
+
+    df = operate_over(df;
+        id=[:v,:q]=>:p,
+        units=maps[:operate],
+    )
+
+    # Save the reported price. If no price was reported, use the calculated value instead.
+    df[!,:reported] .= df[:,:p]
+    df[!,:calculated] .= df[:,:factor] .* df[:,:v] ./ df[:,:q]
+
+    ii = isfinite.(df[:,:calculated])
+    df[ii,:p] .= df[ii,:calculated]
+
+    return stack_append(df[:,col], df_out, var, val; ensure_finite=false)
 end
 
 
@@ -61,7 +235,7 @@ conversion factor for USD per barrel ``\\longrightarrow`` USD per million btu
 \\right\\}
 ```
 """
-function _module_convfac(d::Dict)
+function _partition_convfac(d::Dict)
     println("  Partitioning convfac(yr,r), conversion factor for USD per barrel")
     return filter_with(d[:seds], (src="cru", sec="supply", units=BTU_PER_BARREL); drop=:sec)
 end
@@ -77,10 +251,10 @@ end
         {\\tilde{convfac}_{yr,r} \\text{ [million btu/barrel]}}
 ```
 """
-function _module_cprice!(d::Dict, maps::Dict)
+function _partition_cprice!(d::Dict, maps::Dict)
     println("  Partitioning cprice(yr,r), crude oil price")
 
-    df = operate_over(d[:crude_oil], SLiDE._module_convfac(d);
+    df = operate_over(d[:crude_oil], SLiDE._partition_convfac(d);
         id=[:usd_per_barrel,:btu_per_barrel]=>:usd_per_btu,
         units=maps[:operate],
     )
@@ -100,7 +274,7 @@ end
 \\right\\}
 ```
 """
-function _module_prodbtu!(d::Dict, set::Dict)
+function _partition_prodbtu!(d::Dict, set::Dict)
     println("  Partitioning prodbtu(yr,r,src)")
     d[:prodbtu] = filter_with(d[:seds], (src=set[:as], sec="supply", units=BTU); drop=:sec)
     return d[:prodbtu]
@@ -135,7 +309,7 @@ Average energy demand price ``\\tilde{pedef}_{yr,r,src}`` and its regional avera
       {\\sum_{r} \\sum_{sec} \\tilde{q}_{yr,r,src,sec}}
 ```
 """
-function _module_pedef!(d::Dict, set::Dict, maps::Dict)
+function _partition_pedef!(d::Dict, set::Dict, maps::Dict)
     println("  Partitioning pedef(yr,r,src), average energy demand price")
     var, val = :pq, [:units,:value]
 
@@ -162,8 +336,9 @@ end
 
 
 """
+`pe0(yr,r,src,sec)`
 """
-function _module_pe0!(d::Dict, set::Dict, maps::Dict)
+function _partition_pe0!(d::Dict, set::Dict, maps::Dict)
     println("  Partitioning pe0(yr,r,src,sec)")
     df_demsec = DataFrame(sec=set[:demsec])
     df_energy = filter_with(d[:energy], (src=set[:e], sec=set[:demsec]))
@@ -181,7 +356,7 @@ function _module_pe0!(d::Dict, set::Dict, maps::Dict)
     df = edit_with(df, Replace(:value, missing, "pedef value"))
 
     # Use annual EIA data for crude oil averages.
-    df_cprice = SLiDE._module_cprice!(d, maps)
+    df_cprice = SLiDE._partition_cprice!(d, maps)
 
     idx_q = filter_with(df_energy, (src="cru", pq="q"); drop=:pq)[:,1:end-2]
 
@@ -196,13 +371,14 @@ end
 
 
 """
+`ps0(yr,src)`
 \\begin{aligned}
 ps_{r,src} &= \\sum_{r,sec} pe_{yr,r,src,sec}
 \\\\
 ps_{r,src=cru} &= \\frac{1}{2}ps_{r,src=oil}
 \\end{aligned}
 """
-function _module_ps0!(d::Dict)
+function _partition_ps0!(d::Dict)
     println("  Partitioning ps0(yr,src)")
     var, val = :src, [:units,:value]
     splitter = DataFrame(src=["cru","oil"])
@@ -220,7 +396,7 @@ end
 """
 `prodval(yr,r,src)`
 """
-function _module_prodval!(d::Dict, set::Dict, maps::Dict)
+function _partition_prodval!(d::Dict, set::Dict, maps::Dict)
     println("  Partitioning prodval(yr,r,src)")
     
     df_ps0 = filter_with(d[:ps0], (src=set[:as],))
@@ -239,7 +415,7 @@ end
 """
 `shrgas(yr,r,src)`
 """
-function _module_shrgas!(d::Dict)
+function _partition_shrgas!(d::Dict)
     println("  Partitioning shrgas(yr,r,src)")
     df = copy(d[:prodval])
     df = df / transform_over(df, :src)
@@ -266,7 +442,7 @@ end
 """
 `netgen(yr,r), net interstate electricity flow`
 """
-function _module_netgen!(d::Dict, maps::Dict)
+function _partition_netgen!(d::Dict, maps::Dict)
     println("  Partitioning netgen(yr,r), net interstate electricity flow")
     # (1) Calculate for SEDS data
     df_ps0 = filter_with(d[:ps0], (src="ele",); drop=true)
@@ -300,7 +476,7 @@ end
 \\right\\}
 ```
 """
-function _module_trdele!(d::Dict)
+function _partition_trdele!(d::Dict)
     println("  Partitioning trdele(yr,r,g=ele,t), electricity imports-exports to/from U.S.")
     df = filter_with(d[:seds], (src="ele", sec=["imports","exports"], units=USD))
     d[:trdele] = edit_with(df, Rename.([:src,:sec],[:g,:t]))
@@ -309,8 +485,9 @@ end
 
 
 """
+`pctgen(yr,r,src,sec)`
 """
-function _module_pctgen!(d::Dict, set::Dict)
+function _partition_pctgen!(d::Dict, set::Dict)
     println("  Partitioning pctgen(yr,r,src,sec)")
     df_ele = copy(d[:elegen])
     df_ele = df_ele / transform_over(df_ele, :src)
@@ -330,6 +507,7 @@ end
 
 
 """
+`eq0(yr,r,src,sec)`
 ```math
 \\tilde{eq}_{yr,r,src,sec}
 = \\left\\{
@@ -337,7 +515,7 @@ end
 \\right\\}
 ```
 """
-function _module_eq0!(d::Dict, set::Dict)
+function _partition_eq0!(d::Dict, set::Dict)
     println("  Partitioning eq0(yr,r,src,sec)")
     df = filter_with(d[:energy], (src=set[:e], sec=set[:demsec], pq="q"); drop=true)
     df[!,:value] = max.(0, df[:,:value])
@@ -353,7 +531,7 @@ end
     {\\tilde{eq}_{yr,r,src,sec}}
 ```
 """
-function _module_ed0!(d::Dict, set::Dict, maps::Dict)
+function _partition_ed0!(d::Dict, set::Dict, maps::Dict)
     println("  Partitioning ed0(yr,r,src,sec)")
     idx_p = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:p))
     idx_q = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:q))
@@ -374,13 +552,14 @@ end
 
 
 """
+`emarg0(yr,r,src,sec)`
 ```math
 \\tilde{emarg}_{yr,r,src,sec} = \\dfrac
     {\\tilde{pe}_{yr,r,src,sec} - \\tilde{ps}_{yr,src}}
     {\\tilde{eq}_{yr,r,src,sec}}
 ```
 """
-function _module_emarg0!(d::Dict, set::Dict, maps::Dict)
+function _partition_emarg0!(d::Dict, set::Dict, maps::Dict)
     println("  Partitioning emarg0(yr,r,src,sec)")
     idx_p = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:p))
     idx_q = SLiDE._index_src_sec_pq!(d, set, maps, (:e,:demsec,:q))
@@ -404,11 +583,12 @@ end
 
 
 """
+`ned0(yr,r,src,sec)`
 ```math
 \\tilde{ned}_{yr,r,src,sec} = \\tilde{ed}_{yr,r,src,sec} - \\tilde{emarg}_{yr,r,src,sec}
 ```
 """
-function _module_ned0!(d::Dict)
+function _partition_ned0!(d::Dict)
     println("  Partitioning ned0(yr,r,src,sec)")
     d[:ned0] = d[:ed0] - d[:emarg0]
     return d[:ned0]
