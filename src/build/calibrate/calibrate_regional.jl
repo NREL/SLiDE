@@ -304,7 +304,7 @@ function _energy_calibration_input(d, set, ::Type{T};
     variables = setdiff(SLiDE.list!(set, Dataset(""; build="eem", step="calibrate")), SLiDE.list("taxes"))
     variables_nat = [:ys0,:x0,:m0,:va0,:g0,:i0,:cd0]
     
-    [d[k] = drop_small(copy(d[k])) for k in variables]
+    [d[k] = SLiDE.drop_small(copy(d[k])) for k in variables]
     # ** Validated against bluenote
 
     # Calculate additional values for constraints.
@@ -320,11 +320,11 @@ function _energy_calibration_input(d, set, ::Type{T};
     # Set upper and lower bounds regardless, but do so *after* filling zeros (if required)
     # to save some time.
     T==Dict && [d[k] = fill_zero(df; with=set) for (k,df) in d]
+    
+    SLiDE.set_lower_bound!(d, setdiff(variables, [:ld0,:kd0,:yh0,:cd0]); factor=lower_bound)
+    SLiDE.set_upper_bound!(d, :i0; factor=upper_bound)
 
-    set_lower_bound!(d, setdiff(variables, [:ld0,:kd0,:yh0,:cd0]); factor=lower_bound)
-    set_upper_bound!(d, :i0; factor=upper_bound)
-
-    T==Dict && [d[k] = convert_type(Dict,df) for (k,df) in d]
+    T==Dict && (d = Dict(k => convert_type(Dict,df) for (k,df) in d))
 
     return d
 end
@@ -343,6 +343,7 @@ function _energy_calibration_input(d, set, year, ::Type{T};
     )
     return d
 end
+
 
 # ----- JuMP SYNTAX (without SLiDE functions) ----------------------------------------------
 # @variables(calib, begin

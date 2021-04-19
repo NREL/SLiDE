@@ -6,7 +6,7 @@ function share_sector!(d, set; path::String=SCALE_BLUENOTE_IO)
     
     # Need to make sure set[:sector] !== set[:summary]
     weighting, mapping, lst = share_sector(set, set[:sector]; path=path)
-    d[:sector] = weighting
+    d = merge(d, Dict(:sector=>weighting))
 
     SLiDE.set_sector!(set, lst)
     return d[:sector]

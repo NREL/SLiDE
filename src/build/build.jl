@@ -1,4 +1,9 @@
 function build(dataset::Dataset)
+    if dataset.overwrite
+        @warn("overwriting data not yet supported. Setting overwrite=false.
+            Delete the directory data/$(dataset.name) to replace data.")
+        set!(build; overwrite=false)
+    end
     d, set = build_io(dataset)
     d, set = build_eem(dataset, d, set)
     return d, set
@@ -14,7 +19,7 @@ end
 
 
 """
-    build(dataset::Dataset)
+    build_io(dataset::Dataset)
 This function will execute the SLiDE buildstream and generate the parameters necessary to
 run the model. If the dataset has already been generated and saved, the function will read
 and return those values.
@@ -61,14 +66,14 @@ function build_eem(dataset::Dataset, d::Dict, set::Dict)
     if dataset.eem==true
         set!(dataset; build="eem", step=PARAM_DIR)
 
-        d = SLiDE.read_build(dataset)
-        set = SLiDE.read_set(dataset)
+        merge!(d, SLiDE.read_build(dataset))
+        merge!(set, SLiDE.read_set(dataset))
         
         if dataset.step=="input"
-            d, set = partition_bea(dataset, d, set)
-            d = calibrate_national(dataset, d, set)
-            d, set = share_region(dataset, d, set)
-            d, set = disaggregate_region(dataset, d, set)
+            d, set = scale_sector!(dataset, d, set)
+            d, set, maps = partition_seds(dataset, d, set)
+            d, set, maps = disaggregate_energy!(dataset, d, set, maps)
+            d = calibrate_regional(dataset, d, set)
 
             write_build!(set!(dataset; step=SLiDE.PARAM_DIR), d)
             write_build!(set!(dataset; step=SLiDE.SET_DIR), set)
