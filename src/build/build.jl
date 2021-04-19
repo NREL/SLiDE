@@ -6,6 +6,7 @@ function build(dataset::Dataset)
     end
     d, set = build_io(dataset)
     d, set = build_eem(dataset, d, set)
+    set_sector!(set, set[:sector])
     return d, set
 end
 
@@ -439,7 +440,7 @@ end
 """
 """
 function set_sector!(set::Dict, x::AbstractArray)
-    [set[k] = x for k in [:s,:g,:sector]]
+    [set[k] = string.(x) for k in [:s,:g,:sector]]
     return set
 end
 
