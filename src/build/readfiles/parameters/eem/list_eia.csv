@@ -1,0 +1,19 @@
+partition
+energy
+elegen
+ed0
+emarg0
+ned0
+netgen
+pctgen
+ps0
+shrgas
+trdele
+# --- unused in subsequent step(s) ---
+# convfac
+# cprice
+# eq0
+# pe0
+# pedef
+# prodbtu
+# prodval
