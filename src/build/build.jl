@@ -39,8 +39,8 @@ execute the four steps of the SLiDE buildstream via the following functions:
 - `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
 function build_io(dataset::Dataset)
-    set!(dataset; build="io", step=PARAM_DIR)
-    overwrite(dataset)
+    SLiDE.set!(dataset; build="io", step=PARAM_DIR)
+    SLiDE.overwrite(dataset)
 
     # !!!! PRINT DATASET INFO TO FILE IN DATA/NAME DIRECTORY
     d = SLiDE.read_build(dataset)
@@ -52,11 +52,11 @@ function build_io(dataset::Dataset)
         d, set = share_region(dataset, d, set)
         d, set = disaggregate_region(dataset, d, set)
 
-        write_build!(set!(dataset; step=SLiDE.PARAM_DIR), d)
-        write_build!(set!(dataset; step=SLiDE.SET_DIR), set)
+        SLiDE.write_build!(SLiDE.set!(dataset; step=SLiDE.PARAM_DIR), d)
+        SLiDE.write_build!(SLiDE.set!(dataset; step=SLiDE.SET_DIR), set)
     end
 
-    return d, set
+    return Dict{Any,Any}(d), Dict{Any,Any}(set)
 end
 
 
@@ -65,7 +65,7 @@ end
 function build_eem(dataset::Dataset, d::Dict, set::Dict)
     if dataset.eem==true
         set!(dataset; build="eem", step=PARAM_DIR)
-        
+
         merge!(d, SLiDE.read_build(dataset))
         merge!(set, SLiDE.read_set(dataset))
         
@@ -80,7 +80,7 @@ function build_eem(dataset::Dataset, d::Dict, set::Dict)
         end
     end
 
-    return d, set
+    return Dict{Any,Any}(d), Dict{Any,Any}(set)
 end
 
 

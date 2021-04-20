@@ -1,7 +1,7 @@
 function scale_sector!(dataset::Dataset, d::Dict, set::Dict; path::String=SCALE_EEM_IO)
     SLiDE.set!(dataset; step="scale")
     d, set = aggregate_sector!(d, set; path=path)
-    SLiDE.write_build!(dataset, d)
+    d = Dict{Any,Any}(SLiDE.write_build!(dataset, d))
     return d, set
 end
 
