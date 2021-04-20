@@ -112,10 +112,10 @@ function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary)
     d[:ys0] = filter_with(d[:supply], set)
 
     # In sectordisagg, the good/sector column names are switched...
-    if sector_level==:detail
-        x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
-        d[:ys0] = edit_with(d[:ys0], x)
-    end
+    # if sector_level==:detail
+    #     x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
+    #     d[:ys0] = edit_with(d[:ys0], x)
+    # end
     
     df = indexjoin(d[:ys0], d[:id0]; id=[:ys0,:id0])
     idx = findindex(df)
