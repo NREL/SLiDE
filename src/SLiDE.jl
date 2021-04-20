@@ -250,8 +250,8 @@ include(joinpath("scale", "scale_with.jl"))
 include(joinpath("model", "model_input.jl"))
 
 function __init__()
-
-    last_updated = Dates.DateTime("2021-01-20T00:00:00.0")
+    
+    last_updated = Dates.DateTime("2021-04-19T00:00:00.0")
     data = joinpath(SLiDE.SLIDE_DIR, "data")
     if isdir(data) && last_updated > Dates.unix2datetime(ctime(data))
         @warn("SLiDE input data has been updated.

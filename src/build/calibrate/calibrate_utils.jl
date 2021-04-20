@@ -201,7 +201,7 @@ end
 
 function _call_jump!(f::Function, model::Model; kwargs...)
     # var = [k for (k,v) in model.obj_dict if typeof(v) <: JuMP.Containers.DenseAxisArray]
-    var = _oftype_in(JuMP.Containers.DenseAxisArray, model)
+    var = _oftype_in(JuMP.Containers.DenseAxisArray{VariableRef}, model)
     for v in var
         println("Applying $f to $v")
         _call_jump!(f, model, v; kwargs...)
@@ -212,7 +212,7 @@ end
 
 function _call_jump!(f::Function, model::Model, var::InvertedIndex; kwargs...)
     var = setdiff(
-        _oftype_in(JuMP.Containers.DenseAxisArray, model),
+        _oftype_in(JuMP.Containers.DenseAxisArray{VariableRef}, model),
         ensurearray(var.skip),
     )
     for v in var
