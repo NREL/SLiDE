@@ -1,25 +1,25 @@
 function disaggregate_energy!(dataset, d, set, maps)
     step = "disaggregate"
-    d_read = read_build(set!(dataset; step=step))
+    d_read = SLiDE.read_build(SLiDE.set!(dataset; step=step))
 
     if dataset.step=="input"
         # Do some renaming here so we don't have to later.
         [d[k] = edit_with(d[k], Rename(:src,:g)) for k in [:ed0,:emarg0,:pctgen]]
 
         # Disaggregate.
-        _disaggregate_cng!(d, set, maps)
-        _disagg_energy_fvs!(d)
+        SLiDE._disaggregate_cng!(d, set, maps)
+        SLiDE._disagg_energy_fvs!(d)
 
         # Make individual adjustments.
-        _disagg_energy_md0!(d, set)
-        _disagg_energy_cd0!(d, set)
-        _disagg_energy_ys0!(d, set, maps)
-        _disagg_energy_id0!(d, set, maps)
-        _disagg_energy_m0!(d)
-        _disagg_energy_x0!(d)
+        SLiDE._disagg_energy_md0!(d, set)
+        SLiDE._disagg_energy_cd0!(d, set)
+        SLiDE._disagg_energy_ys0!(d, set, maps)
+        SLiDE._disagg_energy_id0!(d, set, maps)
+        SLiDE._disagg_energy_m0!(d)
+        SLiDE._disagg_energy_x0!(d)
 
         # Zero production.
-        _disagg_energy_zero_prod!(d)
+        SLiDE._disagg_energy_zero_prod!(d)
 
         # Update household disaggregation.
         SLiDE._disagg_hhadj!(d)

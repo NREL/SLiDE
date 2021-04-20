@@ -36,8 +36,8 @@ const DEFAULT_CALIBRATE_BOUND = Dict(
     (:io,:upper) => 5,
     (:eem,:lower) => 0.25,
     (:eem,:upper) => 1.75,
-    (:eem,:lower_seds) => 0.75,
-    (:eem,:upper_seds) => 1.25,
+    (:eem,:seds_lower) => 0.75,
+    (:eem,:seds_upper) => 1.25,
 )
 
 # NUMERICAL

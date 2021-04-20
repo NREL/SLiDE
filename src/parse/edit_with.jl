@@ -310,11 +310,12 @@ end
 
 # ----- EDIT FROM FILE ---------------------------------------------------------------------
 
-function edit_with(df::DataFrame, y::Dict, file::T; print_status::Bool=false) where T <: File
+function SLiDE.edit_with(df::DataFrame, y::Dict, file::T; print_status::Bool=false) where T <: File
     # Specify the order in which edits must occur and which of these edits are included
     # in the yaml file of defined edits.
-    EDITS = ["Deselect", "Rename", "OrderedGroup", "Group", "Concatenate", "Match", "Melt",
-        "Add", "Map", "Replace", "Drop", "Operate", "Combine", "Describe", "Order"]
+    EDITS = ["Deselect","Rename","OrderedGroup","Group","Concatenate","Match","Melt","Stack",
+        "Add","Map","Replace","Drop","Operate","Combine","Describe","Order",
+    ]
     KEYS = intersect(EDITS, collect(keys(y)))
     [df = edit_with(df, y[k], file; print_status=print_status) for k in KEYS]
     return df

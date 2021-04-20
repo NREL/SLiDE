@@ -6,7 +6,6 @@ function build(dataset::Dataset)
     end
     d, set = build_io(dataset)
     d, set = build_eem(dataset, d, set)
-    set_sector!(set, set[:sector])
     return d, set
 end
 
@@ -66,7 +65,7 @@ end
 function build_eem(dataset::Dataset, d::Dict, set::Dict)
     if dataset.eem==true
         set!(dataset; build="eem", step=PARAM_DIR)
-
+        
         merge!(d, SLiDE.read_build(dataset))
         merge!(set, SLiDE.read_set(dataset))
         
@@ -182,6 +181,10 @@ function write_build!(dataset::Dataset, d::Dict)
             [write_build(path, k, v) for (k,v) in d_write]
         end
     end
+
+    # sets s, g would have been filtered out when writing, but we want to make sure they are
+    # defined for subsequent steps.
+    dataset.step==SLiDE.SET_DIR && set_sector!(d, d[:sector])
     return d
 end
 
@@ -221,7 +224,7 @@ function read_set(build::String; sector_level::Symbol=:summary)
         @info("Reading sets from $path.")
         set = read_from(path)
 
-        # Define sectors from 
+        # Define sectors.
         if build=="io" && !haskey(set, :sector)
             if haskey(set, sector_level)
                 SLiDE.set_sector!(set, set[sector_level])
@@ -254,6 +257,7 @@ function read_set(dataset::Dataset)
     else
         SLiDE.read_set(dataset.build; sector_level=dataset.sector_level)
     end
+    dataset.build=="io" && SLiDE.set_sector!(set, set[:sector])
     return set
 end
 

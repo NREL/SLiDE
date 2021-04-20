@@ -39,13 +39,13 @@ function calibrate_national(dataset::Dataset, io::Dict, set::Dict;
 end
 
 
-function calibrate_national(
+function SLiDE.calibrate_national(
     io::Dict,
     set::Dict,
     year::Int;
-    zeropenalty=DEFAULT_CALIBRATE_ZEROPENALTY[:io],
-    lower_bound=DEFAULT_CALIBRATE_BOUND[:io,:lower],
-    upper_bound=DEFAULT_CALIBRATE_BOUND[:io,:upper],
+    zeropenalty=SLiDE.DEFAULT_CALIBRATE_ZEROPENALTY[:io],
+    lower_bound=SLiDE.DEFAULT_CALIBRATE_BOUND[:io,:lower],
+    upper_bound=SLiDE.DEFAULT_CALIBRATE_BOUND[:io,:upper],
 )
     @info("Calibrating $year data")
 
@@ -61,18 +61,20 @@ function calibrate_national(
     calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time"=>60.0))
     
     @variables(calib, begin
-        fd0[g in G, fd in FD], (start=d[:fd0][g,fd], lower_bound=d[:fd0_lb][g,fd], upper_bound=d[:fd0_ub][g,fd])
-        va0[va in VA, s in S], (start=d[:va0][va,s], lower_bound=d[:va0_lb][va,s], upper_bound=d[:va0_ub][va,s])
-        id0[g in G, s in S], (start=d[:id0][g,s], lower_bound=d[:id0_lb][g,s], upper_bound=d[:id0_ub][g,s])
-        ys0[s in S, g in G], (start=d[:ys0][s,g], lower_bound=d[:ys0_lb][s,g], upper_bound=d[:ys0_ub][s,g])
-        md0[m in M, g in G], (start=d[:md0][m,g], lower_bound=d[:md0_lb][m,g], upper_bound=d[:md0_ub][m,g])
-        ms0[g in G, m in M], (start=d[:ms0][g,m], lower_bound=d[:ms0_lb][g,m], upper_bound=d[:ms0_ub][g,m])
-        a0[g in G],  (start=d[:a0][g], lower_bound=d[:a0_lb][g],  upper_bound=d[:a0_ub][g])
-        m0[g in G],  (start=d[:m0][g], lower_bound=d[:m0_lb][g],  upper_bound=d[:m0_ub][g])
-        x0[g in G],  (start=d[:x0][g], lower_bound=d[:x0_lb][g],  upper_bound=d[:x0_ub][g])
-        y0[g in G],  (start=d[:y0][g], lower_bound=d[:y0_lb][g],  upper_bound=d[:y0_ub][g])
-        fs0[g in G], (start=d[:fs0][g],lower_bound=d[:fs0_lb][g], upper_bound=d[:fs0_ub][g])
+        fd0[g in G, fd in FD]>=0, (start=d[:fd0][g,fd])
+        va0[va in VA, s in S]>=0, (start=d[:va0][va,s])
+        id0[g in G, s in S]>=0, (start=d[:id0][g,s])
+        ys0[s in S, g in G]>=0, (start=d[:ys0][s,g])
+        md0[m in M, g in G]>=0, (start=d[:md0][m,g])
+        ms0[g in G, m in M]>=0, (start=d[:ms0][g,m])
+        a0[g in G]>=0,  (start=d[:a0][g])
+        m0[g in G]>=0,  (start=d[:m0][g])
+        x0[g in G]>=0,  (start=d[:x0][g])
+        y0[g in G]>=0,  (start=d[:y0][g])
+        fs0[g in G]>=0, (start=d[:fs0][g])
     end)
+
+    SLiDE.set_bounds!(calib; lower_factor=lower_bound, upper_factor=upper_bound, allow_negative=false)
     
     # --- DEFINE CONSTRAINTS ---------------------------------------------------------------
 
@@ -127,12 +129,12 @@ function calibrate_national(
     )
     
     # Fix "certain parameters" to their original values: fs0, va0, m0.
-    SLiDE.fix!(calib, d, :va0, set, (:va,:s))
-    SLiDE.fix!(calib, d, [:fs0,:m0], set, :g)
-    
     # Fix other/use sector output to zero.
-    SLiDE.fix!(calib, d, :ys0, [set[:oth,:use], G]; value=0)
-    
+    SLiDE.fix!(calib; condition=iszero)
+    SLiDE.fix!(calib, [:fs0,:m0,:va0])
+    SLiDE.fix!(calib, :ys0, [set[:oth,:use], G]; value=0)
+    # return calib
+
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     JuMP.optimize!(calib)
     
@@ -172,9 +174,6 @@ function _national_calibration_input(d, set;
 )
     variables = setdiff(list!(set, Dataset(""; build="io", step="calibrate")), list("taxes"))
 
-    # Fill zeros.
-    d = Dict(k => fill_zero(df; with=set) for (k,df) in d)
-    
     # Handle negatives.
     if haskey(d,:fd0)
         SLiDE.zero_negative!(d[:fd0], :fd=>"pce")
@@ -182,10 +181,8 @@ function _national_calibration_input(d, set;
     end
     SLiDE.zero_negative!(d, setdiff(variables, [:fd0]))
 
-    # Set bounds.
-    SLiDE.set_lower_bound!(d, variables; factor=lower_bound, allow_negative=allow_negative)
-    SLiDE.set_upper_bound!(d, variables; factor=upper_bound, allow_negative=allow_negative)
-
+    # Fill zeros.
+    d = Dict(k => fill_zero(df; with=set) for (k,df) in d)
     d = Dict{Symbol,Dict}(k => convert_type(Dict, df) for (k,df) in d)
     return d
 end
