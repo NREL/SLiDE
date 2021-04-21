@@ -60,7 +60,7 @@ y0,"[yr,g]",Gross output (net margin supply),billions of us dollars (USD),,natio
 yh0,"[yr,r,g]",Household production,billions of us dollars (USD),,regional,1,0,FALSE,0
 ys0,"[yr,r,s,g]",Sectoral supply (with byproducts),billions of us dollars (USD),,regional,1,1,FALSE,0
 fvs,"[yr,r,s,parameter]",Initial factor value shares in production,USD/USD,,,,,,
-netgen,"[yr,r,dataset]",Net interstate flows of electricity,"billion kilowatthours, billions of us dollars (USD)",,,,,,
+netgen,"[yr,r,dataset]",Net interstate flows of electricity,billions of us dollars (USD),,,,,,
 convfac,"[yr,r,src,units]",Conversion factor for USD per barrel to USD per million btu,,,,,,,
 cprice,"[yr,r,src,units]",Crude oil price,us dollars (USD) per million btu,,,,,,
 ed0,"[yr,r,src,sec]",,billions of us dollars (USD),,,,,,

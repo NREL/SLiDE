@@ -10,53 +10,18 @@
 # Returns
 - `d::Dict` of DataFrames containing the model data at the calibration step.
 """
-function calibrate_national(dataset::Dataset, io::Dict, set::Dict;
-    zeropenalty=DEFAULT_CALIBRATE_ZEROPENALTY[:io],
-    lower_bound=DEFAULT_CALIBRATE_BOUND[:io,:lower],
-    upper_bound=DEFAULT_CALIBRATE_BOUND[:io,:upper],
-)
-    step = "calibrate"
-    cal = SLiDE.read_build(SLiDE.set!(dataset; step=step))
-
-    if dataset.step=="input"
-        # Initialize a DataFrame to contain results and do the calibration iteratively.
-        SLiDE.set!(dataset; step=step)
-        cal = Dict(k => DataFrame() for k in list!(set, dataset))
-
-        for year in set[:yr]
-            cal_yr = calibrate_national(io, set, year;
-                zeropenalty=zeropenalty,
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-            )
-            [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
-        end
-
-        SLiDE.write_build!(dataset, cal)
-    end
-    
-    return cal
-end
-
-
-function SLiDE.calibrate_national(
+function calibrate_national(
     io::Dict,
     set::Dict,
     year::Int;
     zeropenalty=SLiDE.DEFAULT_CALIBRATE_ZEROPENALTY[:io],
-    lower_bound=SLiDE.DEFAULT_CALIBRATE_BOUND[:io,:lower],
-    upper_bound=SLiDE.DEFAULT_CALIBRATE_BOUND[:io,:upper],
+    lower_factor=SLiDE.DEFAULT_CALIBRATE_BOUND[:io,:lower],
+    upper_factor=SLiDE.DEFAULT_CALIBRATE_BOUND[:io,:upper],
 )
     @info("Calibrating $year data")
 
-    # Save relevant sets to simplify things a little.
+    d, set = _national_calibration_input(io, set, year, Dict)
     S, G, M, VA, FD = set[:s], set[:g], set[:m], set[:va], set[:fd]
-    
-    SLiDE._calibration_set!(set; final_demand=true, value_added=true)
-    d = SLiDE._national_calibration_input(io, set, year;
-        lower_bound=lower_bound,
-        upper_bound=upper_bound,
-    )
     
     calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time"=>60.0))
     
@@ -74,10 +39,9 @@ function SLiDE.calibrate_national(
         fs0[g in G]>=0, (start=d[:fs0][g])
     end)
 
-    SLiDE.set_bounds!(calib; lower_factor=lower_bound, upper_factor=upper_bound, allow_negative=false)
+    set_bounds!(calib; lower_factor=lower_factor, upper_factor=upper_factor, allow_negative=false)
     
     # --- DEFINE CONSTRAINTS ---------------------------------------------------------------
-
     # Zero profit conditions
     @constraints(calib, begin
         PROFIT_A[g in G], (
@@ -133,15 +97,17 @@ function SLiDE.calibrate_national(
     SLiDE.fix!(calib; condition=iszero)
     SLiDE.fix!(calib, [:fs0,:m0,:va0])
     SLiDE.fix!(calib, :ys0, [set[:oth,:use], G]; value=0)
-    # return calib
 
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     JuMP.optimize!(calib)
-    
     cal = SLiDE._calibration_output(calib, set, year; region=false)
     [cal[k] = filter_with(io[k],(yr=year,)) for k in setdiff(keys(io),keys(cal))]
     return cal
 end
+
+
+calibrate_national(args...; kwargs...) = calibrate(calibrate_national, args...; kwargs...)
+
 
 
 """
@@ -167,37 +133,24 @@ This function prepares the input for the calibration routine:
 # Returns
 - `d::Dict{Symbol, Dict}`: input *variables*
 """
-function _national_calibration_input(d, set;
-    lower_bound=SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND,
-    upper_bound=SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND,
-    allow_negative::Bool=false,
-)
+function _national_calibration_input(d, set)
     variables = setdiff(list!(set, Dataset(""; build="io", step="calibrate")), list("taxes"))
-
+    
     # Handle negatives.
     if haskey(d,:fd0)
-        SLiDE.zero_negative!(d[:fd0], :fd=>"pce")
-        SLiDE.zero_negative!(d[:fd0], :fd=>"C")
+        zero_negative!(d[:fd0], :fd=>"pce")
+        zero_negative!(d[:fd0], :fd=>"C")
     end
-    SLiDE.zero_negative!(d, setdiff(variables, [:fd0]))
+    
+    zero_negative!(d, Not(:fd0))
+    
+    # Finally, add appropriate index permutations to the set list.
+    _calibration_set!(set; final_demand=true, value_added=true)
 
-    # Fill zeros.
-    d = Dict(k => fill_zero(df; with=set) for (k,df) in d)
-    d = Dict{Symbol,Dict}(k => convert_type(Dict, df) for (k,df) in d)
-    return d
+    return d, set
 end
 
 
-function _national_calibration_input(d, set, year;
-    lower_bound=SLiDE.DEFAULT_CALIBRATE_LOWER_BOUND,
-    upper_bound=SLiDE.DEFAULT_CALIBRATE_UPPER_BOUND,
-    allow_negative::Bool=false,
-)
-    d = Dict(k => filter_with(df, (yr=year,); drop=true) for (k,df) in d)
-    d = _national_calibration_input(d, set;
-        lower_bound=lower_bound,
-        upper_bound=upper_bound,
-        allow_negative=allow_negative,
-    )
-    return d
+function _national_calibration_input(args...; kwargs...)
+    return _calibration_input(_national_calibration_input, args...; kwargs...)
 end

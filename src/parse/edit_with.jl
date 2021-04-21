@@ -492,8 +492,8 @@ function _map_with(df::DataFrame, df_map::DataFrame, x::Map)
 
     # Rename columns in the mapping DataFrame to temporary values in case any of these
     # columns were already present in the input DataFrame.
-    from = _generate_id(x.from, :from)
-    to = _generate_id(x.to, :to)
+    from = SLiDE._generate_id(x.from, :from)
+    to = SLiDE._generate_id(x.to, :to)
 
     df_map = unique(hcat(
         edit_with(df_map[:,x.from], Rename.(x.from, from)),
@@ -502,10 +502,10 @@ function _map_with(df::DataFrame, df_map::DataFrame, x::Map)
 
     # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
     # DataFrame are used since all values in each column should be of the same type.
-    if findtype(df[:,x.input]) !== findtype(df_map[:,from])
+    if SLiDE.findtype(df[:,x.input]) !== SLiDE.findtype(df_map[:,from])
         for (ii, ff) in zip(x.input, from)
             try
-                df[!,ii] .= convert_type.(findtype(df_map[:,ff]), df[:,ii])
+                df[!,ii] .= convert_type.(SLiDE.findtype(df_map[:,ff]), df[:,ii])
             catch
                 df[!,ii] .= convert_type.(String, df[:,ii])
                 df_map[!,ff] .= convert_type.(String, df_map[:,ff])
@@ -515,17 +515,22 @@ function _map_with(df::DataFrame, df_map::DataFrame, x::Map)
     
     join_cols = Pair.(x.input, from)
     
-    x.kind == :inner && (df = innerjoin(df, df_map, on=join_cols; makeunique=true))
-    x.kind == :outer && (df = outerjoin(df, df_map, on=join_cols; makeunique=true))
-    x.kind == :left  && (df = leftjoin(df, df_map,  on=join_cols; makeunique=true))
-    x.kind == :right && (df = rightjoin(df, df_map, on=join_cols; makeunique=true))
-    x.kind == :semi  && (df = semijoin(df, df_map,  on=join_cols; makeunique=true))
-    
-    # Remove all output column propertynames that might already be in the DataFrame.
-    # These will be overwritten by the columns from the mapping DataFrame. Finally,
-    # remane mapping "to" columns from their temporary to output values.
-    df = df[:, setdiff(propertynames(df), x.output)]
-    df = edit_with(df, Rename.(to, x.output))
+    if x.kind==:anti
+        df = antijoin(df, df_map,  on=join_cols; makeunique=true)
+    else
+        x.kind == :inner && (df = innerjoin(df, df_map, on=join_cols; makeunique=true))
+        x.kind == :outer && (df = outerjoin(df, df_map, on=join_cols; makeunique=true))
+        x.kind == :left  && (df = leftjoin(df, df_map,  on=join_cols; makeunique=true))
+        x.kind == :right && (df = rightjoin(df, df_map, on=join_cols; makeunique=true))
+        x.kind == :semi  && (df = semijoin(df, df_map,  on=join_cols; makeunique=true))
+        
+        # Remove all output column propertynames that might already be in the DataFrame.
+        # These will be overwritten by the columns from the mapping DataFrame. Finally,
+        # remane mapping "to" columns from their temporary to output values.
+        df = df[:, setdiff(propertynames(df), x.output)]
+        df = edit_with(df, Rename.(to, x.output))
+    end
+
     return df[:,cols]
 end
 

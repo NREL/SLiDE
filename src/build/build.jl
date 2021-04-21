@@ -41,8 +41,7 @@ execute the four steps of the SLiDE buildstream via the following functions:
 function build_io(dataset::Dataset)
     SLiDE.set!(dataset; build="io", step=PARAM_DIR)
     SLiDE.overwrite(dataset)
-
-    # !!!! PRINT DATASET INFO TO FILE IN DATA/NAME DIRECTORY
+    
     d = SLiDE.read_build(dataset)
     set = SLiDE.read_set(dataset)
     
@@ -61,6 +60,23 @@ end
 
 
 """
+    build_eem(dataset::Dataset)
+**If `dataset.eem=true`**, continue the SLiDE buildstream for the Energy-Environment Module.
+If the dataset has already been generated and saved, the function will read and return
+those values.
+
+Otherwise, it will execute the build routine via the following functions:
+1. [`SLiDE.scale_sector`](@ref)
+2. [`SLiDE.partition_seds`](@ref)
+3. [`SLiDE.disaggregate_energy!`](@ref)
+4. [`SLiDE.calibrate_regional`](@ref)
+
+# Arguments
+- `dataset::Dataset` identifier
+
+# Returns
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
 function build_eem(dataset::Dataset, d::Dict, set::Dict)
     if dataset.eem==true
@@ -173,6 +189,7 @@ function write_build!(dataset::Dataset, d::Dict)
     d_write = SLiDE.filter_build!(dataset, d)
 
     if !isempty(d_write)
+        # !!!! ?????? what is this conditional?
         if (dataset.step in SLiDE.BUILD_STEPS && dataset.save_build) ||
                 !(dataset.step in SLiDE.BUILD_STEPS)
             path = datapath(dataset)
@@ -303,35 +320,34 @@ end
 """
     read_input!(dataset::Dataset)
 Read input data for the specified `dataset.build/dataset.step` and set
-`dataset.step = "input"` to indicate further action is required.
+`dataset.step="input"` to indicate further action is required.
 
 # Arguments
 - `dataset::Dataset` identifier
 
 # Returns
-- `d::Dict` of input data.
+- `d::Dict` of input data. If `dataset.step` does not require input data, return Dict().
 """
 function read_input!(dataset::Dataset)
     d = Dict()
     
     if dataset.build=="io"
-        path = joinpath(SLIDE_DIR,"src","build","readfiles","input")
         dataset.step==SLiDE.PARAM_DIR && set!(dataset; step="partition")
-        dataset.step=="partition" && (path = joinpath(path, "$(dataset.sector_level).yml"))
-        dataset.step=="share" && (path = joinpath(path, "share.yml"))
+        
+        file = dataset.step=="partition" ? "$(dataset.sector_level).yml" : "$(dataset.step).yml"
+        path = joinpath(SLIDE_DIR,"src","build","readfiles","input",file)
 
         if isfile(path)
             merge!(d, read_from(path))
             [d[k] = edit_with(df, Deselect([:units],"==")) for (k,df) in d]
-
-            dataset.step=="partition" && push!(d, :sector=>dataset.sector_level)
-            dataset.step = "input"
         end
+
     elseif dataset.build=="eem"
         if dataset.step=="partition"
-            d = read_from(joinpath(SLIDE_DIR,"data","input","eia"))
+            merge!(d, read_from(joinpath(SLIDE_DIR,"data","input","eia")))
         end
     end
+
     dataset.step = "input"
     return d
 end

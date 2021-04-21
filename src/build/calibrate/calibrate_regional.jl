@@ -9,39 +9,6 @@
 # Returns
 - `d::Dict` of DataFrames containing the model data at the calibration step.
 """
-function calibrate_regional(dataset::Dataset, io::Dict, set::Dict;
-    zeropenalty=DEFAULT_CALIBRATE_ZEROPENALTY[:eem],
-    lower_factor=DEFAULT_CALIBRATE_BOUND[:eem,:lower],
-    upper_factor=DEFAULT_CALIBRATE_BOUND[:eem,:upper],
-    seds_lower_factor=DEFAULT_CALIBRATE_BOUND[:eem,:seds_lower],
-    seds_upper_factor=DEFAULT_CALIBRATE_BOUND[:eem,:seds_upper],
-)
-    step = "calibrate"
-    cal = read_build(set!(dataset; step=step))
-
-    if dataset.step=="input"
-        # Initialize a DataFrame to contain results and do the calibration iteratively.
-        set!(dataset; step=step)
-        cal = Dict(k => DataFrame() for k in list!(set, dataset))
-
-        for year in set[:yr]
-            cal_yr = calibrate_regional(io, set, year;
-                zeropenalty=zeropenalty,
-                lower_factor=lower_factor,
-                upper_factor=upper_factor,
-                seds_lower_factor=seds_lower_factor,
-                seds_upper_factor=seds_upper_factor,
-            )
-            [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
-        end
-
-        write_build!(dataset, cal)
-    end
-    
-    return cal
-end
-
-
 function calibrate_regional(
     io::Dict,
     set::Dict,
@@ -51,22 +18,19 @@ function calibrate_regional(
     upper_factor=SLiDE.DEFAULT_CALIBRATE_BOUND[:eem,:upper],
     seds_lower_factor=SLiDE.DEFAULT_CALIBRATE_BOUND[:eem,:seds_lower],
     seds_upper_factor=SLiDE.DEFAULT_CALIBRATE_BOUND[:eem,:seds_upper],
-    optimize::Bool=true,
 )
     @info("Calibrating $year data")
 
-    SLiDE._calibration_set!(set; region=true, energy=true)
-    d = SLiDE._energy_calibration_input(io, set, year, Dict)
-
+    d, set = _energy_calibration_input(io, set, year, Dict)
     S, G, M, R, NAT = set[:s], set[:g], set[:m], set[:r], set[:nat]
     
     calib = Model(optimizer_with_attributes(Ipopt.Optimizer, "max_cpu_time"=>120.0))
 
-    # ----- INITIALIZE VARIABLES -----------------------------------------------------------
+    # --- INITIALIZE VARIABLES -------------------------------------------------------------
     @variables(calib, begin
         # production
         ys0[r in R, s in S, g in G]>=0, (start=d[:ys0][r,s,g])
-        id0[r in R, s in G, g in S]>=0, (start=d[:id0][r,g,s])
+        id0[r in R, g in G, s in S]>=0, (start=d[:id0][r,g,s])
         ld0[r in R, s in S]>=0, (start=d[:ld0][r,s])
         kd0[r in R, s in S]>=0, (start=d[:kd0][r,s])
         # trade
@@ -95,7 +59,6 @@ function calibrate_regional(
 
     set_lower_bound!(calib, Not([:ld0,:kd0,:yh0,:cd0,:bopdef]); factor=lower_factor)
     set_upper_bound!(calib, :i0; factor=upper_factor)
-    # [set_upper_bound(i0[r,g], upper_bound*d[:i0][r,g]) for (r,g) in set[:r,:g] if d[:i0][r,g]!==0.0]
 
     # --- DEFINE CONSTRAINTS ---------------------------------------------------------------
 
@@ -228,58 +191,34 @@ function calibrate_regional(
         )
     )
 
-    # ----- SET BOUNDS AND FIX ZEROS -------------------------------------------------------
+    # --- SET BOUNDS AND FIX ZEROS ---------------------------------------------------------
     # Fix international electricity imports/exports to zero (subject to SEDS data).
-    # fix_lower_bound!(calib, [:x0,:m0], [R,"ele"]; factor=seds_lower_factor)
-    [d[:x0][r,"ele"]>0 ? set_lower_bound(x0[r,"ele"], seds_lower_factor*d[:x0][r,"ele"]) : fix(x0[r,"ele"],0,force=true) for r in R]
-    [d[:m0][r,"ele"]>0 ? set_lower_bound(m0[r,"ele"], seds_lower_factor*d[:m0][r,"ele"]) : fix(m0[r,"ele"],0,force=true) for r in R]
+    fix_lower_bound!(calib, [:x0,:m0], [R,"ele"]; factor=seds_lower_factor)
 
     # Adjust upper and lower bounds to allow SEDS data to shift.
-    # set_bounds!(calib, :cd0, set[:r,:e]; lower_factor=seds_lower_factor, upper_factor=seds_upper_factor)
-    # set_bounds!(calib, :ys0, set[:r,:e,:e]; lower_factor=seds_lower_factor, upper_factor=seds_upper_factor)
-    # set_bounds!(calib, :id0, set[:r,:e,:s]; lower_factor=seds_lower_factor, upper_factor=seds_upper_factor)
-    # set_bounds!(calib, :md0, set[:r,:m,:e]; lower_factor=seds_lower_factor, upper_factor=seds_upper_factor)
-    [set_lower_bound(cd0[r,e], seds_lower_factor*d[:cd0][r,e]) for (r,e) in set[:r,:e] if d[:cd0][r,e]!==0]
-    [set_lower_bound(ys0[r,e,e], seds_lower_factor*d[:ys0][r,e,e]) for (r,e) in set[:r,:e] if d[:ys0][r,e,e]!==0]
-    [set_lower_bound(id0[r,e,s], seds_lower_factor*d[:id0][r,e,s]) for (r,e,s) in set[:r,:e,:s] if d[:id0][r,e,s]!==0]
-    [set_lower_bound(md0[r,m,e], seds_lower_factor*d[:md0][r,m,e]) for (r,m,e) in set[:r,:m,:e] if d[:md0][r,m,e]!==0]
-
-    [set_upper_bound(cd0[r,e], seds_upper_factor*d[:cd0][r,e]) for (r,e) in set[:r,:e] if d[:cd0][r,e]!==0]
-    [set_upper_bound(ys0[r,e,e], seds_upper_factor*d[:ys0][r,e,e]) for (r,e) in set[:r,:e] if d[:ys0][r,e,e]!==0]
-    [set_upper_bound(id0[r,e,s], seds_upper_factor*d[:id0][r,e,s]) for (r,e,s) in set[:r,:e,:s] if d[:id0][r,e,s]!==0]
-    [set_upper_bound(md0[r,m,e], seds_upper_factor*d[:md0][r,m,e]) for (r,m,e) in set[:r,:m,:e] if d[:md0][r,m,e]!==0]
+    set_bounds!(calib, :cd0, set[:r,:e]; lower_factor=seds_lower_factor, upper_factor=seds_upper_factor)
+    set_bounds!(calib, :ys0, set[:r,:e,:e]; lower_factor=seds_lower_factor, upper_factor=seds_upper_factor)
+    set_bounds!(calib, :id0, set[:r,:e,:s]; lower_factor=seds_lower_factor, upper_factor=seds_upper_factor)
+    set_bounds!(calib, :md0, set[:r,:m,:e]; lower_factor=seds_lower_factor, upper_factor=seds_upper_factor)
 
     # Restrict some parameters to zero.
-    # fix!(calib, :id0, set[:r,:g,:e]; condition=iszero)
-    # fix!(calib, :ys0, set[:r,:e,:g]; condition=iszero)
-    # fix!(calib, :md0, set[:r,:m,:g]; condition=iszero)
-    # fix!(calib, [:dm0,:nm0], set[:r,:g,:m]; condition=iszero)
-    # fix!(calib, [:rx0,:yh0], set[:r,:g]; condition=iszero)
-    [fix(id0[r,g,e], 0, force=true) for (r,g,e) in set[:r,:g,:e] if d[:id0][r,g,e]==0]
-    [fix(ys0[r,e,g], 0, force=true) for (r,e,g) in set[:r,:e,:g] if d[:ys0][r,e,g]==0]
-    [fix(md0[r,m,g], 0, force=true) for (r,m,g) in set[:r,:m,:g] if d[:md0][r,m,g]==0]
-    [fix(nm0[r,g,m], 0, force=true) for (r,g,m) in set[:r,:g,:m] if d[:nm0][r,g,m]==0]
-    [fix(dm0[r,g,m], 0, force=true) for (r,g,m) in set[:r,:g,:m] if d[:dm0][r,g,m]==0]
-    [fix(rx0[r,g], 0, force=true) for (r,g) in set[:r,:g] if d[:rx0][r,g]==0]
-    [fix(yh0[r,g], 0, force=true) for (r,g) in set[:r,:g] if d[:yh0][r,g]==0]
+    fix!(calib, :id0, set[:r,:g,:e]; condition=iszero)
+    fix!(calib, :ys0, set[:r,:e,:g]; condition=iszero)
+    fix!(calib, :md0, set[:r,:m,:g]; condition=iszero)
+    fix!(calib, [:dm0,:nm0], set[:r,:g,:m]; condition=iszero)
+    fix!(calib, [:rx0,:yh0], set[:r,:g]; condition=iszero)
 
     # Set electricity imports from the national market to Alaska and Hawaii to zero.
-    # fix!(calib, [:nd0,:xn0], [["ak","hi"],"ele"]; value=0)
-    [fix(nd0[r,"ele"], 0, force=true) for r in ["ak","hi"]]
-    [fix(xn0[r,"ele"], 0, force=true) for r in ["ak","hi"]]
+    fix!(calib, [:nd0,:xn0], [["ak","hi"],"ele"]; value=0)
 
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
-    if optimize
-        JuMP.optimize!(calib)
-        cal = _calibration_output(calib, set, year; region=true)
-        [cal[k] = filter_with(io[k],(yr=year,)) for k in setdiff(keys(io),keys(cal))]
-        return cal
-        # return Dict{Any,Any}(cal)
-    else
-        return calib
-    end
-    # return calib
+    JuMP.optimize!(calib)
+    cal = SLiDE._calibration_output(calib, set, year; region=true)
+    [cal[k] = filter_with(io[k],(yr=year,)) for k in setdiff(keys(io),keys(cal))]
+    return cal
 end
+
+calibrate_regional(args...; kwargs...) = calibrate(calibrate_regional, args...; kwargs...)
 
 
 """
@@ -305,13 +244,12 @@ parameters will include ``yr`` only if `year` is included as an input parameter.
     `\\bar{yh}_{yr,r,g}`, and ``\\bar{cd}_{yr,r,g}``.
 6. (If `T==Dict`), convert to dictionary.
 """
-function _energy_calibration_input(d, set, ::Type{T}) where T <: Union{DataFrame,Dict}
+function _energy_calibration_input(d, set)
     variables = setdiff(SLiDE.list!(set, Dataset(""; build="eem", step="calibrate")), SLiDE.list("taxes"))
     variables_nat = [:ys0,:x0,:m0,:va0,:g0,:i0,:cd0]
     
     [d[k] = SLiDE.drop_small(copy(d[k])) for k in variables]
-    # ** Validated against bluenote
-
+    
     # Calculate additional values for constraints.
     d[:va0] = d[:ld0] + d[:kd0]
     [d[append(k,:nat)] = combine_over(d[k],:r) for k in variables_nat]
@@ -321,75 +259,13 @@ function _energy_calibration_input(d, set, ::Type{T}) where T <: Union{DataFrame
     # Set some values to zero.
     [d[k] = filter_with(d[k], Not(DataFrame(r=["ak","hi"],g="ele"))) for k in [:nd0,:xn0]]
 
-    # If returning a dictionary, fill zeros and convert output to a dictionary.
-    T==Dict && (d = Dict(k => convert_type(Dict, fill_zero(df; with=set)) for (k,df) in d))
+    # Finally, add appropriate index permutations to the set list.
+    _calibration_set!(set; region=true, energy=true)
 
-    return d
+    return d, set
 end
 
 
-function _energy_calibration_input(d, set, year, ::Type{T}) where T <: Union{DataFrame,Dict}
-    d = Dict(k => filter_with(df, (yr=year,); drop=true) for (k,df) in d)
-    d = _energy_calibration_input(d, set, T)
-    return d
+function _energy_calibration_input(args...; kwargs...)
+    return _calibration_input(_energy_calibration_input, args...; kwargs...)
 end
-
-
-# ----- JuMP SYNTAX (without SLiDE functions) ----------------------------------------------
-# @variables(calib, begin
-#     # production
-#     ys0[r in R, s in S, g in G], (start=d[:ys0][r,s,g], lower_bound=lower_factor*d[:ys0][r,s,g])
-#     id0[r in R, s in G, g in S], (start=d[:id0][r,g,s], lower_bound=lower_factor*d[:id0][r,g,s])
-#     ld0[r in R, s in S], (start=d[:ld0][r,s], lower_bound=0)
-#     kd0[r in R, s in S], (start=d[:kd0][r,s], lower_bound=0)
-#     # trade
-#     a0[r in R, g in G],  (start=d[:a0 ][r,g], lower_bound=lower_factor*d[:a0 ][r,g])
-#     nd0[r in R, g in G], (start=d[:nd0][r,g], lower_bound=lower_factor*d[:nd0][r,g])
-#     dd0[r in R, g in G], (start=d[:dd0][r,g], lower_bound=lower_factor*d[:dd0][r,g])
-#     m0[r in R, g in G],  (start=d[:m0 ][r,g], lower_bound=lower_factor*d[:m0 ][r,g])
-#     # supply
-#     s0[r in R, g in G],  (start=d[:s0 ][r,g], lower_bound=lower_factor*d[:s0 ][r,g])
-#     xd0[r in R, g in G], (start=d[:xd0][r,g], lower_bound=lower_factor*d[:xd0][r,g])
-#     xn0[r in R, g in G], (start=d[:xn0][r,g], lower_bound=lower_factor*d[:xn0][r,g])
-#     x0[r in R, g in G],  (start=d[:x0 ][r,g], lower_bound=lower_factor*d[:x0 ][r,g])
-#     rx0[r in R, g in G], (start=d[:rx0][r,g], lower_bound=lower_factor*d[:rx0][r,g])
-#     # demand
-#     yh0[r in R, g in G], (start=d[:yh0][r,g], lower_bound=0)
-#     cd0[r in R, g in G], (start=d[:cd0][r,g], lower_bound=0)
-#     i0[r in R, g in G],  (start=d[:i0 ][r,g], lower_bound=lower_factor*d[:i0 ][r,g], upper_bound=upper_bound*d[:i0][r,g])
-#     g0[r in R, g in G] , (start=d[:g0 ][r,g], lower_bound=lower_factor*d[:g0 ][r,g])
-#     # margin
-#     nm0[r in R, g in G, m in M], (start=d[:nm0][r,g,m], lower_bound=lower_factor*d[:nm0][r,g,m])
-#     dm0[r in R, g in G, m in M], (start=d[:dm0][r,g,m], lower_bound=lower_factor*d[:dm0][r,g,m])
-#     md0[r in R, m in M, g in G], (start=d[:md0][r,m,g], lower_bound=lower_factor*d[:md0][r,m,g])
-#     # balance of payments
-#     bopdef0[r in R] >= 0, (start=d[:bopdef0][r])
-# end)
-
-# ----- SET BOUNDS AND FIX ZEROS -----------------------------------------------------------
-# Fix international electricity imports/exports to zero (subject to SEDS data).
-# [d[:x0][r,"ele"]>0 ? set_lower_bound(x0[r,"ele"], seds_lower_factor*d[:x0][r,"ele"]) : fix(x0[r,"ele"],0,force=true) for r in R]
-# [d[:m0][r,"ele"]>0 ? set_lower_bound(m0[r,"ele"], seds_lower_factor*d[:m0][r,"ele"]) : fix(m0[r,"ele"],0,force=true) for r in R]
-
-# Adjust upper and lower bounds to allow SEDS data to shift.
-# [set_lower_bound(cd0[r,e], seds_lower_factor*d[:cd0][r,e]) for (r,e) in set[:r,:e]]
-# [set_upper_bound(cd0[r,e], seds_upper_factor*d[:cd0][r,e]) for (r,e) in set[:r,:e]]
-# [set_lower_bound(ys0[r,e,e], seds_lower_factor*d[:ys0][r,e,e]) for (r,e) in set[:r,:e]]
-# [set_upper_bound(ys0[r,e,e], seds_upper_factor*d[:ys0][r,e,e]) for (r,e) in set[:r,:e]]
-# [set_lower_bound(id0[r,e,s], seds_lower_factor*d[:id0][r,e,s]) for (r,e,s) in set[:r,:e,:s]]
-# [set_upper_bound(id0[r,e,s], seds_upper_factor*d[:id0][r,e,s]) for (r,e,s) in set[:r,:e,:s]]
-# [set_lower_bound(md0[r,m,e], seds_lower_factor*d[:md0][r,m,e]) for (r,m,e) in set[:r,:m,:e]]
-# [set_upper_bound(md0[r,m,e], seds_upper_factor*d[:md0][r,m,e]) for (r,m,e) in set[:r,:m,:e]]
-
-# Restrict some parameters to zero.
-# [fix(id0[r,g,e], 0, force=true) for (r,g,e) in set[:r,:g,:e] if d[:id0][r,g,e]==0]
-# [fix(ys0[r,e,g], 0, force=true) for (r,e,g) in set[:r,:e,:g] if d[:ys0][r,e,g]==0]
-# [fix(md0[r,m,g], 0, force=true) for (r,m,g) in set[:r,:m,:g] if d[:md0][r,m,g]==0]
-# [fix(nm0[r,g,m], 0, force=true) for (r,g,m) in set[:r,:g,:m] if d[:nm0][r,g,m]==0]
-# [fix(dm0[r,g,m], 0, force=true) for (r,g,m) in set[:r,:g,:m] if d[:dm0][r,g,m]==0]
-# [fix(rx0[r,g], 0, force=true) for (r,g) in set[:r,:g] if d[:rx0][r,g]==0]
-# [fix(yh0[r,g], 0, force=true) for (r,g) in set[:r,:g] if d[:yh0][r,g]==0]
-
-# Set electricity imports from the national market to Alaska and Hawaii to zero.
-# [fix(nd0[r,"ele"], 0, force=true) for r in ["ak","hi"]]
-# [fix(xn0[r,"ele"], 0, force=true) for r in ["ak","hi"]]

@@ -211,6 +211,7 @@ include(joinpath("utils", "fill_zero.jl"))
 include(joinpath("utils", "impute.jl"))
 include(joinpath("utils", "indexjoin.jl"))
 include(joinpath("utils", "label.jl"))
+include(joinpath("utils", "model.jl"))
 include(joinpath("utils", "utils.jl"))
 
 include(joinpath("parse", "edit_with.jl"))
@@ -228,7 +229,6 @@ include(joinpath("build", "partition", "partition_seds.jl"))
 # include(joinpath("build", "partition", "partition_co2emis.jl"))
 
 include(joinpath("build", "calibrate", "calibrate_io.jl"))
-include(joinpath("build", "calibrate", "calibrate_utils.jl"))
 include(joinpath("build", "calibrate", "calibrate_national.jl"))
 include(joinpath("build", "calibrate", "calibrate_regional.jl"))
 
@@ -246,8 +246,8 @@ include(joinpath("scale", "constructors.jl"))
 include(joinpath("scale", "scale_sector.jl"))
 include(joinpath("scale", "scale_with.jl"))
 
-
-include(joinpath("model", "model_input.jl"))
+include(joinpath("model", "_model_io.jl"))
+include(joinpath("model", "model_io.jl"))
 
 function __init__()
     

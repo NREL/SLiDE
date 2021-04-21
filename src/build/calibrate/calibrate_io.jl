@@ -1,3 +1,26 @@
+function calibrate(fun::Function, dataset::Dataset, io::Dict, set::Dict; kwargs...)
+    step = "calibrate"
+    cal = SLiDE.read_build(SLiDE.set!(dataset; step=step))
+
+    if dataset.step=="input"
+        # Initialize a DataFrame to contain results and do the calibration iteratively.
+        SLiDE.set!(dataset; step=step)
+        cal = Dict(k => DataFrame() for k in list!(set, dataset))
+        
+        for year in set[:yr]
+            cal_yr = fun(io, set, year; kwargs...)
+            [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
+        end
+
+        SLiDE.write_build!(dataset, cal)
+    end
+    
+    return cal
+end
+
+
+"""
+"""
 function _calibration_set!(set;
     region::Bool=false,
     energy::Bool=false,
@@ -36,6 +59,21 @@ function _calibration_set!(set;
     end
 
     return set
+end
+
+
+"""
+"""
+function _calibration_input(fun::Function, d, set, ::Type{T}) where T <: Union{DataFrame,Dict}
+    d, set = fun(d, set)
+    T==Dict && (d = Dict(k => convert_type(Dict, fill_zero(df; with=set)) for (k,df) in d))
+    return d, set
+end
+
+function _calibration_input(fun::Function, d, set, year, ::Type{T}
+) where T <: Union{DataFrame,Dict}
+    d = Dict(k => filter_with(df, (yr=year,); drop=true) for (k,df) in d)
+    return _calibration_input(fun, d, set, T)
 end
 
 

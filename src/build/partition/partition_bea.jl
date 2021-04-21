@@ -110,8 +110,8 @@ function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary)
     println("  Partitioning id0(yr,g,s) and ys0(yr,s,g), supply/demand data.")
     d[:id0] = filter_with(d[:use], set)
     d[:ys0] = filter_with(d[:supply], set)
-
-    # In sectordisagg, the good/sector column names are switched...
+    
+    # # In sectordisagg, the good/sector column names are switched...
     # if sector_level==:detail
     #     x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
     #     d[:ys0] = edit_with(d[:ys0], x)
