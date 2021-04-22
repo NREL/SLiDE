@@ -26,11 +26,13 @@ Build the SLiDE package from the Pkg REPL. Type `]` to enter the Pkg REPL and ru
 
 This will generate the `Manifest.toml` file, including the package dependencies. If the directory `SLiDE/data/` does not exist, this will download SLiDE input data.
 
-Precompile the SLiDE package and build the model input data by running:
+Precompile the SLiDE package and build the model input data by running the following lines
+in the terminal. Set `eem=true` to enable the Energy-Environment Module.
 
 ```julia
 julia> using SLiDE
-julia> (d, set) = build()
+julia> dataset = Dataset(; eem=true)
+julia> d, set = build(dataset)
 ```
 
 Reference [`build()` documentation](https://nrel.github.io/SLiDE/man/build/overview.html#SLiDE.build) for options.

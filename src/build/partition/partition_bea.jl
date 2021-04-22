@@ -106,13 +106,15 @@ Treat negative inputs as outputs:
 \\end{aligned}
 ```
 """
-function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary)
+function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary,
+    swap_ys0::Bool=false,
+)
     println("  Partitioning id0(yr,g,s) and ys0(yr,s,g), supply/demand data.")
     d[:id0] = filter_with(d[:use], set)
     d[:ys0] = filter_with(d[:supply], set)
     
     # # In sectordisagg, the good/sector column names are switched...
-    # if sector_level==:detail
+    # if sector_level==:detail && swap_ys0
     #     x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
     #     d[:ys0] = edit_with(d[:ys0], x)
     # end
@@ -129,8 +131,10 @@ function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary)
 end
 
 
-function _partition_ys0!(d::Dict, set::Dict; sector_level::Symbol=:summary)
-    !haskey(d, :ys0) && _partition_io!(d, set; sector_level=sector_level)
+function _partition_ys0!(d::Dict, set::Dict; sector_level::Symbol=:summary,
+    swap_ys0::Bool=false,
+)
+    !haskey(d, :ys0) && _partition_io!(d, set; sector_level=sector_level, swap_ys0=swap_ys0)
     return d[:ys0]
 end
 
@@ -403,9 +407,11 @@ end
 \\tilde{s}_{yr,s} = \\sum_{g}\\tilde{ys}_{yr,s,g}
 ```
 """
-function _partition_s0!(d::Dict, set::Dict)
+function _partition_s0!(d::Dict, set::Dict;
+    swap_ys0::Bool=false,
+)
     if !haskey(d,:s0)
-        _partition_ys0!(d, set)
+        _partition_ys0!(d, set; swap_ys0=swap_ys0)
 
         println("  Partitioning s0(yr,s), aggregate supply")
         d[:s0] = edit_with(combine_over(d[:ys0], :g), Rename(:s,:g))
@@ -596,9 +602,11 @@ from which some may be exported. Net out margin supply from output."
 \\tilde{y}_{yr,g} = \\sum_{s}\\tilde{ys}_{yr,s,g} + \\tilde{fd}_{yr,g} - \\sum_{m}\\tilde{ms}_{yr,g,m}
 ```
 """
-function _partition_y0!(d::Dict, set::Dict; sector_level::Symbol=:summary)
+function _partition_y0!(d::Dict, set::Dict; sector_level::Symbol=:summary,
+    swap_ys0::Bool=false,
+)
     if !haskey(d, :y0)
-        _partition_ys0!(d, set; sector_level=sector_level)
+        _partition_ys0!(d, set; sector_level=sector_level, swap_ys0=swap_ys0)
         _partition_fs0!(d, set; sector_level=sector_level)
         _partition_ms0!(d, set)
         

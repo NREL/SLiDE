@@ -69,7 +69,8 @@ Otherwise, it will execute the build routine via the following functions:
 1. [`SLiDE.scale_sector`](@ref)
 2. [`SLiDE.partition_seds`](@ref)
 3. [`SLiDE.disaggregate_energy!`](@ref)
-4. [`SLiDE.calibrate_regional`](@ref)
+4. [`SLiDE.partition_co2!`](@ref)
+5. [`SLiDE.calibrate_regional`](@ref)
 
 # Arguments
 - `dataset::Dataset` identifier
@@ -80,7 +81,7 @@ Otherwise, it will execute the build routine via the following functions:
 """
 function build_eem(dataset::Dataset, d::Dict, set::Dict)
     if dataset.eem==true
-        set!(dataset; build="eem", step=PARAM_DIR)
+        SLiDE.set!(dataset; build="eem", step=SLiDE.PARAM_DIR)
 
         merge!(d, SLiDE.read_build(dataset))
         merge!(set, SLiDE.read_set(dataset))
@@ -89,10 +90,11 @@ function build_eem(dataset::Dataset, d::Dict, set::Dict)
             d, set = scale_sector!(dataset, d, set)
             d, set, maps = partition_seds(dataset, d, set)
             d, set, maps = disaggregate_energy!(dataset, d, set, maps)
-            d = calibrate_regional(dataset, d, set)
+            # d = partition_co2!(d, set, maps)
+            d = SLiDE.calibrate_regional(dataset, d, set)
 
-            write_build!(set!(dataset; step=SLiDE.PARAM_DIR), d)
-            write_build!(set!(dataset; step=SLiDE.SET_DIR), set)
+            SLiDE.write_build!(set!(dataset; step=SLiDE.PARAM_DIR), d)
+            SLiDE.write_build!(set!(dataset; step=SLiDE.SET_DIR), set)
         end
     end
 

@@ -3,6 +3,7 @@ energy
 elegen
 ed0
 emarg0
+# eq0
 ned0
 netgen
 pctgen
@@ -12,7 +13,6 @@ trdele
 # --- unused in subsequent step(s) ---
 # convfac
 # cprice
-# eq0
 # pe0
 # pedef
 # prodbtu

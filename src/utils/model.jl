@@ -206,7 +206,8 @@ function fix!(model::Model, var::Symbol, idx::Tuple;
         fix(model[var][idx...], value, force=force)
     else
         value = SLiDE._start_value(model, var, idx)
-        condition(value) && SLiDE.fix!(model, var, idx; value=value)
+        # condition(value) && SLiDE.fix!(model, var, idx; value=value)
+        condition(value) && fix(model[var][idx...], value, force=force)
     end
     return nothing
 end
@@ -220,7 +221,8 @@ function fix!(model::Model, var::Symbol, idx::String;
         fix(model[var][idx], value, force=force)
     else
         value = SLiDE._start_value(model, var, idx)
-        condition(value) && SLiDE.fix!(model, var, idx; value=value)
+        # condition(value) && SLiDE.fix!(model, var, idx; value=value)
+        condition(value) && fix(model[var][idx], value, force=force)
     end
     return nothing
 end

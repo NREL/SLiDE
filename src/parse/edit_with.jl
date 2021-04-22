@@ -170,7 +170,7 @@ end
 
 
 function edit_with(df::DataFrame, x::Melt; file=nothing)
-    @warn("Melt <: Edit is depreciated. Use Stack instead.")
+    # !!!! @warn("Melt <: Edit is depreciated. Use Stack instead.")
     on = intersect(x.on, propertynames(df))
     df = melt(df, on, variable_name=x.var, value_name=x.val)
     df[!, x.var] .= convert_type.(String, df[:, x.var])

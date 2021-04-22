@@ -1,8 +1,9 @@
-function build_emissions!(d::Dict, set::Dict, maps::Dict)
+function partition_co2!(d::Dict, set::Dict, maps::Dict)
     _partition_co2emiss!(d, maps)
     _share_co2emiss!(d, set, maps)
-    _disagg_co2emiss!(d, set, maps)
-    return d[:secco2]
+    _partition_secco2!(d, set, maps)
+    _partition_resco2!(d)
+    return d
 end
 
 
@@ -24,7 +25,7 @@ function _partition_co2emiss!(d::Dict, maps::Dict)
         )
         df[!,:value] .= df[:,:factor] .* df[:,:co2_per_btu] .* df[:,:btu]
 
-        d[:co2emiss] = operation_output(df)
+        d[:co2emiss] = SLiDE.operation_output(df)
     end
 
     return d[:co2emiss]
@@ -48,7 +49,7 @@ function _share_co2emiss!(d::Dict, set::Dict, maps::Dict)
 end
 
 
-function _disagg_co2emiss!(d::Dict, set::Dict, maps::Dict)
+function _partition_secco2!(d::Dict, set::Dict, maps::Dict)
     col = [:r,:g,:s,:units,:value]
     xrename = Rename(:src,:g)
     xsec = [Map(maps[:demand],[:sec],[:s],[:sec],[:s],:inner), Deselect([:sec],"==")]
@@ -70,6 +71,12 @@ function _disagg_co2emiss!(d::Dict, set::Dict, maps::Dict)
     d[:secco2] = filter_with(d[:secco2], Not(_no_co2emiss!(d)))
 
     return d[:secco2]
+end
+
+
+function _partition_resco2!(d::Dict)
+    d[:resco2] = edit_with(filter_with(d[:co2emiss], (sec="res",); drop=true), Rename(:src,:g))
+    return d[:resco2]
 end
 
 
