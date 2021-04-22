@@ -291,6 +291,15 @@ end
 
 
 """
+"""
+function add_index!(set::Dict, x::Pair{Symbol,DataFrame}; fun::Function=identity)
+    key, df = x[1], x[2]
+    push!(set, key => listindex(fun(df), Array{Tuple}))
+    return set[key]
+end
+
+
+"""
 # Returns
 - `val::Array{Symbol,1}` of input DataFrame propertynames indicating values, which are
     defined as columns that DO contain `AbstractFloat` or `Bool` DataTypes.
@@ -301,9 +310,17 @@ findvalue(df::DataFrame) = [find_oftype(df, AbstractFloat); find_oftype(df, Bool
 """
 # Returns
 - `idx::Array{Symbol,1}` of input DataFrame propertynames indicating indices, which are
-    defined as columns that do NOT contain `AbstractFloat` or `Bool` DataTypes.
+defined as columns that do NOT contain `AbstractFloat` or `Bool` DataTypes.
+
+    findindex(df::DataFrame, ::Type{T})
 """
 findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
+
+
+"""
+"""
+listindex(df::DataFrame) = df[:,findindex(df)]
+listindex(df::DataFrame, ::Type{T}) where T<:Any = convert_type(T, listindex(df))
 
 
 """

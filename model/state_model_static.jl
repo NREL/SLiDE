@@ -16,13 +16,14 @@ using DataFrames
 ############
 
 #SLiDE data needs to be built or point to pre-existing build directory
-#can pass a name (d, set) = build_data("name_of_build_directory")
-!(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build("state_model"))
+#can pass a name: d, set = build(Dataset("name_of_build_directory"))
+!(@isdefined(d_in) && @isdefined(set_in)) && (d_in, set_in = build(Dataset("state_model")))
 d = copy(d_in)
 set = copy(set_in)
 
 bmkyr = 2016
-(sld, set, idx) = model_input(bmkyr, d, set)
+sld, set = SLiDE._model_input(d, set, bmkyr, Dict)
+S, G, M, R = set[:s], set[:g], set[:m], set[:r]
 
 ########## Model ##########
 cge = MCPModel();

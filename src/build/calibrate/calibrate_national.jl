@@ -14,9 +14,9 @@ function calibrate_national(
     io::Dict,
     set::Dict,
     year::Int;
-    zeropenalty=SLiDE.DEFAULT_CALIBRATE_ZEROPENALTY[:io],
-    lower_factor=SLiDE.DEFAULT_CALIBRATE_BOUND[:io,:lower],
-    upper_factor=SLiDE.DEFAULT_CALIBRATE_BOUND[:io,:upper],
+    zeropenalty=DEFAULT_CALIBRATE_ZEROPENALTY[:io],
+    lower_factor=DEFAULT_CALIBRATE_BOUND[:io,:lower],
+    upper_factor=DEFAULT_CALIBRATE_BOUND[:io,:upper],
 )
     @info("Calibrating $year data")
 
@@ -94,13 +94,13 @@ function calibrate_national(
     
     # Fix "certain parameters" to their original values: fs0, va0, m0.
     # Fix other/use sector output to zero.
-    SLiDE.fix!(calib; condition=iszero)
-    SLiDE.fix!(calib, [:fs0,:m0,:va0])
-    SLiDE.fix!(calib, :ys0, [set[:oth,:use], G]; value=0)
+    fix!(calib; condition=iszero)
+    fix!(calib, [:fs0,:m0,:va0])
+    fix!(calib, :ys0, [set[:oth,:use], G]; value=0)
 
     # --- OPTIMIZE AND SAVE RESULTS --------------------------------------------------------
     JuMP.optimize!(calib)
-    cal = SLiDE._calibration_output(calib, set, year; region=false)
+    cal = _calibration_output(calib, set, year; region=false)
     [cal[k] = filter_with(io[k],(yr=year,)) for k in setdiff(keys(io),keys(cal))]
     return cal
 end
@@ -142,7 +142,7 @@ function _national_calibration_input(d, set)
         zero_negative!(d[:fd0], :fd=>"C")
     end
     
-    zero_negative!(d, Not(:fd0))
+    zero_negative!(d, setdiff(variables,[:fd0]))
     
     # Finally, add appropriate index permutations to the set list.
     _calibration_set!(set; final_demand=true, value_added=true)

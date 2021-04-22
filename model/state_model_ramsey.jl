@@ -17,8 +17,8 @@ using DataFrames
 ############
 
 #SLiDE data needs to be built or point to pre-existing build directory
-#can pass a name (d, set) = build_data("name_of_build_directory")
-!(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build("state_model"))
+#can pass a name: d, set = build(Dataset("name_of_build_directory"))
+!(@isdefined(d_in) && @isdefined(set_in)) && (d_in, set_in = build(Dataset("state_model")))
 d = copy(d_in)
 set = copy(set_in)
 
@@ -38,7 +38,8 @@ isfirst = Dict(years[k] => (years[k] == yrf ? 1 : 0) for k in keys(years))
 yrint = Dict(years[k+1] => years[k+1]-years[k] for k in 1:(length(years)-1))
 
 #Load slide data and time horizon to produce model data and appropriate time-indexed subsets
-(sld, set, idx) = model_input(years, d, set)
+sld, set = SLiDE._model_input(d, set, years, Dict)
+S, G, M, R = set[:s], set[:g], set[:m], set[:r]
 
 
 ########## Model ##########
