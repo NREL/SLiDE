@@ -1,6 +1,6 @@
 name = "SLiDE"
 uuid = "2354c00b-e6a2-41d9-bf87-8a790e1eb718"
-authors = ["Maxwell Brown <maxwell.brown@nrel.gov>", "Caroline Hughes <caroline.hughes@nrel.gov>"]
+authors = ["Jonathon Becker <jon.becker@nrel.gov>", "Maxwell Brown <maxwell.brown@nrel.gov>", "Caroline Hughes <caroline.hughes@nrel.gov>"]
 version = "0.1.0"
 
 [deps]
