@@ -3,7 +3,7 @@
 
 # Arguments
 - `d::Dict` of DataFrames containing the model data.
-- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 
 # Keywords
 - `save_build = true`
@@ -113,7 +113,7 @@ function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary,
     d[:id0] = filter_with(d[:use], set)
     d[:ys0] = filter_with(d[:supply], set)
     
-    # # In sectordisagg, the good/sector column names are switched...
+    # In sectordisagg, the good/sector column names are switched...
     # if sector_level==:detail && swap_ys0
     #     x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
     #     d[:ys0] = edit_with(d[:ys0], x)
@@ -131,16 +131,14 @@ function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary,
 end
 
 
-function _partition_ys0!(d::Dict, set::Dict; sector_level::Symbol=:summary,
-    swap_ys0::Bool=false,
-)
-    !haskey(d, :ys0) && _partition_io!(d, set; sector_level=sector_level, swap_ys0=swap_ys0)
+function _partition_ys0!(d::Dict, set::Dict; kwargs...)
+    !haskey(d, :ys0) && _partition_io!(d, set; kwargs...)
     return d[:ys0]
 end
 
 
-function _partition_id0!(d::Dict, set::Dict; sector_level::Symbol=:summary)
-    !haskey(d, :id0) && _partition_io!(d, set; sector_level=sector_level)
+function _partition_id0!(d::Dict, set::Dict; kwargs...)
+    !haskey(d, :id0) && _partition_io!(d, set; kwargs...)
     return d[:id0]
 end
 
@@ -152,10 +150,10 @@ end
 \\tilde{a}_{yr,g} = \\sum_{fd}\\tilde{fd}_{yr,g,fd} + \\sum_{s}\\tilde{id}_{yr,g,s}
 ```
 """
-function _partition_a0!(d::Dict, set::Dict; sector_level::Symbol=:summary)
+function _partition_a0!(d::Dict, set::Dict; kwargs...)
     if !haskey(d,:a0)
-        _partition_fs0!(d, set; sector_level=sector_level)
-        _partition_id0!(d, set; sector_level=sector_level)
+        _partition_fs0!(d, set; kwargs...)
+        _partition_id0!(d, set; kwargs...)
 
         println("  Partitioning a0(yr,g), Armington supply")
         d[:a0] = combine_over(d[:fd0], :fd) + combine_over(d[:id0], :s)
@@ -237,7 +235,10 @@ end
 \\end{aligned}
 ```
 """
-function _partition_fd!(d::Dict, set::Dict; sector_level::Symbol=:summary)
+function _partition_fd!(d::Dict, set::Dict; sector_level::Symbol=:summary,
+    kwargs...,
+    # swap_ys0::Bool=false,
+)
     x = Rename(:s, :fd)
     d[:fd0] = filter_with(edit_with(d[:use],x), set)
     d[:fs0] = filter_with(d[:fd0], (fd=["pce","C"],); drop = true)
@@ -265,8 +266,8 @@ end
 \\tilde{fd}_{yr,g,fd} = \\max\\left\\{0, \\tilde{fd}_{yr,g,fd} \\right\\} \\;\\vert\\; yr,\\, g,\\, fd = pce \\right\\}
 ```
 """
-function _partition_fd0!(d::Dict, set::Dict; sector_level::Symbol=:summary)
-    !haskey(d,:fd0) && _partition_fd!(d, set; sector_level=sector_level)
+function _partition_fd0!(d::Dict, set::Dict; kwargs...)
+    !haskey(d,:fd0) && _partition_fd!(d, set; kwargs...)
     return d[:fd0]
 end
 
@@ -281,8 +282,8 @@ end
 \\tilde{fs}_{yr,g} = - \\min\\left\\{0, \\tilde{fs}_{yr,g} \\right\\}
 ```
 """
-function _partition_fs0!(d::Dict, set::Dict; sector_level::Symbol=:summary)
-    !haskey(d, :fs0) && _partition_fd!(d, set; sector_level=sector_level)
+function _partition_fs0!(d::Dict, set::Dict; kwargs...)
+    !haskey(d, :fs0) && _partition_fd!(d, set; kwargs...)
     return d[:fs0]
 end
 
@@ -302,7 +303,7 @@ Adjust transport margins according to CIF/FOB adjustments:
 \\;\\forall\\; g = ins
 ```
 """
-function _partition_m0!(d::Dict, set::Dict; sector_level::Symbol=:summary)
+function _partition_m0!(d::Dict, set::Dict; kwargs...)
     if !haskey(d, :m0)
         _partition_cif0!(d, set)
 
@@ -602,12 +603,12 @@ from which some may be exported. Net out margin supply from output."
 \\tilde{y}_{yr,g} = \\sum_{s}\\tilde{ys}_{yr,s,g} + \\tilde{fd}_{yr,g} - \\sum_{m}\\tilde{ms}_{yr,g,m}
 ```
 """
-function _partition_y0!(d::Dict, set::Dict; sector_level::Symbol=:summary,
-    swap_ys0::Bool=false,
+function _partition_y0!(d::Dict, set::Dict; sector_level::Symbol=:summary, kwargs...,
+    # swap_ys0::Bool=false,
 )
     if !haskey(d, :y0)
-        _partition_ys0!(d, set; sector_level=sector_level, swap_ys0=swap_ys0)
-        _partition_fs0!(d, set; sector_level=sector_level)
+        _partition_ys0!(d, set; sector_level=sector_level, kwargs...)
+        _partition_fs0!(d, set; sector_level=sector_level, kwargs...)
         _partition_ms0!(d, set)
         
         println("  Partitioning y0(yr,g), gross output")

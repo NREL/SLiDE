@@ -189,8 +189,6 @@ function convert_type(::Type{Mapping}, x::Weighting)
     return Mapping(unique(x.data[:,[x.from;x.to]]), x.from, x.to, x.on, x.direction)
 end
 
-# [@printf("%-8s %s\n", T, fieldpropertynames(T)[T.types .== Any]) for T in subtypes(Edit) if Any in T.types]
-
 """
     isarray(x::Any)
 Returns true/false if the the DataType or object is an array.
@@ -259,7 +257,7 @@ If the dictionary does not contiain all of the sets specified in `x`,
 the function will produce an error.
 
 # Arguments
-- `set::Dict` dictionary to update with permutations
+- `set::Dict` to update with permutations
 - `x::Tuple{Symbol,1}`: set keys to permute
 """
 function add_permutation!(set::Dict, x::Tuple)

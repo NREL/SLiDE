@@ -30,7 +30,8 @@ _inp_key(x::Parameter) = Symbol(x.parameter)
 _inp_key(x::String) = convert_type(Symbol, splitext(splitdir(x)[end])[1])
 
 _inp_key(x...) = _inp_key(vcat(ensurearray.(x)...))
-_inp_key(id, x::T) where T <: Scale = ismissing(id) ? x.direction : id
+_inp_key(id, scale::T) where T <: Scale = ismissing(id) ? scale.direction : id
+_inp_key(id, scale::T, x...) where T <: Scale = _inp_key(_inp_key(id,scale), ensurearray(x)...)
 
 """
 If no id is specified, default to `id = [x1,x2,...,xN]`

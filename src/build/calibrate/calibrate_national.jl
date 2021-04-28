@@ -4,7 +4,7 @@
 
 # Arguments
 - `d::Dict` of DataFrames containing the model data.
-- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 - `year::Int`: year for which to perform calibration
 
 # Returns

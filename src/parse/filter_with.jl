@@ -96,8 +96,9 @@ function filter_with(
     df = innerjoin(df, df_set, on = idx_set)
     
     if extrapolate
-        :yr in idx_set && (df = extrapolate_year(df, set; forward = forward, backward = backward))
-        :r in idx_set  && (df = extrapolate_region(df, r; overwrite = overwrite))
+        :yr in idx_set && (df = extrapolate_year(df, set; forward=forward, backward=backward))
+        # :yr in idx_set && (df = map_year(df, set; extrapolate=extrapolate))
+        :r in idx_set  && (df = extrapolate_region(df, r; overwrite=overwrite))
     end
 
     # If one of the filtered DataFrame columns contains only one unique value, drop it.
@@ -136,19 +137,13 @@ function filter_with(df::DataFrame, idx::InvertedIndex{DataFrame})
     return df
 end
 
+
 function filter_with(df::DataFrame, x::InvertedIndex{Weighting})
     x = x.skip
     dfx = unique(x.data[:,ensurearray(x.from)])
     df_not = antijoin(df, dfx, on=Pair.(x.on,x.from))
     return df_not
 end
-
-# function filter_with(df::DataFrame, x::InvertedIndex{Weighting})
-#     x = x.skip
-#     df_not = antijoin(df, x.data[:,[x.constant;x.from]],
-#         on=Pair.([x.constant;x.on],[x.constant;x.from]))
-#     return df_not
-# end
 
 
 function filter_with(df::DataFrame, x::InvertedIndex{Mapping})
@@ -391,7 +386,7 @@ end
 
 
 function extrapolate_year(df::DataFrame, set; backward::Bool=true, forward::Bool=true)
-    extrapolate_year(df, set[:yr]; forward = forward, backward = backward)
+    extrapolate_year(df, set[:yr]; forward=forward, backward=backward)
 end
 
 
@@ -445,7 +440,7 @@ julia> map_year([2007,2012] => 2005:2015)
 ```
 """
 function map_year(from::AbstractArray, to::AbstractArray; fun=Statistics.mean, extrapolate=true)
-
+    
     if !extrapolate
         to = intersect(ensurearray(to), intersect(from))
         isempty(to) && (return DataFrame())
@@ -467,6 +462,7 @@ function map_year(from::AbstractArray, to::AbstractArray; fun=Statistics.mean, e
     return df
 end
 
+
 function map_year(from::AbstractArray, to::Integer; fun=Statistics.mean, extrapolate=true)
     df = DataFrame(to=to)
 
@@ -478,14 +474,37 @@ function map_year(from::AbstractArray, to::Integer; fun=Statistics.mean, extrapo
     return df[:,[:from,:to]]
 end
 
-function map_year(scheme::Pair; fun=Statistics.mean, extrapolate=true)
-    return map_year(scheme[1], scheme[2]; fun=fun, extrapolate=extrapolate)
-end
 
-function map_year(df::DataFrame, x; extrapolate=true)
-    dfmap = map_year(unique(df[:,:yr]), x; extrapolate=extrapolate)
+map_year(scheme::Pair; kwargs...) = map_year(scheme[1], scheme[2]; kwargs...)
+
+
+function map_year(df::DataFrame, years::Union{Integer,AbstractArray}; kwargs...)
+    dfmap = map_year(unique(df[:,:yr]), years; kwargs...)
     df = edit_with(df, Map(dfmap,[:from],[:to],[:yr],[:yr],:outer))
     return df
+end
+
+
+function map_year(df::DataFrame, set; kwargs...)
+    haskey(set,:yr) && (df = map_year(df, set[:yr]; kwargs...))
+    return df
+end
+
+
+"""
+"""
+function map_year!(scale::T, years; kwargs...) where T<:Scale
+    if :yr in propertynames(scale.data)
+        set_data!(scale, map_year(scale.data, unique(years); kwargs...))
+    end
+    return scale
+end
+
+function map_year!(scale::T, df::DataFrame; kwargs...) where T<:Scale
+    if :yr in propertynames(df)
+        map_year!(scale, unique(df[:,:yr]); kwargs...)
+    end
+    return scale
 end
 
 

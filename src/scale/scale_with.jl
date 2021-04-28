@@ -26,12 +26,20 @@ function scale_with(df::DataFrame, x::Mapping)
 end
 
 
-scale_with(df::DataFrame, x::Missing) = df
+function scale_with(lst::AbstractArray, x::Mapping)
+    x = SLiDE.compound_for(x, lst, lst)
+    return unique(SLiDE.scale_with(DataFrame(x.on=>lst), x)[:,1])
+end
+
+scale_with(lst, x::Weighting) = SLiDE.scale_with(lst, convert_type(Mapping,x))
+
+scale_with(df::DataFrame, x::Union{Missing,Nothing}) = df
+
+
 
 
 """
     filter_with!(weighting::Weighting, lst::AbstractArray)
-
     filter_with!(mapping::Mapping, weighting::Weighting)
 
     filter_with!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
@@ -70,6 +78,7 @@ function filter_with!(mapping::Mapping, weighting::Weighting)
 end
 
 function filter_with!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
+    # !!!! MAKE SURE ZEROS ARE FILLED HERE.
     weighting, lst = filter_with!(weighting, lst)
     mapping = filter_with!(mapping, weighting)
     return weighting, mapping, lst

@@ -60,23 +60,23 @@ find_sector(df::DataFrame) = find_sector(propertynames(df))
 
 
 """
-Defines [`SLiDE.Weighting`](@ref) field `constant` if `on` is already defined.
+Define the [`SLiDE.Weighting`](@ref) field `constant` if `on` is already defined.
 """
 function set_constant!(x::Weighting)
     idx = findindex(x.data)
     field = ensurearray(x.on)
-    !isempty(intersect(idx, field)) && (x.constant = setdiff(idx, field))
+    !isempty(intersect(idx, field)) && set_constant!(x, setdiff(idx, field))
     return x
 end
 
 
 """
-Defines [`SLiDE.Weighting`](@ref) field `on` if `constant` is already defined.
+Define the [`SLiDE.Weighting`](@ref) field `on` if `constant` is already defined.
 """
 function set_on!(x::Weighting)
     idx = findindex(x.data)
     field = x.constant
-    !isempty(intersect(idx, field)) && (x.on = setdiff(idx, field))
+    !isempty(intersect(idx, field)) && set_on!(x, setdiff(idx, field))
     return x
 end
 
@@ -117,15 +117,10 @@ end
 map_direction(x::Mapping) = map_direction(x.data)
 map_direction(x::Weighting) = map_direction(convert_type(Mapping, x))
 
-# function map_direction(x::T) where T <: Scale
-#     return x.direction == :disaggregate ? (x.from, x.to) : (x.to, x.from)
-# end
-
 
 """
 """
 function set_direction!(x::T) where T <: Scale
-    # agg, dis = map_direction(x.data[:, [x.from;x.to]])
     agg, dis = map_direction(x)
     x.direction = (x.from==agg && x.to==dis) ? :disaggregate : :aggregate
     return x.direction
@@ -134,7 +129,7 @@ end
 
 """
     set_scheme!(mapping::Mapping)
-Defines `Mapping` and/or `Weighting` fields `from` and `to` if `direction` is already defined
+Define `Mapping` and/or `Weighting` fields `from` and `to` if `direction` is already defined.
 
     set_scheme!(mapping::Mapping, weighting::Weighting)
     set_scheme!(weighting::Weighting, mapping::Mapping)
@@ -225,25 +220,21 @@ end
 
 
 """
-    compound_for(x::Weighting, df::DataFrame, lst::AbstractArray)
-    compound_for(x::Weighting, df::DataFrame, lst::AbstractArray)
-    compound_for(x::T, col::Symbol) where T<:Scale
+    compound_for(x::T, lst::AbstractArray, df::DataFrame)
+    compound_for(x::T, lst::AbstractArray)
 """
-function compound_for(x::T, df::DataFrame, lst::AbstractArray) where T <: Scale
-    return compound_for!(copy(x), df, lst)
+function compound_for(x::T, lst::AbstractArray, df::DataFrame) where T<:Scale
+    return compound_for!(copy(x), lst, df)
 end
 
-function compound_for(x::T, col, lst::AbstractArray) where T <: Scale
-    return compound_for!(copy(x), col, lst)
+function compound_for(x::T, lst::AbstractArray) where T<:Scale
+    return compound_for!(copy(x), lst)
 end
-
-compound_for(x::T, col::Symbol) where T <: Scale = compound_for!(copy(x), col)
 
 
 """
-    compound_for!(x::Weighting, col)
-    compound_for!(x::Weighting, col, lst::AbstractArray)
-    compound_for!(x::Weighting, df::DataFrame, lst::AbstractArray)
+    compound_for!(x::T, lst::AbstractArray)
+    compound_for!(x::T, lst::AbstractArray, df::DataFrame)
 This function maps `x.data` to disaggregate variables (`ys0`, `id0`) that include both
 goods and sectors:
 
@@ -262,55 +253,37 @@ generates a dataframe with these sharing parameters through the following proces
     - If ``g = s``, sum all of the share values.
     - If ``g\\neq s``, drop these values.
 """
-function compound_for!(x::T, col::AbstractArray, lst::AbstractArray) where T <: Scale
-    if length(col)>2
+function compound_for!(x::T, lst::AbstractArray) where T<:Scale
+    if !SLiDE.isarray(x.on) || length(x.on)==1
+        return x
+    elseif length(x.on)>2
         @error("Can only compound, at most, two columns.")
-    elseif length(col)==1
-        x = compound_for!(x, col[1])
     else
         df = x.data
-        df_ones = map_identity(x, lst)
+        df_ones = SLiDE.map_identity(x, lst)
         df_all = vcat(df, df_ones)
 
         # Define edits and update fields.
-        xedit = Dict(k => Rename.([x.from;x.to], append.([x.from;x.to],k)) for k in col)
-        x.from = append.(x.from, col)
-        x.to = append.(x.to, col)
-        x.on = col
+        xedit = Dict(k => Rename.([x.from;x.to], append.([x.from;x.to],k)) for k in x.on)
+        set_from!(x, append.(x.from, x.on))
+        set_to!(x, append.(x.to, x.on))
 
-        x.data = _compound_with(x, df, df_ones, xedit)
+        x.data = SLiDE._compound_with(x, df, df_ones, xedit)
     end
     return x
 end
 
-function compound_for!(x::T, df::DataFrame, lst) where T <: Scale
-    compound_for!(x, findindex(df), lst)
-    set_scheme!(x, df)
+function compound_for!(x::T, lst, df::DataFrame) where T<:Scale
+    compound_for!(x, lst)
+    map_year!(x, df)
+    SLiDE.set_scheme!(x, df)
     return x
 end
 
-function compound_for!(x::T, df::DataFrame) where T <: Scale
-    idx = findindex(df)
-    compound_for!(x, df[:,idx], list_unique(df,idx))
-    return x
+function compound_for(x::T, lst::AbstractArray, setlst::AbstractArray) where T<:Scale
+    (SLiDE.isarray(x.on) && length(x.on)==1) && set_on!(x, x.on[1])
+    return SLiDE.compound_for(convert_type(Mapping,x), lst, DataFrame(x.on=>setlst))
 end
-
-function compound_for!(x::T, col::Symbol) where T <: Scale
-    x.on = col
-    return x
-end
-
-function compound_for!(x::Mapping, col::AbstractArray)
-    if length(col)==1
-        compound_for!(x, col[1])
-    else
-        @error("Can only compound type Mapping for one column (by renaming)")
-    end
-    return x
-end
-
-compound_for!(x::T, col::Symbol, lst::AbstractArray) where T <: Scale = compound_for!(x, col)
-compound_for!(x::T, col::Missing, lst::AbstractArray)  where T <: Scale = missing
 
 
 """

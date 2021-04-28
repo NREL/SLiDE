@@ -4,7 +4,7 @@ This function prepares the SLiDE dataset and set lists for modeling.
 
 # Arguments
 - `d::Dict{Symbol,DataFrame}` of DataFrames containing the model data.
-- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 - `year::Int` or `yr::AbstractArray`: year(s) for which to perform calibration
 
 # Returns
@@ -46,7 +46,7 @@ non-zero values when mapping zero-profit and market-clearing conditions.
 
 # Arguments
 - `d::Dict{Symbol,DataFrame}` of DataFrames containing the model data.
-- `set::Dict` of Arrays describing region, sector, final demand, etc.
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 
 # Returns
 - `d::Dict{Symbol,Dict}` of model data with all zeros filled

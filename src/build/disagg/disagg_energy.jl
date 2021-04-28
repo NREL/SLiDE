@@ -34,7 +34,7 @@ end
 """
 function _disaggregate_cng!(d, set, maps)
     weighting, mapping = SLiDE.share_with(Weighting(d[:shrgas]), Mapping(maps[:cng]))
-    disaggregate_sector!(d, set, weighting; scale_id=:cng)
+    disaggregate_sector!(d, set, weighting; label=:cng)
     maps[:demand] = filter_with(maps[:demand], (s=set[:sector],))
     return d, set
 end

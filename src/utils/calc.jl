@@ -109,22 +109,24 @@ function combine_over(
     df::DataFrame,
     col::Array{Symbol,1};
     fun::Function=sum,
-    digits=DEFAULT_ROUND_DIGITS,
+    digits=SLiDE.DEFAULT_ROUND_DIGITS,
 )
     # !!!! add kwarg to findvalue to indicate whether to include integers as values
     val = findvalue(df)
-    idx_by = setdiff(propertynames(df), [col; val])
-    
-    df = combine(groupby(df, idx_by), val .=> fun .=> val)
-    
-    if digits!==false
-        [df[!,ii] .= round.(df[:,ii]; digits=digits)
-            for ii in find_oftype(df[:,val], AbstractFloat)]
+    if !isempty(val)
+        idx_by = setdiff(propertynames(df), [col; val])
+        
+        df = combine(groupby(df, idx_by), val .=> fun .=> val)
+        
+        if digits!==false
+            [df[!,ii] .= SLiDE.round.(df[:,ii]; digits=digits)
+                for ii in find_oftype(df[:,val], AbstractFloat)]
+        end
+        
+        # !!!! See where we actually want to convert boolean sums to integers. I think it's just
+        # in some labor sharing. We can probably keep summed booleans as integers. This seems less confusing.
+        [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
     end
-    
-    # !!!! See where we actually want to convert boolean sums to integers. I think it's just
-    # in some labor sharing. We can probably keep summed booleans as integers. This seems less confusing.
-    [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
     return df
 end
 

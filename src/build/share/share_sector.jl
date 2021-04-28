@@ -1,22 +1,28 @@
 """
     share_sector!()
+# Arguments
+- `d::Dict` of model parameters
 """
-function share_sector!(d, set; path::String=SCALE_BLUENOTE_IO)
-    @info("Sharing sector.")
+function share_sector!(d, set; kwargs...)
+    weighting, mapping, lst = share_sector(set[:sector]; kwargs...)
     
-    # Need to make sure set[:sector] !== set[:summary]
-    weighting, mapping, lst = share_sector(set, set[:sector]; path=path)
-    d = merge(d, Dict(:sector=>weighting))
-
-    SLiDE.set_sector!(set, lst)
-    return d[:sector]
+    push!(d, :sector=>weighting.data)
+    set_sector!(set, lst)
+    
+    return weighting
 end
 
 
 """
     share_sector(set::Dict)
+
+# Returns
+- `weighting::Weighting`
+- `mapping::Mapping`
 """
-function share_sector(set::Dict; path::String=SCALE_BLUENOTE_IO)
+function share_sector( ; path::String=SCALE_BLUENOTE_IO)
+    @info("Sharing sector using mapping in $path.")
+
     sector_level = :detail
     dfmap = read_file(path)[:,1:2]
 
@@ -27,22 +33,12 @@ function share_sector(set::Dict; path::String=SCALE_BLUENOTE_IO)
     df = SLiDE._partition_y0!(det, set_det; sector_level=sector_level)
     
     # Initialize scaling information.
-    weighting, mapping = SLiDE.share_with(Weighting(df), Mapping(dfmap))
-    # weighting = Weighting(df)
-    # mapping = Mapping(dfmap)
-    
-    # SLiDE.set_scheme!(weighting, mapping)
-    # SLiDE.share_with!(weighting, mapping)
-    
-    # !!!! MAP YEAR WHEN COMPOUNDING
-    weighting.data = SLiDE.map_year(weighting.data, set[:yr])
-
-    return weighting, mapping
+    return SLiDE.share_with(Weighting(df), Mapping(dfmap))
 end
 
 
-function share_sector(set::Dict, lst::AbstractArray; path::String=SCALE_BLUENOTE_IO)
-    weighting, mapping = share_sector(set; path=path)
+function share_sector(lst::AbstractArray; kwargs...)
+    weighting, mapping = share_sector( ; kwargs...)
     filter_with!(weighting, mapping, lst)
     return weighting, mapping, lst
 end

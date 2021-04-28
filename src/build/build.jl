@@ -92,7 +92,7 @@ function build_eem(dataset::Dataset, d::Dict, set::Dict)
             d, set, maps = disaggregate_energy!(dataset, d, set, maps)
             # d = partition_co2!(d, set, maps)
             d = SLiDE.calibrate_regional(dataset, d, set)
-
+            
             SLiDE.write_build!(set!(dataset; step=SLiDE.PARAM_DIR), d)
             SLiDE.write_build!(set!(dataset; step=SLiDE.SET_DIR), set)
         end
