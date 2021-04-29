@@ -215,6 +215,10 @@ function calibrate_regional(
     JuMP.optimize!(calib)
     cal = SLiDE._calibration_output(calib, set, year; region=true)
     [cal[k] = filter_with(io[k],(yr=year,)) for k in setdiff(keys(io),keys(cal))]
+
+    # Reassert c0.
+    cal[:c0] = combine_over(cal[:cd0],:g)
+    
     return cal
 end
 
@@ -226,7 +230,6 @@ calibrate_regional(args...; kwargs...) = calibrate(calibrate_regional, args...; 
     _energy_calibration_input(d::Dict, set::Dict)
 This function prepares input for the EEM calibration routine. The indices of the output
 parameters will include ``yr`` only if `year` is included as an input parameter.
-1. Reassert ``c_{yr,r} = \\sum_{g}cd_{yr,r,g}``
 1. Drop "small" values from input data.
 1. Calculate additional values for constraints:
     - Define ``va_{yr,r,s} = ld_{yr,r,s} + kd_{yr,r,s}``
@@ -248,8 +251,6 @@ parameters will include ``yr`` only if `year` is included as an input parameter.
 function _energy_calibration_input(d, set)
     variables = setdiff(SLiDE.list!(set, Dataset(""; build="eem", step="calibrate")), SLiDE.list("taxes"))
     variables_nat = [:ys0,:x0,:m0,:va0,:g0,:i0,:cd0]
-
-    d[:c0] = combine_over(d[:cd0],:g)
 
     [d[k] = SLiDE.drop_small(copy(d[k])) for k in variables]
 
