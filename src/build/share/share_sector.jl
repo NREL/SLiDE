@@ -14,11 +14,37 @@ end
 
 
 """
-    share_sector(set::Dict)
+    share_sector(; kwargs...)
+    share_sector(lst::AbstractArray; kwargs...)
+This function returns sectoral disaggregation weighting factors.
+
+It first reads and partitions ([`partition`](@ref)) detail-level BEA data to calculate 
+gross output, ``y_{yr,g}``, which is used to determine sectoral scaling for disaggregation.
+409 detail-level codes are mapped to 73 summary-level codes using the
+[blueNOTE sectoral scaling map](https://github.com/NREL/SLiDEData/blob/master/coremaps/scale/sector/bluenote.csv),
+denoted here as ``map_{gg\\rightarrow g} = map_{ss\\rightarrow s}``, where
+``gg``/``ss`` are summary-level goods/sectors and
+``g``/``s`` are detail-level goods/sectors.
+
+A sectoral disaggregation parameter ``\\tilde{\\delta}_{yr,gg \\rightarrow g}`` can be defined:
+
+```math
+\\tilde{\\delta}_{yr,gg \\rightarrow g} = \\dfrac
+    {y_{yr,g} \\circ map_{gg\\rightarrow g}}
+    {\\sum_{gg} y_{yr,g} \\circ map_{gg\\rightarrow g}}
+```
+
+This process follows two major steps:
+1. Calculate ``\\tilde{\\delta}_{yr,gg \\rightarrow g}`` for *all* ``(gg,g)``, (summary, detail) pairs.
+2. If an input argument is given, filter sectoral disaggregation weighting to include only the relevant sectors.
+
+# Arguments
+- `lst::AbstractArray` of sectors to include
 
 # Returns
 - `weighting::Weighting`
 - `mapping::Mapping`
+- `lst::AbstractArray` of sectors, updated in case any aggregate sectors were added
 """
 function share_sector( ; path::String=SCALE_BLUENOTE_IO)
     @info("Sharing sector using mapping in $path.")

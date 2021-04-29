@@ -44,8 +44,12 @@ scale_with(df::DataFrame, x::Union{Missing,Nothing}) = df
 
     filter_with!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
     filter_with!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
-Apply the above methods sequentially and returns all input arguments in the order in which
-they are given.
+# This function filters and updates `Weighting.data`, given a `lst` of 
+
+
+When filtering, we ensure the following:
+1. Each disaggregate-level code's corresponging 
+
 """
 function filter_with!(weighting::Weighting, lst::AbstractArray)
     agg, dis = map_direction(weighting)
@@ -56,10 +60,12 @@ function filter_with!(weighting::Weighting, lst::AbstractArray)
     end
 
     dfdis = filter_with(weighting.data, Dict(dis=>lst,))
-    
+        
     dfagg = fill_with(unique(select(dfdis, Not(dis))), 1.0)
     dfagg = dfagg - combine_over(dfdis, dis)
     dfagg[!,dis] .= dfagg[:,agg]
+
+    dropzero!(dfagg)
     
     weighting.data = vcat(dfdis,dfagg)
 
