@@ -310,7 +310,7 @@ end
 
 # ----- EDIT FROM FILE ---------------------------------------------------------------------
 
-function SLiDE.edit_with(df::DataFrame, y::Dict, file::T; print_status::Bool=false) where T <: File
+function edit_with(df::DataFrame, y::Dict, file::T; print_status::Bool=false) where T <: File
     # Specify the order in which edits must occur and which of these edits are included
     # in the yaml file of defined edits.
     EDITS = ["Deselect","Rename","OrderedGroup","Group","Concatenate","Match","Melt","Stack",

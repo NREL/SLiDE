@@ -63,7 +63,10 @@ getid(x::String, id::String) = replace(x, Regex("_*$id" * "_*") => "")
 
 """
 """
-print_status(args...; kwargs...) = println(_write(args...; kwargs...))
+function print_status(args...; kwargs...)
+    str = _write(args...; kwargs...)
+    return isnothing(str) ? nothing : println(str)
+end
 
 
 """
@@ -93,12 +96,10 @@ function _write(str::String, args...; kwargs...)
     )
 end
 
-function _write(x::T; key=missing) where T<:Scale
+function _write(x::T) where T<:Scale
     return string(
-        "  " ^ !ismissing(key),
-        _gerund(x.direction),
-        " " ^ !ismissing(key),
-        _write(key, x.on, _write(x.from=>x.to)),
+        _gerund(x.direction), ": ",
+        _write(x.from=>x.to),
     )
 end
 
@@ -112,16 +113,16 @@ end
 function _write(key::Symbol, idx::Union{Symbol,AbstractArray}; description=missing)
     return string("  ",
         key, _write_index(idx),
-        ismissing(description) ? "" : ": $description",
+        ismissing(description) ? "" : ", $description",
     )
 end
 
-function _write(key, df::DataFrame; kwargs...)
-    return _write(key, findindex(df); kwargs...)
-end
+_write(key, df::DataFrame; kwargs...) = _write(key, findindex(df); kwargs...)
+
+_write(df::DataFrame; key=missing) = !ismissing(key) ? _write(key, df) : nothing
 
 _write(key::Symbol, x::Any, description::String) = _write(key, x; description=description)
-_write(key::Missing, x::Any, description::String) = string(": ", description)
+_write(key::Missing, x::Any, description::String) = string(", ", description)
 _write(key::Symbol, d::Dict; kwargs...) = _write(key, d[key]; kwargs...)
 
 

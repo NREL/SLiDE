@@ -172,6 +172,14 @@ function set_scheme!(x::T, df::DataFrame) where T <: Scale
 end
 
 
+""
+function reverse_scheme!(x::T) where T<:Scale
+    x.direction = x.direction==:aggregate ? :disaggregate : :aggregate
+    x.to, x.from = x.from, x.to
+    return x
+end
+
+
 """
     map_scheme(df)
 This function sets the `direction` field for `Mapping` and `Weighting` types based on

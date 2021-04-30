@@ -20,19 +20,19 @@ function partition_bea(dataset::Dataset, d::Dict, set::Dict; map_fdcat::Bool=fal
 
         map_fdcat && _filter_use!(d,set)
 
-        SLiDE._partition_io!(d, set; sector_level=dataset.sector_level)
-        SLiDE._partition_fd!(d, set; sector_level=dataset.sector_level)
-        SLiDE._partition_va0!(d, set)
-        SLiDE._partition_x0!(d, set)
-        SLiDE._partition_m0!(d, set)
-        SLiDE._partition_md0!(d, set)
-        SLiDE._partition_ms0!(d, set)
-        SLiDE._partition_y0!(d, set; sector_level=dataset.sector_level)
-        SLiDE._partition_a0!(d, set; sector_level=dataset.sector_level)
-        SLiDE._partition_ta0!(d, set)
-        SLiDE._partition_tm0!(d, set)
+        _partition_io!(d, set; sector_level=dataset.sector_level)
+        _partition_fd!(d, set; sector_level=dataset.sector_level)
+        _partition_va0!(d, set)
+        _partition_x0!(d, set)
+        _partition_m0!(d, set)
+        _partition_md0!(d, set)
+        _partition_ms0!(d, set)
+        _partition_y0!(d, set; sector_level=dataset.sector_level)
+        _partition_a0!(d, set; sector_level=dataset.sector_level)
+        _partition_ta0!(d, set)
+        _partition_tm0!(d, set)
 
-        SLiDE.write_build!(dataset, d)
+        write_build!(dataset, d)
     end
     return d, set
 end
@@ -107,17 +107,17 @@ Treat negative inputs as outputs:
 ```
 """
 function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary,
-    swap_ys0::Bool=true,
+    swap_ys0::Bool=false,
 )
     println("  id0(yr,g,s) and ys0(yr,s,g), supply/demand data")
     d[:id0] = filter_with(d[:use], set)
     d[:ys0] = filter_with(d[:supply], set)
     
     # In sectordisagg, the good/sector column names are switched...
-    # if sector_level==:detail && swap_ys0
-    #     x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
-    #     d[:ys0] = edit_with(d[:ys0], x)
-    # end
+    if sector_level==:detail && swap_ys0
+        x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
+        d[:ys0] = edit_with(d[:ys0], x)
+    end
     
     df = indexjoin(d[:ys0], d[:id0]; id=[:ys0,:id0])
     idx = findindex(df)
@@ -236,10 +236,7 @@ end
 \\end{aligned}
 ```
 """
-function _partition_fd!(d::Dict, set::Dict; sector_level::Symbol=:summary,
-    kwargs...,
-    # swap_ys0::Bool=false,
-)
+function _partition_fd!(d::Dict, set::Dict; sector_level::Symbol=:summary, kwargs...)
     x = Rename(:s, :fd)
     d[:fd0] = filter_with(edit_with(d[:use],x), set)
     d[:fs0] = filter_with(d[:fd0], (fd=["pce","C"],); drop = true)
@@ -413,10 +410,10 @@ end
 ```
 """
 function _partition_s0!(d::Dict, set::Dict;
-    swap_ys0::Bool=false,
+    kwargs...
 )
     if !haskey(d,:s0)
-        _partition_ys0!(d, set; swap_ys0=swap_ys0)
+        _partition_ys0!(d, set; kwargs...)
         
         d[:s0] = edit_with(combine_over(d[:ys0], :g), Rename(:s,:g))
 
@@ -616,9 +613,7 @@ from which some may be exported. Net out margin supply from output."
 \\tilde{y}_{yr,g} = \\sum_{s}\\tilde{ys}_{yr,s,g} + \\tilde{fd}_{yr,g} - \\sum_{m}\\tilde{ms}_{yr,g,m}
 ```
 """
-function _partition_y0!(d::Dict, set::Dict; sector_level::Symbol=:summary, kwargs...,
-    # swap_ys0::Bool=false,
-)
+function _partition_y0!(d::Dict, set::Dict; sector_level::Symbol=:summary, kwargs...)
     if !haskey(d, :y0)
         _partition_ys0!(d, set; sector_level=sector_level, kwargs...)
         _partition_fs0!(d, set; sector_level=sector_level, kwargs...)

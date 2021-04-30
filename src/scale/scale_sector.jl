@@ -2,37 +2,37 @@
     scale_sector!(d, set, x; kwargs...)
 """
 function scale_sector!(dataset::Dataset, d::Dict, set::Dict; kwargs...)
-    set!(dataset; step="scale")
+    print_status(set!(dataset; step="scale"))
     d, set = scale_sector!(d, set; kwargs...)
     d = Dict{Any,Any}(write_build!(dataset, d))
     return d, set
 end
 
 
-function scale_sector!(d::Dict, set::Dict; path::String=SCALE_EEM_IO)
-    return scale_sector!(d, set, read_file(path)[:,1:2])
+function scale_sector!(d::Dict, set::Dict; path::String=SLiDE.SCALE_EEM_IO, kwargs...)
+    println("Scaling sector using mapping in $path.")
+    return scale_sector!(d, set, read_file(path)[:,1:2]; kwargs...)
 end
 
 
-function scale_sector!(d::Dict, set::Dict, dfmap::DataFrame)
+function scale_sector!(d::Dict, set::Dict, dfmap::DataFrame, kwargs...)
     # Store dfmap as `Mapping` and set scheme based on the current sectoral set.
     # After the build stream, this *should* be equivalent to the summary-level set.
     mapping = Mapping(dfmap)
     set_scheme!(mapping, DataFrame(g=set[:sector]))
     
-    return scale_sector!(d, set, mapping)
+    return scale_sector!(d, set, mapping; kwargs...)
 end
 
 
 function scale_sector!(d::Dict, set::Dict, mapping::Mapping; kwargs...)
     # If (2) scaling FROM ANY detail-level codes not yet listed in `sector` OR
     # (1) disaggregating, disaggregate summary- to detail-level (or a hybrid of the two).
-    # After assessing whether disaggregation is necessary, update `from`.
     if !complete_with!(set, mapping) || mapping.direction==:disaggregate
         disaggregate_sector!(d, set; kwargs...)
     end
     
-    mapping.direction==:aggregate && aggregate_sector!(d, set, mapping; kwargs...)
+    mapping.direction==:aggregate && aggregate_sector!(d, set, mapping)
 
     return d, set
 end
@@ -69,14 +69,15 @@ scale_sector!(set::Dict, x, var::Symbol) = set[var] = scale_with(set[var], x)
     disaggregate_sector!(d::Dict, set::Dict; kwargs...)
     disaggregate_sector!(d::Dict, set::Dict, weighting::Weighting; kwargs...)
 """
-function disaggregate_sector!(d::Dict, set::Dict)
-    weighting = share_sector!(d, set)
+function disaggregate_sector!(d::Dict, set::Dict; kwargs...)
+    weighting = share_sector!(d, set; kwargs...)
     disaggregate_sector!(d, set, weighting)
     return d
 end
 
 
 function disaggregate_sector!(d::Dict, set::Dict, x::Weighting; label=:disaggregate)
+    print_status(x)
     push!(d, label=>x)
 
     taxes = list("taxes")
@@ -96,6 +97,7 @@ end
     disaggregate_sector!(d::Dict, set::Dict, mapping::Mapping; kwargs...)
 """
 function aggregate_sector!(d::Dict, set::Dict, x::Mapping; label=:aggregate)
+    print_status(x)
     push!(d, label=>x)
 
     # Aggregate taxes. Their associated scaling parameters will be aggregated in the process.

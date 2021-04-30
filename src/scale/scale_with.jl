@@ -2,7 +2,7 @@
     scale_with(df, x)
 """
 function scale_with(df::DataFrame, x::Weighting; kwargs...)
-    print_status(x; kwargs...)
+    print_status(df; kwargs...)
 
     # Save unaffected indices. Map the others and calculate share.
     df_ones = filter_with(df, Not(x))
@@ -18,7 +18,7 @@ end
 
 
 function scale_with(df::DataFrame, x::Mapping; kwargs...)
-    print_status(x; kwargs...)
+    print_status(df; kwargs...)
 
     # Save unaffected indices. Map the others.
     df_ones = filter_with(df, Not(x))
@@ -38,8 +38,6 @@ end
 scale_with(lst, x::Weighting; kwargs...) = scale_with(lst, convert_type(Mapping,x); kwargs...)
 
 scale_with(df::DataFrame, x::Union{Missing,Nothing}; kwargs...) = df
-
-
 
 
 """

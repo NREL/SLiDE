@@ -7,13 +7,13 @@ eq0
 ned0
 netgen
 pctgen
+pe0
 ps0
 shrgas
 trdele
 # --- unused in subsequent step(s) ---
 # convfac
 # cprice
-# pe0
 # pedef
 # prodbtu
 # prodval

@@ -11,10 +11,13 @@ function disaggregate_energy!(dataset, d, set, maps)
         _disagg_energy_fvs!(d)
 
         # Make individual adjustments.
+        println("Update parameters for g=e...")
         _disagg_energy_md0!(d, set)
         _disagg_energy_cd0!(d, set)
         _disagg_energy_ys0!(d, set, maps)
         _disagg_energy_id0!(d, set, maps)
+
+        println("Update parameters for g=ele...")
         _disagg_energy_m0!(d)
         _disagg_energy_x0!(d)
 
@@ -47,8 +50,8 @@ fvs_{yr,r,s,x} = \\dfrac{x_{yr,r,s}}{\\sum_{g}ys_{yr,r,s,g}}
 ```
 """
 function _disagg_energy_fvs!(d::Dict)
-    println("  Calculating fvs, initial factor value shares in production")
     d[:fvs] = vcat([_disagg_energy_fvs(d,key) for key in [:kd0,:ld0]]...)
+    print_status(:fvs, d, "initial factor value shares in production")
     return d[:fvs]
 end
 
@@ -72,45 +75,47 @@ mrgshr_{yr,r,m,g=trd} &= 1 - mrgshr_{yr,r,m,g=trn}
 ```
 """
 function _disagg_energy_mrgshr!(d::Dict, set::Dict)
-    println("  Calculating mrgshr(yr,r,m,g=e)")
     if !haskey(d,:mrgshr)
+        
         var, val = :m, :value
         col = propertynames(d[:md0])
-
+        
         df = filter_with(d[:md0], (g=set[:e],))
         df = df / combine_over(df, var; digits=false)
-
-        df = unstack(df, var, val)
+        
+        df = SLiDE.unstack(df, var, val)
         df = fill_zero(df; with=(yr=set[:yr], r=set[:r], g=set[:e]))
         df[!,:trd] .= 1.0 .- df[:,:trn]
-
-        d[:mrgshr] = select(dropzero(_stack(df, var, val)), col)
+        
+        d[:mrgshr] = SLiDE.select(dropzero(SLiDE._stack(df, var, val)), col)
+        SLiDE.print_status(:mrgshr, d)
     end
     return d[:mrgshr]
 end
 
 
 """
-`md0(yr,r,m,g)`, margin demand
+`md0(yr,r,m,g=e)`, margin demand
 ```math
 md_{yr,r,m,g} = mrgshr_{yr,r,m,g} \\cdot \\sum_{sec} emrg_{yr,r,src\\rightarrow g, sec}
 ```
 """
 function _disagg_energy_md0!(d::Dict, set::Dict)
-    println("  Calculating md0(yr,r,m,g=e), margin demand")
-
+    
     df, df_out = split_with(d[:md0], DataFrame(g=set[:e],))
     
     df_mrgshr = _disagg_energy_mrgshr!(d, set)
     df = df_mrgshr * combine_over(d[:emarg0], :sec)
-
+    
     d[:md0] = dropzero(vcat(df_out, df; cols=:intersect))
+
+    print_status(:md0, d, "margin demand")
     return d[:md0]
 end
 
 
 """
-`cd0(yr,r,g)`, national final consumption
+`cd0(yr,r,g=e)`, national final consumption
 ```math
 \\tilde{cd}_{yr,r,g}
 = \\left\\{
@@ -119,11 +124,11 @@ end
 ```
 """
 function _disagg_energy_cd0!(d::Dict, set::Dict)
-    println("  Calculating cd0(yr,r,g=e), national final consumption")
+    print_status(:cd0, d, "national final consumption")
+
     df, df_out = split_with(d[:cd0], DataFrame(g=set[:e],))
-
     df = filter_with(d[:ed0], (sec="res",); drop=true)
-
+    
     d[:cd0] = vcat(df_out, df; cols=:intersect)
     return d[:cd0]
 end
@@ -132,7 +137,8 @@ end
 """
 """
 function _disagg_energy_ys0!(d::Dict, set::Dict, maps::Dict)
-    println("  Calculating ys0(yr,r,s=e,g=e), regional sectoral output")
+    print_status(:ys0, d, "regional sectoral output")
+
     x = set[:e]
     df, df_out = split_with(d[:ys0], DataFrame(s=x, g=x))
     
@@ -215,10 +221,10 @@ end
 
 
 """
-`id0(yr,r,g=ele,s)`, regional intermediate demand
+`id0(yr,r,g=e,s)`, regional intermediate demand
 """
 function _disagg_energy_id0!(d::Dict, set::Dict, maps::Dict)
-    println("  Calculating id0(yr,r,g=ele,s), regional intermediate demand")
+    print_status(:id0, d, "regional intermediate demand")
     df, df_out = split_with(d[:id0], (g=set[:e],))
 
     df_inpshr = _disagg_energy_inpshr!(d, set, maps)
@@ -233,9 +239,9 @@ end
 `x0(yr,r,g=ele)`, foreign exports
 """
 function _disagg_energy_x0!(d::Dict)
-    println("  Calculating x0(yr,r,g=ele), foreign exports")
-    df, df_out = split_with(d[:x0], (g="ele",))
+    print_status(:x0, d, "foreign exports")
 
+    df, df_out = split_with(d[:x0], (g="ele",))
     df = filter_with(d[:trdele], (t="exports",); drop=true)
 
     d[:x0] = vcat(df_out, df)
@@ -247,9 +253,9 @@ end
 `m0(yr,r,g=ele)`, foreign imports
 """
 function _disagg_energy_m0!(d::Dict)
-    println("  Calculating m0(yr,r,g=ele), foreign imports")
-    df, df_out = split_with(d[:m0], (g="ele",))
+    print_status(:m0, d, "foreign imports")
 
+    df, df_out = split_with(d[:m0], (g="ele",))
     df = filter_with(d[:trdele], (t="imports",); drop=true)
 
     d[:m0] = vcat(df_out, df)

@@ -11,10 +11,11 @@ set list(s) stored in `set`, and adds the sectoral weighting DataFrame to `d`.
 - `weighting::Weighting`
 """
 function share_sector!(d, set; kwargs...)
-    weighting, mapping, lst = share_sector(set[:sector]; kwargs...)
+    weighting, mapping, lst = SLiDE.share_sector(set[:sector]; kwargs...)
     
     push!(d, :sector=>weighting.data)
     set_sector!(set, lst)
+    reverse_scheme!(weighting)
     
     return weighting
 end
@@ -53,19 +54,17 @@ This process follows two major steps:
 - `mapping::Mapping`
 - `lst::AbstractArray` of sectors, updated in case any aggregate sectors were added
 """
-function share_sector( ; path::String=SCALE_BLUENOTE_IO)
-    @info("Sharing sector using mapping in $path.")
+function share_sector( ; path::String=SCALE_BLUENOTE_IO, kwargs...)
+    println("Sharing sector using mapping in $path.")
 
     sector_level = :detail
     dfmap = read_file(path)[:,1:2]
 
     # Get the detail-level info so we can disaggregate.
-    set_det = read_set("io"; sector_level=sector_level)
-    det = read_input!(Dataset(""; step="bea", sector_level=sector_level))
-
-    df = _partition_y0!(det, set_det; sector_level=sector_level)
+    set_det = SLiDE.read_set("io"; sector_level=sector_level)
+    det = SLiDE.read_input!(Dataset(""; step="bea", sector_level=sector_level))
+    df = SLiDE._partition_y0!(det, set_det; sector_level=sector_level, kwargs...)
     
-    # Initialize scaling information.
     return share_with(Weighting(df), Mapping(dfmap))
 end
 

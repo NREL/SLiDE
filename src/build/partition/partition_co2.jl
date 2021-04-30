@@ -87,12 +87,14 @@ function _partition_secco2!(d::Dict, set::Dict, maps::Dict)
     d[:secco2] = dropzero(vcat(df_ele_oil, df; cols=:intersect))
     d[:secco2] = filter_with(d[:secco2], Not(_no_co2emiss!(d)))
 
+    print_status(:resco2, d)
     return d[:secco2]
 end
 
 
 function _partition_resco2!(d::Dict)
     d[:resco2] = edit_with(filter_with(d[:co2emiss], (sec="res",); drop=true), Rename(:src,:g))
+    print_status(:resco2, d)
     return d[:resco2]
 end
 
