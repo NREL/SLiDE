@@ -17,13 +17,26 @@ using DataFrames
 
 #SLiDE data needs to be built or point to pre-existing build directory
 #can pass a name: d, set = build(Dataset("name_of_build_directory"))
-!(@isdefined(d_in) && @isdefined(set_in)) && (d_in, set_in = build(Dataset("state_model")))
+# !(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build(Dataset("state_model")))
+!(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build(Dataset("state_model_eem";eem=true)))
+
+# dataset = Dataset("state_model_eem"; eem=true)
+# d, set = build(dataset)               # build from scratch
+# d_read, set_read = build(dataset)     # read saved data
+# dcomp = benchmark_against(d, d_read)  # compare dictionary values
+
 d = copy(d_in)
 set = copy(set_in)
+
+#d, set = build(Dataset("state_model_eem";eem=true))
 
 bmkyr = 2016
 sld, set = SLiDE._model_input(d, set, bmkyr, Dict)
 S, G, M, R = set[:s], set[:g], set[:m], set[:r]
+
+#set[:gm] = ["col","cru", "eint", "gas","oil", "omnf", "osrv", "pmt", "roe"]
+set[:gm] = set[:g]
+# set[:imrg] = ["roe"]
 
 ########## Model ##########
 cge = MCPModel();
@@ -50,7 +63,8 @@ cge = MCPModel();
 @NLparameter(cge, ta0[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); # Tax net of subsidy rate on intermediate demand
 @NLparameter(cge, tm0[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); # Import tariff
 @NLparameter(cge, cd0[r in set[:r], g in set[:g]] == sld[:cd0][r,g]); # Final demand
-@NLparameter(cge, c0[r in set[:r]] == sld[:c0][r]); # Aggregate final demand
+@NLparameter(cge, c0[r in set[:r]] == sum(sld[:cd0][r,g] for g in set[:g])); # Aggregate final demand
+#@NLparameter(cge, c0[r in set[:r]] == sld[:c0][r]); # Aggregate final demand
 @NLparameter(cge, yh0[r in set[:r], g in set[:g]] == sld[:yh0][r,g]); #Household production
 @NLparameter(cge, bopdef0[r in set[:r]] == sld[:bopdef0][r]); #Balance of payments
 @NLparameter(cge, hhadj[r in set[:r]] == sld[:hhadj][r]); # Household adjustment
@@ -68,9 +82,14 @@ cge = MCPModel();
 
 # benchmark value share parameters
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
+
+# !!!! s0[r,g] is sparse which creates problems in nonlinear expression RX[r,g] due to all value shares being forced to zero here
 @NLparameter(cge, alpha_x[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
 @NLparameter(cge, alpha_d[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(s0[r,g])));
 @NLparameter(cge, alpha_n[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(s0[r,g])));
+# @NLparameter(cge, alpha_x[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
+# @NLparameter(cge, alpha_d[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(s0[r,g])));
+# @NLparameter(cge, alpha_n[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(s0[r,g])));
 @NLparameter(cge, theta_n[r in set[:r], g in set[:g]] == ensurefinite(value(nd0[r,g]) / (value(nd0[r,g]) - value(dd0[r,g]))));
 @NLparameter(cge, theta_m[r in set[:r], g in set[:g]] == ensurefinite((1+value(tm0[r,g])) * value(m0[r,g]) / (value(nd0[r,g]) + value(dd0[r,g]) + (1 + value(tm0[r,g])) * value(m0[r,g]))));
 
@@ -85,12 +104,14 @@ cge = MCPModel();
 @NLparameter(cge, es_f[r in set[:r], g in set[:g]]    == SUB_ELAST[:f]); # Domestic and foreign demand aggregation nest (international) - substitution elasticity
 
 
+
 ################
 # VARIABLES
 ################
 
 # Set lower bound
-lo = MODEL_LOWER_BOUND
+#lo = MODEL_LOWER_BOUND
+lo = 1e-6
 
 #set[:s]
 @variable(cge, Y[(r,s) in set[:Y]] >= lo, start = 1);
@@ -113,6 +134,8 @@ lo = MODEL_LOWER_BOUND
 #consumer:
 @variable(cge,RA[r in set[:r]]>=lo,start = value(c0[r])) ;
 
+# Definitional
+@variable(cge,RX[(r,g) in set[:X]]>=lo,start = 1); # definitional: export transformation unit revenue
 
 ###############################
 # -- PLACEHOLDER VARIABLES --
@@ -133,22 +156,52 @@ lo = MODEL_LOWER_BOUND
 # exports (absent of re-exports) times the price for foreign exchange,
 # region's supply to national market times the national market price
 # regional supply to local market times domestic price
-@NLexpression(cge,RX[r in set[:r],g in set[:g]],
-  (alpha_x[r,g]*PFX^(1 + et_x[r,g])+alpha_n[r,g]*PN[g]^(1 + et_x[r,g])+alpha_d[r,g]*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1 + et_x[r,g]))^(1/(1 + et_x[r,g])) );
+#(r,g) in set[:x]
+#@NLexpression(cge,RX[r in set[:r],g in set[:g]],
+# @NLexpression(cge,RX[(r,g) in set[:X]],
+#   (alpha_x[r,g]*PFX^(1 + et_x[r,g])+alpha_n[r,g]*PN[g]^(1 + et_x[r,g])+alpha_d[r,g]*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1 + et_x[r,g]))^(1/(1 + et_x[r,g])) );
+
+testrx = Dict((r,g) => (value(alpha_x[r,g])+value(alpha_n[r,g])+value(alpha_d[r,g])) for r in set[:r], g in set[:g])
+for k in keys(testrx)
+    if testrx[k] == 0
+        println(k,"=>",testrx[k])
+    end
+end
+
+@mapping(cge,def_RX[(r,g) in set[:X]],
+    # (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
+    # -
+    (alpha_x[r,g]*PFX^(1 + et_x[r,g])+alpha_n[r,g]*PN[g]^(1 + et_x[r,g])+alpha_d[r,g]*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1 + et_x[r,g]))^(1/(1 + et_x[r,g]))
+    -
+    (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
+);
 
 #demand for exports via demand function
-@NLexpression(cge,AX[r in set[:r],g in set[:g]], (x0[r,g] - rx0[r,g])*(PFX/RX[r,g])^et_x[r,g] );
+# (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
+#@NLexpression(cge,AX[r in set[:r],g in set[:g]], (x0[r,g] - rx0[r,g])*(PFX/RX[r,g])^et_x[r,g] );
+@NLexpression(cge,AX[r in set[:r],g in set[:g]], (x0[r,g] - rx0[r,g])*(PFX/(haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^et_x[r,g] );
 
 #demand for contribution to national market
-@NLexpression(cge,AN[r in set[:r],g in set[:g]], xn0[r,g]*(PN[g]/(RX[r,g]))^et_x[r,g] );
+#@NLexpression(cge,AN[r in set[:r],g in set[:g]], xn0[r,g]*(PN[g]/(RX[r,g]))^et_x[r,g] );
+@NLexpression(cge,AN[r in set[:r],g in set[:g]], xn0[r,g]*(PN[g]/(haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^et_x[r,g] );
 
 #demand for regionals supply to local market
 @NLexpression(cge,AD[r in set[:r],g in set[:g]],
-  xd0[r,g] * ((haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0) / (RX[r,g]))^et_x[r,g] );
+#  xd0[r,g] * ((haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0) / (RX[r,g]))^et_x[r,g] );
+  xd0[r,g] * ((haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0) / (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^et_x[r,g] );
 
 # CES function for tradeoff between national and domestic market
 @NLexpression(cge,CDN[r in set[:r],g in set[:g]],
   (theta_n[r,g]*PN[g]^(1-es_d[r,g])+(1-theta_n[r,g])*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1-es_d[r,g]))^(1/(1-es_d[r,g])) );
+
+testcdn = Dict((r,g) => (value(theta_n[r,g])+(1-value(theta_n[r,g]))) for r in set[:r], g in set[:g])
+for k in keys(testcdn)
+    if testcdn[k] == 0
+        println(k,"=>",testcdn[k])
+    end
+end
+
+
 
 # CES function for tradeoff between domestic consumption and foreign exports
 # recall tm in the import tariff thus tm / tm0 is the relative change in import tariff rates
@@ -226,6 +279,9 @@ lo = MODEL_LOWER_BOUND
         PC[r] * c0[r]
 );
 
+testc = Dict((r) => (sum(value(cd0[r,g]) for g in set[:g]) - value(c0[r])) for r in set[:r]);
+
+# !!!! error in md0(r,m,gm) --- no "air" in md0, but exists in set[:gm]
 @mapping(cge,profit_ms[r in set[:r], m in set[:m]],
 # provision of set[:m] to national market
         sum(PN[gm]   * nm0[r,gm,m] for gm in set[:gm])
@@ -234,8 +290,12 @@ lo = MODEL_LOWER_BOUND
         -
 # total margin demand
         PM[r,m] * sum(md0[r,m,gm] for gm in set[:gm])
+#        PM[r,m] * sum(md0[r,m,g] for g in set[:g])
 );
 
+testrm = Dict((r,m) => (sum(value(nm0[r,gm,m]) for gm in set[:g])
++ sum(value(dm0[r,gm,m]) for gm in set[:g])
+- sum(value(md0[r,m,gm]) for gm in set[:g])) for r in set[:r], m in set[:m])
 
 ###################################
 # -- Market Clearing Conditions --
@@ -279,14 +339,16 @@ lo = MODEL_LOWER_BOUND
 
 @mapping(cge,market_pn[g in set[:g]],
 # supply to the national market
+        # sum((haskey(X.lookup[1], (r,g)) ? X[(r,g)] : 1.0)  * (haskey(AN.lookup[1], (r,g)) ? AN[(r,g)] : 0.0) for r in set[:r])
         sum((haskey(X.lookup[1], (r,g)) ? X[(r,g)] : 1.0)  * AN[r,g] for r in set[:r])
         - (
 # demand from the national market
         sum((haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * DN[r,g] for r in set[:r])
-# market supply to the national market
+# margin supply to the national market
         + sum(MS[r,m] * nm0[r,g,m] for r in set[:r] for m in set[:m] if (g in set[:gm]) )
         )
 );
+
 
 @mapping(cge,market_pl[r in set[:r]],
 # supply of labor
@@ -306,6 +368,7 @@ lo = MODEL_LOWER_BOUND
 @mapping(cge,market_pm[r in set[:r], m in set[:m]],
 # margin supply
         MS[r,m] * sum(md0[r,m,gm] for gm in set[:gm])
+#        MS[r,m] * sum(md0[r,m,g] for g in set[:g])
         -
 # margin demand
         sum((haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * md0[r,m,g] for g in set[:g])
@@ -321,7 +384,7 @@ lo = MODEL_LOWER_BOUND
 
 @mapping(cge,market_pfx,
 # balance of payments (exogenous)
-        sum(bopdef0[r] for r in set[:r])
+        sum((bopdef0[r]+hhadj[r]) for r in set[:r])
 # supply of exports
         + sum((haskey(X.lookup[1], (r,g)) ? X[(r,g)] : 1.0)  * AX[r,g] for r in set[:r] for g in set[:g])
 # supply of re-exports
@@ -330,6 +393,10 @@ lo = MODEL_LOWER_BOUND
 # import demand
         sum((haskey(A.lookup[1], (r,g)) ? A[(r,g)] : 1.0) * MD[r,g] for r in set[:r] for g in set[:g] if (r,g) in set[:A])
 );
+
+
+testpfxx = sum(value(bopdef0[r])+value(hhadj[r]) for r in set[:r]) + sum((value(x0[r,g])-value(rx0[r,g])) for r in set[:r] for g in set[:g]) + sum(value(rx0[r,g]) for r in set[:r] for g in set[:g]) - sum(value(m0[r,g]) for r in set[:r] for g in set[:g]);
+
 
 @mapping(cge,income_ra[r in set[:r]],
 # consumption/utility
@@ -378,6 +445,8 @@ lo = MODEL_LOWER_BOUND
 @complementarity(cge,market_pfx,PFX);
 @complementarity(cge,income_ra,RA);
 
+# Definitionals
+@complementarity(cge,def_RX,RX);
 
 ####################
 # -- Model Solve --
@@ -386,5 +455,8 @@ lo = MODEL_LOWER_BOUND
 #set up the options for the path solver
 PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
 
-# solve the model
+# solve the model -- needs a crash iteration for the definitional constraint def_RX
+status = solveMCP(cge)
+
+PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=100000)
 status = solveMCP(cge)
