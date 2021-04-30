@@ -38,6 +38,22 @@ S, G, M, R = set[:s], set[:g], set[:m], set[:r]
 set[:gm] = set[:g]
 # set[:imrg] = ["roe"]
 
+########## Sets ##########
+
+set[:fe] = ["col","gas","oil","cru"]    # fossil energy goods
+set[:pfe] = ["col","gas","oil"]         # fossil energy pinned fuels
+set[:xe] = ["col","gas","cru"]          # extractive resources
+set[:ele] = ["ele"]                     # electricity
+set[:oil] = ["oil"]                     # refined oil
+set[:cru] = ["cru"]                     # crude oil
+set[:gas] = ["gas"]                     # natural gas
+set[:col] = ["col"]                     # coal
+set[:en] = append!(set[:fe], set[:ele]) # energy goods
+set[:nfe] = setdiff(set[:g],set[:fe])   # non-fossil energy goods
+set[:nxe] = setdiff(set[:g],set[:xe])   # non-extractive goods
+set[:nele] = setdiff(set[:g],set[:ele]) # non-electricity goods
+set[:nne] = setdiff(set[:g],set[:en])   # non-energy goods
+
 ########## Model ##########
 cge = MCPModel();
 

@@ -17,7 +17,13 @@ using DataFrames
 
 #SLiDE data needs to be built or point to pre-existing build directory
 #can pass a name: d, set = build(Dataset("name_of_build_directory"))
-!(@isdefined(d_in) && @isdefined(set_in)) && (d_in, set_in = build(Dataset("state_model")))
+!(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build(Dataset("state_model_eem2";eem=true)))
+
+# dataset = Dataset("state_model_eem"; eem=true)
+# d, set = build(dataset)               # build from scratch
+# d_read, set_read = build(dataset)     # read saved data
+# dcomp = benchmark_against(d, d_read)  # compare dictionary values
+
 d = copy(d_in)
 set = copy(set_in)
 
@@ -26,7 +32,10 @@ bmkyr = 2016
 
 #Load slide data and time horizon to produce model data and appropriate time-indexed subsets
 sld, set = SLiDE._model_input(d, set, bmkyr, Dict)
+#sld, set = SLiDE.model_input(d, set, bmkyr, Dict)
 S, G, M, R = set[:s], set[:g], set[:m], set[:r]
+
+set[:gm] = set[:g]
 
 ########## Model ##########
 cge = MCPModel();
@@ -65,7 +74,8 @@ cge = MCPModel();
 @NLparameter(cge, ta0[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); # Tax net of subsidy rate on intermediate demand
 @NLparameter(cge, tm0[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); # Import tariff
 @NLparameter(cge, cd0[r in set[:r], g in set[:g]] == sld[:cd0][r,g]); # Final demand
-@NLparameter(cge, c0[r in set[:r]] == sld[:c0][r]); # Aggregate final demand
+@NLparameter(cge, c0[r in set[:r]] == sum(sld[:cd0][r,g] for g in set[:g])); # Aggregate final demand
+#@NLparameter(cge, c0[r in set[:r]] == sld[:c0][r]); # Aggregate final demand
 @NLparameter(cge, yh0[r in set[:r], g in set[:g]] == sld[:yh0][r,g]); #Household production
 @NLparameter(cge, bopdef0[r in set[:r]] == sld[:bopdef0][r]); #Balance of payments
 @NLparameter(cge, hhadj[r in set[:r]] == sld[:hhadj][r]); # Household adjustment
@@ -115,9 +125,13 @@ cge = MCPModel();
 
 # benchmark value share parameters
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
-@NLparameter(cge, alpha_x[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
-@NLparameter(cge, alpha_d[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(s0[r,g])));
-@NLparameter(cge, alpha_n[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(s0[r,g])));
+@NLparameter(cge, cs0[r in set[:r], g in set[:g]] == value(x0[r,g])-value(rx0[r,g]) + value(xd0[r,g]) + value(xn0[r,g]));
+@NLparameter(cge, alpha_x[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(cs0[r,g])));
+@NLparameter(cge, alpha_d[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(cs0[r,g])));
+@NLparameter(cge, alpha_n[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(cs0[r,g])));
+# @NLparameter(cge, alpha_x[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
+# @NLparameter(cge, alpha_d[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(s0[r,g])));
+# @NLparameter(cge, alpha_n[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(s0[r,g])));
 @NLparameter(cge, theta_n[r in set[:r], g in set[:g]] == ensurefinite(value(nd0[r,g]) / (value(nd0[r,g]) - value(dd0[r,g]))));
 @NLparameter(cge, theta_m[r in set[:r], g in set[:g]] == ensurefinite((1+value(tm0[r,g])) * value(m0[r,g]) / (value(nd0[r,g]) + value(dd0[r,g]) + (1 + value(tm0[r,g])) * value(m0[r,g]))));
 
@@ -178,8 +192,9 @@ lo = 0.0
 @variable(cge,PINV[r in set[:r]] >= lo, start = 1); # Investment price index
 @variable(cge,PW[r in set[:r]] >= lo, start = 1); # Welfare price index
 
-# Reporting variables
+# Definitional variables
 @variable(cge,DKM[(r,s) in set[:PK]] >= lo, start = start_value(YM[(r,s)]) * value(kd0[r,s]));
+@variable(cge,RX[(r,g) in set[:X]]>=lo,start = 1); # definitional: export transformation unit revenue
 
 
 ###############################
@@ -210,18 +225,18 @@ lo = 0.0
 # exports (absent of re-exports) times the price for foreign exchange,
 # region's supply to national market times the national market price
 # regional supply to local market times domestic price
-@NLexpression(cge,RX[r in set[:r],g in set[:g]],
-  (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0)^5)^(1/5) );
+# @NLexpression(cge,RX[r in set[:r],g in set[:g]],
+#   (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0)^5)^(1/5) );
 
 #demand for exports via demand function
-@NLexpression(cge,AX[r in set[:r],g in set[:g]], (x0[r,g] - rx0[r,g])*(PFX/RX[r,g])^4 );
+@NLexpression(cge,AX[r in set[:r],g in set[:g]], (x0[r,g] - rx0[r,g])*(PFX/(haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^4 );
 
 #demand for contribution to national market
-@NLexpression(cge,AN[r in set[:r],g in set[:g]], xn0[r,g]*(PN[g]/(RX[r,g]))^4 );
+@NLexpression(cge,AN[r in set[:r],g in set[:g]], xn0[r,g]*(PN[g]/(haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^4 );
 
 #demand for regionals supply to local market
 @NLexpression(cge,AD[r in set[:r],g in set[:g]],
-  xd0[r,g] * ((haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) / (RX[r,g]))^4 );
+  xd0[r,g] * ((haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) / (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^4 );
 
   ###
 
@@ -469,7 +484,7 @@ lo = 0.0
 
 @mapping(cge,market_pfx,
 # balance of payments (exogenous)
-    sum(bopdef0[r] for r in set[:r])
+    sum((bopdef0[r] + hhadj[r]) for r in set[:r])
 # supply of exports
     + sum((haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1.0)  * AX[r,g] for r in set[:r] for g in set[:g])
 # supply of re-exports
@@ -509,12 +524,29 @@ lo = 0.0
 );
 
 #----------
-# Reporting
+# Definitional/Reporting
 @mapping(cge, DKMdef[(r,s) in set[:PK]],
     DKM[(r,s)]
     -
     YM[(r,s)]*AKym[r,s]
 );
+
+@mapping(cge,def_RX[(r,g) in set[:X]],
+    (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
+    -
+    (alpha_x[r,g]*PFX^(1 + et_x[r,g])+alpha_n[r,g]*PN[g]^(1 + et_x[r,g])+alpha_d[r,g]*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1 + et_x[r,g]))^(1/(1 + et_x[r,g]))
+    # -
+    # (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
+);
+
+# @mapping(cge,deflo_RX[(r,g) in set[:X]],
+#     # (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
+#     # -
+#     (alpha_x[r,g]*PFX^(1 + et_x[r,g])+alpha_n[r,g]*PN[g]^(1 + et_x[r,g])+alpha_d[r,g]*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1 + et_x[r,g]))^(1/(1 + et_x[r,g]))
+#     -
+#     (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
+# );
+
 
 ####################################
 # -- Complementarity Conditions --
@@ -551,6 +583,8 @@ lo = 0.0
 
 #Reporting
 @complementarity(cge,DKMdef,DKM);
+@complementarity(cge,def_RX,RX);
+# @complementarity(cge,deflo_RX,RX);
 
 ####################
 # -- Model Solve --
@@ -561,6 +595,9 @@ PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cum
 
 # solve the model
 status = solveMCP(cge)
+
+#PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=100000)
+#status = solveMCP(cge)
 
 # Pre-loop calculations
 ktot_mx = Dict((r,bmkyr) => value(ks_m[r]) + sum(value(ks_x[r,s]) for s in set[:s])
@@ -639,6 +676,7 @@ for t in 2017:2020
     #update exports start value
     for (r,g) in set[:X]
         set_start_value(X[(r,g)], result_value(X[(r,g)])*(1+value(gr)));
+#        set_start_value(RX[(r,g)], result_value(RX[(r,g)])*(1+value(gr))); # price so shouldn't be adjusted
     end
 
     #update armington start value
@@ -666,9 +704,9 @@ for t in 2017:2020
 
     #update value shares
     for r in set[:r], g in set[:g]
-        set_value(alpha_x[r,g], ensurefinite((value(x0[r, g]) - value(rx0[r, g])) / value(s0[r, g])));
-        set_value(alpha_d[r,g], ensurefinite((value(xd0[r,g])) / value(s0[r, g])));
-        set_value(alpha_n[r,g], ensurefinite(value(xn0[r,g]) / (value(s0[r, g]))));
+        set_value(alpha_x[r,g], ensurefinite((value(x0[r, g]) - value(rx0[r, g])) / value(cs0[r, g])));
+        set_value(alpha_d[r,g], ensurefinite((value(xd0[r,g])) / value(cs0[r, g])));
+        set_value(alpha_n[r,g], ensurefinite(value(xn0[r,g]) / (value(cs0[r, g]))));
         set_value(theta_n[r,g], ensurefinite(value(nd0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]))));
         set_value(theta_m[r,g], ensurefinite((1+value(tm0[r, g])) * value(m0[r, g]) / (value(nd0[r, g]) + value(dd0[r, g]) + (1 + value(tm0[r, g])) * value(m0[r, g]))));
     end
