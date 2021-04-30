@@ -18,6 +18,7 @@ function share_region(dataset::Dataset, d::Dict, set::Dict)
     d_read = read_build(set!(dataset; step=step))
 
     if dataset.step=="input"
+        print_status(set!(dataset; step=step))
         [d_read[k] = filter_with(df, set; extrapolate=true) for (k,df) in d_read]
         merge!(d, d_read)
         

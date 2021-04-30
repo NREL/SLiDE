@@ -53,26 +53,90 @@ function _with_id(df::DataFrame, sub::Symbol; replace=:value)
 end
 
 
-# """
-# """
-# _add_id(x::Symbol, from::Any; replace=:value) = (x == replace) ? from : append(x, from)
-
-
-
-# """
-# """
-# _with_id(df::DataFrame, id::Symbol) = (id == :value) ? findvalue(df) : propertynames_with(df, id)
-
-
-# """
-# """
-# _remove_id(x::Symbol, id::Symbol) = (x == id) ? x : getid(x, id)
-# _remove_id(x::AbstractArray, id::Symbol) = _remove_id.(x, id)
-
-
 """
 """
 getid(x::Symbol, id::Symbol) = Symbol(getid(string(x), string(id)))
 getid(x::String, id::String) = replace(x, Regex("_*$id" * "_*") => "")
 # !!!! function name??? elsewhere, find* selects df columns based on some criteria.
 # !!!! replace findunits with general findcol or something.
+
+
+"""
+"""
+print_status(args...; kwargs...) = println(_write(args...; kwargs...))
+
+
+"""
+"""
+function _write(dataset::Dataset)
+    head = "*"^80 * "\n"
+    line = if dataset.step in ["bea","seds","co2"]
+        "PARTITIONING $(uppercase(dataset.step)) input data. Calculating..."
+    elseif dataset.step=="calibrate"
+        "CALIBRATING $(dataset.build=="io" ? "national" : "regional") data..."
+    elseif dataset.step in ["disaggregate",PARAM_DIR]
+        if dataset.build=="io"
+            "DISAGGREGATING national -> regional data. Calculating..."
+        else
+            "Integrating SEDS energy and electricity data into regionally-disaggregated\nBEA parameters. Calculating..."
+        end
+    else
+        "$(uppercase(_gerund(dataset.step)))..."
+    end
+    return string(head, line)
+end
+
+function _write(str::String, args...; kwargs...)
+    return string(
+        "\t", _gerund(str), " ",
+        _write(args...; kwargs...)
+    )
+end
+
+function _write(x::T; key=missing) where T<:Scale
+    return string(
+        "  " ^ !ismissing(key),
+        _gerund(x.direction),
+        " " ^ !ismissing(key),
+        _write(key, x.on, _write(x.from=>x.to)),
+    )
+end
+
+function _write(x::Pair)
+    return string(
+        _write_list(x[1]), " -> ",
+        _write_list(x[2]),
+    )
+end
+
+function _write(key::Symbol, idx::Union{Symbol,AbstractArray}; description=missing)
+    return string("  ",
+        key, _write_index(idx),
+        ismissing(description) ? "" : ": $description",
+    )
+end
+
+function _write(key, df::DataFrame; kwargs...)
+    return _write(key, findindex(df); kwargs...)
+end
+
+_write(key::Symbol, x::Any, description::String) = _write(key, x; description=description)
+_write(key::Missing, x::Any, description::String) = string(": ", description)
+_write(key::Symbol, d::Dict; kwargs...) = _write(key, d[key]; kwargs...)
+
+
+"This function formats input into a list."
+_write_list(x::AbstractArray) = string("(",string(string.(x,",")...)[1:end-1],")")
+_write_list(x) = string(x)
+
+
+"This function formats DataFrame index as a list"
+_write_index(df::DataFrame) = _write_list(setdiff(propertynames(df), [:units,:value]))
+_write_index(x) = _write_list(ensurearray(x))
+
+
+"This function formats a string as a gerund."
+function _gerund(x)
+    x = titlecase(string(x))
+    return string(x[end]=='e' ? x[1:end-1] : x, "ing")
+end

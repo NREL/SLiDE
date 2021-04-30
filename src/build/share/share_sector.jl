@@ -1,7 +1,14 @@
 """
-    share_sector!()
+    share_sector!(d::Dict, set::Dict; kwargs...)
+This function returns a sectoral disaggregation weighting factor, updates the sectoral
+set list(s) stored in `set`, and adds the sectoral weighting DataFrame to `d`.
+
 # Arguments
 - `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
+
+# Returns
+- `weighting::Weighting`
 """
 function share_sector!(d, set; kwargs...)
     weighting, mapping, lst = share_sector(set[:sector]; kwargs...)
@@ -16,7 +23,7 @@ end
 """
     share_sector(; kwargs...)
     share_sector(lst::AbstractArray; kwargs...)
-This function returns sectoral disaggregation weighting factors.
+This function returns a sectoral disaggregation weighting factor.
 
 It first reads and partitions ([`partition`](@ref)) detail-level BEA data to calculate 
 gross output, ``y_{yr,g}``, which is used to determine sectoral scaling for disaggregation.
@@ -53,13 +60,13 @@ function share_sector( ; path::String=SCALE_BLUENOTE_IO)
     dfmap = read_file(path)[:,1:2]
 
     # Get the detail-level info so we can disaggregate.
-    set_det = SLiDE.read_set("io"; sector_level=sector_level)
-    det = SLiDE.read_input!(Dataset(""; step="partition", sector_level=sector_level))
+    set_det = read_set("io"; sector_level=sector_level)
+    det = read_input!(Dataset(""; step="bea", sector_level=sector_level))
 
-    df = SLiDE._partition_y0!(det, set_det; sector_level=sector_level)
+    df = _partition_y0!(det, set_det; sector_level=sector_level)
     
     # Initialize scaling information.
-    return SLiDE.share_with(Weighting(df), Mapping(dfmap))
+    return share_with(Weighting(df), Mapping(dfmap))
 end
 
 
@@ -74,8 +81,8 @@ end
     share_with(df::DataFrame, x::Mapping)
 """
 function share_with(weighting::Weighting, mapping::Mapping)    
-    SLiDE.set_scheme!(weighting, mapping)
-    SLiDE.share_with!(weighting, mapping)
+    set_scheme!(weighting, mapping)
+    share_with!(weighting, mapping)
     return weighting, mapping
 end
 

@@ -1,29 +1,29 @@
 function disaggregate_energy!(dataset, d, set, maps)
     step = "disaggregate"
-    d_read = SLiDE.read_build(SLiDE.set!(dataset; step=step))
+    d_read = read_build(set!(dataset; step=step))
 
     if dataset.step=="input"
         # Do some renaming here so we don't have to later.
         [d[k] = edit_with(d[k], Rename(:src,:g)) for k in [:ed0,:emarg0,:pctgen]]
 
         # Disaggregate.
-        SLiDE._disaggregate_cng!(d, set, maps)
-        SLiDE._disagg_energy_fvs!(d)
+        _disaggregate_cng!(d, set, maps)
+        _disagg_energy_fvs!(d)
 
         # Make individual adjustments.
-        SLiDE._disagg_energy_md0!(d, set)
-        SLiDE._disagg_energy_cd0!(d, set)
-        SLiDE._disagg_energy_ys0!(d, set, maps)
-        SLiDE._disagg_energy_id0!(d, set, maps)
-        SLiDE._disagg_energy_m0!(d)
-        SLiDE._disagg_energy_x0!(d)
+        _disagg_energy_md0!(d, set)
+        _disagg_energy_cd0!(d, set)
+        _disagg_energy_ys0!(d, set, maps)
+        _disagg_energy_id0!(d, set, maps)
+        _disagg_energy_m0!(d)
+        _disagg_energy_x0!(d)
 
         # Zero production.
-        SLiDE._disagg_energy_zero_prod!(d)
+        _disagg_energy_zero_prod!(d)
 
         # Update household disaggregation.
-        SLiDE._disagg_hhadj!(d)
-        SLiDE.write_build!(SLiDE.set!(dataset; step=step), d)
+        _disagg_hhadj!(d)
+        write_build!(set!(dataset; step=step), d)
     end
     
     return d, set, maps
@@ -33,7 +33,7 @@ end
 """
 """
 function _disaggregate_cng!(d, set, maps)
-    weighting, mapping = SLiDE.share_with(Weighting(d[:shrgas]), Mapping(maps[:cng]))
+    weighting, mapping = share_with(Weighting(d[:shrgas]), Mapping(maps[:cng]))
     disaggregate_sector!(d, set, weighting; label=:cng)
     maps[:demand] = filter_with(maps[:demand], (s=set[:sector],))
     return d, set
@@ -84,7 +84,7 @@ function _disagg_energy_mrgshr!(d::Dict, set::Dict)
         df = fill_zero(df; with=(yr=set[:yr], r=set[:r], g=set[:e]))
         df[!,:trd] .= 1.0 .- df[:,:trn]
 
-        d[:mrgshr] = select(dropzero(SLiDE._stack(df, var, val)), col)
+        d[:mrgshr] = select(dropzero(_stack(df, var, val)), col)
     end
     return d[:mrgshr]
 end
@@ -221,7 +221,7 @@ function _disagg_energy_id0!(d::Dict, set::Dict, maps::Dict)
     println("  Calculating id0(yr,r,g=ele,s), regional intermediate demand")
     df, df_out = split_with(d[:id0], (g=set[:e],))
 
-    df_inpshr = SLiDE._disagg_energy_inpshr!(d, set, maps)
+    df_inpshr = _disagg_energy_inpshr!(d, set, maps)
     df = combine_over(dropzero(d[:ed0] * df_inpshr), :sec; digits=false)
 
     d[:id0] = vcat(df_out, df)
@@ -271,9 +271,9 @@ function _disagg_energy_zero_prod(d::Dict)
 end
 
 function _disagg_energy_zero_prod(df::DataFrame, idxzero::DataFrame)
-    idxon = SLiDE.find_sector(idxzero)
+    idxon = find_sector(idxzero)
     if !(idxon in propertynames(df))
-        idxzero = edit_with(idxzero, Rename(idxon, SLiDE.find_sector(df)))
+        idxzero = edit_with(idxzero, Rename(idxon, find_sector(df)))
     end
     return filter_with(df, Not(idxzero))
 end
@@ -284,7 +284,7 @@ end
 function drop_small!(d, set; digits=5)
     variables = setdiff(keys(d), list("taxes"))
 
-    [d[k] = SLiDE.drop_small(d[k]; digits=digits, key=k) for k in variables
+    [d[k] = drop_small(d[k]; digits=digits, key=k) for k in variables
         if typeof(d[k])==DataFrame]
     return d
 end
@@ -293,14 +293,14 @@ end
 """
 """
 function drop_small(df; digits=5, key=missing)
-    sector = ensurearray(SLiDE.find_sector(df))
+    sector = ensurearray(find_sector(df))
     
     if !isempty(sector)
         col = setdiff(findindex(df), [:yr; sector[1]])
         !ismissing(key) && println("\tDropping small values from $key\t", col)
 
-        df = SLiDE.drop_small_average(df, col; digits=digits)
-        df = SLiDE.drop_small_value(df; digits=digits+2)
+        df = drop_small_average(df, col; digits=digits)
+        df = drop_small_value(df; digits=digits+2)
     end
     
     return df

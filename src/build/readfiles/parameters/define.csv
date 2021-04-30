@@ -78,3 +78,5 @@ trdele,"[yr,r,g,t]",electricity imports-exports to/from U.S.,billions of us doll
 energy,"[yr,r,src,sec,pq,units]",,"us dollars (USD) per million btu, us dollars (USD) per thousand kilowatthour, trillion btu, billion kilowatthours",,,,,,
 elegen,"[yr,r,src,units]",,billion kilowatthours,,,,,,
 co2emis,"[yr,r,src,sec,units,dataset]",,million metric tons of carbon dioxide,,,,,,
+resco2,"[yr,r,g,units]",,,,,,,,
+secco2,"[yr,r,g,s,units]",,,,,,,,

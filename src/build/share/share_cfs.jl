@@ -15,7 +15,7 @@
 ```
 """
 function share_rpc!(d::Dict, set::Dict)
-    println("  Calculating rpc(r,g), regional purchase coefficient")
+    print_status(:rpc, [:r,:g], "regional purchase coefficient")
 
     _set_ng!(d, set)
     _share_mrt0!(d)
@@ -29,6 +29,7 @@ function share_rpc!(d::Dict, set::Dict)
     df_uti = fill_with((r = set[:r], g = "uti"), 0.9)
 
     d[:rpc] = sort([df; df_uti])
+    return d[:rpc]
 end
 
 
@@ -50,13 +51,14 @@ end
 Calling [`SLiDE._avg_ng`](@ref) returns ``\\bar{d}_{r,ng\\in g}``.
 """
 function _share_d0!(d::Dict, set::Dict)
-    println("\td0(r,g), local supply-demand")
     df = copy(d[:cfs])
-
+    
     df = df[df[:,:orig] .== df[:,:dest],:]
     df = edit_with(df, [Rename(:orig, :r), Deselect([:dest], "==")])
-
+    
     d[:d0] = _avg_ng(df, set)
+
+    print_status(:d0, d, "local supply-demand")
     return d[:d0]
 end
 
@@ -83,12 +85,11 @@ end
 ```
 Calling [`SLiDE._avg_ng`](@ref) returns ``\\bar{mn}_{r,ng\\in g}``.
 """
-function _share_mn0!(d::Dict, set::Dict)
-    println("\tmn0(r,g), national demand")
-    df = copy(d[:mrt0])
+function _share_mn0!(d::Dict, set::Dict)    
+    df = edit_with(combine_over(d[:mrt0], :orig), Rename(:dest, :r))
+    d[:mn0] = _avg_ng(df, set)
 
-    df = edit_with(combine_over(df, :orig), Rename(:dest, :r))
-d[:mn0] = _avg_ng(df, set)
+    print_status(:mn0, d, "national demand")
     return d[:mn0]
 end
 
@@ -101,11 +102,10 @@ end
 Calling [`SLiDE._avg_ng`](@ref) returns ``\\bar{xn}_{r,ng\\in g}``.
 """
 function _share_xn0!(d::Dict, set::Dict)
-    println("\txn0(r,g), national exports")
-    df = copy(d[:mrt0])
-
-    df = edit_with(combine_over(df, :dest), Rename(:orig, :r))
+    df = edit_with(combine_over(d[:mrt0], :dest), Rename(:orig, :r))
     d[:xn0] = _avg_ng(df, set)
+
+    print_status(:xn0, d, "national exports")
     return d[:xn0]
 end
 

@@ -5,8 +5,9 @@
 ```
 """
 function share_pce!(d::Dict)
-    println("  Calculating pce(yr,r,g), regional shares of final consumption")
     d[:pce] /= transform_over(d[:pce], :r)
     verify_over(d[:pce], :r) !== true && @error("PCE shares don't sum to 1.")
+    
+    print_status(:pce, [:yr,:r,:g], "regional shares of final consumption")
     return dropnan!(d[:pce])
 end

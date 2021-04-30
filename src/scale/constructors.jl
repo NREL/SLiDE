@@ -1,14 +1,17 @@
 """
+    list_unique(df::DataFrame)
+    list_unique(df::DataFrame, idx::AbstractArray)
+    list_unique(df::DataFrame, idx::Symbol)
+This function returns a list of all unique elements across multiple DataFrame columns
 """
 list_unique(df::DataFrame) = unique(vcat(eachcol(df)...))
 list_unique(df::DataFrame, idx::AbstractArray) = list_unique(df[:,idx])
 list_unique(df::DataFrame, idx::Symbol) = unique(df[:,idx])
 
 
-"""
-"""
+"This function drops `df` rows that are mapped one-to-one."
 function drop_identity(df::DataFrame, idx::Array{Symbol,1})
-    return df[SLiDE.nunique.(eachrow(df[:,idx])).==length(idx), :]
+    return df[nunique.(eachrow(df[:,idx])).==length(idx), :]
 end
 
 function drop_identity(df, idx::Array{Array{Symbol,1},1})
@@ -21,6 +24,12 @@ drop_identity(df, idx::Tuple) = drop_identity(df, ensurearray(idx))
 
 
 """
+    map_identity(x::T, lst::AbstractArray) where T<:Scale
+This function adds one-to-one mapping to the `data` field in `Mapping` or `Weighting` so
+that the entirity of `lst` is included in the mapping.
+
+# Returns
+- `df::DataFrame` with `lst` completely mapped.
 """
 function map_identity(x::Mapping, lst::AbstractArray)
     col = propertynames(x.data)
@@ -59,9 +68,7 @@ end
 find_sector(df::DataFrame) = find_sector(propertynames(df))
 
 
-"""
-Define the [`SLiDE.Weighting`](@ref) field `constant` if `on` is already defined.
-"""
+"Define the [`SLiDE.Weighting`](@ref) field `constant` if `on` is already defined."
 function set_constant!(x::Weighting)
     idx = findindex(x.data)
     field = ensurearray(x.on)
@@ -70,9 +77,7 @@ function set_constant!(x::Weighting)
 end
 
 
-"""
-Define the [`SLiDE.Weighting`](@ref) field `on` if `constant` is already defined.
-"""
+"Define the [`SLiDE.Weighting`](@ref) field `on` if `constant` is already defined."
 function set_on!(x::Weighting)
     idx = findindex(x.data)
     field = x.constant
@@ -84,7 +89,7 @@ end
 """
     map_direction(df::DataFrame)
     map_direction(x::T) where T <: Scale
-Returns a Tuple of DataFrame columns in the order (aggregate-level, disaggregate-level).
+This function returns a Tuple of DataFrame columns in the order (aggregate, disaggregate).
 This is determined from the number of unique entries in each column under the assumption
 that the aggregate-level will have fewer unique entries.
 
@@ -99,7 +104,7 @@ SLiDE.map_direction(df)
 """
 function map_direction(df::DataFrame)
     col = findindex(df)
-    nn_col = SLiDE.nunique(df[:,col])
+    nn_col = nunique(df[:,col])
     nn_unique = unique(nn_col)
 
     # If there is only ONE column on each the aggregate and disaggregate level...
@@ -119,6 +124,8 @@ map_direction(x::Weighting) = map_direction(convert_type(Mapping, x))
 
 
 """
+This function sets the `direction` field to `aggregate` or `disaggregate` based on the
+results of [`SLiDE.map_direction`](@ref) and values of the `from` and `to` fields.
 """
 function set_direction!(x::T) where T <: Scale
     agg, dis = map_direction(x)
@@ -167,6 +174,8 @@ end
 
 """
     map_scheme(df)
+This function sets the `direction` field for `Mapping` and `Weighting` types based on
+overlap between input parameters.
 """
 map_scheme(weighting::Weighting, mapping::Mapping) = _map_scheme(weighting.data, mapping.data)
 map_scheme(mapping::Mapping, weighting::Weighting) = map_scheme(weighting, mapping)
@@ -254,13 +263,13 @@ generates a dataframe with these sharing parameters through the following proces
     - If ``g\\neq s``, drop these values.
 """
 function compound_for!(x::T, lst::AbstractArray) where T<:Scale
-    if !SLiDE.isarray(x.on) || length(x.on)==1
+    if !isarray(x.on) || length(x.on)==1
         return x
     elseif length(x.on)>2
         @error("Can only compound, at most, two columns.")
     else
         df = x.data
-        df_ones = SLiDE.map_identity(x, lst)
+        df_ones = map_identity(x, lst)
         df_all = vcat(df, df_ones)
 
         # Define edits and update fields.
@@ -268,7 +277,7 @@ function compound_for!(x::T, lst::AbstractArray) where T<:Scale
         set_from!(x, append.(x.from, x.on))
         set_to!(x, append.(x.to, x.on))
 
-        x.data = SLiDE._compound_with(x, df, df_ones, xedit)
+        x.data = _compound_with(x, df, df_ones, xedit)
     end
     return x
 end
@@ -276,13 +285,13 @@ end
 function compound_for!(x::T, lst, df::DataFrame) where T<:Scale
     compound_for!(x, lst)
     map_year!(x, df)
-    SLiDE.set_scheme!(x, df)
+    set_scheme!(x, df)
     return x
 end
 
 function compound_for(x::T, lst::AbstractArray, setlst::AbstractArray) where T<:Scale
-    (SLiDE.isarray(x.on) && length(x.on)==1) && set_on!(x, x.on[1])
-    return SLiDE.compound_for(convert_type(Mapping,x), lst, DataFrame(x.on=>setlst))
+    (isarray(x.on) && length(x.on)==1) && set_on!(x, x.on[1])
+    return compound_for(convert_type(Mapping,x), lst, DataFrame(x.on=>setlst))
 end
 
 
@@ -309,7 +318,7 @@ function _compound_with(x::Weighting, df::DataFrame, df_ones::DataFrame, xedit::
     # Sum over (g) at the disaggregate level, keeping only the rows for which
     # (g,s) are the same at this level.
     df_same = transform_over(df_same, dis[1])
-    ii_same = SLiDE._find_constant.(eachrow(df_same[:,dis]))
+    ii_same = _find_constant.(eachrow(df_same[:,dis]))
     df_same = df_same[ii_same,:]
 
     df = vcat(df_same, df_diff)

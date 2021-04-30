@@ -1,8 +1,8 @@
 parameter
 # --- eem ---
-resco2
-secco2
-eq0
+fvs
+netgen
+# eq0
 # --- io ---
 a0
 bopdef0

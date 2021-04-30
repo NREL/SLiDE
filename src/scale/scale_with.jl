@@ -1,7 +1,9 @@
 """
     scale_with(df, x)
 """
-function scale_with(df::DataFrame, x::Weighting)
+function scale_with(df::DataFrame, x::Weighting; kwargs...)
+    print_status(x; kwargs...)
+
     # Save unaffected indices. Map the others and calculate share.
     df_ones = filter_with(df, Not(x))
     df = edit_with(df,
@@ -15,7 +17,9 @@ function scale_with(df::DataFrame, x::Weighting)
 end
 
 
-function scale_with(df::DataFrame, x::Mapping)    
+function scale_with(df::DataFrame, x::Mapping; kwargs...)
+    print_status(x; kwargs...)
+
     # Save unaffected indices. Map the others.
     df_ones = filter_with(df, Not(x))
     df = edit_with(df, Map(x.data, [x.from;], [x.to;], [x.on;], [x.on;], :inner))
@@ -26,14 +30,14 @@ function scale_with(df::DataFrame, x::Mapping)
 end
 
 
-function scale_with(lst::AbstractArray, x::Mapping)
-    x = SLiDE.compound_for(x, lst, lst)
-    return unique(SLiDE.scale_with(DataFrame(x.on=>lst), x)[:,1])
+function scale_with(lst::AbstractArray, x::Mapping; kwargs...)
+    x = compound_for(x, lst, lst)
+    return unique(scale_with(DataFrame(x.on=>lst), x; kwargs...)[:,1])
 end
 
-scale_with(lst, x::Weighting) = SLiDE.scale_with(lst, convert_type(Mapping,x))
+scale_with(lst, x::Weighting; kwargs...) = scale_with(lst, convert_type(Mapping,x); kwargs...)
 
-scale_with(df::DataFrame, x::Union{Missing,Nothing}) = df
+scale_with(df::DataFrame, x::Union{Missing,Nothing}; kwargs...) = df
 
 
 
@@ -45,7 +49,6 @@ scale_with(df::DataFrame, x::Union{Missing,Nothing}) = df
     filter_with!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
     filter_with!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
 # This function filters and updates `Weighting.data`, given a `lst` of 
-
 
 When filtering, we ensure the following:
 1. Each disaggregate-level code's corresponging 

@@ -1,18 +1,24 @@
 function calibrate(fun::Function, dataset::Dataset, io::Dict, set::Dict; kwargs...)
     step = "calibrate"
-    cal = SLiDE.read_build(SLiDE.set!(dataset; step=step))
+    cal = read_build(set!(dataset; step=step))
 
+    # Initialize a DataFrame to store results and calibrate iteratively.
     if dataset.step=="input"
-        # Initialize a DataFrame to contain results and do the calibration iteratively.
-        SLiDE.set!(dataset; step=step)
-        cal = Dict(k => DataFrame() for k in list!(set, dataset))
+        set!(dataset; step=step)
+        print_status(dataset)
+        
+        lst = list!(set, dataset)
+        io, io_out = split_with!(io, lst)
+
+        cal = Dict(k => DataFrame() for k in lst)
         
         for year in set[:yr]
             cal_yr = fun(io, set, year; kwargs...)
-            [cal[k] = [cal[k]; cal_yr[k]] for k in keys(cal_yr)]
+            [cal[k] = [cal[k]; cal_yr[k]] for k in lst]
         end
 
-        SLiDE.write_build!(dataset, cal)
+        write_build!(dataset, cal)
+        merge!(cal, _calibrate_static(dataset,io_out))
     end
     
     return cal
@@ -83,7 +89,7 @@ function _calibration_output(model::Model, set::Dict, year::Integer; region::Boo
     build = region ? "eem" : "io"
     idxskip = region ? [:yr,:fdcat] : [:yr,:r,:fdcat]
 
-    parameters = SLiDE.describe!(set, Dataset(""; build=build, step="calibrate"))
+    parameters = describe!(set, Dataset(""; build=build, step="calibrate"))
 
     d = Dict()
     for (k, parameter) in parameters
@@ -95,4 +101,15 @@ function _calibration_output(model::Model, set::Dict, year::Integer; region::Boo
     end
 
     return d
+end
+
+
+function _calibrate_static(dataset::Dataset, d::Dict)
+    if dataset.build=="io" || isempty(d)
+        return Dict()
+    elseif dataset.build=="eem"
+        lst = list(dataset)
+        lst_model = list(Dataset(""; build=dataset.build, step=PARAM_DIR))
+        return Dict(k => d[k] for k in intersect(setdiff(lst_model,lst),keys(d)))
+    end
 end

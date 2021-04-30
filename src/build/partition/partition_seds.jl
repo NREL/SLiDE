@@ -9,21 +9,22 @@ This function prepares SEDS energy data for the EEM.
     3. CO2 Emissions - [`eem_co2emis!`](@ref)
 """
 function partition_seds(dataset::Dataset, d::Dict, set::Dict)
-    step = "partition"
-    SLiDE.set!(dataset; build="eem", step=step)
+    step = "seds"
+    set!(dataset; build="eem", step=step)
+    
     maps = SLiDE.read_map()
-
     d_read = SLiDE.read_input!(dataset)
 
     if dataset.step=="input"
+        print_status(set!(dataset; step=step))
+
         [d_read[k] = SLiDE.extrapolate_year(df, (yr=set[:yr],)) for (k,df) in d_read]
         merge!(d, d_read)
 
-        SLiDE.partition_elegen!(d, maps)
-        SLiDE.partition_energy!(d, set, maps)
-        # SLiDE.partition_co2emis!(d, set, maps)
+        partition_elegen!(d, maps)
+        partition_energy!(d, set, maps)
 
-        d[:convfac] = SLiDE._partition_convfac(d)
+        # d[:convfac] = SLiDE._partition_convfac(d)
         d[:cprice] = SLiDE._partition_cprice!(d, maps)
         d[:prodbtu] = SLiDE._partition_prodbtu!(d, set)
         d[:pedef] = SLiDE._partition_pedef!(d, set, maps)
@@ -235,9 +236,10 @@ conversion factor for USD per barrel ``\\longrightarrow`` USD per million btu
 \\right\\}
 ```
 """
-function _partition_convfac(d::Dict)
-    println("  Partitioning convfac(yr,r), conversion factor for USD per barrel")
-    return filter_with(d[:seds], (src="cru", sec="supply", units=BTU_PER_BARREL); drop=:sec)
+function _partition_convfac!(d::Dict)
+    print_status("partition",:convfac,[:yr,:r],"conversion factor for USD per barrel")
+    d[:convfac] = filter_with(d[:seds], (src="cru", sec="supply", units=BTU_PER_BARREL); drop=:sec)
+    return d[:convfac]
 end
 
 
@@ -252,9 +254,9 @@ end
 ```
 """
 function _partition_cprice!(d::Dict, maps::Dict)
-    println("  Partitioning cprice(yr,r), crude oil price")
+    print_status("partition",:cprice,[:yr,:r],"crude oil price")
 
-    df = operate_over(d[:crude_oil], SLiDE._partition_convfac(d);
+    df = operate_over(d[:crude_oil], _partition_convfac!(d);
         id=[:usd_per_barrel,:btu_per_barrel]=>:usd_per_btu,
         units=maps[:operate],
     )
@@ -275,7 +277,7 @@ end
 ```
 """
 function _partition_prodbtu!(d::Dict, set::Dict)
-    println("  Partitioning prodbtu(yr,r,src)")
+    print_status("partition",:prodbtu,[:yr,:r,:src])
     d[:prodbtu] = filter_with(d[:seds], (src=set[:as], sec="supply", units=BTU); drop=:sec)
     return d[:prodbtu]
 end
@@ -310,7 +312,8 @@ Average energy demand price ``\\tilde{pedef}_{yr,r,src}`` and its regional avera
 ```
 """
 function _partition_pedef!(d::Dict, set::Dict, maps::Dict)
-    println("  Partitioning pedef(yr,r,src), average energy demand price")
+    print_status("partition",:pedef,[:yr,:r,:src],"average energy demand price")
+
     var, val = :pq, [:units,:value]
 
     splitter = DataFrame(permute((src=[set[:ff];"ele"], sec=set[:demsec], pq=["p","q"])))
@@ -339,7 +342,7 @@ end
 `pe0(yr,r,src,sec)`
 """
 function _partition_pe0!(d::Dict, set::Dict, maps::Dict)
-    println("  Partitioning pe0(yr,r,src,sec)")
+    print_status("partition",:pe0,[:yr,:r,:src,:sec])
     df_demsec = DataFrame(sec=set[:demsec])
     df_energy = filter_with(d[:energy], (src=set[:e], sec=set[:demsec]))
 

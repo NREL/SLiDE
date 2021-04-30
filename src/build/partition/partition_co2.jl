@@ -1,3 +1,20 @@
+function partition_co2!(dataset::Dataset, d::Dict, set::Dict, maps::Dict)
+    step = "co2"
+    d_read = SLiDE.read_build(SLiDE.set!(dataset; step=step))
+
+    if dataset.step=="input"
+        print_status(set!(dataset; step=step))
+
+        SLiDE.partition_co2!(d, set, maps)
+        SLiDE.write_build!(SLiDE.set!(dataset; step=step), copy(d))
+    else
+        merge!(d, d_read)
+    end
+
+    return d
+end
+
+
 function partition_co2!(d::Dict, set::Dict, maps::Dict)
     _partition_co2emiss!(d, maps)
     _share_co2emiss!(d, set, maps)
