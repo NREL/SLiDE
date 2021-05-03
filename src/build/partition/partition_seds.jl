@@ -1,11 +1,16 @@
 """
-This function prepares SEDS energy data for the EEM.
+    partition_seds(dataset::Dataset, d::Dict, set::Dict)
+This function prepares SEDS energy and electricity data for the Energy-Environment Module
+
+# Arguments
+- `dataset::Dataset` identifier
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 
 # Returns
-- `d::Dict` of EIA data from the SLiDE input files,
-    with the addition of the following data sets describing:
-    1. Electricity - [`eem_elegen!`](@ref)
-    1. Energy - [`eem_energy!`](@ref)
+- `d::Dict` of SEDS energy and electricity data
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
+- `maps::Dict` of default mapping schematics and constants
 """
 function partition_seds(dataset::Dataset, d::Dict, set::Dict)
     step = "seds"
@@ -298,15 +303,23 @@ Average energy demand price ``\\tilde{pedef}_{yr,r,src}`` and its regional avera
 
 ```math
 \\begin{aligned}
-\\tilde{pedef}_{yr,r,src}
+\\bar{p}_{yr,r,src}
 &=
-\\dfrac{\\sum_{sec} \\left( \\tilde{p}_{yr,r,src,sec} \\cdot \\tilde{q}_{yr,r,src,sec} \\right)}
-      {\\sum_{sec} \\tilde{q}_{yr,r,src,sec}}
+\\dfrac{\\sum_{sec} \\left( p_{yr,r,src,sec} \\cdot q_{yr,r,src,sec} \\right)}
+      {\\sum_{sec} q_{yr,r,src,sec}}
 \\\\
-\\hat{pedef}_{yr,src}
+\\bar{p}_{yr,src}
 &=
-\\dfrac{\\sum_{r} \\left( \\tilde{pedef}_{yr,r,src} \\cdot \\sum_{sec} \\tilde{q}_{yr,r,src,sec} \\right)}
-      {\\sum_{r} \\sum_{sec} \\tilde{q}_{yr,r,src,sec}}
+\\dfrac{\\sum_{r} \\left( \\bar{p}_{yr,r,src} \\cdot \\sum_{sec} q_{yr,r,src,sec} \\right)}
+      {\\sum_{r} \\sum_{sec} q_{yr,r,src,sec}}
+\\\\&\\\\
+\\bar{p}_{yr,r,src} &=
+\\begin{cases}
+\\bar{p}_{yr,r,src} & \\sum_{sec} q_{yr,r,src,sec} \\neq 0
+\\\\
+\\bar{p}_{yr,src}   & \\sum_{sec} q_{yr,r,src,sec} = 0
+\\end{cases}
+\\end{aligned}
 ```
 """
 function _partition_pedef!(d::Dict, set::Dict, maps::Dict)
@@ -342,7 +355,7 @@ end
 function _partition_pe0!(d::Dict, set::Dict, maps::Dict)
     df_demsec = DataFrame(sec=set[:demsec])
     df_energy = filter_with(d[:energy], (src=set[:e], sec=set[:demsec]))
-    
+    8
     # Use average energy demand prices where available.
     df_p = filter_with(df_energy, (pq="p",); drop=true)
     df_pedef = crossjoin(d[:pedef], df_demsec)
@@ -373,11 +386,14 @@ end
 
 """
 `ps0(yr,src)`, crude oil and natural gas supply prices
+
+```math
 \\begin{aligned}
 ps_{r,src} &= \\sum_{r,sec} pe_{yr,r,src,sec}
 \\\\
 ps_{r,src=cru} &= \\frac{1}{2}ps_{r,src=oil}
 \\end{aligned}
+```
 """
 function _partition_ps0!(d::Dict)
     var, val = :src, [:units,:value]
@@ -397,6 +413,18 @@ end
 
 """
 `prodval(yr,r,src)`, production value (using supply prices)
+
+```math
+\\begin{aligned}
+p_{yr,src} \\text{ [USD/million btu]} &= \\left\\{
+    ps_{yr,src} \\;\\vert\\; [cru,gas] \\in src
+\\right\\}
+\\\\
+prodval_{yr,r,src} \\text{ [billion USD]} &= \\frac{1}{10^3}
+    \\cdot p_{yr,src} \\text{ [USD/million btu]}
+    \\cdot prodbtu_{yr,r,src} \\text{ [trillion btu]}
+\\end{aligned}
+```
 """
 function _partition_prodval!(d::Dict, set::Dict, maps::Dict)
     df_ps0 = filter_with(d[:ps0], (src=set[:as],))
@@ -416,6 +444,32 @@ end
 
 """
 `shrgas(yr,r,src)`, regional share of production for gas extraction
+
+```math
+\\delta_{yr,r,src} = \\dfrac{prodval_{yr,r,src}}{\\sum_{src} prodval_{yr,r,src}}
+```
+
+Fill missing `(yr,src)` values using ``\\bar\\delta_{yr,src}`` as computed by `SLiDE.impute_mean`,
+under the condition that there is some non-zero supply of goods from the `cng` sector:
+
+```math
+ys0^\\star_{yr,r,src} = 
+    \\sum_{g} ys_{yr,r,s=cng,g} \\circ map_{demsec \\in sec} > 0
+```
+
+```math
+\\delta_{yr,r,src} = 
+\\begin{cases}
+\\delta_{yr,r,src} & \\sum_{src}prodval_{yr,r,src} \\neq 0
+\\\\
+\\bar{\\delta}_{yr,r,src} & \\sum_{src}prodval_{yr,r,src}=0,\\, ys0^\\star_{yr,r,src} > 0
+\\end{cases}
+```
+
+Ensure all sectoral shares sum to 1.
+```math
+\\delta_{yr,r,src} = \\dfrac{\\delta_{yr,r,src}}{\\sum_{src}\\delta_{yr,r,src}}
+```
 """
 function _partition_shrgas!(d::Dict)
     df = copy(d[:prodval])

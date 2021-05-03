@@ -11,7 +11,7 @@ This file is auto-generated. Do not edit.
         direction::Symbol
     end
 
-Store mapping AND weighting information for scaling.
+Store mapping AND weighting information for scaling. ```math 1+1 ```
 
 # Arguments
 - `data::DataFrame`: input file name

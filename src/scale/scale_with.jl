@@ -1,6 +1,32 @@
 """
-    scale_with(df, x)
+    scale_with(df::DataFrame, x::Weighting)
+This function maps `df`: `x.from -> x.to`, multiplying by any associated `share` specified
+in `x.data`. For a parameter ``\\bar{z}``,
+```math
+\\begin{aligned}
+\\bar{z}_{c,a} = \\sum_{aa} \\left( \\bar{z}_{c,aa} \\cdot \\tilde{\\delta}_{c,aa \\rightarrow a} \\right)
+\\end{aligned}
+```
+where ``c`` (`x.constant`) represents the index/ices included in, but not changed by,
+the scaling process, and ``aa`` (`x.from`) and ``a`` (`x.to`) represent
+the value(s) of the scaled index/ices before and after scaling.
 
+
+    scale_with(df::DataFrame, x::Mapping)
+This function scales a parameter in `df` according to the input map `dfmap`.
+For a parameter ``\\bar{z}``,
+```math
+\\bar{z}_{c,a} = \\left(\\bar{z}_{c,aa} \\circ map_{aa\\rightarrow a} \\right)
+```
+where ``c`` (`x.constant`) represents the index/ices included in, but not changed by,
+the scaling process, and ``aa`` (`x.from`) and ``a`` (`x.to`) represent
+the value(s) of the scaled index/ices before and after scaling.
+
+For each method, `x.direction = disaggregate`, all disaggregate-level entries will remain
+equal to their aggregate-level value. If `x.direction = aggregate`,
+```math
+\\bar{z}_{c,a} = \\sum_{aa} \\bar{z}_{c,a}
+```
 """
 function scale_with(df::DataFrame, x::Weighting; kwargs...)
     print_status(df; kwargs...)
@@ -42,18 +68,17 @@ scale_with(df::DataFrame, x::Union{Missing,Nothing}; kwargs...) = df
 
 
 """
-    filter_with!(weighting::Weighting, lst::AbstractArray)
-    filter_with!(mapping::Mapping, weighting::Weighting)
+    filter_for!(weighting::Weighting, lst::AbstractArray)
+    filter_for!(mapping::Mapping, weighting::Weighting)
 
-    filter_with!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
-    filter_with!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
-# This function filters and updates `Weighting.data`, given a `lst` of 
+    filter_for!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
+    filter_for!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
 
 When filtering, we ensure the following:
 1. Each disaggregate-level code's corresponging 
 
 """
-function filter_with!(weighting::Weighting, lst::AbstractArray)
+function filter_for!(weighting::Weighting, lst::AbstractArray)
     agg, dis = map_direction(weighting)
 
     dftmp = combine_over(weighting.data, dis)
@@ -79,20 +104,20 @@ function filter_with!(weighting::Weighting, lst::AbstractArray)
     return weighting, lst
 end
 
-function filter_with!(mapping::Mapping, weighting::Weighting)
+function filter_for!(mapping::Mapping, weighting::Weighting)
     col = intersect(propertynames(weighting.data), propertynames(mapping.data))
     mapping.data = unique(weighting.data[:,col])
     return mapping
 end
 
-function filter_with!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
+function filter_for!(weighting::Weighting, mapping::Mapping, lst::AbstractArray)
     # !!!! MAKE SURE ZEROS ARE FILLED HERE.
-    weighting, lst = filter_with!(weighting, lst)
-    mapping = filter_with!(mapping, weighting)
+    weighting, lst = filter_for!(weighting, lst)
+    mapping = filter_for!(mapping, weighting)
     return weighting, mapping, lst
 end
 
-function filter_with!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
-    weighting, mapping, lst = filter_with!(weighting, mapping, lst)
+function filter_for!(mapping::Mapping, weighting::Weighting, lst::AbstractArray)
+    weighting, mapping, lst = filter_for!(weighting, mapping, lst)
     return mapping, weighting, lst
 end

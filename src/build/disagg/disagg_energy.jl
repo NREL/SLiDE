@@ -1,3 +1,15 @@
+"""
+This function disaggregates national-level model parameters to the regional level and
+introduces new parameters.
+
+# Arguments
+- `dataset::Dataset` identifier
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
+
+# Returns
+
+"""
 function disaggregate_energy!(dataset, d, set, maps)
     step = "disaggregate"
     d_read = read_build(set!(dataset; step=step))
@@ -117,7 +129,7 @@ end
 """
 `cd0(yr,r,g=e)`, national final consumption
 ```math
-\\tilde{cd}_{yr,r,g}
+\\bar{cd}_{yr,r,g}
 = \\left\\{
     ed \\left(yr,r,src\\rightarrow g, sec\\right) \\;\\vert\\; yr,\\, r,\\, g,\\, sec=res
 \\right\\}
@@ -179,6 +191,43 @@ end
 
 
 """
+```math
+\\begin{aligned}
+inp_{yr,r,g,s,sec} &= 
+\\big\\{
+    id_{yr,r,g,s} \\circ map_{s\\rightarrow sec} \\;\\vert\\; yr,\\, r,\\, src\\in g,\\, s
+    \\\\&\\qquad\\wedge\\; pctgen_{yr,r,src\\rightarrow g,sec} > 0.01
+\\big\\}
+\\\\&\\\\
+\\alpha^{inp}_{yr,r,g,s,sec} &= \\dfrac
+    {inp_{yr,r,g,s,sec}}
+    {\\sum_s inp_{yr,r,g,s,sec}}
+\\end{aligned}
+```
+
+```math
+\\begin{aligned}
+inp_{yr,r,g,s,sec} &= 
+\\big\\{
+    inp_{yr,r,g,s,sec} \\;\\vert\\; yr,\\, r,\\, src\\in g,\\, s,\\, sec
+    \\\\&\\qquad\\wedge\\; ed_{yr,r,src\\rightarrow g,sec} > 0
+    \\\\&\\qquad\\wedge\\; ys_{yr,r,s,g=s} > 0
+\\big\\}
+\\\\&\\\\
+\\hat{\\alpha}^{inp}_{yr,r,g,s,sec} &= \\dfrac
+    {\\sum_r inp_{yr,r,g,s,sec}}
+    {\\sum_{r,s} inp_{yr,r,g,s,sec}}
+\\end{aligned}
+```
+
+```math
+\\alpha^{inp}_{yr,r,g,s,sec} =
+\\begin{cases}
+\\alpha^{inp}_{yr,r,g,s,sec} & \\sum_s inp_{yr,r,g,s,sec} \\neq 0
+\\\\
+\\hat{\\alpha}^{inp}_{yr,r,g,s,sec} & \\sum_s inp_{yr,r,g,s,sec} = 0
+\\end{cases}
+```
 """
 function _disagg_energy_inpshr!(d::Dict, set::Dict, maps::Dict)
     if !haskey(d, :inpshr)
@@ -222,6 +271,15 @@ end
 
 """
 `id0(yr,r,g=e,s)`, regional intermediate demand
+```math
+id_{yr,r,g,s} =
+\\begin{cases}
+\\sum_{sec} \\left( ed_{yr,r,src\\rightarrow g, sec} \\cdot \\alpha^{inp}_{yr,r,g,s,sec} \\right)
+& e \\in g
+\\\\
+id_{yr,r,g,s} & e\\ni g
+\\end{cases}
+```
 """
 function _disagg_energy_id0!(d::Dict, set::Dict, maps::Dict)
     print_status(:id0, d, "regional intermediate demand")
@@ -237,6 +295,12 @@ end
 
 """
 `x0(yr,r,g=ele)`, foreign exports
+```math
+\\bar{x}_{yr,r,g=ele}
+= \\left\\{
+    trdele \\left(yr,r,t\\right) \\;\\vert\\; yr,\\, r,\\, t=exports
+\\right\\}
+```
 """
 function _disagg_energy_x0!(d::Dict)
     print_status(:x0, d, "foreign exports")
@@ -251,6 +315,12 @@ end
 
 """
 `m0(yr,r,g=ele)`, foreign imports
+```math
+\\bar{m}_{yr,r,g=ele}
+= \\left\\{
+    trdele \\left(yr,r,t\\right) \\;\\vert\\; yr,\\, r,\\, t=imports
+\\right\\}
+```
 """
 function _disagg_energy_m0!(d::Dict)
     print_status(:m0, d, "foreign imports")

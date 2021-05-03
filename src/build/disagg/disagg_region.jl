@@ -1,12 +1,16 @@
 """
-    disagg_region!(dataset::Dataset, d::Dict, set::Dict)
+    disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
+This function disaggregates national-level parameters to the regional level and
+introduces new parameters.
 
 # Arguments
-- `d::Dict` of DataFrames containing the model data.
+- `dataset::Dataset` identifier
+- `d::Dict` of model parameters
 - `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 
 # Returns
-- `d::Dict` of DataFrames containing the model data at the disaggregation step
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
 function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
     step = PARAM_DIR

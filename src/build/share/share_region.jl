@@ -1,17 +1,16 @@
 """
-    share!(d::Dict, set::Dict; save_build = true, overwrite = false)
+    share_region(d::Dict, set::Dict; save_build = true, overwrite = false)
+This function partitions BEA and Census Bureau data to use when disaggregating parameters
+from the national- to regional-level.
 
 # Arguments
-- `d::Dict` of DataFrames containing the model data.
+- `dataset::Dataset` identifier
+- `d::Dict` of model parameters
 - `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 
-# Keywords
-- `save_build = true`
-- `overwrite = false`
-See [`SLiDE.build`](@ref) for keyword argument descriptions.
-
 # Returns
-- `d::Dict` of DataFrames containing the model data at the sharing step.
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
 function share_region(dataset::Dataset, d::Dict, set::Dict)
     step = "share"

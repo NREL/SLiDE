@@ -1,17 +1,14 @@
 """
-    partition(d::Dict, set::Dict; kwargs...)
+    partition_bea(dataset::Dataset, d::Dict, set::Dict; kwargs...)
 
 # Arguments
-- `d::Dict` of DataFrames containing the model data.
+- `dataset::Dataset` identifier
+- `d::Dict` of model parameters
 - `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 
-# Keywords
-- `save_build = true`
-- `overwrite = false`
-See [`SLiDE.build`](@ref) for keyword argument descriptions.
-
 # Returns
-- `d::Dict` of DataFrames containing the model data at the
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
 function partition_bea(dataset::Dataset, d::Dict, set::Dict; map_fdcat::Bool=false)
     if dataset.step=="input"

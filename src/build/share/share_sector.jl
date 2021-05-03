@@ -56,7 +56,7 @@ This process follows two major steps:
 """
 function share_sector( ; path::String=SCALE_BLUENOTE_IO, kwargs...)
     println("Sharing sector using mapping in $path.")
-
+    
     sector_level = :detail
     dfmap = read_file(path)[:,1:2]
 
@@ -71,7 +71,7 @@ end
 
 function share_sector(lst::AbstractArray; kwargs...)
     weighting, mapping = share_sector( ; kwargs...)
-    filter_with!(weighting, mapping, lst)
+    filter_for!(weighting, mapping, lst)
     return weighting, mapping, lst
 end
 

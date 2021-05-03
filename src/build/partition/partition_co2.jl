@@ -1,3 +1,17 @@
+"""
+    partition_co2!(dataset::Dataset, d::Dict, set::Dict, maps::Dict)
+This function partitions and calculates CO2 emissions data.
+
+# Arguments
+- `dataset::Dataset` identifier
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
+- `maps::Dict` of default mapping schematics and constants
+
+# Returns
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
+"""
 function partition_co2!(dataset::Dataset, d::Dict, set::Dict, maps::Dict)
     step = "co2"
     d_read = SLiDE.read_build(SLiDE.set!(dataset; step=step))

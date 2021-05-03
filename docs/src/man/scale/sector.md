@@ -10,27 +10,19 @@ Scaling features enable the following options:
 2. Select a combination of summary- and detail-level goods/sectors.
 3. Aggregate summary- and/or detail-level goods/sectors into those specified in a user-defined map.
 
-## Share
-
 ```@docs
-share_sector!
-SLiDE.share_sector
-SLiDE._combine_sector_levels
+SLiDE.Mapping
+SLiDE.Weighting
 ```
 
-## Disaggregate
-
 ```@docs
-disagg_sector!
-SLiDE._disagg_sector_share
-SLiDE._compound_for
-SLiDE._disagg_sector_map
+SLiDE.compound_for!
+SLiDE.scale_with
+SLiDE.filter_for!
 ```
 
-## Aggregate
-
 ```@docs
+disaggregate_sector!
 aggregate_sector!
-SLiDE._aggregate_tax_with!
-SLiDE._aggregate_sector_map
+aggregate_tax_with!
 ```

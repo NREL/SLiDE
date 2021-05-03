@@ -1,5 +1,16 @@
 """
-    scale_sector!(d, set, x; kwargs...)
+    scale_sector!(dataset::Dataset, d::Dict, set::Dict; kwargs...)
+This function scales model parameters defined over 73 summary-level sectors to a
+user-defined scheme.
+
+# Arguments
+- `dataset::Dataset` identifier
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
+
+# Returns
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
 function scale_sector!(dataset::Dataset, d::Dict, set::Dict; kwargs...)
     print_status(set!(dataset; step="scale"))
@@ -19,9 +30,6 @@ function scale_sector!(d::Dict, set::Dict, dfmap::DataFrame, kwargs...)
     # Store dfmap as `Mapping` and set scheme based on the current sectoral set.
     # After the build stream, this *should* be equivalent to the summary-level set.
     mapping = SLiDE.set_scheme!(Mapping(dfmap), set[:sector])
-    # mapping = Mapping(dfmap)
-    # set_scheme!(mapping, DataFrame(g=set[:sector]))
-    
     return scale_sector!(d, set, mapping; kwargs...)
 end
 
@@ -95,7 +103,10 @@ end
 
 
 """
-    disaggregate_sector!(d::Dict, set::Dict, mapping::Mapping; kwargs...)
+    aggregate_sector!(d::Dict, set::Dict, mapping::Mapping; kwargs...)
+This function performs the sectoral aggregation for all model parameters.
+- Taxes (``ta``, ``tm``, ``ty``) are aggregated using [`SLiDE.aggregate_tax_with!`](@ref).
+- All other parameters are disaggregated using [`SLiDE.scale_with`](@ref).
 """
 function aggregate_sector!(d::Dict, set::Dict, x::Mapping; label=:aggregate)
     print_status(x)

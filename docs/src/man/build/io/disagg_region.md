@@ -1,6 +1,10 @@
 # Regional Disaggregation
 
 ```@docs
+SLiDE.disaggregate_region
+```
+
+```@docs
 SLiDE._disagg_ys0!
 SLiDE._disagg_id0!
 SLiDE._disagg_ty0!
