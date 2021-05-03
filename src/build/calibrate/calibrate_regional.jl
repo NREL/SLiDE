@@ -260,9 +260,6 @@ function _energy_calibration_input(d, set)
     [d[append(:fvs,k)] = filter_with(d[:fvs], (parameter=k,); drop=true) for k in ["ld0","kd0"]]
     d[:netgen] = filter_with(d[:netgen], (dataset="seds",); drop=true)
 
-    # Set some values to zero.
-    [d[k] = filter_with(d[k], Not(DataFrame(r=["ak","hi"],g="ele"))) for k in [:nd0,:xn0]]
-
     # Finally, add appropriate index permutations to the set list.
     _calibration_set!(set; region=true, energy=true)
 

@@ -25,7 +25,7 @@ function share_utd!(d::Dict, set::Dict)
     verify_over(filter_with(df, (t = "exports",)), :r) !== true && @error("Export shares don't sum to 1.")
     
     d[:utd] = dropnan(dropzero(df))
-    set[:notrd] = _set_notrd!(d, set)
+    _set_notrd!(set, d)
     
     print_status(:utd, d, "share of total trade by region")
     return d[:utd]
@@ -33,8 +33,10 @@ end
 
 
 " `notrd`: Goods/sectors not included in imports/exports."
-function _set_notrd!(d::Dict, set::Dict)
-    !(:utd in keys(d)) && @error("shr[:utd] required to find set[:notrd]")
-    set[:notrd] = setdiff(set[:g], d[:utd][:,:g])
+function _set_notrd!(set::Dict, d::Dict)
+    if !haskey(d, :notrd)
+        !haskey(d, :utd) && @error("shr[:utd] required to find set[:notrd]")
+        set[:notrd] = setdiff(set[:g], d[:utd][:,:g])
+    end
     return set[:notrd]
 end

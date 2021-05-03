@@ -358,7 +358,7 @@ Allows for *basic* filtering over years. Will need to expand to include regions.
 function _filter_datastream(df::DataFrame, y::Dict)
     path = joinpath("data", "coresets")
     set = Dict()
-    if "Filter" in keys(y)
+    if haskey(y, "Filter")
         y["Filter"] in [true,"year"]  && push!(set, :yr => read_file(joinpath(path, "yr.csv"))[:,1])
         y["Filter"] in [true,"state"] && push!(set, :r => read_file(joinpath(path, "r", "state.csv"))[:,1])
     end
@@ -375,7 +375,7 @@ mapping and developing. Sorting isn't *necessary* and we could remove this funct
 some time for users.
 """
 function _sort_datastream(df::DataFrame, y::Dict)
-    sorting = "Sort" in keys(y) ? y["Sort"] : true
+    sorting = haskey(y, "Sort") ? y["Sort"] : true
 
     sorting == false && (return df)
 

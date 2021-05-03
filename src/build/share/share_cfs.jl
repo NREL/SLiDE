@@ -17,7 +17,7 @@
 function share_rpc!(d::Dict, set::Dict)
     print_status(:rpc, [:r,:g], "regional purchase coefficient")
 
-    _set_ng!(d, set)
+    _set_ng!(set, d)
     _share_mrt0!(d)
     _share_d0!(d, set)
     _share_xn0!(d, set)
@@ -36,9 +36,7 @@ end
 """
 `ng`: Sectors not included in the CFS.
 """
-function _set_ng!(d::Dict, set::Dict)
-    set[:ng] = setdiff(set[:g], unique(d[:cfs][:,:g]))
-end
+_set_ng!(set::Dict, d::Dict) = set[:ng] = setdiff(set[:g], unique(d[:cfs][:,:g]))
 
 
 """
