@@ -18,8 +18,9 @@ end
 function scale_sector!(d::Dict, set::Dict, dfmap::DataFrame, kwargs...)
     # Store dfmap as `Mapping` and set scheme based on the current sectoral set.
     # After the build stream, this *should* be equivalent to the summary-level set.
-    mapping = Mapping(dfmap)
-    set_scheme!(mapping, DataFrame(g=set[:sector]))
+    mapping = SLiDE.set_scheme!(Mapping(dfmap), set[:sector])
+    # mapping = Mapping(dfmap)
+    # set_scheme!(mapping, DataFrame(g=set[:sector]))
     
     return scale_sector!(d, set, mapping; kwargs...)
 end
@@ -187,19 +188,19 @@ end
 """
 function compound_sector!(d::Dict, set::Dict, scale::T, var::Symbol; label=missing) where T <: Scale
     df = d[var]
-    sector = find_sector(df)
+    sector = SLiDE.find_sector(df)
     scale = copy(scale)
 
     if ismissing(sector)
         return missing
     else
-        key = _inp_key(label, scale, sector)
+        key = SLiDE._inp_key(label, scale, sector)
         # If the key does not already exist in the DataFrame, compound for the DataFrame
         # (with sector columns only) to run set_scheme! and update direction.
         # If the key exists, but is the wrong type (Weighting vs. Mapping), re-compound.
         if !haskey(d, key) || typeof(scale) !== typeof(d[key])
-            set_on!(scale, sector)
-            push!(d, key=>compound_for(scale, set[:sector], df))
+            SLiDE.set_on!(scale, sector)
+            push!(d, key=>SLiDE.compound_for(scale, set[:sector], df))
         end
         return d[key]
     end

@@ -134,6 +134,10 @@ function set_direction!(x::T) where T <: Scale
 end
 
 
+""
+has_scheme(x::T) where T<:Scale = !(:undef in [x.from;x.to;x.direction])
+
+
 """
     set_scheme!(mapping::Mapping)
 Define `Mapping` and/or `Weighting` fields `from` and `to` if `direction` is already defined.
@@ -172,6 +176,13 @@ function set_scheme!(x::T, df::DataFrame) where T <: Scale
 end
 
 
+function set_scheme!(x::T, lst::AbstractArray) where T <: Scale
+    SLiDE.set_scheme!(x, DataFrame(dummy=lst,))
+    x.on = x.from
+    return x
+end
+
+
 ""
 function reverse_scheme!(x::T) where T<:Scale
     x.direction = x.direction==:aggregate ? :disaggregate : :aggregate
@@ -189,7 +200,7 @@ map_scheme(weighting::Weighting, mapping::Mapping) = _map_scheme(weighting.data,
 map_scheme(mapping::Mapping, weighting::Weighting) = map_scheme(weighting, mapping)
 
 function map_scheme(x::Weighting, df::DataFrame)
-    return _map_scheme(df, x.data[:,[x.from;x.to]], x.on)
+    return _map_scheme(df, unique(x.data[:,[x.from;x.to]]), x.on)
 end
 
 map_scheme(x::Mapping, df::DataFrame) = _map_scheme(df, x.data)
@@ -211,7 +222,7 @@ Internal support for [`SLiDE.map_scheme`](@ref) to avoid confusion over DataFram
 """
 function _map_scheme(df::DataFrame, dfmap::DataFrame)
     on = findindex(df)
-    lstmap = list_unique(dfmap)
+    lstmap = SLiDE.list_unique(dfmap)
     
     on = [x for x in on if !isempty(intersect(df[:,x],lstmap))]
 
@@ -220,12 +231,16 @@ function _map_scheme(df::DataFrame, dfmap::DataFrame)
 end
 
 function _map_scheme(df::DataFrame, dfmap::DataFrame, on)
-    idxmap = ensurearray(map_direction(dfmap))
-    dfmap = drop_identity(dfmap, idxmap)
+    idxmap = ensurearray(SLiDE.map_direction(dfmap))
+    dfmap = SLiDE.drop_identity(dfmap, idxmap)
     df = unique(df[:,ensurearray(on)])
 
+    if size(propertynames(dfmap),1) !== 2*size(ensurearray(on),1)
+        on = intersect(propertynames(dfmap), ensurearray(on))
+    end
+
     dmap = Dict(k => unique(dfmap[:,ensurearray(k)]) for k in idxmap)
-    dinner = Dict(k => innerjoin(dmap[k], df, on=Pair.(k, on)) for k in idxmap)
+    dinner = Dict(k => innerjoin(dmap[k], df, on=Pair.(k, on); makeunique=true) for k in idxmap)
 
     # Find out which mapping index/indices overlap(s) most with df.
     # Higher overlap -> from, lower overlap -> to.
@@ -246,6 +261,11 @@ end
 
 function compound_for(x::T, lst::AbstractArray) where T<:Scale
     return compound_for!(copy(x), lst)
+end
+
+function compound_for(x::T, lst::AbstractArray, setlst::AbstractArray) where T<:Scale
+    (isarray(x.on) && length(x.on)==1) && set_on!(x, x.on[1])
+    return compound_for(convert_type(Mapping,x), lst, DataFrame(x.on=>setlst))
 end
 
 
@@ -279,7 +299,7 @@ function compound_for!(x::T, lst::AbstractArray) where T<:Scale
         df = x.data
         df_ones = map_identity(x, lst)
         df_all = vcat(df, df_ones)
-
+        
         # Define edits and update fields.
         xedit = Dict(k => Rename.([x.from;x.to], append.([x.from;x.to],k)) for k in x.on)
         set_from!(x, append.(x.from, x.on))
@@ -295,11 +315,6 @@ function compound_for!(x::T, lst, df::DataFrame) where T<:Scale
     map_year!(x, df)
     set_scheme!(x, df)
     return x
-end
-
-function compound_for(x::T, lst::AbstractArray, setlst::AbstractArray) where T<:Scale
-    (isarray(x.on) && length(x.on)==1) && set_on!(x, x.on[1])
-    return compound_for(convert_type(Mapping,x), lst, DataFrame(x.on=>setlst))
 end
 
 

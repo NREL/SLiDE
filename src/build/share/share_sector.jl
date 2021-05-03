@@ -87,13 +87,15 @@ end
 
 
 function share_with(df::DataFrame, x::Mapping)
+    !has_scheme(x) && SLiDE.set_scheme!(Weighting(df), x)
+
     df = edit_with(df, [
         Rename(x.on, x.from);
         Map(x.data, [x.from;], [x.to;], [x.from;], [x.to;], :inner);
     ])
 
     if x.direction==:aggregate
-        agg, dis = map_direction(x)
+        agg, dis = SLiDE.map_direction(x)
         df = df / combine_over(df, dis)
     end
     return df
@@ -105,6 +107,8 @@ end
 Returns `weighting` with `weighting.data::DataFrame` shared using [`SLiDE.share_with`](@ref)
 """
 function share_with!(weighting::Weighting, mapping::Mapping)
+    set_scheme!(weighting, mapping)
+
     weighting.data = select(
         share_with(weighting.data, mapping),
         [weighting.constant; weighting.from; weighting.to; findvalue(weighting.data)],

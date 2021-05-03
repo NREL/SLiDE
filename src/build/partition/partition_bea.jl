@@ -115,6 +115,7 @@ function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary,
     
     # In sectordisagg, the good/sector column names are switched...
     if sector_level==:detail && swap_ys0
+        @warn("swapping ys0 sector order: (s,g) -> (g,s)")
         x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
         d[:ys0] = edit_with(d[:ys0], x)
     end

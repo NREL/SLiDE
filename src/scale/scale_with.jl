@@ -1,5 +1,6 @@
 """
     scale_with(df, x)
+
 """
 function scale_with(df::DataFrame, x::Weighting; kwargs...)
     print_status(df; kwargs...)

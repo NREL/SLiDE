@@ -6,7 +6,6 @@ This function prepares SEDS energy data for the EEM.
     with the addition of the following data sets describing:
     1. Electricity - [`eem_elegen!`](@ref)
     1. Energy - [`eem_energy!`](@ref)
-    3. CO2 Emissions - [`eem_co2emis!`](@ref)
 """
 function partition_seds(dataset::Dataset, d::Dict, set::Dict)
     step = "seds"
@@ -450,7 +449,7 @@ function _partition_netgen!(d::Dict, maps::Dict)
     df_ps0 = filter_with(d[:ps0], (src="ele",); drop=true)
     df_netgen = filter_with(d[:seds], (src="ele", sec="netgen", units=KWH); drop=true)
 
-    df = SLiDE.operate_over(df_ps0, df_netgen;
+    df = operate_over(df_ps0, df_netgen;
         id=[:usd_per_kwh,:kwh]=>:value,
         units=maps[:operate],
     )

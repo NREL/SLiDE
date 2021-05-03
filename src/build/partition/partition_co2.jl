@@ -16,8 +16,8 @@ end
 
 
 function partition_co2!(d::Dict, set::Dict, maps::Dict)
-    _partition_co2emiss!(d, maps)
-    _share_co2emiss!(d, set, maps)
+    SLiDE._partition_co2emiss!(d, maps)
+    SLiDE._share_co2emiss!(d, set, maps)
     _partition_secco2!(d, set, maps)
     _partition_resco2!(d)
     return d
@@ -54,40 +54,41 @@ end
 function _share_co2emiss!(d::Dict, set::Dict, maps::Dict)
     if !haskey(d, :shrco2)
         x = ["ind","com","trn"]
-        idx = filter_with(maps[:demand], (sec=x,))
 
         df = filter_with(copy(d[:id0]), (g=set[:e],))
-        df_sec = indexjoin(df, idx; kind=:inner)
+        dfmap = filter_with(maps[:demand], (sec=x,))
 
-        d[:shrco2] = df_sec / transform_over(df_sec, :s; digits=false)
+        d[:shrco2] = SLiDE.share_with(df, Mapping(dfmap))
     end
-
     return d[:shrco2]
 end
 
 
 function _partition_secco2!(d::Dict, set::Dict, maps::Dict)
-    col = [:r,:g,:s,:units,:value]
-    xrename = Rename(:src,:g)
-    xsec = [Map(maps[:demand],[:sec],[:s],[:sec],[:s],:inner), Deselect([:sec],"==")]
+    df_co2emiss = edit_with(SLiDE._partition_co2emiss!(d, maps), Rename(:src,:g))
 
-    df_co2emiss = edit_with(_partition_co2emiss!(d, maps), xrename)
-    df_shrsec = _share_co2emiss!(d, set, maps)
+    # (1) Use share for s = (ind,com,trn)
+    df_shrsec = SLiDE._share_co2emiss!(d, set, maps)
 
-    df = operate_over(df_shrsec, df_co2emiss; id=[:factor,:co2]=>:value, fillmissing=0.0)
+    df = SLiDE.operate_over(df_shrsec, df_co2emiss; id=[:factor,:co2]=>:value, fillmissing=0.0)
     df[!,:value] .= df[:,:factor] .* df[:,:co2]
     df[!,:units] .= df[:,:units_co2]
 
     df = combine_over(df, :sec; digits=false)
 
-    # Use un-shared values for s=(ele,oil).
-    idxadj = vcat(DataFrame(g=set[:e], sec="ele"), DataFrame(g="cru", sec="ref"))
-    df_ele_oil = edit_with(filter_with(df_co2emiss, idxadj), xsec)
+    # (2) Use un-shared values for s=(ele,oil).
+    idx = vcat(
+        DataFrame(g=set[:e], sec="ele"),
+        DataFrame(g="cru", sec="ref"),
+    )
+    x = [Map(maps[:demand],[:sec],[:s],[:sec],[:s],:inner), Deselect([:sec],"==")]
+    df_ele_oil = edit_with(filter_with(df_co2emiss, idx), x)
 
+    # (3) Combine.
     d[:secco2] = dropzero(vcat(df_ele_oil, df; cols=:intersect))
-    d[:secco2] = filter_with(d[:secco2], Not(_no_co2emiss!(d)))
+    d[:secco2] = filter_with(d[:secco2], Not(SLiDE._no_co2emiss!(d)))
 
-    print_status(:resco2, d)
+    SLiDE.print_status(:secco2, d)
     return d[:secco2]
 end
 
