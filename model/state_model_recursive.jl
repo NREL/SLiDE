@@ -18,22 +18,14 @@ using DataFrames
 
 #SLiDE data needs to be built or point to pre-existing build directory
 #can pass a name: d, set = build(Dataset("name_of_build_directory"))
-# !(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build(Dataset("state_model_eem2";eem=true)))
-
-dataset = Dataset("state_model_eem2"; eem=true)
-d, set = build(dataset)               # build from scratch
-# d_read, set_read = build(dataset)     # read saved data
-# dcomp = benchmark_against(d, d_read)  # compare dictionary values
-
-# d = copy(d_in)
-# set = copy(set_in)
+dataset = Dataset("state_model_eem"; eem=true)
+d, set = build(dataset)
 
 #Specify benchmark year - this is the first solve year where the benchmark replicated
 bmkyr = 2016
 
 #Load slide data and time horizon to produce model data and appropriate time-indexed subsets
 sld, set = SLiDE._model_input(d, set, bmkyr, Dict)
-#sld, set = SLiDE.model_input(d, set, bmkyr, Dict)
 S, G, M, R = set[:s], set[:g], set[:m], set[:r]
 
 set[:gm] = set[:g]
@@ -126,13 +118,12 @@ cge = MCPModel();
 
 # benchmark value share parameters
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
-@NLparameter(cge, cs0[r in set[:r], g in set[:g]] == value(x0[r,g])-value(rx0[r,g]) + value(xd0[r,g]) + value(xn0[r,g]));
+
+@NLparameter(cge, cs0[r in set[:r], g in set[:g]] == value(x0[r,g])-value(rx0[r,g]) + value(xd0[r,g]) + value(xn0[r,g])); #sum total of outputs in unit revenue/transformation
 @NLparameter(cge, alpha_x[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(cs0[r,g])));
 @NLparameter(cge, alpha_d[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(cs0[r,g])));
 @NLparameter(cge, alpha_n[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(cs0[r,g])));
-# @NLparameter(cge, alpha_x[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
-# @NLparameter(cge, alpha_d[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(s0[r,g])));
-# @NLparameter(cge, alpha_n[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(s0[r,g])));
+
 @NLparameter(cge, theta_n[r in set[:r], g in set[:g]] == ensurefinite(value(nd0[r,g]) / (value(nd0[r,g]) - value(dd0[r,g]))));
 @NLparameter(cge, theta_m[r in set[:r], g in set[:g]] == ensurefinite((1+value(tm0[r,g])) * value(m0[r,g]) / (value(nd0[r,g]) + value(dd0[r,g]) + (1 + value(tm0[r,g])) * value(m0[r,g]))));
 
@@ -160,8 +151,8 @@ lo = 0.0
 
 # sectors
 #@variable(cge, Y[(r, s) in set[:Y]] >= lo, start = 1);
-@variable(cge, X[(r, g) in set[:X]] >= lo, start = 1); # Exports
-@variable(cge, A[(r, g) in set[:A]] >= lo, start = 1); # Armington
+@variable(cge, X[(r, g) in set[:X]] >= lo, start = 1); # Disposition
+@variable(cge, A[(r, g) in set[:A]] >= lo, start = 1); # Armington / Absorption
 @variable(cge, C[r in set[:r]] >= lo, start = 1); # Consumption
 @variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1); # Margin Supply
 
@@ -595,9 +586,6 @@ PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cum
 
 # solve the model
 status = solveMCP(cge)
-
-#PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=100000)
-#status = solveMCP(cge)
 
 # Pre-loop calculations
 ktot_mx = Dict((r,bmkyr) => value(ks_m[r]) + sum(value(ks_x[r,s]) for s in set[:s])
