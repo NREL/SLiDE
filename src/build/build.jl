@@ -8,8 +8,17 @@ read and return those values. Otherwise, it will generate these parameters by ex
 """
 function build(dataset::Dataset)
     dataset.overwrite && overwrite(dataset)
-    d, set = build_io(dataset)
-    d, set = build_eem(dataset, d, set)
+    dataset.eem && set!(dataset; build="eem")
+    
+    if data_saved(dataset)
+        set!(dataset; step=SLiDE.PARAM_DIR)
+        d = read_build(dataset)
+        set = read_set(dataset)
+    else
+        d, set = build_io(dataset)
+        d, set = build_eem(dataset, d, set)
+    end
+
     return d, set
 end
 
@@ -58,6 +67,17 @@ function build_io(dataset::Dataset)
     end
 
     return Dict{Any,Any}(d), Dict{Any,Any}(set)
+end
+
+
+"This function returns true if parameters and sets have already been generated,
+and their values saved, for the given `dataset`."
+function data_saved(dataset::Dataset)
+    dataset = copy(dataset)
+    return .&(
+        isdir(datapath(set!(dataset; step=PARAM_DIR))),
+        isdir(datapath(set!(dataset; step=SET_DIR))),
+    )
 end
 
 
@@ -278,13 +298,13 @@ end
 
 
 function read_set(dataset::Dataset)
-    path = datapath(set!(copy(dataset); step=SET_DIR))
-    set = if isdir(path)
-        Dict{Any,Any}(k => df[:,1] for (k,df) in read_from(path))
+    path = SLiDE.datapath(SLiDE.set!(copy(dataset); step=SLiDE.SET_DIR))
+    if isdir(path)
+        set = Dict{Any,Any}(k => df[:,1] for (k,df) in read_from(path))
+        SLiDE.set_sector!(set, set[:sector])
     else
-        read_set(dataset.build; sector_level=dataset.sector_level)
+        set = read_set(dataset.build; sector_level=dataset.sector_level)
     end
-    dataset.build=="io" && set_sector!(set, set[:sector])
     return set
 end
 
