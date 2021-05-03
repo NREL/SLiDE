@@ -4,6 +4,7 @@
 #
 ####################################
 
+
 using SLiDE
 using CSV
 using JuMP
@@ -17,15 +18,15 @@ using DataFrames
 
 #SLiDE data needs to be built or point to pre-existing build directory
 #can pass a name: d, set = build(Dataset("name_of_build_directory"))
-!(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build(Dataset("state_model_eem2";eem=true)))
+# !(@isdefined(d_in) && @isdefined(set_in)) && ((d_in, set_in) = build(Dataset("state_model_eem2";eem=true)))
 
-# dataset = Dataset("state_model_eem"; eem=true)
-# d, set = build(dataset)               # build from scratch
+dataset = Dataset("state_model_eem2"; eem=true)
+d, set = build(dataset)               # build from scratch
 # d_read, set_read = build(dataset)     # read saved data
 # dcomp = benchmark_against(d, d_read)  # compare dictionary values
 
-d = copy(d_in)
-set = copy(set_in)
+# d = copy(d_in)
+# set = copy(set_in)
 
 #Specify benchmark year - this is the first solve year where the benchmark replicated
 bmkyr = 2016
@@ -584,7 +585,6 @@ lo = 0.0
 #Reporting
 @complementarity(cge,DKMdef,DKM);
 @complementarity(cge,def_RX,RX);
-# @complementarity(cge,deflo_RX,RX);
 
 ####################
 # -- Model Solve --
