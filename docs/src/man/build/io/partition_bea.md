@@ -1,8 +1,12 @@
-# Partition
+# Partition: BEA Make-Use
 
-The first step in the build stream involves partitioning BEA supply and use data, by
-filtering this data based on sectors and goods. Generally, BEA input (`i`) maps to goods
+The first step in the build stream involves partitioning BEA supply/use data into parameters
+by filtering this data based on sectors and goods. Generally, BEA input (`i`) maps to goods
 (`g`), and BEA output (`j`) maps to sectors (`s`).
+
+```@docs
+SLiDE.partition_bea
+```
 
 ```@docs
 SLiDE._partition_io!

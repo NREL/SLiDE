@@ -154,6 +154,53 @@ end
 
 
 """
+    filter_with!(d::Dict, dataset::Dataset)
+    filter_with!(d::Dict, lst::Dict)
+    filter_with!(d::Dict, lst::AbstractArray)
+This function filters `d` to contain only keys relevant to the specified `dataset`.
+This avoids cluttering a saved directory with superfluous parameters that may have been
+calculated at intermediate steps.
+
+If filtering DataFrames, this reorders the DataFrame indices. This is important when
+importing parameters into JuMP models when calibrating or modeling.
+
+# Arguments
+- `dataset::Dataset` identifier
+- `d::Dict` of data to write
+- `lst::Dict` of parameters or `lst::AbstractArray` of sets to include.
+
+# Returns
+- `d::Dict` of filtered data
+"""
+filter_with!(d::Dict, dataset::Dataset) = filter_with!(d, describe(dataset))
+
+function filter_with!(d::Dict, lst::Dict)
+    return Dict(k => sort!(dropzero!(select!(d[k], lst[k])))
+        for k in intersect(keys(d),keys(lst)))
+end
+
+function filter_with!(d::Dict, lst::AbstractArray)
+    [delete!(d, k) for k in keys(d) if !(k in lst)]
+    return d
+end
+
+
+"""
+    split_with!(d::Dict, splitter::AbstractArray)
+This function splits a ditionary into two dictionaries based on the keys inside and outside
+of `splitter`.
+"""
+function split_with!(d::Dict, splitter::AbstractArray)
+    dout = if length(keys(d))==length(splitter)
+        Dict()
+    else
+        Dict(k => pop!(d, k) for k in setdiff(keys(d),splitter))
+    end
+    return d, dout
+end
+
+
+"""
     split_with(df::DataFrame, splitter)
 This function separates `df` into two DataFrames, `df_in` and `df_out`.
 
@@ -174,29 +221,12 @@ function split_with(df::DataFrame, splitter::DataFrame; drop=false)
     idx_join = intersect(propertynames(df), propertynames(splitter))
     df_in = innerjoin(df, splitter, on=idx_join)
     df_out = antijoin(df, splitter, on=idx_join)
-
-    # if drop !== false
-    #     drop = idx_join
-    # end
-    # return drop_filter(df_in; drop=drop), drop_filter(df_out; drop=drop)
     return df_in, df_out
 end
 
 function split_with(df::DataFrame, splitter::NamedTuple; drop=false)
     return split_with(df, DataFrame(permute(splitter)); drop=drop)
 end
-
-
-# function drop_filter(df, col; drop=false)
-#     if drop !== false
-#         idx_drop = setdiff(SLiDE._find_constant(df[:,findindex(df)]), propertynames_with(df,:units))
-#         drop !== true && intersect!(idx_drop, ensurearray(drop))
-#         setdiff!(col, idx_drop)
-#     end
-#     return select(df, col)
-# end
-
-# drop_filter(df; drop=false) = drop_filter(df, propertynames(df); drop=drop)
 
 
 """

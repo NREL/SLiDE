@@ -26,26 +26,30 @@ makedocs(clean = true,
     # workdir = "../",
     pages = [
         "Home" => "index.md",
-        "Introduction" => Any[
-            "Data" => Any[
-                "Overview" => "man/data/overview.md",
-                "Preparation" => "man/data/preparation.md",
-            ],
-            "Build" => Any[
-                "Overview" => "man/build/overview.md",
-                "Partition" => "man/build/partition.md",
-                "Share" => "man/build/share_region.md",
-                "Disaggregate" => "man/build/disagg_region.md",
-            ],
-            "Scale" => Any[
-                "Overview" => "man/scale/overview.md",
-                "Sector" => "man/scale/sector.md",
-            ],
-            "EEM" => Any[
-                "SEDS" => "man/eem/seds.md",
-                "Parameters" => "man/eem/parameters.md",
-            ],
+        "Data" => Any[
+            "Overview" => "man/data/overview.md",
+            "Preparation" => "man/data/preparation.md",
             "Parameters" => "man/parameters.md"
+        ],
+        "Build" => Any[
+            "Overview" => "man/build/overview.md",
+            "Regional" => Any[
+                "Partition: BEA" => "man/build/io/partition_bea.md",
+                "National Calibrate" => "man/build/io/calibrate_national.md",
+                "Regional Sharing" => "man/build/io/share_region.md",
+                "Regional Disaggregation" => "man/build/io/disagg_region.md",
+            ],
+            "Energy-Environment Module" => Any[
+                # "Scale" => "",
+                "Partition: Energy and Electricity" => "man/build/eem/partition_seds.md",
+                "Energy Disaggregation" => "man/build/eem/disagg_energy.md",
+                # ""
+            ],
+        ],
+        "Scale" => Any[
+            "Overview" => "man/scale/overview.md",
+            "Sector" => "man/scale/sector.md",
+            # "Region" => "",
         ],
         "API" => [
             "Types" => map(

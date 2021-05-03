@@ -7,8 +7,9 @@ Note: D.C. is not included in the original data set.
 Assume its SGF data is equal to Maryland's.
 """
 function share_sgf!(d::Dict)
-    println("  Calculating sgf(yr,r,g), regional shares of State Government Finance data")
     d[:sgf] = d[:sgf] / transform_over(d[:sgf], :r)
     verify_over(d[:sgf], :r) !== true && @error("SGF shares don't sum to 1.")
+
+    print_status(:sgf, d, "regional shares of State Government Finance data")
     return dropnan!(d[:sgf])
 end

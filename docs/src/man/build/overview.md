@@ -1,11 +1,5 @@
 # Build
 
-There are four steps required to build the cleaned input data for use in the model:
-1. Partition
-2. Calibrate
-3. Share
-4. Disaggregate
-
 The buildstream process and all of the notation included in the SLiDE documentation here is
 meant to replicate the WiNDC buildstream. For more information, please reference:
 
@@ -15,35 +9,6 @@ meant to replicate the WiNDC buildstream. For more information, please reference
 
 ```@docs
 build
-```
-
-### Partition
-
-Divide BEA supply/use data into parameters.
-
-```@docs
-partition
-```
-
-### Calibrate
-
-```@docs
-calibrate_national
-```
-
-### Share
-
-Divide data into regional component. This will guide how to break the national data into
-regional components by state or county.
-
-```@docs
-share
-```
-
-
-
-### Disaggregate
-
-```@docs
-disagg
+SLiDE.build_io
+SLiDE.build_eem
 ```

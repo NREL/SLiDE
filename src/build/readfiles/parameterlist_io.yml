@@ -3,7 +3,7 @@ Path: [src,build,readfiles,parameters]
 Input:
   sets:         [io, list_index.csv]
   parameters:   [io, list_model.csv]
-  partition:    [io, list_bea.csv]
+  bea:          [io, list_bea.csv]
   calibrate:    [io, list_bea.csv]
   share:        [io, list_share.csv]
   disaggregate: [io, list_model.csv]

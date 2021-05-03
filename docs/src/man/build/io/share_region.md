@@ -1,5 +1,12 @@
 # Regional Sharing
 
+Divide data into regional component. This will guide how to break the national data into
+regional components by state or county.
+
+```@docs
+SLiDE.share_region
+```
+
 ## CFS
 
 ```@docs

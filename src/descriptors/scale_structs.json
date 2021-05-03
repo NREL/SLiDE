@@ -1,11 +1,11 @@
 [
     {
         "struct_name": "Weighting",
-        "docstring": "Store mapping AND weighting information for scaling.",
+        "docstring": "Store mapping AND weighting information for scaling",
         "fields": [
             {
                 "name": "data",
-                "comment": "input file name",
+                "comment": "",
                 "data_type": "DataFrame"
             },
             {
@@ -42,7 +42,7 @@
         "fields": [
             {
                 "name": "data",
-                "comment": "input file name",
+                "comment": "",
                 "data_type": "DataFrame"
             },
             {

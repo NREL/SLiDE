@@ -2,7 +2,7 @@
     share_labor!(d::Dict, set::Dict)
 """
 function share_labor!(d::Dict, set::Dict)
-    println("  Calculating labor(yr,r,s), labor share")
+    print_status(:labor, [:yr,:r,:s], "labor share")
 
     !(:region in collect(keys(d))) && share_region!(d, set)
     _share_lshr0!(d, set)
@@ -37,6 +37,7 @@ function share_labor!(d::Dict, set::Dict)
     df[df[:,:hw],:value] .= df[df[:,:hw],:sec_labor]
     d[:labor] = dropnan(df[:, cols])
     d[:labor_calc] = df
+
     return d[:labor]
 end
 
@@ -57,7 +58,7 @@ end
 ```
 """
 function share_region!(d::Dict, set::Dict)
-    println("  Calculating region(yr,r,s), regional share of value added")
+    print_status(:region, [:yr,:r,:s], "regional share of value added")
     :gdpcat in propertynames(d[:gsp]) && _share_gsp!(d, set)
 
     cols = [findindex(d[:gsp]); :value]

@@ -249,12 +249,13 @@ include(joinpath("model", "model_io.jl"))
 
 function __init__()
     
-    last_updated = Dates.DateTime("2021-04-19T00:00:00.0")
-    data = joinpath(SLiDE.SLIDE_DIR, "data")
+    last_updated = Dates.DateTime("2021-04-20T00:00:00.0")
+    data = joinpath(SLiDE.SLIDE_DIR,"data","input")
     if isdir(data) && last_updated > Dates.unix2datetime(ctime(data))
-        @warn("SLiDE input data has been updated.
-            Remove or rename $data and
-            rebuild SLiDE (] build) to avoid compatibility issues.")
+        @warn("SLiDE input data has been updated. To avoid compatibility issues:
+            (1) Remove or rename $data
+            (2) Restart Julia: > julia --project
+            (3) Rebuild SLiDE: > ] build")
     end
 
     # See: http://pages.cs.wisc.edu/~ferris/path/LICENSE

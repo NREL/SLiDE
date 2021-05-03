@@ -1,38 +1,47 @@
 """
-    scale_sector!(d, set, x; kwargs...)
+    scale_sector!(dataset::Dataset, d::Dict, set::Dict; kwargs...)
+This function scales model parameters defined over 73 summary-level sectors to a
+user-defined scheme.
+
+# Arguments
+- `dataset::Dataset` identifier
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
+
+# Returns
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
 function scale_sector!(dataset::Dataset, d::Dict, set::Dict; kwargs...)
-    set!(dataset; step="scale")
+    print_status(set!(dataset; step="scale"))
     d, set = scale_sector!(d, set; kwargs...)
-    d = Dict{Any,Any}(SLiDE.write_build!(dataset, d))
+    d = Dict{Any,Any}(write_build!(dataset, d))
     return d, set
 end
 
 
-function scale_sector!(d::Dict, set::Dict; path::String=SCALE_EEM_IO)
-    return scale_sector!(d, set, read_file(path)[:,1:2])
+function scale_sector!(d::Dict, set::Dict; path::String=SLiDE.SCALE_EEM_IO, kwargs...)
+    println("Scaling sector using mapping in $path.")
+    return scale_sector!(d, set, read_file(path)[:,1:2]; kwargs...)
 end
 
 
-function scale_sector!(d::Dict, set::Dict, dfmap::DataFrame)
+function scale_sector!(d::Dict, set::Dict, dfmap::DataFrame, kwargs...)
     # Store dfmap as `Mapping` and set scheme based on the current sectoral set.
     # After the build stream, this *should* be equivalent to the summary-level set.
-    mapping = Mapping(dfmap)
-    set_scheme!(mapping, DataFrame(g=set[:sector]))
-    
-    return scale_sector!(d, set, mapping)
+    mapping = SLiDE.set_scheme!(Mapping(dfmap), set[:sector])
+    return scale_sector!(d, set, mapping; kwargs...)
 end
 
 
 function scale_sector!(d::Dict, set::Dict, mapping::Mapping; kwargs...)
     # If (2) scaling FROM ANY detail-level codes not yet listed in `sector` OR
     # (1) disaggregating, disaggregate summary- to detail-level (or a hybrid of the two).
-    # After assessing whether disaggregation is necessary, update `from`.
     if !complete_with!(set, mapping) || mapping.direction==:disaggregate
         disaggregate_sector!(d, set; kwargs...)
     end
     
-    mapping.direction==:aggregate && aggregate_sector!(d, set, mapping; kwargs...)
+    mapping.direction==:aggregate && aggregate_sector!(d, set, mapping)
 
     return d, set
 end
@@ -40,18 +49,12 @@ end
 
 function scale_sector!(d::Dict, set::Dict, weighting::Weighting; kwargs...)
     return disaggregate_sector!(d, set, weighting; kwargs...)
-    # d = if weighting.direction==:aggregate
-    #     aggregate_sector!(d, set, weighting; kwargs...)
-    # elseif weighting.direction==:disaggregate
-    #     disaggregate_sector!(d, set, weighting; kwargs...)
-    # end
-    # return d
 end
 
 
 function scale_sector!(d::Dict, set::Dict, x, var::Symbol; kwargs...)
     x = compound_sector!(d, set, x, var; kwargs...)
-    d[var] = scale_with(d[var], x)
+    d[var] = scale_with(d[var], x; key=var)
     return d[var]
 end
 
@@ -62,46 +65,51 @@ function scale_sector!(d::Dict, set::Dict, x, var::AbstractArray; kwargs...)
 end
 
 
-function SLiDE.scale_sector!(set::Dict, x::T) where T<:Scale
+function scale_sector!(set::Dict, x::T) where T<:Scale
     [scale_sector!(set, x, var) for var in [:gm,:sector] if var in keys(set)]
-    SLiDE.set_sector!(set, set[:sector])
+    set_sector!(set, set[:sector])
     return set
 end
 
-scale_sector!(set::Dict, x, var::Symbol) = set[var] = SLiDE.scale_with(set[var], x)
+scale_sector!(set::Dict, x, var::Symbol) = set[var] = scale_with(set[var], x)
 
 
 """
     disaggregate_sector!(d::Dict, set::Dict; kwargs...)
     disaggregate_sector!(d::Dict, set::Dict, weighting::Weighting; kwargs...)
 """
-function disaggregate_sector!(d::Dict, set::Dict)
-    weighting = share_sector!(d, set)
+function disaggregate_sector!(d::Dict, set::Dict; kwargs...)
+    weighting = share_sector!(d, set; kwargs...)
     disaggregate_sector!(d, set, weighting)
     return d
 end
 
 
 function disaggregate_sector!(d::Dict, set::Dict, x::Weighting; label=:disaggregate)
+    print_status(x)
     push!(d, label=>x)
 
-    taxes = SLiDE.list("taxes")
-    variables = setdiff(SLiDE.list!(set, Dataset(""; build="io", step=SLiDE.PARAM_DIR)), taxes)
+    taxes = list("taxes")
+    variables = setdiff(list!(set, Dataset(""; build="io", step=PARAM_DIR)), taxes)
 
     x_tax = convert_type(Mapping, x)
-    SLiDE.scale_sector!(d, set, x, variables; label=label)
-    SLiDE.scale_sector!(d, set, x_tax, taxes; label=label)
+    scale_sector!(d, set, x, variables; label=label)
+    scale_sector!(d, set, x_tax, taxes; label=label)
 
     # Update sector to match.
-    SLiDE.scale_sector!(set, x)
+    scale_sector!(set, x)
     return d
 end
 
 
 """
-    disaggregate_sector!(d::Dict, set::Dict, mapping::Mapping; kwargs...)
+    aggregate_sector!(d::Dict, set::Dict, mapping::Mapping; kwargs...)
+This function performs the sectoral aggregation for all model parameters.
+- Taxes (``ta``, ``tm``, ``ty``) are aggregated using [`SLiDE.aggregate_tax_with!`](@ref).
+- All other parameters are disaggregated using [`SLiDE.scale_with`](@ref).
 """
 function aggregate_sector!(d::Dict, set::Dict, x::Mapping; label=:aggregate)
+    print_status(x)
     push!(d, label=>x)
 
     # Aggregate taxes. Their associated scaling parameters will be aggregated in the process.
@@ -114,7 +122,7 @@ function aggregate_sector!(d::Dict, set::Dict, x::Mapping; label=:aggregate)
     scale_sector!(d, set, x, variables; label=label)
 
     # Update sector to match.
-    SLiDE.scale_sector!(set, x)
+    scale_sector!(set, x)
     return d
 end
 
@@ -202,7 +210,7 @@ function compound_sector!(d::Dict, set::Dict, scale::T, var::Symbol; label=missi
         # (with sector columns only) to run set_scheme! and update direction.
         # If the key exists, but is the wrong type (Weighting vs. Mapping), re-compound.
         if !haskey(d, key) || typeof(scale) !== typeof(d[key])
-            set_on!(scale, sector)
+            SLiDE.set_on!(scale, sector)
             push!(d, key=>SLiDE.compound_for(scale, set[:sector], df))
         end
         return d[key]
