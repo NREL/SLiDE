@@ -70,17 +70,6 @@ function build_io(dataset::Dataset)
 end
 
 
-"This function returns true if parameters and sets have already been generated,
-and their values saved, for the given `dataset`."
-function data_saved(dataset::Dataset)
-    dataset = copy(dataset)
-    return .&(
-        isdir(datapath(set!(dataset; step=PARAM_DIR))),
-        isdir(datapath(set!(dataset; step=SET_DIR))),
-    )
-end
-
-
 """
     build_eem(dataset::Dataset)
 **If `dataset.eem=true`**, continue the SLiDE buildstream for the Energy-Environment Module.
@@ -109,7 +98,7 @@ function build_eem(dataset::Dataset, d::Dict, set::Dict)
         merge!(set, read_set(dataset))
         
         if dataset.step=="input"
-            d, set = scale_sector!(dataset, d, set)
+            d, set = scale_sector(dataset, d, set)
             d, set, maps = partition_seds(dataset, d, set)
             d, set, maps = disaggregate_energy!(dataset, d, set, maps)
             d = partition_co2!(dataset, d, set, maps)
@@ -121,6 +110,17 @@ function build_eem(dataset::Dataset, d::Dict, set::Dict)
     end
 
     return Dict{Any,Any}(d), Dict{Any,Any}(set)
+end
+
+
+"This function returns true if parameters and sets have already been generated,
+and their values saved, for the given `dataset`."
+function data_saved(dataset::Dataset)
+    dataset = copy(dataset)
+    return .&(
+        isdir(datapath(set!(dataset; step=PARAM_DIR))),
+        isdir(datapath(set!(dataset; step=SET_DIR))),
+    )
 end
 
 
@@ -228,8 +228,8 @@ function write_build!(dataset::Dataset, d::Dict)
     # sets s, g would have been filtered out when writing, but we want to make sure they are
     # defined for subsequent steps.
     if dataset.step==SET_DIR
-        set_sector!(d, d[:sector])
-        set_sector!(d_write, d[:sector])
+        set_sector!(d)
+        set_sector!(d_write)
     end
 
     return d_write
@@ -274,7 +274,7 @@ function read_set(build::String; sector_level::Symbol=:summary)
         # Define sectors.
         if build=="io" && !haskey(set, :sector)
             if haskey(set, sector_level)
-                set_sector!(set, set[sector_level])
+                set_sector!(set; key=sector_level)
             # else
             #     !!!! ERROR, SECTOR LEVEL NOT FOUND
             end
@@ -301,7 +301,7 @@ function read_set(dataset::Dataset)
     path = SLiDE.datapath(SLiDE.set!(copy(dataset); step=SLiDE.SET_DIR))
     if isdir(path)
         set = Dict{Any,Any}(k => df[:,1] for (k,df) in read_from(path))
-        SLiDE.set_sector!(set, set[:sector])
+        SLiDE.set_sector!(set)
     else
         set = read_set(dataset.build; sector_level=dataset.sector_level)
     end
@@ -447,13 +447,17 @@ function set_sector!(set::Dict, x::AbstractArray)
     return set
 end
 
-set_sector!(set, x::Weighting) = set_sector!(set, convert_type(Mapping,x))
-set_sector!(set, x::Mapping) = _set_sector!(set, x, x.to)
+set_sector!(set; key=:sector) = set_sector!(set, set[key])
 
-function _set_sector!(set, x::Mapping, to::Symbol)
-    return set_sector!(set, unique(map_identity(x, set[:sector])[:,to]))
-end
+set_sector!(set::Dict, d::Dict) = set_sector!(set, unique(d[:ys0],:g))
 
-function _set_sector!(set, x::Mapping, to::AbstractArray)
-    return set_sector!(set, unique(x.data[:, first(to)]))
-end
+# set_sector!(set, x::Weighting) = set_sector!(set, convert_type(Mapping,x))
+# set_sector!(set, x::Mapping) = _set_sector!(set, x, x.to)
+
+# function _set_sector!(set, x::Mapping, to::Symbol)
+#     return set_sector!(set, unique(map_identity(x, set[:sector])[:,to]))
+# end
+
+# function _set_sector!(set, x::Mapping, to::AbstractArray)
+#     return set_sector!(set, unique(x.data[:, first(to)]))
+# end

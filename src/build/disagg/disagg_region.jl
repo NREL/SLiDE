@@ -16,7 +16,7 @@ function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
     step = PARAM_DIR
     d_read = read_build(set!(dataset; step=step))
     
-    _set_gm!(d, set)
+    set_gm!(set, d)
 
     if dataset.step=="input"
         print_status(set!(dataset; step=step))
@@ -31,7 +31,7 @@ function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
         _disagg_id0!(d)
         _disagg_ty0!(d, set)
         _disagg_va0!(d, set)
-        _disagg_ld0!(d)
+        _disagg_ld0!(d, set)
         _disagg_kd0!(d)
         
         d[:region] = edit_with(d[:region], Rename(:s,:g))
@@ -71,8 +71,8 @@ function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
         _disagg_hhadj!(d)
         
         # Should we drop other small parameters, too?
-        d[:xn0][d[:xn0][:,:value] .< 1e-8,:value] .= 0;
-        d[:xd0][d[:xd0][:,:value] .< 1e-8,:value] .= 0;
+        d[:xn0][d[:xn0][:,:value] .< 1e-8,:value] .= 0
+        d[:xd0][d[:xd0][:,:value] .< 1e-8,:value] .= 0
 
         return d, set
     else
@@ -89,10 +89,10 @@ end
 ```
 """
 function _disagg_ys0!(d::Dict)
-    :r in propertynames(d[:ys0]) && (return d[:ys0])
-    
-    d[:ys0] = d[:region] * d[:ys0]
-    print_status(:ys0, d, "regional sectoral output")
+    if !(:r in propertynames(d[:ys0]))
+        d[:ys0] = d[:region] * d[:ys0]
+        print_status(:ys0, d, "regional sectoral output")
+    end
     return d[:ys0]
 end
 
@@ -105,11 +105,11 @@ end
 ```
 """
 function _disagg_id0!(d::Dict)
-    :r in propertynames(d[:id0]) && (return d[:id0])
-    
-    d[:id0] = d[:region] * d[:id0]
+    if !(:r in propertynames(d[:id0]))
+        d[:id0] = d[:region] * d[:id0]
 
-    print_status(:id0, d, "regional intermediate demand")
+        print_status(:id0, d, "regional intermediate demand")
+    end
     return d[:id0]
 end
 
@@ -125,7 +125,8 @@ end
 ```
 """
 function _disagg_ty0!(d::Dict, set::Dict)
-    :va in propertynames(d[:va0]) && _unstack_va0!(d, set)
+    _unstack_va0!(d, set)
+
     idx = findindex(d[:va0])
     
     ty0_rev = d[:region] * d[:va0][:,[idx;:othtax]]
@@ -144,14 +145,16 @@ end
 ```
 """
 function _disagg_va0!(d::Dict, set::Dict)
-    :r in propertynames(d[:va0])  && (return d[:va0])
-    :va in propertynames(d[:va0]) && (_unstack_va0!(d, set))
-    idx = findindex(d[:va0])
-    
-    df = d[:va0][:,[idx;:compen]] + d[:va0][:,[idx;:surplus]]
-    d[:va0] = d[:region] * df
+    if !(:r in propertynames(d[:va0]))
+        _unstack_va0!(d, set)
 
-    print_status(:va0, d, "regional share of value added")
+        idx = findindex(d[:va0])
+        
+        df = d[:va0][:,[idx;:compen]] + d[:va0][:,[idx;:surplus]]
+        d[:va0] = d[:region] * df
+
+        print_status(:va0, d, "regional share of value added")
+    end
     return d[:va0]
 end
 
@@ -163,8 +166,9 @@ end
 \\bar{ld}_{yr,r,s} = \\theta_{yr,r,s}^{ls} \\bar{va}_{yr,s,g}
 ```
 """
-function _disagg_ld0!(d::Dict)
-    !(:r in propertynames(d[:va0])) && _disagg_va0!(d, set)
+function _disagg_ld0!(d::Dict, set::Dict)
+    _disagg_va0!(d, set)
+
     d[:ld0] = d[:labor] * d[:va0]
 
     print_status(:ld0, d, "labor demand")
@@ -213,7 +217,7 @@ end
 ```
 """
 function _disagg_g0!(d::Dict)
-    ("pce" in d[:fd0][:,:fd]) && (_disagg_fdcat!(d))
+    _disagg_fdcat!(d)
     
     df = filter_with(d[:fd0], (fd="G",); drop = true)
     d[:g0] = d[:sgf] * df
@@ -231,7 +235,7 @@ end
 ```
 """
 function _disagg_i0!(d::Dict)
-    !("pce" in d[:fd0][:,:fd]) && (_disagg_fdcat!(d))
+    _disagg_fdcat!(d)
     
     df = filter_with(d[:fd0], (fd="I",); drop = true)
     d[:i0] = d[:region] * df
@@ -243,12 +247,13 @@ end
 
 """
 `cd0(yr,r,g)`, national final consumption
+
 ```math
 \\bar{cd}_{yr,r,g} = \\alpha_{yr,r,g}^{pce} \\sum_{C \\in fd} \\tilde{fd}_{yr,g,fd}
 ```
 """
 function _disagg_cd0!(d::Dict)
-    !("pce" in d[:fd0][:,:fd]) && (_disagg_fdcat!(d))
+    _disagg_fdcat!(d)
     
     df = filter_with(d[:fd0], (fd="C",); drop = true)
     d[:cd0] = d[:pce] * df
@@ -266,7 +271,7 @@ end
 ```
 """
 function _disagg_c0!(d::Dict)
-    !(:cd0 in keys(d)) && _disagg_cd0!(d)
+    !haskey(d, :cd0) && _disagg_cd0!(d)
     d[:c0] = combine_over(d[:cd0], :g)
 
     print_status(:c0, d, "total final household consumption")
@@ -282,10 +287,10 @@ end
 ```
 """
 function _disagg_yh0!(d::Dict)
-    if !(:diff in keys(d))
-        d[:yh0] = d[:region] * d[:fs0]
+    d[:yh0] = if !haskey(d, :diff)
+        d[:region] * d[:fs0]
     else
-        d[:yh0] = d[:yh0] + d[:diff]
+        d[:yh0] + d[:diff]
     end
 
     print_status(:yh0, d, "household production")
@@ -316,11 +321,11 @@ end
 ```
 """
 function _disagg_x0!(d::Dict, set::Dict)
-    if !(:diff in keys(d))
-        !(:notrd in keys(set)) && _set_notrd!(d, set)
+    if !haskey(d, :diff)
+        _set_notrd!(set, d)
 
-        df_exports = filter_with(d[:utd], (t = "exports",); drop = true)
-        df_region = filter_with(d[:region], (g = set[:notrd],))
+        df_exports = filter_with(d[:utd], (t="exports",); drop = true)
+        df_region = filter_with(d[:region], (g=set[:notrd],))
 
         df_trd = dropmissing(df_exports * d[:x0])
         df_notrd = dropmissing(df_region * d[:x0])
@@ -460,7 +465,7 @@ end
 """
 function _disagg_dc0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     d[:dc0] = dropmissing((d[:s0] - d[:x0] + d[:rx0]))
-    (round_digits !== false) && (d[:dc0] = round!(d[:dc0], :value; digits = round_digits))
+    round_digits!==false && (d[:dc0] = round!(d[:dc0], :value; digits=round_digits))
     return d[:dc0]
 end
 
@@ -530,15 +535,15 @@ end
 
 
 "`gm`: Commodities employed in margin supply"
-function _set_gm!(d::Dict, set::Dict)
-    ms0_sum = combine_over(d[:ms0], [:yr,:m])
-    md0_sum = combine_over(d[:md0], [:yr,:m])
+function set_gm!(set::Dict, d::Dict)
+    idx = setdiff(findindex(d[:md0]), ensurearray(find_sector(d[:md0])))
 
-    ms0_sum[!,:value] .= ms0_sum[:,:value] .!= 0.0
-    md0_sum[!,:value] .= md0_sum[:,:value] .!= 0.0
+    set[:gm] = if :r in idx
+        dropmissing(combine_over(d[:nm0] + d[:dm0], idx) + combine_over(d[:md0], idx))[:,1]
+    else
+        dropmissing(combine_over(d[:ms0], idx) + combine_over(d[:md0], idx))[:,1]
+    end
 
-    gm = ms0_sum + md0_sum
-    set[:gm] = gm[gm[:,:value] .> 0, :g]
     return set[:gm]
 end
 
@@ -590,7 +595,7 @@ _disagg_nd0min(d::Dict) = d[:pt0] - d[:nd0max]
 ```
 """
 function _disagg_dd0!(d::Dict)
-    !(:dd0max in keys(d)) && _disagg_dd0max!(d)
+    !haskey(d, :dd0max) && _disagg_dd0max!(d)
     d[:dd0] = d[:dd0max] * d[:rpc]
 
     print_status(:dd0, d, "regional demand from local market")
@@ -609,8 +614,8 @@ function _disagg_nd0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     df_pt0 = _disagg_pt0(d; round_digits=false)
     
     d[:nd0] = df_pt0 - d[:dd0]
-    # (round_digits !== false) && (d[:nd0][!,:value] .= round.(d[:nd0][:,:value]; digits = round_digits))
-    (round_digits !== false) && (d[:nd0] = round!(d[:nd0], :value; digits = round_digits))
+
+    round_digits!==false && (d[:nd0] = round!(d[:nd0], :value; digits=round_digits))
 
     print_status(:nd0, d, "regional demand from national market")
     return d[:nd0]
@@ -654,7 +659,7 @@ end
 ```
 """
 function _disagg_shrtrd!(d::Dict)
-    !(:ms0tot in keys(d)) && _disagg_ms0tot!(d)
+    !haskey(d, :ms0tot) && _disagg_ms0tot!(d)
 
     df = d[:ms0tot]
     d[:shrtrd] = dropnan(df / transform_over(df, :m))
@@ -671,8 +676,8 @@ end
 ```
 """
 function _disagg_dm0!(d::Dict)
-    !(:ms0tot in keys(d)) && _disagg_ms0tot!(d)
-    !(:shrtrd in keys(d)) && _disagg_shrtrd!(d)
+    !haskey(d, :ms0tot) && _disagg_ms0tot!(d)
+    !haskey(d, :shrtrd) && _disagg_shrtrd!(d)
     
     cols = propertynames(d[:ms0tot])
     dm1 = dropmissing(d[:ms0tot] * d[:rpc])

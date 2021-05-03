@@ -1,5 +1,5 @@
 """
-    scale_sector!(dataset::Dataset, d::Dict, set::Dict; kwargs...)
+    scale_sector(dataset::Dataset, d::Dict, set::Dict; kwargs...)
 This function scales model parameters defined over 73 summary-level sectors to a
 user-defined scheme.
 
@@ -12,11 +12,21 @@ user-defined scheme.
 - `d::Dict` of model parameters
 - `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
-function scale_sector!(dataset::Dataset, d::Dict, set::Dict; kwargs...)
-    print_status(set!(dataset; step="scale"))
-    d, set = scale_sector!(d, set; kwargs...)
-    d = Dict{Any,Any}(write_build!(dataset, d))
-    return d, set
+function scale_sector(dataset::Dataset, d::Dict, set::Dict; kwargs...)
+    step = PARAM_DIR
+    d_read = read_build(set!(dataset; step=step))
+
+    if dataset.step=="input"
+        print_status(set!(dataset; step="scale"))
+        d, set = scale_sector!(d, set; kwargs...)
+        d = Dict{Any,Any}(write_build!(dataset, d))
+
+        return d, set
+    else
+        set_sector!(set, d_read)
+        set_gm!(set, d_read)
+        return d, set
+    end
 end
 
 
@@ -66,12 +76,10 @@ end
 
 
 function scale_sector!(set::Dict, x::T) where T<:Scale
-    [scale_sector!(set, x, var) for var in [:gm,:sector] if var in keys(set)]
-    set_sector!(set, set[:sector])
+    set[:sector] = scale_with(set[:sector], x)
+    set_sector!(set)
     return set
 end
-
-scale_sector!(set::Dict, x, var::Symbol) = set[var] = scale_with(set[var], x)
 
 
 """
@@ -96,8 +104,9 @@ function disaggregate_sector!(d::Dict, set::Dict, x::Weighting; label=:disaggreg
     scale_sector!(d, set, x, variables; label=label)
     scale_sector!(d, set, x_tax, taxes; label=label)
 
-    # Update sector to match.
+    # Update sets to match.
     scale_sector!(set, x)
+    set_gm!(set, d)
     return d
 end
 
@@ -121,9 +130,10 @@ function aggregate_sector!(d::Dict, set::Dict, x::Mapping; label=:aggregate)
     variables = setdiff(parameters, vcat(ensurearray.(taxes)...))
     scale_sector!(d, set, x, variables; label=label)
 
-    # Update sector to match.
+    # Update sets to match.
     scale_sector!(set, x)
-    return d
+    set_gm!(set, d)
+    return d, set
 end
 
 

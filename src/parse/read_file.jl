@@ -340,13 +340,13 @@ function _read_from_yaml(path::String; run_bash::Bool=false)
     y = read_file(path)
 
     # If the yaml file includes the key "Path", this indicates that the yaml file 
-    if "Path" in keys(y)
+    if haskey(y, "Path")
         # Look for shell scripts in this path, and run them if they are there.
         # If none are found, nothing will happen.
         run_bash && _run_bash(joinpath(SLIDE_DIR, ensurearray(y["Path"])...))
         
         files = ensurearray(values(find_oftype(y, File)))
-        inp = "Input" in keys(y) ? y["Input"] : files
+        inp = haskey(y, "Input") ? y["Input"] : files
         d = _read_from_yaml(_joinpath(y["Path"]), inp)
         d = _edit_from_yaml(d, y, inp)
     else

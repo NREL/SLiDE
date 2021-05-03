@@ -319,7 +319,7 @@ This function generates a DataFrame with these sharing parameters through the fo
 # Example
 These two examples are taken from slices of the `Weighting` and `Mapping` DataTypes
 compounded to scale sectoral supply, `ys0(yr,r,s,g)` when scaling the model parameters
-during the first step of the EEM build stream, executed by [`SLiDE.scale_sector!`](@ref).
+during the first step of the EEM build stream, executed by [`SLiDE.scale_sector`](@ref).
 
 First, summary-level parameters must be disaggregated to a hybrid of summary- and detail-
 level data.

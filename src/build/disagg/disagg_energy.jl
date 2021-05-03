@@ -35,12 +35,18 @@ function disaggregate_energy!(dataset, d, set, maps)
 
         # Zero production.
         _disagg_energy_zero_prod!(d)
+        _disagg_energy_zero_island!(d)
 
         # Update household disaggregation.
         _disagg_hhadj!(d)
         write_build!(set!(dataset; step=step), d)
+    else
+        merge!(d, d_read)
+        set_sector!(set, d)
+        maps[:demand] = filter_with(maps[:demand], (s=set[:sector],))
     end
     
+    set_gm!(set, d)
     return d, set, maps
 end
 
@@ -352,6 +358,23 @@ function _disagg_energy_zero_prod(df::DataFrame, idxzero::DataFrame)
         idxzero = edit_with(idxzero, Rename(idxon, find_sector(df)))
     end
     return filter_with(df, Not(idxzero))
+end
+
+
+"""
+    _disagg_energy_zero_island!(d::Dict)
+    _disagg_energy_zero_island!(d::Dict, var::Symbol)
+"""
+function _disagg_energy_zero_island!(d)
+    [_disagg_energy_zero_island!(d, var) for var in [:nd0,:xn0]]
+    return d
+end
+
+function _disagg_energy_zero_island!(d, var::Symbol)
+    print_status(var, d)
+
+    d[var] = filter_with(d[var], Not(DataFrame(r=["ak","hi"], g="ele")))
+    return nothing
 end
 
 
