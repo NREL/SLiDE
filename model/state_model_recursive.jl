@@ -28,7 +28,7 @@ bmkyr = 2016
 sld, set = SLiDE._model_input(d, set, bmkyr, Dict)
 S, G, M, R = set[:s], set[:g], set[:m], set[:r]
 
-set[:gm] = set[:g]
+#set[:gm] = set[:g]
 
 ########## Model ##########
 cge = MCPModel();
