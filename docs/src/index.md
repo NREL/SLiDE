@@ -29,8 +29,8 @@ Precompile the SLiDE package and build the model input data by running:
 
 ```julia
 julia> using SLiDE
-
-julia> (d, set) = build()
+julia> dataset = Dataset( ; eem=true)
+julia> d, set = build(dataset)
 ```
 
 ## References
