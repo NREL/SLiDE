@@ -295,43 +295,95 @@ lo = 0.0
 #lo = 1e-6
 
 # sectors
+@variables(cge, begin
+    YX[(r,s) in set[:Y]] >= lo, (start = value(thetax))
+    YM[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax)))
+    YYM[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax)))
+    E[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax)))
+    VA[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax)))
+    X[(r,g) in set[:X]] >= lo, (start = 1)
+    A[(r,g) in set[:A]] >= lo, (start = 1)
+    MS[r in set[:r], m in set[:m]] >= lo, (start = 1)
+    LS[r in set[:r]] >= lo, (start = 1)
+    C[r in set[:r]] >= lo, (start = 1)
+    INV[r in set[:r]] >= lo, (start = 1)
+    Z[r in set[:r]] >= lo, (start = 1)
+    W[r in set[:r]] >= lo, (start = 1)
+    CO2[r in set[:r]] >= lo, (start = value(cb0[r]))
+end)
+
+# commodities
+@variables(cge, begin
+    PA[(r,g) in set[:PA]] >= lo, (start = 1)
+    PY[(r,g) in set[:PY]] >= lo, (start = 1)
+    PD[(r,g) in set[:PD]] >= lo, (start = 1)
+    PN[g in set[:g]] >= lo, (start = 1)
+    PYM[(r,s) in set[:Y]] >= lo, (start = 1)
+    PE[(r,s) in set[:Y]] >= lo, (start = 1)
+    PVA[(r,s) in set[:Y]] >= lo, (start = 1)
+    RK[(r,s) in set[:PK]] >= lo, (start = 1)
+    RKX[(r,s) in set[:PK]] >= lo, (start = 1)
+    PFR[(r,s) in set[:PK]] >= lo, (start = 1)
+    PFRX[(r,s) in set[:PK]] >= lo, (start = 1)
+    PM[r in set[:r], m in set[:m]] >= lo, (start = 1)
+    PFX >= lo, (start = 1)
+    PLS[r in set[:r]] >= lo, (start = 1)
+    PL[r in set[:r]] >= lo, (start = 1)
+    PC[r in set[:r]] >= lo, (start = 1)
+    PINV[r in set[:r]] >= lo, (start = 1)
+    PZ[r in set[:r]] >= lo, (start = 1)
+    PW[r in set[:r]] >= lo, (start = 1)
+    PCO2 >= lo, (start = 1)
+    PDCO2[r in set[:r]] >= lo, (start = 1)
+end)
+
+# Demand
+#@variable(cge, RA[r in set[:r]] >= lo, start = (value(z0[r])+value(inv0[r])));
+@variable(cge, RA[r in set[:r]]>=lo,start = value(w0[r])) ;
+
+# Definitionals
+@variables(cge, begin
+    U[r in set[:r]] >= lo, (start = value(u0[r]))
+    RX[(r,g) in set[:X]] >= lo, (start = 1)
+end)
+
 #@variable(cge, Y[(r, s) in set[:Y]] >= lo, start = 1);
-@variable(cge, X[(r, g) in set[:X]] >= lo, start = 1); # Disposition
-@variable(cge, A[(r, g) in set[:A]] >= lo, start = 1); # Armington / Absorption
-@variable(cge, C[r in set[:r]] >= lo, start = 1); # Consumption
-@variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1); # Margin Supply
+# @variable(cge, X[(r, g) in set[:X]] >= lo, start = 1); # Disposition
+# @variable(cge, A[(r, g) in set[:A]] >= lo, start = 1); # Armington / Absorption
+# @variable(cge, C[r in set[:r]] >= lo, start = 1); # Consumption
+# @variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1); # Margin Supply
 
 #commodities:
-@variable(cge, PA[(r, g) in set[:PA]] >= lo, start = 1); # Regional market (input)
-@variable(cge, PY[(r, g) in set[:PY]] >= lo, start = 1); # Regional market (output)
-@variable(cge, PD[(r, g) in set[:PD]] >= lo, start = 1); # Local market price
-@variable(cge, PN[g in set[:g]] >= lo, start =1); # National market
-@variable(cge, PL[r in set[:r]] >= lo, start = 1); # Wage rate
-#@variable(cge, PK[(r, s) in set[:PK]] >= lo, start =1); # Rental rate of capital ###
-@variable(cge, PM[r in set[:r], m in set[:m]] >= lo, start =1); # Margin price
-@variable(cge, PC[r in set[:r]] >= lo, start = 1); # Consumer price index #####
-@variable(cge, PFX >= lo, start = 1); # Foreign exchange
+# @variable(cge, PA[(r, g) in set[:PA]] >= lo, start = 1); # Regional market (input)
+# @variable(cge, PY[(r, g) in set[:PY]] >= lo, start = 1); # Regional market (output)
+# @variable(cge, PD[(r, g) in set[:PD]] >= lo, start = 1); # Local market price
+# @variable(cge, PN[g in set[:g]] >= lo, start =1); # National market
+# @variable(cge, PL[r in set[:r]] >= lo, start = 1); # Wage rate
+# #@variable(cge, PK[(r, s) in set[:PK]] >= lo, start =1); # Rental rate of capital ###
+# @variable(cge, PM[r in set[:r], m in set[:m]] >= lo, start =1); # Margin price
+# @variable(cge, PC[r in set[:r]] >= lo, start = 1); # Consumer price index #####
+# @variable(cge, PFX >= lo, start = 1); # Foreign exchange
 
 #consumer:
-@variable(cge,RA[r in set[:r]]>=lo,start = value(w0[r])) ;
+# @variable(cge,RA[r in set[:r]]>=lo,start = value(w0[r])) ;
 
 
 #--- recursive dynamic variable declaration ---
 # sectors
-@variable(cge,YM[(r,s) in set[:Y]] >= lo, start = (1-value(thetax))); # Mutable production index - replaces Y
-@variable(cge,YX[(r,s) in set[:Y]] >= lo, start = value(thetax)); # Extant production index
-@variable(cge,INV[r in set[:r]] >= lo, start = 1); # Investment
-@variable(cge,W[r in set[:r]] >= lo, start = 1); # Welfare index
+# @variable(cge,YM[(r,s) in set[:Y]] >= lo, start = (1-value(thetax))); # Mutable production index - replaces Y
+# @variable(cge,YX[(r,s) in set[:Y]] >= lo, start = value(thetax)); # Extant production index
+# @variable(cge,INV[r in set[:r]] >= lo, start = 1); # Investment
+# @variable(cge,W[r in set[:r]] >= lo, start = 1); # Welfare index
 
 # commodities
-@variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
-@variable(cge,RK[(r,s) in set[:PK]] >= lo, start = 1); # Return to regional capital
-@variable(cge,PINV[r in set[:r]] >= lo, start = 1); # Investment price index
-@variable(cge,PW[r in set[:r]] >= lo, start = 1); # Welfare price index
+# @variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
+# @variable(cge,RK[(r,s) in set[:PK]] >= lo, start = 1); # Return to regional capital
+# @variable(cge,PINV[r in set[:r]] >= lo, start = 1); # Investment price index
+# @variable(cge,PW[r in set[:r]] >= lo, start = 1); # Welfare price index
 
-# Definitional variables
-@variable(cge,DKM[(r,s) in set[:PK]] >= lo, start = start_value(YM[(r,s)]) * value(kd0[r,s]));
-@variable(cge,RX[(r,g) in set[:X]]>=lo,start = 1); # definitional: export transformation unit revenue
+# # Definitional variables
+# @variable(cge,DKM[(r,s) in set[:PK]] >= lo, start = start_value(YM[(r,s)]) * value(kd0[r,s]));
+# @variable(cge,RX[(r,g) in set[:X]]>=lo,start = 1); # definitional: export transformation unit revenue
 
 
 ###############################
