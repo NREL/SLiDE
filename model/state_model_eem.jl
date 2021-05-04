@@ -172,7 +172,7 @@ end
 @NLparameter(cge, leis_e0[r in set[:r]] == value(lte0[r]) - value(lab_e0[r]));  # benchmark year leisure time endowment/supply
 @NLparameter(cge, leis_e[r in set[:r]] == value(lte0[r]) - value(lab_e0[r]));  # duplicate/overwritable leisure time endowment/supply
 @NLparameter(cge, z0[r in set[:r]] == value(c0[r]) + value(leis_e0[r]));    # benchmark full consumption
-@NLparameter(cge, lies_shr[r in set[:r]] == value(leis_e0[r]) / (value(c0[r]) + value(leis_e0[r])));  # leisure share of full consumption
+@NLparameter(cge, leis_shr[r in set[:r]] == value(leis_e0[r]) / (value(c0[r]) + value(leis_e0[r])));  # leisure share of full consumption
 
 @NLparameter(cge, es_z[r in set[:r]] == 0); #substitution elasticity between leisure and consumption in prod Z
 @NLparameter(cge, theta_l == 0.05); # uncompensated labor supply elasticity
@@ -222,7 +222,7 @@ end
 # Investment
 @NLparameter(cge, theta_inv[r in set[:r], g in set[:g]] == value(i0[r,g]) / value(inv0[r])); # Intermediate input share of investment output
 
-# Consumption
+# Final Consumption
 @NLparameter(cge, theta_cd[r in set[:r], g in set[:g]] == value(cd0[r,g]) / sum(value(cd0[r,g]) for g in set[:g]));
 
 # Energy-nesting
@@ -257,6 +257,8 @@ end
 
 @NLparameter(cge, es_inv[r in set[:r]] == 5); # Investment production - substitution elasticity
 
+@NLparameter(cge, es_cd[r in set[:r]] == 0.99); # Final consumption - substitution elasticity
+
 #Energy nesting substitution elasticities
 @NLparameter(cge, es_fe[s in set[:s]] == 0); #FE nest
 @NLparameter(cge, es_ele[s in set[:s]] == 0); # EN nest
@@ -278,8 +280,6 @@ for r in set[:r], s in set[:xe]
     set_value(es_fr[r,s], value(esup_xe[s]) * value(theta_fr[r,s]) / (1-value(theta_fr[r,s])));
 end
 
-
-
 # Autonomous energy efficiency improvement (aeei) - used to pin energy demands
 # initialized to 1
 @NLparameter(cge, idaeei[r in set[:r], g in set[:g], s in set[:s]] == 1);   # aeei for good g in sector s
@@ -292,98 +292,94 @@ end
 
 # specify lower bound
 lo = 0.0
-#lo = 1e-6
+low = 0.0
 
 # sectors
 @variables(cge, begin
-    YX[(r,s) in set[:Y]] >= lo, (start = value(thetax))
-    YM[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax)))
-    YYM[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax)))
-    E[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax)))
-    VA[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax)))
-    X[(r,g) in set[:X]] >= lo, (start = 1)
-    A[(r,g) in set[:A]] >= lo, (start = 1)
-    MS[r in set[:r], m in set[:m]] >= lo, (start = 1)
-    LS[r in set[:r]] >= lo, (start = 1)
-    C[r in set[:r]] >= lo, (start = 1)
-    INV[r in set[:r]] >= lo, (start = 1)
-    Z[r in set[:r]] >= lo, (start = 1)
-    W[r in set[:r]] >= lo, (start = 1)
-    CO2[r in set[:r]] >= lo, (start = value(cb0[r]))
-end)
+    YX[(r,s) in set[:Y]] >= lo, (start = value(thetax)) # Extant output
+    YM[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax))) # Mutable output
+    # YYM[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax))) # pre-fixed resource Mutable output
+    # E[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax))) # Energy index
+    # VA[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax))) # Value-added index
+    X[(r,g) in set[:X]] >= lo, (start = 1)  # Disposition / Exports
+    A[(r,g) in set[:A]] >= lo, (start = 1)  # Absorption / Armington
+    MS[r in set[:r], m in set[:m]] >= lo, (start = 1)   # Margin supply
+    # LS[r in set[:r]] >= lo, (start = (1-value(u0[r]))) # Labor supply
+    C[r in set[:r]] >= lo, (start = 1) # Final Consumption
+    INV[r in set[:r]] >= lo, (start = 1) # Investment
+    # Z[r in set[:r]] >= lo, (start = 1) # Full consumption
+    W[r in set[:r]] >= lo, (start = 1) # Welfare index
+    # CO2[r in set[:r]] >= lo, (start = value(cb0[r])) # CO2 emissions supply
+end);
 
 # commodities
 @variables(cge, begin
-    PA[(r,g) in set[:PA]] >= lo, (start = 1)
-    PY[(r,g) in set[:PY]] >= lo, (start = 1)
-    PD[(r,g) in set[:PD]] >= lo, (start = 1)
-    PN[g in set[:g]] >= lo, (start = 1)
-    PYM[(r,s) in set[:Y]] >= lo, (start = 1)
-    PE[(r,s) in set[:Y]] >= lo, (start = 1)
-    PVA[(r,s) in set[:Y]] >= lo, (start = 1)
-    RK[(r,s) in set[:PK]] >= lo, (start = 1)
-    RKX[(r,s) in set[:PK]] >= lo, (start = 1)
-    PFR[(r,s) in set[:PK]] >= lo, (start = 1)
-    PFRX[(r,s) in set[:PK]] >= lo, (start = 1)
-    PM[r in set[:r], m in set[:m]] >= lo, (start = 1)
-    PFX >= lo, (start = 1)
-    PLS[r in set[:r]] >= lo, (start = 1)
-    PL[r in set[:r]] >= lo, (start = 1)
-    PC[r in set[:r]] >= lo, (start = 1)
-    PINV[r in set[:r]] >= lo, (start = 1)
-    PZ[r in set[:r]] >= lo, (start = 1)
-    PW[r in set[:r]] >= lo, (start = 1)
-    PCO2 >= lo, (start = 1)
-    PDCO2[r in set[:r]] >= lo, (start = 1)
-end)
+    PA[(r,g) in set[:PA]] >= lo, (start = 1) # Regional market (input) price
+    PY[(r,g) in set[:PY]] >= lo, (start = 1) # Regional market (output) price
+    PD[(r,g) in set[:PD]] >= lo, (start = 1) # Local market price
+    PN[g in set[:g]] >= lo, (start = 1) # National market price
+    # PYM[(r,s) in set[:Y]] >= lo, (start = 1) # pre-fixed resource mutable composite price
+    # PE[(r,s) in set[:Y]] >= lo, (start = 1) # Energy composite price
+    # PVA[(r,s) in set[:Y]] >= lo, (start = 1) # Value-added composite price
+    RK[(r,s) in set[:PK]] >= lo, (start = 1) # Capital rental - mutable
+    RKX[(r,s) in set[:PK]] >= lo, (start = 1) # Capital rental - extant
+    # PFR[(r,s) in set[:PK]] >= low, (start = 1) # Fixed resource - mutable
+    # PFRX[(r,s) in set[:PK]] >= low, (start = 1) # Fixed resource - extant
+    PM[r in set[:r], m in set[:m]] >= lo, (start = 1) # Margin price
+    PFX >= lo, (start = 1) # Foreign exchange price
+    # PLS[r in set[:r]] >= low, (start = value(wref[r])) # Labor supply price
+    PL[r in set[:r]] >= lo, (start = 1) # Leisure / Time price
+    PC[r in set[:r]] >= lo, (start = 1) # Final consumption price
+    PINV[r in set[:r]] >= lo, (start = 1) # Investment price
+    # PZ[r in set[:r]] >= lo, (start = 1) # Full consumption price
+    PW[r in set[:r]] >= lo, (start = 1) # Welfare price
+    # PCO2 >= lo, (start = 1) # CO2 factor price
+    # PDCO2[r in set[:r]] >= lo, (start = 1) # Effective CO2 price
+end);
 
 # Demand
 #@variable(cge, RA[r in set[:r]] >= lo, start = (value(z0[r])+value(inv0[r])));
 @variable(cge, RA[r in set[:r]]>=lo,start = value(w0[r])) ;
 
 # Definitionals
+# !!!! new subsets and start values needed (placeholders for now)
 @variables(cge, begin
-    U[r in set[:r]] >= lo, (start = value(u0[r]))
-    RX[(r,g) in set[:X]] >= lo, (start = 1)
-end)
+    RX[(r,g) in set[:X]] >= lo, (start = 1) # Unit revenue function disposition
+    DKM[(r,s) in set[:PK]] >= lo, (start = start_value(YM[(r,s)])*value(kd0[r,s])) # Mutable capital demand
+# remaining variables unused -- for some reason unused variables will throw bounds error if declared prior to used variable
+    U[r in set[:r]] >= lo, (start = 1) # Unemployment rate index
+    DKX[(r,s) in set[:PK]] >= lo, (start = start_value(YX[(r,s)])*value(kd0[r,s])) # Extant capital demand
+    DCD[r in set[:r], g in set[:g]] >= lo, (start = start_value(C[r])*value(cd0[r,g])) # Final consumption demand
+    DIDM[r in set[:r], g in set[:g], s in set[:s]] >= lo, (start = 1) # Intermediate demand - mutable
+    DIDX[r in set[:r], g in set[:g], s in set[:s]] >= lo, (start = 1) # Intermediate demand - extant
+    DND[r in set[:r], g in set[:g]] >= lo, (start = 1) # Import demand from national market
+    DMF[r in set[:r], g in set[:g]] >= lo, (start = 1) # Import demand from foreign market
+    DLS[r in set[:r]] >= lo, (start = 1) # Leisure demand
+    DLDM[r in set[:r], s in set[:s]] >= lo, (start = 1) # Labor demand - mutable
+    DLDX[r in set[:r], s in set[:s]] >= lo, (start = 1) # Labor demand - extant
+    SX[(r,g) in set[:X]] >= lo, (start = 1) # Commodity supply
+    SXN[r in set[:r], g in set[:g]] >= lo, (start = 1) # Exports supplied to national (domestic) market
+    SXF[r in set[:r], g in set[:g]] >= lo, (start = 1) # Exports supplied to foreign (international) market
+    SLS[r in set[:r]] >= lo, (start = 1) # Labor supply
+    SCO2[r in set[:r]] >= lo, (start = 1) # CO2 emissions supply
+end);
 
-#@variable(cge, Y[(r, s) in set[:Y]] >= lo, start = 1);
-# @variable(cge, X[(r, g) in set[:X]] >= lo, start = 1); # Disposition
-# @variable(cge, A[(r, g) in set[:A]] >= lo, start = 1); # Armington / Absorption
-# @variable(cge, C[r in set[:r]] >= lo, start = 1); # Consumption
-# @variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1); # Margin Supply
-
-#commodities:
-# @variable(cge, PA[(r, g) in set[:PA]] >= lo, start = 1); # Regional market (input)
-# @variable(cge, PY[(r, g) in set[:PY]] >= lo, start = 1); # Regional market (output)
-# @variable(cge, PD[(r, g) in set[:PD]] >= lo, start = 1); # Local market price
-# @variable(cge, PN[g in set[:g]] >= lo, start =1); # National market
-# @variable(cge, PL[r in set[:r]] >= lo, start = 1); # Wage rate
-# #@variable(cge, PK[(r, s) in set[:PK]] >= lo, start =1); # Rental rate of capital ###
-# @variable(cge, PM[r in set[:r], m in set[:m]] >= lo, start =1); # Margin price
-# @variable(cge, PC[r in set[:r]] >= lo, start = 1); # Consumer price index #####
-# @variable(cge, PFX >= lo, start = 1); # Foreign exchange
-
-#consumer:
-# @variable(cge,RA[r in set[:r]]>=lo,start = value(w0[r])) ;
-
-
-#--- recursive dynamic variable declaration ---
-# sectors
-# @variable(cge,YM[(r,s) in set[:Y]] >= lo, start = (1-value(thetax))); # Mutable production index - replaces Y
-# @variable(cge,YX[(r,s) in set[:Y]] >= lo, start = value(thetax)); # Extant production index
-# @variable(cge,INV[r in set[:r]] >= lo, start = 1); # Investment
-# @variable(cge,W[r in set[:r]] >= lo, start = 1); # Welfare index
-
-# commodities
-# @variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
-# @variable(cge,RK[(r,s) in set[:PK]] >= lo, start = 1); # Return to regional capital
-# @variable(cge,PINV[r in set[:r]] >= lo, start = 1); # Investment price index
-# @variable(cge,PW[r in set[:r]] >= lo, start = 1); # Welfare price index
-
-# # Definitional variables
-# @variable(cge,DKM[(r,s) in set[:PK]] >= lo, start = start_value(YM[(r,s)]) * value(kd0[r,s]));
-# @variable(cge,RX[(r,g) in set[:X]]>=lo,start = 1); # definitional: export transformation unit revenue
+@variables(cge, begin
+    PCO2 >= lo, (start = 1) # CO2 factor price
+    PDCO2[r in set[:r]] >= lo, (start = 1) # Effective CO2 price
+    PZ[r in set[:r]] >= lo, (start = 1) # Full consumption price
+    PLS[r in set[:r]] >= low, (start = value(wref[r])) # Labor supply price
+    PFR[(r,s) in set[:PK]] >= low, (start = 1) # Fixed resource - mutable
+    PFRX[(r,s) in set[:PK]] >= low, (start = 1) # Fixed resource - extant
+    PYM[(r,s) in set[:Y]] >= lo, (start = 1) # pre-fixed resource mutable composite price
+    PE[(r,s) in set[:Y]] >= lo, (start = 1) # Energy composite price
+    PVA[(r,s) in set[:Y]] >= lo, (start = 1) # Value-added composite price
+    CO2[r in set[:r]] >= lo, (start = value(cb0[r])) # CO2 emissions supply
+    Z[r in set[:r]] >= lo, (start = 1) # Full consumption
+    YYM[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax))) # pre-fixed resource Mutable output
+    E[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax))) # Energy index
+    VA[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax))) # Value-added index
+end);
 
 
 ###############################
