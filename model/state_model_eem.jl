@@ -61,7 +61,9 @@ set[:nne] = setdiff(set[:g],set[:en])   # non-energy goods
 # SWITCHES
 ##############
 
-swfr=0
+swfr = 0
+swunemp = 0
+swcarb = 0
 
 ########## Model ##########
 cge = MCPModel();
@@ -134,51 +136,114 @@ if swfr == 1
     end
 end
 
+# store values for overwrite if needed
+@NLparameter(cge, ymid[r in set[:r], g in set[:g], s in set[:s]] == value(id0[r,g,s]));
+@NLparameter(cge, yxid[r in set[:r], g in set[:g], s in set[:s]] == value(id0[r,g,s]));
+@NLparameter(cge, cid[r in set[:r], g in set[:g]] == value(cd0[r,g]));
 
-# -- Major Assumptions --
-# Temporal/Dynamic modifications
-
-# @NLparameter(cge, ir == 0.05); # interest rate
-# @NLparameter(cge, gr == 0.02); # growth rate --- try sector and set[:r] specific
+# Capital and investment benchmarks
 @NLparameter(cge, dr == 0.05); # capital depreciation rate
 @NLparameter(cge, thetax == 0.3); # extant production share
 
-#new capital endowment
-@NLparameter(cge, ks_n[r in set[:r], s in set[:s]] ==
-    value(kd0[r, s])  * (value(dr)+value(gr)) / (1 + value(gr)) );
+# !!!! Sector-specific for now - issues with more flexibility
+@NLparameter(cge, ks_m0[r in set[:r], s in set[:s]] == value(kd0[r,s]) * (1-value(thetax)));    # Mutable total capital endowment - Non-extant capital base year
+@NLparameter(cge, ks_m[r in set[:r], s in set[:s]] == value(kd0[r,s]) * (1-value(thetax)));
 
-# mutable old capital endowment
-@NLparameter(cge, ks_s[r in set[:r], s in set[:s]] ==
-    value(kd0[r, s]) * (1 - value(thetax)) - value(ks_n[r,s]) );
+@NLparameter(cge, ks_x0[r in set[:r], s in set[:s]] == value(kd0[r, s]) * value(thetax));   # Extant capital endowment base year
+@NLparameter(cge, ks_x[r in set[:r], s in set[:s]] == value(kd0[r, s]) * value(thetax));
 
-# Mutable total capital endowment - Non-extant capital
-@NLparameter(cge, ks_m[r in set[:r]] == sum(value(kd0[r,s]) * (1-value(thetax)) for s in set[:s]));
+@NLparameter(cge, tks0[r in set[:r], s in set[:s]] == value(ks_x0[r,s]) + value(ks_m0[r,s]));   # total capital stock in base year
+@NLparameter(cge, tks[r in set[:r], s in set[:s]] == value(ks_x0[r,s]) + value(ks_m0[r,s]));
 
-# Extant capital endowment
-@NLparameter(cge, ks_x[r in set[:r], s in set[:s]] ==
-    value(kd0[r, s]) * value(thetax) );
+@NLparameter(cge, inv0[r in set[:r]] == sum(value(i0[r,g]) for g in set[:g]));  # Benchmark investment supply
 
-# Labor endowment
-@NLparameter(cge, le0[r in set[:r], s in set[:s]] == value(ld0[r,s]));
+# split fixed resource between extant and mutable
+@NLparameter(cge, frx0[r in set[:r], s in set[:s]] == value(fr0[r,s])*value(thetax));
+@NLparameter(cge, frx[r in set[:r], s in set[:s]] == value(fr0[r,s])*value(thetax));
+@NLparameter(cge, frm0[r in set[:r], s in set[:s]] == value(fr0[r,s])*(1-value(thetax)));
+@NLparameter(cge, frm[r in set[:r], s in set[:s]] == value(fr0[r,s])*(1-value(thetax)));
+@NLparameter(cge, frb0[r in set[:r], s in set[:s]] == value(fr0[r,s]));  # base year resource
 
-# Benchmark investment supply
-@NLparameter(cge, inv0[r in set[:r]] == sum(value(i0[r,g]) for g in set[:g]));
+# Labor-Leisure benchmarks
+@NLparameter(cge, lab_e0[r in set[:r]] == sum(value(ld0[r,s]) for s in set[:s]));   # benchmark year Labor endowment/supply
+@NLparameter(cge, lab_e[r in set[:r]] == sum(value(ld0[r,s]) for s in set[:s]));   # duplicate/overwritable Labor endowment/supply
+@NLparameter(cge, lte0_shr[r in set[:r]] == 0.4);   # extra time to calibrate time endowment (leisure share of time endowment)
+@NLparameter(cge, lte0[r in set[:r]] == value(lab_e0[r])/(1-value(lte0_shr[r])));   # time endowment
+@NLparameter(cge, leis_e0[r in set[:r]] == value(lte0[r]) - value(lab_e0[r]));  # benchmark year leisure time endowment/supply
+@NLparameter(cge, leis_e[r in set[:r]] == value(lte0[r]) - value(lab_e0[r]));  # duplicate/overwritable leisure time endowment/supply
+@NLparameter(cge, z0[r in set[:r]] == value(c0[r]) + value(leis_e0[r]));    # benchmark full consumption
+@NLparameter(cge, lies_shr[r in set[:r]] == value(leis_e0[r]) / (value(c0[r]) + value(leis_e0[r])));  # leisure share of full consumption
 
-# Benchmark welfare index
+@NLparameter(cge, es_z[r in set[:r]] == 0); #substitution elasticity between leisure and consumption in prod Z
+@NLparameter(cge, theta_l == 0.05); # uncompensated labor supply elasticity
+
+# Unemployment and labor frictions (Balistreri 2002)
+# Calibration point established (Hafstead, Williams, Chen 2019)
+@NLparameter(cge, u0[r in set[:r]] == 0);    # benchmark unemployment rate
+
+# if unemployment switched on, set unemployment rate (placeholder value)
+if swunemp == 1
+    for r in set[:r]
+        set_value(u0[r], 0.05);
+    end
+end
+
+@NLparameter(cge, wref[r in set[:r]] == 1/(1-value(u0[r])));    # benchmark reservation wage
+@NLparameter(cge, sig == 0.9);  # Exponent on labor supply (LS) externality
+@NLparameter(cge, uta == 1-value(sig));  # Exponent on Unemployment (U) externality
+
+# !!!! Benchmark welfare index --- Don't forget to update with new model
+#@NLparameter(cge, w0[r in set[:r]] == value(inv0[r])+value(z0[r]));
 @NLparameter(cge, w0[r in set[:r]] == value(inv0[r])+value(c0[r]));
 
+# Energy-Nesting Benchmark parameters
+@NLparameter(cge, va_bar[r in set[:r], s in set[:s]] == value(ld0[r,s]) + value(kd0[r,s])); # bmk value-added
+@NLparameter(cge, fe_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:fe])); # bmk fossil-energy FE
+@NLparameter(cge, en_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:en])); # bmk energy EN
+@NLparameter(cge, ne_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:nne])); # bmk non-energy NNE
+@NLparameter(cge, vaen_bar[r in set[:r], s in set[:s]] == value(va_bar[r,s]) + value(en_bar[r,s])); # bmk value-added-energy vaen
+@NLparameter(cge, klem_bar[r in set[:r], s in set[:s]] == value(vaen_bar[r,s]) + value(ne_bar[r,s])); # bmk value-added-energy vaen
+
+
 # benchmark value share parameters
+# capital-labor (value added nest)
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
 
+# disposition / Export
 @NLparameter(cge, cs0[r in set[:r], g in set[:g]] == value(x0[r,g])-value(rx0[r,g]) + value(xd0[r,g]) + value(xn0[r,g])); #sum total of outputs in unit revenue/transformation
 @NLparameter(cge, alpha_x[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(cs0[r,g])));
 @NLparameter(cge, alpha_d[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(cs0[r,g])));
 @NLparameter(cge, alpha_n[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(cs0[r,g])));
 
+# absorption / Armington
 @NLparameter(cge, theta_n[r in set[:r], g in set[:g]] == ensurefinite(value(nd0[r,g]) / (value(nd0[r,g]) - value(dd0[r,g]))));
 @NLparameter(cge, theta_m[r in set[:r], g in set[:g]] == ensurefinite((1+value(tm0[r,g])) * value(m0[r,g]) / (value(nd0[r,g]) + value(dd0[r,g]) + (1 + value(tm0[r,g])) * value(m0[r,g]))));
 
+# Investment
 @NLparameter(cge, theta_inv[r in set[:r], g in set[:g]] == value(i0[r,g]) / value(inv0[r])); # Intermediate input share of investment output
+
+# Consumption
+@NLparameter(cge, theta_cd[r in set[:r], g in set[:g]] == value(cd0[r,g]) / sum(value(cd0[r,g]) for g in set[:g]));
+
+# Energy-nesting
+@NLparameter(cge, theta_fe[r in set[:r], g in set[:fe], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(fe_bar[r,s])));
+@NLparameter(cge, theta_en[r in set[:r], g in set[:en], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(en_bar[r,s])));
+@NLparameter(cge, theta_ele[r in set[:r], s in set[:s]] == ensurefinite(sum(value(id0[r,g,s]) for g in set[:ele])/value(fe_bar[r,s])));
+@NLparameter(cge, theta_ne[r in set[:r], g in set[:nne], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(ne_bar[r,s])));
+@NLparameter(cge, theta_va[r in set[:r], s in set[:s]] == ensurefinite(value(va_bar[r,s])/value(vaen_bar[r,s])));
+@NLparameter(cge, theta_kle[r in set[:r], s in set[:s]] == ensurefinite(value(vaen_bar[r,s])/value(klem_bar[r,s])));
+
+# fixed factor (top-level)
+@NLparameter(cge, theta_fr[r in set[:r], s in set[:s]] == 0);
+
+# !!!! could remove if-statement and just declare - would default to zero due to fr0=0 above
+if swfr == 1
+    for r in set[:r], s in set[:s]
+        set_value(theta_fr[r,s], ensurefinite(value(fr0[r,s])/(value(klem_bar[r,s])+value(fr0[r,s]))));
+    end
+end
+
+
 
 #Substitution and transformation elasticities
 @NLparameter(cge, es_va[r in set[:r], s in set[:s]] == SUB_ELAST[:va]); # value-added nest - substitution elasticity
@@ -192,6 +257,34 @@ end
 
 @NLparameter(cge, es_inv[r in set[:r]] == 5); # Investment production - substitution elasticity
 
+#Energy nesting substitution elasticities
+@NLparameter(cge, es_fe[s in set[:s]] == 0); #FE nest
+@NLparameter(cge, es_ele[s in set[:s]] == 0); # EN nest
+@NLparameter(cge, es_ve[s in set[:s]] == 0); # VAEN/KLE nest
+@NLparameter(cge, es_ne[s in set[:s]] == 0); # NE nest
+@NLparameter(cge, es_klem[s in set[:s]] == 0); # KLEM nest
+
+# Calibrate resource supply elasticities (Rutherford 2002)
+@NLparameter(cge, esup_xe[s in set[:s]] == 0);  # resource supply elasticities
+@NLparameter(cge, es_fr[r in set[:r], s in set[:s]] == 0); # substitution elasticity top nest
+
+# Calibration point informed by EPA SAGE Model Documentation
+set_value(esup_xe["col"], 2.4);
+set_value(esup_xe["gas"], 0.5);
+set_value(esup_xe["cru"], 0.15);
+
+# calculate implied substitution elasticitiy from share and supply elasticity (Rutherford 2002)
+for r in set[:r], s in set[:xe]
+    set_value(es_fr[r,s], value(esup_xe[s]) * value(theta_fr[r,s]) / (1-value(theta_fr[r,s])));
+end
+
+
+
+# Autonomous energy efficiency improvement (aeei) - used to pin energy demands
+# initialized to 1
+@NLparameter(cge, idaeei[r in set[:r], g in set[:g], s in set[:s]] == 1);   # aeei for good g in sector s
+@NLparameter(cge, cdaeei[r in set[:r], g in set[:g]] == 1); # aeei for final demand
+
 
 ################
 # VARIABLES
@@ -199,6 +292,7 @@ end
 
 # specify lower bound
 lo = 0.0
+#lo = 1e-6
 
 # sectors
 #@variable(cge, Y[(r, s) in set[:Y]] >= lo, start = 1);
@@ -231,7 +325,7 @@ lo = 0.0
 
 # commodities
 @variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
-@variable(cge,RK[r in set[:r]] >= lo, start = 1); # Return to regional capital
+@variable(cge,RK[(r,s) in set[:PK]] >= lo, start = 1); # Return to regional capital
 @variable(cge,PINV[r in set[:r]] >= lo, start = 1); # Investment price index
 @variable(cge,PW[r in set[:r]] >= lo, start = 1); # Welfare price index
 
@@ -249,7 +343,7 @@ lo = 0.0
 
 #Cobb-douglas for mutable/new
 @NLexpression(cge, CVAym[r in set[:r], s in set[:s]],
-    PL[r]^alpha_kl[r,s] * RK[r]^(1-alpha_kl[r,s]));
+    PL[r]^alpha_kl[r,s] * (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)^(1-alpha_kl[r,s]));
 
 #demand for labor in VA
 @NLexpression(cge,ALym[r in set[:r], s in set[:s]],
@@ -257,7 +351,7 @@ lo = 0.0
 
 #demand for capital in VA
 @NLexpression(cge,AKym[r in set[:r],s in set[:s]],
-    kd0[r,s] * CVAym[r,s] / RK[r]);
+    kd0[r,s] * CVAym[r,s] / (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0));
 
 @NLexpression(cge,DINV[r in set[:r], g in set[:g]],
     (i0[r,g] * (PINV[r]/(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)^es_inv[r])));
@@ -321,7 +415,7 @@ lo = 0.0
 # cost of labor inputs
     + PL[r] * ALym[r,s]
 # cost of capital inputs
-    + RK[r] * AKym[r,s]
+    + (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) * AKym[r,s]
     -
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
     sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
@@ -414,12 +508,12 @@ lo = 0.0
 #----------
 #Recursive dynamics mkt clearance
 
-@mapping(cge,market_rk[r in set[:r]],
+@mapping(cge,market_rk[(r, s) in set[:PK]],
 # mutable capital supply
-    ks_m[r]
+    ks_m[r,s]
     -
 # mutable capital demand
-    sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AKym[r,s] for s in set[:s])
+    (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AKym[r,s]
 );
 
 @mapping(cge,market_rkx[(r, s) in set[:PK]],
@@ -459,7 +553,7 @@ lo = 0.0
 
 @mapping(cge,market_pl[r in set[:r]],
 # supply of labor
-    sum(le0[r,s] for s in set[:s])
+    lab_e0[r]
     -
 # demand for labor in all set[:s]
     (
@@ -546,10 +640,10 @@ lo = 0.0
     -
     (
 # labor income
-        PL[r] * sum(le0[r,s] for s in set[:s])
+        PL[r] * lab_e0[r]
 # capital income
-        + RK[r] * ks_m[r]
-        +sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in set[:s])
+        + sum((haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) * ks_m[r,s] for s in set[:s])
+        + sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in set[:s])
 # provision of household supply
         + sum( (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * yh0[r,g] for g in set[:g])
 # revenue or costs of foreign exchange including household adjustment
@@ -638,6 +732,7 @@ PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cum
 # solve the model
 status = solveMCP(cge)
 
+#= !!!! SECTOR SPECIFIC CAPITAL UPDATES NEEDED
 # Pre-loop calculations
 ktot_mx = Dict((r,bmkyr) => value(ks_m[r]) + sum(value(ks_x[r,s]) for s in set[:s])
     for r in set[:r])
@@ -757,3 +852,4 @@ for t in 2017:2020
     # solve next period
     status = solveMCP(cge)
 end
+=#
