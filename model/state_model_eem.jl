@@ -346,7 +346,7 @@ end);
 @variables(cge, begin
     RX[(r,g) in set[:X]] >= lo, (start = 1) # Unit revenue function disposition
     DKM[(r,s) in set[:PK]] >= lo, (start = start_value(YM[(r,s)])*value(kd0[r,s])) # Mutable capital demand
-# remaining variables unused -- for some reason unused variables will throw bounds error if declared prior to used variable
+# !!!! remaining variables unused -- for some reason unused variables will throw bounds error if declared prior to used variable
     U[r in set[:r]] >= lo, (start = 1) # Unemployment rate index
     DKX[(r,s) in set[:PK]] >= lo, (start = start_value(YX[(r,s)])*value(kd0[r,s])) # Extant capital demand
     DCD[r in set[:r], g in set[:g]] >= lo, (start = start_value(C[r])*value(cd0[r,g])) # Final consumption demand
