@@ -8,7 +8,6 @@ module SLiDE
 #################################################################################
 # IMPORTS
 import CSV
-# import Combinatorics
 import Complementarity;     using Complementarity
 import DataFrames;          using DataFrames
 import Dates
@@ -17,12 +16,7 @@ import Ipopt;               using Ipopt
 import JSON;                using JSON
 import JuMP;                using JuMP
 import Logging;             using Logging
-# import PowerSimulations;
-# import Printf
-# import Query;               using Query
-# import Revise
 import Statistics;          using Statistics
-# import Test;
 import XLSX
 import YAML
 
@@ -156,7 +150,7 @@ export partition_co2emis!
 export disaggregate_energy!
 
 # MODEL
-export model_input
+# export model_input
 
 #################################################################################
 # INCLUDES
@@ -240,11 +234,9 @@ include(joinpath("build", "share", "share_sector.jl"))
 include(joinpath("build", "disagg", "disagg_region.jl"))
 include(joinpath("build", "disagg", "disagg_energy.jl"))
 
-include(joinpath("scale", "constructors.jl"))
 include(joinpath("scale", "scale_sector.jl"))
 include(joinpath("scale", "scale_with.jl"))
 
-# include(joinpath("model", "_model_io.jl"))
 include(joinpath("model", "model_io.jl"))
 
 function __init__()

@@ -7,7 +7,7 @@
 - `year::Int`: year for which to perform calibration
 
 # Returns
-- `d::Dict` of DataFrames containing the model data at the calibration step.
+- `d::Dict` of DataFrames containing the model data.
 """
 function calibrate_regional(
     io::Dict,
@@ -237,16 +237,17 @@ parameters will include ``yr`` only if `year` is included as an input parameter.
         ``\\tilde{m}_{yr,g}``, ``\\tilde{va}_{yr,s}``, ``\\tilde{g}_{yr,g}``,
         ``\\tilde{i}_{yr,g}``, ``\\tilde{cd}_{yr,g}``.
         For any parameter ``\\bar{z}_{yr,r,s,g}``,
-            ```math
-            \\tilde{z}_{yr,s,g} = \\sum_{r} \\bar{z}_{yr,r,s,g}
-            ```
+        
+        ```math
+        \\tilde{z}_{yr,s,g} = \\sum_{r} \\bar{z}_{yr,r,s,g}
+        ```
+
     - Separate ``fvs_{yr,r,s}`` for labor (`fvs_ld0`) and capital (`fvs_kd0`).
     - Filter ``netgen_{yr,r}`` to include only values from SEDS input data.
 1. Set electricity imports/exports from/to the national market to/from Alaska and Hawaii to zero.
 1. (If `T==Dict`), fill zeros.
-1. Set lower bounds for all variables except for ``\\bar{ld}_{yr,r,s}``, `\\bar{kd}_{yr,r,s}`,
-    `\\bar{yh}_{yr,r,g}`, and ``\\bar{cd}_{yr,r,g}``.
-1. (If `T==Dict`), convert to dictionary.
+1. Set lower bounds for all variables except for ``\\bar{ld}_{yr,r,s}``, ``\\bar{kd}_{yr,r,s}``,
+    ``\\bar{yh}_{yr,r,g}``, and ``\\bar{cd}_{yr,r,g}``.
 """
 function _energy_calibration_input(d, set)
     variables = setdiff(list!(set, Dataset(""; build="eem", step="calibrate")), list("taxes"))

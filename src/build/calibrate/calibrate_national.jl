@@ -8,7 +8,7 @@
 - `year::Int`: year for which to perform calibration
 
 # Returns
-- `d::Dict` of DataFrames containing the model data at the calibration step.
+- `d::Dict` of DataFrames containing the model data
 """
 function calibrate_national(
     io::Dict,
@@ -109,29 +109,27 @@ end
 calibrate_national(args...; kwargs...) = calibrate(calibrate_national, args...; kwargs...)
 
 
-
 """
     _national_calibration_input(d::Dict, set::Dict, year::Int)
     _national_calibration_input(d::Dict, set::Dict)
 This function prepares the input for the calibration routine:
 1. Select parameters relevant to the calibration routine.
-2. For all parameters except taxes (ta0, tm0), set negative values to zero.
-    In the case of final demand, only set negative values to zero for `fd = pce`.
-    ```math
-    \\begin{aligned}
-    x = max\\left\\{0, x\\right\\}
-    fd_{g,fd} = max\\{0, fd_{g,fd}\\}
-    ```
-3. Fill all "missing" values with zeros to generate a complete dataset. This is relevant
+1. For all parameters except taxes (ta0, tm0), set negative values to zero:
+    ``x = max\\left\\{0, x\\right\\}``
+1. In the case of final demand, only set negative values to zero for `fd = pce`:
+    ``fd_{g,fd} = max\\{0, fd_{g,fd}\\}``
+1. Fill all "missing" values with zeros to generate a complete dataset. This is relevant
     to how the penalty for missing keys is applied in the objective function.
 
 # Arguments
 - `d::Dict{Symbol,DataFrame}`: all input *parameters*
-- `set::Dict`
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 - `year::Int` overwhich to calibrate
 
 # Returns
 - `d::Dict{Symbol, Dict}`: input *variables*
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.),
+    updated to include necessary set permutations.
 """
 function _national_calibration_input(d, set)
     variables = setdiff(list!(set, Dataset(""; build="io", step="calibrate")), list("taxes"))

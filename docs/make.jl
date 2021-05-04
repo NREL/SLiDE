@@ -35,22 +35,22 @@ makedocs(clean = true,
             "Overview" => "man/build/overview.md",
             "Regional" => Any[
                 "Partition: BEA" => "man/build/io/partition_bea.md",
-                "National Calibrate" => "man/build/io/calibrate_national.md",
+                "National Calibration" => "man/build/io/calibrate_national.md",
                 "Regional Sharing" => "man/build/io/share_region.md",
                 "Regional Disaggregation" => "man/build/io/disagg_region.md",
             ],
             "Energy-Environment Module" => Any[
-                # "Scale" => "",
                 "Partition: Energy and Electricity" => "man/build/eem/partition_seds.md",
                 "Energy Disaggregation" => "man/build/eem/disagg_energy.md",
-                # ""
+                "Regional Calibration" => "man/build/eem/calibrate_regional.md",
             ],
         ],
-        "Scale" => Any[
-            "Overview" => "man/scale/overview.md",
-            "Sector" => "man/scale/sector.md",
+        "Scale" => "man/scale/overview.md",
+        # Any[
+            # "Overview" => "man/scale/overview.md",
+            # "Sector" => "man/scale/sector.md",
             # "Region" => "",
-        ],
+        # ],
         "API" => [
             "Types" => map(
                 s -> "api/types/$(s)",

@@ -16,13 +16,13 @@ SLiDE.Weighting
 ```
 
 ```@docs
-SLiDE.compound_for!
 SLiDE.scale_with
+SLiDE.compound_for!
 SLiDE.filter_for!
 ```
 
 ```@docs
-disaggregate_sector!
-aggregate_sector!
-aggregate_tax_with!
+SLiDE.disaggregate_sector!
+SLiDE.aggregate_sector!
+SLiDE.aggregate_tax_with!
 ```

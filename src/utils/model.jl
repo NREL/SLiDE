@@ -15,8 +15,6 @@ This function sets negative values to zero.
 # Returns
 - `df::DataFrame` or `d::Dict{Symbol,DataFrame}` with negative values set to zero.
 """
-zero_negative(x::Real) = max(0, x)
-
 function zero_negative!(df::DataFrame)
     df[!,:value] .= zero_negative.(df[:,:value])
     return df
@@ -44,6 +42,9 @@ function zero_negative!(d::Dict, var::InvertedIndex)
 end
 
 
+zero_negative(x::Real) = max(0, x)
+
+
 """
 This function returns the start value of the JuMP Model VariableRef `model[var][idx]`.
 """
@@ -52,6 +53,7 @@ _start_value(model::Model, var::Symbol, idx::String) = start_value(model[var][id
 
 
 """
+    upper_bound(x::Real; kwargs...)
 This function returns an upper bound on `x`:
     ```math
     x_{upper} =
@@ -68,12 +70,12 @@ This function returns an upper bound on `x`:
 # Keyword Arguments
 - `factor::Real=0` to use to calculate upper bound.
 - `value::Real=NaN`: If a value is given, set upper bound to this value.
-- `allow_negative::Bool=true`: Do we want to set negative values to zero?
+- `allow_negative::Bool=true`: Do we want to make negative values positive?
 
 # Returns
 - `x::Real`: calculted upper bound
 """
-function _upper_bound(x::Real; factor::Real=0, value::Real=NaN, allow_negative::Bool=true)
+function upper_bound(x::Real; factor::Real=0, value::Real=NaN, allow_negative::Bool=true)
     return if iszero(x)
         Inf
     elseif !isnan(value)
@@ -85,6 +87,7 @@ end
 
 
 """
+    lower_bound(x::Real; kwargs...)
 This function calculates a lower bound on `x`:
     ```math
     x_{lower} =
@@ -106,7 +109,7 @@ This function calculates a lower bound on `x`:
 # Returns
 - `x::Real`: calculted lower bound
 """
-function _lower_bound(x::Real; factor::Real=0, value::Real=NaN, allow_negative::Bool=true)
+function lower_bound(x::Real; factor::Real=0, value::Real=NaN, allow_negative::Bool=true)
     return if !isnan(value)
         value
     else
@@ -116,24 +119,28 @@ end
 
 
 """
+    set_upper_bound!(model::JuMP.Model, var, idx; kwargs...)
 This function sets a JuMP Model variable's upper bound as calculated by
-[`SLiDE._upper_bound`](@ref).
-    
+[`SLiDE.upper_bound`](@ref).
+
 # Arguments
 - `model::JuMP.Model` to update
 - `var::Symbol` or `var::AbstractArray`: variable or list of variables to update
 - `idx::Symbol`, `idx::Tuple`, or `idx::AbstractArray`: index or list of indices overwhich
     to set bounds.
+
+# Keyword Arguments
+Consistent with [`SLiDE.upper_bound`](@ref)
 """
 function set_upper_bound!(model::Model, var::Symbol, idx::Tuple; kwargs...)
-    val = SLiDE._start_value(model, var, idx)
-    !iszero(val) && set_upper_bound(model[var][idx...], _upper_bound(val; kwargs...))
+    val = _start_value(model, var, idx)
+    !iszero(val) && set_upper_bound(model[var][idx...], upper_bound(val; kwargs...))
     return nothing
 end
 
 function set_upper_bound!(model::Model, var::Symbol, idx::String; kwargs...)
     val = SLiDE._start_value(model, var, idx)
-    !iszero(val) && set_upper_bound(model[var][idx], _upper_bound(val; kwargs...))
+    !iszero(val) && set_upper_bound(model[var][idx], upper_bound(val; kwargs...))
     return nothing
 end
 
@@ -141,24 +148,28 @@ set_upper_bound!(args...; kwargs...) = _call_jump!(set_upper_bound!, args...; kw
 
 
 """
+    set_lower_bound!(model::JuMP.Model, var, idx; kwargs...)
 This function sets a JuMP Model variable's lower bound as calculated by
-[`SLiDE._lower_bound`](@ref).
+[`SLiDE.lower_bound`](@ref).
 
 # Arguments
 - `model::JuMP.Model` to update
 - `var::Symbol` or `var::AbstractArray`: variable or list of variables to update
 - `idx::Symbol`, `idx::Tuple`, or `idx::AbstractArray`: index or list of indices overwhich
     to set bounds.
+
+# Keyword Arguments
+Consistent with [`SLiDE.lower_bound`](@ref)
 """
 function set_lower_bound!(model::Model, var::Symbol, idx::Tuple; kwargs...)
     val = _start_value(model, var, idx)
-    set_lower_bound(model[var][idx...], _lower_bound(val; kwargs...))
+    set_lower_bound(model[var][idx...], lower_bound(val; kwargs...))
     return nothing
 end
 
 function set_lower_bound!(model::Model, var::Symbol, idx::String; kwargs...)
     val = _start_value(model, var, idx)
-    set_lower_bound(model[var][idx], _lower_bound(_start_value(model, var, idx); kwargs...))
+    set_lower_bound(model[var][idx], lower_bound(_start_value(model, var, idx); kwargs...))
     return nothing
 end
 
@@ -166,6 +177,7 @@ set_lower_bound!(args...; kwargs...) = _call_jump!(set_lower_bound!, args...; kw
 
 
 """
+    set_bounds!(model::JuMP.Model, var, idx; kwargs...)
 This function sets upper and lower bound on the specified JuMP Model variable(s).
 
 # Arguments
@@ -175,12 +187,9 @@ This function sets upper and lower bound on the specified JuMP Model variable(s)
     to set bounds.
 
 # Keyword Arguments
-- `lower_bound::Real=NaN`: factor passed to [`SLiDE.set_lower_bound!`](@ref)
-- `upper_bound::Real=NaN`: factor passed to [`SLiDE.set_upper_bound!`](@ref)
-
-# Returns
-- `model::JuMP.Model`, with specified variable(s)' upper and lower bounds set over the
-    given index/indices
+- `lower_factor::Real=0`: passed to [`SLiDE.lower_bound`](@ref) as `factor`
+- `upper_factor::Real=0`: passed to [`SLiDE.upper_bound`](@ref) as `factor`
+- `allow_negative::Bool=true`: passed to [`SLiDE.lower_bound`](@ref) and [`SLiDE.upper_bound`](@ref)
 """
 function set_bounds!(model::Model, var::Symbol, idx::Union{String,Tuple};
     lower_factor::Real=0,
@@ -196,6 +205,24 @@ set_bounds!(args...; kwargs...) = _call_jump!(set_bounds!, args...; kwargs...)
 
 
 """
+    fix!(model::JuMP.Model, var, idx; kwargs...)
+This function fixes a model variable `model[var][idx]` if its start value meets a specified
+condition.
+
+# Arguments
+- `model::JuMP.Model` to update
+- `var::Symbol` or `var::AbstractArray`: variable or list of variables to update
+- `idx::Symbol`, `idx::Tuple`, or `idx::AbstractArray`: index or list of indices overwhich
+    to set bounds.
+
+# Keyword Arguments
+- `values::Real=NaN`, to which to fix the JuMP Variable if it meets the condition.
+    If `value==NaN`, as is specified by default, fix the variable based on its start value.
+- `condition::Function=isreal`, that determines whether to fix the value. By default, all
+    Real-valued start values will be fixed. If, for instance, `condition=iszero`, is given,
+    all variables with start values of zero will be fixed to zero.
+    Non-zero values will not be fixed.
+- `force::true`, passed to JuMP.fix
 """
 function fix!(model::Model, var::Symbol, idx::Tuple;
     condition::Function=isreal,
@@ -231,6 +258,18 @@ fix!(args...; kwargs...) = _call_jump!(fix!, args...; kwargs...)
 
 
 """
+    fix_lower_bound!(model::JuMP.Model, var, idx; kwargs...)
+This function fixes a model variable `model[var][idx]` if its start value meets a specified
+condition using [`SLiDE.fix!`](@ref), OR sets its lower bound using [`SLiDE.set_lower_bound!`](@ref).
+
+# Arguments
+- `model::JuMP.Model` to update
+- `var::Symbol` or `var::AbstractArray`: variable or list of variables to update
+- `idx::Symbol`, `idx::Tuple`, or `idx::AbstractArray`: index or list of indices overwhich
+    to set bounds.
+
+# Keyword Arguments
+See [`SLiDE.fix!`] and [`SLiDE.lower_bound`]
 """
 function fix_lower_bound!(model::Model, var::Symbol, idx::Union{String,Tuple}; kwargs...)
     if iszero(_start_value(model, var, idx))

@@ -6,9 +6,6 @@ introduces new parameters.
 - `dataset::Dataset` identifier
 - `d::Dict` of model parameters
 - `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
-
-# Returns
-
 """
 function disaggregate_energy!(dataset, d, set, maps)
     step = "disaggregate"
@@ -361,10 +358,8 @@ function _disagg_energy_zero_prod(df::DataFrame, idxzero::DataFrame)
 end
 
 
-"""
-    _disagg_energy_zero_island!(d::Dict)
-    _disagg_energy_zero_island!(d::Dict, var::Symbol)
-"""
+" Set electricity imports (``nd_{yr,r,g}``) /exports (``xn_{yr,r,g}``) from/to the national
+market to/from Alaska and Hawaii to zero. "
 function _disagg_energy_zero_island!(d)
     [_disagg_energy_zero_island!(d, var) for var in [:nd0,:xn0]]
     return d

@@ -1,5 +1,15 @@
 # https://link.springer.com/content/pdf/bbm%3A978-0-85729-829-4%2F1.pdf
+"""
+    impute_mean(df::DataFrame, col::Symbol)
 
+```math
+\\bar{z} = \\dfrac{\\sum_x z}{N}
+```
+
+```math
+\\bar{z} = \\dfrac{\\sum_x z \\cdot w}{\\sum_x w}
+```
+"""
 function impute_mean(df, col; weight=DataFrame(), condition=DataFrame())
     if isempty(condition)
         condition, df = split_with(df, (value=NaN,))

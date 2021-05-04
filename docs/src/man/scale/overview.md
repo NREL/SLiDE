@@ -1,8 +1,19 @@
 # Scaling
 
+The build stream produces state-level (regionally) model parameters at the summary-level (sectorally).
+
 ## Regional Scaling
 
-Source data is regional-specific and available for a variety of regional divisions: state, CBSA, CSA
+### Aggregation
+
+By default, the SLiDE build stream produces regional data at the state level.
+However, setting `region_level` enables regional aggregation to the region- or division-level, using the [regional scaling map](https://github.com/NREL/SLiDEData/blob/master/coremaps/scale/region/region.csv).
+
+BEA and Census Bureau used to produce shares via [`SLiDE.share_region`](@ref) and applied via [`SLiDE.disaggregate_region`](@ref) is aggregated to the desired level immediately upon being read into the build stream.
+
+### Disaggregation
+*Regional disaggregation will be tackeled during future development phases*
+Source data is regional-specific and available for a variety of regional divisions: state, CBSA, CSA.
 
 | Source | Data         | Region | State | County | CSA | CBSA |
 |:-------|:-------------|:-------|:------|:-------|:----|:-----|
@@ -21,17 +32,24 @@ Codes listed in the [Census Delineation Files](https://www.census.gov/geographie
 
 ## Sectoral Scaling
 
-### BEA
+By default, there are 73 summary-level goods/sectors.
+These can be disaggregated into 409 detail-level goods/sectors
+using the [blueNOTE sectoral scaling map](https://github.com/NREL/SLiDEData/blob/master/coremaps/scale/sector/bluenote.csv).
 
+Scaling features enable the following options:
+1. Select a subset of summary-level or detail-level goods/sectors to examine.
+1. Select a combination of summary- and detail-level goods/sectors.
+1. Aggregate summary- and/or detail-level goods/sectors into those specified in a user-defined map.
 
-### NAICS
+### Aggregation
 
-The [NAICS Codes](https://www.census.gov/programs-surveys/economic-census/guidance/understanding-naics.html) are structured into the following levels, indicated by the number of digits in the code:
+```@docs
+SLiDE.aggregate_sector!
+SLiDE.aggregate_tax_with!
+```
 
-| Digits | Level             |
-|--------|:------------------|
-| 2      | Sector            |
-| 3      | Subsector         |
-| 4      | Industry Group    |
-| 5      | NAICS Industry    |
-| 6      | National Industry |
+### Disaggregation
+
+```@docs
+SLiDE.disaggregate_sector!
+```

@@ -28,8 +28,8 @@ function partition_seds(dataset::Dataset, d::Dict, set::Dict)
         partition_elegen!(d, maps)
         partition_energy!(d, set, maps)
 
-        _partition_cprice!(d, maps)
-        _partition_prodbtu!(d, set)
+        _partition_cprice!(d, set, maps)
+        # _partition_prodbtu!(d, set)
         _partition_pedef!(d, set, maps)
         _partition_pe0!(d, set, maps)
         _partition_ps0!(d)
@@ -229,60 +229,59 @@ end
 
 
 """
-`convfac(yr,r)` [million btu per barrel],
-conversion factor for USD per barrel ``\\longrightarrow`` USD per million btu
-
+`cprice(yr,r)` [USD per million btu], crude oil price
 ```math
-\\tilde{convfac}_{yr,r} \\text{ [million btu/barrel]}
-= \\left\\{
+\\begin{aligned}
+\\tilde{k}_{yr,r,src} \\text{ [million btu/barrel]} &= \\left\\{
     seds \\left( yr, r, src, sec \\right) \\;\\vert\\; yr,\\, r,\\, src=cru,\\, sec=supply
 \\right\\}
+\\\\
+\\tilde{p}_{yr,r,src,sec} \\text{ [USD/million btu]} &= \\dfrac
+    {\\bar{crude oil}_{yr} \\text{ [USD/barrel]}}
+    {\\tilde{k}_{yr,r,src} \\text{ [million btu/barrel]}}
+\\circ \\vec{1}_{demsec\\in sec}
+\\end{aligned}
 ```
-"""
-function _partition_convfac!(d::Dict)
-    d[:convfac] = filter_with(d[:seds], (src="cru", sec="supply", units=BTU_PER_BARREL); drop=:sec)
-    print_status(:convfac, d, "conversion factor for USD per barrel")
-    return d[:convfac]
-end
 
-
-"""
-`cprice(yr,r)` [USD per million btu], crude oil price
+Fill zero `(yr,r,src=cru,sec)` values using ``\\bar{p}_{yr,src=cru,sec}`` as computed by 
+`SLiDE.impute_mean`, under the condition that crude oil quantity is defined:
 
 ```math
-\\tilde{cprice}_{yr,r} \\text{ [usd/million btu]}
-=
-\\dfrac{\\bar{crude oil}_{yr} \\text{ [usd/barrel]}}
-        {\\tilde{convfac}_{yr,r} \\text{ [million btu/barrel]}}
+\\tilde{q}^\\star_{yr,r,src=cru,sec} \\text{ [trillion btu]} = \\left\\{
+    seds \\left( yr, r, src, sec \\right) \\;\\vert\\; yr,\\, r,\\, src=cru,\\, demsec\\in sec,\\
+\\right\\}
+```
+
+```math
+\\tilde{p}_{yr,r,src,sec} \\text{ [USD/million btu]} =
+\\begin{cases}
+\\tilde{p}_{yr,r,src=cru,sec} & \\tilde{p}_{yr,r,src,sec}
+\\\\
+\\bar{p}_{yr,src=cru,sec} \\circ \\vec{1}_{r} & \\tilde{p}_{yr,r,src,sec}, \\tilde{q}^\\star_{yr,r,src=cru,sec} > 0
+\\end{cases}
 ```
 """
-function _partition_cprice!(d::Dict, maps::Dict)
-    df = operate_over(d[:crude_oil], _partition_convfac!(d);
+function _partition_cprice!(d::Dict, set::Dict, maps::Dict)
+    # (1) Calculate crude oil price from supply.
+    k = filter_with(d[:seds], (src="cru", sec="supply", units=BTU_PER_BARREL); drop=:sec)
+
+    df = operate_over(d[:crude_oil], k;
         id=[:usd_per_barrel,:btu_per_barrel]=>:usd_per_btu,
         units=maps[:operate],
     )
     df[!,:value] .= df[:,:factor] .* df[:,:usd_per_barrel] ./ df[:,:btu_per_barrel]
     
-    d[:cprice] = operation_output(df)
+    df = operation_output(df)
+
+    # (2) Impute to fill missing values.
+    idx = filter_with(d[:seds], (src="cru", sec=set[:demsec], pq="q"); drop=:pq)[:,1:end-2]
+    
+    df_avg, df = impute_mean(df, :r; condition=idx)
+    df = crossjoin(df, DataFrame(sec=set[:demsec]))
+    d[:cprice] = vcat(df_avg, df)
 
     print_status(:cprice, d, "crude oil price")
     return d[:cprice]
-end
-
-
-"""
-`prodbtu(yr,r,src)`, total production of either natural gas or crude oil
-```math
-\\tilde{prodbtu}_{yr,r} \\text{ [trillion btu]}
-= \\left\\{
-    seds \\left( yr, r, src, sec \\right) \\;\\vert\\; yr,\\, r,\\, as\\in src,\\, sec=supply
-\\right\\}
-```
-"""
-function _partition_prodbtu!(d::Dict, set::Dict)
-    d[:prodbtu] = filter_with(d[:seds], (src=set[:as], sec="supply", units=BTU); drop=:sec)
-    print_status(:prodbtu, d, "total production of either natural gas or crude oil")
-    return d[:prodbtu]
 end
 
 
@@ -298,33 +297,30 @@ This parameter can be calculated from prices ``\\tilde{p}_{yr,r,src,sec}`` and q
 \\right\\}
 ```
 
-Average energy demand price ``\\tilde{pedef}_{yr,r,src}`` and its regional average
-``\\hat{pedef}_{yr,src}`` are calculated as follows:
+Average energy demand price ``\\hat{p}_{yr,r,src}`` is calculated as its
+``\\tilde{q}_{yr,r,src,sec}``-weighted sectoral aggregate:
 
 ```math
-\\begin{aligned}
-\\bar{p}_{yr,r,src}
-&=
-\\dfrac{\\sum_{sec} \\left( p_{yr,r,src,sec} \\cdot q_{yr,r,src,sec} \\right)}
-      {\\sum_{sec} q_{yr,r,src,sec}}
-\\\\
-\\bar{p}_{yr,src}
-&=
-\\dfrac{\\sum_{r} \\left( \\bar{p}_{yr,r,src} \\cdot \\sum_{sec} q_{yr,r,src,sec} \\right)}
-      {\\sum_{r} \\sum_{sec} q_{yr,r,src,sec}}
-\\\\&\\\\
-\\bar{p}_{yr,r,src} &=
+\\hat{p}_{yr,r,src} = \\dfrac
+    {\\sum_{sec} \\left( \\tilde{p}_{yr,r,src,sec} \\cdot \\tilde{q}_{yr,r,src,sec} \\right)}
+    {\\sum_{sec} \\tilde{q}_{yr,r,src,sec}}
+```
+
+Fill missing `(yr,r,src)` values using ``\\bar{p}_{yr,src}``, as computed by
+[`SLiDE.impute_mean`](@ref), weighted by ``\\sum_{sec} q_{yr,r,src,sec}``.
+
+```math
+\\tilde{pedef}_{yr,r,src} =
 \\begin{cases}
-\\bar{p}_{yr,r,src} & \\sum_{sec} q_{yr,r,src,sec} \\neq 0
+\\tilde{pedef}_{yr,r,src} & \\sum_{sec} q_{yr,r,src,sec} \\neq 0
 \\\\
-\\bar{p}_{yr,src}   & \\sum_{sec} q_{yr,r,src,sec} = 0
+\\bar{pedef}_{yr,src} & \\sum_{sec} q_{yr,r,src,sec} = 0
 \\end{cases}
-\\end{aligned}
 ```
 """
 function _partition_pedef!(d::Dict, set::Dict, maps::Dict)
     var, val = :pq, [:units,:value]
-
+    
     splitter = DataFrame(permute((src=[set[:ff];"ele"], sec=set[:demsec], pq=["p","q"])))
     splitter = indexjoin(splitter, maps[:pq]; kind=:left)
 
@@ -339,7 +335,6 @@ function _partition_pedef!(d::Dict, set::Dict, maps::Dict)
     # For missing or NaN results, replace with the average. NaN values are a result of an
     # aggregate q = 0 (stored here in pedef), so use this to identify.
     idx = intersect(findindex(df), propertynames(df_out))
-
     df_avg, df = SLiDE.impute_mean(df[:,[idx;:value]], :r; weight=df[:,[idx;:q]])
 
     d[:pedef] = sort(vcat(df_avg, df; cols=:intersect))
@@ -351,16 +346,31 @@ end
 
 """
 `pe0(yr,r,src,sec)`, energy demand prices
+```math
+\\begin{aligned}
+\\tilde{p}_{yr,r,src\\neq cru,sec} &= \\left\\{
+    energy \\left( yr, r, src, sec \\right) \\;\\vert\\; yr,\\, r,\\, src,\\, demsec\\in sec
+\\right\\}
+\\\\&\\\\
+\\tilde{p}_{yr,r,src,sec} &= 
+\\begin{cases}
+\\tilde{p}_{yr,r,src\\neq cru,sec} & src\\neq cru, \\tilde{p}_{yr,r,src\\neq cru,sec}\\neq 0
+\\\\
+\\hat{p}_{yr,r,src\\neq cru} \\circ \\vec{1}_{sec} & src\\neq cru, \\tilde{p}_{yr,r,src\\neq cru} = 0
+\\\\&\\\\
+\\tilde{p}_{yr,r,src=cru,sec} & src=cru
+\\end{cases}
+\\end{aligned}
+```
+
+with ``\\tilde{p}_{yr,r,src=cru,sec}`` calculated by [`SLiDE._partition_cprice!`](@ref) and
+``\\hat{p}_{yr,r,src=cru}`` calculated by [`SLiDE._partition_pedef!`](@ref)
 """
 function _partition_pe0!(d::Dict, set::Dict, maps::Dict)
-    df_demsec = DataFrame(sec=set[:demsec])
-    df_energy = filter_with(d[:energy], (src=set[:e], sec=set[:demsec]))
-    8
+
     # Use average energy demand prices where available.
-    df_p = filter_with(df_energy, (pq="p",); drop=true)
-    df_pedef = crossjoin(d[:pedef], df_demsec)
-    col = propertynames(df_p)
-    idx = findindex(df_p)
+    df_p = filter_with(d[:energy], (sec=set[:demsec], pq="p",); drop=true)
+    df_pedef = crossjoin(d[:pedef], DataFrame(sec=set[:demsec]))
     
     # !!!! Improvement to indexjoin where if fillmissing does some kind of column indicating,
     # (:pedef => :p could mean fill missing values in p with values from pedef --
@@ -369,15 +379,9 @@ function _partition_pe0!(d::Dict, set::Dict, maps::Dict)
     df = edit_with(df, Replace(:value, missing, "pedef value"))
     
     # Use annual EIA data for crude oil averages.
-    df_cprice = SLiDE._partition_cprice!(d, maps)
+    df_cprice = SLiDE._partition_cprice!(d, set, maps)
     
-    idx_q = filter_with(df_energy, (src="cru", pq="q"); drop=:pq)[:,1:end-2]
-    
-    df_avg, df_cprice = SLiDE.impute_mean(df_cprice, :r; condition=idx_q)
-    df_cprice = crossjoin(df_cprice, df_demsec)
-    df_cprice = vcat(df_avg, df_cprice)
-    
-    d[:pe0] = [df[:,col]; df_cprice[:,col]]
+    d[:pe0] = vcat(df, df_cprice; cols=:intersect)
     
     print_status(:pe0, d, "energy demand prices")
     return d[:pe0]
@@ -386,14 +390,14 @@ end
 
 """
 `ps0(yr,src)`, crude oil and natural gas supply prices
-
 ```math
 \\begin{aligned}
-ps_{r,src} &= \\sum_{r,sec} pe_{yr,r,src,sec}
+\\bar{ps}_{yr,src} &= \\min_{r,sec} \\tilde{p}_{yr,r,src,sec}
 \\\\
-ps_{r,src=cru} &= \\frac{1}{2}ps_{r,src=oil}
+\\bar{ps}_{r,src=cru} &= \\frac{1}{2}\\bar{ps}_{r,src=oil}
 \\end{aligned}
 ```
+with ``\\tilde{pe}_{yr,r,src,sec}`` calculated by [`SLiDE._partition_pe0!`](@ref).
 """
 function _partition_ps0!(d::Dict)
     var, val = :src, [:units,:value]
@@ -413,11 +417,14 @@ end
 
 """
 `prodval(yr,r,src)`, production value (using supply prices)
-
 ```math
 \\begin{aligned}
 p_{yr,src} \\text{ [USD/million btu]} &= \\left\\{
-    ps_{yr,src} \\;\\vert\\; [cru,gas] \\in src
+    \\bar{ps}_{yr,src} \\;\\vert\\; [cru,gas] \\in src
+\\right\\}
+\\\\
+\\tilde{q}_{yr,r,src} \\text{ [trillion btu]} &= \\left\\{
+    seds \\left( yr, r, src, sec \\right) \\;\\vert\\; yr,\\, r,\\, [cru,gas]\\in src,\\, sec=supply
 \\right\\}
 \\\\
 prodval_{yr,r,src} \\text{ [billion USD]} &= \\frac{1}{10^3}
@@ -425,11 +432,13 @@ prodval_{yr,r,src} \\text{ [billion USD]} &= \\frac{1}{10^3}
     \\cdot prodbtu_{yr,r,src} \\text{ [trillion btu]}
 \\end{aligned}
 ```
+with ``\\bar{ps}_{yr,src}`` calculated by [`SLiDE._partition_ps0!`](@ref).
 """
 function _partition_prodval!(d::Dict, set::Dict, maps::Dict)
-    df_ps0 = filter_with(d[:ps0], (src=set[:as],))
-    
-    df = operate_over(df_ps0, d[:prodbtu];
+    p = filter_with(d[:ps0], (src=set[:as],))
+    q = filter_with(d[:seds], (src=set[:as], sec="supply", units=BTU); drop=:sec)
+
+    df = operate_over(p, q;
         id=[:usd_per_btu,:btu]=>:usd,
         units=maps[:operate],
     )
@@ -449,12 +458,12 @@ end
 \\delta_{yr,r,src} = \\dfrac{prodval_{yr,r,src}}{\\sum_{src} prodval_{yr,r,src}}
 ```
 
-Fill missing `(yr,src)` values using ``\\bar\\delta_{yr,src}`` as computed by `SLiDE.impute_mean`,
+Fill missing `(yr,src)` values using ``\\bar{\\delta}_{yr,src}`` as computed by [`SLiDE.impute_mean`](@ref),
 under the condition that there is some non-zero supply of goods from the `cng` sector:
 
 ```math
 ys0^\\star_{yr,r,src} = 
-    \\sum_{g} ys_{yr,r,s=cng,g} \\circ map_{demsec \\in sec} > 0
+    \\sum_{g} ys_{yr,r,s=cng,g} \\circ \\vec{1}_{demsec \\in sec} > 0
 ```
 
 ```math
@@ -497,6 +506,31 @@ end
 
 """
 `netgen(yr,r), net interstate electricity flow`
+This can be computed using both SEDS data and regional parameters. Using SEDS data:
+```math
+\\begin{aligned}
+p \\text{ [USD/thousand kWh]} &= \\left\\{
+    \\bar{ps}_{yr,src} \\;\\vert\\; src=ele
+\\right\\}
+\\\\
+q \\text{ [billion kWh]} &= \\left\\{
+    seds(yr,r,src,sec) \\;\\vert\\; src=ele,\\, sec=netgen
+\\right\\}
+\\end{aligned}
+```
+with ``\\bar{ps}_{yr,src}`` calculated by [`SLiDE._partition_ps0!`](@ref).
+
+```math
+v_{yr,r} \\text{ [billion USD]} = \\dfrac{1}{10^3} \\cdot \\dfrac
+    {p \\text{ [USD/thousand kWh]}}
+    {q \\text{ [billion kWh]}}
+```
+
+Using regional parameters:
+
+```math
+v_{yr,r} = nd_{yr,r,g=ele} - xn_{yr,r,g=ele}
+```
 """
 function _partition_netgen!(d::Dict, maps::Dict)
     # (1) Calculate for SEDS data
@@ -529,8 +563,7 @@ end
 """
 `trdele(yr,r,g=ele,t)`, electricity imports-exports to/from U.S.
 ```math
-\\tilde{trdele}_{yr,r,t} \\text{ [billion usd]}
-= \\left\\{
+\\tilde{trdele}_{yr,r,t} \\text{ [billion usd]} = \\left\\{
     seds \\left( yr, r, src, sec \\right) \\;\\vert\\; yr,\\, r,\\, src=ele,\\, [imports,exports]\\in sec
 \\right\\}
 ```
@@ -546,6 +579,11 @@ end
 
 """
 `pctgen(yr,r,src,sec)`, percent of electricity generation
+```math
+pctgen_{yr,r,src} = \\left\\{
+    \\dfrac{elegen_{yr,r,src}}{\\sum_{src} elegen_{yr,r,src}} \\;\\vert\\; ff \\in src
+\\right\\} \\circ \\vec{1}_{sec=ele}
+```
 """
 function _partition_pctgen!(d::Dict, set::Dict)
     df_ele = copy(d[:elegen])
@@ -568,16 +606,15 @@ end
 
 
 """
-`eq0(yr,r,src,sec)`
+`eq0(yr,r,src,sec)`, energy demand
 ```math
-\\tilde{eq}_{yr,r,src,sec}
-= \\left\\{
+\\tilde{eq}_{yr,r,src,sec} = \\left\\{
     energy \\left( yr, r, src, sec \\right) \\;\\vert\\; yr,\\, r,\\, e\\in src,\\, demsec\\in sec
 \\right\\}
 ```
 """
 function _partition_eq0!(d::Dict, set::Dict)
-    df = filter_with(d[:energy], (src=set[:e], sec=set[:demsec], pq="q"); drop=true)
+    df = filter_with(d[:energy], (sec=set[:demsec], pq="q"); drop=true)
     df[!,:value] = max.(0, df[:,:value])
     d[:eq0] = dropzero(df)
 
@@ -587,6 +624,7 @@ end
 
 
 """
+`ed0(yr,r,src,sec)`, energy demand
 ```math
 \\tilde{ed}_{yr,r,src,sec} = \\dfrac
     {\\tilde{pe}_{yr,r,src,sec}}
@@ -615,7 +653,7 @@ end
 
 
 """
-`emarg0(yr,r,src,sec)`
+`emarg0(yr,r,src,sec)`, margin demand for energy markups
 ```math
 \\tilde{emarg}_{yr,r,src,sec} = \\dfrac
     {\\tilde{pe}_{yr,r,src,sec} - \\tilde{ps}_{yr,src}}
