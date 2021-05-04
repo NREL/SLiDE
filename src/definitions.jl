@@ -52,8 +52,8 @@ SUB_ELAST[:y] = 0       # top-level Y nest (VA,M)
 SUB_ELAST[:m] = 0       # materials nest
 SUB_ELAST[:a] = 0       # top-level A nest for aggregate demand (margins, goods)
 SUB_ELAST[:mar] = 0     # margin supply
-SUB_ELAST[:d] = 2       # domestic demand aggregation nest (intranational)
-SUB_ELAST[:f] = 4       # domestic and foreign demand aggregation nest (international)
+SUB_ELAST[:d] = 4       # domestic demand aggregation nest (intranational)
+SUB_ELAST[:f] = 2       # domestic and foreign demand aggregation nest (international)
 
 # Transportation elasticity: disposition, distribute regional supply to local, national, export
 const TRANS_ELAST = Dict(:x => 4)

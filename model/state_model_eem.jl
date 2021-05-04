@@ -386,26 +386,44 @@ end);
 # -- PLACEHOLDER VARIABLES --
 ###############################
 
-#----------
-### Recursive Model expressions
-
+#---------- Value-added
 #Cobb-douglas for mutable/new
-@NLexpression(cge, CVAym[r in set[:r], s in set[:s]],
-    PL[r]^alpha_kl[r,s] * (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)^(1-alpha_kl[r,s]));
+@NLexpression(cge, CVA[r in set[:r], s in set[:s]],
+    PL[r]^alpha_kl[r,s] * (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)^(1-alpha_kl[r,s])
+);
+
+# #CES for mutable/new
+# @NLexpression(cge, CVA[r in set[:r], s in set[:s]],
+#     (alpha_kl[r,s]*PL[r]^(1-es_va[r,s]) + (1-alpha_kl[r,s])*(haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)^(1-es_va[r,s]))^(1/(1-es_va[r,s]));
 
 #demand for labor in VA
-@NLexpression(cge,ALym[r in set[:r], s in set[:s]],
-    ld0[r,s] * CVAym[r,s] / PL[r]);
+@NLexpression(cge,AL[r in set[:r], s in set[:s]],
+    ld0[r,s] * (CVA[r,s] / PL[r])^es_va[r,s]
+);
 
 #demand for capital in VA
-@NLexpression(cge,AKym[r in set[:r],s in set[:s]],
-    kd0[r,s] * CVAym[r,s] / (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0));
+@NLexpression(cge,AK[r in set[:r],s in set[:s]],
+    kd0[r,s] * (CVA[r,s] / (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0))^es_va[r,s]
+);
 
-@NLexpression(cge,DINV[r in set[:r], g in set[:g]],
-    (i0[r,g] * (PINV[r]/(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)^es_inv[r])));
+# # !!!! test this
+# #Cobb-douglas for mutable/new
+# @NLexpression(cge, CVAcd[r in set[:r], s in set[:s]],
+#     PL[r]^alpha_kl[r,s] * (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)^(1-alpha_kl[r,s]));
 
-#----------
+# #CES for mutable/new
+# @NLexpression(cge, CVAces[r in set[:r], s in set[:s]],
+#     (alpha_kl[r,s]*PL[r]^(1-es_va[r,s]) + (1-alpha_kl[r,s])*(haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)^(1-es_va[r,s]))^(1/(1-es_va[r,s]));
 
+# @NLexpression(cge,AL[r in set[:r], s in set[:s]],
+#     ld0[r,s] * ((es_va[r,s]==1) ? CVAcd[r,s] : CVAces[r,s]) / PL[r])^es_va[r,s]);
+
+# #CES demand for capital in VA
+# @NLexpression(cge,AK[r in set[:r],s in set[:s]],
+#     kd0[r,s] * ((es_va[r,s]==1) ? CVAcd[r,s] : CVAces[r,s]) / (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0))^es_va[r,s]);
+
+
+# ---------- Disposition / Export
 #CES function for output demand - including
 # exports (absent of re-exports) times the price for foreign exchange,
 # region's supply to national market times the national market price
@@ -414,41 +432,86 @@ end);
 #   (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0)^5)^(1/5) );
 
 #demand for exports via demand function
-@NLexpression(cge,AX[r in set[:r],g in set[:g]], (x0[r,g] - rx0[r,g])*(PFX/(haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^4 );
+@NLexpression(cge,AX[r in set[:r],g in set[:g]],
+    (x0[r,g] - rx0[r,g])*(PFX/(haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^et_x[r,g]
+);
 
 #demand for contribution to national market
-@NLexpression(cge,AN[r in set[:r],g in set[:g]], xn0[r,g]*(PN[g]/(haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^4 );
+@NLexpression(cge,AN[r in set[:r],g in set[:g]],
+    xn0[r,g]*(PN[g]/(haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^et_x[r,g]
+);
 
 #demand for regionals supply to local market
 @NLexpression(cge,AD[r in set[:r],g in set[:g]],
-  xd0[r,g] * ((haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) / (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^4 );
+    xd0[r,g] * ((haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) / (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^et_x[r,g]
+);
 
   ###
 
+# ---------- Absorption / Armington / Import
 # CES function for tradeoff between national and domestic market
 @NLexpression(cge,CDN[r in set[:r],g in set[:g]],
-  (theta_n[r,g]*PN[g]^(1-2)+(1-theta_n[r,g])*(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0)^(1-2))^(1/(1-2)) );
+    (theta_n[r,g]*PN[g]^(1-es_d[r,g])+(1-theta_n[r,g])*(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0)^(1-es_d[r,g]))^(1/(1-es_d[r,g]))
+);
 
 # CES function for tradeoff between domestic consumption and foreign exports
 # recall tm in the import tariff thus tm / tm0 is the relative change in import tariff rates
 @NLexpression(cge,CDM[r in set[:r],g in set[:g]],
-  ((1-theta_m[r,g])*CDN[r,g]^(1-4)+theta_m[r,g]*(PFX*(1+tm[r,g])/(1+tm0[r,g]))^(1-4))^(1/(1-4)) );
+    ((1-theta_m[r,g])*CDN[r,g]^(1-es_f[r,g])+theta_m[r,g]*(PFX*(1+tm[r,g])/(1+tm0[r,g]))^(1-es_f[r,g]))^(1/(1-es_f[r,g]))
+);
 
 # set[:r] demand from the national market <- note nesting of CDN in CDM
 @NLexpression(cge,DN[r in set[:r],g in set[:g]],
-  nd0[r,g]*(CDN[r,g]/PN[g])^2*(CDM[r,g]/CDN[r,g])^4 );
+    nd0[r,g]*(CDN[r,g]/PN[g])^es_d[r,g]*(CDM[r,g]/CDN[r,g])^es_f[r,g]
+);
 
 # region demand from local market <- note nesting of CDN in CDM
 @NLexpression(cge,DD[r in set[:r],g in set[:g]],
-  dd0[r,g]*(CDN[r,g]/(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0))^2*(CDM[r,g]/CDN[r,g])^4 );
+    dd0[r,g]*(CDN[r,g]/(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0))^es_d[r,g]*(CDM[r,g]/CDN[r,g])^es_f[r,g]
+);
 
-# import demand
+# Foreign import demand
 @NLexpression(cge,MD[r in set[:r],g in set[:g]],
-  m0[r,g]*(CDM[r,g]*(1+tm[r,g])/(PFX*(1+tm0[r,g])))^4 );
+    m0[r,g]*(CDM[r,g]/(PFX*(1+tm[r,g])/(1+tm0[r,g])))^es_f[r,g]
+);
 
-# final demand
+#---------- Final Consumption
+# Unit cost function for final consumption
+@NLexpression(cge,CC[r in set[:r]],
+    sum(theta_cd[r,g]*(haskey(PA.lookup[1], (r, g)) ? PA[(r,g)] : 1.0)^(1-es_cd[r]) for g in set[:g])^(1/(1-es_cd[r]))
+);
+
+# final demand for goods in consumption
 @NLexpression(cge,CD[r in set[:r],g in set[:g]],
-  cd0[r,g]*PC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) );
+    cd0[r,g]*CC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)^es_cd[r]
+);
+
+# #alternate
+# @NLexpression(cge,CD[r in set[:r],g in set[:g]],
+#   cd0[r,g]*PC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)
+# );
+
+#---------- Investment
+# demand for goods in investment
+@NLexpression(cge,DINV[r in set[:r], g in set[:g]],
+    (i0[r,g] * (PINV[r]/(haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)^es_inv[r]))
+);
+
+#---------- Full consumption and leisure
+# unit cost for full consumption
+@NLexpression(cge,CZ[r in set[:r]],
+    (leis_shr[r]*PL[r]^(1-es_z[r]) + (1-leis_shr[r])*PC[r]^(1-es_z[r]))^(1/(1-es_z[r]))
+);
+
+# Leisure demand
+@NLexpression(cge,DLEIS[r in set[:r]],
+    leis_e0[r] * (CZ[r] / PC[r])^(es_z[r])
+);
+
+# Consumption demand
+@NLexpression(cge,DCONS[r in set[:r]],
+    c0[r] * (CZ[r] / PC[r])^(es_z[r])
+);
 
 
 ###############################
@@ -461,9 +524,9 @@ end);
 # cost of intermediate demand
     sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
 # cost of labor inputs
-    + PL[r] * ALym[r,s]
+    + PL[r] * AL[r,s]
 # cost of capital inputs
-    + (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) * AKym[r,s]
+    + (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) * AK[r,s]
     -
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
     sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
@@ -561,7 +624,7 @@ end);
     ks_m[r,s]
     -
 # mutable capital demand
-    (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AKym[r,s]
+    (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AK[r,s]
 );
 
 @mapping(cge,market_rkx[(r, s) in set[:PK]],
@@ -605,7 +668,7 @@ end);
     -
 # demand for labor in all set[:s]
     (
-        sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ALym[r,s] for s in set[:s])
+        sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * AL[r,s] for s in set[:s])
         + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ld0[r,s] for s in set[:s])
     )
 );
@@ -713,7 +776,7 @@ end);
 @mapping(cge, DKMdef[(r,s) in set[:PK]],
     DKM[(r,s)]
     -
-    YM[(r,s)]*AKym[r,s]
+    YM[(r,s)]*AK[r,s]
 );
 
 @mapping(cge,def_RX[(r,g) in set[:X]],
