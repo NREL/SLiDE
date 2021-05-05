@@ -513,7 +513,7 @@ end);
     c0[r] * (CZ[r] / PC[r])^(es_z[r])
 );
 
-#---------- Energy-environment nesting
+#---------- Energy-environment production nesting
 # !!!! Still need to add co2 emissions
 # !!!! Cautious of subsetting - definitionals may be needed to replace NLexpressions
 
@@ -564,6 +564,9 @@ end);
 
 # Demand function: co2 emissions
 # !!!! Add this when doing co2 sweep
+@NLexpression(cge,IDA_co2[r in set[:r], g in set[:g], s in set[:s]],
+    idcb0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CVE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + (swcarb==1 ? (PDCO2[r]*idcco2[r,g,s]) : 0.0)))^es_fe[s]
+);
 
 # Demand function: value-added composite
 @NLexpression(cge,IVA[r in set[:r], s in set[:s]],
