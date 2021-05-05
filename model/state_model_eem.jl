@@ -814,6 +814,23 @@ end);
     (haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.) * kd0[r,s]
 );
 
+@mapping(cge,market_pfr[(r, s) in set[:PK]],
+# mutable fixed resource supply
+    frm[r,s]
+    -
+# mutable fixed resource demand
+    (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AFR[r,s]
+);
+
+@mapping(cge,market_pfrx[(r, s) in set[:PK]],
+# extant fixed resource supply
+    (frx[r,s])
+    -
+# extant fixed resource demand
+    (haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.) * fr0[r,s]
+);
+
+
 @mapping(cge,market_pa[(r, g) in set[:PA]],
 # absorption or supply
     (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g]
@@ -825,7 +842,9 @@ end);
 # final demand
         + C[r] * CD[r,g]
 # intermediate demand
-        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
+        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:nne]))
+        + sum((haskey(E.lookup[1], (r, s)) ? YM[(r, s)] : 1) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:ele]))
+        + sum((haskey(E.lookup[1], (r, s)) ? YM[(r, s)] : 1) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:fe]))
         + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
     )
 );
@@ -841,16 +860,34 @@ end);
     (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1) * s0[r,g]
 );
 
-@mapping(cge,market_pl[r in set[:r]],
-# supply of labor
-    lab_e0[r]
+# !!!! may need subset set[:PYM]
+@mapping(cge,market_pym[(r,s) in set[:Y]],
+# supply of KLEM composite
+    YYM[r,s] * klem_bar[r,s]
     -
-# demand for labor in all set[:s]
-    (
-        sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * AL[r,s] for s in set[:s])
-        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ld0[r,s] for s in set[:s])
-    )
+# Demand for KLEM composite
+    YM[r,s]*IYM[r,s]
 );
+
+@mapping(cge,market_pe[(r,s) in set[:Y]],
+# supply of energy composite
+    E[r,s]*sum(id0[r,g,s] for g in set[:en])
+#    E[r,s]*en_bar[r,s]
+    -
+# demand for energy composite
+    YYM[r,s]*IE[r,s]
+);
+
+@mapping(cge,market_va[(r,s) in set[:Y]],
+# supply of value-added composite
+    VA[r,s]*(ld0[r,s]+kd0[r,s])
+#    VA[r,s]*va_bar[r,s]
+    -
+# demand for value-added composite
+    YYM[r,s]*IVA[r,s]
+);
+
+
 #----------
 
 
@@ -890,7 +927,32 @@ end);
     C[r] * c0[r]
     -
 # Consumption demand
-    W[r] * c0[r]
+    Z[r] * DCONS[r]
+);
+
+@mapping(cge,market_pls[r in set[:r]],
+# supply of labor
+    LS[r] * lab_e[r]
+    -
+# demand for labor
+# !!!! QC this - verify correctness
+    [
+        sum(VA[r,s]*AL[r,s]*(1-u0[r]) for s in set[:s])
+        + sum(YX[r,s]*ld0[r,s]*(1-u0[r]) for s in set[:s])
+    ]
+);
+
+@mapping(cge,market_pl[r in set[:r]],
+# supply time
+    lte0[r]
+    -
+# demand for time
+    [
+# !!!! need to add in unemployment here with swunump switch
+        LS[r] * lab_e[r]
+#       LS[r] * lab_e[r] / (1-U[r])
+        + Z[r] * DLEIS[r]
+    ]
 );
 
 @mapping(cge, market_pinv[r in set[:r]],
@@ -899,6 +961,14 @@ end);
     -
 # investment demanded
     W[r]*inv0[r]
+);
+
+@mapping(cge,market_pz[r in set[:r]],
+# full consumption supply
+    Z[r]*z0[r]
+    -
+# full consumption Demand
+    W[r]*z0[r]
 );
 
 @mapping(cge, market_pw[r in set[:r]],
@@ -921,8 +991,23 @@ end);
     sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] for r in set[:r] for g in set[:g] if (r,g) in set[:A])
 );
 
+# !!!! UPDATE: carbon market clearance
+# @mapping(cge,market_pdco2[r in set[:r]],
+#     CO2[r]
+#     -
+#     [
+
+#     ]
+# );
+
+@mapping(cge,market_pco2,
+    sum(carb0[r] for r in set[:r])
+    -
+    sum(CO2[r] for r in set[:r])
+);
 
 #----------
+# !!!! UPDATE: income balance
 #Income balance update for recursive dynamics
 @mapping(cge,income_ra[r in set[:r]],
 # consumption/utility
