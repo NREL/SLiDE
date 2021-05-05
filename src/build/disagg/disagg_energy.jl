@@ -150,6 +150,41 @@ end
 
 
 """
+For ``e\\neq oil``,
+
+```math
+q_{yr,r,src} = \\left\\{
+    energy(yr,r,src,sec) \\;\\vert\\; sec=supply
+\\right\\}
+\\\\
+v_{yr,r,src=e} \\text{ [billion USD]} = \\dfrac{1}{10^3} \\cdot \\dfrac
+    {\\tilde{q}_{yr,r,src}}
+    {\\bar{ps}_{yr,src}}
+```
+
+For ``e=oil``
+
+```math
+\\begin{aligned}
+q_{yr,r} \\text{ [trillion btu]} &= \\left\\{
+    energy(yr,r,src,sec) \\;\\vert\\; src=cru,\\, sec=ref
+\\right\\}
+\\\\
+v \\text{ [billion USD]} &= \\left\\{
+    ned_{yr,r,src=oil,sec} \\;\\vert\\; src=oil
+\\right\\}
+\\\\&\\\\
+v_{yr,r,src=oil} &= \\dfrac
+    {q_{yr,r}}
+    {\\sum_{r} q_{yr,r}}
+\\cdot
+\\sum_{r,sec} v_{yr,r,src,sec}
+\\end{aligned}
+```
+
+```math
+ys_{yr,r,s=e,g=e} = v_{yr,r,src=e} \\circ \\vec{1}_{s=g} \\circ map_{src\\rightarrow g}
+```
 """
 function _disagg_energy_ys0!(d::Dict, set::Dict, maps::Dict)
     print_status(:ys0, d, "regional sectoral output")
@@ -158,10 +193,10 @@ function _disagg_energy_ys0!(d::Dict, set::Dict, maps::Dict)
     df, df_out = split_with(d[:ys0], DataFrame(s=x, g=x))
     
     # (1) Calculate data for e = [ele,cru,gas,col].
-    df_energy = filter_with(d[:energy], (src=x, sec="supply", pq="q"); drop=true)
-    df_ps0 = filter_with(d[:ps0], (src=x,))
+    df_supply = filter_with(d[:energy], (sec="supply", pq="q"); drop=true)
+    # df_ps0 = filter_with(d[:ps0], (src=x,))
 
-    df = operate_over(df_energy, df_ps0;
+    df = operate_over(df_supply, d[:ps0];
         id=[:x,:usd_per_x]=>:usd,
         units=maps[:operate], 
         fillmissing=0.0,
@@ -170,6 +205,7 @@ function _disagg_energy_ys0!(d::Dict, set::Dict, maps::Dict)
     operation_output!(df, Not(:units))
 
     # (2) Since we don't have ps0(oil), calculate (oil,oil) as a share of ned0.
+    # !!!! Could map with maps[demand] to get sec=ref -> s=oil
     df_energy = filter_with(d[:energy], (src="cru", sec="ref", pq="q"); drop=true)
     df_ned = filter_with(d[:ned0], (src="oil",))
 

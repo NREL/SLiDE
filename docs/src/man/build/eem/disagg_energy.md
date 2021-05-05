@@ -15,6 +15,5 @@ SLiDE._disagg_energy_inpshr!
 SLiDE._disagg_energy_m0!
 SLiDE._disagg_energy_x0!
 SLiDE._disagg_energy_zero_prod!
+SLiDE._disagg_energy_zero_island!
 ```
-
-## ys0

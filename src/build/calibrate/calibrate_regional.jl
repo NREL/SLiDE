@@ -236,12 +236,7 @@ parameters will include ``yr`` only if `year` is included as an input parameter.
     - Aggregate regionally: ``\\tilde{ys}_{yr,s,g}``, ``\\tilde{x}_{yr,g}``,
         ``\\tilde{m}_{yr,g}``, ``\\tilde{va}_{yr,s}``, ``\\tilde{g}_{yr,g}``,
         ``\\tilde{i}_{yr,g}``, ``\\tilde{cd}_{yr,g}``.
-        For any parameter ``\\bar{z}_{yr,r,s,g}``,
-        
-        ```math
-        \\tilde{z}_{yr,s,g} = \\sum_{r} \\bar{z}_{yr,r,s,g}
-        ```
-
+        For any parameter ``\\bar{z}_{yr,r,s,g}``, ``\\tilde{z}_{yr,s,g} = \\sum_{r} \\bar{z}_{yr,r,s,g}``
     - Separate ``fvs_{yr,r,s}`` for labor (`fvs_ld0`) and capital (`fvs_kd0`).
     - Filter ``netgen_{yr,r}`` to include only values from SEDS input data.
 1. Set electricity imports/exports from/to the national market to/from Alaska and Hawaii to zero.

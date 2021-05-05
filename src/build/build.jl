@@ -23,11 +23,8 @@ function build(dataset::Dataset)
 end
 
 
-function build(name::String=DEFAULT_DATASET;
-    overwrite=DEFAULT_OVERWRITE,
-    save_build=DEFAULT_SAVE_BUILD,
-)
-    return build(Dataset(name; overwrite=overwrite, save_build=save_build))
+function build(name::String=DEFAULT_DATASET; kwargs...)
+    return build(Dataset(name; kwargs...))
 end
 
 
@@ -160,6 +157,7 @@ end
 This function returns the path to the directory location specified by
 `dataset.name/dataset.build/dataset.step`. Building a dataset called `dataset.name` with
 `dataset.save_build=true` will produce files in the following structure.
+    ```
     /SLIDE_DATA/data/dataset.name/
     ├── eem/
     |   ├── parameters/
@@ -167,6 +165,7 @@ This function returns the path to the directory location specified by
     ├── io/
     |   ├── parameters/
     └───└── sets/
+    ```
 
 # Arguments
 - `dataset::String`: Dataset identifier
@@ -449,15 +448,4 @@ end
 
 set_sector!(set; key=:sector) = set_sector!(set, set[key])
 
-set_sector!(set::Dict, d::Dict) = set_sector!(set, unique(d[:ys0],:g))
-
-# set_sector!(set, x::Weighting) = set_sector!(set, convert_type(Mapping,x))
-# set_sector!(set, x::Mapping) = _set_sector!(set, x, x.to)
-
-# function _set_sector!(set, x::Mapping, to::Symbol)
-#     return set_sector!(set, unique(map_identity(x, set[:sector])[:,to]))
-# end
-
-# function _set_sector!(set, x::Mapping, to::AbstractArray)
-#     return set_sector!(set, unique(x.data[:, first(to)]))
-# end
+set_sector!(set::Dict, d::Dict) = set_sector!(set, unique(d[:ys0][:,:g]))

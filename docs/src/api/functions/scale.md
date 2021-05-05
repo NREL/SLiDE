@@ -1,3 +1,4 @@
+# Scale
 
 ```@docs
 SLiDE.scale_with

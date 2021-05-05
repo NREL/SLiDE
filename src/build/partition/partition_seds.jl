@@ -14,10 +14,9 @@ This function prepares SEDS energy and electricity data for the Energy-Environme
 """
 function partition_seds(dataset::Dataset, d::Dict, set::Dict)
     step = "seds"
-    set!(dataset; build="eem", step=step)
-    
+    d_read = read_build(set!(dataset; step=step))
+
     maps = read_map()
-    d_read = read_input!(dataset)
 
     if dataset.step=="input"
         print_status(set!(dataset; step=step))
@@ -48,6 +47,7 @@ function partition_seds(dataset::Dataset, d::Dict, set::Dict)
         write_build!(SLiDE.set!(dataset; step=step), copy(d))
     else
         merge!(d, d_read)
+        set_sector!(set, d)
     end
     
     return d, set, maps
@@ -92,7 +92,7 @@ end
 ```
 
 [`SLiDE._partition_energy_supply`](@ref) adds supply information from the electricity
-generation dataset output by [`SLiDE.eem_elegen!`](@ref). The following functions are
+generation dataset output by [`SLiDE.partition_elegen!`](@ref). The following functions are
 used to calculate values or make adjustments to values in the energy dataset.
 These operations must occur in the following order:
 1. [`SLiDE._partition_energy_ref`](@ref)

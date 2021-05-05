@@ -11,11 +11,6 @@ Scaling features enable the following options:
 3. Aggregate summary- and/or detail-level goods/sectors into those specified in a user-defined map.
 
 ```@docs
-SLiDE.Mapping
-SLiDE.Weighting
-```
-
-```@docs
 SLiDE.scale_with
 SLiDE.compound_for!
 SLiDE.filter_for!

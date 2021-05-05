@@ -31,8 +31,7 @@ in the terminal. Set `eem=true` to enable the Energy-Environment Module.
 
 ```julia
 julia> using SLiDE
-julia> dataset = Dataset(; eem=true)
-julia> d, set = build(dataset)
+julia> d, set = build( ; eem=true)
 ```
 
 Reference [`build()` documentation](https://nrel.github.io/SLiDE/man/build/overview.html#SLiDE.build) for options.

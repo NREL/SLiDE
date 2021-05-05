@@ -42,15 +42,11 @@ makedocs(clean = true,
             "Energy-Environment Module" => Any[
                 "Partition: Energy and Electricity" => "man/build/eem/partition_seds.md",
                 "Energy Disaggregation" => "man/build/eem/disagg_energy.md",
+                "Partition: CO2 Emissions" => "man/build/eem/partition_co2.md",
                 "Regional Calibration" => "man/build/eem/calibrate_regional.md",
             ],
         ],
         "Scale" => "man/scale/overview.md",
-        # Any[
-            # "Overview" => "man/scale/overview.md",
-            # "Sector" => "man/scale/sector.md",
-            # "Region" => "",
-        # ],
         "API" => [
             "Types" => map(
                 s -> "api/types/$(s)",

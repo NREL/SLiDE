@@ -7,9 +7,10 @@ The build stream produces state-level (regionally) model parameters at the summa
 ### Aggregation
 
 By default, the SLiDE build stream produces regional data at the state level.
-However, setting `region_level` enables regional aggregation to the region- or division-level, using the [regional scaling map](https://github.com/NREL/SLiDEData/blob/master/coremaps/scale/region/region.csv).
 
-BEA and Census Bureau used to produce shares via [`SLiDE.share_region`](@ref) and applied via [`SLiDE.disaggregate_region`](@ref) is aggregated to the desired level immediately upon being read into the build stream.
+BEA and Census Bureau used to produce shares via [`SLiDE.share_region`](@ref) and applied
+via [`SLiDE.disaggregate_region`](@ref) is aggregated to the desired level immediately upon being
+read into the build stream.
 
 ### Disaggregation
 *Regional disaggregation will be tackeled during future development phases*
@@ -40,6 +41,11 @@ Scaling features enable the following options:
 1. Select a subset of summary-level or detail-level goods/sectors to examine.
 1. Select a combination of summary- and detail-level goods/sectors.
 1. Aggregate summary- and/or detail-level goods/sectors into those specified in a user-defined map.
+
+```@docs
+SLiDE.scale_sector
+SLiDE.scale_sector!
+```
 
 ### Aggregation
 

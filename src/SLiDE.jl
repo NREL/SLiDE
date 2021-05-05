@@ -102,10 +102,10 @@ export propertynames_with
 export edit_with
 export fill_zero
 export fill_with
-export extend_year      # maybe depreciated
+# export extend_year      # maybe depreciated
 export map_year
 export extrapolate_region
-export extrapolate_year # maybe depreciated
+export extrapolate_year
 export filter_with
 export split_with
 export split_fill_unstack
@@ -132,22 +132,23 @@ export benchmark_against
 
 # BUILD
 export build
-export partition_bea
-export calibrate_national
-export share_region
-export disaggregate_region
+# export partition_bea
+# export calibrate_national
+# export share_region
+# export disaggregate_region
 
 export share_sector!
 export scale_sector!
 export disaggregate_sector!
 export aggregate_sector!
 
+
 # ENERGY ENVIRONMENT MODULE
 export partition_seds
-export partition_elegen!
-export partition_energy!
-export partition_co2emis!
-export disaggregate_energy!
+# export partition_elegen!
+# export partition_energy!
+# export partition_co2emis!
+# export disaggregate_energy!
 
 # MODEL
 # export model_input

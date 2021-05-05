@@ -13,7 +13,7 @@ user-defined scheme.
 - `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
 function scale_sector(dataset::Dataset, d::Dict, set::Dict; kwargs...)
-    step = PARAM_DIR
+    step = "scale"
     d_read = read_build(set!(dataset; step=step))
 
     if dataset.step=="input"
@@ -25,7 +25,7 @@ function scale_sector(dataset::Dataset, d::Dict, set::Dict; kwargs...)
     else
         set_sector!(set, d_read)
         set_gm!(set, d_read)
-        return d, set
+        return d_read, set
     end
 end
 
