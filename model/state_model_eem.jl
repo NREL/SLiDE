@@ -513,6 +513,80 @@ end);
     c0[r] * (CZ[r] / PC[r])^(es_z[r])
 );
 
+#---------- Energy-environment nesting
+# !!!! Still need to add co2 emissions
+# !!!! Cautious of subsetting - definitionals may be needed to replace NLexpressions
+
+# Unit cost function: Fossil-energy
+@NLexpression(cge,CFE[r in set[:r], s in set[:s]],
+    sum(theta_fe[r,g,s]*(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)^(1-es_fe[s]) for g in set[:fe])^(1/(1-es_fe[s]))
+);
+
+# Unit cost function: Energy (ele + fe)
+@NLexpression(cge,CEN[r in set[:r], s in set[:s]],
+    (sum(theta_ele[r,s]*(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)^(1-es_ele[s]) for g in set[:ele]) + (1-theta_ele[r,s])*CFE[r,s]^(1-es_ele[s]))^(1/(1-es_ele[s]))
+);
+
+# Unit cost function: Value-added + Energy
+@NLexpression(cge,CVE[r in set[:r], s in set[:s]],
+    (theta_va[r,s]*CVA[r,s]^(1-es_ve[s]) + (1-theta_va[r,s])*CEN[r,s]^(1-es_ve[s]))^(1/(1-es_ve[s]))
+);
+
+# Unit cost function: non-energy (materials)
+@NLexpression(cge,CNE[r in set[:r], s in set[:s]],
+    sum(theta_ne[r,g,s]*(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)^(1-es_ne[s]) for g in set[:nne])^(1/(1-es_ne[s]))
+);
+
+# Unit cost function: Value-added/Energy + non-energy (materials)
+@NLexpression(cge,CYM[r in set[:r], s in set[:s]],
+    (theta_kle[r,s]*CVE[r,s]^(1-es_klem[s]) + (1-theta_kle[r,s])*CNE[r,s]^(1-es_klem[s]))^(1/(1-es_klem[s]))
+);
+
+# Unit cost function: klem + fixed resource factor (calibrated to supply elasticity)
+@NLexpression(cge,CXE[r in set[:r], s in set[:s]],
+    (theta_fr[r,s]*(haskey(PFR.lookup[1], (r,s)) ? PFR[(r,s)] : 1.0)^(1-es_fr[r,s]) + (1-theta_fr[r,s])*CYM[r,s]^(1-es_fr[r,s]))^(1/(1-es_fr[r,s]))
+);
+
+# Demand function: non-energy (materials)
+@NLexpression(cge,IDA_ne[r in set[:r], g in set[:g], s in set[:s]],
+    id0[r,g,s]*(CNE[r,s]/(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0))^(es_ne[s])
+);
+
+# Demand function: electricity
+@NLexpression(cge,IDA_ele[r in set[:r], g in set[:g], s in set[:s]],
+    id0[r,g,s]*(CEN[r,s]/(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0))^(es_ele[s])
+);
+
+# Demand function: fossil-energy
+@NLexpression(cge,IDA_fe[r in set[:r], g in set[:g], s in set[:s]],
+    id0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CFE[r,s]/(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0))^(es_fe[s])
+);
+
+# Demand function: co2 emissions
+# !!!! Add this when doing co2 sweep
+
+# Demand function: value-added composite
+@NLexpression(cge,IVA[r in set[:r], s in set[:s]],
+    (ld0[r,s]+kd0[r,s])*(CVE[r,s]/CVA[r,s])^(es_ve[s])
+#    va_bar[r,s]*(CVE[r,s]/CVA[r,s])^(es_ve[s])
+);
+
+# Demand function: energy composite
+@NLexpression(cge,IE[r in set[:r], s in set[:s]],
+    (sum(id0[r,g,s] for g in set[:en]))*(CVE[r,s]/CEN[r,s])^(es_ve[s])
+#    en_bar[r,s]*(CVE[r,s]/CEN[r,s])^(es_ve[s])
+);
+
+# Demand function: fixed resource factor
+@NLexpression(cge,AFR[r in set[:r], s in set[:s]],
+    fr0[r,s]*(CXE[r,s]/(haskey(PFR.lookup[1], (r,s)) ? PFR[(r,s)] : 1.0))^(es_fr[r,s])
+);
+
+# Demand function: KLEM bundle (non-fixed resource)
+@NLexpression(cge,IYM[r in set[:r], s in set[:s]],
+    klem_bar[r,s]*(CXE[r,s]/CYM[r,s])^(es_fr[r,s])
+);
+
 
 ###############################
 # -- Zero Profit Conditions --
