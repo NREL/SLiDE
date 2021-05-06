@@ -63,7 +63,11 @@ set[:nne] = setdiff(set[:g],set[:en])   # non-energy goods
 
 swfr = 0
 swunemp = 0
-swcarb = 1
+swcarb = 0
+
+# swfr = 1
+# swunemp = 1
+# swcarb = 1
 
 # sw = Dict();
 # sw[:swfr] = 0
@@ -351,20 +355,20 @@ end);
     DKM[(r,s) in set[:PK]] >= lo, (start = start_value(YM[(r,s)])*value(kd0[r,s])) # Mutable capital demand
 # !!!! remaining variables unused -- for some reason unused variables will throw bounds error if declared prior to used variable
     U[r in set[:r]] >= lo, (start = 1) # Unemployment rate index
-    DKX[(r,s) in set[:PK]] >= lo, (start = start_value(YX[(r,s)])*value(kd0[r,s])) # Extant capital demand
-    DCD[r in set[:r], g in set[:g]] >= lo, (start = start_value(C[r])*value(cd0[r,g])) # Final consumption demand
-    DIDM[r in set[:r], g in set[:g], s in set[:s]] >= lo, (start = 1) # Intermediate demand - mutable
-    DIDX[r in set[:r], g in set[:g], s in set[:s]] >= lo, (start = 1) # Intermediate demand - extant
-    DND[r in set[:r], g in set[:g]] >= lo, (start = 1) # Import demand from national market
-    DMF[r in set[:r], g in set[:g]] >= lo, (start = 1) # Import demand from foreign market
-    DLS[r in set[:r]] >= lo, (start = 1) # Leisure demand
-    DLDM[r in set[:r], s in set[:s]] >= lo, (start = 1) # Labor demand - mutable
-    DLDX[r in set[:r], s in set[:s]] >= lo, (start = 1) # Labor demand - extant
-    SX[(r,g) in set[:X]] >= lo, (start = 1) # Commodity supply
-    SXN[r in set[:r], g in set[:g]] >= lo, (start = 1) # Exports supplied to national (domestic) market
-    SXF[r in set[:r], g in set[:g]] >= lo, (start = 1) # Exports supplied to foreign (international) market
-    SLS[r in set[:r]] >= lo, (start = 1) # Labor supply
-    SCO2[r in set[:r]] >= lo, (start = 1) # CO2 emissions supply
+    # DKX[(r,s) in set[:PK]] >= lo, (start = start_value(YX[(r,s)])*value(kd0[r,s])) # Extant capital demand
+    # DCD[r in set[:r], g in set[:g]] >= lo, (start = start_value(C[r])*value(cd0[r,g])) # Final consumption demand
+    # DIDM[r in set[:r], g in set[:g], s in set[:s]] >= lo, (start = 1) # Intermediate demand - mutable
+    # DIDX[r in set[:r], g in set[:g], s in set[:s]] >= lo, (start = 1) # Intermediate demand - extant
+    # DND[r in set[:r], g in set[:g]] >= lo, (start = 1) # Import demand from national market
+    # DMF[r in set[:r], g in set[:g]] >= lo, (start = 1) # Import demand from foreign market
+    # DLS[r in set[:r]] >= lo, (start = 1) # Leisure demand
+    # DLDM[r in set[:r], s in set[:s]] >= lo, (start = 1) # Labor demand - mutable
+    # DLDX[r in set[:r], s in set[:s]] >= lo, (start = 1) # Labor demand - extant
+    # SX[(r,g) in set[:X]] >= lo, (start = 1) # Commodity supply
+    # SXN[r in set[:r], g in set[:g]] >= lo, (start = 1) # Exports supplied to national (domestic) market
+    # SXF[r in set[:r], g in set[:g]] >= lo, (start = 1) # Exports supplied to foreign (international) market
+    # SLS[r in set[:r]] >= lo, (start = 1) # Labor supply
+    # SCO2[r in set[:r]] >= lo, (start = 1) # CO2 emissions supply
 end);
 
 @variables(cge, begin
@@ -670,7 +674,7 @@ end);
 );
 
 # !!!! cautious of subsetting - may need new set[:E]
-@mapping(cge,profit_E[(r,s) in set[:Y]],
+@mapping(cge,profit_e[(r,s) in set[:Y]],
 # cost of electricity
     sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * IDA_ele[r,g,s] for g in set[:ele])
 # cost of fossil energy
@@ -787,7 +791,7 @@ end);
 );
 
 # !!!! CO2 emissions
-@mapping(cge,profit_CO2[r in set[:r]],
+@mapping(cge,profit_co2[r in set[:r]],
     (PCO2 + (carb0[r]==0 ? PC[r] : 0.0)*1e-6)
     -
     PDCO2[r]
@@ -881,7 +885,7 @@ end);
     YYM[(r,s)]*IE[r,s]
 );
 
-@mapping(cge,market_va[(r,s) in set[:Y]],
+@mapping(cge,market_pva[(r,s) in set[:Y]],
 # supply of value-added composite
     VA[(r,s)]*(ld0[r,s]+kd0[r,s])
 #    VA[(r,s)]*va_bar[r,s]
@@ -1046,7 +1050,7 @@ end);
 
 #----------
 # Definitional/Reporting
-@mapping(cge, DKMdef[(r,s) in set[:PK]],
+@mapping(cge, def_DKM[(r,s) in set[:PK]],
     DKM[(r,s)]
     -
     YM[(r,s)]*AK[r,s]
@@ -1060,13 +1064,11 @@ end);
     # (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
 );
 
-# @mapping(cge,deflo_RX[(r,g) in set[:X]],
-#     # (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
-#     # -
-#     (alpha_x[r,g]*PFX^(1 + et_x[r,g])+alpha_n[r,g]*PN[g]^(1 + et_x[r,g])+alpha_d[r,g]*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1 + et_x[r,g]))^(1/(1 + et_x[r,g]))
-#     -
-#     (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
-# );
+@mapping(cge,def_U[r in set[:r]],
+    U[r] * swunemp
+    -
+    (1 - LS[r]*lab_e[r]/(lte0[r]-Z[r]*DLEIS[r]))
+);
 
 
 ####################################
@@ -1076,35 +1078,48 @@ end);
 # define complementarity conditions
 # note the pattern of ZPC -> primal variable  &  MCC -> dual variable (price)
 #@complementarity(cge,profit_y,Y);
-@complementarity(cge,profit_ym,YM);
 @complementarity(cge,profit_yx,YX);
+@complementarity(cge,profit_ym,YM);
+@complementarity(cge,profit_yym,YYM);
+@complementarity(cge,profit_va,VA);
+@complementarity(cge,profit_e,E);
 @complementarity(cge,profit_x,X);
 @complementarity(cge,profit_a,A);
 @complementarity(cge,profit_c,C);
+@complementarity(cge,profit_z,Z);
+@complementarity(cge,profit_ls,LS);
+@complementarity(cge,profit_inv,INV);
+@complementarity(cge,profit_w,W);
 @complementarity(cge,profit_ms,MS);
+@complementarity(cge,profit_co2,CO2);
+@complementarity(cge,market_rk,RK);
+@complementarity(cge,market_rkx,RKX);
+@complementarity(cge,market_pfr,PFR);
+@complementarity(cge,market_pfrx,PFRX);
 @complementarity(cge,market_pa,PA);
 @complementarity(cge,market_py,PY);
+@complementarity(cge,market_pym,PYM);
+@complementarity(cge,market_pe,PE);
+@complementarity(cge,market_pva,PVA);
 @complementarity(cge,market_pd,PD);
 @complementarity(cge,market_pn,PN);
 @complementarity(cge,market_pl,PL);
-#@complementarity(cge,market_pk,PK);
-@complementarity(cge,market_rk,RK);
-@complementarity(cge,market_rkx,RKX);
 @complementarity(cge,market_pm,PM);
 @complementarity(cge,market_pc,PC);
+@complementarity(cge,market_pls,PLS);
+@complementarity(cge,market_pl,PL);
+@complementarity(cge,market_pinv,PINV);
+@complementarity(cge,market_pz,PZ);
+@complementarity(cge,market_pw,PW);
 @complementarity(cge,market_pfx,PFX);
+@complementarity(cge,market_pdco2,PDCO2);
+@complementarity(cge,market_pco2,PCO2);
 @complementarity(cge,income_ra,RA);
 
-#----------
-#Recursive Dynamics
-@complementarity(cge,profit_inv,INV);
-@complementarity(cge,profit_w,W);
-@complementarity(cge,market_pinv,PINV);
-@complementarity(cge,market_pw,PW);
-
 #Reporting
-@complementarity(cge,DKMdef,DKM);
+@complementarity(cge,def_DKM,DKM);
 @complementarity(cge,def_RX,RX);
+@complementarity(cge,def_U,U);
 
 ####################
 # -- Model Solve --
