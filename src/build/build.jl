@@ -23,7 +23,8 @@ function build(dataset::Dataset)
 end
 
 
-function build(name::String=DEFAULT_DATASET; kwargs...)
+function build(name::String=""; kwargs...)
+    ismissing(name) && (name = "$(dataset.region_level)_model")
     return build(Dataset(name; kwargs...))
 end
 

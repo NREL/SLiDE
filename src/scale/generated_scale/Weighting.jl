@@ -11,10 +11,10 @@ This file is auto-generated. Do not edit.
         direction::Symbol
     end
 
-Store mapping AND weighting information for scaling. ```math 1+1 ```
+Store mapping AND weighting information for scaling
 
 # Arguments
-- `data::DataFrame`: input file name
+- `data::DataFrame`
 - `constant::Array{Symbol,1}`: `data` columns that are included in but not changed by the mapping process
 - `from::Union{Symbol,Array{Symbol,1}}`: `data` columns that overlap with `on`
 - `to::Union{Symbol,Array{Symbol,1}}`: `data` columns that DO NOT overlap with `on`
@@ -22,7 +22,6 @@ Store mapping AND weighting information for scaling. ```math 1+1 ```
 - `direction::Symbol`: indicator describing whether to aggregate/disaggregate
 """
 mutable struct Weighting <: Scale
-    "input file name"
     data::DataFrame
     "`data` columns that are included in but not changed by the mapping process"
     constant::Array{Symbol,1}

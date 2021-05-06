@@ -255,3 +255,27 @@ function find_set(mapping::Mapping, set::Dict, levels::AbstractArray)
     df = innerjoin(mapping.data, df, on=Pair.(mapping.from, mapping.on))
     return unique(df[:,:set])
 end
+
+
+"""
+# Argument
+- `idx::AbstractArray`: list of columns that might contain good/sector indices **OR**
+    `df::DataFrame`: for which we need to find goods/sectors
+
+# Returns
+- `idx::Array{Symbol,1}`: input columns that overlap with `[:g,:s]` in the order in which
+    they're given
+"""
+function find_sector(idx::AbstractArray)
+    idx = intersect(idx, [:g,:s])
+
+    return if length(idx)==0
+        missing
+    elseif length(idx)==1
+        idx[1]
+    else
+        idx
+    end
+end
+
+find_sector(df::DataFrame) = find_sector(propertynames(df))
