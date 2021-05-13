@@ -44,7 +44,6 @@ Scaling features enable the following options:
 
 ```@docs
 SLiDE.scale_sector
-SLiDE.scale_sector!
 ```
 
 ### Aggregation
