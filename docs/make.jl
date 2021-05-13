@@ -29,7 +29,7 @@ makedocs(clean = true,
         "Data" => Any[
             "Overview" => "man/data/overview.md",
             "Preparation" => "man/data/preparation.md",
-            "Parameters" => "man/parameters.md"
+            # "Parameters" => "man/parameters.md"
         ],
         "Build" => Any[
             "Overview" => "man/build/overview.md",
