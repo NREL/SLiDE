@@ -14,21 +14,19 @@ This function prepares SEDS energy and electricity data for the Energy-Environme
 """
 function partition_seds(dataset::Dataset, d::Dict, set::Dict)
     step = "seds"
-    d_read = read_build(set!(dataset; step=step))
+    d_read = read_build(SLiDE.set!(dataset; step=step))
 
     maps = read_map()
 
     if dataset.step=="input"
-        print_status(set!(dataset; step=step))
-
-        [d_read[k] = SLiDE.extrapolate_year(df, (yr=set[:yr],)) for (k,df) in d_read]
+        SLiDE.print_status(SLiDE.set!(dataset; step=step))
+        filter_with!(d_read, set, dataset)
         merge!(d, d_read)
 
         partition_elegen!(d, maps)
         partition_energy!(d, set, maps)
 
         _partition_cprice!(d, set, maps)
-        # _partition_prodbtu!(d, set)
         _partition_pedef!(d, set, maps)
         _partition_pe0!(d, set, maps)
         _partition_ps0!(d)

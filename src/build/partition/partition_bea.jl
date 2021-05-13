@@ -13,7 +13,7 @@
 function partition_bea(dataset::Dataset, d::Dict, set::Dict; map_fdcat::Bool=false)
     if dataset.step=="input"
         print_status(set!(dataset; step="bea"))
-        [d[k] = filter_with(d[k], (yr=set[:yr],)) for k in [:supply,:use]]
+        filter_with!(d, set, dataset)
 
         map_fdcat && _filter_use!(d,set)
 

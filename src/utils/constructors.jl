@@ -24,13 +24,26 @@ function set!(dataset::Dataset;
     !ismissing(eem) && set_eem!(dataset, eem)
     !ismissing(name) && set_name!(dataset, name)
     !ismissing(step) && set_step!(dataset, step)
-    !ismissing(build) && set_build!(dataset, build)
+    !ismissing(build) && set_build!(dataset, _check_build(build))
     !ismissing(overwrite) && set_overwrite!(dataset, overwrite)
     !ismissing(save_build) && set_save_build!(dataset, save_build)
-    !ismissing(region_level) && set_region_level!(dataset, region_level)
-    !ismissing(sector_level) && set_sector_level!(dataset, sector_level)
+    !ismissing(region_level) && set_region_level!(dataset, _check_region_level(region_level))
+    !ismissing(sector_level) && set_sector_level!(dataset, _check_sector_level(sector_level))
     return dataset
 end
+
+function _check_dataset(field, allowed, value)
+    if !(value in allowed)
+        throw(ArgumentError("allowed values for $field: $(_write_list(allowed))"))
+    else
+        return value
+    end
+end
+
+_check_sector_level(value) = _check_dataset(:sector_level, [:summary,:detail], value)
+_check_region_level(value) = _check_dataset(:region_level, [:state,:division,:region], value)
+_check_build(value) = _check_dataset(:build, ["io","eem"], value)
+
 
 
 """

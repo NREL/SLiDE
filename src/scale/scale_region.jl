@@ -44,16 +44,22 @@ end
 
 """
 """
-function compound_region!(d::Dict, set::Dict, scale::T, var::Symbol) where T <: Scale
+function compound_region!(d::Dict, set::Dict, scale::T, var::Symbol; label=missing) where T <: Scale
     df = d[var]
-    on = find_region(df)
-    key = _inp_key(:region,on)
+    region = SLiDE.find_region(df)
+    scale = copy(scale)
     
-    if !haskey(d,key)
-        scale = copy(scale)
-        
-        set_on!(scale, on)
-        push!(d, key => compound_for!(scale, set[:r], df))
+    if ismissing(region)
+        return missing
+    else
+        key = SLiDE._inp_key(label, scale, region)
+        # If the key does not already exist in the DataFrame, compound for the DataFrame
+        # (with region columns only) to run set_scheme! and update direction.
+        # If the key exists, but is the wrong type (Weighting vs. Mapping), re-compound.
+        if !haskey(d,key) || typeof(scale) !== typeof(d[key])
+            set_on!(scale, region)
+            push!(d, key => SLiDE.compound_for!(scale, set[:r], df))
+        end
     end
 
     return d[key]

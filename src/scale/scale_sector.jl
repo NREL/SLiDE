@@ -228,6 +228,30 @@ function compound_sector!(d::Dict, set::Dict, scale::T, var::Symbol; label=missi
 end
 
 
+function _compound_for!(dimension::Symbol, d::Dict, set::Dict, scale::T, var::Symbol; label=missing) where T <: Scale
+    setkey = dimension==:sector
+
+
+    df = d[var]
+    sector = SLiDE.find_sector(df)
+    scale = copy(scale)
+
+    if ismissing(sector)
+        return missing
+    else
+        key = SLiDE._inp_key(label, scale, sector)
+        # If the key does not already exist in the DataFrame, compound for the DataFrame
+        # (with sector columns only) to run set_scheme! and update direction.
+        # If the key exists, but is the wrong type (Weighting vs. Mapping), re-compound.
+        if !haskey(d, key) || typeof(scale) !== typeof(d[key])
+            SLiDE.set_on!(scale, sector)
+            push!(d, key=>SLiDE.compound_for(scale, set[:sector], df))
+        end
+        return d[key]
+    end
+end
+
+
 """
     complete_with(lst::AbstractArray, mapping::Mapping)
 This function assesses whether `Mapping` replaces any of the values in `lst`.

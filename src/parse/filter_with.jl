@@ -184,6 +184,21 @@ function filter_with!(d::Dict, lst::AbstractArray)
     return d
 end
 
+function filter_with!(d::Dict, set::Dict, dataset::Dataset)
+    has_region = dataset.step!=="bea"
+    drop_units = dataset.step!=="seds"
+
+    # Define filtering.
+    has_region && push!(set, :r => read_file(SLiDE.inputpath("r","state"; type="set"))[:,1])
+    filt = (yr=set[:yr], r=set[:r], orig=set[:r], dest=set[:r])
+
+    x = Deselect([:units],"==")
+    [d[k] = filter_with((drop_units ? edit_with(df, x) : df), filt;
+        extrapolate=true) for (k,df) in d]
+
+    return has_region ? SLiDE.scale_region!(dataset, d, set) : d, set
+end
+
 
 """
     split_with!(d::Dict, splitter::AbstractArray)
