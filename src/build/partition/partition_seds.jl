@@ -69,6 +69,7 @@ For fossil fuels, use heatrate to convert as follows:
 ```
 """
 function partition_elegen!(d::Dict, maps::Dict)
+    # !!!! for future, keep RE partitioned
     df = filter_with(d[:seds], maps[:elegen]; drop=:sec)
 
     df = operate_over(df, d[:heatrate];
@@ -581,7 +582,7 @@ end
 `pctgen(yr,r,src,sec)`, percent of electricity generation
 ```math
 pctgen_{yr,r,src} = \\left\\{
-    \\dfrac{elegen_{yr,r,src}}{\\sum_{src} elegen_{yr,r,src}} \\;\\vert\\; ff \\in src
+    \\dfrac{elegen_{yr,r,src}}{\\sum_{src} elegen_{yr,r,src}} \\;\\bigg\\vert\\; ff \\in src
 \\right\\} \\circ \\vec{1}_{sec=ele}
 ```
 """
@@ -606,7 +607,7 @@ end
 
 
 """
-`eq0(yr,r,src,sec)`, energy demand
+`eq0(yr,r,src,sec)` [billion kWh, ``src=ele``; trillion btu, ``src\\neq ele``], energy demand
 ```math
 \\tilde{eq}_{yr,r,src,sec} = \\left\\{
     energy \\left( yr, r, src, sec \\right) \\;\\vert\\; yr,\\, r,\\, e\\in src,\\, demsec\\in sec
@@ -624,11 +625,11 @@ end
 
 
 """
-`ed0(yr,r,src,sec)`, energy demand
+`ed0(yr,r,src,sec)` [billion USD], energy demand
 ```math
-\\tilde{ed}_{yr,r,src,sec} = \\dfrac
-    {\\tilde{pe}_{yr,r,src,sec}}
-    {\\tilde{eq}_{yr,r,src,sec}}
+\\tilde{ed}_{yr,r,src,sec} = \\dfrac{1}{10^3} \\cdot
+    \\tilde{pe}_{yr,r,src,sec} \\cdot
+    \\tilde{eq}_{yr,r,src,sec}
 ```
 """
 function _partition_ed0!(d::Dict, set::Dict, maps::Dict)
