@@ -158,7 +158,7 @@ This function returns the path to the directory location specified by
 `dataset.name/dataset.build/dataset.step`. Building a dataset called `dataset.name` with
 `dataset.save_build=true` will produce files in the following structure.
     ```
-    /SLIDE_DATA/data/dataset.name/
+    /SLIDE_DATA/data/output/dataset.name/
     ├── eem/
     |   ├── parameters/
     |   └── sets/
