@@ -56,6 +56,32 @@ set[:nxe] = setdiff(set[:g],set[:xe])   # non-extractive goods
 set[:nele] = setdiff(set[:g],set[:ele]) # non-electricity goods
 set[:nne] = setdiff(set[:g],set[:en])   # non-energy goods
 
+sld[:va_bar] = (Dict((r,s) => (sld[:ld0][r,s] + sld[:kd0][r,s])
+    for r in set[:r], s in set[:s]));
+
+sld[:fe_bar] = (Dict((r,s) => sum(sld[:id0][r,g,s] for g in set[:fe])
+    for r in set[:r], s in set[:s]));
+
+sld[:en_bar] = (Dict((r,s) => sum(sld[:id0][r,g,s] for g in set[:en])
+    for r in set[:r], s in set[:s]));
+
+sld[:ne_bar] = (Dict((r,s) => sum(sld[:id0][r,g,s] for g in set[:nne])
+    for r in set[:r], s in set[:s]));
+
+sld[:vaen_bar] = (Dict((r,s) => (sld[:va_bar][r,s] + sld[:en_bar][r,s])
+    for r in set[:r], s in set[:s]));
+
+sld[:klem_bar] = (Dict((r,s) => (sld[:vaen_bar][r,s] + sld[:ne_bar][r,s])
+    for r in set[:r], s in set[:s]));
+
+function combvec(set_a...)
+    return vec(collect(Iterators.product(set_a...)))
+end
+
+set[:PE] = filter(x -> sld[:en_bar][x] != 0.0, combvec(set[:r],set[:s]))
+set[:PVA] = filter(x -> sld[:va_bar][x] != 0.0, combvec(set[:r],set[:s]))
+set[:PYM] = filter(x -> sld[:klem_bar][x] != 0.0, combvec(set[:r],set[:s]))
+
 
 ##############
 # SWITCHES
@@ -250,8 +276,6 @@ if swfr == 1
     end
 end
 
-
-
 #Substitution and transformation elasticities
 @NLparameter(cge, es_va[r in set[:r], s in set[:s]] == SUB_ELAST[:va]); # value-added nest - substitution elasticity
 @NLparameter(cge, es_y[r in set[:r], s in set[:s]]  == SUB_ELAST[:y]); # Top-level Y nest (VA,M) - substitution elasticity
@@ -378,14 +402,14 @@ end);
     PLS[r in set[:r]] >= low, (start = value(wref[r])) # Labor supply price
     PFR[(r,s) in set[:PK]] >= low, (start = 1) # Fixed resource - mutable
     PFRX[(r,s) in set[:PK]] >= low, (start = 1) # Fixed resource - extant
-    PYM[(r,s) in set[:Y]] >= lo, (start = 1) # pre-fixed resource mutable composite price
-    PE[(r,s) in set[:Y]] >= lo, (start = 1) # Energy composite price
-    PVA[(r,s) in set[:Y]] >= lo, (start = 1) # Value-added composite price
+    PYM[(r,s) in set[:PYM]] >= lo, (start = 1) # pre-fixed resource mutable composite price
+    PE[(r,s) in set[:PE]] >= lo, (start = 1) # Energy composite price
+    PVA[(r,s) in set[:PVA]] >= lo, (start = 1) # Value-added composite price
     CO2[r in set[:r]] >= lo, (start = value(cb0[r])) # CO2 emissions supply
     Z[r in set[:r]] >= lo, (start = 1) # Full consumption
-    YYM[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax))) # pre-fixed resource Mutable output
-    E[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax))) # Energy index
-    VA[(r,s) in set[:Y]] >= lo, (start = (1-value(thetax))) # Value-added index
+    YYM[(r,s) in set[:PYM]] >= lo, (start = (1-value(thetax))) # pre-fixed resource Mutable output
+    E[(r,s) in set[:PE]] >= lo, (start = (1-value(thetax))) # Energy index
+    VA[(r,s) in set[:PVA]] >= lo, (start = (1-value(thetax))) # Value-added index
     LS[r in set[:r]] >= lo, (start = 1) # Labor supply
 
 end);
@@ -561,22 +585,22 @@ end);
 );
 
 # Demand function: non-energy (materials)
-@NLexpression(cge,IDA_ne[r in set[:r], g in set[:g], s in set[:s]],
+@NLexpression(cge,IDA_ne[r in set[:r], g in set[:nne], s in set[:s]],
     id0[r,g,s]*(CNE[r,s]/(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0))^(es_ne[s])
 );
 
 # Demand function: electricity
-@NLexpression(cge,IDA_ele[r in set[:r], g in set[:g], s in set[:s]],
+@NLexpression(cge,IDA_ele[r in set[:r], g in set[:ele], s in set[:s]],
     id0[r,g,s]*(CEN[r,s]/(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0))^(es_ele[s])
 );
 
 # Demand function: fossil-energy
-@NLexpression(cge,IDA_fe[r in set[:r], g in set[:g], s in set[:s]],
+@NLexpression(cge,IDA_fe[r in set[:r], g in set[:fe], s in set[:s]],
     id0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CFE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)+ PDCO2[r]*idcco2[r,g,s]*swcarb))^(es_fe[s])
 );
 
 # Demand function: co2 emissions
-@NLexpression(cge,IDA_co2[r in set[:r], g in set[:g], s in set[:s]],
+@NLexpression(cge,IDA_co2[r in set[:r], g in set[:fe], s in set[:s]],
     idcb0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CVE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb))^es_fe[s]
 );
 
@@ -617,7 +641,7 @@ end);
     + (haskey(RKX.lookup[1], (r,s)) ? RKX[(r,s)] : 1.0) * kd0[r,s]
 # cost of fixed resource factor input
 # !!!! possible need for switch to control swfr = [0,1] and for fossil resources
-    +(haskey(PFRX.lookup[1], (r,s)) ? PFRX[(r,s)] : 1.0) * fr0[r,s]
+    + (haskey(PFRX.lookup[1], (r,s)) ? PFRX[(r,s)] : 1.0) * fr0[r,s]
     -
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
     sum((haskey(PY.lookup[1], (r,g)) ? PY[(r,g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
@@ -649,7 +673,7 @@ end);
 );
 
 # !!!! cautious of subsetting - may need new set[:YYM]
-@mapping(cge,profit_yym[(r,s) in set[:Y]],
+@mapping(cge,profit_yym[(r,s) in set[:PYM]],
 # cost of value-added composite
     (haskey(PVA.lookup[1], (r,s)) ? PVA[(r,s)] : 1.0)  * IVA[r,s]
 # cost of energy composite
@@ -662,7 +686,7 @@ end);
 );
 
 # !!!! cautious of subsetting - may need new set[:VA]
-@mapping(cge,profit_va[(r,s) in set[:Y]],
+@mapping(cge,profit_va[(r,s) in set[:PVA]],
 # cost of labor
     (PLS[r]/wref[r])*AL[r,s]
 # cost of capital
@@ -674,7 +698,7 @@ end);
 );
 
 # !!!! cautious of subsetting - may need new set[:E]
-@mapping(cge,profit_e[(r,s) in set[:Y]],
+@mapping(cge,profit_e[(r,s) in set[:PE]],
 # cost of electricity
     sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * IDA_ele[r,g,s] for g in set[:ele])
 # cost of fossil energy
@@ -810,7 +834,7 @@ end);
     ks_m[r,s]
     -
 # mutable capital demand
-    (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AK[r,s]
+    (haskey(VA.lookup[1], (r, s)) ? VA[(r, s)] : 1.0) * AK[r,s]
 );
 
 @mapping(cge,market_rkx[(r, s) in set[:PK]],
@@ -849,10 +873,10 @@ end);
 # final demand
         + C[r] * CD[r,g]
 # intermediate demand
-        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:nne]))
-        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:ele]))
-        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:fe]))
-        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
+        + sum((haskey(YYM.lookup[1], (r, s)) ? YYM[(r, s)] : 1.) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:PYM] && g in set[:nne]))
+        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.) * IDA_ele[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:ele]))
+        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.) * IDA_fe[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:fe]))
+        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
     )
 );
 
@@ -864,34 +888,34 @@ end);
     + yh0[r,g]
     -
 # aggregate supply (akin to market demand)
-    (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1) * s0[r,g]
+    (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1.) * s0[r,g]
 );
 
 # !!!! may need subset set[:PYM]
-@mapping(cge,market_pym[(r,s) in set[:Y]],
+@mapping(cge,market_pym[(r,s) in set[:PYM]],
 # supply of KLEM composite
-    YYM[(r,s)]
+    (haskey(YYM.lookup[1], (r,s)) ? YYM[(r,s)] : 1.0) * klem_bar[r,s]
     -
 # Demand for KLEM composite
-    YM[(r,s)]*IYM[r,s]
+    (haskey(YM.lookup[1], (r,s)) ? YM[(r,s)] : 1.0) * IYM[r,s]
 );
 
-@mapping(cge,market_pe[(r,s) in set[:Y]],
+@mapping(cge,market_pe[(r,s) in set[:PE]],
 # supply of energy composite
-    E[(r,s)]*sum(id0[r,g,s] for g in set[:en])
+    (haskey(E.lookup[1], (r,s)) ? E[(r,s)] : 1.0) * sum(id0[r,g,s] for g in set[:en])
 #    E[(r,s)]*en_bar[r,s]
     -
 # demand for energy composite
-    YYM[(r,s)]*IE[r,s]
+    (haskey(YYM.lookup[1], (r,s)) ? YYM[(r,s)] : 1.0) * IE[r,s]
 );
 
-@mapping(cge,market_pva[(r,s) in set[:Y]],
+@mapping(cge,market_pva[(r,s) in set[:PVA]],
 # supply of value-added composite
-    VA[(r,s)]*(ld0[r,s]+kd0[r,s])
+    (haskey(VA.lookup[1], (r,s)) ? VA[(r,s)] : 1.0) * (ld0[r,s]+kd0[r,s])
 #    VA[(r,s)]*va_bar[r,s]
     -
 # demand for value-added composite
-    YYM[(r,s)]*IVA[r,s]
+    (haskey(YYM.lookup[1], (r,s)) ? YYM[(r,s)] : 1.0) * IVA[r,s]
 );
 
 
@@ -1002,7 +1026,7 @@ end);
     -
     (
         sum((haskey(YX.lookup[1], (r,s)) ? YX[(r,s)] : 1.0) * idcb0[r,g,s] for g in set[:fe], s in set[:s])
-        + sum((haskey(E.lookup[1], (r,s)) ? E[(r,s)] : 1.0) * IDA_co2[r,g,s] for g in set[:fe], s in set[:s])
+        + sum((haskey(E.lookup[1], (r,s)) ? E[(r,s)] : 1.0) * IDA_fe[r,g,s] * idcco2[r,g,s] for g in set[:fe], s in set[:s])
         + sum(C[r]*CD[r,g]*cdcco2[r,g] for g in set[:fe])
     )
 );
@@ -1053,7 +1077,7 @@ end);
 @mapping(cge, def_DKM[(r,s) in set[:PK]],
     DKM[(r,s)]
     -
-    YM[(r,s)]*AK[r,s]
+    VA[(r,s)]*AK[r,s]
 );
 
 @mapping(cge,def_RX[(r,g) in set[:X]],
