@@ -38,7 +38,7 @@ cge = MCPModel();
 # SETS
 ##############
 
-swunemp = 0
+swunemp = 1
 
 # Set description
 #set[:s] -> sectors
@@ -230,9 +230,9 @@ lo = 0.0
 # --- labor-leisure variables ---
 @variable(cge,Z[r in set[:r]] >= lo, start=1);
 @variable(cge,PZ[r in set[:r]] >= lo, start=1);
-@variable(cge,LS[r in set[:r]] >= lo, start=1);
-@variable(cge,PLS[r in set[:r]] >= lo, start=1);
-#@variable(cge,U[r in set[:r]] >= lo, (start = value(u0[r]))); # Unemployment rate index
+@variable(cge,LS[r in set[:r]] >= lo, start=(1-value(u0[r])));
+@variable(cge,PLS[r in set[:r]] >= lo, start=value(wref[r]));
+@variable(cge,U[r in set[:r]] >= lo, (start = value(u0[r]))); # Unemployment rate index
 
 
 
@@ -245,11 +245,11 @@ lo = 0.0
 
 #Cobb-douglas for mutable/new
 @NLexpression(cge, CVAym[r in set[:r], s in set[:s]],
-    PLS[r]^alpha_kl[r,s] * RK[r]^(1-alpha_kl[r,s]));
+    (PLS[r]/wref[r])^alpha_kl[r,s] * RK[r]^(1-alpha_kl[r,s]));
 
 #demand for labor in VA
 @NLexpression(cge,ALym[r in set[:r], s in set[:s]],
-    ld0[r,s] * CVAym[r,s] / PLS[r]);
+    ld0[r,s] * CVAym[r,s] / (PLS[r]/wref[r]));
 
 #demand for capital in VA
 @NLexpression(cge,AKym[r in set[:r],s in set[:s]],
@@ -348,7 +348,7 @@ lo = 0.0
 # cost of intermediate demand
     sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
 # cost of labor inputs
-    + PLS[r] * ALym[r,s]
+    + (PLS[r]/wref[r]) * ALym[r,s]
 # cost of capital inputs
     + RK[r] * AKym[r,s]
     -
@@ -360,7 +360,7 @@ lo = 0.0
 # cost of intermediate demand
     sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
 # cost of labor inputs
-    + PLS[r] * ld0[r,s]
+    + (PLS[r]/wref[r]) * ld0[r,s]
 # cost of capital inputs
     + (haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * kd0[r,s]
     -
@@ -427,8 +427,9 @@ lo = 0.0
     -
 # revenues from labor
     (
-        PLS[r] * lab_e[r]
-    )
+        PLS[r] * lab_e[r] * (1-swunemp)
+        + (PLS[r] * lab_e[r] * (1-u0[r]) * ((LS[r]/((1-u0[r])))^sig) * (U[r]/u0[r])^uta) * (swunemp)
+     )
 );
 
 @mapping(cge, profit_inv[r in set[:r]],
@@ -515,10 +516,11 @@ lo = 0.0
     -
 # demand for labor in all set[:s]
     (
-        sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ALym[r,s] for s in set[:s])
-        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ld0[r,s] for s in set[:s])
+        sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ALym[r,s] * (1-u0[r]) for s in set[:s])
+        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ld0[r,s] * (1-u0[r]) for s in set[:s])
     )
 );
+
 
 @mapping(cge,market_pl[r in set[:r]],
 # supply time
@@ -526,7 +528,8 @@ lo = 0.0
     -
 # demand for time
     (
-        LS[r] * lab_e[r]
+        LS[r] * lab_e[r] * (1-swunemp)
+        + (LS[r] * lab_e[r] / (1-U[r])) * (swunemp)
         + Z[r] * DLEIS[r]
     )
 );
@@ -663,6 +666,13 @@ lo = 0.0
 # );
 
 
+@mapping(cge,def_U[r in set[:r]],
+    U[r] * swunemp
+    -
+    (1 - LS[r]*lab_e[r]/(lte0[r]-Z[r]*DLEIS[r]))
+);
+
+
 ####################################
 # -- Complementarity Conditions --
 ####################################
@@ -705,6 +715,9 @@ lo = 0.0
 @complementarity(cge,market_pls,PLS);
 @complementarity(cge,profit_z,Z);
 @complementarity(cge,market_pz,PZ);
+
+# unemployment
+@complementarity(cge,def_U,U);
 
 ####################
 # -- Model Solve --
