@@ -143,35 +143,35 @@ This function is applied to the following tax rates, which are scaled by a the c
 parameters. It returns the aggregated tax rate as well as the aggregated scaling parameter.
 
 - `ta(yr,r,g)`, absorption taxes, scaled by domestic absorption, `a(yr,r,g)`:
-    ```math
-    \\begin{aligned}
-    \\bar{a}_{yr,r,g} &= \\bar{a}_{yr,r,gg} \\circ map_{gg\\rightarrow g}
-    \\\\
-    \\bar{ta}_{yr,r,g} &= \\dfrac
-        {\\left(\\bar{ta}_{yr,r,gg} \\cdot \\bar{a}_{yr,r,gg} \\right) \\circ map_{gg\\rightarrow g}}
-        {                                  \\bar{a}_{yr,r,g}}
-    \\end{aligned}
-    ```
+```math
+\\begin{aligned}
+\\bar{a}_{yr,r,g} &= \\bar{a}_{yr,r,gg} \\circ map_{gg\\rightarrow g}
+\\\\
+\\bar{ta}_{yr,r,g} &= \\dfrac
+    {\\left(\\bar{ta}_{yr,r,gg} \\cdot \\bar{a}_{yr,r,gg} \\right) \\circ map_{gg\\rightarrow g}}
+    {                                  \\bar{a}_{yr,r,g}}
+\\end{aligned}
+```
 - `tm(yr,r,g)`, import taxes, scaled by foreign imports, `m(yr,r,g)`:
-    ```math
-    \\begin{aligned}
-    \\bar{m}_{yr,r,g} &= \\bar{m}_{yr,r,gg} \\circ map_{gg\\rightarrow g}
-    \\\\
-    \\bar{tm}_{yr,r,g} &= \\dfrac
-        {\\left(\\bar{tm}_{yr,r,gg} \\cdot \\bar{m}_{yr,r,gg} \\right) \\circ map_{gg\\rightarrow g}}
-        {                                  \\bar{m}_{yr,r,g}}
-    \\end{aligned}
-    ```
+```math
+\\begin{aligned}
+\\bar{m}_{yr,r,g} &= \\bar{m}_{yr,r,gg} \\circ map_{gg\\rightarrow g}
+\\\\
+\\bar{tm}_{yr,r,g} &= \\dfrac
+    {\\left(\\bar{tm}_{yr,r,gg} \\cdot \\bar{m}_{yr,r,gg} \\right) \\circ map_{gg\\rightarrow g}}
+    {                                  \\bar{m}_{yr,r,g}}
+\\end{aligned}
+```
 - `ty(yr,r,s)`, production taxes, scaled by total regional sectoral output, `ys(yr,r,s,g)`:
-    ```math
-    \\begin{aligned}
-    \\bar{ys}_{yr,r,s,g} &= \\bar{ys}_{yr,r,ss,gg} \\circ map_{ss\\rightarrow s, gg\\rightarrow g}
-    \\\\
-    \\bar{ty}_{yr,r,s} &= \\dfrac
-        {\\left(\\bar{ty}_{yr,r,ss} \\cdot \\sum_{gg} \\bar{ys}_{yr,r,ss,gg} \\right) \\circ map_{ss\\rightarrow s}}
-        {                                  \\sum_{g}  \\bar{ys}_{yr,r,s ,g}}
-    \\end{aligned}
-    ```
+```math
+\\begin{aligned}
+\\bar{ys}_{yr,r,s,g} &= \\bar{ys}_{yr,r,ss,gg} \\circ map_{ss\\rightarrow s, gg\\rightarrow g}
+\\\\
+\\bar{ty}_{yr,r,s} &= \\dfrac
+    {\\left(\\bar{ty}_{yr,r,ss} \\cdot \\sum_{gg} \\bar{ys}_{yr,r,ss,gg} \\right) \\circ map_{ss\\rightarrow s}}
+    {                                  \\sum_{g}  \\bar{ys}_{yr,r,s ,g}}
+\\end{aligned}
+```
 
 where ``gg``, ``ss`` represent **dis**aggregate-level goods and sectors
 and ``g``, ``s`` represent aggregate-level goods and sectors.

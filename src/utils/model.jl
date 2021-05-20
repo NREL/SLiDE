@@ -55,14 +55,14 @@ _start_value(model::Model, var::Symbol, idx::String) = start_value(model[var][id
 """
     upper_bound(x::Real; kwargs...)
 This function returns an upper bound on `x`:
-    ```math
-    x_{upper} =
-    \\begin{cases}
-    \\abs\\left\\{factor \\cdot x \\right\\}  & \\texttt{allow_negative}
-    \\
-    factor \\cdot x                           & \\texttt{!allow_negative}
-    \\end{cases}
-    ```
+```math
+x_{upper} =
+\\begin{cases}
+\\abs\\left\\{factor \\cdot x \\right\\}  & \\texttt{allow_negative}
+\\
+factor \\cdot x                           & \\texttt{!allow_negative}
+\\end{cases}
+```
 
 # Arguments
 - `x::Real` reference value to calculate upper bound
@@ -89,14 +89,14 @@ end
 """
     lower_bound(x::Real; kwargs...)
 This function calculates a lower bound on `x`:
-    ```math
-    x_{lower} =
-    \\begin{cases}
-    \\max\\left\\{0,\\, factor \\cdot x \\right\\}  & \\texttt{allow_negative}
-    \\
-    factor \\cdot x                                 & \\texttt{!allow_negative}
-    \\end{cases}
-    ```
+```math
+x_{lower} =
+\\begin{cases}
+\\max\\left\\{0,\\, factor \\cdot x \\right\\}  & \\texttt{allow_negative}
+\\
+factor \\cdot x                                 & \\texttt{!allow_negative}
+\\end{cases}
+```
 
 # Arguments
 - `x::Real` reference value to calculate lower bound
@@ -269,7 +269,7 @@ condition using [`SLiDE.fix!`](@ref), OR sets its lower bound using [`SLiDE.set_
     to set bounds.
 
 # Keyword Arguments
-See [`SLiDE.fix!`] and [`SLiDE.lower_bound`]
+See [`SLiDE.fix!`](@ref) and [`SLiDE.lower_bound`](@ref)
 """
 function fix_lower_bound!(model::Model, var::Symbol, idx::Union{String,Tuple}; kwargs...)
     if iszero(_start_value(model, var, idx))

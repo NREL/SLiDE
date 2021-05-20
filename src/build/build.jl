@@ -125,7 +125,7 @@ end
 """
     overwrite(dataset::Dataset)
 This function executes `dataset.overwrite=true`.
-If a directory exists at `dataset.name/dataset.build`, and
+If a directory exists at the location returned by [`SLiDE.datapath`](@ref)
 - Output data HAS been generated, append the date this directory was created and move it.
 - Output data HAS NOT yet been generated, remove the directory and start over.
 """
@@ -159,7 +159,7 @@ This function returns the path to the directory location specified by
 `dataset.name/dataset.build/dataset.step`. Building a dataset called `dataset.name` with
 `dataset.save_build=true` will produce files in the following structure.
     ```
-    /SLIDE_DATA/data/dataset.name/
+    /SLIDE_DATA/data/output/dataset.name/
     ├── eem/
     |   ├── parameters/
     |   └── sets/
@@ -178,14 +178,15 @@ This function returns the path to the directory location specified by
         U.S. states and summary-level sectors and goods.
 """
 function datapath(dataset::Dataset; directory_level=:step)
+    path = joinpath(DATA_DIR, "output")
     if directory_level==:name
-        path = joinpath(DATA_DIR, dataset.name)
+        path = joinpath(path, dataset.name)
 
     elseif directory_level==:build
-        path = joinpath(DATA_DIR, dataset.name, dataset.build)
+        path = joinpath(path, dataset.name, dataset.build)
 
     elseif directory_level==:step
-        path = joinpath(DATA_DIR, dataset.name, dataset.build)
+        path = joinpath(path, dataset.name, dataset.build)
         path = if dataset.step in [PARAM_DIR, SET_DIR]
             joinpath(path, dataset.step)
         else

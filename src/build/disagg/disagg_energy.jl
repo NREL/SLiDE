@@ -60,8 +60,13 @@ end
 
 """
 `fvs`, initial factor value shares in production
+This share is calculated for each capital demand, ``kd_{yr,r,s}``, and labor demand,
+``ld_{yr,r,s}``. For each of these parameters, ``z``, ``fvs_{yr,r,s,z}`` is defined:
 ```math
-fvs_{yr,r,s,x} = \\dfrac{x_{yr,r,s}}{\\sum_{g}ys_{yr,r,s,g}}
+fvs_{yr,r,s,z} = \\left\\{
+    \\dfrac{z_{yr,r,s}}{\\sum_{g}ys_{yr,r,s,g}}
+    \\;\\bigg\\vert\\; \\ [kd, ld] \\in z
+\\right\\}
 ```
 """
 function _disagg_energy_fvs!(d::Dict)
@@ -230,12 +235,18 @@ end
 
 
 """
+``\\alpha^{inp}_{yr,r,g,s,sec}``, input share
+This parameter can be calculated from intermediate regional demand, ``id_{yr,r,g,s}``,
+subject to the condition that, for ``(yr,r,g,sec)``, percent generation is greater than 1%:
+
 ```math
+pctgen^\\star_{yr,r,src\\rightarrow g,sec} > 0.01
+\\\\~\\\\
 \\begin{aligned}
-inp_{yr,r,g,s,sec} &= 
+inp_{yr,r,g,s,sec} &=
 \\big\\{
-    id_{yr,r,g,s} \\circ map_{s\\rightarrow sec} \\;\\vert\\; yr,\\, r,\\, src\\in g,\\, s
-    \\\\&\\qquad\\wedge\\; pctgen_{yr,r,src\\rightarrow g,sec} > 0.01
+    id_{yr,r,g,s} \\cdot map_{s\\rightarrow sec} \\;\\vert\\; yr,\\, r,\\, src\\in g,\\, s
+    \\\\&\\qquad\\wedge\\;pctgen_{yr,r,src\\rightarrow g,sec} > 0.01
 \\big\\}
 \\\\&\\\\
 \\alpha^{inp}_{yr,r,g,s,sec} &= \\dfrac
@@ -244,7 +255,13 @@ inp_{yr,r,g,s,sec} &=
 \\end{aligned}
 ```
 
+Missing ``(yr,r,g,s,sec)`` values can be filled using ``\\hat{\\alpha}^{inp}``, the
+regionally-weighted input share, where ``inp_{yr,r,g,s,sec}`` is subject to the conditions:
 ```math
+ed^\\star_{yr,r,src\\rightarrow g,sec} > 0
+\\\\
+ys^\\star_{yr,r,s,g=s} > 0
+\\\\~\\\\
 \\begin{aligned}
 inp_{yr,r,g,s,sec} &= 
 \\big\\{
@@ -262,9 +279,9 @@ inp_{yr,r,g,s,sec} &=
 ```math
 \\alpha^{inp}_{yr,r,g,s,sec} =
 \\begin{cases}
-\\alpha^{inp}_{yr,r,g,s,sec} & \\sum_s inp_{yr,r,g,s,sec} \\neq 0
+\\alpha^{inp}_{yr,r,g,s,sec} & \\sum_s inp_{yr,r,g,s,sec} \\neq 0, pctgen^\\star
 \\\\
-\\hat{\\alpha}^{inp}_{yr,r,g,s,sec} & \\sum_s inp_{yr,r,g,s,sec} = 0
+\\hat{\\alpha}^{inp}_{yr,r,g,s,sec} & \\sum_s inp_{yr,r,g,s,sec} = 0, pctgen^\\star, ed^\\star, ys^\\star
 \\end{cases}
 ```
 """
