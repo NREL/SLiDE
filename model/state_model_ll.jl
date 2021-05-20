@@ -38,7 +38,7 @@ cge = MCPModel();
 # SETS
 ##############
 
-swunemp = 1
+swunemp = 0
 
 # Set description
 #set[:s] -> sectors
@@ -94,20 +94,31 @@ swunemp = 1
 @NLparameter(cge, dr == 0.05); # capital depreciation rate
 @NLparameter(cge, thetax == 0.3); # extant production share
 
-#new capital endowment
-@NLparameter(cge, ks_n[r in set[:r], s in set[:s]] ==
-    value(kd0[r, s])  * (value(dr)+value(gr)) / (1 + value(gr)) );
+# #new capital endowment
+# @NLparameter(cge, ks_n[r in set[:r], s in set[:s]] ==
+#     value(kd0[r, s])  * (value(dr)+value(gr)) / (1 + value(gr)) );
 
-# mutable old capital endowment
-@NLparameter(cge, ks_s[r in set[:r], s in set[:s]] ==
-    value(kd0[r, s]) * (1 - value(thetax)) - value(ks_n[r,s]) );
+# # mutable old capital endowment
+# @NLparameter(cge, ks_s[r in set[:r], s in set[:s]] ==
+#     value(kd0[r, s]) * (1 - value(thetax)) - value(ks_n[r,s]) );
 
-# Mutable total capital endowment - Non-extant capital
-@NLparameter(cge, ks_m[r in set[:r]] == sum(value(kd0[r,s]) * (1-value(thetax)) for s in set[:s]));
+# # Mutable total capital endowment - Non-extant capital
+# @NLparameter(cge, ks_m[r in set[:r]] == sum(value(kd0[r,s]) * (1-value(thetax)) for s in set[:s]));
 
-# Extant capital endowment
-@NLparameter(cge, ks_x[r in set[:r], s in set[:s]] ==
-    value(kd0[r, s]) * value(thetax) );
+# # Extant capital endowment
+# @NLparameter(cge, ks_x[r in set[:r], s in set[:s]] ==
+#     value(kd0[r, s]) * value(thetax) );
+
+# !!!! Sector-specific for now - issues with more flexibility
+@NLparameter(cge, ks_m0[r in set[:r], s in set[:s]] == value(kd0[r,s]) * (1-value(thetax)));    # Mutable total capital endowment - Non-extant capital base year
+@NLparameter(cge, ks_m[r in set[:r], s in set[:s]] == value(kd0[r,s]) * (1-value(thetax)));
+
+@NLparameter(cge, ks_x0[r in set[:r], s in set[:s]] == value(kd0[r, s]) * value(thetax));   # Extant capital endowment base year
+@NLparameter(cge, ks_x[r in set[:r], s in set[:s]] == value(kd0[r, s]) * value(thetax));
+
+@NLparameter(cge, tks0[r in set[:r], s in set[:s]] == value(ks_x0[r,s]) + value(ks_m0[r,s]));   # total capital stock in base year
+@NLparameter(cge, tks[r in set[:r], s in set[:s]] == value(ks_x0[r,s]) + value(ks_m0[r,s]));
+
 
 # Labor endowment
 @NLparameter(cge, le0[r in set[:r], s in set[:s]] == value(ld0[r,s]));
@@ -219,7 +230,7 @@ lo = 0.0
 
 # commodities
 @variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
-@variable(cge,RK[r in set[:r]] >= lo, start = 1); # Return to regional capital
+@variable(cge,RK[(r,s) in set[:PK]] >= lo, start = 1); # Return to regional capital
 @variable(cge,PINV[r in set[:r]] >= lo, start = 1); # Investment price index
 @variable(cge,PW[r in set[:r]] >= lo, start = 1); # Welfare price index
 
@@ -245,7 +256,7 @@ lo = 0.0
 
 #Cobb-douglas for mutable/new
 @NLexpression(cge, CVAym[r in set[:r], s in set[:s]],
-    (PLS[r]/wref[r])^alpha_kl[r,s] * RK[r]^(1-alpha_kl[r,s]));
+    (PLS[r]/wref[r])^alpha_kl[r,s] * (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)^(1-alpha_kl[r,s]));
 
 #demand for labor in VA
 @NLexpression(cge,ALym[r in set[:r], s in set[:s]],
@@ -253,8 +264,7 @@ lo = 0.0
 
 #demand for capital in VA
 @NLexpression(cge,AKym[r in set[:r],s in set[:s]],
-    kd0[r,s] * CVAym[r,s] / RK[r]);
-
+    kd0[r,s] * CVAym[r,s] / (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0));
 
 #----------
 
@@ -350,7 +360,7 @@ lo = 0.0
 # cost of labor inputs
     + (PLS[r]/wref[r]) * ALym[r,s]
 # cost of capital inputs
-    + RK[r] * AKym[r,s]
+    + (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) * AKym[r,s]
     -
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
     sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
@@ -467,12 +477,12 @@ lo = 0.0
 #----------
 #Recursive dynamics mkt clearance
 
-@mapping(cge,market_rk[r in set[:r]],
+@mapping(cge,market_rk[(r,s) in set[:PK]],
 # mutable capital supply
-    ks_m[r]
+    ks_m[r,s]
     -
 # mutable capital demand
-    sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AKym[r,s] for s in set[:s])
+    (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AKym[r,s]
 );
 
 @mapping(cge,market_rkx[(r, s) in set[:PK]],
@@ -622,8 +632,8 @@ lo = 0.0
         PL[r] * lab_e[r]
         + PL[r] * leis_e[r]
 # capital income
-        + RK[r] * ks_m[r]
-#        +sum((haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) * ks_m[r,s] for s in set[:s])
+#        + RK[r] * ks_m[r]
+        +sum((haskey(RK.lookup[1], (r, s)) ? RK[(r,s)] : 1.0) * ks_m[r,s] for s in set[:s])
         +sum((haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * ks_x[r,s] for s in set[:s])
 # provision of household supply
         + sum( (haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0) * yh0[r,g] for g in set[:g])
