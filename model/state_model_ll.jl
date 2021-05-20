@@ -28,7 +28,6 @@ bmkyr = 2016
 sld, set = SLiDE._model_input(d, set, bmkyr, Dict)
 S, G, M, R = set[:s], set[:g], set[:m], set[:r]
 
-#set[:gm] = set[:g]
 
 ########## Model ##########
 cge = MCPModel();
@@ -46,6 +45,48 @@ swunemp = 0
 #set[:r] -> regions
 #set[:m] -> margins
 #set[:gm] -> goods_margins
+
+# More subsets
+set[:fe] = ["col","gas","oil","cru"]    # fossil energy goods
+set[:pfe] = ["col","gas","oil"]         # fossil energy pinned fuels
+set[:xe] = ["col","gas","cru"]          # extractive resources
+set[:ele] = ["ele"]                     # electricity
+set[:oil] = ["oil"]                     # refined oil
+set[:cru] = ["cru"]                     # crude oil
+set[:gas] = ["gas"]                     # natural gas
+set[:col] = ["col"]                     # coal
+set[:en] = vcat(set[:fe], set[:ele]) # energy goods
+set[:nfe] = setdiff(set[:g],set[:fe])   # non-fossil energy goods
+set[:nxe] = setdiff(set[:g],set[:xe])   # non-extractive goods
+set[:nele] = setdiff(set[:g],set[:ele]) # non-electricity goods
+set[:nne] = setdiff(set[:g],set[:en])   # non-energy goods
+
+sld[:va_bar] = (Dict((r,s) => (sld[:ld0][r,s] + sld[:kd0][r,s])
+    for r in set[:r], s in set[:s]));
+
+sld[:fe_bar] = (Dict((r,s) => sum(sld[:id0][r,g,s] for g in set[:fe])
+    for r in set[:r], s in set[:s]));
+
+sld[:en_bar] = (Dict((r,s) => sum(sld[:id0][r,g,s] for g in set[:en])
+    for r in set[:r], s in set[:s]));
+
+sld[:ne_bar] = (Dict((r,s) => sum(sld[:id0][r,g,s] for g in set[:nne])
+    for r in set[:r], s in set[:s]));
+
+sld[:vaen_bar] = (Dict((r,s) => (sld[:va_bar][r,s] + sld[:en_bar][r,s])
+    for r in set[:r], s in set[:s]));
+
+sld[:klem_bar] = (Dict((r,s) => (sld[:vaen_bar][r,s] + sld[:ne_bar][r,s])
+    for r in set[:r], s in set[:s]));
+
+function combvec(set_a...)
+    return vec(collect(Iterators.product(set_a...)))
+end
+
+set[:PE] = filter(x -> sld[:en_bar][x] != 0.0, combvec(set[:r],set[:s]))
+set[:PVA] = filter(x -> sld[:va_bar][x] != 0.0, combvec(set[:r],set[:s]))
+set[:PYM] = filter(x -> sld[:klem_bar][x] != 0.0, combvec(set[:r],set[:s]))
+
 
 
 ##############
@@ -170,6 +211,11 @@ swunemp = 0
 @NLparameter(cge, es_z[r in set[:r]] == 0); #substitution elasticity between leisure and consumption in prod Z
 @NLparameter(cge, theta_l == 0.05); # uncompensated labor supply elasticity
 
+for r in set[:r]
+    set_value(es_z[r], 1 + value(theta_l) / value(leis_shr[r]))
+end
+
+
 # Unemployment and labor frictions (Balistreri 2002)
 # Calibration point established (Hafstead, Williams, Chen 2019)
 @NLparameter(cge, u0[r in set[:r]] == 0);    # benchmark unemployment rate
@@ -190,6 +236,30 @@ end
 #@NLparameter(cge, w0[r in set[:r]] == value(inv0[r])+value(c0[r]));
 @NLparameter(cge, w0[r in set[:r]] == value(inv0[r])+value(z0[r]));
 #@NLparameter(cge, w0[r in set[:r]] == value(inv0[r])+value(c0[r]));
+
+# Energy-Nesting Benchmark parameters
+@NLparameter(cge, va_bar[r in set[:r], s in set[:s]] == value(ld0[r,s]) + value(kd0[r,s])); # bmk value-added
+@NLparameter(cge, fe_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:fe])); # bmk fossil-energy FE
+@NLparameter(cge, en_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:en])); # bmk energy EN
+@NLparameter(cge, ne_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:nne])); # bmk non-energy NNE
+@NLparameter(cge, vaen_bar[r in set[:r], s in set[:s]] == value(va_bar[r,s]) + value(en_bar[r,s])); # bmk value-added-energy vaen
+@NLparameter(cge, klem_bar[r in set[:r], s in set[:s]] == value(vaen_bar[r,s]) + value(ne_bar[r,s])); # bmk value-added-energy vaen
+
+# Energy-nesting
+@NLparameter(cge, theta_fe[r in set[:r], g in set[:fe], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(fe_bar[r,s])));
+@NLparameter(cge, theta_en[r in set[:r], g in set[:en], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(en_bar[r,s])));
+@NLparameter(cge, theta_ele[r in set[:r], s in set[:s]] == ensurefinite(sum(value(id0[r,g,s]) for g in set[:ele])/value(en_bar[r,s])));
+@NLparameter(cge, theta_ne[r in set[:r], g in set[:nne], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(ne_bar[r,s])));
+@NLparameter(cge, theta_va[r in set[:r], s in set[:s]] == ensurefinite(value(va_bar[r,s])/value(vaen_bar[r,s])));
+@NLparameter(cge, theta_kle[r in set[:r], s in set[:s]] == ensurefinite(value(vaen_bar[r,s])/value(klem_bar[r,s])));
+
+#Energy nesting substitution elasticities
+@NLparameter(cge, es_fe[s in set[:s]] == 0.5); #FE nest
+@NLparameter(cge, es_ele[s in set[:s]] == 0.1); # EN nest
+@NLparameter(cge, es_ve[s in set[:s]] == 0.5); # VAEN/KLE nest
+@NLparameter(cge, es_ne[s in set[:s]] == 0.5); # NE nest
+@NLparameter(cge, es_klem[s in set[:s]] == 0); # KLEM nest
+
 
 
 ################
@@ -244,6 +314,14 @@ lo = 0.0
 @variable(cge,LS[r in set[:r]] >= lo, start=(1-value(u0[r])));
 @variable(cge,PLS[r in set[:r]] >= lo, start=value(wref[r]));
 @variable(cge,U[r in set[:r]] >= lo, (start = value(u0[r]))); # Unemployment rate index
+
+# --- energy nesting variables ---
+@variables(cge, begin
+    PE[(r,s) in set[:PE]] >= lo, (start = 1) # Energy composite price
+    PVA[(r,s) in set[:PVA]] >= lo, (start = 1) # Value-added composite price
+    E[(r,s) in set[:PE]] >= lo, (start = (1-value(thetax))) # Energy index
+    VA[(r,s) in set[:PVA]] >= lo, (start = (1-value(thetax))) # Value-added index
+end);
 
 
 
@@ -346,6 +424,83 @@ lo = 0.0
     c0[r] * (CZ[r] / PC[r])^(es_z[r])
 );
 
+#---------- Energy-environment production nesting
+# !!!! Still need to add co2 emissions
+# !!!! Cautious of subsetting - definitionals may be needed to replace NLexpressions
+
+# Definitionals needed here
+# Unit cost function: Fossil-energy
+@NLexpression(cge,CFE[r in set[:r], s in set[:s]],
+    sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0))^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
+);
+
+# Unit cost function: Energy (ele + fe)
+@NLexpression(cge,CEN[r in set[:r], s in set[:s]],
+    (sum(theta_ele[r,s]*(haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0)^(1-es_ele[s]) for gg in set[:ele]) + (1-theta_ele[r,s])*CFE[r,s]^(1-es_ele[s]))^(1/(1-es_ele[s]))
+);
+
+# Unit cost function: Value-added + Energy
+@NLexpression(cge,CVE[r in set[:r], s in set[:s]],
+    (theta_va[r,s]*CVA[r,s]^(1-es_ve[s]) + (1-theta_va[r,s])*CEN[r,s]^(1-es_ve[s]))^(1/(1-es_ve[s]))
+);
+
+# Unit cost function: non-energy (materials)
+@NLexpression(cge,CNE[r in set[:r], s in set[:s]],
+    sum(theta_ne[r,g,s]*(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)^(1-es_ne[s]) for g in set[:nne])^(1/(1-es_ne[s]))
+);
+
+# # Unit cost function: Value-added/Energy + non-energy (materials)
+# @NLexpression(cge,CYM[r in set[:r], s in set[:s]],
+#     (theta_kle[r,s]*CVE[r,s]^(1-es_klem[s]) + (1-theta_kle[r,s])*CNE[r,s]^(1-es_klem[s]))^(1/(1-es_klem[s]))
+# );
+
+# # Unit cost function: klem + fixed resource factor (calibrated to supply elasticity)
+# @NLexpression(cge,CXE[r in set[:r], s in set[:s]],
+#     (theta_fr[r,s]*(haskey(PFR.lookup[1], (r,s)) ? PFR[(r,s)] : 1.0)^(1-es_fr[r,s]) + (1-theta_fr[r,s])*CYM[r,s]^(1-es_fr[r,s]))^(1/(1-es_fr[r,s]))
+# );
+
+# Demand function: non-energy (materials)
+@NLexpression(cge,IDA_ne[r in set[:r], g in set[:nne], s in set[:s]],
+    id0[r,g,s] * (CNE[r,s]/(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0))^(es_ne[s])
+);
+
+# Demand function: electricity
+@NLexpression(cge,IDA_ele[r in set[:r], g in set[:ele], s in set[:s]],
+    id0[r,g,s] * (CEN[r,s]/(haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0))^(es_ele[s])
+);
+
+# Demand function: fossil-energy
+@NLexpression(cge,IDA_fe[r in set[:r], g in set[:fe], s in set[:s]],
+    id0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CFE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)))^(es_fe[s])
+);
+
+# # Demand function: co2 emissions
+# @NLexpression(cge,IDA_co2[r in set[:r], g in set[:fe], s in set[:s]],
+#     idcb0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CVE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb))^es_fe[s]
+# );
+
+# Demand function: value-added composite
+@NLexpression(cge,IVA[r in set[:r], s in set[:s]],
+    (ld0[r,s]+kd0[r,s])*(CVE[r,s]/CVA[r,s])^(es_ve[s])
+#    va_bar[r,s]*(CVE[r,s]/CVA[r,s])^(es_ve[s])
+);
+
+# Demand function: energy composite
+@NLexpression(cge,IE[r in set[:r], s in set[:s]],
+    (sum(id0[r,g,s] for g in set[:en]))*(CVE[r,s]/CEN[r,s])^(es_ve[s])
+#    en_bar[r,s]*(CVE[r,s]/CEN[r,s])^(es_ve[s])
+);
+
+# # Demand function: fixed resource factor
+# @NLexpression(cge,AFR[r in set[:r], s in set[:s]],
+#     fr0[r,s]*(CXE[r,s]/(haskey(PFR.lookup[1], (r,s)) ? PFR[(r,s)] : 1.0))^(es_fr[r,s])
+# );
+
+# # Demand function: KLEM bundle (non-fixed resource)
+# @NLexpression(cge,IYM[r in set[:r], s in set[:s]],
+#     klem_bar[r,s]*(CXE[r,s]/CYM[r,s])^(es_fr[r,s])
+# );
+
 
 
 ###############################
@@ -353,19 +508,6 @@ lo = 0.0
 ###############################
 
 #----------
-#Recursive  --- update to Y
-@mapping(cge,profit_ym[(r, s) in set[:Y]],
-# cost of intermediate demand
-    sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
-# cost of labor inputs
-    + (PLS[r]/wref[r]) * ALym[r,s]
-# cost of capital inputs
-    + (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) * AKym[r,s]
-    -
-# revenue from sectoral supply (take note of r/s/g indices on ys0)
-    sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
-);
-
 @mapping(cge,profit_yx[(r, s) in set[:Y]],
 # cost of intermediate demand
     sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
@@ -377,6 +519,54 @@ lo = 0.0
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
     sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
 );
+
+#Recursive  --- update to Y
+# @mapping(cge,profit_ym[(r, s) in set[:Y]],
+# # cost of intermediate demand
+#     sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
+# # cost of labor inputs
+#     + (PLS[r]/wref[r]) * ALym[r,s]
+# # cost of capital inputs
+#     + (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) * AKym[r,s]
+#     -
+# # revenue from sectoral supply (take note of r/s/g indices on ys0)
+#     sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
+# );
+
+@mapping(cge,profit_ym[(r,s) in set[:Y]],
+# cost of value-added composite
+    (haskey(PVA.lookup[1], (r,s)) ? PVA[(r,s)] : 1.0)  * IVA[r,s]
+# cost of energy composite
+    + (haskey(PE.lookup[1], (r,s)) ? PE[(r,s)] : 1.0)  * IE[r,s]
+# cost of non-energy goods
+    + sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)  * IDA_ne[r,g,s] for g in set[:nne])
+    -
+# revenue from sectoral supply (take note of r/s/g indices on ys0)
+    sum((haskey(PY.lookup[1], (r,g)) ? PY[(r,g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
+);
+
+@mapping(cge,profit_va[(r,s) in set[:PVA]],
+# cost of labor
+    (PLS[r]/wref[r])*ALym[r,s]
+# cost of capital
+    + (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)*AKym[r,s]
+    -
+# revenue from value-added supply
+    (haskey(PVA.lookup[1], (r,s)) ? PVA[(r,s)] : 1.0)  * (ld0[r,s]+kd0[r,s])
+    # (haskey(PVA.lookup[1], (r,s)) ? PVA[(r,s)] : 1.0)  * va_bar[r,s]
+);
+
+@mapping(cge,profit_e[(r,s) in set[:PE]],
+# cost of electricity
+    sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * IDA_ele[r,g,s] for g in set[:ele])
+# cost of fossil energy
+    + sum(((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)) * IDA_fe[r,g,s] for g in set[:fe])
+    -
+# revenue from energy supply
+    (haskey(PE.lookup[1], (r,s)) ? PE[(r,s)] : 1.0)  * sum(id0[r,g,s] for g in set[:en])
+    # (haskey(PE.lookup[1], (r,s)) ? PE[(r,s)] : 1.0)  * en_bar[r,s]
+);
+
 
 #----------
 
@@ -482,7 +672,8 @@ lo = 0.0
     ks_m[r,s]
     -
 # mutable capital demand
-    (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AKym[r,s]
+#    (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * AKym[r,s]
+    (haskey(VA.lookup[1], (r, s)) ? VA[(r, s)] : 1.0) * AKym[r,s]
 );
 
 @mapping(cge,market_rkx[(r, s) in set[:PK]],
@@ -504,8 +695,11 @@ lo = 0.0
 # final demand
         + C[r] * CD[r,g]
 # intermediate demand
-        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
-        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
+#        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
+        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:nne]))
+        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_ele[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:ele]))
+        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_fe[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:fe]))
+        + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.0) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
     )
 );
 
@@ -518,6 +712,24 @@ lo = 0.0
     -
 # aggregate supply (akin to market demand)
     (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1) * s0[r,g]
+);
+
+@mapping(cge,market_pe[(r,s) in set[:PE]],
+# supply of energy composite
+    (haskey(E.lookup[1], (r,s)) ? E[(r,s)] : 1.0) * sum(id0[r,g,s] for g in set[:en])
+#    E[(r,s)]*en_bar[r,s]
+    -
+# demand for energy composite
+    (haskey(YM.lookup[1], (r,s)) ? YM[(r,s)] : 1.0) * IE[r,s]
+);
+
+@mapping(cge,market_pva[(r,s) in set[:PVA]],
+# supply of value-added composite
+    (haskey(VA.lookup[1], (r,s)) ? VA[(r,s)] : 1.0) * (ld0[r,s]+kd0[r,s])
+#    VA[(r,s)]*va_bar[r,s]
+    -
+# demand for value-added composite
+    (haskey(YM.lookup[1], (r,s)) ? YM[(r,s)] : 1.0) * IVA[r,s]
 );
 
 @mapping(cge,market_pls[r in set[:r]],
@@ -729,6 +941,13 @@ lo = 0.0
 # unemployment
 @complementarity(cge,def_U,U);
 
+# energy nesting
+@complementarity(cge,profit_e,E);
+@complementarity(cge,market_pe,PE);
+@complementarity(cge,profit_va,VA);
+@complementarity(cge,market_pva,PVA);
+
+
 ####################
 # -- Model Solve --
 ####################
@@ -738,6 +957,10 @@ PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cum
 
 # solve the model
 status = solveMCP(cge)
+
+for s in set[:s]
+    set_value(es_ve[s], 0.5);
+end
 
 #=
 # Pre-loop calculations

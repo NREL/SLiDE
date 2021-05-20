@@ -50,7 +50,7 @@ set[:oil] = ["oil"]                     # refined oil
 set[:cru] = ["cru"]                     # crude oil
 set[:gas] = ["gas"]                     # natural gas
 set[:col] = ["col"]                     # coal
-set[:en] = append!(set[:fe], set[:ele]) # energy goods
+set[:en] = vcat(set[:fe], set[:ele]) # energy goods
 set[:nfe] = setdiff(set[:g],set[:fe])   # non-fossil energy goods
 set[:nxe] = setdiff(set[:g],set[:xe])   # non-extractive goods
 set[:nele] = setdiff(set[:g],set[:ele]) # non-electricity goods
@@ -261,7 +261,7 @@ end
 # Energy-nesting
 @NLparameter(cge, theta_fe[r in set[:r], g in set[:fe], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(fe_bar[r,s])));
 @NLparameter(cge, theta_en[r in set[:r], g in set[:en], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(en_bar[r,s])));
-@NLparameter(cge, theta_ele[r in set[:r], s in set[:s]] == ensurefinite(sum(value(id0[r,g,s]) for g in set[:ele])/value(fe_bar[r,s])));
+@NLparameter(cge, theta_ele[r in set[:r], s in set[:s]] == ensurefinite(sum(value(id0[r,g,s]) for g in set[:ele])/value(en_bar[r,s])));
 @NLparameter(cge, theta_ne[r in set[:r], g in set[:nne], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(ne_bar[r,s])));
 @NLparameter(cge, theta_va[r in set[:r], s in set[:s]] == ensurefinite(value(va_bar[r,s])/value(vaen_bar[r,s])));
 @NLparameter(cge, theta_kle[r in set[:r], s in set[:s]] == ensurefinite(value(vaen_bar[r,s])/value(klem_bar[r,s])));
