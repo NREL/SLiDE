@@ -14,11 +14,11 @@ from the national- to regional-level.
 """
 function share_region(dataset::Dataset, d::Dict, set::Dict)
     step = "share"
-    d_read = read_build(set!(dataset; step=step))
+    d_read = SLiDE.read_build(SLiDE.set!(dataset; step=step))
 
     if dataset.step=="input"
-        print_status(SLiDE.set!(dataset; step=step))
-        filter_with!(d_read, set, dataset)
+        SLiDE.print_status(SLiDE.set!(dataset; step="share"))
+        SLiDE.filter_with!(d_read, set, dataset)
         merge!(d, d_read)
         
         # Add CFS regional sets for filtering.

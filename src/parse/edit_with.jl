@@ -587,21 +587,29 @@ This is helpful when preparing input for calculations during which units are pre
 # Returns
 
 """
-function _unstack(df::DataFrame, colkey::Symbol, value::Array{Symbol,1})
+function _unstack(df, colkey::Symbol, value::Vector{Symbol}; kwargs...)
     idx = setdiff(propertynames(df), [colkey;value])
-    lst = [_unstack(df[:,[idx;[colkey,val]]], colkey, val) for val in value]
+    lst = [_unstack(df[:,[idx;[colkey,val]]], colkey, val; kwargs...) for val in value]
     return indexjoin(lst...)
 end
 
-function _unstack(df::DataFrame, colkey::Symbol, value::Symbol)
-    return unstack(df, colkey, value; renamecols=x -> _add_id(value, x))
+
+function _unstack(df::DataFrame, colkey::Symbol, value::Symbol; fillmissing=false)
+    val = convert_type.(Symbol, unique(df[:,colkey]))
+    df = unstack(df, colkey, value; renamecols=x -> SLiDE._add_id(value, x))
+
+    println(fillmissing!==false)
+    fillmissing!==false && (df = edit_with(df, Replace.(val, missing, 0.0)))
+
+    return df
 end
 
-function _unstack(df::DataFrame, colkey::Array{Symbol,1}, value::Union{Symbol,Array{Symbol,1}})
+
+function _unstack(df, colkey::Vector{Symbol}, value::Union{Symbol,Vector{Symbol}}; kwargs...)
     df[!,:variable] .= append.(convert_type(Array{Tuple}, df[:,colkey]))
     df = select(df, Not(colkey))
 
-    return _unstack(df, :variable, value)
+    return _unstack(df, :variable, value; kwargs...)
 end
 
 

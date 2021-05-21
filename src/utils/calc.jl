@@ -105,14 +105,14 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `df::DataFrame` WITHOUT the specified column(s) argument. The resulting DataFrame will be
     'shorter' than the input DataFrame.
 """
-function combine_over(
-    df::DataFrame,
-    col::Array{Symbol,1};
+function combine_over(df::DataFrame, col::Array{Symbol,1};
     fun::Function=sum,
-    digits=SLiDE.DEFAULT_ROUND_DIGITS,
+    # digits=SLiDE.DEFAULT_ROUND_DIGITS,
+    digits=false,
 )
     # !!!! add kwarg to findvalue to indicate whether to include integers as values
     val = findvalue(df)
+
     if !isempty(val)
         idx_by = setdiff(propertynames(df), [col; val])
         
@@ -125,20 +125,22 @@ function combine_over(
         
         # !!!! See where we actually want to convert boolean sums to integers. I think it's just
         # in some labor sharing. We can probably keep summed booleans as integers. This seems less confusing.
-        [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
+        # [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
     end
     return df
 end
 
 
-function combine_over(
-    df::DataFrame,
-    col::Symbol;
-    fun::Function=sum,
-    digits=DEFAULT_ROUND_DIGITS,
-)
-    return combine_over(df, ensurearray(col); fun=fun, digits=digits)
-end
+# function combine_over(
+#     df::DataFrame,
+#     col::Symbol;
+#     fun::Function=sum,
+#     digits=DEFAULT_ROUND_DIGITS,
+# )
+#     return combine_over(df, ensurearray(col); fun=fun, digits=digits)
+# end
+
+combine_over(df, col::Symbol; kwargs...) = combine_over(df, ensurearray(col); kwargs...)
 
 combine_over(df, col::Any) = df
 
@@ -166,7 +168,8 @@ function transform_over(
     df::DataFrame,
     col::Array{Symbol,1};
     fun::Function=sum,
-    digits=SLiDE.DEFAULT_ROUND_DIGITS,
+    # digits=SLiDE.DEFAULT_ROUND_DIGITS,
+    digits = false,
 )
     cols_out = propertynames(df)
     val = findvalue(df)
@@ -184,14 +187,15 @@ function transform_over(
 end
 
 
-function transform_over(
-    df::DataFrame,
-    col::Symbol;
-    fun::Function=sum,
-    digits=SLiDE.DEFAULT_ROUND_DIGITS,
-)
-    return transform_over(df, ensurearray(col); fun=fun, digits=digits)
-end
+# function transform_over(
+#     df::DataFrame,
+#     col::Symbol;
+#     fun::Function=sum,
+#     # digits=SLiDE.DEFAULT_ROUND_DIGITS,
+# )
+#     return transform_over(df, ensurearray(col); fun=fun, digits=digits)
+# end
+SLiDE.transform_over(df, col::Symbol; kwargs...) = transform_over(df, ensurearray(col); kwargs...)
 
 transform_over(df, col::Any) = df
 

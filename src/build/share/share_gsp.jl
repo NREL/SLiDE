@@ -4,7 +4,7 @@
 function share_labor!(d::Dict, set::Dict)
     print_status(:labor, [:yr,:r,:s], "labor share")
 
-    !(:region in collect(keys(d))) && share_region!(d, set)
+    !haskey(d,:region) && share_region!(d, set)
     _share_lshr0!(d, set)
 
     cols = propertynames(d[:region])
@@ -59,14 +59,10 @@ end
 """
 function share_region!(d::Dict, set::Dict)
     print_status(:region, [:yr,:r,:s], "regional share of value added")
-    :gdpcat in propertynames(d[:gsp]) && _share_gsp!(d, set)
 
-    cols = [findindex(d[:gsp]); :value]
-    df = edit_with(copy(d[:gsp]), Rename(:gdp, :value))[:,cols]
+    # SLiDE._share_gsp!(d)
+    df = select(rename(SLiDE._share_gsp!(d), :gdp=>:value), [findindex(df);:value])
     df = df / transform_over(df, :r)
-    
-    # JUST IN CASE we switch back to g here..
-    s = intersect(cols, [:s,:g])[1]
     
     # Let the used and scrap sectors be an average of other sectors.
     # These are the only sectors that have NaN values.
@@ -94,19 +90,19 @@ Calculate factor totals:
 \\end{aligned}
 ```
 """
-function _share_gsp!(d::Dict, set::Dict)
-    df = copy(d[:gsp])
-    :gdpcat in propertynames(d[:gsp]) && (df = unstack(dropzero(d[:gsp]), :gdpcat, :value))
-    
-    df = edit_with(df, Replace.(Symbol.(set[:gdpcat]), missing, 0.0))
+function _share_gsp!(d::Dict)
+    if :gdpcat in propertynames(d[:gsp])
+        df = _unstack(d[:gsp], :gdpcat, :value; fillmissing=0.0)
 
-    df[!,:sudo] .= df[:,:gdp] - df[:,:taxsbd]
-    df[!,:comp] .= df[:,:cmp] + df[:,:gos]
+        df[!,:sudo] .= df[:,:gdp] - df[:,:taxsbd]
+        df[!,:comp] .= df[:,:cmp] + df[:,:gos]
 
-    df[!,:calc] .= df[:,:cmp] + df[:,:gos] + df[:,:taxsbd]
-    df[!,:diff] .= df[:,:calc] - df[:,:gdp]
+        df[!,:calc] .= df[:,:cmp] + df[:,:gos] + df[:,:taxsbd]
+        df[!,:diff] .= df[:,:calc] - df[:,:gdp]
 
-    d[:gsp] = df
+        d[:gsp] = df
+    end
+    return d[:gsp]
 end
 
 

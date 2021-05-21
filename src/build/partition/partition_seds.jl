@@ -42,7 +42,7 @@ function partition_seds(dataset::Dataset, d::Dict, set::Dict)
 
         # Drop units if they're not used later.
         [select!(d[k], Not(:units)) for k in [:ed0,:emarg0,:ned0,:trdele,:pctgen,:netgen]]
-        write_build!(SLiDE.set!(dataset; step=step), copy(d))
+        write_build!(set!(dataset; step=step), copy(d))
     else
         merge!(d, d_read)
         set_sector!(set, d)
@@ -270,15 +270,15 @@ function _partition_cprice!(d::Dict, set::Dict, maps::Dict)
     )
     df[!,:value] .= df[:,:factor] .* df[:,:usd_per_barrel] ./ df[:,:btu_per_barrel]
     
-    df = operation_output(df)
+    operation_output!(df)
 
-    # (2) Impute to fill missing values.
+    # (2) Impute to fill missing values. Doing so will add index 'sec' to df_avg.
+    # After imputation, map df across all sec=demsec.
     idx = filter_with(d[:seds], (src="cru", sec=set[:demsec], pq="q"); drop=:pq)[:,1:end-2]
-    
-    df_avg, df = impute_mean(df, :r; condition=idx)
-    df = crossjoin(df, DataFrame(sec=set[:demsec]))
-    d[:cprice] = vcat(df_avg, df)
+    idxadd = DataFrame(sec=set[:demsec])
 
+    d[:cprice] = impute_mean(df, :r; condition=idx, add=idxadd)
+    
     print_status(:cprice, d, "crude oil price")
     return d[:cprice]
 end
@@ -323,20 +323,18 @@ function _partition_pedef!(d::Dict, set::Dict, maps::Dict)
     splitter = DataFrame(permute((src=[set[:ff];"ele"], sec=set[:demsec], pq=["p","q"])))
     splitter = indexjoin(splitter, maps[:pq]; kind=:left)
 
-    df, df_out = split_fill_unstack(copy(d[:energy]), splitter, var, val);
+    df, df_out = split_fill_unstack(copy(d[:energy]), splitter, var, val; units=:p)
 
     df[!,:pq] .= df[:,:p] .* df[:,:q]
-    
     df = combine_over(df,:sec)
+
     df[!,:value] .= df[:,:pq] ./ df[:,:q]
-    df[!,:units] .= df[:,:units_p]
     
     # For missing or NaN results, replace with the average. NaN values are a result of an
     # aggregate q = 0 (stored here in pedef), so use this to identify.
     idx = intersect(findindex(df), propertynames(df_out))
-    df_avg, df = SLiDE.impute_mean(df[:,[idx;:value]], :r; weight=df[:,[idx;:q]])
 
-    d[:pedef] = sort(vcat(df_avg, df; cols=:intersect))
+    d[:pedef] = SLiDE.impute_mean(df[:,[idx;:value]], :r; weight=df[:,[idx;:q]])
 
     print_status(:pedef, d, "average energy demand price")
     return d[:pedef]
@@ -370,12 +368,7 @@ function _partition_pe0!(d::Dict, set::Dict, maps::Dict)
     # Use average energy demand prices where available.
     df_p = filter_with(d[:energy], (sec=set[:demsec], pq="p",); drop=true)
     df_pedef = crossjoin(d[:pedef], DataFrame(sec=set[:demsec]))
-    
-    # !!!! Improvement to indexjoin where if fillmissing does some kind of column indicating,
-    # (:pedef => :p could mean fill missing values in p with values from pedef --
-    # I really like this approach)
-    df = indexjoin(df_p, df_pedef; id=[:value,:pedef], fillmissing=false)
-    df = edit_with(df, Replace(:value, missing, "pedef value"))
+    df = indexjoin(df_p, df_pedef; id=[:value,:pedef], fillmissing=:value=>:pedef)
     
     # Use annual EIA data for crude oil averages.
     df_cprice = SLiDE._partition_cprice!(d, set, maps)
@@ -483,16 +476,13 @@ function _partition_shrgas!(d::Dict)
     df = copy(d[:prodval])
     df = df / transform_over(df, :src)
 
-    # Use ys0 to determine which indices to keep.
+    # Use ys0 to determine which indices to keep (those present for ys0 but not for prodval)
     idx_ys0 = crossjoin(
         filter_with(combine_over(d[:ys0], :g), (s="cng",); drop=true)[:,1:end-1],
         DataFrame(src=unique(df[:,:src])),
     )
     
-    # Define indices where we need to calculate an average (that present for ys0 but not for
-    # prodval), calculate REGIONAL average, and apply that to the determined index.
-    df_avg, df = SLiDE.impute_mean(df, :r; condition=idx_ys0)
-    df = vcat(df, df_avg)
+    df = impute_mean(df, :r; condition=idx_ys0)
 
     # Ensure all SECTORAL shares sum to one.
     df = df / combine_over(df, :src)
@@ -541,7 +531,8 @@ function _partition_netgen!(d::Dict, maps::Dict)
         units=maps[:operate],
     )
     df[!,:value] .= df[:,:factor] .* df[:,:usd_per_kwh] .* df[:,:kwh]
-    SLiDE.operation_output!(df)
+
+    operation_output!(df)
 
     # (2) Calculate for IO data.
     df_nd0 = filter_with(d[:nd0], (g="ele",); drop=true)
@@ -550,11 +541,11 @@ function _partition_netgen!(d::Dict, maps::Dict)
 
     # (3) Label the data by its source and concatenate.
     df_seds = edit_with(df, Add(:dataset,"seds"))
-    df_io = edit_with(df_io, [Add(:dataset,"io"), Add(:units, USD)])
+    df_io = edit_with(df_io, [Add(:dataset,"io"), Add(:units,USD)])
 
     d[:netgen] = vcat(df_seds, df_io)
 
-    SLiDE.print_status(:netgen, d, "net interstate electricity flow")
+    print_status(:netgen, d, "net interstate electricity flow")
     return d[:netgen]
 end
 
