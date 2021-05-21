@@ -38,6 +38,7 @@ cge = MCPModel();
 ##############
 
 swunemp = 0
+swcarb = 1
 
 # Set description
 #set[:s] -> sectors
@@ -260,6 +261,15 @@ end
 @NLparameter(cge, es_ne[s in set[:s]] == 0.5); # NE nest
 @NLparameter(cge, es_klem[s in set[:s]] == 0); # KLEM nest
 
+# co2 emissions
+#co2 emissions --- Converted to billion tonnes of co2
+#so that model carbon prices interpreted in $/tonnes
+@NLparameter(cge, idcb0[r in set[:r], g in set[:g], s in set[:s]] == sld[:secco2][r,g,s,"million metric tons of carbon dioxide"]*1e-3); # industrial/sectoral demand for co2
+@NLparameter(cge, cdcb0[r in set[:r], g in set[:g]] == sld[:resco2][r,g,"million metric tons of carbon dioxide"]*1e-3);  # final demand for co2
+@NLparameter(cge, cb0[r in set[:r]] == sum((sum(value(idcb0[r,g,s]) for s in set[:s]) + value(cdcb0[r,g])) for g in set[:g]));  # supply of co2
+@NLparameter(cge, carb0[r in set[:r]] == value(cb0[r]));  # co2 endowment
+@NLparameter(cge, idcco2[r in set[:r], g in set[:g], s in set[:s]] == ensurefinite(value(idcb0[r,g,s])/value(id0[r,g,s])));
+@NLparameter(cge, cdcco2[r in set[:r], g in set[:g]] == ensurefinite(value(cdcb0[r,g])/value(cd0[r,g])));
 
 
 ################
@@ -323,7 +333,12 @@ lo = 0.0
     VA[(r,s) in set[:PVA]] >= lo, (start = (1-value(thetax))) # Value-added index
 end);
 
-
+# --- co2 emissions ---
+@variables(cge, begin
+    PCO2 >= lo, (start = 1e-6) # CO2 factor price
+    PDCO2[r in set[:r]] >= lo, (start = 1e-6) # Effective CO2 price
+    CO2[r in set[:r]] >= lo, (start = value(cb0[r])) # CO2 emissions supply
+end);
 
 ###############################
 # -- PLACEHOLDER VARIABLES --
@@ -389,12 +404,12 @@ end);
 #---------- Final Consumption
 # Unit cost function for final consumption
 @NLexpression(cge,CC[r in set[:r]],
-    sum(theta_cd[r,g]*((haskey(PA.lookup[1], (r, g)) ? PA[(r,g)] : 1.0))^(1-es_cd[r]) for g in set[:g])^(1/(1-es_cd[r]))
+    sum(theta_cd[r,g]*((haskey(PA.lookup[1], (r, g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*cdcco2[r,g]*swcarb)^(1-es_cd[r]) for g in set[:g])^(1/(1-es_cd[r]))
 );
 
 # final demand for goods in consumption
 @NLexpression(cge,CD[r in set[:r],g in set[:g]],
-    cd0[r,g]* (CC[r] / ((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)))^es_cd[r]
+    cd0[r,g]* (CC[r] / ((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) + PDCO2[r]*cdcco2[r,g]*swcarb))^es_cd[r]
 );
 
 # #alternate
@@ -431,7 +446,7 @@ end);
 # Definitionals needed here
 # Unit cost function: Fossil-energy
 @NLexpression(cge,CFE[r in set[:r], s in set[:s]],
-    sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0))^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
+    sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0) + PDCO2[r]*idcco2[r,gg,s]*swcarb)^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
 );
 
 # Unit cost function: Energy (ele + fe)
@@ -471,7 +486,7 @@ end);
 
 # Demand function: fossil-energy
 @NLexpression(cge,IDA_fe[r in set[:r], g in set[:fe], s in set[:s]],
-    id0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CFE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)))^(es_fe[s])
+    id0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CFE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb))^(es_fe[s])
 );
 
 # # Demand function: co2 emissions
@@ -510,7 +525,7 @@ end);
 #----------
 @mapping(cge,profit_yx[(r, s) in set[:Y]],
 # cost of intermediate demand
-    sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
+    sum(((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb) * id0[r,g,s] for g in set[:g])
 # cost of labor inputs
     + (PLS[r]/wref[r]) * ld0[r,s]
 # cost of capital inputs
@@ -560,7 +575,7 @@ end);
 # cost of electricity
     sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * IDA_ele[r,g,s] for g in set[:ele])
 # cost of fossil energy
-    + sum(((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)) * IDA_fe[r,g,s] for g in set[:fe])
+    + sum(((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb) * IDA_fe[r,g,s] for g in set[:fe])
     -
 # revenue from energy supply
     (haskey(PE.lookup[1], (r,s)) ? PE[(r,s)] : 1.0)  * sum(id0[r,g,s] for g in set[:en])
@@ -604,7 +619,7 @@ end);
 
 @mapping(cge, profit_c[r in set[:r]],
 # costs of inputs - computed as final demand times regional market prices
-    sum(((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)) * CD[r,g] for g in set[:g])
+    sum(((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) + PDCO2[r]*cdcco2[r,g]*swcarb) * CD[r,g] for g in set[:g])
     -
 # revenues/benefit computed as CPI * reference consumption
     PC[r] * c0[r]
@@ -659,6 +674,11 @@ end);
     PM[r,m] * sum(md0[r,m,gm] for gm in set[:gm])
 );
 
+@mapping(cge,profit_co2[r in set[:r]],
+    (PCO2 + (carb0[r]==0 ? PC[r] : 0.0)*1e-6)
+    -
+    PDCO2[r]
+);
 
 ###################################
 # -- Market Clearing Conditions --
@@ -832,6 +852,21 @@ end);
     sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] for r in set[:r] for g in set[:g] if (r,g) in set[:A])
 );
 
+@mapping(cge,market_pdco2[r in set[:r]],
+    CO2[r]
+    - (
+        sum((haskey(YX.lookup[1], (r,s)) ? YX[(r,s)] : 1.0) * id0[r,g,s] * idcco2[r,g,s] for g in set[:g], s in set[:s])
+        + sum((haskey(E.lookup[1], (r,s)) ? E[(r,s)] : 1.0) * IDA_fe[r,g,s] * idcco2[r,g,s] for g in set[:fe], s in set[:s])
+        + sum(C[r]*CD[r,g]*cdcco2[r,g] for g in set[:g])
+    )
+);
+
+@mapping(cge,market_pco2,
+    sum(carb0[r] for r in set[:r])
+    -
+    sum(CO2[r] for r in set[:r])
+);
+
 
 #----------
 #Income balance update for recursive dynamics
@@ -860,6 +895,8 @@ end);
 # production taxes - assumes lumpsum recycling
         + sum( (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ys0[r,s,g] * ty[r,s] for s in set[:s], g in set[:g])
         + sum( (haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ys0[r,s,g] * ty[r,s] for s in set[:s], g in set[:g])
+# co2 endowment
+        + PCO2 * carb0[r] * swcarb
     )
 );
 
@@ -947,6 +984,12 @@ end);
 @complementarity(cge,profit_va,VA);
 @complementarity(cge,market_pva,PVA);
 
+# co2 emissions
+@complementarity(cge,profit_co2,CO2);
+@complementarity(cge,market_pdco2,PDCO2);
+@complementarity(cge,market_pco2,PCO2);
+
+
 
 ####################
 # -- Model Solve --
@@ -958,9 +1001,9 @@ PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cum
 # solve the model
 status = solveMCP(cge)
 
-for s in set[:s]
-    set_value(es_ve[s], 0.5);
-end
+# for s in set[:s]
+#     set_value(es_ve[s], 0.5);
+# end
 
 #=
 # Pre-loop calculations
