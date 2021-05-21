@@ -37,7 +37,7 @@ cge = MCPModel();
 # SETS
 ##############
 
-swunemp = 0
+swunemp = 1
 swcarb = 1
 
 # Set description
@@ -310,7 +310,7 @@ lo = 0.0
 
 # commodities
 @variable(cge,RKX[(r,s) in set[:PK]] >= lo, start = 1); # Return to extant capital
-@variable(cge,RK[(r,s) in set[:PK]] >= lo, start = 1); # Return to regional capital
+@variable(cge,RK[(r,s) in set[:PK]] >= lo, start = 1); # Return to mutable capital
 @variable(cge,PINV[r in set[:r]] >= lo, start = 1); # Investment price index
 @variable(cge,PW[r in set[:r]] >= lo, start = 1); # Welfare price index
 
@@ -456,7 +456,7 @@ end);
 
 # Unit cost function: Value-added + Energy
 @NLexpression(cge,CVE[r in set[:r], s in set[:s]],
-    (theta_va[r,s]*CVA[r,s]^(1-es_ve[s]) + (1-theta_va[r,s])*CEN[r,s]^(1-es_ve[s]))^(1/(1-es_ve[s]))
+    (theta_va[r,s]*CVAym[r,s]^(1-es_ve[s]) + (1-theta_va[r,s])*CEN[r,s]^(1-es_ve[s]))^(1/(1-es_ve[s]))
 );
 
 # Unit cost function: non-energy (materials)
@@ -496,7 +496,7 @@ end);
 
 # Demand function: value-added composite
 @NLexpression(cge,IVA[r in set[:r], s in set[:s]],
-    (ld0[r,s]+kd0[r,s])*(CVE[r,s]/CVA[r,s])^(es_ve[s])
+    (ld0[r,s]+kd0[r,s])*(CVE[r,s]/CVAym[r,s])^(es_ve[s])
 #    va_bar[r,s]*(CVE[r,s]/CVA[r,s])^(es_ve[s])
 );
 
