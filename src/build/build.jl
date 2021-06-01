@@ -266,7 +266,7 @@ function write_build!(dataset::Dataset, d::Dict)
             [write_build(path, k, v) for (k,v) in d_write]
         end
     end
-
+    
     # sets s, g would have been filtered out when writing, but we want to make sure they are
     # defined for subsequent steps.
     if dataset.step==SET_DIR

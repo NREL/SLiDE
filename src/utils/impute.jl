@@ -51,7 +51,7 @@ function impute_mean(df, col; weight=DataFrame(), condition=DataFrame(), add=Dat
         else
             combine_over(df * weight, col) / combine_over(weight, col)
         end
-
+        
         dfavg = indexjoin(condition, dfavg; kind=kind)
     end
 
@@ -60,4 +60,23 @@ function impute_mean(df, col; weight=DataFrame(), condition=DataFrame(), add=Dat
     !isempty(add) && (df = crossjoin(df, add))
 
     return vcat(dfavg, df; cols=:intersect)
+end
+
+
+"""
+"""
+function split_condition(df::DataFrame, value=NaN)
+    condition, df = split_with(df, (value=value,))
+    condition = condition[:, findindex(condition)]
+    return condition, df, :inner
+end
+
+function split_condition(df::DataFrame, condition::DataFrame, args...)
+    if isempty(condition)
+        return split_condition(df, args...)
+    else
+        idx = intersect(findindex(df), propertynames(condition))
+        condition = antijoin(condition, df, on=idx)
+        return select(condition,idx), df, :outer
+    end
 end

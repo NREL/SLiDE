@@ -27,7 +27,7 @@ function share_region(dataset::Dataset, d::Dict, set::Dict)
         SLiDE.share_pce!(d)
         SLiDE.share_sgf!(d)
         SLiDE.share_utd!(d, set)
-        SLiDE.share_region!(d, set)
+        SLiDE.share_gdp!(d, set)
         SLiDE.share_labor!(d, set)
         SLiDE.share_rpc!(d, set)
 
