@@ -26,7 +26,7 @@ function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
             (:yr,:r,:g) => fill_with((yr=set[:yr], r=set[:r], g=set[:g]), 1.0),
         ))
 
-        d[:region] = edit_with(d[:region], Rename(:g,:s))
+        d[:gdp] = edit_with(d[:gdp], Rename(:g,:s))
         _disagg_ys0!(d)
         _disagg_id0!(d)
         _disagg_ty0!(d, set)
@@ -34,7 +34,7 @@ function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
         _disagg_ld0!(d, set)
         _disagg_kd0!(d)
         
-        d[:region] = edit_with(d[:region], Rename(:s,:g))
+        d[:gdp] = edit_with(d[:gdp], Rename(:s,:g))
         _disagg_fdcat!(d)
         _disagg_g0!(d)
         _disagg_i0!(d)
@@ -90,7 +90,7 @@ end
 """
 function _disagg_ys0!(d::Dict)
     if !(:r in propertynames(d[:ys0]))
-        d[:ys0] = d[:region] * d[:ys0]
+        d[:ys0] = d[:gdp] * d[:ys0]
         print_status(:ys0, d, "regional sectoral output")
     end
     return d[:ys0]
@@ -106,7 +106,7 @@ end
 """
 function _disagg_id0!(d::Dict)
     if !(:r in propertynames(d[:id0]))
-        d[:id0] = d[:region] * d[:id0]
+        d[:id0] = d[:gdp] * d[:id0]
 
         print_status(:id0, d, "regional intermediate demand")
     end
@@ -129,7 +129,7 @@ function _disagg_ty0!(d::Dict, set::Dict)
 
     idx = findindex(d[:va0])
     
-    ty0_rev = d[:region] * d[:va0][:,[idx;:othtax]]
+    ty0_rev = d[:gdp] * d[:va0][:,[idx;:othtax]]
     d[:ty0] = dropnan(ty0_rev / combine_over(d[:ys0], :g))
 
     print_status(:ty0, d, "production tax rate")
@@ -151,7 +151,7 @@ function _disagg_va0!(d::Dict, set::Dict)
         idx = findindex(d[:va0])
         
         df = d[:va0][:,[idx;:compen]] + d[:va0][:,[idx;:surplus]]
-        d[:va0] = d[:region] * df
+        d[:va0] = d[:gdp] * df
 
         print_status(:va0, d, "regional share of value added")
     end
@@ -238,7 +238,7 @@ function _disagg_i0!(d::Dict)
     _disagg_fdcat!(d)
     
     df = filter_with(d[:fd0], (fd="I",); drop = true)
-    d[:i0] = d[:region] * df
+    d[:i0] = d[:gdp] * df
 
     print_status(:i0, d, "national investment demand")
     return d[:i0]
@@ -288,7 +288,7 @@ end
 """
 function _disagg_yh0!(d::Dict)
     d[:yh0] = if !haskey(d, :diff)
-        d[:region] * d[:fs0]
+        d[:gdp] * d[:fs0]
     else
         d[:yh0] + d[:diff]
     end
@@ -325,7 +325,7 @@ function _disagg_x0!(d::Dict, set::Dict)
         _set_notrd!(set, d)
 
         df_exports = filter_with(d[:utd], (t="exports",); drop = true)
-        df_region = filter_with(d[:region], (g=set[:notrd],))
+        df_region = filter_with(d[:gdp], (g=set[:notrd],))
 
         df_trd = dropmissing(df_exports * d[:x0])
         df_notrd = dropmissing(df_region * d[:x0])
@@ -354,7 +354,7 @@ function _disagg_s0!(d::Dict)
         d[:s0] + d[:diff]
     end
 
-    print_status(:s0, d, "total supply")
+    SLiDE.print_status(:s0, d, "total supply")
     return dropmissing!(d[:s0])
 end
 
@@ -534,7 +534,9 @@ function _disagg_bop!(d::Dict)
 end
 
 
-"`gm`: Commodities employed in margin supply"
+"""
+`gm`, commodities employed in margin supply
+"""
 function set_gm!(set::Dict, d::Dict)
     idx = setdiff(findindex(d[:md0]), ensurearray(find_sector(d[:md0])))
 
@@ -581,10 +583,10 @@ end
 
 
 "`dd0min(yr,r,g)`, minimum regional demand from local market"
-_disagg_dd0min(d::Dict) = d[:pt0] - d[:dd0max]
+_disagg_dd0min(d::Dict) = d[:pt0] - d[:nd0max]
 
 "`nd0min(yr,r,g)`, minimum regional demand from national market"
-_disagg_nd0min(d::Dict) = d[:pt0] - d[:nd0max]
+_disagg_nd0min(d::Dict) = d[:pt0] - d[:dd0max]
 
 
 """
