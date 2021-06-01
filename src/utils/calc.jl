@@ -97,7 +97,7 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `col::Symbol` or `col::Array{Symbol,1}`: column(s) over which to operate.
 
 # Keywords
-- `operation::Function = sum`: Operation to perform over the DataFrame columns. By default,
+- `operation::Function=sum`: Operation to perform over the DataFrame columns. By default,
     the function will return a summation. Other standard summary functions include: `sum`,
     `prod`, `minimum`, `maximum`, `mean`, `var`, `std`, `first`, `last` and `length`.
 
@@ -105,40 +105,17 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `df::DataFrame` WITHOUT the specified column(s) argument. The resulting DataFrame will be
     'shorter' than the input DataFrame.
 """
-function combine_over(df::DataFrame, col::Array{Symbol,1};
-    fun::Function=sum,
-    # digits=SLiDE.DEFAULT_ROUND_DIGITS,
-    digits=false,
-)
-    # !!!! add kwarg to findvalue to indicate whether to include integers as values
+function combine_over(df::DataFrame, col::Array{Symbol,1}; fun::Function=sum, kwargs...)
     val = findvalue(df)
 
     if !isempty(val)
-        idx_by = setdiff(propertynames(df), [col; val])
-        
-        df = combine(groupby(df, idx_by), val .=> fun .=> val)
-        
-        if digits!==false
-            [df[!,ii] .= SLiDE.round.(df[:,ii]; digits=digits)
-                for ii in find_oftype(df[:,val], AbstractFloat)]
-        end
-        
-        # !!!! See where we actually want to convert boolean sums to integers. I think it's just
-        # in some labor sharing. We can probably keep summed booleans as integers. This seems less confusing.
-        # [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
+        idx = setdiff(propertynames(df), [col; val])    
+        df = combine(groupby(df, idx), val .=> fun .=> val)
+        round!(df; kwargs...)
     end
+    
     return df
 end
-
-
-# function combine_over(
-#     df::DataFrame,
-#     col::Symbol;
-#     fun::Function=sum,
-#     digits=DEFAULT_ROUND_DIGITS,
-# )
-#     return combine_over(df, ensurearray(col); fun=fun, digits=digits)
-# end
 
 combine_over(df, col::Symbol; kwargs...) = combine_over(df, ensurearray(col); kwargs...)
 
@@ -156,7 +133,7 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `col::Symbol` or `col::Array{Symbol,1}`: column(s) over which to operate.
 
 # Keywords
-- `operation::Function = sum`: Operation to perform over the DataFrame columns. By default,
+- `operation::Function=sum`: Operation to perform over the DataFrame columns. By default,
     the function will return a summation. Other standard summary functions include: `sum`,
     `prod`, `minimum`, `maximum`, `mean`, `var`, `std`, `first`, `last` and `length`.
 
@@ -164,38 +141,17 @@ to the input DataFrame `df` over the input column(s) `col`.
 - `df::DataFrame` WITH the specified column(s) argument. The resulting DataFrame will be
     the same length as the input DataFrame.
 """
-function transform_over(
-    df::DataFrame,
-    col::Array{Symbol,1};
-    fun::Function=sum,
-    # digits=SLiDE.DEFAULT_ROUND_DIGITS,
-    digits = false,
-)
-    cols_out = propertynames(df)
+function transform_over(df::DataFrame, col::Array{Symbol,1}; fun::Function=sum, kwargs...)
+    cols = propertynames(df)
     val = findvalue(df)
-    idx_by = setdiff(propertynames(df), [col; val])
+    idx = setdiff(propertynames(df), [col; val])
 
-    df = transform(groupby(df, idx_by), val .=> fun .=> val)
+    df = transform(groupby(df, idx), val .=> fun .=> val)
 
-    if digits!==false
-        [df[!,ii] .= round.(df[:,ii]; digits=digits)
-            for ii in find_oftype(df[:,val], AbstractFloat)]
-    end
-
-    [df[!,ii] .= convert_type.(Float64, df[:,ii]) for ii in find_oftype(df[:,val], Int)]
-    return df[:,cols_out]
+    return round!(select(df, cols); kwargs...)
 end
 
-
-# function transform_over(
-#     df::DataFrame,
-#     col::Symbol;
-#     fun::Function=sum,
-#     # digits=SLiDE.DEFAULT_ROUND_DIGITS,
-# )
-#     return transform_over(df, ensurearray(col); fun=fun, digits=digits)
-# end
-SLiDE.transform_over(df, col::Symbol; kwargs...) = transform_over(df, ensurearray(col); kwargs...)
+transform_over(df, col::Symbol; kwargs...) = transform_over(df, ensurearray(col); kwargs...)
 
 transform_over(df, col::Any) = df
 
@@ -210,17 +166,16 @@ number of digits.
     all columns of type `AbstractFloat` will be rounded.
 
 # Keywords
-- `digits::Int = 10`: Number of decimal places to keep when rounding
+- `digits::Int=10`: Number of decimal places to keep when rounding
 """
-function round!(df::DataFrame; digits::Int = DEFAULT_ROUND_DIGITS)
-    return round!(df, find_oftype(df, AbstractFloat); digits = digits)
-end
-
-
-function round!(df::DataFrame, col::Union{Symbol,Array{Symbol,1}}; digits::Int = DEFAULT_ROUND_DIGITS)
-    df[!,col] .= round.(df[:,col]; digits = digits)
+function round!(df::DataFrame, col::Union{Symbol,Vector{Symbol}}; digits=DEFAULT_ROUND_DIGITS)
+    if digits!==false && !isempty([col;])
+        df[!,col] .= round.(df[:,col]; digits=digits)
+    end
     return df
 end
+
+round!(df; kwargs...) = round!(df, find_oftype(df, AbstractFloat); kwargs...)
 
 
 """

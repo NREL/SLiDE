@@ -598,9 +598,8 @@ function _unstack(df::DataFrame, colkey::Symbol, value::Symbol; fillmissing=fals
     val = convert_type.(Symbol, unique(df[:,colkey]))
     df = unstack(df, colkey, value; renamecols=x -> SLiDE._add_id(value, x))
 
-    println(fillmissing!==false)
     fillmissing!==false && (df = edit_with(df, Replace.(val, missing, 0.0)))
-
+    
     return df
 end
 
