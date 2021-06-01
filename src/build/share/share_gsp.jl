@@ -83,7 +83,7 @@ with
 - ``\\theta^{labor\\star}`` calculated  by [`SLiDE.condition_wg`](@ref)
 - ``\\theta^{labor\\star}_{\\bullet,r,s}`` calculated  by [`SLiDE.condition_hw`](@ref)
 """
-function SLiDE.share_labor!(d::Dict, set::Dict)
+function share_labor!(d::Dict, set::Dict)
     if !haskey(d,:labor)
         df = copy(SLiDE._share_gsp!(d))
         df[!,:value] .= df[:,:cmp] ./ df[:,:comp]
