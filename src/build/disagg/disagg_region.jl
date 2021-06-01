@@ -14,7 +14,7 @@ introduces new parameters.
 """
 function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
     step = PARAM_DIR
-    d_read = read_build(set!(dataset; step=step))
+    d_read = read_build(set!(dataset; step=PARAM_DIR))
     
     set_gm!(set, d)
 
@@ -354,7 +354,7 @@ function _disagg_s0!(d::Dict)
         d[:s0] + d[:diff]
     end
 
-    SLiDE.print_status(:s0, d, "total supply")
+    print_status(:s0, d, "total supply")
     return dropmissing!(d[:s0])
 end
 
@@ -465,7 +465,7 @@ end
 """
 function _disagg_dc0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     d[:dc0] = dropmissing((d[:s0] - d[:x0] + d[:rx0]))
-    round_digits!==false && (d[:dc0] = round!(d[:dc0], :value; digits=round_digits))
+    round!(d[:dc0], :value; digits=round_digits)
     return d[:dc0]
 end
 
@@ -485,7 +485,7 @@ function _disagg_pt0(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     df_ptm0 = dropmissing(((d[:yr,:r,:g] + d[:tm0]) * d[:m0]) + combine_over(d[:md0], :m))
 
     df = df_pta0 - df_ptm0
-    (round_digits !== false) && round!(df, :value; digits = round_digits)
+    round!(df, :value; digits=round_digits)
     return df
 end
 
@@ -616,8 +616,7 @@ function _disagg_nd0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     df_pt0 = _disagg_pt0(d; round_digits=false)
     
     d[:nd0] = df_pt0 - d[:dd0]
-
-    round_digits!==false && (d[:nd0] = round!(d[:nd0], :value; digits=round_digits))
+    round!(d[:nd0], :value; digits=round_digits)
 
     print_status(:nd0, d, "regional demand from national market")
     return d[:nd0]

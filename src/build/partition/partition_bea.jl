@@ -104,7 +104,7 @@ Treat negative inputs as outputs:
 ```
 """
 function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary,
-    swap_ys0::Bool=true,
+    swap_ys0::Bool=false,
 )
     println("  id0(yr,g,s) and ys0(yr,s,g), supply/demand data")
     d[:id0] = filter_with(d[:use], set)

@@ -1,5 +1,5 @@
 """
-    share_region(d::Dict, set::Dict; save_build = true, overwrite = false)
+    share_region(d::Dict, set::Dict)
 This function partitions BEA and Census Bureau data to use when disaggregating parameters
 from the national- to regional-level.
 

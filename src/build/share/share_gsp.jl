@@ -60,10 +60,10 @@ Labor shares that are still undefined are calculated:
 
 ```math
 \\begin{aligned}
-\\bar{\\theta}^{labor}_{\\bullet, r,s} &= \\dfrac{1}{N_{\\bullet, r, s}} \\sum_{yr}
+\\theta^{labor}_{\\bullet, r,s} &= \\dfrac{1}{N_{\\bullet, r, s}} \\sum_{yr}
     \\left\\{ \\theta^{labor}_{yr,r,s} \\;\\vert\\; (yr,r,s) \\;\\exists\\; \\theta^{labor}_{yr,r,s} \\leq 1 \\right\\}
 \\\\
-\\bar{\\theta}^{labor}_{yr, \\bullet, s} &= \\dfrac{1}{N_{yr, \\bullet, s}} \\sum_{r}
+\\theta^{labor}_{yr, \\bullet, s} &= \\dfrac{1}{N_{yr, \\bullet, s}} \\sum_{r}
     \\left\\{ \\theta^{labor}_{yr,r,s} \\;\\vert\\; (yr,r,s) \\;\\exists\\; \\theta^{labor}_{yr,r,s} < 1 \\right\\}
 \\end{aligned}
 ```
@@ -73,9 +73,9 @@ Labor shares that are still undefined are calculated:
 \\begin{cases}
 \\theta^{labor}_{yr,r,s}             & \\exists\\; \\theta^{\\star\\,labor}_{yr,r,s} \\leq 1
 \\\\&\\\\
-\\bar{\\theta}^{labor}_{\\bullet,r,s}  & \\exists\\; \\theta^{\\star\\,labor}_{yr,r,s} > 1
+\\theta^{labor}_{\\bullet,r,s}  & \\exists\\; \\theta^{\\star\\,labor}_{yr,r,s} > 1
 \\\\&\\\\
-\\bar{\\theta}^{labor}_{yr,\\bullet,s} & \\exists\\; \\theta^{\\star\\,labor}_{\\bullet,r,s} > 1
+\\theta^{labor}_{yr,\\bullet,s} & \\exists\\; \\theta^{\\star\\,labor}_{\\bullet,r,s} > 1
 \\end{cases}
 ```
 
@@ -83,38 +83,38 @@ with
 - ``\\theta^{labor\\star}`` calculated  by [`SLiDE.condition_wg`](@ref)
 - ``\\theta^{labor\\star}_{\\bullet,r,s}`` calculated  by [`SLiDE.condition_hw`](@ref)
 """
-function share_labor!(d::Dict, set::Dict)
+function SLiDE.share_labor!(d::Dict, set::Dict)
     if !haskey(d,:labor)
-        df = copy(_share_gsp!(d))
+        df = copy(SLiDE._share_gsp!(d))
         df[!,:value] .= df[:,:cmp] ./ df[:,:comp]
         dropzero!(dropnan!(select!(df, [findindex(df);:value])))
 
-        dfavg = _share_labor_va0!(d)
+        dfavg = SLiDE._share_labor_va0!(d)
 
-        condition, df, kind = split_condition(df, d[:gdp])
+        condition, df, kind = SLiDE.split_condition(df, SLiDE.share_gdp!(d, set))
         dfavg = indexjoin(condition, dfavg; kind=:inner)
 
         df = vcat(df, dfavg)
 
         # Address high-wage cases.
-        idx_wg = condition_wg(df, >)
-        idx_hw = condition_hw(df)
+        idx_wg = SLiDE.condition_wg(df, >)
+        idx_hw = SLiDE.condition_hw(df)
         df0 = fill_zero(df; with=set)
         
         # Imput year.
-        high_wg = condition_wg(df0, >)
+        high_wg = SLiDE.condition_wg(df0, >)
         df_not_high = filter_with(df0, Not(high_wg))
         df_yr = dropzero(combine_over(df_not_high, :yr; fun=Statistics.mean))
         
         # Impute region.
-        low_wg = condition_wg(df0, <)
+        low_wg = SLiDE.condition_wg(df0, <)
         df_low = filter_with(df0, low_wg)
         df_r = dropzero(combine_over(df_low, :r; fun=Statistics.mean))
         
         # Filter.
         df = filter_with(df, Not(idx_wg))
-        df_yr = filter_with(df_yr, idx_wg)
-        df_r = filter_with(df_r, idx_hw)
+        df_yr = isempty(idx_wg) ? DataFrame() : filter_with(df_yr, idx_wg)
+        df_r = isempty(idx_hw) ? DataFrame() : filter_with(df_r, idx_hw)
 
         d[:labor] = vcat(df, df_yr, df_r)
     end
@@ -127,7 +127,7 @@ end
 `labor_va(yr,s)`, labor share of value added
 
 ```math
-\\bar{\\theta}^{labor}_{yr,s} =
+\\theta^{labor}_{yr,s} =
 \\begin{cases}
 \\dfrac{compen(yr,s)}{compen(yr,s) + surplus(yr,s)}
     & surplus(yr,s) \\geq 0
@@ -186,7 +186,9 @@ end
 `wg(yr,r,s)`, (year,region,sector) indices with high wage shares (>1)
 
 ```math
-\\theta^{labor\\star}_{yr,r,s} = \\left\\{(yr,r,s) \\;\\vert\\; (yr,r,s) \\;\\exists\\; \\theta^{labor}_{yr,r,s} > 1 \\right\\}
+\\theta^{labor\\star}_{yr,r,s} = \\left\\{
+    (yr,r,s) \\;\\vert\\; (yr,r,s) \\;\\exists\\; \\theta^{labor}_{yr,r,s} > 1
+\\right\\}
 ```
 """
 function condition_wg(df::DataFrame, fun::Function)
@@ -198,13 +200,15 @@ end
 `hw(r,s)`, (region,sector) pairings with ALL wage shares > 1
 
 ```math
-\\theta^{\\labor\\star}_{\\bullet,r,s} = \\left\\{(r,s) \\;\\big\\vert\\; (r,s) \\;\\exists\\; \\sum_{yr} \\theta^{labor}_{yr,r,s} > 1 \\right\\}
+\\theta^{\\labor\\star}_{\\bullet,r,s} = \\left\\{
+    (r,s) \\;\\big\\vert\\; (r,s) \\;\\exists\\; \\sum_{yr} \\theta^{labor}_{yr,r,s} > 1
+\\right\\}
 ```
 """
 function condition_hw(df::DataFrame)
     df = copy(df)
     df[!,:value] .= df[:,:value] .> 1
-    df = combine_over(df,:yr; fun=prod)
+    df = combine_over(df, :yr; fun=prod)
 
     return df[df[:,:value], findindex(df)]
 end
