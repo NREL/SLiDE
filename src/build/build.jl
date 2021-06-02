@@ -7,6 +7,9 @@ read and return those values. Otherwise, it will generate these parameters by ex
 1. [`SLiDE.build_eem`](@ref) -- if `dataset.eem=true`
 """
 function build(dataset::Dataset)
+    input_region_level = dataset.region_level
+    set_region_level!(dataset, :state)
+
     dataset.overwrite && overwrite(dataset)
     dataset.eem && set!(dataset; build="eem")
     
@@ -17,6 +20,12 @@ function build(dataset::Dataset)
     else
         d, set = build_io(dataset)
         d, set = build_eem(dataset, d, set)
+    end
+
+    if input_region_level!==:state
+        d, set = scale_region!(set!(dataset; region_level=input_region_level), d, set)
+        write_build!(set!(dataset; step=PARAM_DIR), d)
+        write_build!(set!(dataset; step=SET_DIR), set)
     end
 
     return d, set
@@ -182,11 +191,14 @@ function datapath(dataset::Dataset; directory_level=:step)
     if directory_level==:name
         path = joinpath(path, dataset.name)
 
+    elseif directory_level==:region
+        path = joinpath(path, dataset.name, "$(dataset.region_level)")
+
     elseif directory_level==:build
-        path = joinpath(path, dataset.name, dataset.build)
+        path = joinpath(path, dataset.name, "$(dataset.region_level)", dataset.build)
 
     elseif directory_level==:step
-        path = joinpath(path, dataset.name, dataset.build)
+        path = joinpath(path, dataset.name, "$(dataset.region_level)", dataset.build)
         path = if dataset.step in [PARAM_DIR, SET_DIR]
             joinpath(path, dataset.step)
         else

@@ -196,7 +196,8 @@ function filter_with!(d::Dict, set::Dict, dataset::Dataset)
     [d[k] = filter_with((drop_units ? edit_with(df, x) : df), filt;
         extrapolate=true) for (k,df) in d]
 
-    return has_region ? SLiDE.scale_region!(dataset, d, set) : d, set
+    # return has_region ? SLiDE.scale_region!(dataset, d, set) : d, set
+    return d, set
 end
 
 

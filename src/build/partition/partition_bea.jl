@@ -103,19 +103,10 @@ Treat negative inputs as outputs:
 \\end{aligned}
 ```
 """
-function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary,
-    swap_ys0::Bool=false,
-)
+function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary)
     println("  id0(yr,g,s) and ys0(yr,s,g), supply/demand data")
     d[:id0] = filter_with(d[:use], set)
     d[:ys0] = filter_with(d[:supply], set)
-    
-    # In sectordisagg, the good/sector column names are switched...
-    if sector_level==:detail && swap_ys0
-        @warn("swapping ys0 sector order: (s,g) -> (g,s)")
-        x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
-        d[:ys0] = edit_with(d[:ys0], x)
-    end
     
     df = indexjoin(d[:ys0], d[:id0]; id=[:ys0,:id0])
     idx = findindex(df)
