@@ -639,7 +639,7 @@ end);
 
 @mapping(cge,profit_e[(r,s) in set[:PE]],
 # cost of electricity
-    sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * id0[r,g,s] for g in set[:ele])
+    sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * IDA_ele[r,g,s] for g in set[:ele])
 # cost of fossil energy
     + sum(((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)) * id0[r,g,s] for g in set[:fe])
     -
@@ -823,7 +823,7 @@ end
 # intermediate demand
 #        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
         + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:nne]))
-        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * id0[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:ele]))
+        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_ele[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:ele]))
         + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * id0[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:fe]))
         + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.0) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
     )
@@ -1062,6 +1062,11 @@ end
     (sum(theta_ele[r,s]*(haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0)^(1-es_ele[s]) for gg in set[:ele]) + (1-theta_ele[r,s])*CFE[r,s]^(1-es_ele[s]))^(1/(1-es_ele[s]))
 );
 
+# @mapping(cge,def_CFE[(r,s) in set[:FE]],
+#     CFE[(r,s)]
+#     -
+#     sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0))^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
+# );
 ####################################
 # -- Complementarity Conditions --
 ####################################
@@ -1127,20 +1132,9 @@ end
 ####################
 
 #set up the options for the path solver
-PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
 
 # solve the model
-status = solveMCP(cge)
-
-# for r in set[:r]
-#     set_value(carb0[r], value(carb0[r])*0.9);
-# end
-
-# for r in set[:r], s in set[:s]
-#     set_value(ty[r,s], value(ty[r,s])*1.1)
-# end
-
-PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=10000)
+status = solveMCP(cge, output_options = 1, convergence_tolerance=1e-6, output=1, time_limit=3600, cumulative_iteration_limit=0)
 
 # solve the model
-status = solveMCP(cge)
+status = solveMCP(cge, convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=10000)
