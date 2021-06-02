@@ -13,14 +13,13 @@ This file is auto-generated. Do not edit.
 Store mapping information for scaling. This should NOT include any multiplication factors.
 
 # Arguments
-- `data::DataFrame`: input file name
+- `data::DataFrame`
 - `from::Union{Symbol,Array{Symbol,1}}`: `data` columns that overlap with `on`
 - `to::Union{Symbol,Array{Symbol,1}}`: `data` columns that DO NOT overlap with `on`
 - `on::Union{Symbol,Array{Symbol,1}}`: columns that can be mapped with `data`
 - `direction::Symbol`: indicator describing whether to aggregate/disaggregate
 """
 mutable struct Mapping <: Scale
-    "input file name"
     data::DataFrame
     "`data` columns that overlap with `on`"
     from::Union{Symbol,Array{Symbol,1}}

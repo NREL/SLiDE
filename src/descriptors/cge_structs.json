@@ -19,6 +19,11 @@
                 "data_type": "String"
             },
             {
+                "name": "region_level",
+                "comment": "Aggregation level to use when reading BEA GDP and Census Bureau data.",
+                "data_type": "Symbol"
+            },
+            {
                 "name": "sector_level",
                 "comment": "Aggregation level to use when reading BEA supply/use data.",
                 "data_type": "Symbol"

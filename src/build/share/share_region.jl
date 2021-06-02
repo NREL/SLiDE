@@ -1,5 +1,5 @@
 """
-    share_region(d::Dict, set::Dict; save_build = true, overwrite = false)
+    share_region(d::Dict, set::Dict)
 This function partitions BEA and Census Bureau data to use when disaggregating parameters
 from the national- to regional-level.
 
@@ -14,11 +14,11 @@ from the national- to regional-level.
 """
 function share_region(dataset::Dataset, d::Dict, set::Dict)
     step = "share"
-    d_read = read_build(set!(dataset; step=step))
+    d_read = SLiDE.read_build(SLiDE.set!(dataset; step=step))
 
     if dataset.step=="input"
-        print_status(set!(dataset; step=step))
-        [d_read[k] = filter_with(df, set; extrapolate=true) for (k,df) in d_read]
+        SLiDE.print_status(SLiDE.set!(dataset; step="share"))
+        SLiDE.filter_with!(d_read, set, dataset)
         merge!(d, d_read)
         
         # Add CFS regional sets for filtering.
@@ -27,7 +27,7 @@ function share_region(dataset::Dataset, d::Dict, set::Dict)
         SLiDE.share_pce!(d)
         SLiDE.share_sgf!(d)
         SLiDE.share_utd!(d, set)
-        SLiDE.share_region!(d, set)
+        SLiDE.share_gdp!(d, set)
         SLiDE.share_labor!(d, set)
         SLiDE.share_rpc!(d, set)
 

@@ -6,6 +6,7 @@ This file is auto-generated. Do not edit.
         name::String
         build::String
         step::String
+        region_level::Symbol
         sector_level::Symbol
         eem::Bool
         save_build::Bool
@@ -18,6 +19,7 @@ This file is auto-generated. Do not edit.
 - `name::String`: dataset identifier
 - `build::String`: Current step of the buildstream process: `io` or `eem`
 - `step::String`: Current substep of the buildstream. If `build=io`, these steps are `partition, calibrate, share, disaggregate`. If `build=eem`, these steps are ...
+- `region_level::Symbol`: Aggregation level to use when reading BEA GDP and Census Bureau data.
 - `sector_level::Symbol`: Aggregation level to use when reading BEA supply/use data.
 - `eem::Bool`: Flag indicating whether to include the Energy-Environment module. If `eem=true`, first build `io` supply/use data. Then build `eem` data.
 - `save_build::Bool`: Flag indicating decides whether to save the information at each build step. Setting `save_build=true` will add directories in the locations returned by [`SLiDE.datapath`](@ref). This feature is particularly helpful for buildstream debugging.
@@ -30,6 +32,8 @@ mutable struct Dataset <: CGE
     build::String
     "Current substep of the buildstream. If `build=io`, these steps are `partition, calibrate, share, disaggregate`. If `build=eem`, these steps are ..."
     step::String
+    "Aggregation level to use when reading BEA GDP and Census Bureau data."
+    region_level::Symbol
     "Aggregation level to use when reading BEA supply/use data."
     sector_level::Symbol
     "Flag indicating whether to include the Energy-Environment module. If `eem=true`, first build `io` supply/use data. Then build `eem` data."
@@ -41,8 +45,8 @@ mutable struct Dataset <: CGE
 end
 
 
-function Dataset(; name, build, step, sector_level, eem, save_build, overwrite, )
-    Dataset(name, build, step, sector_level, eem, save_build, overwrite, )
+function Dataset(; name, build, step, region_level, sector_level, eem, save_build, overwrite, )
+    Dataset(name, build, step, region_level, sector_level, eem, save_build, overwrite, )
 end
 
 """Get [`Dataset`](@ref) `name`."""
@@ -51,6 +55,8 @@ get_name(value::Dataset) = value.name
 get_build(value::Dataset) = value.build
 """Get [`Dataset`](@ref) `step`."""
 get_step(value::Dataset) = value.step
+"""Get [`Dataset`](@ref) `region_level`."""
+get_region_level(value::Dataset) = value.region_level
 """Get [`Dataset`](@ref) `sector_level`."""
 get_sector_level(value::Dataset) = value.sector_level
 """Get [`Dataset`](@ref) `eem`."""
@@ -66,6 +72,8 @@ set_name!(value::Dataset, val) = value.name = val
 set_build!(value::Dataset, val) = value.build = val
 """Set [`Dataset`](@ref) `step`."""
 set_step!(value::Dataset, val) = value.step = val
+"""Set [`Dataset`](@ref) `region_level`."""
+set_region_level!(value::Dataset, val) = value.region_level = val
 """Set [`Dataset`](@ref) `sector_level`."""
 set_sector_level!(value::Dataset, val) = value.sector_level = val
 """Set [`Dataset`](@ref) `eem`."""

@@ -35,7 +35,7 @@ nd0min,"[yr,r,g]",Minimum regional demand from national market,billions of us do
 nm0,"[yr,r,g,m]",National margin supply,billions of us dollars (USD),,regional,1,0,FALSE,0
 pce,"[yr,r,g]",,,,share,1,0,FALSE,0
 pt0,"[yr,r,g]",,billions of us dollars (USD),,regional,1,0,FALSE,0
-region,"[yr,r,s]",,,,share,0,1,FALSE,0
+gdp,"[yr,r,s]",,,,share,0,1,FALSE,0
 rpc,"[r,g]",,,,share,1,0,FALSE,0
 rx0,"[yr,r,g]",,,,regional,1,0,FALSE,0
 s0,"[yr,r,g]",Aggregate supply,billions of us dollars (USD),,regional,1,0,FALSE,0

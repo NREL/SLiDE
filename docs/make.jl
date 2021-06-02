@@ -58,7 +58,10 @@ makedocs(clean = true,
                 s -> "api/internals/$(s)",
                 sort(readdir(joinpath(@__DIR__, "src/api/internals"))))
             ],
-        "Model" => "api/model.md",
+        "Model" => Any[
+            "Overview" => "man/model/overview.md",
+            "Constraints" => "man/model/constraints.md",
+        ],
     ]
 )
 

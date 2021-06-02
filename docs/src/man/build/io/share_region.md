@@ -20,7 +20,12 @@ SLiDE._avg_ng
 
 ## GSP
 ```@docs
-SLiDE.share_region!
+SLiDE.share_gdp!
+SLiDE.share_labor!
+SLiDE._share_gsp!
+SLiDE._share_labor_va0!
+SLiDE.condition_wg
+SLiDE.condition_hw
 ```
 
 ## PCE

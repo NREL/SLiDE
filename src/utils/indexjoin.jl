@@ -141,6 +141,12 @@ end
 
 """
 """
+function _fill_missing(df::DataFrame, scheme::Pair{Symbol,Symbol})
+    # !!!! check against id to look for units?
+    return edit_with(df, Replace(scheme[1], missing, "$(scheme[2]) value"))
+end
+
+
 function _fill_missing(df::DataFrame, fillmissing)
     # Do we even want to fill missing values?
     fillmissing === false && (return df)

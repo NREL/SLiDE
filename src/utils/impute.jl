@@ -1,4 +1,3 @@
-# https://link.springer.com/content/pdf/bbm%3A978-0-85729-829-4%2F1.pdf
 """
     impute_mean(df::DataFrame, col::Symbol)
 This function fills missing values in `df` with the average over the index given in `col`
@@ -28,8 +27,11 @@ Returns
 - `df_avg::DataFrame` of mean.
 - `df::DataFrame` of unchanged values
 """
-function impute_mean(df, col; weight=DataFrame(), condition=DataFrame())
-    # !!!! see: https://github.com/invenia/Impute.jl
+function impute_mean(df, col; weight=DataFrame(), condition=DataFrame(), add=DataFrame())
+    # !!!! see...
+    # https://github.com/invenia/Impute.jl
+    # https://link.springer.com/content/pdf/bbm%3A978-0-85729-829-4%2F1.pdf
+    # 
     if isempty(condition)
         condition, df = split_with(df, (value=NaN,))
         condition = condition[:, findindex(condition)]
@@ -41,11 +43,40 @@ function impute_mean(df, col; weight=DataFrame(), condition=DataFrame())
     end
 
     # Calculate average.
-    if isempty(weight)
-        dfavg = combine_over(df, col; fun=Statistics.mean)
+    if isempty(condition)
+        dfavg = DataFrame()
     else
-        dfavg = combine_over(df * weight, col) / combine_over(weight, col)
+        dfavg = if isempty(weight)
+            combine_over(df, col; fun=Statistics.mean)
+        else
+            combine_over(df * weight, col) / combine_over(weight, col)
+        end
+        
+        dfavg = indexjoin(condition, dfavg; kind=kind)
     end
-    
-    return indexjoin(condition, dfavg; kind=kind), df
+
+    # Add missing column(s) to df as necessary.
+    add = add[:,setdiff(findindex(condition), findindex(df))]
+    !isempty(add) && (df = crossjoin(df, add))
+
+    return vcat(dfavg, df; cols=:intersect)
+end
+
+
+"""
+"""
+function split_condition(df::DataFrame, value=NaN)
+    condition, df = split_with(df, (value=value,))
+    condition = condition[:, findindex(condition)]
+    return condition, df, :inner
+end
+
+function split_condition(df::DataFrame, condition::DataFrame, args...)
+    if isempty(condition)
+        return split_condition(df, args...)
+    else
+        idx = intersect(findindex(df), propertynames(condition))
+        condition = antijoin(condition, df, on=idx)
+        return select(condition,idx), df, :outer
+    end
 end

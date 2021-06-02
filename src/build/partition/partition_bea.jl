@@ -12,18 +12,18 @@
 """
 function partition_bea(dataset::Dataset, d::Dict, set::Dict; map_fdcat::Bool=false)
     if dataset.step=="input"
-        print_status(set!(dataset; step="bea"))
-        [d[k] = filter_with(d[k], (yr=set[:yr],)) for k in [:supply,:use]]
+        SLiDE.print_status(SLiDE.set!(dataset; step="bea"))
+        SLiDE.filter_with!(d, set, dataset)
 
         map_fdcat && _filter_use!(d,set)
 
-        _partition_io!(d, set; sector_level=dataset.sector_level)
-        _partition_fd!(d, set; sector_level=dataset.sector_level)
-        _partition_va0!(d, set)
-        _partition_x0!(d, set)
-        _partition_m0!(d, set)
-        _partition_md0!(d, set)
-        _partition_ms0!(d, set)
+        SLiDE._partition_io!(d, set; sector_level=dataset.sector_level)
+        SLiDE._partition_fd!(d, set; sector_level=dataset.sector_level)
+        SLiDE._partition_va0!(d, set)
+        SLiDE._partition_x0!(d, set)
+        SLiDE._partition_m0!(d, set)
+        SLiDE._partition_md0!(d, set)
+        SLiDE._partition_ms0!(d, set)
         _partition_y0!(d, set; sector_level=dataset.sector_level)
         _partition_a0!(d, set; sector_level=dataset.sector_level)
         _partition_ta0!(d, set)
@@ -35,12 +35,12 @@ function partition_bea(dataset::Dataset, d::Dict, set::Dict; map_fdcat::Bool=fal
 end
 
 
-function partition_bea(dataset::Dataset; map_fdcat::Bool=false)
-    set!(dataset; step="bea")
-    d = read_build(dataset)
-    set = read_set(dataset)
+function partition_bea(dataset::Dataset; kwargs...)
+    SLiDE.set!(dataset; step="bea")
+    d = SLiDE.read_build(dataset)
+    set = SLiDE.read_set(dataset)
     
-    return partition_bea(dataset, d, set; map_fdcat=map_fdcat)
+    return partition_bea(dataset, d, set; kwargs...)
 end
 
 
@@ -103,19 +103,10 @@ Treat negative inputs as outputs:
 \\end{aligned}
 ```
 """
-function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary,
-    swap_ys0::Bool=false,
-)
+function _partition_io!(d::Dict, set::Dict; sector_level::Symbol=:summary)
     println("  id0(yr,g,s) and ys0(yr,s,g), supply/demand data")
     d[:id0] = filter_with(d[:use], set)
     d[:ys0] = filter_with(d[:supply], set)
-    
-    # In sectordisagg, the good/sector column names are switched...
-    if sector_level==:detail && swap_ys0
-        @warn("swapping ys0 sector order: (s,g) -> (g,s)")
-        x = Rename.([:g,:s,:g_temp],[:g_temp,:g,:s])
-        d[:ys0] = edit_with(d[:ys0], x)
-    end
     
     df = indexjoin(d[:ys0], d[:id0]; id=[:ys0,:id0])
     idx = findindex(df)
@@ -337,8 +328,10 @@ function _partition_md0!(d::Dict, set::Dict)
         _partition_mrg0!(d, set)
         _partition_trn0!(d, set)
 
-        d[:md0] = [edit_with(d[:mrg0], Add(:m, "trd")); edit_with(d[:trn0], Add(:m, "trn"))]
-        d[:md0] = sort(d[:md0][:,[:yr,:m,:g,:value]])
+        d[:md0] = vcat(
+            edit_with(d[:mrg0], Add(:m, "trd")),
+            edit_with(d[:trn0], Add(:m, "trn")),
+        )
         d[:md0] = _remove_imrg(d[:md0], :g => set[:imrg])
         
         d[:md0][!,:value] .= max.(d[:md0][:,:value], 0)
@@ -369,8 +362,11 @@ function _partition_ms0!(d::Dict, set::Dict)
         _partition_mrg0!(d, set)
         _partition_trn0!(d, set)
         
-        d[:ms0] = [edit_with(d[:mrg0], Add(:m, "trd")); edit_with(d[:trn0], Add(:m, "trn"))]
-        d[:ms0] = sort(d[:ms0][:,[:yr,:g,:m,:value]])
+        d[:ms0] = vcat(
+            edit_with(d[:mrg0], Add(:m, "trd")),
+            edit_with(d[:trn0], Add(:m, "trn")),
+        )
+        # d[:ms0] = sort(d[:ms0][:,[:yr,:g,:m,:value]])
         
         d[:ms0][!,:value] .= max.(-d[:ms0][:,:value], 0)
 

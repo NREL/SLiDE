@@ -59,10 +59,13 @@ function share_sector( ; path::String=SCALE_BLUENOTE_IO, kwargs...)
     
     sector_level = :detail
     dfmap = read_file(path)[:,1:2]
-
+    
     # Get the detail-level info so we can disaggregate.
-    set_det = SLiDE.read_set("io"; sector_level=sector_level)
-    det = SLiDE.read_input!(Dataset(""; step="bea", sector_level=sector_level))
+    dataset = Dataset(""; step="bea", sector_level=sector_level)
+    set_det = read_set("io"; sector_level=sector_level)
+    det = read_input!(dataset)
+    filter_with!(det, set_det, set!(dataset; step="bea"))
+
     df = SLiDE._partition_y0!(det, set_det; sector_level=sector_level, kwargs...)
     
     return share_with(Weighting(df), Mapping(dfmap))
