@@ -37,8 +37,8 @@ cge = MCPModel();
 # SETS
 ##############
 
-swunemp = 1
-swcarb = 1
+swunemp = 0
+swcarb = 0
 
 # Set description
 #set[:s] -> sectors
@@ -263,7 +263,7 @@ end
 ################
 
 # specify lower bound
-lo = 0.0
+lo = 1e-6
 
 # sectors
 #@variable(cge, Y[(r, s) in set[:Y]] >= lo, start = 1);
@@ -674,8 +674,8 @@ end
 # intermediate demand
 #        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
         + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:nne]))
-        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_ele[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:ele]))
-        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_fe[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:fe]))
+        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_ele[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:ele]))
+        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_fe[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:fe]))
         + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.0) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
     )
 );
@@ -978,4 +978,16 @@ end
 status = solveMCP(cge, output_options = 1, convergence_tolerance=1e-6, output=1, time_limit=3600, cumulative_iteration_limit=0)
 
 # solve the model
+status = solveMCP(cge, convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=10000)
+
+# carbon limit
+# for r in set[:r]
+#     set_value(carb0[r], value(carb0[r])*0.8)
+# end
+
+# output tax
+for r in set[:r], s in set[:s]
+    set_value(ty[r,s], value(ty[r,s])*1.1)
+end
+
 status = solveMCP(cge, convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=10000)
