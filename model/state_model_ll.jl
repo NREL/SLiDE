@@ -37,7 +37,7 @@ cge = MCPModel();
 # SETS
 ##############
 
-swunemp = 0
+swunemp = 1
 swcarb = 1
 
 # Set description
@@ -135,21 +135,6 @@ set[:CFE] = filter(x -> sld[:fe_bar][x] != 0.0, combvec(set[:r],set[:s]))
 @NLparameter(cge, gr == 0.02); # growth rate --- try sector and set[:r] specific
 @NLparameter(cge, dr == 0.05); # capital depreciation rate
 @NLparameter(cge, thetax == 0.3); # extant production share
-
-# #new capital endowment
-# @NLparameter(cge, ks_n[r in set[:r], s in set[:s]] ==
-#     value(kd0[r, s])  * (value(dr)+value(gr)) / (1 + value(gr)) );
-
-# # mutable old capital endowment
-# @NLparameter(cge, ks_s[r in set[:r], s in set[:s]] ==
-#     value(kd0[r, s]) * (1 - value(thetax)) - value(ks_n[r,s]) );
-
-# # Mutable total capital endowment - Non-extant capital
-# @NLparameter(cge, ks_m[r in set[:r]] == sum(value(kd0[r,s]) * (1-value(thetax)) for s in set[:s]));
-
-# # Extant capital endowment
-# @NLparameter(cge, ks_x[r in set[:r], s in set[:s]] ==
-#     value(kd0[r, s]) * value(thetax) );
 
 # !!!! Sector-specific for now - issues with more flexibility
 @NLparameter(cge, ks_m0[r in set[:r], s in set[:s]] == value(kd0[r,s]) * (1-value(thetax)));    # Mutable total capital endowment - Non-extant capital base year
@@ -337,11 +322,11 @@ lo = 0.0
 end);
 
 # --- co2 emissions ---
-# @variables(cge, begin
-#     PCO2 >= lo, (start = 1e-6) # CO2 factor price
-#     PDCO2[r in set[:r]] >= lo, (start = 1e-6) # Effective CO2 price
-#     CO2[r in set[:r]] >= lo, (start = value(cb0[r])) # CO2 emissions supply
-# end);
+@variables(cge, begin
+    PCO2 >= lo, (start = 1e-6) # CO2 factor price
+    PDCO2[r in set[:r]] >= lo, (start = 1e-6) # Effective CO2 price
+    CO2[r in set[:r]] >= lo, (start = value(cb0[r])) # CO2 emissions supply
+end);
 
 ###############################
 # -- PLACEHOLDER VARIABLES --
@@ -368,23 +353,19 @@ end);
 # exports (absent of re-exports) times the price for foreign exchange,
 # region's supply to national market times the national market price
 # regional supply to local market times domestic price
+# Definitional for RX needed
 # @NLexpression(cge,RX[r in set[:r],g in set[:g]],
 #   (alpha_x[r,g]*PFX^5+alpha_n[r,g]*PN[g]^5+alpha_d[r,g]*(haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0)^5)^(1/5) );
 
 #demand for exports via demand function
 @NLexpression(cge,AX[r in set[:r],g in set[:g]], (x0[r,g] - rx0[r,g])*(PFX/(haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^4 );
-# @NLexpression(cge,AX[r in set[:r],g in set[:g]], (x0[r,g] - rx0[r,g])*(PFX/(1))^4 );
-# @NLexpression(cge,AX[r in set[:r],g in set[:g]], (x0[r,g] - rx0[r,g]));
 
 #demand for contribution to national market
 @NLexpression(cge,AN[r in set[:r],g in set[:g]], xn0[r,g]*(PN[g]/(haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^4 );
-# @NLexpression(cge,AN[r in set[:r],g in set[:g]], xn0[r,g]*(PN[g]/(1))^4 );
 
 #demand for regionals supply to local market
 @NLexpression(cge,AD[r in set[:r],g in set[:g]],
   xd0[r,g] * ((haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) / (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0))^4 );
-# @NLexpression(cge,AD[r in set[:r],g in set[:g]],
-#   xd0[r,g] * ((haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) / (1))^4 );
 
   ###
 
@@ -411,25 +392,14 @@ end);
 
 #---------- Final Consumption
 # Unit cost function for final consumption
-# @NLexpression(cge,CC[r in set[:r]],
-#     sum(theta_cd[r,g]*((haskey(PA.lookup[1], (r, g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*cdcco2[r,g]*swcarb)^(1-es_cd[r]) for g in set[:g])^(1/(1-es_cd[r]))
-# );
 @NLexpression(cge,CC[r in set[:r]],
-    sum(theta_cd[r,g]*((haskey(PA.lookup[1], (r, g)) ? PA[(r,g)] : 1.0))^(1-es_cd[r]) for g in set[:g])^(1/(1-es_cd[r]))
+    sum(theta_cd[r,g]*((haskey(PA.lookup[1], (r, g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*cdcco2[r,g]*swcarb)^(1-es_cd[r]) for g in set[:g])^(1/(1-es_cd[r]))
 );
 
 # final demand for goods in consumption
-# @NLexpression(cge,CD[r in set[:r],g in set[:g]],
-#     cd0[r,g]* (CC[r] / ((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) + PDCO2[r]*cdcco2[r,g]*swcarb))^es_cd[r]
-# );
 @NLexpression(cge,CD[r in set[:r],g in set[:g]],
-    cd0[r,g]* (CC[r] / ((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)))^es_cd[r]
+    cd0[r,g]* (CC[r] / ((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) + PDCO2[r]*cdcco2[r,g]*swcarb))^es_cd[r]
 );
-
-# #alternate
-# @NLexpression(cge,CD[r in set[:r],g in set[:g]],
-#   cd0[r,g]*PC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)
-# );
 
 #---------- Investment
 # demand for goods in investment
@@ -456,21 +426,7 @@ end);
 #---------- Energy-environment production nesting
 # !!!! Still need to add co2 emissions
 # !!!! Cautious of subsetting - definitionals may be needed to replace NLexpressions
-
-# Definitionals needed here
-# Unit cost function: Fossil-energy
-# @NLexpression(cge,CFE[r in set[:r], s in set[:s]],
-#     sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0) + PDCO2[r]*idcco2[r,gg,s]*swcarb)^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
-# );
-# @NLexpression(cge,CFE[r in set[:r], s in set[:s]],
-#     sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0))^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
-# );
-
-
-# Unit cost function: Energy (ele + fe)
-# @NLexpression(cge,CEN[r in set[:r], s in set[:s]],
-#     (sum(theta_ele[r,s]*(haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0)^(1-es_ele[s]) for gg in set[:ele]) + (1-theta_ele[r,s])*CFE[r,s]^(1-es_ele[s]))^(1/(1-es_ele[s]))
-# );
+# Definitionals for CFE and CNE
 
 # Unit cost function: Value-added + Energy
 @NLexpression(cge,CVE[r in set[:r], s in set[:s]],
@@ -487,15 +443,7 @@ end);
     (theta_kle[r,s]*CVE[r,s]^(1-es_klem[s]) + (1-theta_kle[r,s])*CNE[r,s]^(1-es_klem[s]))^(1/(1-es_klem[s]))
 );
 
-# # Unit cost function: klem + fixed resource factor (calibrated to supply elasticity)
-# @NLexpression(cge,CXE[r in set[:r], s in set[:s]],
-#     (theta_fr[r,s]*(haskey(PFR.lookup[1], (r,s)) ? PFR[(r,s)] : 1.0)^(1-es_fr[r,s]) + (1-theta_fr[r,s])*CYM[r,s]^(1-es_fr[r,s]))^(1/(1-es_fr[r,s]))
-# );
-
 # Demand function: non-energy (materials)
-# @NLexpression(cge,IDA_ne[r in set[:r], g in set[:nne], s in set[:s]],
-#     id0[r,g,s] * (CYM[r,s]/CNE[r,s])^es_klem[s] * (CNE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)))^(es_ne[s])
-# );
 @NLexpression(cge,IDA_ne[r in set[:r], g in set[:nne], s in set[:s]],
     id0[r,g,s] * (CYM[r,s]/CNE[r,s])^es_klem[s] * (CNE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)))^(es_ne[s])
 );
@@ -506,16 +454,10 @@ end);
 );
 
 # Demand function: fossil-energy
-# @NLexpression(cge,IDA_fe[r in set[:r], g in set[:fe], s in set[:s]],
-#     id0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CFE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb))^(es_fe[s])
-# );
 @NLexpression(cge,IDA_fe[r in set[:r], g in set[:fe], s in set[:s]],
-    id0[r,g,s] * ((haskey(CEN.lookup[1], (r,s)) ? CEN[(r,s)] : 1.0)/(haskey(CFE.lookup[1], (r,s)) ? CFE[(r,s)] : 1.0))^(es_ele[s]) * ((haskey(CFE.lookup[1], (r,s)) ? CFE[(r,s)] : 1.0)/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)))^(es_fe[s])
+    id0[r,g,s] * ((haskey(CEN.lookup[1], (r,s)) ? CEN[(r,s)] : 1.0)/(haskey(CFE.lookup[1], (r,s)) ? CFE[(r,s)] : 1.0))^(es_ele[s]) * ((haskey(CFE.lookup[1], (r,s)) ? CFE[(r,s)] : 1.0)/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb))^(es_fe[s])
 );
-# # Demand function: co2 emissions
-# @NLexpression(cge,IDA_co2[r in set[:r], g in set[:fe], s in set[:s]],
-#     idcb0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CVE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb))^es_fe[s]
-# );
+
 
 # Demand function: value-added composite
 @NLexpression(cge,IVA[r in set[:r], s in set[:s]],
@@ -530,16 +472,6 @@ end);
 #    en_bar[r,s]*(CVE[r,s]/CEN[r,s])^(es_ve[s])
 );
 
-# # Demand function: fixed resource factor
-# @NLexpression(cge,AFR[r in set[:r], s in set[:s]],
-#     fr0[r,s]*(CXE[r,s]/(haskey(PFR.lookup[1], (r,s)) ? PFR[(r,s)] : 1.0))^(es_fr[r,s])
-# );
-
-# # Demand function: KLEM bundle (non-fixed resource)
-# @NLexpression(cge,IYM[r in set[:r], s in set[:s]],
-#     klem_bar[r,s]*(CXE[r,s]/CYM[r,s])^(es_fr[r,s])
-# );
-
 
 
 ###############################
@@ -547,21 +479,9 @@ end);
 ###############################
 
 #----------
-# @mapping(cge,profit_yx[(r, s) in set[:Y]],
-# # cost of intermediate demand
-#     sum(((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb) * id0[r,g,s] for g in set[:g])
-# # cost of labor inputs
-#     + (PLS[r]/wref[r]) * ld0[r,s]
-# # cost of capital inputs
-#     + (haskey(RKX.lookup[1], (r, s)) ? RKX[(r,s)] : 1.0) * kd0[r,s]
-#     -
-# # revenue from sectoral supply (take note of r/s/g indices on ys0)
-#     sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
-# );
-
 @mapping(cge,profit_yx[(r, s) in set[:Y]],
 # cost of intermediate demand
-    sum(((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)) * id0[r,g,s] for g in set[:g])
+    sum(((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb) * id0[r,g,s] for g in set[:g])
 # cost of labor inputs
     + (PLS[r]/wref[r]) * ld0[r,s]
 # cost of capital inputs
@@ -570,19 +490,6 @@ end);
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
     sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
 );
-
-#Recursive  --- update to Y
-# @mapping(cge,profit_ym[(r, s) in set[:Y]],
-# # cost of intermediate demand
-#     sum((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) * id0[r,g,s] for g in set[:g])
-# # cost of labor inputs
-#     + (PLS[r]/wref[r]) * ALym[r,s]
-# # cost of capital inputs
-#     + (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) * AKym[r,s]
-#     -
-# # revenue from sectoral supply (take note of r/s/g indices on ys0)
-#     sum((haskey(PY.lookup[1], (r, g)) ? PY[(r, g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
-# );
 
 @mapping(cge,profit_ym[(r,s) in set[:Y]],
 # cost of value-added composite
@@ -608,41 +515,11 @@ end);
     # (haskey(PVA.lookup[1], (r,s)) ? PVA[(r,s)] : 1.0)  * va_bar[r,s]
 );
 
-# @mapping(cge,profit_va[(r,s) in set[:PVA]],
-#     CVAym[r,s]
-#     -
-# # revenue from value-added supply
-#     (haskey(PVA.lookup[1], (r,s)) ? PVA[(r,s)] : 1.0)
-#     # (haskey(PVA.lookup[1], (r,s)) ? PVA[(r,s)] : 1.0)  * va_bar[r,s]
-# );
-
-# @mapping(cge,profit_e[(r,s) in set[:PE]],
-# # cost of electricity
-#     sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * IDA_ele[r,g,s] for g in set[:ele])
-# # cost of fossil energy
-#     + sum(((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb) * IDA_fe[r,g,s] for g in set[:fe])
-#     -
-# # revenue from energy supply
-#     (haskey(PE.lookup[1], (r,s)) ? PE[(r,s)] : 1.0)  * sum(id0[r,g,s] for g in set[:en])
-#     # (haskey(PE.lookup[1], (r,s)) ? PE[(r,s)] : 1.0)  * en_bar[r,s]
-# );
-
-# @mapping(cge,profit_e[(r,s) in set[:PE]],
-# # cost of electricity
-#     sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * IDA_ele[r,g,s] for g in set[:ele])
-# # cost of fossil energy
-#     + sum(((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)) * IDA_fe[r,g,s] for g in set[:fe])
-#     -
-# # revenue from energy supply
-#     (haskey(PE.lookup[1], (r,s)) ? PE[(r,s)] : 1.0)  * sum(id0[r,g,s] for g in set[:en])
-#     # (haskey(PE.lookup[1], (r,s)) ? PE[(r,s)] : 1.0)  * en_bar[r,s]
-# );
-
 @mapping(cge,profit_e[(r,s) in set[:PE]],
 # cost of electricity
     sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * IDA_ele[r,g,s] for g in set[:ele])
 # cost of fossil energy
-    + sum(((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)) * IDA_fe[r,g,s] for g in set[:fe])
+    + sum(((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb) * IDA_fe[r,g,s] for g in set[:fe])
     -
 # revenue from energy supply
     (haskey(PE.lookup[1], (r,s)) ? PE[(r,s)] : 1.0)  * sum(id0[r,g,s] for g in set[:en])
@@ -682,17 +559,9 @@ end);
     )
 );
 
-# @mapping(cge, profit_c[r in set[:r]],
-# # costs of inputs - computed as final demand times regional market prices
-#     sum(((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) + PDCO2[r]*cdcco2[r,g]*swcarb) * CD[r,g] for g in set[:g])
-#     -
-# # revenues/benefit computed as CPI * reference consumption
-#     PC[r] * c0[r]
-# );
-
 @mapping(cge, profit_c[r in set[:r]],
 # costs of inputs - computed as final demand times regional market prices
-    sum(((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0)) * CD[r,g] for g in set[:g])
+    sum(((haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0) + PDCO2[r]*cdcco2[r,g]*swcarb) * CD[r,g] for g in set[:g])
     -
 # revenues/benefit computed as CPI * reference consumption
     PC[r] * c0[r]
@@ -762,11 +631,11 @@ end
     PM[r,m] * sum(md0[r,m,gm] for gm in set[:gm])
 );
 
-# @mapping(cge,profit_co2[r in set[:r]],
-#     (PCO2 + (carb0[r]==0 ? PC[r] : 0.0)*1e-6)
-#     -
-#     PDCO2[r]
-# );
+@mapping(cge,profit_co2[r in set[:r]],
+    (PCO2 + (carb0[r]==0 ? PC[r] : 0.0)*1e-6)
+    -
+    PDCO2[r]
+);
 
 ###################################
 # -- Market Clearing Conditions --
@@ -791,25 +660,6 @@ end
 # extant capital demand
     (haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.) * kd0[r,s]
 );
-
-# @mapping(cge,market_pa[(r, g) in set[:PA]],
-# # absorption or supply
-#     (haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.) * a0[r,g]
-#     - (
-# # government demand (exogenous)
-#         g0[r,g]
-# # demand for investment
-#         + INV[r]*DINV[r,g]
-# # final demand
-#         + C[r] * CD[r,g]
-# # intermediate demand
-# #        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
-#         + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:nne]))
-#         + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_ele[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:ele]))
-#         + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_fe[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:fe]))
-#         + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.0) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
-#     )
-# );
 
 @mapping(cge,market_pa[(r, g) in set[:PA]],
 # absorption or supply
@@ -898,8 +748,6 @@ if swunemp == 1
 );
 end
 
-
-
 @mapping(cge,market_pd[(r, g) in set[:PD]],
 # aggregate supply
     (haskey(X.lookup[1], (r, g)) ? X[(r, g)] : 1)  * AD[r,g]
@@ -975,21 +823,21 @@ end
     sum((haskey(A.lookup[1], (r, g)) ? A[(r, g)] : 1.0) * MD[r,g] for r in set[:r] for g in set[:g] if (r,g) in set[:A])
 );
 
-# @mapping(cge,market_pdco2[r in set[:r]],
-#     CO2[r]
-#     - (
-#         sum((haskey(YX.lookup[1], (r,s)) ? YX[(r,s)] : 1.0) * id0[r,g,s] * idcco2[r,g,s] for g in set[:g], s in set[:s])
-#         + sum((haskey(E.lookup[1], (r,s)) ? E[(r,s)] : 1.0) * IDA_fe[r,g,s] * idcco2[r,g,s] for g in set[:fe], s in set[:s])
-# #        + sum((haskey(YM.lookup[1], (r,s)) ? YM[(r,s)] : 1.0) * IDA_ne[r,g,s] * idcco2[r,g,s] for g in set[:nne], s in set[:s])
-#         + sum(C[r]*CD[r,g]*cdcco2[r,g] for g in set[:g])
-#     )
-# );
+@mapping(cge,market_pdco2[r in set[:r]],
+    CO2[r]
+    - (
+        sum((haskey(YX.lookup[1], (r,s)) ? YX[(r,s)] : 1.0) * id0[r,g,s] * idcco2[r,g,s] for g in set[:g], s in set[:s])
+        + sum((haskey(E.lookup[1], (r,s)) ? E[(r,s)] : 1.0) * IDA_fe[r,g,s] * idcco2[r,g,s] for g in set[:fe], s in set[:s])
+#        + sum((haskey(YM.lookup[1], (r,s)) ? YM[(r,s)] : 1.0) * IDA_ne[r,g,s] * idcco2[r,g,s] for g in set[:nne], s in set[:s])
+        + sum(C[r]*CD[r,g]*cdcco2[r,g] for g in set[:g])
+    )
+);
 
-# @mapping(cge,market_pco2,
-#     sum(carb0[r] for r in set[:r])
-#     -
-#     sum(CO2[r] for r in set[:r])
-# );
+@mapping(cge,market_pco2,
+    sum(carb0[r] for r in set[:r])
+    -
+    sum(CO2[r] for r in set[:r])
+);
 
 
 #----------
@@ -1020,7 +868,7 @@ end
         + sum( (haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * ys0[r,s,g] * ty[r,s] for s in set[:s], g in set[:g])
         + sum( (haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1) * ys0[r,s,g] * ty[r,s] for s in set[:s], g in set[:g])
 # co2 endowment
-        # + PCO2 * carb0[r] * swcarb
+        + PCO2 * carb0[r] * swcarb
     )
 );
 
@@ -1036,17 +884,7 @@ end
     (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
     -
     (alpha_x[r,g]*PFX^(1 + et_x[r,g])+alpha_n[r,g]*PN[g]^(1 + et_x[r,g])+alpha_d[r,g]*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1 + et_x[r,g]))^(1/(1 + et_x[r,g]))
-    # -
-    # (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
 );
-
-# @mapping(cge,deflo_RX[(r,g) in set[:X]],
-#     # (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
-#     # -
-#     (alpha_x[r,g]*PFX^(1 + et_x[r,g])+alpha_n[r,g]*PN[g]^(1 + et_x[r,g])+alpha_d[r,g]*(haskey(PD.lookup[1], (r,g)) ? PD[(r,g)] : 1.0)^(1 + et_x[r,g]))^(1/(1 + et_x[r,g]))
-#     -
-#     (haskey(RX.lookup[1], (r,g)) ? RX[(r,g)] : 1.0)
-# );
 
 
 @mapping(cge,def_U[r in set[:r]],
@@ -1066,7 +904,7 @@ end
 @mapping(cge,def_CFE[(r,s) in set[:CFE]],
     CFE[(r,s)]
     -
-    sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0))^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
+    sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0) + PDCO2[r]*idcco2[r,gg,s]*swcarb)^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
 );
 
 ####################################
@@ -1124,9 +962,9 @@ end
 @complementarity(cge,market_pva,PVA);
 
 # co2 emissions
-# @complementarity(cge,profit_co2,CO2);
-# @complementarity(cge,market_pdco2,PDCO2);
-# @complementarity(cge,market_pco2,PCO2);
+@complementarity(cge,profit_co2,CO2);
+@complementarity(cge,market_pdco2,PDCO2);
+@complementarity(cge,market_pco2,PCO2);
 
 
 
