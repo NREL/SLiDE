@@ -88,7 +88,7 @@ set[:PE] = filter(x -> sld[:en_bar][x] != 0.0, combvec(set[:r],set[:s]))
 set[:PVA] = filter(x -> sld[:va_bar][x] != 0.0, combvec(set[:r],set[:s]))
 set[:PYM] = filter(x -> sld[:klem_bar][x] != 0.0, combvec(set[:r],set[:s]))
 
-
+set[:CFE] = filter(x -> sld[:fe_bar][x] != 0.0, combvec(set[:r],set[:s]))
 
 ##############
 # PARAMETERS
@@ -319,6 +319,7 @@ lo = 0.0
 @variable(cge,DKM[(r,s) in set[:PK]] >= lo, start = start_value(YM[(r,s)]) * value(kd0[r,s]));
 @variable(cge,RX[(r,g) in set[:X]]>=lo,start = 1); # definitional: export transformation unit revenue
 @variable(cge,CEN[(r,s) in set[:PE]]>=lo,start = 1); # definitional: energy unit cost
+@variable(cge,CFE[(r,s) in set[:CFE]]>=lo,start = 1); # definitional: fossil energy unit cost
 
 # --- labor-leisure variables ---
 @variable(cge,Z[r in set[:r]] >= lo, start=1);
@@ -461,9 +462,9 @@ end);
 # @NLexpression(cge,CFE[r in set[:r], s in set[:s]],
 #     sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0) + PDCO2[r]*idcco2[r,gg,s]*swcarb)^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
 # );
-@NLexpression(cge,CFE[r in set[:r], s in set[:s]],
-    sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0))^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
-);
+# @NLexpression(cge,CFE[r in set[:r], s in set[:s]],
+#     sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0))^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
+# );
 
 
 # Unit cost function: Energy (ele + fe)
@@ -509,7 +510,7 @@ end);
 #     id0[r,g,s] * (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CFE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) + PDCO2[r]*idcco2[r,g,s]*swcarb))^(es_fe[s])
 # );
 @NLexpression(cge,IDA_fe[r in set[:r], g in set[:fe], s in set[:s]],
-    id0[r,g,s] * ((haskey(CEN.lookup[1], (r,s)) ? CEN[(r,s)] : 1.0)/CFE[r,s])^(es_ele[s]) * (CFE[r,s]/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)))^(es_fe[s])
+    id0[r,g,s] * ((haskey(CEN.lookup[1], (r,s)) ? CEN[(r,s)] : 1.0)/(haskey(CFE.lookup[1], (r,s)) ? CFE[(r,s)] : 1.0))^(es_ele[s]) * ((haskey(CFE.lookup[1], (r,s)) ? CFE[(r,s)] : 1.0)/((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)))^(es_fe[s])
 );
 # # Demand function: co2 emissions
 # @NLexpression(cge,IDA_co2[r in set[:r], g in set[:fe], s in set[:s]],
@@ -641,7 +642,7 @@ end);
 # cost of electricity
     sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * IDA_ele[r,g,s] for g in set[:ele])
 # cost of fossil energy
-    + sum(((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)) * id0[r,g,s] for g in set[:fe])
+    + sum(((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0)) * IDA_fe[r,g,s] for g in set[:fe])
     -
 # revenue from energy supply
     (haskey(PE.lookup[1], (r,s)) ? PE[(r,s)] : 1.0)  * sum(id0[r,g,s] for g in set[:en])
@@ -824,7 +825,7 @@ end
 #        + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
         + sum((haskey(YM.lookup[1], (r, s)) ? YM[(r, s)] : 1.0) * IDA_ne[r,g,s] for s in set[:s] if ((r,s) in set[:Y] && g in set[:nne]))
         + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_ele[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:ele]))
-        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * id0[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:fe]))
+        + sum((haskey(E.lookup[1], (r, s)) ? E[(r, s)] : 1.0) * IDA_fe[r,g,s] for s in set[:s] if ((r,s) in set[:PE] && g in set[:fe]))
         + sum((haskey(YX.lookup[1], (r, s)) ? YX[(r, s)] : 1.0) * id0[r,g,s] for s in set[:s] if (r,s) in set[:Y])
     )
 );
@@ -1059,14 +1060,15 @@ end
 @mapping(cge,def_CEN[(r,s) in set[:PE]],
     CEN[(r,s)]
     -
-    (sum(theta_ele[r,s]*(haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0)^(1-es_ele[s]) for gg in set[:ele]) + (1-theta_ele[r,s])*CFE[r,s]^(1-es_ele[s]))^(1/(1-es_ele[s]))
+    (sum(theta_ele[r,s]*(haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0)^(1-es_ele[s]) for gg in set[:ele]) + (1-theta_ele[r,s])*(haskey(CFE.lookup[1], (r,s)) ? CFE[(r,s)] : 1.0)^(1-es_ele[s]))^(1/(1-es_ele[s]))
 );
 
-# @mapping(cge,def_CFE[(r,s) in set[:FE]],
-#     CFE[(r,s)]
-#     -
-#     sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0))^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
-# );
+@mapping(cge,def_CFE[(r,s) in set[:CFE]],
+    CFE[(r,s)]
+    -
+    sum(theta_fe[r,gg,s]*((haskey(PA.lookup[1], (r,gg)) ? PA[(r,gg)] : 1.0))^(1-es_fe[s]) for gg in set[:fe])^(1/(1-es_fe[s]))
+);
+
 ####################################
 # -- Complementarity Conditions --
 ####################################
@@ -1104,6 +1106,7 @@ end
 @complementarity(cge,DKMdef,DKM);
 @complementarity(cge,def_RX,RX);
 @complementarity(cge,def_CEN,CEN);
+@complementarity(cge,def_CFE,CFE);
 
 # Labor leisure
 @complementarity(cge,profit_ls,LS);
