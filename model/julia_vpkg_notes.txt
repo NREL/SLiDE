@@ -1,0 +1,16 @@
+Package version notes:
+DataFrames version - 0.21.8 (DataFrames pushes PATHSolver up to 1.1.1)
+PathSolver version - 0.6.2 --- (pushes up DataFrames and JuMP)
+Complementarity version - 0.7.2 -- compatible with pathsolver 0.6.2
+JuMP version - 0.21.4
+
+add DataFrames@0.21.8
+add PATHSolver@0.6.2
+add JuMP@0.21.4
+
+New version of JuMP no longer compatible with haskey() variable/equation filtering method
+
+Trick is:
+Build the slide benchmark with old Dataframes and jump version (and new pathsolver/complementarity)
+Then run model with old PathSolver and Complementarity Versions (with new dataframes version)
+packages require changes between build and modeling
