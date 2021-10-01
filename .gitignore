@@ -14,4 +14,4 @@ docs/build/
 deps/*.log
 
 model/bmk_data/*.csv
-*~
+model/*~
