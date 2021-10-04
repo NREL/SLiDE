@@ -154,7 +154,7 @@ fill_zero(tuple(regions,goods),sld[:a0])
 fill_zero(tuple(regions,goods),sld[:ta0])
 fill_zero(tuple(regions,goods),sld[:tm0])
 fill_zero(tuple(regions,goods),sld[:cd0])
-fill_zero((regions),sld[:c0])
+fill_zero(tuple(regions),sld[:c0])
 fill_zero(tuple(regions,goods),sld[:yh0])
 fill_zero(tuple(regions),sld[:bopdef0])
 fill_zero(tuple(regions),sld[:hhadj])
@@ -183,12 +183,13 @@ y_check = Dict()
 sset = Dict()
 
 sset[:Y] = filter(x -> y_check[x] != 0.0, combvec(set[:r], set[:s]));
-sset[:X] = filter(x -> haskey(sld[:s0], x), combvec(set[:r], set[:g]));
+sset[:X] = filter(x -> sld[:s0][x[1],x[2]] != 0.0, combvec(set[:r], set[:g]));
 sset[:A] = filter(x -> a_set[x[1], x[2]] != 0.0, combvec(set[:r], set[:g]));
-sset[:PA] = filter(x -> haskey(sld[:a0], (x[1], x[2])), combvec(set[:r], set[:g]));
-sset[:PD] = filter(x -> haskey(sld[:xd0], (x[1], x[2])), combvec(set[:r], set[:g]));
-sset[:PK] = filter(x -> haskey(sld[:kd0], (x[1], x[2])), combvec(set[:r], set[:s]));
-sset[:PY] = filter(x -> y_check[x[1], x[2]] >= 0, combvec(set[:r], set[:g]));
+sset[:PA] = filter(x -> sld[:a0][x[1],x[2]] != 0.0, combvec(set[:r], set[:g]));
+sset[:PD] = filter(x -> sld[:xd0][x[1],x[2]] != 0.0, combvec(set[:r], set[:g]));
+sset[:PK] = filter(x -> sld[:kd0][x[1],x[2]] != 0.0, combvec(set[:r], set[:s]));
+sset[:PY] = filter(x -> sld[:s0][x[1], x[2]] != 0.0, combvec(set[:r], set[:g]));
+sset[:CD] = filter(x -> sld[:cd0][x[1], x[2]] != 0.0, combvec(set[:r], set[:g]));
 
 
 ########## Model ##########
@@ -231,6 +232,7 @@ cge = MCPModel();
 @NLparameter(cge, ty[r in set[:r], s in set[:s]] == sld[:ty0][r,s]); #
 @NLparameter(cge, ta[r in set[:r], g in set[:g]] == sld[:ta0][r,g]); #
 @NLparameter(cge, tm[r in set[:r], g in set[:g]] == sld[:tm0][r,g]); #
+# @NLparameter(cge, tm[r in set[:r], g in set[:g]] == 0.0); #
 
 # benchmark value share parameters
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
@@ -258,22 +260,22 @@ cge = MCPModel();
 lo = MODEL_LOWER_BOUND
 
 #set[:s]
-@variable(cge, Y[(r,s) in sset[:Y]] >= lo, start = 1);
-@variable(cge, X[(r,g) in sset[:X]] >= lo, start = 1);
-@variable(cge, A[(r,g) in sset[:A]] >= lo, start = 1);
-@variable(cge, C[r in set[:r]] >= lo, start = 1);
-@variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1);
+@variable(cge, Y[(r,s) in sset[:Y]] >= lo, start = 1.0);
+@variable(cge, X[(r,g) in sset[:X]] >= lo, start = 1.0);
+@variable(cge, A[(r,g) in sset[:A]] >= lo, start = 1.0);
+@variable(cge, C[r in set[:r]] >= lo, start = 1.0);
+@variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1.0);
 
 #commodities:
-@variable(cge, PA[(r,g) in sset[:PA]] >= lo, start = 1); # Regional market (input)
-@variable(cge, PY[(r,g) in sset[:PY]] >= lo, start = 1); # Regional market (output)
-@variable(cge, PD[(r,g) in sset[:PD]] >= lo, start = 1); # Local market price
-@variable(cge, PN[g in set[:g]] >= lo, start =1); # National market
-@variable(cge, PL[r in set[:r]] >= lo, start = 1); # Wage rate
-@variable(cge, PK[(r,s) in sset[:PK]] >= lo, start =1); # Rental rate of capital ###
-@variable(cge, PM[r in set[:r], m in set[:m]] >= lo, start =1); # Margin price
-@variable(cge, PC[r in set[:r]] >= lo, start = 1); # Consumer price index #####
-@variable(cge, PFX >= lo, start = 1); # Foreign exchange
+@variable(cge, PA[(r,g) in sset[:PA]] >= lo, start = 1.0); # Regional market (input)
+@variable(cge, PY[(r,g) in sset[:PY]] >= lo, start = 1.0); # Regional market (output)
+@variable(cge, PD[(r,g) in sset[:PD]] >= lo, start = 1.0); # Local market price
+@variable(cge, PN[g in set[:g]] >= lo, start =1.0); # National market
+@variable(cge, PL[r in set[:r]] >= lo, start = 1.0); # Wage rate
+@variable(cge, PK[(r,s) in sset[:PK]] >= lo, start = 1.0); # Rental rate of capital ###
+@variable(cge, PM[r in set[:r], m in set[:m]] >= lo, start = 1.0); # Margin price
+@variable(cge, PC[r in set[:r]] >= lo, start = 1.0); # Consumer price index #####
+@variable(cge, 1.0>=PFX>=1.0, start = 1.0); # Foreign exchange
 
 #consumer:
 @variable(cge,RA[r in set[:r]]>=lo,start = value(c0[r])) ;
@@ -282,6 +284,7 @@ lo = MODEL_LOWER_BOUND
 # EQUATIONS
 ##############
 
+#=
 # * $prod:Y(r,s)$y_(r,s)  s:0 va:1
 # * 	o:PY(r,g)	q:ys0(r,s,g)            a:RA(r) t:ty(r,s)    p:(1-ty0(r,s))
 # * 	i:PA(r,g)	q:id0(r,g,s)
@@ -305,7 +308,7 @@ lo = MODEL_LOWER_BOUND
 # *			(ld0(r,s)+kd0(r,s)) * PVA(r,s)
 
 # 	=e= sum(g,PY(r,g)*ys0(r,s,g))*(1-ty(r,s));
-
+=#
 
 #cobb-douglas function for value added (VA)
 @NLexpression(cge,CVA[r in set[:r],s in set[:s]],
@@ -320,16 +323,17 @@ lo = MODEL_LOWER_BOUND
 
 @mapping(cge,profit_y[(r,s) in sset[:Y]],
 # cost of intermediate demand
-        sum((haskey(PA.lookup[1], (r,g)) ? PA[(r,g)] : 1.0) * id0[r,g,s] for g in set[:g])
+        sum(PA[(r,g)] * id0[r,g,s] for g in set[:g] if ((r,g) in sset[:PA]))
 # cost of labor inputs
         + PL[r] * LD[r,s]
 # cost of capital inputs
         + (haskey(PK.lookup[1], (r,s)) ? PK[(r,s)] : 1.0)* KD[r,s]
         -
 # revenue from sectoral supply (take note of r/s/g indices on ys0)
-        sum((haskey(PY.lookup[1], (r,g)) ? PY[(r,g)] : 1.0)  * ys0[r,s,g] for g in set[:g]) * (1-ty[r,s])
+        sum(PY[(r,g)] * ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) * (1-ty[r,s])
 );
 
+#=
 # * $prod:X(r,g)$x_(r,g)  t:4
 # * 	o:PFX		q:(x0(r,g)-rx0(r,g))
 # * 	o:PN(g)		q:xn0(r,g)
@@ -348,21 +352,22 @@ lo = MODEL_LOWER_BOUND
 
 # prf_X(x_(r,g))..
 # 		PY(r,g)*s0(r,g) =e= (x0(r,g)-rx0(r,g)+xn0(r,g)+xd0(r,g)) * RX(r,g);
-
+=#
 
 @NLexpression(cge,RX[r in set[:r],g in set[:g]],
               (
-                  theta_xd[r,g]*PD[(r,g)]^(1+et_x[r,g])
+                  theta_xd[r,g]*(haskey(PD.lookup[1],(r,g)) ? PD[(r,g)] : 1.0)^(1+et_x[r,g])
                   + theta_xn[r,g]*PN[g]^(1+et_x[r,g])
                   + theta_xe[r,g]*PFX^(1+et_x[r,g])
               )^(1/(1+et_x[r,g]))
-              );
+);
 
 @mapping(cge,profit_x[(r,g) in sset[:X]],
          PY[(r,g)]*s0[r,g]
          - (x0[r,g]-rx0[r,g]+xn0[r,g]+xd0[r,g])*RX[r,g]
-         );
+);
 
+#=
 # * $prod:A(r,g)$a_(r,g)  s:0 dm:2  d(dm):4
 # * 	o:PA(r,g)	q:a0(r,g)		a:RA(r)	t:ta(r,g)	p:(1-ta0(r,g))
 # * 	o:PFX		q:rx0(r,g)
@@ -385,59 +390,64 @@ lo = MODEL_LOWER_BOUND
 # 	 	sum(m,PM(r,m)*md0(r,m,g)) + 
 # 			(nd0(r,g)+dd0(r,g)+m0(r,g)*(1+tm0(r,g))) * PMND(r,g)
 # 				=e= PA(r,g)*a0(r,g)*(1-ta(r,g)) + PFX*rx0(r,g);
+=#
 
 @NLexpression(cge,PND[r in set[:r],g in set[:g]],
               (
                   theta_n[r,g]*PN[g]^(1-es_d[r,g])
-                  + (1-theta_n[r,g])*PD[(r,g)]^(1-es_d[r,g])
+                  + (1-theta_n[r,g])*(haskey(PD.lookup[1],(r,g)) ? PD[(r,g)] : 1.0)^(1-es_d[r,g])
               )^(1/(1-es_d[r,g]))
-              );
+);
 
 @NLexpression(cge,PMND[r in set[:r],g in set[:g]],
               (
                   theta_m[r,g]*(PFX*(1+tm[r,g])/(1+tm0[r,g]))^(1-es_f[r,g])
                   + (1-theta_m[r,g])*PND[r,g]^(1-es_f[r,g])
               )^(1/(1-es_f[r,g]))
-              );
+);
 
 @mapping(cge,profit_a[(r,g) in sset[:A]],
-         sum(m,PM[r,m]*md0[r,m,g])
+         sum(PM[r,m]*md0[r,m,g] for m in set[:m])
          + (nd0[r,g]+dd0[r,g]+m0[r,g]*(1+tm0[r,g]))*PMND[r,g]
          - (
              PA[(r,g)]*a0[r,g]*(1-ta[r,g])
              + PFX*rx0[r,g]
          )
-         );
+);
 
-
+#=
 # * $prod:MS(r,m)
 # * 	o:PM(r,m)	q:(sum(gm, md0(r,m,gm)))
 # * 	i:PN(gm)	q:nm0(r,gm,m)
 # * 	i:PD(r,gm)	q:dm0(r,gm,m)
 
 # prf_MS(r,m)..	sum(gm, PN(gm)*nm0(r,gm,m) + PD(r,gm)*dm0(r,gm,m)) =g= PM(r,m)*sum(gm, md0(r,m,gm));
-
+=#
 
 @mapping(cge,profit_ms[r in set[:r],m in set[:m]],
-         sum(PN[gm]*nm0[r,gm,m] + PD[(r,gm)]*dm0[r,gm,m] for gm in set[:gm])
+         sum(PN[gm]*nm0[r,gm,m] + (haskey(PD.lookup[1],(r,gm)) ? PD[(r,gm)] : 1.0)*dm0[r,gm,m] for gm in set[:gm])
          - PM[r,m]*sum(md0[r,m,gm] for gm in set[:gm])
-         );
+);
 
-
+#=
 # * $prod:C(r)  s:1
 # *     	o:PC(r)		q:c0(r)
 # * 	i:PA(r,g)	q:cd0(r,g)
 
-
 # prf_C(r)..	prod(g$cd0(r,g), PA(r,g)**(cd0(r,g)/c0(r))) =g= PC(r);
+=#
 
+# !!!! no product function in Julia
+# !!!! stick to fixed proportions I guess for now
+# !!!! could possibly add if ((r,g) in sset[:CD]) to sum statement
+@NLparameter(cge, theta_cd[r in set[:r], g in set[:g]] == ensurefinite(value(cd0[r,g]) / sum(value(cd0[r,gg]) for gg in set[:g])));
 
 @mapping(cge,profit_c[r in set[:r]],
-         sum((PA[(r,g)]^(cd0[r,g]/c0[r])) for g in set[:g])
+         sum(PA[(r,g)]*theta_cd[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
          - PC[r]
-         );
+);
 
-
+#=
 # * $demand:RA(r)
 # * 	d:PC(r)		q:c0(r)
 # * 	e:PY(r,g)	q:yh0(r,g)
@@ -454,19 +464,174 @@ lo = MODEL_LOWER_BOUND
 # 				+ sum(a_(r,g)$a0(r,g), A(r,g)*ta(r,g)*PA(r,g)*a0(r,g))
 # 				+ sum(a_(r,g)$m0(r,g), A(r,g)*tm(r,g)*PFX*m0(r,g)*
 # 						(PMND(r,g)*(1+tm0(r,g))/(PFX*(1+tm(r,g))))**2);
+=#
 
-@mapping(cge,RA[r in set[:r]],
+@mapping(cge,income_ra[r in set[:r]],
          RA[r]
          - (
              sum(PY[(r,g)]*yh0[r,g] for g in set[:g])
              + PFX*(bopdef0[r]+hhadj[r])
-             - sum(g, PA[(r,g)]*(g0[r,g]+i0[r,g]))
+             - sum(PA[(r,g)]*(g0[r,g]+i0[r,g]) for g in set[:g] if ((r,g) in sset[:PA]))
              + sum(PL[r]*ld0[r,s] for s in set[:s])
-             + sum(PK[r,s]*kd0[r,s] for s in set[:s])
-             + sum(Y[(r,s)]*ty[r,s]*sum(PY[(r,g)]*ys0[r,s,g] for g in set[:g]) for s in set[:s])
-             + sum(A[(r,g)]*ta[r,g]*PA[(r,g)]*a0[r,g] for g in set[:g])
-             + sum(A[(r,g)]*tm[r,g]*PFX*m0[r,g]*(PMND[r,g]*(1+tm0[r,g])/(PFX*(1+tm[r,g])))^es_f[r,g] for g in set[:g])
+             + sum(PK[(r,s)]*kd0[r,s] for s in set[:s] if ((r,s) in sset[:PK]))
+             + sum(Y[(r,s)]*ty[r,s]*sum(PY[(r,g)]*ys0[r,s,g] for g in set[:g]) for s in set[:s] if ((r,s) in sset[:Y]))
+            + sum(A[(r,g)]*ta[r,g]*PA[(r,g)]*a0[r,g] for g in set[:g] if ((r,g) in sset[:A]))
+            + sum(A[(r,g)]*tm[r,g]*PFX*m0[r,g]*(PMND[r,g]*(1+tm0[r,g])/(PFX*(1+tm[r,g])))^es_f[r,g] for g in set[:g] if ((r,g) in sset[:A]))
          )
-         );
+);
 
+#=
 # market clearance conditions:
+# mkt_PA(a_(r,g))..	A(r,g)*a0(r,g) =e= sum(y_(r,s), Y(r,s)*id0(r,g,s)) 
+# 					+ cd0(r,g)*C(r)*PC(r)/PA(r,g)
+# 					+ g0(r,g) + i0(r,g);
+=#
+
+@mapping(cge,market_pa[(r,g) in sset[:PA]],
+         A[(r,g)]*a0[r,g]
+         - (
+             sum(Y[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
+             + C[r]*cd0[r,g]*(PC[r]/PA[(r,g)])
+             + g0[r,g]
+             + i0[r,g]
+         )
+);
+
+# mkt_PY(r,g)$s0(r,g)..	sum(y_(r,s), Y(r,s)*ys0(r,s,g)) + yh0(r,g) =e= X(r,g) * s0(r,g);
+
+@mapping(cge,market_py[(r,g) in sset[:PY]],
+         sum(Y[(r,s)]*ys0[r,s,g] for s in set[:s] if ((r,s) in sset[:Y])) + yh0[r,g]
+         - X[(r,g)]*s0[r,g]
+);
+
+#=
+# mkt_PD(r,g)$xd0(r,g)..	X(r,g)*xd0(r,g) * 
+
+# *	This is a tricky piece of code.  The PIP sector in HI has a single output from the 
+# *	X sector into the PD market.  This output is only used in margins which have a Leontief
+# *	demand structure.  In a counter-factual equilibrium, the price (PD("HI","PIP")) can then
+# *	fall to zero, and iso-elastic compensated supply function cannot be evaluated  (0/0).
+# *	We therefore need to differentiate between sectors with Leontief supply and those in 
+# *	which outputs are produce for multiple markets.  This is the sort of numerical nuisance
+# *	that is avoided when using MPSGE.
+
+# 			( ( (PD(r,g)/RX(r,g))**4 )$round(1-thetaxd(r,g),6) + 1$(not round(1-thetaxd(r,g),6))) =e= 
+
+# 				sum(a_(r,g), A(r,g) * dd0(r,g) * 
+# 				(PND(r,g)/PD(r,g))**4 * (PMND(r,g)/PND(r,g))**2)
+# 				+ sum((m,gm)$sameas(g,gm), dm0(r,gm,m)*MS(r,m));
+=#
+
+@NLexpression(cge,AD[r in set[:r],g in set[:g]],
+  ((haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) / (RX[r,g]))^et_x[r,g] );
+
+@mapping(cge,market_pd[(r,g) in sset[:PD]],
+#         (haskey(X.lookup[1],(r,g)) ? X[(r,g)] : 1.0)*xd0[r,g]*((isless(1e-6,(1-value(theta_xd[r,g])))) ? ((PD[(r,g)]/RX[r,g])^et_x[r,g]) : 1.0)
+         (haskey(X.lookup[1],(r,g)) ? X[(r,g)] : 1.0)*xd0[r,g]*((isless(1e-6,(1-value(theta_xd[r,g])))) ? AD[r,g] : 1.0)
+#         (haskey(X.lookup[1],(r,g)) ? X[(r,g)] : 1.0)*xd0[r,g]*((PD[(r,g)]/RX[r,g])^et_x[r,g])
+#         (haskey(X.lookup[1],(r,g)) ? X[(r,g)] : 1.0)*xd0[r,g]
+         - (
+             (haskey(A.lookup[1],(r,g)) ? A[(r,g)] : 1.0)*dd0[r,g]*((PND[r,g]/PD[(r,g)])^es_d[r,g])*((PMND[r,g]/PND[r,g])^es_f[r,g])
+             + sum(MS[r,m]*dm0[r,g,m] for m in set[:m] if (g in set[:gm]))
+         )
+);
+
+#=
+# mkt_PN(g)..		sum(x_(r,g), X(r,g) * xn0(r,g) * (PN(g)/PY(r,g))**4) =e= 
+# 			sum(a_(r,g), A(r,g) * nd0(r,g) * (PND(R,G)/PN(g))**4 * (PMND(r,g)/PND(r,g))**2)
+# 			+ sum((r,m,gm)$sameas(g,gm), nm0(r,gm,m)*MS(r,m));
+=#
+
+@mapping(cge,market_pn[g in set[:g]],
+         sum(X[(r,g)]*xn0[r,g]*((PN[g]/PY[(r,g)])^et_x[r,g]) for r in set[:r] if ((r,g) in sset[:X]))
+         - (
+             sum(A[(r,g)]*nd0[r,g]*((PND[r,g]/PN[g])^es_d[r,g])*((PMND[r,g]/PND[r,g])^es_f[r,g]) for r in set[:r] if ((r,g) in sset[:A]))
+             + sum(MS[r,m]*nm0[r,g,m] for r in set[:r] for m in set[:m] if (g in set[:gm]))
+         )
+);
+
+#=
+# mkt_PFX..		sum(x_(r,g), X(r,g)*(x0(r,g)-rx0(r,g))*(PFX/PY(r,g))**4) 
+# 			+ sum(a_(r,g), A(r,g)*rx0(r,g)) 
+# 			+ sum(r, bopdef0(r)+hhadj(r)) =e= 
+# 			sum(a_(r,g), A(r,g)*m0(r,g)*(PMND(r,g)*(1+tm0(r,g))/(PFX*(1+tm(r,g))))**2);
+=#
+
+@mapping(cge,market_pfx,
+         sum(X[(r,g)]*(x0[r,g]-rx0[r,g]) for (r,g) in sset[:X])
+         + sum(A[(r,g)]*rx0[r,g] for (r,g) in sset[:A])
+         + sum(bopdef0[r]+hhadj[r] for r in set[:r])
+         - sum(A[(r,g)]*m0[r,g]*(((PMND[r,g]*(1+tm0[r,g]))/(PFX*(1+tm[r,g])))^es_f[r,g]) for (r,g) in sset[:A])
+);
+
+# mkt_PL(r)..	sum(s,ld0(r,s)) =g= sum(y_(r,s), Y(r,s)*ld0(r,s)*PVA(r,s)/PL(r));
+
+@mapping(cge,market_pl[r in set[:r]],
+         sum(ld0[r,s] for s in set[:s])
+         - sum(Y[(r,s)]*ld0[r,s]*(CVA[r,s]/PL[r]) for s in set[:s] if ((r,s) in sset[:Y]))
+);
+
+# mkt_PK(r,s)$kd0(r,s)..	kd0(r,s) =e= kd0(r,s)*Y(r,s)*PVA(r,s)/PK(r,s);
+
+@mapping(cge,market_pk[(r,s) in sset[:PK]],
+         kd0[r,s]
+         - kd0[r,s]*Y[(r,s)]*(CVA[r,s]/PK[(r,s)])
+);
+
+# mkt_PM(r,m)..		MS(r,m)*sum(gm,md0(r,m,gm)) =e= sum(a_(r,g),md0(r,m,g)*A(r,g));
+
+@mapping(cge,market_pm[r in set[:r],m in set[:m]],
+         MS[r,m]*sum(md0[r,m,gm] for gm in set[:gm])
+         - sum(md0[r,m,g]*A[(r,g)] for g in set[:g] if ((r,g) in sset[:A]))
+);
+
+# mkt_PC(r)..	C(r)*c0(r)*PC(r) =e= RA(r);
+
+@mapping(cge,market_pc[r in set[:r]],
+         PC[r]*C[r]*c0[r]
+         - RA[r]
+);
+
+
+@complementarity(cge,profit_y,Y);
+@complementarity(cge,profit_x,X);
+@complementarity(cge,profit_a,A);
+@complementarity(cge,profit_c,C);
+@complementarity(cge,profit_ms,MS);
+@complementarity(cge,market_pa,PA);
+@complementarity(cge,market_py,PY);
+@complementarity(cge,market_pd,PD);
+@complementarity(cge,market_pn,PN);
+@complementarity(cge,market_pl,PL);
+@complementarity(cge,market_pk,PK);
+@complementarity(cge,market_pm,PM);
+@complementarity(cge,market_pc,PC);
+@complementarity(cge,market_pfx,PFX);
+@complementarity(cge,income_ra,RA);
+
+####################
+# -- Model Solve --
+####################
+
+#set up the options for the path solver
+PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=0)
+
+# solve the model
+status = solveMCP(cge)
+
+# Free trade counterfactual
+for r in set[:r],g in set[:g]
+    set_value(tm[r,g],0.0)
+    # set_value(tm[r,g],value(tm0[r,g]))
+end
+
+# for r in set[:r],s in set[:s]
+#     set_value(ty[r,s],value(ty0[r,s])*1.1)
+# end
+
+#value(tm["SC","che"])
+#set up the options for the path solver
+PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=10000)
+
+# solve the model
+status = solveMCP(cge)
