@@ -435,6 +435,7 @@ lo = MODEL_LOWER_BOUND
 # * 	i:PA(r,g)	q:cd0(r,g)
 
 # prf_C(r)..	prod(g$cd0(r,g), PA(r,g)**(cd0(r,g)/c0(r))) =g= PC(r);
+# prf_C(r).. sum(g$cd0(r,g),PA(r,g)*(cd0(r,g)/c0(r)) =g= PC(r);
 =#
 
 # !!!! no product function in Julia
@@ -442,8 +443,21 @@ lo = MODEL_LOWER_BOUND
 # !!!! could possibly add if ((r,g) in sset[:CD]) to sum statement
 @NLparameter(cge, theta_cd[r in set[:r], g in set[:g]] == ensurefinite(value(cd0[r,g]) / sum(value(cd0[r,gg]) for gg in set[:g])));
 
+@NLparameter(cge, es_cd == 0.0);
+
+# unit cost for consumption
+@NLexpression(cge, CC[r in set[:r]],
+    sum( theta_cd[r,gg]*(haskey(PA.lookup[1], (r, gg)) ? PA[(r, gg)] : 1.0)^(1-es_cd) for gg in set[:g])^(1/(1-es_cd))
+);
+
+# final demand
+@NLexpression(cge,CD[r in set[:r],g in set[:g]],
+    ((CC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0))^es_cd));
+#  cd0[r,g]*PC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0));
+
 @mapping(cge,profit_c[r in set[:r]],
          sum(PA[(r,g)]*theta_cd[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
+#         CC[r]
          - PC[r]
 );
 
@@ -485,13 +499,17 @@ lo = MODEL_LOWER_BOUND
 # mkt_PA(a_(r,g))..	A(r,g)*a0(r,g) =e= sum(y_(r,s), Y(r,s)*id0(r,g,s)) 
 # 					+ cd0(r,g)*C(r)*PC(r)/PA(r,g)
 # 					+ g0(r,g) + i0(r,g);
+
+# mkt_PA(a_(r,g))..	A(r,g)*a0(r,g) =e= sum(y_(r,s), Y(r,s)*id0(r,g,s)) 
+# 					+ cd0(r,g)*C(r)
+# 					+ g0(r,g) + i0(r,g);
 =#
 
 @mapping(cge,market_pa[(r,g) in sset[:PA]],
          A[(r,g)]*a0[r,g]
          - (
              sum(Y[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
-             + C[r]*cd0[r,g]*(PC[r]/PA[(r,g)])
+             + C[r]*cd0[r,g]
              + g0[r,g]
              + i0[r,g]
          )
@@ -525,11 +543,12 @@ lo = MODEL_LOWER_BOUND
 @NLexpression(cge,AD[r in set[:r],g in set[:g]],
   ((haskey(PD.lookup[1], (r, g)) ? PD[(r, g)] : 1.0) / (RX[r,g]))^et_x[r,g] );
 
+# couple options for testing here
 @mapping(cge,market_pd[(r,g) in sset[:PD]],
 #         (haskey(X.lookup[1],(r,g)) ? X[(r,g)] : 1.0)*xd0[r,g]*((isless(1e-6,(1-value(theta_xd[r,g])))) ? ((PD[(r,g)]/RX[r,g])^et_x[r,g]) : 1.0)
-         (haskey(X.lookup[1],(r,g)) ? X[(r,g)] : 1.0)*xd0[r,g]*((isless(1e-6,(1-value(theta_xd[r,g])))) ? AD[r,g] : 1.0)
 #         (haskey(X.lookup[1],(r,g)) ? X[(r,g)] : 1.0)*xd0[r,g]*((PD[(r,g)]/RX[r,g])^et_x[r,g])
 #         (haskey(X.lookup[1],(r,g)) ? X[(r,g)] : 1.0)*xd0[r,g]
+         (haskey(X.lookup[1],(r,g)) ? X[(r,g)] : 1.0)*xd0[r,g]*((isless(1e-6,(1-value(theta_xd[r,g])))) ? AD[r,g] : 1.0)
          - (
              (haskey(A.lookup[1],(r,g)) ? A[(r,g)] : 1.0)*dd0[r,g]*((PND[r,g]/PD[(r,g)])^es_d[r,g])*((PMND[r,g]/PND[r,g])^es_f[r,g])
              + sum(MS[r,m]*dm0[r,g,m] for m in set[:m] if (g in set[:gm]))
@@ -623,15 +642,29 @@ status = solveMCP(cge)
 for r in set[:r],g in set[:g]
     set_value(tm[r,g],0.0)
     # set_value(tm[r,g],value(tm0[r,g]))
+    # set_value(et_x[r,g],0.0)
 end
+
+# set_value(et_x["HI","pip"],0.0)
+
+chk = Dict((r,g) => isless(1e-6,(1-value(theta_xd[r,g])))
+           for r in set[:r], g in set[:g]);
+
+# for r in set[:r],g in set[:g]
+#     if chk[r,g]==false
+#         println(r,",",g)
+#         set_value(et_x[r,g],0.0)
+#     end
+# end
 
 # for r in set[:r],s in set[:s]
 #     set_value(ty[r,s],value(ty0[r,s])*1.1)
 # end
 
 #value(tm["SC","che"])
+
 #set up the options for the path solver
-PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=10000)
+PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=100000)
 
 # solve the model
 status = solveMCP(cge)
