@@ -93,6 +93,9 @@ mod_year = 2017
 #specify the path where the dumped csv files are stored
 data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model", "bmk_data"))
 
+# sld = Dict(:ys0 => df_to_dict(Dict, read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"); drop_cols = [:yr], value_col = :Val))
+# sld[:ys0]
+
 #blueNOTE contains a dictionary of the parameters needed to specify the model
 sld = Dict(
     :ys0 => df_to_dict(Dict, read_data_temp("ys0",mod_year,data_temp_dir,"Sectoral supply"); drop_cols = [:yr], value_col = :Val),
@@ -112,7 +115,7 @@ sld = Dict(
     :tm0 => df_to_dict(Dict, read_data_temp("tm0",mod_year,data_temp_dir,"Import tariff"); drop_cols = [:yr], value_col = :Val),
     :cd0 => df_to_dict(Dict, read_data_temp("cd0",mod_year,data_temp_dir,"Final demand"); drop_cols = [:yr], value_col = :Val),
     :c0 => df_to_dict(Dict, read_data_temp("c0",mod_year,data_temp_dir,"Aggregate final demand"); drop_cols = [:yr], value_col = :Val),
-    :yh0 => df_to_dict(Dict, read_data_temp("yh0",mod_year,data_temp_dir,"Household production"); drop_cols = [:yr], value_col = :Val),
+#    :yh0 => df_to_dict(Dict, read_data_temp("yh0",mod_year,data_temp_dir,"Household production"); drop_cols = [:yr], value_col = :Val),
     :bopdef0 => df_to_dict(Dict, read_data_temp("bopdef0",mod_year,data_temp_dir,"Balance of payments"); drop_cols = [:yr], value_col = :Val),
     :hhadj => df_to_dict(Dict, read_data_temp("hhadj",mod_year,data_temp_dir,"Household adjustment"); drop_cols = [:yr], value_col = :Val),
     :g0 => df_to_dict(Dict, read_data_temp("g0",mod_year,data_temp_dir,"Government demand"); drop_cols = [:yr], value_col = :Val),
@@ -122,6 +125,8 @@ sld = Dict(
     :dd0 => df_to_dict(Dict, read_data_temp("dd0",mod_year,data_temp_dir,"Regional demand from local  market"); drop_cols = [:yr], value_col = :Val),
     :nd0 => df_to_dict(Dict, read_data_temp("nd0",mod_year,data_temp_dir,"Regional demand from national market"); drop_cols = [:yr], value_col = :Val)
 )
+
+
 
 regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
 sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
@@ -136,6 +141,8 @@ set = Dict(
     :m => margins,
     :gm => goods_margins
 )
+
+sld[:yh0] = Dict((r,g) => 0.0 for r in set[:r],g in set[:g])
 
 # need to fill in zeros to avoid missing keys
 fill_zero(tuple(regions,sectors,goods),sld[:ys0])
@@ -239,7 +246,7 @@ cge = MCPModel();
 @NLparameter(cge, theta_xe[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
 @NLparameter(cge, theta_xd[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(s0[r,g])));
 @NLparameter(cge, theta_xn[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(s0[r,g])));
-@NLparameter(cge, theta_n[r in set[:r], g in set[:g]] == ensurefinite(value(nd0[r,g]) / (value(nd0[r,g]) - value(dd0[r,g]))));
+@NLparameter(cge, theta_n[r in set[:r], g in set[:g]] == ensurefinite(value(nd0[r,g]) / (value(nd0[r,g]) + value(dd0[r,g]))));
 @NLparameter(cge, theta_m[r in set[:r], g in set[:g]] == ensurefinite((1+value(tm0[r,g])) * value(m0[r,g]) / (value(nd0[r,g]) + value(dd0[r,g]) + (1 + value(tm0[r,g])) * value(m0[r,g]))));
 
 #Substitution and transformation elasticities
@@ -258,6 +265,8 @@ cge = MCPModel();
 
 # Set lower bound
 lo = MODEL_LOWER_BOUND
+#lo = 1e-4
+lo_eps = 1e-4
 
 #set[:s]
 @variable(cge, Y[(r,s) in sset[:Y]] >= lo, start = 1.0);
@@ -587,14 +596,16 @@ lo = MODEL_LOWER_BOUND
 
 @mapping(cge,market_pl[r in set[:r]],
          sum(ld0[r,s] for s in set[:s])
-         - sum(Y[(r,s)]*ld0[r,s]*(CVA[r,s]/PL[r]) for s in set[:s] if ((r,s) in sset[:Y]))
+#         - sum(Y[(r,s)]*ld0[r,s]*(CVA[r,s]/PL[r]) for s in set[:s] if ((r,s) in sset[:Y]))
+         - sum(Y[(r,s)]*LD[r,s] for s in set[:s] if ((r,s) in sset[:Y]))
 );
 
 # mkt_PK(r,s)$kd0(r,s)..	kd0(r,s) =e= kd0(r,s)*Y(r,s)*PVA(r,s)/PK(r,s);
 
 @mapping(cge,market_pk[(r,s) in sset[:PK]],
          kd0[r,s]
-         - kd0[r,s]*Y[(r,s)]*(CVA[r,s]/PK[(r,s)])
+#         - kd0[r,s]*Y[(r,s)]*(CVA[r,s]/PK[(r,s)])
+         - Y[(r,s)]*KD[r,s]
 );
 
 # mkt_PM(r,m)..		MS(r,m)*sum(gm,md0(r,m,gm)) =e= sum(a_(r,g),md0(r,m,g)*A(r,g));
@@ -643,6 +654,8 @@ for r in set[:r],g in set[:g]
     set_value(tm[r,g],0.0)
     # set_value(tm[r,g],value(tm0[r,g]))
     # set_value(et_x[r,g],0.0)
+    # set_value(es_d[r,g],0.0)
+    # set_value(es_f[r,g],0.0)
 end
 
 # set_value(et_x["HI","pip"],0.0)
@@ -650,21 +663,34 @@ end
 chk = Dict((r,g) => isless(1e-6,(1-value(theta_xd[r,g])))
            for r in set[:r], g in set[:g]);
 
-# for r in set[:r],g in set[:g]
-#     if chk[r,g]==false
-#         println(r,",",g)
-#         set_value(et_x[r,g],0.0)
-#     end
-# end
+for r in set[:r],g in set[:g]
+    if chk[r,g]==false
+        println(r,",",g)
+        set_value(et_x[r,g],0.0)
+        set_value(es_d[r,g],0.0)
+        set_value(es_f[r,g],0.0)
+    end
+end
 
 # for r in set[:r],s in set[:s]
-#     set_value(ty[r,s],value(ty0[r,s])*1.1)
+#     set_value(ty[r,s],value(ty0[r,s])*1.05)
 # end
 
 #value(tm["SC","che"])
 
 #set up the options for the path solver
-PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cumulative_iteration_limit=100000)
+PATHSolver.options(convergence_tolerance=1e-6, minor_iteration_limit=50812, time_limit=1e+10, cumulative_iteration_limit=100000)
 
 # solve the model
 status = solveMCP(cge)
+
+# for (r,g) in sset[:PD]
+#     set_lower_bound(PD[(r,g)], 1e-4)
+# end
+# for g in set[:g]
+#     set_lower_bound(PN[g], 1e-4)
+# end
+# for (r,s) in sset[:PK]
+#     set_lower_bound(PK[(r,s)], 1e-6)
+# end
+
