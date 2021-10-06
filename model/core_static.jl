@@ -452,7 +452,7 @@ lo_eps = 1e-4
 # !!!! could possibly add if ((r,g) in sset[:CD]) to sum statement
 @NLparameter(cge, theta_cd[r in set[:r], g in set[:g]] == ensurefinite(value(cd0[r,g]) / sum(value(cd0[r,gg]) for gg in set[:g])));
 
-@NLparameter(cge, es_cd == 0.0);
+@NLparameter(cge, es_cd == 0.99);
 
 # unit cost for consumption
 @NLexpression(cge, CC[r in set[:r]],
@@ -465,8 +465,8 @@ lo_eps = 1e-4
 #  cd0[r,g]*PC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0));
 
 @mapping(cge,profit_c[r in set[:r]],
-         sum(PA[(r,g)]*theta_cd[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
-#         CC[r]
+#         sum(PA[(r,g)]*theta_cd[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
+         CC[r]
          - PC[r]
 );
 
@@ -518,7 +518,7 @@ lo_eps = 1e-4
          A[(r,g)]*a0[r,g]
          - (
              sum(Y[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
-             + C[r]*cd0[r,g]
+             + C[r]*cd0[r,g]*CD[r,g]
              + g0[r,g]
              + i0[r,g]
          )
@@ -666,9 +666,9 @@ chk = Dict((r,g) => isless(1e-6,(1-value(theta_xd[r,g])))
 for r in set[:r],g in set[:g]
     if chk[r,g]==false
         println(r,",",g)
-        set_value(et_x[r,g],0.0)
-        set_value(es_d[r,g],0.0)
-        set_value(es_f[r,g],0.0)
+        # set_value(et_x[r,g],0.0)
+        # set_value(es_d[r,g],0.0)
+        # set_value(es_f[r,g],0.0)
     end
 end
 
@@ -694,3 +694,6 @@ status = solveMCP(cge)
 #     set_lower_bound(PK[(r,s)], 1e-6)
 # end
 
+for g in set[:g]
+    println(g,"=>",result_value(X[("IA",g)]))
+end
