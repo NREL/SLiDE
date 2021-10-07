@@ -8,6 +8,7 @@
 # - could skip the downgrade of PATHSolver/Complementarity and just do JuMP
 # - new complementarity requires changes to way options/solve statement passed
 
+# use repl to do this with package manager ] instead
 # import Pkg
 # Pkg.add(Pkg.PackageSpec(name = "DataFrames", version = v"0.21.8"))
 # Pkg.add(Pkg.PackageSpec(name = "PATHSolver", version = v"0.6.2"))
@@ -345,6 +346,11 @@ lo_eps = 1e-4
 #cobb-douglas function for value added (VA)
 @NLexpression(cge,CVA[r in set[:r],s in set[:s]],
               PL[r]^alpha_kl[r,s] * (haskey(PK.lookup[1], (r,s)) ? PK[(r,s)] : 1.0) ^ (1-alpha_kl[r,s]) );
+              # PL[r]^alpha_kl[r,s] * (isempty([k.I[1] for k in keys(PK) if k.I[1]==(r,s)]) ? 1.0 : PK[(r,s)]) ^ (1-alpha_kl[r,s]) );
+
+# isempty([k.I[1] for k in keys(PK) if k.I[1]==("CO","cru")])
+# option to replace haskey in equation/nlexpression
+# (isempty([k.I[1] for k in keys(PK) if k.I[1]==(r,s)]) ? 1.0 : PK[(r,s)])
 
 #demand for labor in VA
 @NLexpression(cge,LD[r in set[:r], s in set[:s]], ld0[r,s] * CVA[r,s] / PL[r] );
