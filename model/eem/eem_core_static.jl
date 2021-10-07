@@ -351,6 +351,8 @@ lo_eps = 1e-4
 # isempty([k.I[1] for k in keys(PK) if k.I[1]==("CO","cru")])
 # option to replace haskey in equation/nlexpression
 # (isempty([k.I[1] for k in keys(PK) if k.I[1]==(r,s)]) ? 1.0 : PK[(r,s)])
+# other possible option to test is get(PK,(r,g),1.0) in new jump version - this would be ideal
+
 
 #demand for labor in VA
 @NLexpression(cge,LD[r in set[:r], s in set[:s]], ld0[r,s] * CVA[r,s] / PL[r] );
