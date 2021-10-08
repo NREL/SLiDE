@@ -98,7 +98,7 @@ end
 
 # year for the model to be based off of
 mod_year = 2017
-dataset_r = "bmk_data_census"
+dataset_r = "bmk_data_state"
 
 #specify the path where the dumped csv files are stored
 data_temp_dir = abspath(joinpath(dirname(Base.find_package("SLiDE")), "..", "model","eem", dataset_r))
@@ -842,7 +842,6 @@ status = solveMCP(cge)
 for r in set[:r],g in set[:g]
     set_value(tm[r,g],0.0)
     # set_value(tm[r,g],value(tm0[r,g]))
-    # set_value(es_d[r,g],0.0)
 end
 
 chk = Dict((r,g) => isless(1e-6,(1-value(theta_xd[r,g])))
@@ -851,9 +850,7 @@ chk = Dict((r,g) => isless(1e-6,(1-value(theta_xd[r,g])))
 for r in set[:r],g in set[:g]
     if chk[r,g]==false
         println(r,",",g)
-        # set_value(et_x[r,g],0.0)
         # set_value(es_d[r,g],0.0)
-        # set_value(es_f[r,g],0.0)
     end
 end
 
