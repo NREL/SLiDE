@@ -16,7 +16,7 @@ function combvec(set_a...)
     return vec(collect(Iterators.product(set_a...)))
 end
 
-cge = MCPModel();
+
 
 set = Dict()
 set[:r] = ["CO","CA"]
@@ -32,26 +32,28 @@ end
 sset = Dict()
 sset[:RK] = filter(x -> k0[x] != 0.0, combvec(set[:r],set[:s]));
 
+cge = MCPModel();
+
 @variable(cge,RK[(r,s) in sset[:RK]],start=1.0)
 
 # Works with all JuMP versions
 @NLexpression(cge,KD1[r in set[:r],s in set[:s]],
-              k0[r,s]*(isempty([k.I[1] for k in keys(RK) if k.I[1]==(r,s)]) ? 1.0 : RK[(r,s)])
+              k0[r,s]*1/(isempty([k.I[1] for k in keys(RK) if k.I[1]==(r,s)]) ? 1.0 : RK[(r,s)])
 );
 
 # Works with all JuMP versions
 @NLexpression(cge,KD2[r in set[:r],s in set[:s]],
-              k0[r,s]*(isempty([k.I[1] for k in keys(RK) if k.I[1]==(r,s)]) ? 1.0 : getindex(RK,(r,s)))
+              k0[r,s]*1/(isempty([k.I[1] for k in keys(RK) if k.I[1]==(r,s)]) ? 1.0 : getindex(RK,(r,s)))
 );
 
 # Throws error with JuMP > v0.21.4
 @NLexpression(cge,KD3[r in set[:r],s in set[:s]],
-              k0[r,s]*(haskey(RK.lookup[1],(r,s)) ? RK[(r,s)] : 1.0)
+              k0[r,s]*1/(haskey(RK.lookup[1],(r,s)) ? RK[(r,s)] : 1.0)
 );
 
 # !!!! I had hoped get() would work, but throws error
 @NLexpression(cge,KD4[r in set[:r],s in set[:s]],
-              k0[r,s]*get(RK,(r,s),1.0)
+              k0[r,s]*1/get(RK,(r,s),1.0)
 );
 
 # Throws error
