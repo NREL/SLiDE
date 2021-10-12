@@ -133,6 +133,8 @@ sld = Dict(
 )
 
 sld[:tk0] = df_to_dict(Dict, read_data_temp("tk0",data_temp_dir,"capital tax rate"); drop_cols = [], value_col = :Val)
+sld[:resco2] = df_to_dict(Dict, read_data_temp("resco2",data_temp_dir,"residential co2 emissions"); drop_cols = [], value_col = :Val)
+sld[:secco2] = df_to_dict(Dict, read_data_temp("secco2",data_temp_dir,"sectoral co2 emissions"); drop_cols = [], value_col = :Val)
 
 regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
 sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
@@ -142,6 +144,7 @@ margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=str
 # * define margin goods
 # gm(g) = yes$(sum((r,m), nm0(r,g,m) + dm0(r,g,m)) or sum((r,m), md0(r,m,g)));
 # goods_margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_gm.csv"),descriptor="goods with margins set"))[!,:g]);
+
 
 
 set = Dict(
@@ -185,6 +188,11 @@ fill_zero(tuple(regions,goods),sld[:nd0])
 sld[:tm] = sld[:tm0]
 sld[:ta] = sld[:ta0]
 sld[:ty] = sld[:ty0]
+
+for r in set[:r], g in set[:g], s in set[:s]
+    get!(sld[:secco2],(r,g,s),0.0)
+    get!(sld[:resco2],(r,g),0.0)
+end
 
 #following subsets are used to limit the size of the model
 # the a_set restricits the A variables indices to those
@@ -257,6 +265,15 @@ cge = MCPModel();
 
 # rescale taxes for now
 @NLparameter(cge, tk0[r in set[:r]] == get(sld[:tk0],(r,),0.0)); #Balance of payments
+
+#co2 emissions --- Converted to billion tonnes of co2
+#so that model carbon prices interpreted in $/tonnes
+@NLparameter(cge, idcb0[r in set[:r], g in set[:g], s in set[:s]] == sld[:secco2][r,g,s]*1e-3); # industrial/sectoral demand for co2
+@NLparameter(cge, cdcb0[r in set[:r], g in set[:g]] == sld[:resco2][r,g]*1e-3);  # final demand for co2
+@NLparameter(cge, cb0[r in set[:r]] == sum((sum(value(idcb0[r,g,s]) for s in set[:s]) + value(cdcb0[r,g])) for g in set[:g]));  # supply of co2
+@NLparameter(cge, carb0[r in set[:r]] == value(cb0[r]));  # co2 endowment
+@NLparameter(cge, idcco2[r in set[:r], g in set[:g], s in set[:s]] == ensurefinite(value(idcb0[r,g,s])/value(id0[r,g,s])));
+@NLparameter(cge, cdcco2[r in set[:r], g in set[:g]] == ensurefinite(value(cdcb0[r,g])/value(cd0[r,g])));
 
 for r in set[:r],s in set[:s]
     set_value(kd0[r,s],value(kd0[r,s])*(1+value(tk0[r])))
@@ -339,6 +356,9 @@ lo_eps = 1e-4
 @variable(cge, Z[r in set[:r]] >= lo, start = 1.0);
 @variable(cge, W[r in set[:r]] >= lo, start = 1.0);
 
+@variable(cge, CO2[r in set[:r]] >= lo, start = value(carb0[r]));
+
+
 #commodities:
 @variable(cge, PA[(r,g) in sset[:PA]] >= lo, start = 1.0); # Regional market (input)
 @variable(cge, PY[(r,g) in sset[:PY]] >= lo, start = 1.0); # Regional market (output)
@@ -360,6 +380,9 @@ lo_eps = 1e-4
 @variable(cge, PINV[r in set[:r]] >= lo, start = 1.0); # Investment price index
 @variable(cge, PZ[r in set[:r]] >= lo, start = 1.0); # Cons-Inv price index
 @variable(cge, PW[r in set[:r]] >= lo, start = 1.0); # Welfare/Full consumption price index 
+
+@variable(cge, PDCO2[r in set[:r]] >= lo, start = 1e-6); # effective carbon price
+@variable(cge, PCO2 >= lo, start = 1e-6); # carbon factor price
 
 #consumer:
 @variable(cge,RA[r in set[:r]]>=lo,start = value(w0[r])) ;
@@ -424,15 +447,25 @@ lo_eps = 1e-4
 @NLexpression(cge,KD[r in set[:r],s in set[:s]],
               kd0[r,s] * CVA[r,s] / (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) );
 
+# co2 inclusive input price
+@NLexpression(cge,PID[r in set[:r],g in set[:g],s in set[:s]],
+              ((haskey(PA.lookup[1],(r,g)) ? PA[(r,g)] : 1.0)+PDCO2[r]*idcco2[r,g,s])
+);
+
+@NLexpression(cge,PCD[r in set[:r],g in set[:g]],
+              ((haskey(PA.lookup[1],(r,g)) ? PA[(r,g)] : 1.0)+PDCO2[r]*cdcco2[r,g])
+);
+
+
 @mapping(cge,profit_ym[(r,s) in sset[:Y]],
-        sum(PA[(r,g)] * id0[r,g,s] for g in set[:g] if ((r,g) in sset[:PA]))
+        sum(PID[r,g,s] * id0[r,g,s] for g in set[:g] if ((r,g) in sset[:PA]))
         + PL[r] * LD[r,s]
         + (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)* KD[r,s]
         - (sum(PY[(r,g)] * ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) * (1-ty[r,s]))
 );
 
 @mapping(cge,profit_yx[(r,s) in sset[:Y]],
-        sum(PA[(r,g)] * id0[r,g,s] for g in set[:g] if ((r,g) in sset[:PA]))
+        sum(PID[r,g,s] * id0[r,g,s] for g in set[:g] if ((r,g) in sset[:PA]))
         + PL[r] * ld0[r,s]
         + (haskey(RKX.lookup[1], (r,s)) ? RKX[(r,s)] : 1.0)* kd0[r,s]
         - (sum(PY[(r,g)] * ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) * (1-ty[r,s]))
@@ -548,18 +581,33 @@ lo_eps = 1e-4
 # !!!! could possibly add if ((r,g) in sset[:CD]) to sum statement
 # unit cost for consumption
 @NLexpression(cge, CC[r in set[:r]],
-    sum( theta_cd[r,gg]*(haskey(PA.lookup[1], (r, gg)) ? PA[(r, gg)] : 1.0)^(1-es_cd) for gg in set[:g])^(1/(1-es_cd))
+    sum( theta_cd[r,gg]*PCD[r,gg]^(1-es_cd) for gg in set[:g])^(1/(1-es_cd))
 );
 
 # final demand
 @NLexpression(cge,CD[r in set[:r],g in set[:g]],
-    ((CC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0))^es_cd));
+    ((CC[r] / PCD[r,g])^es_cd));
 #  cd0[r,g]*PC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0));
 
 @mapping(cge,profit_c[r in set[:r]],
 #         sum(PA[(r,g)]*theta_cd[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
          CC[r]
          - PC[r]
+);
+
+#=
+# * * co2 emissions
+# * $prod:CO2(r)
+# * 	o:PDCO2(r)	q:1
+# * 	i:PCO2		q:1		p:1
+# * 	i:PC(r)$[not carb0(r)]		q:(1e-6)
+
+prf_CO2(r)..	PCO2 + PC(r)$[(not carb0(r))]*1e-6 =g= PDCO2(r);
+=#
+
+@mapping(cge,profit_co2[r in set[:r]],
+         PCO2 + (carb0[r]==0.0 ? PC[r] : 0.0)*1e-6
+         - PDCO2[r]
 );
 
 #=
@@ -725,6 +773,7 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
              + sum(YX[(r,s)]*ty[r,s]*sum(PY[(r,g)]*ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) for s in set[:s] if ((r,s) in sset[:Y]))
              + sum(A[(r,g)]*ta[r,g]*PA[(r,g)]*a0[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
              + sum(A[(r,g)]*tm[r,g]*PFX*m0[r,g]*(PMND[r,g]*(1+tm0[r,g])/(PFX*(1+tm[r,g])))^es_f[r,g] for g in set[:g] if ((r,g) in sset[:A]))
+             + PCO2*carb0[r]
          )
 );
 
@@ -900,6 +949,29 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
          - RA[r]
 );
 
+# mkt_PCO2..		sum(r,carb0(r)) - sum(r,CO2(r)) =g= 0;
+
+@mapping(cge,market_pco2,
+         sum(carb0[r] for r in set[:r]) - sum(CO2[r] for r in set[:r])
+);
+
+#=
+# mkt_PDCO2(r)..	CO2(r)
+# 				- (
+# 					sum((g,s)$[y_(r,s)$ks_x(r,s)],YX(r,s)*id0(r,g,s)*cco2(r,g,s))
+# 					+ sum((g,s)$[y_(r,s)],YM(r,s)*id0(r,g,s)*cco2(r,g,s))
+# 					+ sum(g$[cd0(r,g)],C(r)*cd0(r,g)*CD(r,g)*cco2(r,g,"fd"))
+# 				) =g= 0;
+=#
+
+@mapping(cge,market_pdco2[r in set[:r]],
+         CO2[r]
+         - (
+             sum(YX[(r,s)]*id0[r,g,s]*idcco2[r,g,s] for s in set[:s] for g in set[:g] if ((r,s) in sset[:PK]))
+             + sum(YM[(r,s)]*id0[r,g,s]*idcco2[r,g,s] for s in set[:s] for g in set[:g] if ((r,s) in sset[:PK]))
+             + sum(C[r]*cd0[r,g]*CD[r,g]*cdcco2[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
+         )
+);
 
 
 # @complementarity(cge,profit_y,Y);
@@ -915,6 +987,7 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
 @complementarity(cge,profit_inv,INV);
 @complementarity(cge,profit_z,Z);
 @complementarity(cge,profit_w,W);
+@complementarity(cge,profit_co2,CO2);
 
 @complementarity(cge,market_pa,PA);
 @complementarity(cge,market_py,PY);
@@ -934,6 +1007,8 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
 @complementarity(cge,market_pz,PZ);
 @complementarity(cge,market_pw,PW);
 
+@complementarity(cge,market_pco2,PCO2);
+@complementarity(cge,market_pdco2,PDCO2);
 
 @complementarity(cge,income_ra,RA);
 
@@ -949,9 +1024,14 @@ status = solveMCP(cge)
 
 # Free trade counterfactual
 for r in set[:r],g in set[:g]
-    set_value(tm[r,g],0.0)
-    # set_value(tm[r,g],value(tm0[r,g]))
+    # set_value(tm[r,g],0.0)
+    set_value(tm[r,g],value(tm0[r,g]))
 end
+
+for r in set[:r]
+    set_value(carb0[r],value(carb0[r])*0.8)
+end
+
 
 chk = Dict((r,g) => isless(1e-6,(1-value(theta_xd[r,g])))
            for r in set[:r], g in set[:g]);
