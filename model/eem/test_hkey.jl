@@ -16,8 +16,6 @@ function combvec(set_a...)
     return vec(collect(Iterators.product(set_a...)))
 end
 
-
-
 set = Dict()
 set[:r] = ["CO","CA"]
 set[:s] = ["ele","oil"]
