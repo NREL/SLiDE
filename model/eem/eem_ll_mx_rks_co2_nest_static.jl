@@ -113,6 +113,7 @@ end
 
 # year for the model to be based off of
 mod_year = 2017
+# dataset_r = "bmk_data_census"
 dataset_r = "bmk_data_state"
 
 #specify the path where the dumped csv files are stored
@@ -237,6 +238,48 @@ sset[:PY] = filter(x -> sld[:s0][x[1], x[2]] != 0.0, combvec(set[:r], set[:g]));
 sset[:CD] = filter(x -> sld[:cd0][x[1], x[2]] != 0.0, combvec(set[:r], set[:g]));
 
 
+# More subsets
+set[:em] = ["col","gas","oil","cru"]         # fossil energy pinned fuels
+set[:fe] = ["col","gas","oil"]    # fossil energy goods
+set[:xe] = ["col","gas","cru"]          # extractive resources
+set[:ele] = ["ele"]                     # electricity
+set[:oil] = ["oil"]                     # refined oil
+set[:cru] = ["cru"]                     # crude oil
+set[:gas] = ["gas"]                     # natural gas
+set[:col] = ["col"]                     # coal
+set[:en] = vcat(set[:fe], set[:ele]) # energy goods
+set[:nfe] = setdiff(set[:g],set[:fe])   # non-fossil energy goods
+set[:nxe] = setdiff(set[:g],set[:xe])   # non-extractive goods
+set[:nele] = setdiff(set[:g],set[:ele]) # non-electricity goods
+set[:nne] = setdiff(set[:g],set[:en])   # non-energy goods
+
+sld[:va_bar] = (Dict((r,s) => (sld[:ld0][r,s] + sld[:kd0][r,s])
+    for r in set[:r], s in set[:s]));
+
+sld[:fe_bar] = (Dict((r,s) => sum(sld[:id0][r,g,s] for g in set[:fe])
+    for r in set[:r], s in set[:s]));
+
+sld[:en_bar] = (Dict((r,s) => sum(sld[:id0][r,g,s] for g in set[:en])
+    for r in set[:r], s in set[:s]));
+
+sld[:ne_bar] = (Dict((r,s) => sum(sld[:id0][r,g,s] for g in set[:nne])
+    for r in set[:r], s in set[:s]));
+
+sld[:vaen_bar] = (Dict((r,s) => (sld[:va_bar][r,s] + sld[:en_bar][r,s])
+    for r in set[:r], s in set[:s]));
+
+sld[:klem_bar] = (Dict((r,s) => (sld[:vaen_bar][r,s] + sld[:ne_bar][r,s])
+    for r in set[:r], s in set[:s]));
+
+
+sset[:PE] = filter(x -> sld[:en_bar][x] != 0.0, combvec(set[:r],set[:s]))
+sset[:PVA] = filter(x -> sld[:va_bar][x] != 0.0, combvec(set[:r],set[:s]))
+sset[:PYM] = filter(x -> sld[:klem_bar][x] != 0.0, combvec(set[:r],set[:s]))
+
+sset[:IDA_ne] = filter(x -> sld[:id0][x] !=0.0, combvec(set[:r],set[:nne],set[:s]))
+sset[:IDA_ele] = filter(x -> sld[:id0][x] !=0.0, combvec(set[:r],set[:ele],set[:s]))
+sset[:IDA_fe] = filter(x -> sld[:id0][x] !=0.0, combvec(set[:r],set[:fe],set[:s]))
+
 ########## Model ##########
 cge = MCPModel();
 
@@ -322,6 +365,14 @@ end
 @NLparameter(cge, ks_m0[r in set[:r]] == value(ktot0[r])-sum(value(ks_x[r,s]) for s in set[:s])); #
 @NLparameter(cge, ks_m[r in set[:r]] == value(ks_m0[r])); #
 
+# Energy-Nesting Benchmark parameters
+@NLparameter(cge, va_bar[r in set[:r], s in set[:s]] == value(ld0[r,s]) + value(kd0[r,s])); # bmk value-added
+@NLparameter(cge, fe_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:fe])); # bmk fossil-energy FE
+@NLparameter(cge, en_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:en])); # bmk energy EN
+@NLparameter(cge, ne_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:nne])); # bmk non-energy NNE
+@NLparameter(cge, vaen_bar[r in set[:r], s in set[:s]] == value(va_bar[r,s]) + value(en_bar[r,s])); # bmk value-added-energy vaen
+@NLparameter(cge, klem_bar[r in set[:r], s in set[:s]] == value(vaen_bar[r,s]) + value(ne_bar[r,s])); # bmk value-added-energy vaen
+
 # benchmark value share parameters
 @NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
 @NLparameter(cge, theta_xe[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
@@ -332,6 +383,14 @@ end
 @NLparameter(cge, theta_cd[r in set[:r], g in set[:g]] == ensurefinite(value(cd0[r,g]) / sum(value(cd0[r,gg]) for gg in set[:g])));
 @NLparameter(cge, theta_inv[r in set[:r], g in set[:g]] == ensurefinite(value(i0[r,g]) / sum(value(i0[r,gg]) for gg in set[:g])));
 @NLparameter(cge, theta_ksm[r in set[:r], s in set[:s]] == ensurefinite(value(ksrs_m0[r,s]) / sum(value(ksrs_m0[rr,ss]) for rr in set[:r] for ss in set[:s])));
+
+# banchmark value shares - Energy-nesting
+@NLparameter(cge, theta_fe[r in set[:r], g in set[:fe], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(fe_bar[r,s])));
+@NLparameter(cge, theta_en[r in set[:r], g in set[:en], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(en_bar[r,s])));
+@NLparameter(cge, theta_ele[r in set[:r], s in set[:s]] == ensurefinite(sum(value(id0[r,g,s]) for g in set[:ele])/value(en_bar[r,s])));
+@NLparameter(cge, theta_ne[r in set[:r], g in set[:nne], s in set[:s]] == ensurefinite(value(id0[r,g,s])/value(ne_bar[r,s])));
+@NLparameter(cge, theta_va[r in set[:r], s in set[:s]] == ensurefinite(value(va_bar[r,s])/value(vaen_bar[r,s])));
+@NLparameter(cge, theta_kle[r in set[:r], s in set[:s]] == ensurefinite(value(vaen_bar[r,s])/value(klem_bar[r,s])));
 
 #Substitution and transformation elasticities
 @NLparameter(cge, es_va[r in set[:r], s in set[:s]] == 1); # value-added nest - substitution elasticity
@@ -346,6 +405,15 @@ end
 @NLparameter(cge, es_inv == 5); # investment
 @NLparameter(cge, et_k == 4); # capital transformation
 
+# Substitution elasticities Energy nesting
+@NLparameter(cge, es_fe[s in set[:s]] == 0.5); #FE nest
+@NLparameter(cge, es_ele[s in set[:s]] == 0.5); # EN nest
+@NLparameter(cge, es_ve[s in set[:s]] == 0.5); # VAEN/KLE nest
+@NLparameter(cge, es_ne[s in set[:s]] == 0); # NE nest
+@NLparameter(cge, es_klem[s in set[:s]] == 0); # KLEM nest
+
+set_value(es_ele["ele"],0.0);
+
 ##############
 # VARIABLES
 ##############
@@ -359,6 +427,8 @@ lo_eps = 1e-4
 # @variable(cge, Y[(r,s) in sset[:Y]] >= lo, start = 1.0);
 @variable(cge, YM[(r,s) in sset[:Y]] >= lo, start = 1-value(thetax));
 @variable(cge, YX[(r,s) in sset[:Y]] >= lo, start = value(thetax));
+@variable(cge, VA[(r,s) in sset[:PVA]] >= lo, start = (1-value(thetax)));
+@variable(cge, E[(r,s) in sset[:PE]] >= lo, start = (1-value(thetax)));
 
 @variable(cge, X[(r,g) in sset[:X]] >= lo, start = 1.0);
 @variable(cge, A[(r,g) in sset[:A]] >= lo, start = 1.0);
@@ -375,6 +445,8 @@ lo_eps = 1e-4
 
 
 #commodities:
+@variable(cge, PVA[(r,s) in sset[:PVA]] >= lo, start = 1.0); #
+@variable(cge, PE[(r,s) in sset[:PE]] >= lo, start = 1.0); # 
 @variable(cge, PA[(r,g) in sset[:PA]] >= lo, start = 1.0); # Regional market (input)
 @variable(cge, PY[(r,g) in sset[:PY]] >= lo, start = 1.0); # Regional market (output)
 @variable(cge, PD[(r,g) in sset[:PD]] >= lo, start = 1.0); # Local market price
@@ -406,44 +478,6 @@ lo_eps = 1e-4
 # EQUATIONS
 ##############
 
-#=
-# * $prod:Y(r,s)$y_(r,s)  s:0 va:1
-# * 	o:PY(r,g)	q:ys0(r,s,g)            a:RA(r) t:ty(r,s)    p:(1-ty0(r,s))
-# * 	i:PA(r,g)	q:id0(r,g,s)
-# * 	i:PL(r)		q:ld0(r,s)	va:
-# * 	i:PK(r,s)	q:kd0(r,s)	va:
-
-# * $prod:YM(r,s)$y_(r,s)  s:0 va:1
-# * 	o:PY(r,g)	q:ys0(r,s,g)            a:RA(r) t:ty(r,s)    p:(1-ty0(r,s))
-# * 	i:PA(r,g)	q:id0(r,g,s)
-# * 	i:PL(r)		q:ld0(r,s)	va:
-# * 	i:RK(r,s)	q:kd0(r,s)	va:	
-
-# * $prod:YX(r,s)$[y_(r,s)$ks_x(r,s)]  s:0 va:0
-# * 	o:PY(r,g)	q:ys0(r,s,g)            a:RA(r) t:ty(r,s)    p:(1-ty0(r,s))
-# * 	i:PA(r,g)	q:id0(r,g,s)
-# * 	i:PL(r)		q:ld0(r,s)	va:
-# * 	i:RKX(r,s)	q:kd0(r,s)	va:	
-
-# parameter	lvs(r,s)	Labor value share;
-
-# $echo	lvs(r,s) = 0; lvs(r,s)$ld0(r,s) = ld0(r,s)/(ld0(r,s)+kd0(r,s));	>>MCPMODEL.GEN	
-
-# $macro	PVA(r,s)	(PL(r)**lvs(r,s) * PK(r,s)**(1-lvs(r,s)))
-
-# $macro  LD(r,s)         (ld0(r,s)*PVA(r,s)/PL(r))
-# $macro  KD(r,s)		(kd0(r,s)*PVA(r,s)/PK(r,s))
-
-# prf_Y(y_(r,s))..
-
-# 		sum(g, PA(r,g)*id0(r,g,s)) + 
-
-# 			PL(r)*LD(r,s) + PK(r,s)*KD(r,s)
-# *			(ld0(r,s)+kd0(r,s)) * PVA(r,s)
-
-# 	=e= sum(g,PY(r,g)*ys0(r,s,g))*(1-ty(r,s));
-=#
-
 #cobb-douglas function for value added (VA)
 # @NLexpression(cge,CVA[r in set[:r],s in set[:s]],
 #               PL[r]^alpha_kl[r,s] * (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) ^ (1-alpha_kl[r,s]) );
@@ -455,18 +489,16 @@ lo_eps = 1e-4
 # @NLexpression(cge,CVA[r in set[:r],s in set[:s]],
 #               PL[r]^alpha_kl[r,s] * testget(RK,(r,s),1.0) ^ (1-alpha_kl[r,s]) );
 
-# isempty([k.I[1] for k in keys(PK) if k.I[1]==("CO","cru")])
-# option to replace haskey in equation/nlexpression
-# (isempty([k.I[1] for k in keys(PK) if k.I[1]==(r,s)]) ? 1.0 : PK[(r,s)])
-# other possible option to test is get(PK,(r,g),1.0) in new jump version - this would be ideal
-
-
 #demand for labor in VA
 @NLexpression(cge,LD[r in set[:r], s in set[:s]], ld0[r,s] * CVA[r,s] / PL[r] );
 
 #demand for capital in VA
 @NLexpression(cge,KD[r in set[:r],s in set[:s]],
               kd0[r,s] * CVA[r,s] / (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) );
+
+@mapping(cge,profit_va[(r,s) in sset[:PVA]],
+         CVA[r,s] - PVA[(r,s)]
+);
 
 # co2 inclusive input price
 @NLexpression(cge,PID[r in set[:r],g in set[:g],s in set[:s]],
@@ -477,12 +509,63 @@ lo_eps = 1e-4
               ((haskey(PA.lookup[1],(r,g)) ? PA[(r,g)] : 1.0)+PDCO2[r]*cdcco2[r,g])
 );
 
+# Unit cost function: Fossil-energy
+@NLexpression(cge,CFE[r in set[:r], s in set[:s]],
+              sum(theta_fe[r,g,s]*PID[r,g,s]^(1-es_fe[s]) for g in set[:fe])^(1/(1-es_fe[s]))
+);
+
+# Unit cost function: Energy (ele + fe)
+@NLexpression(cge,CEN[r in set[:r], s in set[:s]],
+              (sum(theta_ele[r,s]*PID[r,g,s]^(1-es_ele[s]) for g in set[:ele]) + (1-theta_ele[r,s])*CFE[r,s]^(1-es_ele[s]))^(1/(1-es_ele[s]))
+);
+
+# Demand function: fossil-energy
+@NLexpression(cge,IDA_fe[r in set[:r], g in set[:fe], s in set[:s]],
+              (CEN[r,s]/CFE[r,s])^(es_ele[s]) * (CFE[r,s]/PID[r,g,s])^(es_fe[s])
+);
+
+# Demand function: electricity
+@NLexpression(cge,IDA_ele[r in set[:r], g in set[:ele], s in set[:s]],
+              (CEN[r,s]/PID[r,g,s])^(es_ele[s])
+);
+
+@mapping(cge,profit_e[(r,s) in sset[:PE]],
+         CEN[r,s] - PE[(r,s)]
+);
+
+# Unit cost function: Value-added + Energy
+@NLexpression(cge,CVE[r in set[:r], s in set[:s]],
+              (theta_va[r,s]*CVA[r,s]^(1-es_ve[s]) + (1-theta_va[r,s])*CEN[r,s]^(1-es_ve[s]))^(1/(1-es_ve[s]))
+);
+
+# Unit cost function: non-energy (materials)
+@NLexpression(cge,CNE[r in set[:r], s in set[:s]],
+              sum(theta_ne[r,g,s]*PID[r,g,s]^(1-es_ne[s]) for g in set[:nne])^(1/(1-es_ne[s]))
+);
+
+# Unit cost function: Value-added/Energy + non-energy (materials)
+@NLexpression(cge,CYM[r in set[:r], s in set[:s]],
+              (theta_kle[r,s]*CVE[r,s]^(1-es_klem[s]) + (1-theta_kle[r,s])*CNE[r,s]^(1-es_klem[s]))^(1/(1-es_klem[s]))
+);
+
+# Demand function: non-energy (materials)
+@NLexpression(cge,IDA_ne[r in set[:r], g in set[:nne], s in set[:s]],
+    (CYM[r,s]/CNE[r,s])^(es_klem[s])*(CNE[r,s]/PID[r,g,s])^(es_ne[s])
+);
+
+# Demand function: value-added composite
+@NLexpression(cge,IVA[r in set[:r], s in set[:s]],
+    (CYM[r,s]/CVE[r,s])^(es_klem[s])*(CVE[r,s]/CVA[r,s])^(es_ve[s])
+);
+
+# Demand function: energy composite
+@NLexpression(cge,IE[r in set[:r], s in set[:s]],
+    (CYM[r,s]/CVE[r,s])^(es_klem[s])*(CVE[r,s]/CEN[r,s])^(es_ve[s])
+);
 
 @mapping(cge,profit_ym[(r,s) in sset[:Y]],
-        sum(PID[r,g,s] * id0[r,g,s] for g in set[:g] if ((r,g) in sset[:PA]))
-        + PL[r] * LD[r,s]
-        + (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)* KD[r,s]
-        - (sum(PY[(r,g)] * ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) * (1-ty[r,s]))
+         CYM[r,s]*klem_bar[r,s]
+         - (sum(PY[(r,g)] * ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) * (1-ty[r,s]))
 );
 
 @mapping(cge,profit_yx[(r,s) in sset[:Y]],
@@ -492,26 +575,6 @@ lo_eps = 1e-4
         - (sum(PY[(r,g)] * ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) * (1-ty[r,s]))
 );
 
-#=
-# * $prod:X(r,g)$x_(r,g)  t:4
-# * 	o:PFX		q:(x0(r,g)-rx0(r,g))
-# * 	o:PN(g)		q:xn0(r,g)
-# * 	o:PD(r,g)	q:xd0(r,g)
-# * 	i:PY(r,g)	q:s0(r,g)
-
-# parameter	thetaxd(r,g)	Value share (output to PD market),
-# 		thetaxn(r,g)	Value share (output to PN market),
-# 		thetaxe(r,g)	Value share (output to PFX market);
-
-# $echo	thetaxd(r,g) = xd0(r,g)/s0(r,g);		>>MCPMODEL.GEN	
-# $echo	thetaxn(r,g) = xn0(r,g)/s0(r,g);		>>MCPMODEL.GEN	
-# $echo	thetaxe(r,g) = (x0(r,g)-rx0(r,g))/s0(r,g);	>>MCPMODEL.GEN	
-
-# $macro	RX(r,g)	 (( thetaxd(r,g) * PD(r,g)**(1+4) + thetaxn(r,g) * PN(g)**(1+4) + thetaxe(r,g) * PFX**(1+4) )**(1/(1+4)))
-
-# prf_X(x_(r,g))..
-# 		PY(r,g)*s0(r,g) =e= (x0(r,g)-rx0(r,g)+xn0(r,g)+xd0(r,g)) * RX(r,g);
-=#
 
 @NLexpression(cge,RX[r in set[:r],g in set[:g]],
               (
@@ -526,30 +589,6 @@ lo_eps = 1e-4
          - (x0[r,g]-rx0[r,g]+xn0[r,g]+xd0[r,g])*RX[r,g]
 );
 
-#=
-# * $prod:A(r,g)$a_(r,g)  s:0 dm:2  d(dm):4
-# * 	o:PA(r,g)	q:a0(r,g)		a:RA(r)	t:ta(r,g)	p:(1-ta0(r,g))
-# * 	o:PFX		q:rx0(r,g)
-# * 	i:PN(g)		q:nd0(r,g)	d:
-# * 	i:PD(r,g)	q:dd0(r,g)	d:
-# * 	i:PFX		q:m0(r,g)	dm: 	a:RA(r)	t:tm(r,g) 	p:(1+tm0(r,g))
-# * 	i:PM(r,m)	q:md0(r,m,g)
-
-# parameter	thetam(r,g)	Import value share
-# 		thetan(r,g)	National value share;
-
-# $echo	thetam(r,g)=0; thetan(r,g)=0;								>>MCPMODEL.GEN
-# $echo	thetam(r,g)$m0(r,g) = m0(r,g)*(1+tm0(r,g))/(m0(r,g)*(1+tm0(r,g))+nd0(r,g)+dd0(r,g));	>>MCPMODEL.GEN
-# $echo	thetan(r,g)$nd0(r,g) = nd0(r,g) /(nd0(r,g)+dd0(r,g));					>>MCPMODEL.GEN
-
-# $macro PND(r,g)  ( (thetan(r,g)*PN(g)**(1-4) + (1-thetan(r,g))*PD(r,g)**(1-4))**(1/(1-4)) ) 
-# $macro PMND(r,g) ( (thetam(r,g)*(PFX*(1+tm(r,g))/(1+tm0(r,g)))**(1-2) + (1-thetam(r,g))*PND(r,g)**(1-2))**(1/(1-2)) )
-
-# prf_A(a_(r,g))..
-# 	 	sum(m,PM(r,m)*md0(r,m,g)) + 
-# 			(nd0(r,g)+dd0(r,g)+m0(r,g)*(1+tm0(r,g))) * PMND(r,g)
-# 				=e= PA(r,g)*a0(r,g)*(1-ta(r,g)) + PFX*rx0(r,g);
-=#
 
 @NLexpression(cge,PND[r in set[:r],g in set[:g]],
               (
@@ -574,28 +613,11 @@ lo_eps = 1e-4
          )
 );
 
-#=
-# * $prod:MS(r,m)
-# * 	o:PM(r,m)	q:(sum(gm, md0(r,m,gm)))
-# * 	i:PN(gm)	q:nm0(r,gm,m)
-# * 	i:PD(r,gm)	q:dm0(r,gm,m)
-
-# prf_MS(r,m)..	sum(gm, PN(gm)*nm0(r,gm,m) + PD(r,gm)*dm0(r,gm,m)) =g= PM(r,m)*sum(gm, md0(r,m,gm));
-=#
 
 @mapping(cge,profit_ms[r in set[:r],m in set[:m]],
          sum(PN[gm]*nm0[r,gm,m] + (haskey(PD.lookup[1],(r,gm)) ? PD[(r,gm)] : 1.0)*dm0[r,gm,m] for gm in set[:gm])
          - PM[r,m]*sum(md0[r,m,gm] for gm in set[:gm])
 );
-
-#=
-# * $prod:C(r)  s:1
-# *     	o:PC(r)		q:c0(r)
-# * 	i:PA(r,g)	q:cd0(r,g)
-
-# prf_C(r)..	prod(g$cd0(r,g), PA(r,g)**(cd0(r,g)/c0(r))) =g= PC(r);
-# prf_C(r).. sum(g$cd0(r,g),PA(r,g)*(cd0(r,g)/c0(r)) =g= PC(r);
-=#
 
 # !!!! no product function in Julia
 # !!!! stick to fixed proportions I guess for now
@@ -616,35 +638,11 @@ lo_eps = 1e-4
          - PC[r]
 );
 
-#=
-# * * co2 emissions
-# * $prod:CO2(r)
-# * 	o:PDCO2(r)	q:1
-# * 	i:PCO2		q:1		p:1
-# * 	i:PC(r)$[not carb0(r)]		q:(1e-6)
-
-prf_CO2(r)..	PCO2 + PC(r)$[(not carb0(r))]*1e-6 =g= PDCO2(r);
-=#
-
 @mapping(cge,profit_co2[r in set[:r]],
          PCO2 + (carb0[r]==0.0 ? PC[r] : 0.0)*1e-6
          - PDCO2[r]
 );
 
-#=
-* * investment supply
-* $prod:INV(r) s:esub_inv
-* 	o:PINV(r)	q:inv0(r)
-* 	i:PA(r,g)	q:i0(r,g)
-
-parameter theta_inv(r,g);
-$echo theta_inv(r,g)=0; theta_inv(r,g)$[sum(gg,i0(r,gg))] = i0(r,g)/sum(gg,i0(r,gg));	>>MCPMODEL.GEN
-
-$macro CINV(r)		(sum(gg, theta_inv(r,gg)*PA(r,gg)**(1-esub_inv))**(1/(1-esub_inv)))
-$macro DINV(r,g)	((CINV(r)/PA(r,g))**esub_inv)
-
-prf_INV(r)..	CINV(r) - PINV(r) =g= 0;
-=#
 
 @NLexpression(cge,CINV[r in set[:r]],
               (sum( theta_inv[r,gg]*(haskey(PA.lookup[1],(r,gg)) ? PA[(r,gg)] : 1.0)^(1-es_inv) for gg in set[:g])^(1/(1-es_inv)))
@@ -659,39 +657,11 @@ prf_INV(r)..	CINV(r) - PINV(r) =g= 0;
          - PINV[r]
 );
 
-#=
-* * labor supply
-* $prod:LS(r)
-* 	o:PL(r)		q:(lab_e0(r)*gprod)
-* 	i:PLS(r)	q:(lab_e0(r)*gprod)
-
-prf_LS(r)..		PLS(r)*lab_e0(r) - PL(r)*lab_e0(r) =g= 0;
-=#
-
 @mapping(cge, profit_ls[r in set[:r]],
          PLS[r]*lbr0[r]
          - PL[r]*lbr0[r]
 );
 
-#=
-# * * capital transformation function
-# * $prod:KS	t:etaK
-# * 	o:RK(r,s)	q:ksrs_m0(r,s)
-# * 	i:RKS		q:(sum((r,s),ksrs_m0(r,s)))
-
-# * prf_KS..	RKS*sum((r,s),ksrs_m0(r,s))**(1/(1+etaK))
-# * 			=g=
-# * 			sum((r,s), ksrs_m0(r,s)*RK(r,s)**(1+etaK))**(1/(1+etaK));
-
-# parameter theta_ksm(r,s);
-# *!!!! no clue why this all of a sudden doesn't work properly
-# *$echo theta_ksm(r,s)=0; theta_ksm(r,s) = ksrs_m0(r,s)/sum((rr,g),ksrs_m0(rr,g));	>>MCPMODEL.GEN
-# theta_ksm(r,s)$[(sum((rr,ss),ksrs_m0(rr,ss)))] = ksrs_m0(r,s)/sum((rr,ss),ksrs_m0(rr,ss));
-
-# $macro CKS	(sum((rr,ss),theta_ksm(rr,ss)*RK(rr,ss)**(1+etaK))**(1/(1+etaK)))
-
-# prf_KS..	RKS - CKS =g= 0;
-=#
 
 @NLexpression(cge, CKS,
               (sum(theta_ksm[r,s]*RK[(r,s)]^(1+et_k) for r in set[:r] for s in set[:s] if ((r,s) in sset[:PK]))^(1/(1+et_k)))
@@ -701,38 +671,11 @@ prf_LS(r)..		PLS(r)*lab_e0(r) - PL(r)*lab_e0(r) =g= 0;
          RKS - CKS
 );
 
-#=
-* * consumption + investment
-* $prod:Z(r)	s:0
-* 	o:PZ(r)		q:z0(r)
-* 	i:PC(r)		q:c0(r)
-* 	i:PINV(r)	q:inv0(r)
-
-prf_Z(r)..		PC(r)*c0(r) + PINV(r)*inv0(r) =g= PZ(r)*z0(r);
-=#
-
 @mapping(cge, profit_z[r in set[:r]],
          PC[r]*c0[r] + PINV[r]*inv0[r]
          - PZ[r]*z0[r]
 );
 
-
-#=
-* * full consumption
-* $prod:W(r)	s:esub_z(r)
-* 	o:PW(r)		q:w0(r)
-* 	i:PZ(r)		q:z0(r)
-* 	i:PLS(r)	q:leis_e0(r)
-
-parameter theta_w(r);
-$echo theta_w(r)=0; theta_w(r)$w0(r) = leis_e0(r)/w0(r);	>>MCPMODEL.GEN
-
-$macro CW(r)	( (theta_w(r)*PLS(r)**(1-esub_z(r)) + (1-theta_w(r))*PZ(r)**(1-esub_z(r)))**(1/(1-esub_z(r))) )
-$macro DZ(r)	( (CW(r)/PZ(r))**esub_z(r) )
-$macro DLSR(r)	( (CW(r)/PLS(r))**esub_z(r) )
-
-prf_W(r)..		CW(r) - PW(r) =g= 0;
-=#
 
 @NLexpression(cge,CW[r in set[:r]],
               (theta_w[r]*PLS[r]^(1-es_w[r]) + (1-theta_w[r])*PZ[r]^(1-es_w[r]))^(1/(1-es_w[r]))
@@ -752,33 +695,6 @@ prf_W(r)..		CW(r) - PW(r) =g= 0;
          - PW[r]
 );
 
-    
-#=
-* * income balance
-* $demand:RA(r)
-* 	d:PW(r)		q:w0(r)
-* 	e:PY(r,g)	q:yh0(r,g)
-* 	e:PFX		q:(bopdef0(r) + hhadj(r))
-* 	e:PA(r,g)	q:(-g0(r,g))
-* 	e:PLS(r)	q:(lab_e0(r))
-* 	e:PLS(r)	q:leis_e0(r)
-* 	e:PK(r,s)	q:kd0(r,s)
-
-bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
-				- sum(g, PA(r,g)*(g0(r,g)))
-				+ PLS(r)*lab_e0(r)
-				+ PLS(r)*leis_e0(r)
-				+ sum(s, PK(r,s)*kd0(r,s))
-				+ sum(y_(r,s), Y(r,s)*ty(r,s)*sum(g$ys0(r,s,g), PY(r,g)*ys0(r,s,g)))
-				+ sum(a_(r,g)$a0(r,g), A(r,g)*ta(r,g)*PA(r,g)*a0(r,g))
-				+ sum(a_(r,g)$m0(r,g), A(r,g)*tm(r,g)*PFX*m0(r,g)*
-						(PMND(r,g)*(1+tm0(r,g))/(PFX*(1+tm(r,g))))**esubdm(g));
-
-...
-				+ sum(s, RK(r,s)*ksrs_m(r,s) + RKX(r,s)*ks_x(r,s))
-				+ sum(y_(r,s), YM(r,s)*ty(r,s)*sum(g$ys0(r,s,g), PY(r,g)*ys0(r,s,g)))
-				+ sum(y_(r,s)$ks_x(r,s), YX(r,s)*ty(r,s)*sum(g$ys0(r,s,g), PY(r,g)*ys0(r,s,g)))
-=#
 
 @mapping(cge,income_ra[r in set[:r]],
          RA[r]
@@ -799,17 +715,27 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
 );
 
 
-#=
-# market clearance conditions:
-# mkt_PA(a_(r,g))..	A(r,g)*a0(r,g) =e= sum(y_(r,s), Y(r,s)*id0(r,g,s)) 
-# 					+ cd0(r,g)*C(r)*PC(r)/PA(r,g)
-# 					+ g0(r,g) + i0(r,g);
-=#
+# @mapping(cge,market_pa[(r,g) in sset[:PA]],
+#          A[(r,g)]*a0[r,g]
+#          - (
+#              sum(YM[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
+#              + sum(YX[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
+#              + C[r]*cd0[r,g]*CD[r,g]
+#              + g0[r,g]
+#              + INV[r]*i0[r,g]*DINV[r,g]
+#          )
+# );
+
 
 @mapping(cge,market_pa[(r,g) in sset[:PA]],
          A[(r,g)]*a0[r,g]
          - (
-             sum(YM[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
+             sum(YM[(r,s)]*id0[r,g,s]*IDA_ne[r,g,s] for s in set[:s] if ((r,s) in sset[:Y] && (r,g,s) in sset[:IDA_ne]))
+             + sum(E[(r,s)]*id0[r,g,s]*IDA_ele[r,g,s] for s in set[:s] if ((r,s) in sset[:PE] && (r,g,s) in sset[:IDA_ele]))
+             + sum(E[(r,s)]*id0[r,g,s]*IDA_fe[r,g,s] for s in set[:s] if ((r,s) in sset[:PE] && (r,g,s) in sset[:IDA_fe]))
+             # sum(YM[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y] && g in set[:nne]))
+             # + sum(E[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:PE] && g in set[:ele]))
+             # + sum(E[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:PE] && g in set[:fe]))
              + sum(YX[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
              + C[r]*cd0[r,g]*CD[r,g]
              + g0[r,g]
@@ -817,7 +743,6 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
          )
 );
 
-# mkt_PY(r,g)$s0(r,g)..	sum(y_(r,s), Y(r,s)*ys0(r,s,g)) + yh0(r,g) =e= X(r,g) * s0(r,g);
 
 @mapping(cge,market_py[(r,g) in sset[:PY]],
          sum(YM[(r,s)]*ys0[r,s,g] for s in set[:s] if ((r,s) in sset[:Y]))
@@ -856,11 +781,6 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
          )
 );
 
-#=
-# mkt_PN(g)..		sum(x_(r,g), X(r,g) * xn0(r,g) * (PN(g)/PY(r,g))**4) =e= 
-# 			sum(a_(r,g), A(r,g) * nd0(r,g) * (PND(R,G)/PN(g))**4 * (PMND(r,g)/PND(r,g))**2)
-# 			+ sum((r,m,gm)$sameas(g,gm), nm0(r,gm,m)*MS(r,m));
-=#
 
 @mapping(cge,market_pn[g in set[:g]],
          sum(X[(r,g)]*xn0[r,g]*((PN[g]/PY[(r,g)])^et_x[r,g]) for r in set[:r] if ((r,g) in sset[:X]))
@@ -870,12 +790,6 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
          )
 );
 
-#=
-# mkt_PFX..		sum(x_(r,g), X(r,g)*(x0(r,g)-rx0(r,g))*(PFX/PY(r,g))**4) 
-# 			+ sum(a_(r,g), A(r,g)*rx0(r,g)) 
-# 			+ sum(r, bopdef0(r)+hhadj(r)) =e= 
-# 			sum(a_(r,g), A(r,g)*m0(r,g)*(PMND(r,g)*(1+tm0(r,g))/(PFX*(1+tm(r,g))))**2);
-=#
 
 @mapping(cge,market_pfx,
          sum(X[(r,g)]*(x0[r,g]-rx0[r,g]) for (r,g) in sset[:X])
@@ -884,36 +798,28 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
          - sum(A[(r,g)]*m0[r,g]*(((PMND[r,g]*(1+tm0[r,g]))/(PFX*(1+tm[r,g])))^es_f[r,g]) for (r,g) in sset[:A])
 );
 
-# mkt_PL(r)..	sum(s,ld0(r,s)) =g= sum(y_(r,s), Y(r,s)*ld0(r,s)*PVA(r,s)/PL(r));
+
+@mapping(cge,market_pe[(r,s) in sset[:PE]],
+         E[(r,s)]*en_bar[r,s]
+         - YM[(r,s)]*en_bar[r,s]*IE[r,s]
+);
+
+@mapping(cge,market_pva[(r,s) in sset[:PVA]],
+         VA[(r,s)]*va_bar[r,s]
+         - YM[(r,s)]*va_bar[r,s]*IVA[r,s]
+);
 
 @mapping(cge,market_pl[r in set[:r]],
          LS[r]*lbr0[r]
          - (
-             sum(YM[(r,s)]*LD[r,s] for s in set[:s] if ((r,s) in sset[:Y]))
+             sum(VA[(r,s)]*LD[r,s] for s in set[:s] if ((r,s) in sset[:PVA]))
              + sum(YX[(r,s)]*ld0[r,s] for s in set[:s] if ((r,s) in sset[:Y]))
          )
 );
 
-# mkt_PK(r,s)$kd0(r,s)..	kd0(r,s) =e= kd0(r,s)*Y(r,s)*PVA(r,s)/PK(r,s);
-
-# @mapping(cge,market_pk[(r,s) in sset[:PK]],
-#          kd0[r,s]
-#          - Y[(r,s)]*KD[r,s]
-# );
-
-# mkt_RK(r,s)$ksrs_m(r,s)..	ksrs_m(r,s) =e= YM(r,s)*KD(r,s);
-# mkt_RKX(r,s)$ks_x(r,s)..	ks_x(r,s) =e= YX(r,s)*kd0(r,s);
-
-# @mapping(cge,market_rk[(r,s) in sset[:PK]],
-#          ksrs_m[r,s]
-#          - YM[(r,s)]*KD[r,s]
-# );
-
-# mkt_RK(r,s)$ksrs_m(r,s)..	KS*ksrs_m0(r,s)*((RK(r,s)/CKS)**etaK) =e= YM(r,s)*KD(r,s);
-
 @mapping(cge,market_rk[(r,s) in sset[:PK]],
          KS*ksrs_m0[r,s]*((RK[(r,s)]/CKS)^et_k)
-         - YM[(r,s)]*KD[r,s]
+         - VA[(r,s)]*KD[r,s]
 );
 
 @mapping(cge,market_rks,
@@ -932,28 +838,24 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
          - sum(md0[r,m,g]*A[(r,g)] for g in set[:g] if ((r,g) in sset[:A]))
 );
 
-# mkt_PC(r).. 	C(r)*c0(r) =g= Z(r)*c0(r);
 
 @mapping(cge,market_pc[r in set[:r]],
          C[r]*c0[r]
          - Z[r]*c0[r]
 );
 
-# mkt_PINV(r).. 	INV(r)*inv0(r) =g= Z(r)*inv0(r);
 
 @mapping(cge,market_pinv[r in set[:r]],
          INV[r]*inv0[r]
          - Z[r]*inv0[r]
 );
 
-# mkt_PZ(r)..		Z(r)*z0(r) =g= W(r)*z0(r)*DZ(r);
 
 @mapping(cge,market_pz[r in set[:r]],
          Z[r]*z0[r]
          - W[r]*z0[r]*DZ[r]
 );
 
-# mkt_PLS(r)..	(lab_e0(r)+leis_e0(r)) =g= LS(r)*lab_e0(r) + W(r)*leis_e0(r)*DLSR(r);
 
 @mapping(cge,market_pls[r in set[:r]],
          lbr0[r]+lsr0[r]
@@ -963,33 +865,25 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
          )
 );
 
-# mkt_PW(r)..		PW(r)*W(r)*w0(r) =g= RA(r);
 
 @mapping(cge,market_pw[r in set[:r]],
          PW[r]*W[r]*w0[r]
          - RA[r]
 );
 
-# mkt_PCO2..		sum(r,carb0(r)) - sum(r,CO2(r)) =g= 0;
 
 @mapping(cge,market_pco2,
          sum(carb0[r] for r in set[:r]) - sum(CO2[r] for r in set[:r])
 );
 
-#=
-# mkt_PDCO2(r)..	CO2(r)
-# 				- (
-# 					sum((g,s)$[y_(r,s)$ks_x(r,s)],YX(r,s)*id0(r,g,s)*cco2(r,g,s))
-# 					+ sum((g,s)$[y_(r,s)],YM(r,s)*id0(r,g,s)*cco2(r,g,s))
-# 					+ sum(g$[cd0(r,g)],C(r)*cd0(r,g)*CD(r,g)*cco2(r,g,"fd"))
-# 				) =g= 0;
-=#
 
 @mapping(cge,market_pdco2[r in set[:r]],
          CO2[r]
          - (
-             sum(YX[(r,s)]*id0[r,g,s]*idcco2[r,g,s] for s in set[:s] for g in set[:g] if ((r,s) in sset[:PK]))
-             + sum(YM[(r,s)]*id0[r,g,s]*idcco2[r,g,s] for s in set[:s] for g in set[:g] if ((r,s) in sset[:PK]))
+             sum(YX[(r,s)]*id0[r,g,s]*idcco2[r,g,s] for s in set[:s] for g in set[:g] if ((r,s) in sset[:Y]))
+             + sum(YM[(r,s)]*id0[r,g,s]*idcco2[r,g,s]*IDA_ne[r,g,s] for s in set[:s] for g in set[:nne] if ((r,s) in sset[:Y] && (r,g,s) in sset[:IDA_ne]))
+             + sum(E[(r,s)]*id0[r,g,s]*idcco2[r,g,s]*IDA_ele[r,g,s] for s in set[:s] for g in set[:ele] if ((r,s) in sset[:PE] && (r,g,s) in sset[:IDA_ele]))
+             + sum(E[(r,s)]*id0[r,g,s]*idcco2[r,g,s]*IDA_fe[r,g,s] for s in set[:s] for g in set[:fe] if ((r,s) in sset[:PE] && (r,g,s) in sset[:IDA_fe]))
              + sum(C[r]*cd0[r,g]*CD[r,g]*cdcco2[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
          )
 );
@@ -998,6 +892,9 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
 # @complementarity(cge,profit_y,Y);
 @complementarity(cge,profit_ym,YM);
 @complementarity(cge,profit_yx,YX);
+@complementarity(cge,profit_va,VA);
+@complementarity(cge,profit_e,E);
+
 @complementarity(cge,profit_x,X);
 @complementarity(cge,profit_a,A);
 @complementarity(cge,profit_c,C);
@@ -1010,6 +907,8 @@ bal_RA(r)..	RA(r) =e= sum(g, PY(r,g)*yh0(r,g)) + PFX*(bopdef0(r) + hhadj(r))
 @complementarity(cge,profit_w,W);
 @complementarity(cge,profit_co2,CO2);
 
+@complementarity(cge,market_pva,PVA);
+@complementarity(cge,market_pe,PE);
 @complementarity(cge,market_pa,PA);
 @complementarity(cge,market_py,PY);
 @complementarity(cge,market_pd,PD);
