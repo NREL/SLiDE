@@ -1,6 +1,6 @@
 ##################################################
 #
-# Replication of windc-3.0 capital transformation (rks) in julia with counterfactual testing
+# Replication of windc-3.0 energy nesting in julia with counterfactual testing
 #
 ##################################################
 
@@ -571,7 +571,7 @@ lo_eps = 1e-4
 @mapping(cge,profit_yx[(r,s) in sset[:Y]],
         sum(PID[r,g,s] * id0[r,g,s] for g in set[:g] if ((r,g) in sset[:PA]))
         + PL[r] * ld0[r,s]
-        + (haskey(RKX.lookup[1], (r,s)) ? RKX[(r,s)] : 1.0)* kd0[r,s]
+        + RKX[(r,s)]* kd0[r,s]
         - (sum(PY[(r,g)] * ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) * (1-ty[r,s]))
 );
 
@@ -630,10 +630,8 @@ lo_eps = 1e-4
 # final demand
 @NLexpression(cge,CD[r in set[:r],g in set[:g]],
     ((CC[r] / PCD[r,g])^es_cd));
-#  cd0[r,g]*PC[r] / (haskey(PA.lookup[1], (r, g)) ? PA[(r, g)] : 1.0));
 
 @mapping(cge,profit_c[r in set[:r]],
-#         sum(PA[(r,g)]*theta_cd[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
          CC[r]
          - PC[r]
 );
@@ -645,7 +643,7 @@ lo_eps = 1e-4
 
 
 @NLexpression(cge,CINV[r in set[:r]],
-              (sum( theta_inv[r,gg]*(haskey(PA.lookup[1],(r,gg)) ? PA[(r,gg)] : 1.0)^(1-es_inv) for gg in set[:g])^(1/(1-es_inv)))
+              (sum( theta_inv[r,gg]*PA[(r,gg)]^(1-es_inv) for gg in set[:g] if ((r,gg) in sset[:PA]))^(1/(1-es_inv)))
 );
 
 @NLexpression(cge, DINV[r in set[:r],g in set[:g]],
@@ -774,9 +772,9 @@ lo_eps = 1e-4
 
 # couple options for testing here
 @mapping(cge,market_pd[(r,g) in sset[:PD]],
-         (haskey(X.lookup[1],(r,g)) ? X[(r,g)] : 1.0)*xd0[r,g]*((isless(1e-6,(1-value(theta_xd[r,g])))) ? AD[r,g] : 1.0)
+         X[(r,g)]*xd0[r,g]*((isless(1e-6,(1-value(theta_xd[r,g])))) ? AD[r,g] : 1.0)
          - (
-             (haskey(A.lookup[1],(r,g)) ? A[(r,g)] : 1.0)*dd0[r,g]*((PND[r,g]/PD[(r,g)])^es_d[r,g])*((PMND[r,g]/PND[r,g])^es_f[r,g])
+             A[(r,g)]*dd0[r,g]*((PND[r,g]/PD[(r,g)])^es_d[r,g])*((PMND[r,g]/PND[r,g])^es_f[r,g])
              + sum(MS[r,m]*dm0[r,g,m] for m in set[:m] if (g in set[:gm]))
          )
 );
@@ -971,5 +969,4 @@ status = solveMCP(cge)
 
 for r in set[:r]
     println("$r=>",result_value(C[r])," C[r]")
-    # println("$r=>",result_value(W[r])," W[r]")
 end
