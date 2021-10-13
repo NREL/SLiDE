@@ -713,17 +713,6 @@ lo_eps = 1e-4
 );
 
 
-# @mapping(cge,market_pa[(r,g) in sset[:PA]],
-#          A[(r,g)]*a0[r,g]
-#          - (
-#              sum(YM[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
-#              + sum(YX[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
-#              + C[r]*cd0[r,g]*CD[r,g]
-#              + g0[r,g]
-#              + INV[r]*i0[r,g]*DINV[r,g]
-#          )
-# );
-
 
 @mapping(cge,market_pa[(r,g) in sset[:PA]],
          A[(r,g)]*a0[r,g]
@@ -731,9 +720,6 @@ lo_eps = 1e-4
              sum(YM[(r,s)]*id0[r,g,s]*IDA_ne[r,g,s] for s in set[:s] if ((r,s) in sset[:Y] && (r,g,s) in sset[:IDA_ne]))
              + sum(E[(r,s)]*id0[r,g,s]*IDA_ele[r,g,s] for s in set[:s] if ((r,s) in sset[:PE] && (r,g,s) in sset[:IDA_ele]))
              + sum(E[(r,s)]*id0[r,g,s]*IDA_fe[r,g,s] for s in set[:s] if ((r,s) in sset[:PE] && (r,g,s) in sset[:IDA_fe]))
-             # sum(YM[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y] && g in set[:nne]))
-             # + sum(E[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:PE] && g in set[:ele]))
-             # + sum(E[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:PE] && g in set[:fe]))
              + sum(YX[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
              + C[r]*cd0[r,g]*CD[r,g]
              + g0[r,g]
