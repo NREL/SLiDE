@@ -152,10 +152,24 @@ sld[:tk0] = df_to_dict(Dict, read_data_temp("tk0",data_temp_dir,"capital tax rat
 sld[:resco2] = df_to_dict(Dict, read_data_temp("resco2",data_temp_dir,"residential co2 emissions"); drop_cols = [], value_col = :Val)
 sld[:secco2] = df_to_dict(Dict, read_data_temp("secco2",data_temp_dir,"sectoral co2 emissions"); drop_cols = [], value_col = :Val)
 
+sld[:pop] = df_to_dict(Dict, read_data_temp("pop",data_temp_dir,"population"); drop_cols = [], value_col = :Val)
+sld[:le0] = df_to_dict(Dict, read_data_temp("le0",data_temp_dir,"household labor endowment"); drop_cols = [], value_col = :Val)
+sld[:ke0] = df_to_dict(Dict, read_data_temp("ke0",data_temp_dir,"Household interest payments"); drop_cols = [], value_col = :Val)
+sld[:tl0] = df_to_dict(Dict, read_data_temp("tl0",data_temp_dir,"labor tax rate"); drop_cols = [], value_col = :Val)
+sld[:cd0_h] = df_to_dict(Dict, read_data_temp("cd0_h",data_temp_dir,"household expenditures"); drop_cols = [], value_col = :Val)
+sld[:c0_h] = df_to_dict(Dict, read_data_temp("c0_h",data_temp_dir,"household consumption"); drop_cols = [], value_col = :Val)
+sld[:sav0] = df_to_dict(Dict, read_data_temp("sav0",data_temp_dir,"household saving"); drop_cols = [], value_col = :Val)
+sld[:tp0] = df_to_dict(Dict, read_data_temp("trn0",data_temp_dir,"transfers"); drop_cols = [], value_col = :Val)
+sld[:hhtp0] = df_to_dict(Dict, read_data_temp("hhtrn0",data_temp_dir,"household transfers"); drop_cols = [], value_col = :Val)
+
+
+
 regions = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_r.csv"),descriptor="region set"))[!,:Dim1]);
 sectors = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_s.csv"),descriptor="sector set"))[!,:Dim1]);
 goods = sectors;
 margins = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_m.csv"),descriptor="margin set"))[!,:Dim1]);
+households = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_h.csv"),descriptor="household set"))[!,:Dim1]);
+transfers = convert(Vector{String},SLiDE.read_file(data_temp_dir,CSVInput(name=string("set_trn.csv"),descriptor="transfers set"))[!,:Dim1]);
 
 # * define margin goods
 # gm(g) = yes$(sum((r,m), nm0(r,g,m) + dm0(r,g,m)) or sum((r,m), md0(r,m,g)));
@@ -168,6 +182,8 @@ set = Dict(
     :s => sectors,
     :g => goods,
     :m => margins,
+    :h => households,
+    :tp => transfers
 #    :gm => goods_margins
 )
 
@@ -200,6 +216,17 @@ fill_zero(tuple(regions,goods),sld[:xn0])
 fill_zero(tuple(regions,goods),sld[:xd0])
 fill_zero(tuple(regions,goods),sld[:dd0])
 fill_zero(tuple(regions,goods),sld[:nd0])
+
+fill_zero(tuple(set[:r],set[:h]),sld[:pop])
+fill_zero(tuple(set[:r],set[:r],set[:h]),sld[:le0])
+fill_zero(tuple(set[:r],set[:h]),sld[:ke0])
+fill_zero(tuple(set[:r],set[:h]),sld[:tl0])
+fill_zero(tuple(set[:r],set[:g],set[:h]),sld[:cd0_h])
+fill_zero(tuple(set[:r],set[:h]),sld[:c0_h])
+fill_zero(tuple(set[:r],set[:h]),sld[:sav0])
+fill_zero(tuple(set[:r],set[:h]),sld[:tp0])
+fill_zero(tuple(set[:r],set[:h],set[:tp]),sld[:hhtp0])
+
 
 sld[:tm] = sld[:tm0]
 sld[:ta] = sld[:ta0]
@@ -253,7 +280,13 @@ set[:nxe] = setdiff(set[:g],set[:xe])   # non-extractive goods
 set[:nele] = setdiff(set[:g],set[:ele]) # non-electricity goods
 set[:nne] = setdiff(set[:g],set[:en])   # non-energy goods
 
-sld[:va_bar] = (Dict((r,s) => (sld[:ld0][r,s] + sld[:kd0][r,s])
+fill_zero(tuple(regions),sld[:tk0])
+for r in set[:r]
+    get!(sld[:tk0],(r,),0.0)
+end
+
+
+sld[:va_bar] = (Dict((r,s) => (sld[:ld0][r,s] + sld[:kd0][r,s]*(1+sld[:tk0][(r,)]))
     for r in set[:r], s in set[:s]));
 
 sld[:fe_bar] = (Dict((r,s) => sum(sld[:id0][r,g,s] for g in set[:fe])
@@ -322,7 +355,34 @@ cge = MCPModel();
 # @NLparameter(cge, tm[r in set[:r], g in set[:g]] == 0.0); #
 
 # rescale taxes for now
-@NLparameter(cge, tk0[r in set[:r]] == get(sld[:tk0],(r,),0.0)); #Balance of payments
+@NLparameter(cge, tk0[r in set[:r]] == get(sld[:tk0],(r,),0.0)); #
+
+# household parameters
+@NLparameter(cge, pop[r in set[:r],h in set[:h]] == sld[:pop][r,h]); #
+@NLparameter(cge, le0[r in set[:r],q in set[:r],h in set[:h]] == sld[:le0][r,q,h]); #
+@NLparameter(cge, ke0[r in set[:r],h in set[:h]] == sld[:ke0][r,h]); #
+@NLparameter(cge, tl0[r in set[:r],h in set[:h]] == sld[:tl0][r,h]); #
+@NLparameter(cge, cd0_h[r in set[:r],g in set[:g],h in set[:h]] == sld[:cd0_h][r,g,h]); #
+@NLparameter(cge, c0_h[r in set[:r],h in set[:h]] == sld[:c0_h][r,h]); #
+@NLparameter(cge, sav0[r in set[:r],h in set[:h]] == sld[:sav0][r,h]); #
+@NLparameter(cge, tp0[r in set[:r],h in set[:h]] == sld[:tp0][r,h]); #
+@NLparameter(cge, hhtp0[r in set[:r],h in set[:h],tp in set[:tp]] == sld[:hhtp0][r,h,tp]); #
+
+@NLparameter(cge, tk[r in set[:r],s in set[:s]] == get(sld[:tk0],(r,),0.0)); #
+@NLparameter(cge, tl[r in set[:r],h in set[:h]] == sld[:tl0][r,h]); #
+
+@NLparameter(cge, totsav0 == sum(value(sav0[r,h]) for r in set[:r],h in set[:h]));
+@NLparameter(cge, fsav0 == sum(value(i0[r,g]) for r in set[:r],g in set[:g]) - value(totsav0));
+@NLparameter(cge, taxrevL[q in set[:r]] == sum(value(tl0[r,h])*value(le0[r,q,h]) for r in set[:r],h in set[:h]));
+@NLparameter(cge, taxrevK == sum(value(tk0[r])*value(ke0[r,h]) for r in set[:r],h in set[:h]));
+@NLparameter(cge, govdef0 == sum(value(g0[r,g]) for r in set[:r],g in set[:g])
+             + sum(value(tp0[r,h]) for r in set[:r],h in set[:h])
+             - sum(value(taxrevL[q]) for q in set[:r])
+             - value(taxrevK)
+             - sum(value(ty0[r,s])*value(ys0[r,s,g]) for r in set[:r],s in set[:s],g in set[:g])
+             - sum(value(ta0[r,g])*value(a0[r,g]) + value(tm0[r,g])*value(m0[r,g]) for r in set[:r],g in set[:g])
+);
+
 
 #co2 emissions --- Converted to billion tonnes of co2
 #so that model carbon prices interpreted in $/tonnes
@@ -333,9 +393,12 @@ cge = MCPModel();
 @NLparameter(cge, idcco2[r in set[:r], g in set[:g], s in set[:s]] == ensurefinite(value(idcb0[r,g,s])/value(id0[r,g,s])));
 @NLparameter(cge, cdcco2[r in set[:r], g in set[:g]] == ensurefinite(value(cdcb0[r,g])/value(cd0[r,g])));
 
-for r in set[:r],s in set[:s]
-    set_value(kd0[r,s],value(kd0[r,s])*(1+value(tk0[r])))
-end
+@NLparameter(cge, cd0_h_shr[r in set[:r],g in set[:g],h in set[:h]] == ensurefinite(value(cd0_h[r,g,h])/sum(value(cd0_h[r,g,hh]) for hh in set[:h])));
+@NLparameter(cge, cdcco2_h[r in set[:r],g in set[:g],h in set[:h]] == ensurefinite(value(cdcb0[r,g])*value(cd0_h_shr[r,g,h])/value(cd0_h[r,g,h])));
+
+# for r in set[:r],s in set[:s]
+#     set_value(kd0[r,s],value(kd0[r,s])*(1+value(tk0[r])))
+# end
 
 # labor-leisure parameters
 @NLparameter(cge, inv0[r in set[:r]] == sum(value(i0[r,g]) for g in set[:g])); # Investment supply
@@ -350,6 +413,21 @@ end
 @NLparameter(cge, theta_w[r in set[:r]] == ensurefinite(value(lsr0[r]) / value(w0[r])));
 @NLparameter(cge, sup_ul == 0.05); # uncompensated labor supply elasticity
 @NLparameter(cge, es_w[r in set[:r]] == 1 + value(sup_ul) / value(theta_w[r])); # elasticity for full consumption/welfare index bundle
+
+# hh labor-leisure parameters
+@NLparameter(cge, theta_sav[r in set[:r],h in set[:h]] == value(sav0[r,h])/sum(value(sav0[r,hh]) for hh in set[:h]));
+@NLparameter(cge, i0_h[r in set[:r],g in set[:g],h in set[:h]] == value(i0[r,g])*value(theta_sav[r,h]));
+@NLparameter(cge, inv0_h[r in set[:r],h in set[:h]] == sum(value(i0_h[r,g,h]) for g in set[:g]));
+@NLparameter(cge, fsav_h[r in set[:r],h in set[:h]] == value(inv0_h[r,h])-value(sav0[r,h]));
+
+@NLparameter(cge, lbr0_h[r in set[:r],h in set[:h]] == sum(value(le0[r,q,h])*(1-value(tl0[r,h])) for q in set[:r])); # Labor endowment/supply
+@NLparameter(cge, lte0_h[r in set[:r],h in set[:h]] == value(lbr0_h[r,h])/(1-value(extra[r]))); # time endowment
+@NLparameter(cge, lsr0_h[r in set[:r],h in set[:h]] == value(lte0_h[r,h])-value(lbr0_h[r,h])); # leisure time
+@NLparameter(cge, z0_h[r in set[:r],h in set[:h]] == value(c0_h[r,h])+value(inv0_h[r,h])); # consumption-investment bundle
+@NLparameter(cge, w0_h[r in set[:r],h in set[:h]] == value(z0_h[r,h])+value(lsr0_h[r,h])); # welfare/full-consumption bundle
+
+@NLparameter(cge, theta_wh[r in set[:r],h in set[:h]] == ensurefinite(value(lsr0_h[r,h]) / value(w0_h[r,h])));
+@NLparameter(cge, es_wh[r in set[:r],h in set[:h]] == 1 + value(sup_ul) / value(theta_wh[r,h])); # elasticity for full consumption/welfare index bundle
 
 # Recursive dynamic parameters
 @NLparameter(cge, delta == 0.05); # 
@@ -366,7 +444,7 @@ end
 @NLparameter(cge, ks_m[r in set[:r]] == value(ks_m0[r])); #
 
 # Energy-Nesting Benchmark parameters
-@NLparameter(cge, va_bar[r in set[:r], s in set[:s]] == value(ld0[r,s]) + value(kd0[r,s])); # bmk value-added
+@NLparameter(cge, va_bar[r in set[:r], s in set[:s]] == value(ld0[r,s]) + value(kd0[r,s])*(1+value(tk0[r]))); # bmk value-added
 @NLparameter(cge, fe_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:fe])); # bmk fossil-energy FE
 @NLparameter(cge, en_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:en])); # bmk energy EN
 @NLparameter(cge, ne_bar[r in set[:r], s in set[:s]] == sum(value(id0[r,g,s]) for g in set[:nne])); # bmk non-energy NNE
@@ -374,7 +452,7 @@ end
 @NLparameter(cge, klem_bar[r in set[:r], s in set[:s]] == value(vaen_bar[r,s]) + value(ne_bar[r,s])); # bmk value-added-energy vaen
 
 # benchmark value share parameters
-@NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s]))));
+@NLparameter(cge, alpha_kl[r in set[:r], s in set[:s]] == ensurefinite(value(ld0[r,s]) / (value(ld0[r,s]) + value(kd0[r,s])*(1+value(tk0[r])))));
 @NLparameter(cge, theta_xe[r in set[:r], g in set[:g]] == ensurefinite((value(x0[r,g]) - value(rx0[r,g])) / value(s0[r,g])));
 @NLparameter(cge, theta_xd[r in set[:r], g in set[:g]] == ensurefinite(value(xd0[r,g]) / value(s0[r,g])));
 @NLparameter(cge, theta_xn[r in set[:r], g in set[:g]] == ensurefinite(value(xn0[r,g]) / value(s0[r,g])));
@@ -430,14 +508,15 @@ lo = MODEL_LOWER_BOUND
 
 @variable(cge, X[(r,g) in sset[:X]] >= lo, start = 1.0);
 @variable(cge, A[(r,g) in sset[:A]] >= lo, start = 1.0);
-@variable(cge, C[r in set[:r]] >= lo, start = 1.0);
 @variable(cge, MS[r in set[:r], m in set[:m]] >= lo, start = 1.0);
 
-@variable(cge, LS[r in set[:r]] >= lo, start = 1.0);
 @variable(cge, KS >= lo, start = 1.0);
 @variable(cge, INV[r in set[:r]] >= lo, start = 1.0);
-@variable(cge, Z[r in set[:r]] >= lo, start = 1.0);
-@variable(cge, W[r in set[:r]] >= lo, start = 1.0);
+
+@variable(cge, LS[r in set[:r],h in set[:h]] >= lo, start = 1.0);
+@variable(cge, C[r in set[:r],h in set[:h]] >= lo, start = 1.0);
+@variable(cge, Z[r in set[:r],h in set[:h]] >= lo, start = 1.0);
+@variable(cge, W[r in set[:r],h in set[:h]] >= lo, start = 1.0);
 
 @variable(cge, CO2[r in set[:r]] >= lo, start = value(carb0[r]));
 
@@ -455,22 +534,29 @@ lo = MODEL_LOWER_BOUND
 @variable(cge, RK[(r,s) in sset[:PK]] >= lo, start = 1.0); # Rental rate of capital - mutable ###
 @variable(cge, RKX[(r,s) in sset[:PK]] >= lo, start = 1.0); # Rental rate of capital - extant ###
 @variable(cge, RKS >= lo, start = 1.0); # Aggregate mutable rental rate
+@variable(cge, PK >= lo, start = 1.0); # Aggregate mutable rental rate
 
 @variable(cge, PM[r in set[:r], m in set[:m]] >= lo, start = 1.0); # Margin price
-@variable(cge, PC[r in set[:r]] >= lo, start = 1.0); # Consumer price index 
 
 @variable(cge, 1.0>=PFX>=1.0, start = 1.0); # Foreign exchange (fixed as numeraire currently)
 
-@variable(cge, PLS[r in set[:r]] >= lo, start = 1.0); # Opportunity cost of work price index
 @variable(cge, PINV[r in set[:r]] >= lo, start = 1.0); # Investment price index
-@variable(cge, PZ[r in set[:r]] >= lo, start = 1.0); # Cons-Inv price index
-@variable(cge, PW[r in set[:r]] >= lo, start = 1.0); # Welfare/Full consumption price index 
+@variable(cge, PLS[r in set[:r],h in set[:h]] >= lo, start = 1.0); # Opportunity cost of work price index
+@variable(cge, PC[r in set[:r],h in set[:h]] >= lo, start = 1.0); # Consumer price index 
+@variable(cge, PZ[r in set[:r],h in set[:h]] >= lo, start = 1.0); # Cons-Inv price index
+@variable(cge, PW[r in set[:r],h in set[:h]] >= lo, start = 1.0); # Welfare/Full consumption price index 
 
 @variable(cge, PDCO2[r in set[:r]] >= lo, start = 1e-6); # effective carbon price
 @variable(cge, PCO2 >= lo, start = 1e-6); # carbon factor price
 
 #consumer:
-@variable(cge,RA[r in set[:r]]>=lo,start = value(w0[r])) ;
+@variable(cge,RA[r in set[:r],h in set[:h]]>=lo,start = value(w0_h[r,h])) ;
+@variable(cge, GOVT >= lo, start = sum(value(g0[r,g]) for r in set[:r],g in set[:g])); # carbon factor price
+@variable(cge, NYSE >= lo, start = sum(value(ke0[r,h]) for r in set[:r],h in set[:h])); # carbon factor price
+
+# aux
+@variable(cge, TRANS >= lo, start = 1.0); # carbon factor price
+
 
 ##############
 # EQUATIONS
@@ -482,7 +568,7 @@ lo = MODEL_LOWER_BOUND
 #               # PL[r]^alpha_kl[r,s] * (isempty([k.I[1] for k in keys(PK) if k.I[1]==(r,s)]) ? 1.0 : PK[(r,s)]) ^ (1-alpha_kl[r,s]) );
 
 @NLexpression(cge,CVA[r in set[:r],s in set[:s]],
-              PL[r]^alpha_kl[r,s] * (isempty([k.I[1] for k in keys(RK) if k.I[1]==(r,s)]) ? 1.0 : getindex(RK,(r,s))) ^ (1-alpha_kl[r,s]) );
+              PL[r]^alpha_kl[r,s] * ((isempty([k.I[1] for k in keys(RK) if k.I[1]==(r,s)]) ? 1.0 : getindex(RK,(r,s)))*(1+tk[r,s])/(1+tk0[r])) ^ (1-alpha_kl[r,s]) );
 
 # @NLexpression(cge,CVA[r in set[:r],s in set[:s]],
 #               PL[r]^alpha_kl[r,s] * testget(RK,(r,s),1.0) ^ (1-alpha_kl[r,s]) );
@@ -492,7 +578,7 @@ lo = MODEL_LOWER_BOUND
 
 #demand for capital in VA
 @NLexpression(cge,KD[r in set[:r],s in set[:s]],
-              kd0[r,s] * CVA[r,s] / (haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0) );
+              kd0[r,s] * CVA[r,s] / ((haskey(RK.lookup[1], (r,s)) ? RK[(r,s)] : 1.0)*(1+tk[r,s])/(1+tk0[r])) );
 
 # zero profit condition:
 @mapping(cge,profit_va[(r,s) in sset[:PVA]],
@@ -571,7 +657,7 @@ lo = MODEL_LOWER_BOUND
 @mapping(cge,profit_yx[(r,s) in sset[:Y]],
         sum(PID[r,g,s] * id0[r,g,s] for g in set[:g] if ((r,g) in sset[:PA]))
         + PL[r] * ld0[r,s]
-        + RKX[(r,s)]* kd0[r,s]
+        + RKX[(r,s)] * (1+tk[r,s])/(1+tk0[r]) * kd0[r,s] *(1+tk0[r])
         - (sum(PY[(r,g)] * ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) * (1-ty[r,s]))
 );
 
@@ -626,23 +712,34 @@ lo = MODEL_LOWER_BOUND
 # !!!! stick to fixed proportions I guess for now
 # !!!! could possibly add if ((r,g) in sset[:CD]) to sum statement
 # unit cost for consumption
-@NLexpression(cge, CC[r in set[:r]],
-    sum( theta_cd[r,gg]*PCD[r,gg]^(1-es_cd) for gg in set[:g])^(1/(1-es_cd))
+# @NLexpression(cge, CC[r in set[:r]],
+#     sum( theta_cd[r,gg]*PCD[r,gg]^(1-es_cd) for gg in set[:g])^(1/(1-es_cd))
+# );
+
+# # final demand
+# @NLexpression(cge,CD[r in set[:r],g in set[:g]],
+#     ((CC[r] / PCD[r,g])^es_cd));
+
+@NLparameter(cge, theta_cd_h[r in set[:r],g in set[:g],h in set[:h]] == ensurefinite(value(cd0_h[r,g,h])/sum(value(cd0_h[r,gg,h]) for gg in set[:g])));
+
+@NLexpression(cge, CC[r in set[:r],h in set[:h]],
+    sum( theta_cd_h[r,gg,h]*PCD[r,gg]^(1-es_cd) for gg in set[:g])^(1/(1-es_cd))
 );
 
 # final demand
-@NLexpression(cge,CD[r in set[:r],g in set[:g]],
-    ((CC[r] / PCD[r,g])^es_cd));
+@NLexpression(cge,CD[r in set[:r],g in set[:g],h in set[:h]],
+    ((CC[r,h] / PCD[r,g])^es_cd));
+
 
 # zero profit: final consumption
-@mapping(cge,profit_c[r in set[:r]],
-         CC[r]
-         - PC[r]
+@mapping(cge,profit_c[r in set[:r],h in set[:h]],
+         CC[r,h]
+         - PC[r,h]
 );
 
 #
 @mapping(cge,profit_co2[r in set[:r]],
-         PCO2 + (carb0[r]==0.0 ? PC[r] : 0.0)*1e-6
+         PCO2 + (carb0[r]==0.0 ? PFX : 0.0)*1e-6
          - PDCO2[r]
 );
 
@@ -660,10 +757,16 @@ lo = MODEL_LOWER_BOUND
          - PINV[r]
 );
 
-@mapping(cge, profit_ls[r in set[:r]],
-         PLS[r]*lbr0[r]
-         - PL[r]*lbr0[r]
+# @mapping(cge, profit_ls[r in set[:r]],
+#          PLS[r]*lbr0[r]
+#          - PL[r]*lbr0[r]
+# );
+
+@mapping(cge, profit_ls[r in set[:r],h in set[:h]],
+         PLS[r,h]*lbr0_h[r,h]
+         - sum(PL[q]*le0[r,q,h]*(1-tl[r,h]) for q in set[:r])
 );
+
 
 
 @NLexpression(cge, CKS,
@@ -674,50 +777,111 @@ lo = MODEL_LOWER_BOUND
          RKS - CKS
 );
 
-@mapping(cge, profit_z[r in set[:r]],
-         PC[r]*c0[r] + PINV[r]*inv0[r]
-         - PZ[r]*z0[r]
+# @mapping(cge, profit_z[r in set[:r]],
+#          PC[r]*c0[r] + PINV[r]*inv0[r]
+#          - PZ[r]*z0[r]
+# );
+
+@mapping(cge, profit_z[r in set[:r],h in set[:h]],
+         PC[r,h]*c0_h[r,h] + PINV[r]*inv0_h[r,h]
+         - PZ[r,h]*z0_h[r,h]
+);
+
+# @NLexpression(cge,CW[r in set[:r]],
+#               (theta_w[r]*PLS[r]^(1-es_w[r]) + (1-theta_w[r])*PZ[r]^(1-es_w[r]))^(1/(1-es_w[r]))
+# );
+
+# @NLexpression(cge, DZ[r in set[:r]],
+#               ((CW[r]/PZ[r])^es_w[r])
+# );
+
+# @NLexpression(cge, DLSR[r in set[:r]],
+#               ((CW[r]/PLS[r])^es_w[r])
+# );
+
+
+# @mapping(cge, profit_w[r in set[:r]],
+#          CW[r]
+#          - PW[r]
+# );
+
+@NLexpression(cge,CW[r in set[:r],h in set[:h]],
+              (theta_wh[r,h]*PLS[r,h]^(1-es_wh[r,h]) + (1-theta_wh[r,h])*PZ[r,h]^(1-es_wh[r,h]))^(1/(1-es_wh[r,h]))
+);
+
+@NLexpression(cge, DZ[r in set[:r],h in set[:h]],
+              ((CW[r,h]/PZ[r,h])^es_wh[r,h])
+);
+
+@NLexpression(cge, DLSR[r in set[:r],h in set[:h]],
+              ((CW[r,h]/PLS[r,h])^es_wh[r,h])
 );
 
 
-@NLexpression(cge,CW[r in set[:r]],
-              (theta_w[r]*PLS[r]^(1-es_w[r]) + (1-theta_w[r])*PZ[r]^(1-es_w[r]))^(1/(1-es_w[r]))
-);
-
-@NLexpression(cge, DZ[r in set[:r]],
-              ((CW[r]/PZ[r])^es_w[r])
-);
-
-@NLexpression(cge, DLSR[r in set[:r]],
-              ((CW[r]/PLS[r])^es_w[r])
+@mapping(cge, profit_w[r in set[:r],h in set[:h]],
+         CW[r,h]
+         - PW[r,h]
 );
 
 
-@mapping(cge, profit_w[r in set[:r]],
-         CW[r]
-         - PW[r]
-);
+# @mapping(cge,income_ra[r in set[:r]],
+#          RA[r]
+#          - (
+#              sum(PY[(r,g)]*yh0[r,g] for g in set[:g] if ((r,g) in sset[:PY]))
+#              + PFX*(bopdef0[r]+hhadj[r])
+#              - sum(PA[(r,g)]*(g0[r,g]) for g in set[:g] if ((r,g) in sset[:PA]))
+#              + PLS[r]*lbr0[r]
+#              + PLS[r]*lsr0[r]
+#              + RKS*ks_m[r]
+#              + sum(RKX[(r,s)]*ks_x[r,s] for s in set[:s] if ((r,s) in sset[:PK]))
+#              + sum(YM[(r,s)]*ty[r,s]*sum(PY[(r,g)]*ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) for s in set[:s] if ((r,s) in sset[:Y]))
+#              + sum(YX[(r,s)]*ty[r,s]*sum(PY[(r,g)]*ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) for s in set[:s] if ((r,s) in sset[:Y]))
+#              + sum(A[(r,g)]*ta[r,g]*PA[(r,g)]*a0[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
+#              + sum(A[(r,g)]*tm[r,g]*PFX*m0[r,g]*(PMND[r,g]*(1+tm0[r,g])/(PFX*(1+tm[r,g])))^es_f[r,g] for g in set[:g] if ((r,g) in sset[:A]))
+#              + PCO2*carb0[r]
+#          )
+# );
 
-
-@mapping(cge,income_ra[r in set[:r]],
-         RA[r]
+@mapping(cge,income_ra[r in set[:r],h in set[:h]],
+         RA[r,h]
          - (
-             sum(PY[(r,g)]*yh0[r,g] for g in set[:g] if ((r,g) in sset[:PY]))
-             + PFX*(bopdef0[r]+hhadj[r])
-             - sum(PA[(r,g)]*(g0[r,g]) for g in set[:g] if ((r,g) in sset[:PA]))
-             + PLS[r]*lbr0[r]
-             + PLS[r]*lsr0[r]
-             + RKS*ks_m[r]
-             + sum(RKX[(r,s)]*ks_x[r,s] for s in set[:s] if ((r,s) in sset[:PK]))
-             + sum(YM[(r,s)]*ty[r,s]*sum(PY[(r,g)]*ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) for s in set[:s] if ((r,s) in sset[:Y]))
-             + sum(YX[(r,s)]*ty[r,s]*sum(PY[(r,g)]*ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) for s in set[:s] if ((r,s) in sset[:Y]))
-             + sum(A[(r,g)]*ta[r,g]*PA[(r,g)]*a0[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
-             + sum(A[(r,g)]*tm[r,g]*PFX*m0[r,g]*(PMND[r,g]*(1+tm0[r,g])/(PFX*(1+tm[r,g])))^es_f[r,g] for g in set[:g] if ((r,g) in sset[:A]))
-             + PCO2*carb0[r]
+             PFX*sum(hhtp0[r,h,tp] for tp in set[:tp])*TRANS
+             + PLS[r,h]*lbr0_h[r,h]
+             + PLS[r,h]*lsr0_h[r,h]
+             + PK*ke0[r,h]
+             + PFX*fsav_h[r,h]
+             + PCO2*carb0[r]*(pop[r,h]/sum(pop[r,hh] for hh in set[:h]))
+             # + PCO2*carb0[r]*(pop[r,h]/sum(pop[rr,hh] for rr in set[:r],hh in set[:h]))
          )
 );
 
+@mapping(cge,income_govt,
+         sum(PA[(r,g)]*g0[r,g] for r in set[:r],g in set[:g] if ((r,g) in sset[:PA]))
+         - (
+             PFX*govdef0
+             + PFX*(-sum(tp0[r,h] for r in set[:r],h in set[:h]))*TRANS
+             + sum(YM[(r,s)]*ty[r,s]*sum(PY[(r,g)]*ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) for r in set[:r],s in set[:s] if ((r,s) in sset[:Y]))
+             + sum(YX[(r,s)]*ty[r,s]*sum(PY[(r,g)]*ys0[r,s,g] for g in set[:g] if ((r,g) in sset[:PY])) for r in set[:r],s in set[:s] if ((r,s) in sset[:Y]))
+             + sum(A[(r,g)]*ta[r,g]*PA[(r,g)]*a0[r,g] for r in set[:r],g in set[:g] if ((r,g) in sset[:PA]))
+             + sum(A[(r,g)]*tm[r,g]*PFX*m0[r,g]*(PMND[r,g]*(1+tm0[r,g])/(PFX*(1+tm[r,g])))^es_f[r,g] for r in set[:r],g in set[:g] if ((r,g) in sset[:A]))
+             + sum(VA[(r,s)]*tk[r,s]*RK[(r,s)]*KD[r,s] for r in set[:r],s in set[:s] if ((r,s) in sset[:PK]))
+             + sum(YX[(r,s)]*tk[r,s]*RKX[(r,s)]*kd0[r,s] for r in set[:r],s in set[:s] if ((r,s) in sset[:PK]))
+             + sum(LS[r,h]*tl[r,h]*sum(PL[q]*le0[r,q,h] for q in set[:r]) for r in set[:r],h in set[:h])
+         )
+);
 
+@mapping(cge,income_nyse,
+         NYSE
+         - (
+             sum(PY[(r,g)]*yh0[r,g] for r in set[:r],g in set[:g] if ((r,g) in sset[:PY]))
+             + sum(RKS*ks_m[r] for r in set[:r])
+             + sum(RKX[(r,s)]*ks_x[r,s] for r in set[:r],s in set[:s] if ((r,s) in sset[:PK]))
+         )
+);
+
+@mapping(cge,aux_trans,
+         GOVT - sum(PA[(r,g)]*g0[r,g] for r in set[:r],g in set[:g] if ((r,g) in sset[:PA]))
+);
 
 @mapping(cge,market_pa[(r,g) in sset[:PA]],
          A[(r,g)]*a0[r,g]
@@ -726,7 +890,8 @@ lo = MODEL_LOWER_BOUND
              + sum(E[(r,s)]*id0[r,g,s]*IDA_ele[r,g,s] for s in set[:s] if ((r,s) in sset[:PE] && (r,g,s) in sset[:IDA_ele]))
              + sum(E[(r,s)]*id0[r,g,s]*IDA_fe[r,g,s] for s in set[:s] if ((r,s) in sset[:PE] && (r,g,s) in sset[:IDA_fe]))
              + sum(YX[(r,s)]*id0[r,g,s] for s in set[:s] if ((r,s) in sset[:Y]))
-             + C[r]*cd0[r,g]*CD[r,g]
+             # + C[r]*cd0[r,g]*CD[r,g]
+             + sum(C[r,h]*cd0_h[r,g,h]*CD[r,g,h] for h in set[:h])
              + g0[r,g]
              + INV[r]*i0[r,g]*DINV[r,g]
          )
@@ -798,11 +963,19 @@ lo = MODEL_LOWER_BOUND
          - YM[(r,s)]*va_bar[r,s]*IVA[r,s]
 );
 
-@mapping(cge,market_pl[r in set[:r]],
-         LS[r]*lbr0[r]
+# @mapping(cge,market_pl[r in set[:r]],
+#          LS[r]*lbr0[r]
+#          - (
+#              sum(VA[(r,s)]*LD[r,s] for s in set[:s] if ((r,s) in sset[:PVA]))
+#              + sum(YX[(r,s)]*ld0[r,s] for s in set[:s] if ((r,s) in sset[:Y]))
+#          )
+# );
+
+@mapping(cge,market_pl[q in set[:r]],
+         sum(LS[r,h]*le0[r,q,h] for r in set[:r],h in set[:h])
          - (
-             sum(VA[(r,s)]*LD[r,s] for s in set[:s] if ((r,s) in sset[:PVA]))
-             + sum(YX[(r,s)]*ld0[r,s] for s in set[:s] if ((r,s) in sset[:Y]))
+             sum(VA[(q,s)]*LD[q,s] for s in set[:s] if ((q,s) in sset[:PVA]))
+             + sum(YX[(q,s)]*ld0[q,s] for s in set[:s] if ((q,s) in sset[:Y]))
          )
 );
 
@@ -828,38 +1001,42 @@ lo = MODEL_LOWER_BOUND
 );
 
 
-@mapping(cge,market_pc[r in set[:r]],
-         C[r]*c0[r]
-         - Z[r]*c0[r]
+@mapping(cge,market_pc[r in set[:r],h in set[:h]],
+         C[r,h]*c0_h[r,h]
+         - Z[r,h]*c0_h[r,h]
 );
 
 
 @mapping(cge,market_pinv[r in set[:r]],
          INV[r]*inv0[r]
-         - Z[r]*inv0[r]
+         - sum(Z[r,h]*inv0_h[r,h] for h in set[:h])
 );
 
 
-@mapping(cge,market_pz[r in set[:r]],
-         Z[r]*z0[r]
-         - W[r]*z0[r]*DZ[r]
+@mapping(cge,market_pz[r in set[:r],h in set[:h]],
+         Z[r,h]*z0_h[r,h]
+         - W[r,h]*z0_h[r,h]*DZ[r,h]
 );
 
 
-@mapping(cge,market_pls[r in set[:r]],
-         lbr0[r]+lsr0[r]
+@mapping(cge,market_pls[r in set[:r],h in set[:h]],
+         (lbr0_h[r,h]+lsr0_h[r,h])
          - (
-             LS[r]*lbr0[r]
-             + W[r]*lsr0[r]*DLSR[r]  
+             LS[r,h]*sum(le0[r,q,h]*(1-tl0[r,h]) for q in set[:r])
+             + W[r,h]*lsr0_h[r,h]*DLSR[r,h]
          )
 );
 
 
-@mapping(cge,market_pw[r in set[:r]],
-         PW[r]*W[r]*w0[r]
-         - RA[r]
+@mapping(cge,market_pw[r in set[:r],h in set[:h]],
+         PW[r,h]*W[r,h]*w0_h[r,h]
+         - RA[r,h]
 );
 
+@mapping(cge,market_pk,
+         PK*sum(ke0[r,h] for r in set[:r],h in set[:h])
+         - NYSE
+);
 
 @mapping(cge,market_pco2,
          sum(carb0[r] for r in set[:r]) - sum(CO2[r] for r in set[:r])
@@ -873,7 +1050,7 @@ lo = MODEL_LOWER_BOUND
              + sum(YM[(r,s)]*id0[r,g,s]*idcco2[r,g,s]*IDA_ne[r,g,s] for s in set[:s] for g in set[:nne] if ((r,s) in sset[:Y] && (r,g,s) in sset[:IDA_ne]))
              + sum(E[(r,s)]*id0[r,g,s]*idcco2[r,g,s]*IDA_ele[r,g,s] for s in set[:s] for g in set[:ele] if ((r,s) in sset[:PE] && (r,g,s) in sset[:IDA_ele]))
              + sum(E[(r,s)]*id0[r,g,s]*idcco2[r,g,s]*IDA_fe[r,g,s] for s in set[:s] for g in set[:fe] if ((r,s) in sset[:PE] && (r,g,s) in sset[:IDA_fe]))
-             + sum(C[r]*cd0[r,g]*CD[r,g]*cdcco2[r,g] for g in set[:g] if ((r,g) in sset[:PA]))
+             + sum(C[r,h]*cd0_h[r,g,h]*CD[r,g,h]*cdcco2_h[r,g,h] for g in set[:g],h in set[:h] if ((r,g) in sset[:PA]))
          )
 );
 
@@ -903,7 +1080,7 @@ lo = MODEL_LOWER_BOUND
 @complementarity(cge,market_pd,PD);
 @complementarity(cge,market_pn,PN);
 @complementarity(cge,market_pl,PL);
-# @complementarity(cge,market_pk,PK);
+@complementarity(cge,market_pk,PK);
 @complementarity(cge,market_rk,RK);
 @complementarity(cge,market_rks,RKS);
 @complementarity(cge,market_rkx,RKX);
@@ -920,6 +1097,11 @@ lo = MODEL_LOWER_BOUND
 @complementarity(cge,market_pdco2,PDCO2);
 
 @complementarity(cge,income_ra,RA);
+@complementarity(cge,income_govt,GOVT);
+@complementarity(cge,income_nyse,NYSE);
+
+@complementarity(cge,aux_trans,TRANS);
+
 
 ####################
 # -- Model Solve --
@@ -932,10 +1114,10 @@ PATHSolver.options(convergence_tolerance=1e-6, output=:yes, time_limit=3600, cum
 status = solveMCP(cge)
 
 # Free trade counterfactual
-for r in set[:r],g in set[:g]
-    # set_value(tm[r,g],0.0)
-    set_value(tm[r,g],value(tm0[r,g]))
-end
+# for r in set[:r],g in set[:g]
+#     # set_value(tm[r,g],0.0)
+#     set_value(tm[r,g],value(tm0[r,g]))
+# end
 
 for r in set[:r]
     set_value(carb0[r],value(carb0[r])*0.8)
@@ -958,6 +1140,6 @@ PATHSolver.options(convergence_tolerance=1e-6, minor_iteration_limit=50812, time
 # solve the model
 status = solveMCP(cge)
 
-for r in set[:r]
-    println("$r=>",result_value(C[r])," C[r]")
+for r in set[:r],h in set[:h]
+    println("$r,$h=>",result_value(C[r,h])," C[r,h]")
 end
