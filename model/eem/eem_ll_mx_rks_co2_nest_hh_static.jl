@@ -948,7 +948,10 @@ lo = MODEL_LOWER_BOUND
 @mapping(cge,market_pfx,
          sum(X[(r,g)]*(x0[r,g]-rx0[r,g]) for (r,g) in sset[:X])
          + sum(A[(r,g)]*rx0[r,g] for (r,g) in sset[:A])
-         + sum(bopdef0[r]+hhadj[r] for r in set[:r])
+         + sum(fsav_h[r,h] for r in set[:r] for h in set[:h])
+         + govdef0
+         + sum(hhtp0[r,h,tp] for r in set[:r] for h in set[:h] for tp in set[:tp])*TRANS
+         - sum(tp0[r,h] for r in set[:r] for h in set[:h])*TRANS
          - sum(A[(r,g)]*m0[r,g]*(((PMND[r,g]*(1+tm0[r,g]))/(PFX*(1+tm[r,g])))^es_f[r,g]) for (r,g) in sset[:A])
 );
 
