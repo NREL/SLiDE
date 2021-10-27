@@ -228,14 +228,15 @@ function split_gams(x::String)
     return [_expand_set(matches[jj][1]) for jj in 1:length(matches)]
 end
 
-
 function split_gams(xf::Array{String,1}; colnames=[])
+    xf = strip.(xf)
     xf = xf[xf .!== ""]                             # blank lines
     xf = xf[match.(r"^\s*SET", xf) .=== nothing]    # set definitions
     xf = xf[match.(r"^\s*\*", xf) .=== nothing]     # commented lines
     length(xf) == 0 && (return nothing)
 
-    data = split_gams.(xf)
+    data = _split_gams(xf)
+    # data = split_gams.(xf)
 
     if length(unique(length.(data))) == 1
         COLS = length(data[1])
@@ -248,6 +249,57 @@ function split_gams(xf::Array{String,1}; colnames=[])
     end
 
     return data
+end
+
+
+"""
+"""
+function _split_gams(xf::Vector{String})
+    IS_MULTILINE = any(.!isnothing.(match.(r"\s!\s", xf)))
+    return IS_MULTILINE ? _split_multiline(xf) : _split_monoline.(xf)
+end
+
+
+"""
+"""
+function _split_multiline(xf::Vector{String})
+    xf = split.(xf, r"(\.|\s!\s\"*)")
+    xf = [string.(
+            [reduce(replace, [r"\",$"=>"", "\t"=>" "], init=x[ii]) for ii in 1:length(x)])
+        for x in xf]
+    return _fill_multiline(xf)
+end
+
+
+"""
+"""
+function _fill_multiline(x::Vector{String}, N=3)
+    return if length(x)==1 && x[1] in [")","),","/;",") /;"]
+        []
+    elseif x[end]=="("
+        [x[1:end-1];fill("",N-(length(x)-1))]
+    elseif length(x)<N
+        [fill("",N-length(x));x]
+    else
+        x
+    end
+end
+
+
+function _fill_multiline(xf::Vector{Vector{String}})
+    xf = _fill_multiline.(xf)
+    xf = xf[.!isempty.(xf)]
+
+    [isempty(xf[ii][1]) && (xf[ii][1] = xf[ii-1][1]) for ii in 2:size(xf,1)]
+    return xf[[!any(isempty.(x)) for x in xf]]
+end
+
+
+"""
+"""
+function _split_monoline(x::String)
+    matches = collect(eachmatch(r"((?<=\").*(?=\")|\((?>[^()]|(?R))*\)|[\w\d]+)", x))
+    return [SLiDE._expand_set(matches[jj][1]) for jj in 1:length(matches)]
 end
 
 
