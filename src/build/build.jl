@@ -11,7 +11,6 @@ function build(dataset::Dataset)
     set_region_level!(dataset, :state)
 
     dataset.overwrite && overwrite(dataset)
-    dataset.eem && set!(dataset; build="eem")
     
     if data_saved(dataset)
         set!(dataset; step=SLiDE.PARAM_DIR)
@@ -124,6 +123,9 @@ end
 and their values saved, for the given `dataset`."
 function data_saved(dataset::Dataset)
     dataset = copy(dataset)
+    
+    # Set dataset build step to reflect the ultimate goal.
+    dataset.eem && set!(dataset; build="eem")
     return .&(
         isdir(datapath(set!(dataset; step=PARAM_DIR))),
         isdir(datapath(set!(dataset; step=SET_DIR))),
