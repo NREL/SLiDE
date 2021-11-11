@@ -36,6 +36,8 @@ function disaggregate_energy!(dataset, d, set, maps)
 
         # Update household disaggregation.
         _disagg_hhadj!(d)
+
+        [d[k] = edit_with(d[k], Rename(:g,:src)) for k in [:ed0,:emarg0,:pctgen]]
         write_build!(set!(dataset; step=step), d)
     else
         merge!(d, d_read)
