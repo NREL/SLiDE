@@ -65,6 +65,11 @@
                 "data_type": "String"
             },
             {
+                "name": "descriptor",
+                "comment": "set descriptor; this will be used to identify the GAMS set to be read.",
+                "data_type": "String"
+            },
+            {
                 "name": "col",
                 "comment": "column names",
                 "data_type": "Array{Symbol,1}"

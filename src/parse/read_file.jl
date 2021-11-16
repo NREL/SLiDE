@@ -29,11 +29,21 @@ the `data/coremaps` directory. It returns a .csv file.
     dictionary. All keys that correspond with SLiDE DataStream DataTypes will be converted
     to (lists of) those types.
 """
+# function read_file(path::Any, file::GAMSInput; remove_notes::Bool=false)
+#     filepath = SLiDE._joinpath(path, file)
+#     return _read_gams(filepath; colnames=file.col, id=file.descriptor)
+#     # xf = readlines(filepath)
+#     # df = split_gams(xf; colnames=file.col)
+#     # return df
+# end
+
+
 function read_file(path::Any, file::GAMSInput; remove_notes::Bool=false)
-    filepath = _joinpath(path, file)
-    xf = readlines(filepath)
-    df = split_gams(xf; colnames=file.col)
-    return df
+    filepath = SLiDE._joinpath(path, file)
+    return _read_gams(filepath; colnames=file.col, id=file.descriptor)
+    # xf = readlines(filepath)
+    # df = split_gams(xf; colnames=file.col)
+    # return df
 end
 
 
@@ -88,14 +98,14 @@ function read_file(editor::T) where T <: Edit
 end
 
 
-function read_file(file::String; colnames=[])
+function read_file(file::String; kwargs...)
+    ext = splitext(file)[end]
 
-    if occursin(".map", file) | occursin(".set", file)
-        # return gams_to_dataframe(readlines(file); colnames=colnames)
-        return split_gams(readlines(file); colnames=colnames)
+    if ext in [".gms",".map",".set"]
+        return _read_gams(file; kwargs...)
     end
 
-    if occursin(".yml", file) | occursin(".yaml", file)
+    if ext in [".yml",".yaml"]
         y = YAML.load(open(file))
         # Here, we first list all sub-subtypes of DataStream (DataTypes that are used in
         # editing datasource files). Then, we find where they overlap with keys in the
@@ -105,15 +115,15 @@ function read_file(file::String; colnames=[])
         [y[k] = load_from(datatype(k), y[k]) for k in KEYS]
         return y
         
-    elseif occursin(".csv", file)
+    elseif ext in [".csv"]
         df = _read_csv(file)
         return df
     end
 end
 
 
-function read_file(path::Union{Array{String,1}, String}...; colnames=[])
-    return read_file(_joinpath(path); colnames=colnames)
+function read_file(path::Union{Array{String,1}, String}...; kwargs...)
+    return read_file(_joinpath(path); kwargs...)
 end
 
 
@@ -209,7 +219,7 @@ end
 
 
 """
-    split_gams(xf::Array{String,1}; colnames = false)
+    _read_gams(xf::Array{String,1}; kwargs...)
 This function converts a GAMS map or set to a DataFrame, expanding sets into multiple rows.
 
 # Arguments
@@ -223,25 +233,28 @@ This function converts a GAMS map or set to a DataFrame, expanding sets into mul
 # Returns
 - `df::DataFrame`: A dataframe representation of the GAMS map or set.
 """
-function split_gams(x::String)
-    matches = collect(eachmatch(r"((?<=\").*(?=\")|\((?>[^()]|(?R))*\)|[\w\d]+)", x))
-    return [_expand_set(matches[jj][1]) for jj in 1:length(matches)]
+function _read_gams(filepath; kwargs...)
+    lines = readlines(filepath)
+    lines = SLiDE._clean_gams(lines)
+    lines = SLiDE._get_set(lines; kwargs...)
+    return SLiDE._split_gams(lines; kwargs...)
 end
 
-function split_gams(xf::Array{String,1}; colnames=[])
-    xf = strip.(xf)
-    xf = xf[xf .!== ""]                             # blank lines
-    xf = xf[match.(r"^\s*SET", xf) .=== nothing]    # set definitions
-    xf = xf[match.(r"^\s*\*", xf) .=== nothing]     # commented lines
-    length(xf) == 0 && (return nothing)
 
-    data = _split_gams(xf)
-    # data = split_gams.(xf)
+"""
+"""
+function _split_gams(xf::Vector{String}; id, kwargs...)
+    header = first(xf)
+    xf = xf[.!SLiDE._has_set.(xf, id)]
+    
+    ISMULTILINE = any(.!isnothing.(match.(r"\s!\s", xf)))
+    data = ISMULTILINE ? SLiDE._split_multiline(xf) : SLiDE._split_row.(xf)
 
+    # Return as a DataFrame.
     if length(unique(length.(data))) == 1
-        COLS = length(data[1])
-        cols = isempty(colnames) ? _generate_id(COLS) : colnames
-        data = if all(typeof.(data) .== Array{String,1})
+        cols = SLiDE._gams_header(header, length(data[1]); id=id, kwargs...)
+
+        data = if all(typeof.(data) .== Vector{String})
             DataFrame(permutedims(hcat(data...)), cols)
         else
             vcat([DataFrame(Pair.(cols, row)) for row in data]...)
@@ -251,22 +264,18 @@ function split_gams(xf::Array{String,1}; colnames=[])
     return data
 end
 
-
-"""
-"""
-function _split_gams(xf::Vector{String})
-    IS_MULTILINE = any(.!isnothing.(match.(r"\s!\s", xf)))
-    return IS_MULTILINE ? _split_multiline(xf) : _split_monoline.(xf)
-end
+_split_gams(x::String) = SLiDE._split_row(x)
+_split_gams(x::SubString) = SLiDE._split_gams(string(x))
 
 
 """
 """
 function _split_multiline(xf::Vector{String})
+    xf = xf[xf.!=="/;"]
+    xf = [reduce(replace, [r"\",$"=>"", "\t"=>" "], init=x) for x in xf]
     xf = split.(xf, r"(\.|\s!\s\"*)")
-    xf = [string.(
-            [reduce(replace, [r"\",$"=>"", "\t"=>" "], init=x[ii]) for ii in 1:length(x)])
-        for x in xf]
+    
+    xf = [[_expand_set(x[jj]) for jj in 1:length(x)] for x in xf]
     return _fill_multiline(xf)
 end
 
@@ -289,7 +298,6 @@ end
 function _fill_multiline(xf::Vector{Vector{String}})
     xf = _fill_multiline.(xf)
     xf = xf[.!isempty.(xf)]
-
     [isempty(xf[ii][1]) && (xf[ii][1] = xf[ii-1][1]) for ii in 2:size(xf,1)]
     return xf[[!any(isempty.(x)) for x in xf]]
 end
@@ -297,18 +305,139 @@ end
 
 """
 """
-function _split_monoline(x::String)
+function _split_row(x::String)
+    # Close missing "" at the end of the line.
+    if occursin("\"", x) && length(findall("\"", x))==1
+        x *= "\""
+    end
+    
+    # xreg = Regex("(" * join([
+    #         """(?<=\\").*(?=\\")""",              # between quotations (exclusive)
+    #         "(?>(?>\\([^()]*(?R)?[^()]*\\)))",    # between parentheses (inclusive)
+    #         "[\\w\\d]+",
+    #     ],"|") * ")")
     matches = collect(eachmatch(r"((?<=\").*(?=\")|\((?>[^()]|(?R))*\)|[\w\d]+)", x))
     return [SLiDE._expand_set(matches[jj][1]) for jj in 1:length(matches)]
 end
 
 
 """
+```jldoctest
+lines = "SET mapog(as,s) \"Mapping between oil and gas sectors\" / gas.cng, cru.cng /;"
+SLiDE._expand_set([lines])
+
+# output
+
+3-element Array{String,1}:
+ "SET mapog(as,s) \"Mapping between oil and gas sectors\""
+ "gas.cng"
+ "cru.cng"
+```
 """
 function _expand_set(x)
-    m = match(r"^\((.*)\)$", x)
-    x = (m !== nothing) ? string.(strip.(split(m[1], ","))) : string(x)
-    return x
+    m = match(r"^\s*\((.*)\)\s*$", x)
+    return string.(strip.((m !== nothing) ? split(m[1], ",") : x))
+end
+
+
+function _expand_set(lst::Vector{String})
+    if length(lst)==1
+        # In a set/map defined in a single line, the set/map contents will be nested in / /
+        x = match(r"(?<set>.*)/(?<lines>.*)/", first(lst))
+
+        # Split at commas without separating lists inside parentheses.
+        # https://stackoverflow.com/a/66912887
+        xnonsep = "[^,]*"
+        xreg = Regex("(" * join([
+            xnonsep * "(?>(?>\\([^()]*(?R)?[^()]*\\)))" * xnonsep,
+            "[\\w\\d\\.]+",
+        ],"|") * ")")
+
+        matches = collect(eachmatch(xreg, x[:lines]))
+        lst = string.(strip.([x[:set]; getindex.(matches,1)]))
+    end
+    
+    return lst
+end
+
+
+"""
+"""
+function _has_set(str::String, id::String)
+    xreg = Regex("^\\s*sets*\\s+" * id * "\\W|^\\s*" * id * "\\W")
+    matches = match.(xreg, lowercase.(str))
+    return !isnothing(matches)
+end
+
+
+"""
+"""
+function _get_set(lines; kwargs...)
+    # matches = match.(r"^set", lines)
+    # ii = (1:length(lines))[.!isnothing.(matches)]
+    # rngs = UnitRange.(ii, [ii[2:end].-1; length(lines)])
+    return _get_set(lines, 1:length(lines); kwargs...)
+end
+
+function _get_set(lines, rng; id, kwargs...)
+    tmp = lines[rng]
+    matches = SLiDE._has_set.(tmp, id)
+    all(.!matches) && (return lines)
+    # all(.!matches) && (return nothing)
+
+    ii = (1:length(tmp))[matches]
+    length(ii)>1 && error("multiple set matches found.")
+
+    iistart = first(ii)
+    str = tmp[iistart]
+
+    if occursin("/", str)
+        if length(findall("/", str))==2
+            return SLiDE._expand_set([str])
+        else
+            iistop = iistart + findmax(.!isnothing.(match.(r"/[,;]*\s*$", tmp[iistart+1:end])))[2]
+            return tmp[iistart:iistop]
+        end
+
+    else
+        matches = match.(r";\s*$", tmp[iistart+1:end])
+        iistop = iistart + findmax(.!isnothing.(matches))[2]
+        return tmp[iistart:iistop]
+    end
+
+    return lines
+end
+
+
+"""
+"""
+function _clean_gams(xf)
+    xf = strip.(xf)
+    xf = xf[xf .!== ""]                             # blank lines
+    # xf = xf[match.(r"^\s*SET", xf) .=== nothing]    # set definitions
+    # xf = xf[match.(r"^\s*\*", xf) .=== nothing]     # commented lines
+    xf = xf[match.(r"^\*", xf) .=== nothing]     # commented lines
+    return xf
+end
+
+
+"""
+"""
+function _gams_header(str, N; id, colnames=[])
+    !isempty(colnames) && (return colnames)
+
+    # If no set is defined here...
+    tmp = SLiDE._generate_id(N)
+    !SLiDE._has_set(str, id) && (return tmp)
+
+    xset = match(r"(\(\S*\))", lowercase(str))
+    cols = Symbol.(ensurearray(isnothing(xset) ? id : SLiDE._expand_set(getindex(xset,1))))
+
+    # Replace any implicitly named sets (labeled *) with x.
+    iiundef = (1:length(cols))[cols.==Symbol(*)]
+    cols[iiundef] .= tmp[iiundef]
+
+    return length(cols)==N-1 ? [cols;:desc] : cols
 end
 
 
