@@ -243,12 +243,12 @@ end
 
 """
 """
-function _split_gams(xf::Vector{String}; id, kwargs...)
-    header = first(xf)
-    xf = xf[.!SLiDE._has_set.(xf, id)]
+function _split_gams(lines::Vector{String}; id, kwargs...)
+    header = first(lines)
+    lines = lines[.&(.!SLiDE._has_set.(lines, id),lines.!=="/;")]
     
-    ISMULTILINE = any(.!isnothing.(match.(r"\s!\s", xf)))
-    data = ISMULTILINE ? SLiDE._split_multiline(xf) : SLiDE._split_row.(xf)
+    ISMULTILINE = any(.!isnothing.(match.(r".\($", lines)))
+    data = ISMULTILINE ? SLiDE._split_multiline(lines) : SLiDE._split_row.(lines)
 
     # Return as a DataFrame.
     if length(unique(length.(data))) == 1
@@ -270,13 +270,12 @@ _split_gams(x::SubString) = SLiDE._split_gams(string(x))
 
 """
 """
-function _split_multiline(xf::Vector{String})
-    xf = xf[xf.!=="/;"]
-    xf = [reduce(replace, [r"\",$"=>"", "\t"=>" "], init=x) for x in xf]
-    xf = split.(xf, r"(\.|\s!\s\"*)")
+function SLiDE._split_multiline(lines::Vector{String})
+    lines = [reduce(replace, [r"\",$"=>"", "\t"=>" "], init=x) for x in lines]
+    data = split.(lines, r"(\.|\s!\s\"*)")
     
-    xf = [[_expand_set(x[jj]) for jj in 1:length(x)] for x in xf]
-    return _fill_multiline(xf)
+    data = [[SLiDE._expand_set(x[jj]) for jj in 1:length(x)] for x in data]
+    return length(unique(length.(data)))==1 ? data : SLiDE._fill_multiline(data)
 end
 
 
@@ -341,6 +340,10 @@ end
 
 
 function _expand_set(lst::Vector{String})
+    if length(lst)==2 && all(length.(findall.("/",lst)).==1)
+        lst = [*(lst...)]
+    end
+    
     if length(lst)==1
         # In a set/map defined in a single line, the set/map contents will be nested in / /
         x = match(r"(?<set>.*)/(?<lines>.*)/", first(lst))
@@ -356,16 +359,19 @@ function _expand_set(lst::Vector{String})
         matches = collect(eachmatch(xreg, x[:lines]))
         lst = string.(strip.([x[:set]; getindex.(matches,1)]))
     end
-    
+
     return lst
 end
 
 
 """
 """
-function _has_set(str::String, id::String)
+function SLiDE._has_set(str::String, id::String)
+    # A separator indicates that this is NOT a set.
+    occursin("!", str) && (return false)
+    # matches = match.(Regex("(?<=[^sets|^SETS])?\\s+(?=$(id)\\W)"), str)
     xreg = Regex("^\\s*sets*\\s+" * id * "\\W|^\\s*" * id * "\\W")
-    matches = match.(xreg, lowercase.(str))
+    matches = match.(xreg, lowercase(str))
     return !isnothing(matches)
 end
 
@@ -373,13 +379,17 @@ end
 """
 """
 function _get_set(lines; kwargs...)
+    # matches = SLiDE._has_set.(lines, id)
+    # ii = (1:length(lines))[matches]
+    # if length(ii)>1
+    #     rngs = UnitRange.(ii, [ii[2:end].-1; length(lines)])
+
     # matches = match.(r"^set", lines)
     # ii = (1:length(lines))[.!isnothing.(matches)]
-    # rngs = UnitRange.(ii, [ii[2:end].-1; length(lines)])
-    return _get_set(lines, 1:length(lines); kwargs...)
+    return SLiDE._get_set(lines, 1:length(lines); kwargs...)
 end
 
-function _get_set(lines, rng; id, kwargs...)
+function SLiDE._get_set(lines, rng; id, kwargs...)
     tmp = lines[rng]
     matches = SLiDE._has_set.(tmp, id)
     all(.!matches) && (return lines)
@@ -396,7 +406,7 @@ function _get_set(lines, rng; id, kwargs...)
             return SLiDE._expand_set([str])
         else
             iistop = iistart + findmax(.!isnothing.(match.(r"/[,;]*\s*$", tmp[iistart+1:end])))[2]
-            return tmp[iistart:iistop]
+            return SLiDE._expand_set(tmp[iistart:iistop])
         end
 
     else
