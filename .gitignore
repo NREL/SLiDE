@@ -1,0 +1,14 @@
+# .gitignore
+**/.DS_Store
+**/scratch*
+**/data*/
+.git/
+.vscode/
+
+Manifest.toml
+
+admin/
+dev/
+calibrate/
+docs/build/
+deps/*.log
