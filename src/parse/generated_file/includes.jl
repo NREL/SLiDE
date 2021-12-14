@@ -2,6 +2,7 @@ include("SetInput.jl")
 include("DataInput.jl")
 include("CSVInput.jl")
 include("GAMSInput.jl")
+include("TXTInput.jl")
 include("XLSXInput.jl")
 
 export get_col

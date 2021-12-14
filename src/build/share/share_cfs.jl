@@ -5,19 +5,19 @@
 \\rho_{r,g}^{cfs}
 =
 \\begin{cases}
-\\dfrac{\\bar{d}_{r,g}}
-       {\\bar{d}_{r,g} - \\bar{mn}_{r,g}}  & r\\neq uti, \\bar{d}_{r,g} \\neq \\bar{mn}_{r,g}
+\\dfrac{d_{r,g}}
+       {d_{r,g} - mn_{r,g}}  & r\\neq uti, d_{r,g} \\neq mn_{r,g}
 \\\\
-0.0                                        & r\\neq uti, \\bar{d}_{r,g} = \\bar{mn}_{r,g}
+0.0                                        & r\\neq uti, d_{r,g} = mn_{r,g}
 \\\\
 0.9                                        & r = uti
 \\end{cases}
 ```
 """
 function share_rpc!(d::Dict, set::Dict)
-    println("  Calculating rpc(r,g), regional purchase coefficient")
+    print_status(:rpc, [:r,:g], "regional purchase coefficient")
 
-    _set_ng!(d, set)
+    _set_ng!(set, d)
     _share_mrt0!(d)
     _share_d0!(d, set)
     _share_xn0!(d, set)
@@ -29,34 +29,34 @@ function share_rpc!(d::Dict, set::Dict)
     df_uti = fill_with((r = set[:r], g = "uti"), 0.9)
 
     d[:rpc] = sort([df; df_uti])
+    return d[:rpc]
 end
 
 
 """
 `ng`: Sectors not included in the CFS.
 """
-function _set_ng!(d::Dict, set::Dict)
-    set[:ng] = setdiff(set[:g], unique(d[:cfs][:,:g]))
-end
+_set_ng!(set::Dict, d::Dict) = set[:ng] = setdiff(set[:g], unique(d[:cfs][:,:g]))
 
 
 """
 `d0(r,g)`: Local supply-demand (CFS), trade that remains within the same region.
 
 ```math
-\\bar{d}_{r,ng\\ni g} = \\left\\{{cfs}\\left(orig,dest,g\\right)
+d_{r,ng\\ni g} = \\left\\{{cfs}\\left(orig,dest,g\\right)
 \\;\\vert\\; orig=dest, \\, g \\right\\}
 ```
-Calling [`SLiDE._avg_ng`](@ref) returns ``\\bar{d}_{r,ng\\in g}``.
+Calling [`SLiDE._avg_ng`](@ref) returns ``d_{r,ng\\in g}``.
 """
 function _share_d0!(d::Dict, set::Dict)
-    println("\td0(r,g), local supply-demand")
     df = copy(d[:cfs])
-
+    
     df = df[df[:,:orig] .== df[:,:dest],:]
     df = edit_with(df, [Rename(:orig, :r), Deselect([:dest], "==")])
-
+    
     d[:d0] = _avg_ng(df, set)
+
+    print_status(:d0, d, "local supply-demand")
     return d[:d0]
 end
 
@@ -64,7 +64,7 @@ end
 """
 `mrt0(orig,dest,g)`: Interstate trade (CFS)
 ```math
-\\bar{mrt}_{orig,dest,ng\\ni g} = \\left\\{{cfs}\\left(orig,dest,g\\right)
+mrt_{orig,dest,ng\\ni g} = \\left\\{cfs\\left(orig,dest,g\\right)
 \\;\\vert\\; orig\\neq dest, \\, g \\right\\}
 ```
 """
@@ -77,18 +77,17 @@ end
 
 
 """
-`mn0(r,g)`: National demand (CFS)
+`mn0(r,g)`, national demand (CFS)
 ```math
-\\bar{mn}_{r,ng\\ni g} = \\sum_{orig} \\bar{mrt}_{orig,dest,ng\\ni g}
+mn_{r,ng\\ni g} = \\sum_{orig} mrt_{orig,dest,ng\\ni g}
 ```
-Calling [`SLiDE._avg_ng`](@ref) returns ``\\bar{mn}_{r,ng\\in g}``.
+Calling [`SLiDE._avg_ng`](@ref) returns ``mn_{r,ng\\in g}``.
 """
-function _share_mn0!(d::Dict, set::Dict)
-    println("\tmn0(r,g), national demand")
-    df = copy(d[:mrt0])
+function _share_mn0!(d::Dict, set::Dict)    
+    df = edit_with(combine_over(d[:mrt0], :orig), Rename(:dest, :r))
+    d[:mn0] = _avg_ng(df, set)
 
-    df = edit_with(combine_over(df, :orig), Rename(:dest, :r))
-d[:mn0] = _avg_ng(df, set)
+    print_status(:mn0, d, "national demand")
     return d[:mn0]
 end
 
@@ -96,23 +95,22 @@ end
 """
 `xn0(r,g)`: National exports (CFS)
 ```math
-\\bar{xn}_{r,ng\\ni g} = \\sum_{dest} \\bar{mrt}_{orig,dest,ng\\ni g}
+xn_{r,ng\\ni g} = \\sum_{dest} mrt_{orig,dest,ng\\ni g}
 ```
-Calling [`SLiDE._avg_ng`](@ref) returns ``\\bar{xn}_{r,ng\\in g}``.
+Calling [`SLiDE._avg_ng`](@ref) returns ``xn_{r,ng\\in g}``.
 """
 function _share_xn0!(d::Dict, set::Dict)
-    println("\txn0(r,g), national exports")
-    df = copy(d[:mrt0])
-
-    df = edit_with(combine_over(df, :dest), Rename(:orig, :r))
+    df = edit_with(combine_over(d[:mrt0], :dest), Rename(:orig, :r))
     d[:xn0] = _avg_ng(df, set)
+
+    print_status(:xn0, d, "national exports")
     return d[:xn0]
 end
 
 
 """
 ```math
-\\bar{x}_{r,ng\\in g} = \\dfrac{\\sum_g \\bar{x}_{r,g}}
+x_{r,ng\\in g} = \\dfrac{\\sum_g x_{r,g}}
     {\\text{length}(ng)}
 ```
 """

@@ -1,90 +1,83 @@
 """
-    function disagg!(d::Dict, set::Dict; save_build = true, overwrite = false)
+    disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
+This function disaggregates national-level parameters to the regional level and
+introduces new parameters.
 
 # Arguments
-- `d::Dict` of DataFrames containing the model data.
-- `set::Dict` of Arrays describing region, sector, final demand, etc.
-
-# Keywords
-- `save_build = true`
-- `overwrite = false`
-See [`SLiDE.build`](@ref) for keyword argument descriptions.
+- `dataset::Dataset` identifier
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 
 # Returns
-- `d::Dict` of DataFrames containing the model data at the disaggregation step
+- `d::Dict` of model parameters
+- `set::Dict` of Arrays describing parameter indices (years, regions, goods, sectors, etc.)
 """
-function disagg(
-    dataset::String,
-    d::Dict,
-    set::Dict;
-    save_build::Bool = DEFAULT_SAVE_BUILD,
-    overwrite::Bool = DEFAULT_OVERWRITE
-    )
-    CURR_STEP = "disagg"
-
-    d = merge(d, Dict(
-        :r => fill_with((r = set[:r],), 1.0),
-        (:yr,:r,:g) => fill_with((yr = set[:yr], r = set[:r], g = set[:g]), 1.0)))
-
-    # If there is already disaggregation data, read it and return.
-    d_read = read_build(dataset, CURR_STEP; overwrite = overwrite)
-    !(isempty(d_read)) && (return (d_read, set))
+function disaggregate_region(dataset::Dataset, d::Dict, set::Dict)
+    step = PARAM_DIR
+    d_read = read_build(set!(dataset; step=PARAM_DIR))
     
-    # Run all disaggregation calculations.
-    _set_gm!(d, set)
-    
-    d[:region] = edit_with(d[:region], Rename(:g,:s))
-    _disagg_ys0!(d)
-    _disagg_id0!(d)
-    _disagg_ty0!(d, set)
-    _disagg_va0!(d, set)
-    _disagg_ld0!(d)
-    _disagg_kd0!(d)
+    set_gm!(set, d)
 
-    d[:region] = edit_with(d[:region], Rename(:s,:g))
-    _disagg_fdcat!(d)
-    _disagg_g0!(d)
-    _disagg_i0!(d)
-    _disagg_cd0!(d)
-    _disagg_c0!(d)
+    if dataset.step=="input"
+        print_status(set!(dataset; step=step))
 
-    d[:yh0_temp] = _disagg_yh0!(d)
-    _disagg_fe0!(d)
-    d[:x0_temp] = _disagg_x0!(d, set)
-    d[:s0_temp] = _disagg_s0!(d)
-    _disagg_a0!(d)
+        d = merge(d, Dict(
+            :r => fill_with((r=set[:r],), 1.0),
+            (:yr,:r,:g) => fill_with((yr=set[:yr], r=set[:r], g=set[:g]), 1.0),
+        ))
 
-    _disagg_ta0!(d)
-    _disagg_tm0!(d)
+        d[:gdp] = edit_with(d[:gdp], Rename(:g,:s))
+        _disagg_ys0!(d)
+        _disagg_id0!(d)
+        _disagg_ty0!(d, set)
+        _disagg_va0!(d, set)
+        _disagg_ld0!(d, set)
+        _disagg_kd0!(d)
+        
+        d[:gdp] = edit_with(d[:gdp], Rename(:s,:g))
+        _disagg_fdcat!(d)
+        _disagg_g0!(d)
+        _disagg_i0!(d)
+        _disagg_cd0!(d)
+        _disagg_c0!(d)
 
-    _disagg_thetaa!(d)
-    _disagg_m0!(d)
-    _disagg_md0!(d)
-    d[:rx0_temp] = _disagg_rx0!(d)
+        _disagg_yh0!(d)
+        _disagg_fe0!(d)
+        _disagg_x0!(d, set)
+        _disagg_s0!(d)
+        _disagg_a0!(d)
+        _disagg_ta0!(d)
+        _disagg_tm0!(d)
 
-    _disagg_diff!(d)
-    _apply_diff!(d, set)
+        _disagg_thetaa!(d)
+        _disagg_m0!(d)
+        _disagg_md0!(d)
+        _disagg_rx0!(d)
 
-    _disagg_bop!(d)
-    _disagg_pt0!(d)
-    _disagg_dc0!(d)
+        _disagg_diff!(d)
+        _apply_diff!(d, set)
 
-    _disagg_dd0!(d)
-    _disagg_nd0!(d)
+        _disagg_bop!(d)
+        _disagg_pt0!(d)
+        _disagg_dc0!(d)
 
-    _disagg_dm0!(d)
-    _disagg_nm0!(d)
-    _disagg_xd0!(d)
-    _disagg_xn0!(d)
-    _disagg_hhadj!(d)
+        _disagg_dd0!(d)
+        _disagg_nd0!(d)
 
-    # Should other
-    d[:xn0][d[:xn0][:,:value] .< 1e-8,:value] .= 0;
-    d[:xd0][d[:xd0][:,:value] .< 1e-8,:value] .= 0;
+        _disagg_dm0!(d)
+        _disagg_nm0!(d)
+        _disagg_xd0!(d)
+        _disagg_xn0!(d)
+        _disagg_hhadj!(d)
+        
+        # Should we drop other small parameters, too?
+        d[:xn0][d[:xn0][:,:value] .< 1e-8,:value] .= 0
+        d[:xd0][d[:xd0][:,:value] .< 1e-8,:value] .= 0
 
-    write_build!(dataset, CURR_STEP, d; save_build = save_build)
-    write_build!(dataset, SET_DIR, Dict(k => set[k] for k in [:gm]))
-    return (d, set)
+        return d, set
+    else
+        return d_read, set
+    end
 end
 
 
@@ -96,12 +89,13 @@ end
 ```
 """
 function _disagg_ys0!(d::Dict)
-    println("  Disaggregating ys0(yr,r,s,g), regional sectoral output")
-    :r in propertynames(d[:ys0]) && (return d[:ys0])
-
-    d[:ys0] = d[:region] * d[:ys0]
+    if !(:r in propertynames(d[:ys0]))
+        d[:ys0] = d[:gdp] * d[:ys0]
+        print_status(:ys0, d, "regional sectoral output")
+    end
     return d[:ys0]
 end
+
 
 """
 `id(yr,r,g,s)`, regional intermediate demand
@@ -111,10 +105,11 @@ end
 ```
 """
 function _disagg_id0!(d::Dict)
-    println("  Disaggregating id0(yr,r,g,s), regional intermediate demand")
-    :r in propertynames(d[:id0]) && (return d[:id0])
+    if !(:r in propertynames(d[:id0]))
+        d[:id0] = d[:gdp] * d[:id0]
 
-    d[:id0] = d[:region] * d[:id0]
+        print_status(:id0, d, "regional intermediate demand")
+    end
     return d[:id0]
 end
 
@@ -130,12 +125,14 @@ end
 ```
 """
 function _disagg_ty0!(d::Dict, set::Dict)
-    println("  Disaggregating ty0(yr,r,s), production tax rate")
-    :va in propertynames(d[:va0]) && _unstack_va0!(d, set)
-    idx = findindex(d[:va0])
+    _unstack_va0!(d, set)
 
-    ty0_rev = d[:region] * d[:va0][:,[idx;:othtax]]
+    idx = findindex(d[:va0])
+    
+    ty0_rev = d[:gdp] * d[:va0][:,[idx;:othtax]]
     d[:ty0] = dropnan(ty0_rev / combine_over(d[:ys0], :g))
+
+    print_status(:ty0, d, "production tax rate")
     return d[:ty0]
 end
 
@@ -148,13 +145,16 @@ end
 ```
 """
 function _disagg_va0!(d::Dict, set::Dict)
-    println("  Disaggregating va0(yr,r,s), regional share of value added.")
-    :r in propertynames(d[:va0])  && (return d[:va0])
-    :va in propertynames(d[:va0]) && (_unstack_va0!(d, set))
-    idx = findindex(d[:va0])
+    if !(:r in propertynames(d[:va0]))
+        _unstack_va0!(d, set)
 
-    df = d[:va0][:,[idx;:compen]] + d[:va0][:,[idx;:surplus]]
-    d[:va0] = d[:region] * df
+        idx = findindex(d[:va0])
+        
+        df = d[:va0][:,[idx;:compen]] + d[:va0][:,[idx;:surplus]]
+        d[:va0] = d[:gdp] * df
+
+        print_status(:va0, d, "regional share of value added")
+    end
     return d[:va0]
 end
 
@@ -166,10 +166,12 @@ end
 \\bar{ld}_{yr,r,s} = \\theta_{yr,r,s}^{ls} \\bar{va}_{yr,s,g}
 ```
 """
-function _disagg_ld0!(d::Dict)
-    println("  Disaggregating ld0(yr,r,s), labor demand")
-    !(:r in propertynames(d[:va0])) && _disagg_va0!(d, set)
+function _disagg_ld0!(d::Dict, set::Dict)
+    _disagg_va0!(d, set)
+
     d[:ld0] = d[:labor] * d[:va0]
+
+    print_status(:ld0, d, "labor demand")
     return d[:ld0]
 end
 
@@ -182,8 +184,10 @@ end
 ```
 """
 function _disagg_kd0!(d::Dict)
-    println("  Disaggregating kd0(yr,r,s), capital demand")
     d[:kd0] = d[:va0] - d[:ld0]
+
+    print_status(:kd0, d, "capital demand")
+    return d[:kd0]
 end
 
 
@@ -213,11 +217,12 @@ end
 ```
 """
 function _disagg_g0!(d::Dict)
-    println("  Disaggregating g0(yr,r,g), national government demand")
-    ("pce" in d[:fd0][:,:fd]) && (_disagg_fdcat!(d))
-
+    _disagg_fdcat!(d)
+    
     df = filter_with(d[:fd0], (fd="G",); drop = true)
     d[:g0] = d[:sgf] * df
+
+    print_status(:g0, d, "national government demand")
     return d[:g0]
 end
 
@@ -230,11 +235,12 @@ end
 ```
 """
 function _disagg_i0!(d::Dict)
-    println("  Disaggregating i0(yr,r,g), national investment demand")
-    !("pce" in d[:fd0][:,:fd]) && (_disagg_fdcat!(d))
-
+    _disagg_fdcat!(d)
+    
     df = filter_with(d[:fd0], (fd="I",); drop = true)
-    d[:i0] = d[:region] * df
+    d[:i0] = d[:gdp] * df
+
+    print_status(:i0, d, "national investment demand")
     return d[:i0]
 end
 
@@ -247,11 +253,12 @@ end
 ```
 """
 function _disagg_cd0!(d::Dict)
-    println("  Disaggregating cd0(yr,r,g), national final consumption")
-    !("pce" in d[:fd0][:,:fd]) && (_disagg_fdcat!(d))
-
+    _disagg_fdcat!(d)
+    
     df = filter_with(d[:fd0], (fd="C",); drop = true)
     d[:cd0] = d[:pce] * df
+
+    print_status(:cd0, d, "national final consumption")
     return d[:cd0]
 end
 
@@ -264,9 +271,10 @@ end
 ```
 """
 function _disagg_c0!(d::Dict)
-    println("  Disaggregating c0(yr,r), total final household consumption")
-    !(:cd0 in keys(d)) && _disagg_cd0!(d)
+    !haskey(d, :cd0) && _disagg_cd0!(d)
     d[:c0] = combine_over(d[:cd0], :g)
+
+    print_status(:c0, d, "total final household consumption")
     return d[:c0]
 end
 
@@ -279,13 +287,13 @@ end
 ```
 """
 function _disagg_yh0!(d::Dict)
-    if !(:diff in keys(d))
-        println("  Disaggregating yh0(yr,r,g), household production")
-        d[:yh0] = d[:region] * d[:fs0]
+    d[:yh0] = if !haskey(d, :diff)
+        d[:gdp] * d[:fs0]
     else
-        println("  Applying difference to yh0(yr,r,g), household production")
-        d[:yh0] = d[:yh0] + d[:diff]
+        d[:yh0] + d[:diff]
     end
+
+    print_status(:yh0, d, "household production")
     return dropmissing!(d[:yh0])
 end
 
@@ -298,8 +306,9 @@ end
 ```
 """
 function _disagg_fe0!(d::Dict)
-    println("  Disaggregating fe0(yr,r), total factor supply")
     d[:fe0] = combine_over(d[:va0], :s)
+
+    print_status(:fe0, d, "total factor supply")
     return d[:fe0]
 end
 
@@ -312,22 +321,21 @@ end
 ```
 """
 function _disagg_x0!(d::Dict, set::Dict)
-    if !(:diff in keys(d))
-        println("  Disaggregating x0(yr,r,g), foreign exports")
-        !(:notrd in keys(set)) && _set_notrd!(d, set)
+    if !haskey(d, :diff)
+        _set_notrd!(set, d)
 
-        df_exports = filter_with(d[:utd], (t = "exports",); drop = true)
-        df_region = filter_with(d[:region], (g = set[:notrd],))
+        df_exports = filter_with(d[:utd], (t="exports",); drop = true)
+        df_region = filter_with(d[:gdp], (g=set[:notrd],))
 
         df_trd = dropmissing(df_exports * d[:x0])
         df_notrd = dropmissing(df_region * d[:x0])
 
         d[:x0] = [df_trd; df_notrd]
     else
-        println("  Applying difference to x0(yr,r,g), foreign exports")
         d[:x0] = d[:x0] + d[:diff]
     end
-
+    
+    print_status(:x0, d, "foreign exports")
     return dropmissing!(d[:x0])
 end
 
@@ -340,13 +348,13 @@ end
 ```
 """
 function _disagg_s0!(d::Dict)
-    if !(:diff in keys(d))
-        println("  Disaggregating s0(yr,r,g), total supply")
-        d[:s0] = combine_over(d[:ys0], :s) + d[:yh0]
+    d[:s0] = if !haskey(d,:diff)
+        combine_over(d[:ys0], :s) + d[:yh0]
     else
-        println("  Applying difference to s0(yr,r,g), total supply")
-        d[:s0] = d[:s0] + d[:diff]
+        d[:s0] + d[:diff]
     end
+
+    print_status(:s0, d, "total supply")
     return dropmissing!(d[:s0])
 end
 
@@ -359,91 +367,91 @@ a_{yr,r,g} = \\bar{cd}_{yr,r,g} + \\bar{g}_{yr,r,g} + \\bar{i}_{yr,r,g} + \\sum_
 ```
 """
 function _disagg_a0!(d::Dict)
-    println("  Disaggregating a0(yr,r,g), domestic absorption")
-
     d[:a0] = dropmissing(d[:cd0] + d[:g0] + d[:i0] + combine_over(d[:id0], :s))
+
+    print_status(:a0, d, "domestic absorption")
     return d[:a0]
 end
 
 
 "`ta0(yr,r,g)`: Absorption taxes"
 function _disagg_ta0!(d::Dict)
-    println("  Disaggregating ta0(yr,r,g), absorption taxes")
     d[:ta0] = d[:ta0] * d[:r]
+
+    print_status(:ta0, d, "absorption taxes")
     return d[:ta0]
 end
 
 
 "`tm0(yr,r,g)`: Import taxes"
 function _disagg_tm0!(d::Dict)
-    println("  Disaggregating tm0(yr,r,g), import taxes")
     d[:tm0] = d[:tm0] * d[:r]
+
+    print_status(:tm0, d, "import taxes")
     return d[:tm0]
 end
 
 
 """
 `thetaa(yr,r,g)`, share of regional absorption
-
 ```math
 \\alpha_{yr,r,g}^{abs} = \\frac{\\bar{a}_{yr,r,g}}{\\sum_{rr}\\bar{a}_{yr,r,g}}
 ```
 """
 function _disagg_thetaa!(d::Dict)
-    println("  Disaggregating thetaa(yr,r,g), share of regional absorption")
     d[:thetaa] = dropnan(d[:a0] / transform_over(d[:a0], :r))
+
+    print_status(:thetaa, d, "share of regional absorption")
     return d[:thetaa]
 end
 
 
 """
-`m0(yr,r,g)`, foreign Imports
-
+`m0(yr,r,g)`, foreign imports
 ```math
 \\bar{m}_{yr,r,g} = \\alpha_{yr,r,g}^{abs} \\tilde{m}_{yr,g}
 ```
 """
 function _disagg_m0!(d::Dict)
-    println("  Disaggregating m0(yr,r,g), foreign imports")
     d[:m0] = d[:thetaa] * d[:m0]
+
+    print_status(:m0, d, "foreign imports")
     return d[:m0]
 end
 
 
 """
 `md0(yr,r,m,g)`, margin demand
-
 ```math
 \\bar{md}_{yr,r,m,g} = \\alpha_{yr,r,g}^{abs} \\tilde{md}_{yr,m,g}
 ```
 """
 function _disagg_md0!(d::Dict)
-    println("  Disaggregating md0(yr,r,m,g), margin demand")
     d[:md0] = dropmissing(d[:thetaa] * d[:md0])
+
+    print_status(:md0, d, "margin demand")
     return d[:md0]
 end
 
 
 """
 `rx0(yr,r,g)`, re-exports
-
 ```math
 \\bar{rx}_{yr,r,g} = \\bar{x}_{yr,r,g} - \\bar{s}_{yr,r,g}
 ```
 """
-function _disagg_rx0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
-    if !(:diff in keys(d))
-        println("  Disaggregating rx0(yr,r,g), re-exports")
+function _disagg_rx0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
+    if !haskey(d,:diff)
         d[:rx0] = d[:x0] - d[:s0]
-
+        
         if round_digits !== false
             d[:rx0][round.(d[:rx0][:,:value]; digits = round_digits) .< 0, :value] .= 0.0
         end
     else
-        println("  Applying difference to rx0(yr,r,g), re-exports")
         d[:rx0] = d[:rx0] + d[:diff]
     end
-
+    
+    print_status(:rx0, d, "re-exports")
     return dropmissing(d[:rx0])
 end
 
@@ -455,14 +463,9 @@ end
 \\bar{dc}_{yr,r,g} = \\bar{s}_{yr,r,g} - \\bar{x}_{yr,r,g} + \\bar{rx}_{yr,r,g}
 ```
 """
-function _disagg_dc0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
-    # (!!!!) name for this?
+function _disagg_dc0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     d[:dc0] = dropmissing((d[:s0] - d[:x0] + d[:rx0]))
-
-    # if round_digits !== false
-    #     d[:dc0][!,:value] .= round.(d[:dc0][:,:value]; digits = round_digits)
-    # end
-    (round_digits !== false) && (d[:dc0] = round!(d[:dc0], :value; digits = round_digits))
+    round!(d[:dc0], :value; digits=round_digits)
     return d[:dc0]
 end
 
@@ -477,26 +480,26 @@ end
 \\end{aligned}
 ```
 """
-function _disagg_pt0(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
+function _disagg_pt0(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     df_pta0 = dropmissing(((d[:yr,:r,:g] - d[:ta0]) * d[:a0]) + d[:rx0])
     df_ptm0 = dropmissing(((d[:yr,:r,:g] + d[:tm0]) * d[:m0]) + combine_over(d[:md0], :m))
 
     df = df_pta0 - df_ptm0
-    (round_digits !== false) && round!(df, :value; digits = round_digits)
+    round!(df, :value; digits=round_digits)
     return df
 end
 
 
-function _disagg_pt0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
-    d[:pt0] = _disagg_pt0(d, round_digits = round_digits)
+function _disagg_pt0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
+    d[:pt0] = _disagg_pt0(d, round_digits=round_digits)
     return d[:pt0]
 end
 
 
 "`diff`:"
-function _disagg_diff!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
+function _disagg_diff!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
     # df = _disagg_pt0!(d)
-    df = _disagg_pt0(d; round_digits = DEFAULT_ROUND_DIGITS)
+    df = _disagg_pt0(d; round_digits=DEFAULT_ROUND_DIGITS)
 
     df[!,:value] .= - min.(0, df[:,:value])
     d[:diff] = dropzero!(df)
@@ -507,10 +510,12 @@ end
 Add an adjustment to `rx_{yr,r,g}`, `s_{yr,r,g}`, `x_{yr,r,g}`, and `yh_{yr,r,g}`.
 """
 function _apply_diff!(d::Dict, set::Dict)
+    println("Applying difference to the following parameters:")
     _disagg_rx0!(d)
     _disagg_s0!(d)
     _disagg_x0!(d, set)
     _disagg_yh0!(d)
+    println("Resuming disaggregation...")
 end
 
 
@@ -522,22 +527,25 @@ end
 ```
 """
 function _disagg_bop!(d::Dict)
-    println("  Disaggregating bopdef0(yr,r), balance of payments (closure parameter)")
     d[:bopdef0] = combine_over((d[:m0] - d[:x0]), :g)
+
+    print_status(:bopdef0, d, "balance of payments (closure parameter)")
     return d[:bopdef0]
 end
 
 
-"`gm`: Commodities employed in margin supply"
-function _set_gm!(d::Dict, set::Dict)
-    ms0_sum = combine_over(d[:ms0], [:yr,:m])
-    md0_sum = combine_over(d[:md0], [:yr,:m])
+"""
+`gm`, commodities employed in margin supply
+"""
+function set_gm!(set::Dict, d::Dict)
+    idx = setdiff(findindex(d[:md0]), ensurearray(find_sector(d[:md0])))
 
-    ms0_sum[!,:value] .= ms0_sum[:,:value] .!= 0.0
-    md0_sum[!,:value] .= md0_sum[:,:value] .!= 0.0
+    set[:gm] = if :r in idx
+        dropmissing(combine_over(d[:nm0] + d[:dm0], idx) + combine_over(d[:md0], idx))[:,1]
+    else
+        dropmissing(combine_over(d[:ms0], idx) + combine_over(d[:md0], idx))[:,1]
+    end
 
-    gm = ms0_sum + md0_sum
-    set[:gm] = gm[gm[:,:value] .> 0, :g]
     return set[:gm]
 end
 
@@ -550,33 +558,35 @@ end
 ```
 """
 function _disagg_dd0max!(d::Dict)
-    println("  Disaggregating dd0max(yr,r,g), maximum regional demand from local market")
     cols = propertynames(d[:pt0])
     df = indexjoin(d[:pt0], d[:dc0]; id = [:pt0,:dc0])
     df[!,:value] = min.(df[:,:pt0], df[:,:dc0])
     
     d[:dd0max] = df[:,cols]
+
+    print_status(:dd0max, d, "maximum regional demand from local market")
     return d[:dd0max]
 end
 
 
 "`nd0max(yr,r,g)`, maximum regional demand from national market"
 function _disagg_nd0max!(d::Dict)
-    println("  Disaggregating nd0max(yr,r,g), maximum regional demand from national market")
     cols = propertynames(d[:pt0])
     df = indexjoin(d[:pt0], d[:dc0]; id = [:pt0,:dc0])
     df[!,:value] = min.(df[:,:pt0], df[:,:dc0])
-
+    
     d[:nd0max] = df[:,cols]
+
+    print_status(:nd0max, d, "maximum regional demand from national market")
     return d[:nd0max]
 end
 
 
 "`dd0min(yr,r,g)`, minimum regional demand from local market"
-_disagg_dd0min(d::Dict) = d[:pt0] - d[:dd0max]
+_disagg_dd0min(d::Dict) = d[:pt0] - d[:nd0max]
 
 "`nd0min(yr,r,g)`, minimum regional demand from national market"
-_disagg_nd0min(d::Dict) = d[:pt0] - d[:nd0max]
+_disagg_nd0min(d::Dict) = d[:pt0] - d[:dd0max]
 
 
 """
@@ -587,9 +597,10 @@ _disagg_nd0min(d::Dict) = d[:pt0] - d[:nd0max]
 ```
 """
 function _disagg_dd0!(d::Dict)
-    println("  Disaggregating dd(yr,r,g), regional demand from local market")
-    !(:dd0max in keys(d)) && _disagg_dd0max!(d)
+    !haskey(d, :dd0max) && _disagg_dd0max!(d)
     d[:dd0] = d[:dd0max] * d[:rpc]
+
+    print_status(:dd0, d, "regional demand from local market")
     return d[:dd0]
 end
 
@@ -601,13 +612,13 @@ end
 \\bar{nd}_{yr,r,g} = \\bar{pt}_{yr,r,g} - \\bar{dd}_{yr,r,g}
 ```
 """
-function _disagg_nd0!(d::Dict; round_digits = DEFAULT_ROUND_DIGITS)
-    println("  Disaggregating nd(yr,r,g), regional demand from national market")
-    df_pt0 = _disagg_pt0(d; round_digits = false)
-
+function _disagg_nd0!(d::Dict; round_digits=DEFAULT_ROUND_DIGITS)
+    df_pt0 = _disagg_pt0(d; round_digits=false)
+    
     d[:nd0] = df_pt0 - d[:dd0]
-    # (round_digits !== false) && (d[:nd0][!,:value] .= round.(d[:nd0][:,:value]; digits = round_digits))
-    (round_digits !== false) && (d[:nd0] = round!(d[:nd0], :value; digits = round_digits))
+    round!(d[:nd0], :value; digits=round_digits)
+
+    print_status(:nd0, d, "regional demand from national market")
     return d[:nd0]
 end
 
@@ -649,7 +660,7 @@ end
 ```
 """
 function _disagg_shrtrd!(d::Dict)
-    !(:ms0tot in keys(d)) && _disagg_ms0tot!(d)
+    !haskey(d, :ms0tot) && _disagg_ms0tot!(d)
 
     df = d[:ms0tot]
     d[:shrtrd] = dropnan(df / transform_over(df, :m))
@@ -666,17 +677,18 @@ end
 ```
 """
 function _disagg_dm0!(d::Dict)
-    println("  Disaggregating dm0(yr,r,g,m), margin supply from the local market")
-    !(:ms0tot in keys(d)) && _disagg_ms0tot!(d)
-    !(:shrtrd in keys(d)) && _disagg_shrtrd!(d)
-
+    !haskey(d, :ms0tot) && _disagg_ms0tot!(d)
+    !haskey(d, :shrtrd) && _disagg_shrtrd!(d)
+    
     cols = propertynames(d[:ms0tot])
     dm1 = dropmissing(d[:ms0tot] * d[:rpc])
     dm2 = dropmissing((d[:shrtrd] * d[:dc0]) - d[:dd0])
-
+    
     df = indexjoin(dm1, dm2; id = [:dm1,:dm2])
     df[!,:value] .= min.(df[:,:dm1], df[:,:dm2])
     d[:dm0] = df[:,cols]
+
+    print_status(:dm0, d, "margin supply from the local market")
     return d[:dm0]
 end
 
@@ -689,8 +701,9 @@ end
 ```
 """
 function _disagg_nm0!(d::Dict)
-    println("  Disaggregating nm0(yr,r,g,m), margin demand from the national market")
     d[:nm0] = d[:ms0tot] - d[:dm0]
+
+    print_status(:nm0, d, "margin demand from the national market")
     return d[:nm0]
 end
 
@@ -703,8 +716,9 @@ end
 ```
 """
 function _disagg_xd0!(d::Dict)
-    println("  Disaggregating xd0(yr,r,g), regional supply to local market")
     d[:xd0] = combine_over(d[:dm0], :m) + d[:dd0]
+
+    print_status(:xd0, d, "regional supply to local market")
     return d[:xd0]
 end
 
@@ -717,8 +731,9 @@ end
 ```
 """
 function _disagg_xn0!(d::Dict)
-    println("  Disaggregating xn0(yr,r,g), regional supply to national market")
     d[:xn0] = d[:s0] + d[:rx0] - d[:xd0] - d[:x0]
+
+    print_status(:xn0, d, "regional supply to national market")
     return d[:xn0]
 end
 
@@ -736,16 +751,16 @@ end
 ```
 """
 function _disagg_hhadj!(d::Dict)
-    println("  Disaggregating hhadj(yr,r), household adjustment")
     dh = Dict(k => edit_with(copy(d[k]), Rename(:g,:s))
-        for k in [:c0,:ld0,:kd0,:yh0,:bopdef0,:ta0,:a0,:tm0,:ty0,:g0,:i0,:m0])
-    dh[:ys0] = copy(d[:ys0])
-
-    d[:hhadj] = dh[:c0] -
+    for k in [:c0,:ld0,:kd0,:yh0,:bopdef0,:ta0,:a0,:tm0,:ty0,:g0,:i0,:m0])
+        dh[:ys0] = copy(d[:ys0])
+        
+        d[:hhadj] = dh[:c0] -
         combine_over(dh[:ld0] + dh[:kd0] + dh[:yh0], :s) - dh[:bopdef0] -
         combine_over(dh[:ta0]*dh[:a0] + dh[:tm0]*dh[:m0] + dh[:ty0]*combine_over(dh[:ys0],:g), :s) +
         combine_over(dh[:g0] + dh[:i0], :s)
-    
+        
+    print_status(:hhadj, d, "household adjustment")
     return d[:hhadj]
 end
 

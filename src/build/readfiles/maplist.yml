@@ -1,0 +1,10 @@
+Path: data
+
+Input:
+  cng:       [coremaps, crosswalk, cng.csv]
+  demand:    [coremaps, crosswalk, demand_pmt.csv]
+  elegen:    [coremaps, crosswalk, elegen.csv]
+  pq:        [coremaps, crosswalk, pq.csv]
+  units:     [coremaps, define, units.csv]
+  co2perbtu: [constants, co2perbtu.csv]
+  operate:   [constants, operate.csv]

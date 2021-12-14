@@ -34,6 +34,57 @@
         "supertype": "Edit"
     },
     {
+        "struct_name": "Concatenate",
+        "docstring": "Concatenate side-by-side DataFrames into one normal-form DataFrame.",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "final column names",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "on",
+                "comment": "column name indicator specifying where to stack",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "var",
+                "comment": "column name for storing indicator",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Describe",
+        "docstring": "This DataType is required when multiple DataFrames will be appended into one output file (say, if multiple sheets from an XLSX file are included). Before the DataFrames are appended, a column `col` will be added and filled with the value in the file descriptor. !!!! Does it make sense to have a DataType with one field?",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "name of new column",
+                "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Deselect",
+        "docstring": "",
+        "fields": [
+            {
+                "name": "col",
+                "comment": "name of column containing data to remove",
+                "data_type": "Array{Symbol,1}"
+            },
+            {
+                "name": "operation",
+                "comment": "how to determine what to drop",
+                "data_type": "String"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
         "struct_name": "Drop",
         "docstring": "Remove information from the dataframe - either an entire column or rows containing specified values.",
         "fields": [
@@ -51,18 +102,6 @@
                 "name": "operation",
                 "comment": "how to determine what to drop",
                 "data_type": "String"
-            }
-        ],
-        "supertype": "Edit"
-    },
-    {
-        "struct_name": "Describe",
-        "docstring": "This DataType is required when multiple DataFrames will be appended into one output file (say, if multiple sheets from an XLSX file are included). Before the DataFrames are appended, a column `col` will be added and filled with the value in the file descriptor. !!!! Does it make sense to have a DataType with one field?",
-        "fields": [
-            {
-                "name": "col",
-                "comment": "name of new column",
-                "data_type": "Symbol"
             }
         ],
         "supertype": "Edit"
@@ -132,6 +171,28 @@
                 "name": "kind",
                 "comment": "type of join to perform.",
                 "data_type": "Symbol"
+            }
+        ],
+        "supertype": "Edit"
+    },
+    {
+        "struct_name": "Match",
+        "docstring": "Extract values from the specified column into a column or columns based on the specified regular expression.",
+        "fields": [
+            {
+                "name": "on",
+                "comment": "string indicating where to split",
+                "data_type": "Regex"
+            },
+            {
+                "name": "input",
+                "comment": "column to split",
+                "data_type": "Symbol"
+            },
+            {
+                "name": "output",
+                "comment": "column names to label text surrounding the split",
+                "data_type": "Array{Symbol,1}"
             }
         ],
         "supertype": "Edit"
@@ -247,62 +308,23 @@
         "supertype": "Edit"
     },
     {
-        "struct_name": "Match",
-        "docstring": "Extract values from the specified column into a column or columns based on the specified regular expression.",
-        "fields": [
-            {
-                "name": "on",
-                "comment": "string indicating where to split",
-                "data_type": "Regex"
-            },
-            {
-                "name": "input",
-                "comment": "column to split",
-                "data_type": "Symbol"
-            },
-            {
-                "name": "output",
-                "comment": "column names to label text surrounding the split",
-                "data_type": "Array{Symbol,1}"
-            }
-        ],
-        "supertype": "Edit"
-    },
-    {
         "struct_name": "Stack",
-        "docstring": "Concatenate side-by-side DataFrames into one normal-form DataFrame.",
+        "docstring": "Normalize the dataframe by 'melting' columns into rows, lengthening the dataframe by duplicating values in the column `on` into new rows and defining 2 new columns: 1. `var` with header names from the original dataframe. 2. `val` with column values from the original dataframe. This operation can only be performed once per dataframe.",
         "fields": [
             {
-                "name": "col",
-                "comment": "final column names",
-                "data_type": "Array{Symbol,1}"
-            },
-            {
                 "name": "on",
-                "comment": "column name indicator specifying where to stack",
+                "comment": "name of column(s) NOT included in melt",
                 "data_type": "Array{Symbol,1}"
             },
             {
                 "name": "var",
-                "comment": "column name for storing indicator",
+                "comment": "name of column containing header NAMES from the original dataframe",
                 "data_type": "Symbol"
-            }
-        ],
-        "supertype": "Edit"
-    },
-    {
-        "struct_name": "Deselect",
-        "docstring": "",
-        "fields": [
-            {
-                "name": "col",
-                "comment": "name of column containing data to remove",
-                "data_type": "Array{Symbol,1}"
             },
             {
-                "name": "operation",
-                "comment": "how to determine what to drop",
-                "data_type": "String"
+                "name": "val",
+                "comment": "name of column containing VALUES from the original dataframe",
+                "data_type": "Symbol"
             }
         ],
         "supertype": "Edit"

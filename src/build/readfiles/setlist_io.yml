@@ -1,0 +1,14 @@
+Path: [data, coresets]
+
+SetInput:
+  - {descriptor: yr,         name: yr.csv}
+  - {descriptor: r,          name: [r, state.csv]}
+  - {descriptor: summary,    name: [s, summary.csv]}
+  - {descriptor: detail,     name: [s, detail.csv]}
+  - {descriptor: m,          name: [s, m.csv]}
+  - {descriptor: imrg,       name: [s, mrg.csv]}
+  - {descriptor: oth use,    name: [s, oth_use.csv]}
+  - {descriptor: fd,         name: fd.csv}
+  - {descriptor: ts,         name: ts.csv}
+  - {descriptor: va,         name: va.csv}
+  - {descriptor: gdpcat,     name: gdpcat.csv}

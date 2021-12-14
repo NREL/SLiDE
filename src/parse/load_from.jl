@@ -33,7 +33,7 @@ function load_from(::Type{T}, d::Array{Dict{Any,Any},1}) where T <: Any
 end
 
 
-function load_from(::Type{T}, d::Dict{Any,Any}) where T <: Any
+function load_from(::Type{T}, d::Dict) where T <: Any
     # Fill the datatype with the values in the dictionary keys, ensuring correct t.
     (fields, types) = (string.(fieldnames(T)), T.types)
     d = _load_path(d)

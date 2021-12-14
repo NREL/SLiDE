@@ -27,10 +27,9 @@ This will generate the `Manifest.toml` file, including the package dependencies.
 
 Precompile the SLiDE package and build the model input data by running:
 
-```
+```julia
 julia> using SLiDE
-
-julia> (d, set) = build()
+julia> d, set = build( ; eem=true)
 ```
 
 ## References

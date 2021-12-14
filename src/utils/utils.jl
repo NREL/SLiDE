@@ -18,6 +18,14 @@ Base.broadcastable(x::InvertedIndex{T}) where {T <: Any} = [x];
 
 
 """
+Extends copy to Weighting and Mapping
+"""
+Base.copy(x::Dataset) = Dataset(x.name, x.build, x.step, x.region_level, x.sector_level, x.eem, x.save_build, x.overwrite)
+Base.copy(x::Weighting) = Weighting(copy(x.data), x.constant, x.from, x.to, x.on, x.direction)
+Base.copy(x::Mapping) = Mapping(copy(x.data), x.from, x.to, x.on, x.direction)
+
+
+"""
     Base.split(x::Missing)
     Base.split(x::Number)
 Extends `split` to ignore missing fields.
@@ -174,7 +182,23 @@ convert_type(::Type{Bool}, x::AbstractString) = lowercase(x) == "true" ? true : 
 convert_type(::Type{UnitRange}, x::AbstractArray) = x[1]:x[end]
 convert_type(::Type{UnitRange}, x::Any) = convert_type(UnitRange, ensurearray(x))
 
-# [@printf("%-8s %s\n", T, fieldpropertynames(T)[T.types .== Any]) for T in subtypes(Edit) if Any in T.types]
+convert_type(::Type{DataFrame}, x::NamedTuple) = DataFrame(permute(x))
+convert_type(::Type{T}, x::T) where T = x
+
+function convert_type(::Type{Mapping}, x::Weighting)
+    return Mapping(unique(x.data[:,[x.from;x.to]]), x.from, x.to, x.on, x.direction)
+end
+
+
+"""
+"""
+function convert_type!(df::DataFrame, col::Symbol, T::DataType)
+    if col in propertynames(df) && eltype(skipmissing(df[:,col])) != T
+        df[!,col] = convert_type.(T, df[:,col])
+    end
+    return df
+end
+
 
 """
     isarray(x::Any)
@@ -244,18 +268,43 @@ If the dictionary does not contiain all of the sets specified in `x`,
 the function will produce an error.
 
 # Arguments
-- `set::Dict` dictionary to update with permutations
+- `set::Dict` to update with permutations
 - `x::Tuple{Symbol,1}`: set keys to permute
 """
 function add_permutation!(set::Dict, x::Tuple)
-    if !(x in keys(set))
+    if !haskey(set, x)
         missing_keys = setdiff(ensurearray(x), keys(set))
         if !isempty(missing_keys)
             @error("Cannot create a composite $x. Key(s) $missing_keys missing from set.")
         end
-        set[x] = sort(permute([[set[k] for k in x]...,]))
+        if length(x) == length(unique(x))
+            lst = permute([[set[k] for k in x]...,])
+        else
+            # Save the number of occurrances of each set in `tmp`. Then permute such that
+            # multiple entries of a single set will be coupled.
+            tmp = unique(transform_over(DataFrame(x=ensurearray(x), num=true), :num))
+            lst = [row[:num]==1 ? set[row[:x]] : vcat.(fill(set[row[:x]],Int(row[:num]))...)
+                for row in eachrow(tmp)]
+                    
+            lst = if length(unique(x))==1
+                Tuple.(lst[1])
+            else
+                [Tuple(vcat(ensurearray(x)...)) for x in permute(lst)]
+            end
+        end
+
+        set[x] = sort(lst)
         end
     return set[x]
+end
+
+
+"""
+"""
+function add_index!(set::Dict, x::Pair{Symbol,DataFrame}; fun::Function=identity)
+    key, df = x[1], x[2]
+    push!(set, key => listindex(fun(df), Array{Tuple}))
+    return set[key]
 end
 
 
@@ -270,9 +319,17 @@ findvalue(df::DataFrame) = [find_oftype(df, AbstractFloat); find_oftype(df, Bool
 """
 # Returns
 - `idx::Array{Symbol,1}` of input DataFrame propertynames indicating indices, which are
-    defined as columns that do NOT contain `AbstractFloat` or `Bool` DataTypes.
+defined as columns that do NOT contain `AbstractFloat` or `Bool` DataTypes.
+
+    findindex(df::DataFrame, ::Type{T})
 """
 findindex(df::DataFrame) = setdiff(propertynames(df), findvalue(df))
+
+
+"""
+"""
+listindex(df::DataFrame) = df[:,findindex(df)]
+listindex(df::DataFrame, ::Type{T}) where T<:Any = convert_type(T, listindex(df))
 
 
 """
@@ -286,10 +343,24 @@ findunits(df::DataFrame) = propertynames_with(df, :units)
 
 """
 """
-function propertynames_with(df::DataFrame, id::Symbol)
-    col = propertynames(df)
-    return col[occursin.(id,col)]
+propertynames_with(df::DataFrame, id) = propertynames_with(propertynames(df), id)
+
+function propertynames_with(col::Array{Symbol,1}, id)
+    return col[.!isnothing.(match.(Regex("\\b$id\\b"), replace.(string.(col), "_"=>" ")))]
 end
+
+
+"""
+"""
+nunique(df::DataFrame) = nunique.(eachcol(df))
+nunique(x::AbstractArray) = length(unique(skipmissing(x)))
+nunique(row::DataFrameRow) = length(unique(skipmissing(row)))
+
+
+"""
+"""
+DataFrames.nonunique(x::AbstractArray) = unique(x[nonunique(DataFrame(x=x))])
+
 
 
 """

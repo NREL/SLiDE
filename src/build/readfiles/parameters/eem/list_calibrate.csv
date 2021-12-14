@@ -1,0 +1,32 @@
+parameter
+# --- eem ---
+fvs
+netgen
+# eq0
+# --- io ---
+a0
+bopdef0
+c0
+cd0
+dd0
+dm0
+g0
+hhadj
+i0
+id0
+kd0
+ld0
+m0
+md0
+nd0
+nm0
+rx0
+s0
+ta0
+tm0
+ty0
+x0
+xd0
+xn0
+yh0
+ys0

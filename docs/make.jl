@@ -12,7 +12,7 @@ if haskey(ENV, "DOCSARGS")
     end
 end
 
-DocMeta.setdocmeta!(SLiDE, :DocTestSetup, :(using SLiDE); recursive=true)
+DocMeta.setdocmeta!(SLiDE, :DocTestSetup, :(using SLiDE, DataFrames); recursive=true)
 
 # Now, generate the documentation.
 makedocs(clean = true,
@@ -26,23 +26,27 @@ makedocs(clean = true,
     # workdir = "../",
     pages = [
         "Home" => "index.md",
-        "Introduction" => Any[
-            "Data" => Any[
-                "Overview" => "man/data/overview.md",
-                "Preparation" => "man/data/preparation.md",
-            ],
-            "Build" => Any[
-                "Overview" => "man/build/overview.md",
-                "Partition" => "man/build/partition.md",
-                "Share" => "man/build/share.md",
-                "Disaggregate" => "man/build/disagg.md",
-            ],
-            # "EEM" => Any[
-            #     "SEDS" => "man/eem/seds.md",
-            # ],
-            "Scaling" => "man/scaling.md",
-            "Parameters" => "man/parameters.md"
+        "Data" => Any[
+            "Overview" => "man/data/overview.md",
+            "Preparation" => "man/data/preparation.md",
+            # "Parameters" => "man/parameters.md"
         ],
+        "Build" => Any[
+            "Overview" => "man/build/overview.md",
+            "Regional" => Any[
+                "Partition: BEA" => "man/build/io/partition_bea.md",
+                "National Calibration" => "man/build/io/calibrate_national.md",
+                "Regional Sharing" => "man/build/io/share_region.md",
+                "Regional Disaggregation" => "man/build/io/disagg_region.md",
+            ],
+            "Energy-Environment Module" => Any[
+                "Partition: Energy and Electricity" => "man/build/eem/partition_seds.md",
+                "Energy Disaggregation" => "man/build/eem/disagg_energy.md",
+                "Partition: CO2 Emissions" => "man/build/eem/partition_co2.md",
+                "Regional Calibration" => "man/build/eem/calibrate_regional.md",
+            ],
+        ],
+        "Scale" => "man/scale/overview.md",
         "API" => [
             "Types" => map(
                 s -> "api/types/$(s)",
@@ -54,7 +58,10 @@ makedocs(clean = true,
                 s -> "api/internals/$(s)",
                 sort(readdir(joinpath(@__DIR__, "src/api/internals"))))
             ],
-        "Model" => "api/model.md",
+        "Model" => Any[
+            "Overview" => "man/model/overview.md",
+            "Constraints" => "man/model/constraints.md",
+        ],
     ]
 )
 

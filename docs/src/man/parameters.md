@@ -1,5 +1,25 @@
 # Parameters
 
+Sharing:
+* ``\alpha^{*}_{yr,r,s}`` - regional sharing parameter associated with the * dataset
+* ``\beta^{mar}_{yr,r,m,g}`` - share of trade and transport margins
+* ``\rho^{cfs}_{r,g}`` - regional purchase coefficients
+* ``\theta^{ls}_{yr,r,s}`` - share of labor in total value added
+
+Non-sharing:
+* ``\sigma`` - constant elasticity of substitution governing input trade offs in production
+* ``\eta_{r,g}`` - elasticity of transformation governing the supply of output to regional markets
+* ``\gamma`` - positive penalty on zero elements
+* ``\Pi^X_{r,g}`` - zero profit condition for ``X_{r,g}``
+* ``\Phi_{r,c}`` denote the subset of ``(r,c)`` with non-zero elements, ``\Phi^C_{r,c}`` denote its converse
+* ``\psi`` denote the cutoff point for large decreases relative to the reference level
+
+DIY:
+* ``\delta`` - sectoral disaggregation
+* ````
+* Open: ``\zeta, \iota, \kappa, \lambda, \mu, \nu, \xi, \pi, \tau, \chi, \omega``
+
+
 ## BEA Supply/Use
 
 | Parameter | Variables   | Description                                   |
