@@ -184,6 +184,22 @@ function filter_with!(d::Dict, lst::AbstractArray)
     return d
 end
 
+function filter_with!(d::Dict, set::Dict, dataset::Dataset)
+    has_region = dataset.step!=="bea"
+    drop_units = dataset.step!=="seds"
+
+    # Define filtering.
+    has_region && push!(set, :r => read_file(SLiDE.inputpath("r","state"; type="set"))[:,1])
+    filt = (yr=set[:yr], r=set[:r], orig=set[:r], dest=set[:r])
+
+    x = Deselect([:units],"==")
+    [d[k] = filter_with((drop_units ? edit_with(df, x) : df), filt;
+        extrapolate=true) for (k,df) in d]
+
+    # return has_region ? SLiDE.scale_region!(dataset, d, set) : d, set
+    return d, set
+end
+
 
 """
     split_with!(d::Dict, splitter::AbstractArray)
@@ -224,8 +240,9 @@ function split_with(df::DataFrame, splitter::DataFrame; drop=false)
     return df_in, df_out
 end
 
-function split_with(df::DataFrame, splitter::NamedTuple; drop=false)
-    return split_with(df, DataFrame(permute(splitter)); drop=drop)
+
+function split_with(df, splitter::NamedTuple; kwargs...)
+    return split_with(df, DataFrame(permute(splitter)); kwargs...)
 end
 
 
@@ -252,7 +269,8 @@ function split_fill_unstack(
     df::DataFrame,
     splitter::DataFrame,
     colkey::Union{Symbol, Array{Symbol,1}},
-    value::Union{Symbol, Array{Symbol,1}},
+    value::Union{Symbol, Array{Symbol,1}};
+    units=missing,
 )
     df_in, df_out = split_with(df, splitter)
     
@@ -261,20 +279,17 @@ function split_fill_unstack(
     # idx_split = findindex(splitter)
     # df_perm = crossjoin(permute(df_in[:,setdiff(idx,idx_split)]), splitter)
     # df_in = indexjoin(df_in, df_perm)
-    
+
     df_in = _unstack(df_in, colkey, value)
+
+    !ismissing(units) && (df_in[!,:units] .= df_in[:,append(:units,units)])
 
     return df_in, df_out
 end
 
 
-function split_fill_unstack(
-    df::DataFrame,
-    splitter::NamedTuple,
-    colkey::Union{Symbol, Array{Symbol,1}},
-    value::Union{Symbol, Array{Symbol,1}},
-)
-    return split_fill_unstack(df, convert_type(DataFrame, splitter), colkey, value)
+function split_fill_unstack(df, splitter::NamedTuple, colkey, value)
+    return split_fill_unstack(df, convert_type(DataFrame, splitter), colkey, value; kwargs...)
 end
 
 
@@ -299,13 +314,13 @@ function stack_append(
     df_out::DataFrame,
     colkey::Union{Symbol, Array{Symbol,1}},
     value::Union{Symbol, Array{Symbol,1}};
-    cols::Symbol=:intersect,
     ensure_finite::Bool=true,
+    cols::Symbol=:intersect,
 )
     if ensure_finite
         inputs = propertynames_with(findvalue(df_wide),0)
         if !isempty(inputs)
-            outputs = _remove_id.(inputs,0)
+            outputs = SLiDE._remove_id.(inputs,0)
             for (inp,out) in zip(inputs,outputs)
                 ii = .!isfinite.(df_wide[:,out])
                 df_wide[ii,out] .= df_wide[ii,inp]
@@ -314,7 +329,7 @@ function stack_append(
     end
 
     
-    df_wide = _stack(df_wide, colkey, value)
+    df_wide = SLiDE._stack(df_wide, colkey, value)
 
     return vcat(df_wide, df_out; cols=cols)
 end

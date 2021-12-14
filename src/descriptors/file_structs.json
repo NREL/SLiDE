@@ -65,6 +65,33 @@
                 "data_type": "String"
             },
             {
+                "name": "descriptor",
+                "comment": "set descriptor; this will be used to identify the GAMS set to be read.",
+                "data_type": "String"
+            },
+            {
+                "name": "col",
+                "comment": "column names",
+                "data_type": "Array{Symbol,1}"
+            }
+        ],
+        "supertype": "File"
+    },
+    {
+        "struct_name": "TXTInput",
+        "docstring": "Read .txt file",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "input file name",
+                "data_type": "String"
+            },
+            {
+                "name": "descriptor",
+                "comment": "file descriptor",
+                "data_type": "String"
+            },
+            {
                 "name": "col",
                 "comment": "column names",
                 "data_type": "Array{Symbol,1}"

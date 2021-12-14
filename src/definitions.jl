@@ -11,6 +11,7 @@ const DATA_DIR = joinpath(SLIDE_DIR,"data")
 const READ_DIR = joinpath(SLIDE_DIR,"src","build","readfiles")
 
 # FILES
+const SCALE_REGION = joinpath(SLIDE_DIR,"data","coremaps","scale","region","region.csv")
 const SCALE_BLUENOTE_IO = joinpath(DATA_DIR,"coremaps","scale","sector","bluenote.csv")
 const SCALE_EEM_IO = joinpath(DATA_DIR,"coremaps","scale","sector","eem_pmt.csv")
 

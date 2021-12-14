@@ -16,15 +16,15 @@ function disaggregate_energy!(dataset, d, set, maps)
         [d[k] = edit_with(d[k], Rename(:src,:g)) for k in [:ed0,:emarg0,:pctgen]]
 
         # Disaggregate.
-        _disaggregate_cng!(d, set, maps)
-        _disagg_energy_fvs!(d)
+        SLiDE._disaggregate_cng!(d, set, maps)
+        SLiDE._disagg_energy_fvs!(d)
 
         # Make individual adjustments.
         println("Update parameters for g=e...")
-        _disagg_energy_md0!(d, set)
-        _disagg_energy_cd0!(d, set)
-        _disagg_energy_ys0!(d, set, maps)
-        _disagg_energy_id0!(d, set, maps)
+        SLiDE._disagg_energy_md0!(d, set)
+        SLiDE._disagg_energy_cd0!(d, set)
+        SLiDE._disagg_energy_ys0!(d, set, maps)
+        SLiDE._disagg_energy_id0!(d, set, maps)
 
         println("Update parameters for g=ele...")
         _disagg_energy_m0!(d)
@@ -36,6 +36,8 @@ function disaggregate_energy!(dataset, d, set, maps)
 
         # Update household disaggregation.
         _disagg_hhadj!(d)
+
+        [d[k] = edit_with(d[k], Rename(:g,:src)) for k in [:ed0,:emarg0,:pctgen]]
         write_build!(set!(dataset; step=step), d)
     else
         merge!(d, d_read)

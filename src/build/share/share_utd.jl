@@ -5,20 +5,35 @@
 \\alpha_{yr,r,g,t}^{utd}
 =
 \\begin{cases}
-\\dfrac{           \\bar{utd}_{yr,r ,g,t}}
-       {\\sum_{r'} \\bar{utd}_{yr,r',g,t}}        & notrd\\ni g
+\\dfrac{           utd_{yr,r ,g,t}}
+       {\\sum_{r'} utd_{yr,r',g,t}}        & notrd\\ni g
 \\\\
-\\dfrac{\\sum_{yr'}    \\bar{utd}_{yr',r ,g,t}}
-       {\\sum_{yr',r'} \\bar{utd}_{yr',r',g,t}}   & notrd\\in g
+\\dfrac{\\sum_{yr'}    utd_{yr',r ,g,t}}
+       {\\sum_{yr',r'} utd_{yr',r',g,t}}   & notrd\\in g
 \\end{cases}
 ```
 """
 function share_utd!(d::Dict, set::Dict)
-    d[:utd] = fill_zero(d[:utd])
-    df = d[:utd] / transform_over(d[:utd], :r)
+    begin idxshr = :r; idximp = :yr end
+
+    df0 = fill_zero(copy(d[:utd]))
+    df = df0 / transform_over(df0, idxshr)
+
+    # Define a condition.
+    condition, df, kind = split_condition(df)
+
+    # Fill.
+    dfavg = transform_over(df0, idximp) / transform_over(df0, [idximp,idxshr])
+    dfavg = indexjoin(condition, dfavg; kind=kind)
+
+    # Concatenate.
+    df = vcat(dfavg, df; cols=:intersect)
+
+    # d[:utd] = fill_zero(d[:utd])
+    # df = d[:utd] / transform_over(d[:utd], :r)
     
-    df_yr = transform_over(d[:utd], :yr) / transform_over(d[:utd], [:yr,:r])
-    df[isnan.(df[:,:value]), :value] .= df_yr[isnan.(df[:,:value]),:value]
+    # df_yr = transform_over(d[:utd], :yr) / transform_over(d[:utd], [:yr,:r])
+    # df[isnan.(df[:,:value]), :value] .= df_yr[isnan.(df[:,:value]),:value]
     
     # Check import and export shares.
     verify_over(filter_with(df, (t = "imports",)), :r) !== true && @error("Import shares don't sum to 1.")

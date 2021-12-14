@@ -15,6 +15,10 @@ Build stream preferences can be specified using the [`SLiDE.Dataset`](@ref) inpu
     the directory `data/<name>`. If no name is specified, `"state_model"` will be used.
 
 The following options can be specified using keyword arguments.
+- `region_level::Symbol`. What level of regional aggregation would you like? Options include:
+    - `:state`: 50 states + D.C.
+    - `:division`: 9 divisions **(default)**
+    - `:region`: 4 regions
 - `overwrite::Bool`. Would you like to overwrite the existing dataset with this name?
     If set to true, the existing directory will be renamed.
 - `eem::Bool`. Would you like to build the Energy-Environment Module?

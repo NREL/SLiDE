@@ -7,23 +7,34 @@ read and return those values. Otherwise, it will generate these parameters by ex
 1. [`SLiDE.build_eem`](@ref) -- if `dataset.eem=true`
 """
 function build(dataset::Dataset)
+    input_region_level = dataset.region_level
+    set_region_level!(dataset, :state)
+
     dataset.overwrite && overwrite(dataset)
     dataset.eem && set!(dataset; build="eem")
-    
+
     if data_saved(dataset)
         set!(dataset; step=SLiDE.PARAM_DIR)
         d = read_build(dataset)
         set = read_set(dataset)
     else
+        set!(dataset; build="io")
         d, set = build_io(dataset)
         d, set = build_eem(dataset, d, set)
+    end
+
+    if input_region_level!==:state
+        d, set = scale_region!(set!(dataset; region_level=input_region_level), d, set)
+        write_build!(set!(dataset; step=PARAM_DIR), d)
+        write_build!(set!(dataset; step=SET_DIR), set)
     end
 
     return d, set
 end
 
 
-function build(name::String=DEFAULT_DATASET; kwargs...)
+function build(name::String=""; kwargs...)
+    ismissing(name) && (name = "$(dataset.region_level)_model")
     return build(Dataset(name; kwargs...))
 end
 
@@ -113,7 +124,10 @@ end
 "This function returns true if parameters and sets have already been generated,
 and their values saved, for the given `dataset`."
 function data_saved(dataset::Dataset)
-    dataset = copy(dataset)
+    # dataset = copy(dataset)
+    
+    # Set dataset build step to reflect the ultimate goal.
+    dataset.eem && set!(dataset; build="eem")
     return .&(
         isdir(datapath(set!(dataset; step=PARAM_DIR))),
         isdir(datapath(set!(dataset; step=SET_DIR))),
@@ -181,11 +195,14 @@ function datapath(dataset::Dataset; directory_level=:step)
     if directory_level==:name
         path = joinpath(path, dataset.name)
 
+    elseif directory_level==:region
+        path = joinpath(path, dataset.name, "$(dataset.region_level)")
+
     elseif directory_level==:build
-        path = joinpath(path, dataset.name, dataset.build)
+        path = joinpath(path, dataset.name, "$(dataset.region_level)", dataset.build)
 
     elseif directory_level==:step
-        path = joinpath(path, dataset.name, dataset.build)
+        path = joinpath(path, dataset.name, "$(dataset.region_level)", dataset.build)
         path = if dataset.step in [PARAM_DIR, SET_DIR]
             joinpath(path, dataset.step)
         else
@@ -196,6 +213,47 @@ function datapath(dataset::Dataset; directory_level=:step)
     end
     return path
 end
+
+
+"""
+"""
+function has_input!(dataset::Dataset)
+    (dataset.build=="io" && dataset.step==SLiDE.PARAM_DIR) && set_step!(dataset, "bea")
+    return any([
+        dataset.build=="io" && dataset.step in ["bea","share"],
+        dataset.build=="eem" && dataset.step=="seds",
+    ])
+end
+
+
+"""
+"""
+function inputpath(dataset::Dataset)
+    return if has_input!(dataset)
+        if dataset.build=="io"
+            if dataset.step=="bea"; joinpath(SLiDE.READ_DIR, "input", "$(dataset.sector_level).yml")
+            else;                   joinpath(SLiDE.READ_DIR, "input", "$(dataset.step).yml")
+            end
+        else
+            joinpath(SLiDE.DATA_DIR,"input","eia")
+        end
+    else
+        nothing
+    end
+end
+
+function inputpath(str::String; type="input")
+    path = if type=="input"; joinpath(SLiDE.DATA_DIR,"input","$str.csv")
+    elseif type=="set";   joinpath(SLiDE.DATA_DIR,"coresets","$str.csv")
+    elseif type=="map";   joinpath(SLiDE.DATA_DIR,"coremaps","$str.csv")
+    end
+
+    if isfile(path)
+        return path
+    end
+end
+
+inputpath(x...; kwargs...) = inputpath(joinpath(x...); kwargs...)
 
 
 """
@@ -224,7 +282,7 @@ function write_build!(dataset::Dataset, d::Dict)
             [write_build(path, k, v) for (k,v) in d_write]
         end
     end
-
+    
     # sets s, g would have been filtered out when writing, but we want to make sure they are
     # defined for subsequent steps.
     if dataset.step==SET_DIR
@@ -275,11 +333,9 @@ function read_set(build::String; sector_level::Symbol=:summary)
         if build=="io" && !haskey(set, :sector)
             if haskey(set, sector_level)
                 set_sector!(set; key=sector_level)
-            # else
-            #     !!!! ERROR, SECTOR LEVEL NOT FOUND
+            # else !!!! ERROR, SECTOR LEVEL NOT FOUND
             end
         end
-    
     # If pointing to a path,
     elseif isfile(build)
         path = build
@@ -290,8 +346,7 @@ function read_set(build::String; sector_level::Symbol=:summary)
             set = read_from(path)
             [set[k] = df[:,1] for (k,df) in set if typeof(df)<:DataFrame]
         end
-    # else
-    #     !!!! ERROR, MUST BE IO, EEM, OR POINT TO PATH
+    # else !!!! ERROR, MUST BE IO, EEM, OR POINT TO PATH
     end
     return set
 end
@@ -341,10 +396,7 @@ end
 # Returns
 - `d::Dict` of EEM mapping datasets.
 """
-function read_map()
-    path = joinpath(SLIDE_DIR,"src","build","readfiles")
-    return read_from(joinpath(path, "maplist.yml"))
-end
+read_map() = read_from(joinpath(READ_DIR, "maplist.yml"))
 
 
 """
@@ -359,25 +411,8 @@ Read input data for the specified `dataset.build/dataset.step` and set
 - `d::Dict` of input data. If `dataset.step` does not require input data, return Dict().
 """
 function read_input!(dataset::Dataset)
-    d = Dict()
-    
-    if dataset.build=="io"
-        dataset.step==PARAM_DIR && set!(dataset; step="bea")
-        
-        file = dataset.step=="bea" ? "$(dataset.sector_level).yml" : "$(dataset.step).yml"
-        path = joinpath(SLIDE_DIR,"src","build","readfiles","input",file)
-
-        if isfile(path)
-            merge!(d, read_from(path))
-            [d[k] = edit_with(df, Deselect([:units],"==")) for (k,df) in d]
-        end
-
-    elseif dataset.build=="eem"
-        if dataset.step=="seds"
-            merge!(d, read_from(joinpath(SLIDE_DIR,"data","input","eia")))
-        end
-    end
-
+    path = inputpath(dataset)
+    d = !isnothing(path) ? read_from(path) : Dict()
     dataset.step = "input"
     return d
 end
@@ -450,3 +485,9 @@ end
 set_sector!(set; key=:sector) = set_sector!(set, set[key])
 
 set_sector!(set::Dict, d::Dict) = set_sector!(set, unique(d[:ys0][:,:g]))
+
+
+"""
+"""
+set_region!(set::Dict, x::AbstractArray) = set[:r] = string.(x)
+set_region!(set::Dict, d::Dict) = set_region!(set, unique(d[:ys0][:,:r]))

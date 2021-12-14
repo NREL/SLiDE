@@ -20,7 +20,7 @@ Base.broadcastable(x::InvertedIndex{T}) where {T <: Any} = [x];
 """
 Extends copy to Weighting and Mapping
 """
-Base.copy(x::Dataset) = Dataset(x.name, x.build, x.step, x.sector_level, x.eem, x.save_build, x.overwrite)
+Base.copy(x::Dataset) = Dataset(x.name, x.build, x.step, x.region_level, x.sector_level, x.eem, x.save_build, x.overwrite)
 Base.copy(x::Weighting) = Weighting(copy(x.data), x.constant, x.from, x.to, x.on, x.direction)
 Base.copy(x::Mapping) = Mapping(copy(x.data), x.from, x.to, x.on, x.direction)
 
@@ -188,6 +188,17 @@ convert_type(::Type{T}, x::T) where T = x
 function convert_type(::Type{Mapping}, x::Weighting)
     return Mapping(unique(x.data[:,[x.from;x.to]]), x.from, x.to, x.on, x.direction)
 end
+
+
+"""
+"""
+function convert_type!(df::DataFrame, col::Symbol, T::DataType)
+    if col in propertynames(df) && eltype(skipmissing(df[:,col])) != T
+        df[!,col] = convert_type.(T, df[:,col])
+    end
+    return df
+end
+
 
 """
     isarray(x::Any)

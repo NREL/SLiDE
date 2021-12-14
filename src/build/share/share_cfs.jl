@@ -5,10 +5,10 @@
 \\rho_{r,g}^{cfs}
 =
 \\begin{cases}
-\\dfrac{\\bar{d}_{r,g}}
-       {\\bar{d}_{r,g} - \\bar{mn}_{r,g}}  & r\\neq uti, \\bar{d}_{r,g} \\neq \\bar{mn}_{r,g}
+\\dfrac{d_{r,g}}
+       {d_{r,g} - mn_{r,g}}  & r\\neq uti, d_{r,g} \\neq mn_{r,g}
 \\\\
-0.0                                        & r\\neq uti, \\bar{d}_{r,g} = \\bar{mn}_{r,g}
+0.0                                        & r\\neq uti, d_{r,g} = mn_{r,g}
 \\\\
 0.9                                        & r = uti
 \\end{cases}
@@ -43,10 +43,10 @@ _set_ng!(set::Dict, d::Dict) = set[:ng] = setdiff(set[:g], unique(d[:cfs][:,:g])
 `d0(r,g)`: Local supply-demand (CFS), trade that remains within the same region.
 
 ```math
-\\bar{d}_{r,ng\\ni g} = \\left\\{{cfs}\\left(orig,dest,g\\right)
+d_{r,ng\\ni g} = \\left\\{{cfs}\\left(orig,dest,g\\right)
 \\;\\vert\\; orig=dest, \\, g \\right\\}
 ```
-Calling [`SLiDE._avg_ng`](@ref) returns ``\\bar{d}_{r,ng\\in g}``.
+Calling [`SLiDE._avg_ng`](@ref) returns ``d_{r,ng\\in g}``.
 """
 function _share_d0!(d::Dict, set::Dict)
     df = copy(d[:cfs])
@@ -64,7 +64,7 @@ end
 """
 `mrt0(orig,dest,g)`: Interstate trade (CFS)
 ```math
-\\bar{mrt}_{orig,dest,ng\\ni g} = \\left\\{{cfs}\\left(orig,dest,g\\right)
+mrt_{orig,dest,ng\\ni g} = \\left\\{cfs\\left(orig,dest,g\\right)
 \\;\\vert\\; orig\\neq dest, \\, g \\right\\}
 ```
 """
@@ -77,11 +77,11 @@ end
 
 
 """
-`mn0(r,g)`: National demand (CFS)
+`mn0(r,g)`, national demand (CFS)
 ```math
-\\bar{mn}_{r,ng\\ni g} = \\sum_{orig} \\bar{mrt}_{orig,dest,ng\\ni g}
+mn_{r,ng\\ni g} = \\sum_{orig} mrt_{orig,dest,ng\\ni g}
 ```
-Calling [`SLiDE._avg_ng`](@ref) returns ``\\bar{mn}_{r,ng\\in g}``.
+Calling [`SLiDE._avg_ng`](@ref) returns ``mn_{r,ng\\in g}``.
 """
 function _share_mn0!(d::Dict, set::Dict)    
     df = edit_with(combine_over(d[:mrt0], :orig), Rename(:dest, :r))
@@ -95,9 +95,9 @@ end
 """
 `xn0(r,g)`: National exports (CFS)
 ```math
-\\bar{xn}_{r,ng\\ni g} = \\sum_{dest} \\bar{mrt}_{orig,dest,ng\\ni g}
+xn_{r,ng\\ni g} = \\sum_{dest} mrt_{orig,dest,ng\\ni g}
 ```
-Calling [`SLiDE._avg_ng`](@ref) returns ``\\bar{xn}_{r,ng\\in g}``.
+Calling [`SLiDE._avg_ng`](@ref) returns ``xn_{r,ng\\in g}``.
 """
 function _share_xn0!(d::Dict, set::Dict)
     df = edit_with(combine_over(d[:mrt0], :dest), Rename(:orig, :r))
@@ -110,7 +110,7 @@ end
 
 """
 ```math
-\\bar{x}_{r,ng\\in g} = \\dfrac{\\sum_g \\bar{x}_{r,g}}
+x_{r,ng\\in g} = \\dfrac{\\sum_g x_{r,g}}
     {\\text{length}(ng)}
 ```
 """

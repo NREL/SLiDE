@@ -59,6 +59,7 @@ export SetInput
 export CSVInput
 export GAMSInput
 export XLSXInput
+export TXTInput
 export DataInput
 
 export Check
@@ -75,6 +76,7 @@ export Mapping
 # UTILITIES
 export append
 export convert_type
+export convert_type!
 export datatype
 export dropnan!
 export dropnan
@@ -235,6 +237,7 @@ include(joinpath("build", "share", "share_sector.jl"))
 include(joinpath("build", "disagg", "disagg_region.jl"))
 include(joinpath("build", "disagg", "disagg_energy.jl"))
 
+include(joinpath("scale", "scale_region.jl"))
 include(joinpath("scale", "scale_sector.jl"))
 include(joinpath("scale", "scale_with.jl"))
 
