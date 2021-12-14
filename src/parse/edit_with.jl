@@ -144,7 +144,7 @@ end
 edit_with(df::DataFrame, x::Map; file=nothing) = _map_with(df, x.file, x)
 
 
-function SLiDE.edit_with(df::DataFrame, x::Match; file=nothing)
+function edit_with(df::DataFrame, x::Match; file=nothing)
     if !(x.input in propertynames(df))
         @warn("$(x.input) not found in DataFrame propertynames.")
         return df
@@ -234,7 +234,7 @@ function edit_with(df::DataFrame, x::Order; file=nothing)
 end
 
 
-function SLiDE.edit_with(df::DataFrame, x::Rename; file=nothing)
+function edit_with(df::DataFrame, x::Rename; file=nothing)
     cols = propertynames(df)
     x.from in cols && (df = rename(df, x.from => x.to))
     x.to == :upper && (df = edit_with(df, Rename.(cols, uppercase.(cols))))

@@ -209,7 +209,6 @@ function _remove_empty(df::DataFrame)
     end
     return df[:,1:LAST]
 end
-# _remove_empty(df::DataFrame) = df[:,eltype.(eachcol(df)) .!== Missing]
 
 
 # ----- GAMS FILE SUPPORT ------------------------------------------------------------------
@@ -229,7 +228,7 @@ This function converts a GAMS map or set to a DataFrame, expanding sets into mul
 # Returns
 - `df::DataFrame`: A dataframe representation of the GAMS map or set.
 """
-function SLiDE._read_gams(filepath::String; id="", colnames=[], kwargs...)
+function _read_gams(filepath::String; id="", colnames=[], kwargs...)
     lines = readlines(filepath)
     lines = SLiDE._clean_gams(lines)
     lines = SLiDE._get_set(lines; id=id, kwargs...)
