@@ -29,40 +29,35 @@ the `data/coremaps` directory. It returns a .csv file.
     dictionary. All keys that correspond with SLiDE DataStream DataTypes will be converted
     to (lists of) those types.
 """
-# function read_file(path::Any, file::GAMSInput; remove_notes::Bool=false)
-#     filepath = SLiDE._joinpath(path, file)
-#     return _read_gams(filepath; colnames=file.col, id=file.descriptor)
-#     # xf = readlines(filepath)
-#     # df = split_gams(xf; colnames=file.col)
-#     # return df
-# end
-
-
-function read_file(path::Any, file::GAMSInput; remove_notes::Bool=false)
-    filepath = SLiDE._joinpath(path, file)
-    return _read_gams(filepath; colnames=file.col, id=file.descriptor)
-    # xf = readlines(filepath)
-    # df = split_gams(xf; colnames=file.col)
-    # return df
+function read_file(path, file::T; kwargs...) where T<:File
+    return read_file(joinpath!(path, file); kwargs...)
 end
 
 
-function read_file(path::Any, file::CSVInput; remove_notes::Bool=false)
-    filepath = _joinpath(path, file)
-    df = _read_csv(filepath)
-    
+function read_file(file::GAMSInput; kwargs...)
+    return _read_gams(file.name; colnames=file.col, id=file.descriptor)
+end
+
+
+function read_file(file::CSVInput; remove_notes::Bool=false, kwargs...)
+    df = SLiDE._read_csv(file.name)
+
     if remove_notes && size(df, 1) > 1
-        df = _remove_header(df, filepath)
-        df = _remove_footer(df)
-        df = _remove_empty(df)
+        df = SLiDE._remove_header(df, file.name)
+        df = SLiDE._remove_footer(df)
+        df = SLiDE._remove_empty(df)
     end
     return df
 end
 
 
-function read_file(path::Any, file::XLSXInput; remove_notes::Bool=false)
-    filepath = _joinpath(path, file)
-    xf = XLSX.readdata(filepath, file.sheet, file.range)
+function read_file(file::TXTInput; kwargs...)
+    return _read_txt(file.name; colnames=file.col)
+end
+
+
+function read_file(file::XLSXInput; kwargs...)
+    xf = XLSX.readdata(file.name, file.sheet, file.range)
     
     # Delete rows containing only missing values.
     xf = xf[[!all(row) for row in eachrow(ismissing.(xf))],:]
@@ -70,31 +65,22 @@ function read_file(path::Any, file::XLSXInput; remove_notes::Bool=false)
 end
 
 
-function read_file(path::Any, file::DataInput; remove_notes::Bool=false)
-    df = read_file(path, convert_type(CSVInput, file))
+function read_file(file::DataInput; kwargs...)
+    df = read_file(convert_type(CSVInput, file); kwargs...)
     df = edit_with(df, Rename.(propertynames(df), file.col))
-
-    (:value in propertynames(df)) && (df[!,:value] .= convert_type.(Float64, df[:,:value]))
-    return df
+    return convert_type!(df,:value,Float64)
 end
 
 
-function read_file(path::Any, file::SetInput; remove_notes::Bool=false)
+function read_file(path::Any, file::SetInput; kwargs...)
     filepath = _joinpath(path, file)
     df = _read_csv(filepath)
     return sort(df[:,1])
 end
 
 
-# function read_file(path::Array{String,1}, file::T; remove_notes::Bool=false) where T <: File
-#     return read_file(_joinpath(path), file; remove_notes=remove_notes)
-# end
-
-
-function read_file(editor::T) where T <: Edit
-    filepath = _joinpath("data", "coremaps", editor.file)
-    df = read_file(filepath)
-    return df
+function read_file(editor::T) where T<:Edit
+    return read_file(_joinpath("data", "coremaps", editor.file))
 end
 
 
@@ -134,16 +120,24 @@ _joinpath(path::Array{String,1}) = joinpath(path...)
 _joinpath(path::Union{Array{String,1}, String}...) = _joinpath(vcat(path...))
 _joinpath(path::Union{Array{String,1}, String}, file::T) where T<:File = _joinpath(path, file.name)
 
+function joinpath!(path, file::T) where T<:File
+    file.name = _joinpath(path, file)
+    return file
+end
+
+
+# ----- CSV FILE SUPPORT -------------------------------------------------------------------
 
 """
 """
-function _read_csv(filepath::String; header::Int=1)
+function _read_csv(filepath::String; header::Int=1, kwargs...)
     df = CSV.read(filepath, DataFrame,
         silencewarnings=true,
         ignoreemptylines=true,
         comment="#",
         missingstrings=["","\xc9","..."];
-        header=header)
+        header=header,
+    )
     
     (header > 0 && isempty(df)) && (df = _read_csv(filepath; header=0))
 
@@ -218,6 +212,8 @@ end
 # _remove_empty(df::DataFrame) = df[:,eltype.(eachcol(df)) .!== Missing]
 
 
+# ----- GAMS FILE SUPPORT ------------------------------------------------------------------
+
 """
     _read_gams(xf::Array{String,1}; kwargs...)
 This function converts a GAMS map or set to a DataFrame, expanding sets into multiple rows.
@@ -233,91 +229,117 @@ This function converts a GAMS map or set to a DataFrame, expanding sets into mul
 # Returns
 - `df::DataFrame`: A dataframe representation of the GAMS map or set.
 """
-function _read_gams(filepath; kwargs...)
+function SLiDE._read_gams(filepath::String; id="", colnames=[], kwargs...)
     lines = readlines(filepath)
     lines = SLiDE._clean_gams(lines)
-    lines = SLiDE._get_set(lines; kwargs...)
-    return SLiDE._split_gams(lines; kwargs...)
+    lines = SLiDE._get_set(lines; id=id, kwargs...)
+    lines = [reduce(replace, Pair.([r"\"","!",r",$",r";$"],""), init=x) for x in lines]
+
+    header = lines[SLiDE._has_set.(lines, id)]
+    lines = lines[.&(.!SLiDE._has_set.(lines, id),lines.!=="/")]
+
+    lines = SLiDE._split_gams(lines)
+    lines = SLiDE.unnest(lines, "()")
+    lines = SLiDE.unnest(lines)
+
+    M = length(first(lines))
+    # header = SLiDE._gams_header(header, M; id=id)
+    df = DataFrame([getindex.(lines,ii) for ii in 1:M])
+    length(colnames)==size(df,2) && reduce(rename!, propertynames(df).=>colnames, init=df)
+    return df
 end
 
 
 """
 """
-function _split_gams(lines::Vector{String}; id, kwargs...)
-    header = first(lines)
-    lines = lines[.&(.!SLiDE._has_set.(lines, id),lines.!=="/;")]
+function _split_gams(row::String)
+    # 1. Split at first space.
+    m = match(r"(^\S+)\s+\"?(.*)\"*", row)
+    row = isnothing(m) ? [row;] : string.(m.captures)
     
-    ISMULTILINE = any(.!isnothing.(match.(r".\($", lines)))
-    data = ISMULTILINE ? SLiDE._split_multiline(lines) : SLiDE._split_row.(lines)
+    # 2. Within captures, split at "." and expand any comma-separated sub-groups.
+    row = vcat([occursin(".",x) ? split.(x,".") : x for x in row]...)
+    row = SLiDE._expand_set.(row)
+    return row
+    # return row[row.!=="("]
+end
 
-    # Return as a DataFrame.
-    if length(unique(length.(data))) == 1
-        cols = SLiDE._gams_header(header, length(data[1]); id=id, kwargs...)
+_split_gams(rows::AbstractArray) = _split_gams.(rows)
 
-        data = if all(typeof.(data) .== Vector{String})
-            DataFrame(permutedims(hcat(data...)), cols)
-        else
-            vcat([DataFrame(Pair.(cols, row)) for row in data]...)
-        end
+
+"""
+"""
+function unnest(lines, id; fun=identity, kwargs...)
+    N = size(lines,1)
+    
+    iibeg = (1:N)[.&(any.(broadcast.(in, id[1], lines)), .!any.(broadcast.(in, id[2], lines)))]
+    iiend = (1:N)[.&(any.(broadcast.(in, id[2], lines)), .!any.(broadcast.(in, id[1], lines)))]
+    
+    if .&(.!isempty.([iibeg,iiend])...)
+        iiunit = setdiff(1:N, UnitRange.(iibeg,iiend)...)  # all mapping contained to current row
+        iiagg = iibeg                           # outer nesting level
+        iidis = UnitRange.(iibeg.+1,iiend.-1)   # inner nesting level
+
+        ids = string.(split(id,""))
+        filter!.(x -> !(x in ids), lines)
+
+        lines = vcat(
+            lines[iiunit],
+            _unnest(lines, iiagg, iidis),
+        )
     end
 
-    return data
-end
-
-_split_gams(x::String) = SLiDE._split_row(x)
-_split_gams(x::SubString) = SLiDE._split_gams(string(x))
-
-
-"""
-"""
-function SLiDE._split_multiline(lines::Vector{String})
-    lines = [reduce(replace, [r"\",$"=>"", "\t"=>" "], init=x) for x in lines]
-    data = split.(lines, r"(\.|\s!\s\"*)")
-    
-    data = [[SLiDE._expand_set(x[jj]) for jj in 1:length(x)] for x in data]
-    return length(unique(length.(data)))==1 ? data : SLiDE._fill_multiline(data)
+    return lines
 end
 
 
-"""
-"""
-function _fill_multiline(x::Vector{String}, N=3)
-    return if length(x)==1 && x[1] in [")","),","/;",") /;"]
-        []
-    elseif x[end]=="("
-        [x[1:end-1];fill("",N-(length(x)-1))]
-    elseif length(x)<N
-        [fill("",N-length(x));x]
-    else
-        x
+function unnest(rows)
+    iinested = eltype.(rows).==Any
+
+    if any(iinested)
+        rows = vcat(
+            vcat(_unnest.(rows[iinested])...),
+            rows[.!iinested],
+        )
     end
-end
-
-
-function _fill_multiline(xf::Vector{Vector{String}})
-    xf = _fill_multiline.(xf)
-    xf = xf[.!isempty.(xf)]
-    [isempty(xf[ii][1]) && (xf[ii][1] = xf[ii-1][1]) for ii in 2:size(xf,1)]
-    return xf[[!any(isempty.(x)) for x in xf]]
+    return rows
 end
 
 
 """
 """
-function _split_row(x::String)
-    # Close missing "" at the end of the line.
-    if occursin("\"", x) && length(findall("\"", x))==1
-        x *= "\""
+function _unnest(row::Vector{T}) where T<:Any
+    iidis = typeof.(row).<:AbstractArray
+    
+    if any(iidis)
+        row_dis = row[iidis][1]
+        row_agg = convert_type.(typeof.(row[.!iidis]), row[.!iidis])
+        # row_agg = row[.!iidis]
+
+        # Keep track of which row elements are inner/outer to preserve ordering.
+        # This is necessary for concatenation later.
+        idx = fill(0,size(row))
+        idx[iidis] .= collect((1:sum(iidis)).+length(row_agg))
+        idx[.!iidis] .= 1:length(row_agg)
+        
+        row = _unnest(row_agg, row_dis)
+        row = [permute!(x,idx) for x in row]
     end
     
-    # xreg = Regex("(" * join([
-    #         """(?<=\\").*(?=\\")""",              # between quotations (exclusive)
-    #         "(?>(?>\\([^()]*(?R)?[^()]*\\)))",    # between parentheses (inclusive)
-    #         "[\\w\\d]+",
-    #     ],"|") * ")")
-    matches = collect(eachmatch(r"((?<=\").*(?=\")|\((?>[^()]|(?R))*\)|[\w\d]+)", x))
-    return [SLiDE._expand_set(matches[jj][1]) for jj in 1:length(matches)]
+    return row
 end
+
+function _unnest(rows::AbstractVector, iiagg::Vector{Int}, iidis::Vector{UnitRange{Int}})
+    return vcat([_unnest(rows,aa,dd) for (aa,dd) in zip(iiagg,iidis)]...)
+end
+
+function _unnest(rows::AbstractVector, iiagg::Int, iidis::UnitRange{Int})
+    row_agg = rows[iiagg]
+    row_dis = rows[iidis]
+    return _unnest(row_agg, row_dis)
+end
+
+_unnest(row_outer, row_inner) = [vcat(row_outer,x) for x in row_inner]
 
 
 """
@@ -333,14 +355,16 @@ SLiDE._expand_set([lines])
  "cru.cng"
 ```
 """
-function _expand_set(x)
+function _expand_set(x::AbstractString)
     m = match(r"^\s*\((.*)\)\s*$", x)
     return string.(strip.((m !== nothing) ? split(m[1], ",") : x))
 end
 
 
 function _expand_set(lst::Vector{String})
+    # If ending slash on following line???
     if length(lst)==2 && all(length.(findall.("/",lst)).==1)
+        @error("FOUND IT.")
         lst = [*(lst...)]
     end
     
@@ -366,9 +390,12 @@ end
 
 """
 """
-function SLiDE._has_set(str::String, id::String)
+function _has_set(str::String, id::String)
+    isempty(id) && (return false)
+
     # A separator indicates that this is NOT a set.
     occursin("!", str) && (return false)
+    
     # matches = match.(Regex("(?<=[^sets|^SETS])?\\s+(?=$(id)\\W)"), str)
     xreg = Regex("^\\s*sets*\\s+" * id * "\\W|^\\s*" * id * "\\W")
     matches = match.(xreg, lowercase(str))
@@ -378,41 +405,37 @@ end
 
 """
 """
-function _get_set(lines; kwargs...)
-    # matches = SLiDE._has_set.(lines, id)
-    # ii = (1:length(lines))[matches]
-    # if length(ii)>1
-    #     rngs = UnitRange.(ii, [ii[2:end].-1; length(lines)])
+function _get_set(lines; id="", kwargs...)
+    isempty(id) && (return lines)
 
-    # matches = match.(r"^set", lines)
-    # ii = (1:length(lines))[.!isnothing.(matches)]
-    return SLiDE._get_set(lines, 1:length(lines); kwargs...)
-end
-
-function SLiDE._get_set(lines, rng; id, kwargs...)
-    tmp = lines[rng]
-    matches = SLiDE._has_set.(tmp, id)
+    matches = SLiDE._has_set.(lines, id)
     all(.!matches) && (return lines)
-    # all(.!matches) && (return nothing)
 
-    ii = (1:length(tmp))[matches]
-    length(ii)>1 && error("multiple set matches found.")
+    ii = (1:length(lines))[matches]
+    # length(ii)>1 && error("multiple set matches found.")
 
     iistart = first(ii)
-    str = tmp[iistart]
+    str = lines[iistart]
 
     if occursin("/", str)
+        # Are all set elements listed in one line?
         if length(findall("/", str))==2
-            return SLiDE._expand_set([str])
+            lines = SLiDE._expand_set([str])
+        # Does set definition take multiple lines? If so, find the line ending in /
+        # to indicate where it ends.
         else
-            iistop = iistart + findmax(.!isnothing.(match.(r"/[,;]*\s*$", tmp[iistart+1:end])))[2]
-            return SLiDE._expand_set(tmp[iistart:iistop])
+            iistop = iistart + findmax(occursin.(r"/[,;]*\s*$", lines[iistart+1:end]))[2]
+            lines = SLiDE._expand_set(lines[iistart:iistop])
+            lines[end] = replace(lines[end], r"\s*/;$"=>"")
+            lines = lines[.!isempty.(lines)]
+            # return SLiDE._expand_set(lines[iistart:iistop])
         end
 
     else
-        matches = match.(r";\s*$", tmp[iistart+1:end])
-        iistop = iistart + findmax(.!isnothing.(matches))[2]
-        return tmp[iistart:iistop]
+        iistop = iistart + findmax(occursin.(r";\s*$", lines[iistart+1:end]))[2]
+        # matches = match.(r";\s*$", lines[iistart+1:end])
+        # iistop = iistart + findmax(.!isnothing.(matches))[2]
+        lines = lines[iistart:iistop]
     end
 
     return lines
@@ -423,17 +446,15 @@ end
 """
 function _clean_gams(xf)
     xf = strip.(xf)
-    xf = xf[xf .!== ""]                             # blank lines
-    # xf = xf[match.(r"^\s*SET", xf) .=== nothing]    # set definitions
-    # xf = xf[match.(r"^\s*\*", xf) .=== nothing]     # commented lines
-    xf = xf[match.(r"^\*", xf) .=== nothing]     # commented lines
+    xf = xf[xf .!== ""]                       # blank lines
+    xf = xf[match.(r"^\*", xf) .=== nothing]  # commented lines
     return xf
 end
 
 
 """
 """
-function _gams_header(str, N; id, colnames=[])
+function _gams_header(str, N; id="", colnames=[])
     !isempty(colnames) && (return colnames)
 
     # If no set is defined here...
@@ -448,6 +469,22 @@ function _gams_header(str, N; id, colnames=[])
     cols[iiundef] .= tmp[iiundef]
 
     return length(cols)==N-1 ? [cols;:desc] : cols
+end
+
+# ----- TXT FILE SUPPORT -------------------------------------------------------------------
+
+"""
+"""
+function _read_txt(path; kwargs...)
+    mat = DelimitedFiles.readdlm(path, String)
+    head = _txt_header(size(mat,2); kwargs...)
+    return DataFrame(mat, head)
+end
+
+
+function _txt_header(N::Integer; colnames=[], kwargs...)
+    tmp = SLiDE._generate_id(N)
+    return |(isempty(colnames), N>length(colnames)) ? tmp : colnames[1:N]
 end
 
 
