@@ -144,27 +144,41 @@ end
 edit_with(df::DataFrame, x::Map; file=nothing) = _map_with(df, x.file, x)
 
 
-function edit_with(df::DataFrame, x::Match; file=nothing)
+function SLiDE.edit_with(df::DataFrame, x::Match; file=nothing)
+    if !(x.input in propertynames(df))
+        @warn("$(x.input) not found in DataFrame propertynames.")
+        return df
+    end
+
     if x.on == r"expand range"
         ROWS, COLS = size(df)
         cols = propertynames(df)
         df = [[DataFrame(Dict(cols[jj] =>
-                cols[jj] == x.input ? _expand_range(df[ii,jj]) : df[ii,jj]
+                cols[jj] == x.input ? SLiDE._expand_range(df[ii,jj]) : df[ii,jj]
             for jj in 1:COLS)) for ii in 1:ROWS]...;]
     else
         # Ensure all row values are strings and can be matched with a Regex, and do so.
         # Temporarily remove missing values, just in case.
-        df[:,x.input] .= convert_type.(String, df[:,x.input])
-        col = edit_with(copy(df), Replace(x.input, missing, ""))[:,x.input]
+        convert_type!(df, x.input, String)
+        col = coalesce.(df[:,x.input],"")
         m = match.(x.on, col)
         
-        # Add empty columns for all output columns not already in the DataFrame.
-        # Where there is a match, fill empty cells. If values in the input column,
-        # leave cells without a match unchanged.
-        df = edit_with(df, Add.(setdiff(x.output, propertynames(df)), ""))
-        [m[ii] !== nothing && ([df[ii,out] = m[ii][out] for out in x.output])
-            for ii in 1:length(m)]
+        # Extract the names of all captures from the input regex (x.on)
+        # and ensure that the DataFrame contains a column for each.
+        captures = intersect(
+            convert_type.(Symbol, values(Base.PCRE.capture_names(x.on.regex))),
+            x.output,
+        )
+        # df = edit_with(df, Add.(captures,""))
+        ii = .!isnothing.(m)
+        for cap in captures
+            !(cap in propertynames(df)) && edit_with(df, Add(cap,""))
+            df[ii,cap] .= getindex.(m[ii], cap)
+        end
     end
+    
+    !(x.input in x.output) && select!(df, Not(x.input))
+    :value in x.output     && convert_type!(df, :value, String)
     return df
 end
 
@@ -220,11 +234,13 @@ function edit_with(df::DataFrame, x::Order; file=nothing)
 end
 
 
-function edit_with(df::DataFrame, x::Rename; file=nothing)
+function SLiDE.edit_with(df::DataFrame, x::Rename; file=nothing)
     cols = propertynames(df)
     x.from in cols && (df = rename(df, x.from => x.to))
     x.to == :upper && (df = edit_with(df, Rename.(cols, uppercase.(cols))))
     x.to == :lower && (df = edit_with(df, Rename.(cols, lowercase.(cols))))
+
+    # x.to == :value && (df[!,x.to] .= convert_type.(Float64, df[:,x.to]))
     return df
 end
 
@@ -311,12 +327,11 @@ end
 # ----- EDIT FROM FILE ---------------------------------------------------------------------
 
 function edit_with(df::DataFrame, y::Dict, file::T; print_status::Bool=false) where T <: File
-    # Specify the order in which edits must occur and which of these edits are included
-    # in the yaml file of defined edits.
-    EDITS = ["Deselect","Rename","OrderedGroup","Group","Concatenate","Match","Melt","Stack",
-        "Add","Map","Replace","Drop","Operate","Combine","Describe","Order",
-    ]
-    KEYS = intersect(EDITS, collect(keys(y)))
+    # EDITS = ["Deselect","Rename","OrderedGroup","Group","Concatenate","Match","Melt","Stack",
+    #     "Add","Map","Replace","Drop","Operate","Combine","Describe","Order",
+    # ]
+    # KEYS = intersect(EDITS, collect(keys(y)))
+    KEYS = _collect_edits(y)
     [df = edit_with(df, y[k], file; print_status=print_status) for k in KEYS]
     return df
 end
@@ -349,6 +364,18 @@ function edit_with(y::Dict; print_status::Bool=false)
     # read, edit, and concattenate.
     files = ensurearray(values(find_oftype(y, File)))
     return edit_with(files, y; print_status=print_status)
+end
+
+
+"""
+Specify the order in which edits must occur and which of these edits are included
+in the yaml file of defined edits.
+"""
+function _collect_edits(y::Dict)
+    EDITS = ["Deselect","Rename","OrderedGroup","Group","Concatenate","Match","Melt","Stack",
+        "Add","Map","Replace","Drop","Operate","Combine","Describe","Order",
+    ]
+    return intersect(EDITS, collect(keys(y)))
 end
 
 
@@ -518,7 +545,7 @@ function _map_with(df::DataFrame, df_map::DataFrame, x::Map)
     if x.kind==:anti
         df = antijoin(df, df_map,  on=join_cols; makeunique=true)
     else
-        x.kind == :inner && (df = innerjoin(df, df_map, on=join_cols; makeunique=true))
+        x.kind in [:inner,:sum] && (df = innerjoin(df, df_map, on=join_cols; makeunique=true))
         x.kind == :outer && (df = outerjoin(df, df_map, on=join_cols; makeunique=true))
         x.kind == :left  && (df = leftjoin(df, df_map,  on=join_cols; makeunique=true))
         x.kind == :right && (df = rightjoin(df, df_map, on=join_cols; makeunique=true))
@@ -529,6 +556,11 @@ function _map_with(df::DataFrame, df_map::DataFrame, x::Map)
         # remane mapping "to" columns from their temporary to output values.
         df = df[:, setdiff(propertynames(df), x.output)]
         df = edit_with(df, Rename.(to, x.output))
+
+        if x.kind==:sum
+            df = combine_over(df, x.input; digits=false)
+            setdiff!(cols, x.input)
+        end
     end
 
     return df[:,cols]
