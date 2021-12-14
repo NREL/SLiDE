@@ -59,6 +59,7 @@ export SetInput
 export CSVInput
 export GAMSInput
 export XLSXInput
+export TXTInput
 export DataInput
 
 export Check
@@ -75,6 +76,7 @@ export Mapping
 # UTILITIES
 export append
 export convert_type
+export convert_type!
 export datatype
 export dropnan!
 export dropnan

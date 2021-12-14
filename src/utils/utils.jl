@@ -189,6 +189,17 @@ function convert_type(::Type{Mapping}, x::Weighting)
     return Mapping(unique(x.data[:,[x.from;x.to]]), x.from, x.to, x.on, x.direction)
 end
 
+
+"""
+"""
+function convert_type!(df::DataFrame, col::Symbol, T::DataType)
+    if col in propertynames(df) && eltype(skipmissing(df[:,col])) != T
+        df[!,col] = convert_type.(T, df[:,col])
+    end
+    return df
+end
+
+
 """
     isarray(x::Any)
 Returns true/false if the the DataType or object is an array.
