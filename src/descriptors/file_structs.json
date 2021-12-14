@@ -78,6 +78,28 @@
         "supertype": "File"
     },
     {
+        "struct_name": "TXTInput",
+        "docstring": "Read .txt file",
+        "fields": [
+            {
+                "name": "name",
+                "comment": "input file name",
+                "data_type": "String"
+            },
+            {
+                "name": "descriptor",
+                "comment": "file descriptor",
+                "data_type": "String"
+            },
+            {
+                "name": "col",
+                "comment": "column names",
+                "data_type": "Array{Symbol,1}"
+            }
+        ],
+        "supertype": "File"
+    },
+    {
         "struct_name": "XLSXInput",
         "docstring": "Read .xlsx file.",
         "fields": [

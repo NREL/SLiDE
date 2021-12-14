@@ -2,7 +2,7 @@
 This file is auto-generated. Do not edit.
 =#
 """
-    mutable struct GAMSInput2 <: File
+    mutable struct GAMSInput <: File
         name::String
         descriptor::String
         col::Array{Symbol,1}
