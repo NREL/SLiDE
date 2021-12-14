@@ -11,12 +11,14 @@ function build(dataset::Dataset)
     set_region_level!(dataset, :state)
 
     dataset.overwrite && overwrite(dataset)
-    
+    dataset.eem && set!(dataset; build="eem")
+
     if data_saved(dataset)
         set!(dataset; step=SLiDE.PARAM_DIR)
         d = read_build(dataset)
         set = read_set(dataset)
     else
+        set!(dataset; build="io")
         d, set = build_io(dataset)
         d, set = build_eem(dataset, d, set)
     end
@@ -122,7 +124,7 @@ end
 "This function returns true if parameters and sets have already been generated,
 and their values saved, for the given `dataset`."
 function data_saved(dataset::Dataset)
-    dataset = copy(dataset)
+    # dataset = copy(dataset)
     
     # Set dataset build step to reflect the ultimate goal.
     dataset.eem && set!(dataset; build="eem")
