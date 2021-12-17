@@ -145,34 +145,56 @@ edit_with(df::DataFrame, x::Map; file=nothing) = _map_with(df, x.file, x)
 
 
 function edit_with(df::DataFrame, x::Match; file=nothing)
+    if !(x.input in propertynames(df))
+        @warn("$(x.input) not found in DataFrame propertynames.")
+        return df
+    end
+    
     if x.on == r"expand range"
         ROWS, COLS = size(df)
         cols = propertynames(df)
         df = [[DataFrame(Dict(cols[jj] =>
-                cols[jj] == x.input ? _expand_range(df[ii,jj]) : df[ii,jj]
+                cols[jj] == x.input ? SLiDE._expand_range(df[ii,jj]) : df[ii,jj]
             for jj in 1:COLS)) for ii in 1:ROWS]...;]
     else
         # Ensure all row values are strings and can be matched with a Regex, and do so.
         # Temporarily remove missing values, just in case.
-        df[:,x.input] .= convert_type.(String, df[:,x.input])
-        col = edit_with(copy(df), Replace(x.input, missing, ""))[:,x.input]
+        convert_type!(df, x.input, String)
+        col = coalesce.(df[:,x.input],"")
         m = match.(x.on, col)
         
-        # Add empty columns for all output columns not already in the DataFrame.
-        # Where there is a match, fill empty cells. If values in the input column,
-        # leave cells without a match unchanged.
-        df = edit_with(df, Add.(setdiff(x.output, propertynames(df)), ""))
-        [m[ii] !== nothing && ([df[ii,out] = m[ii][out] for out in x.output])
-            for ii in 1:length(m)]
+        # Extract the names of all captures from the input regex (x.on)
+        # and ensure that the DataFrame contains a column for each.
+        captures = intersect(
+            convert_type.(Symbol, values(Base.PCRE.capture_names(x.on.regex))),
+            x.output,
+        )
+        # df = edit_with(df, Add.(captures,""))
+        ii = .!isnothing.(m)
+        for cap in captures
+            !(cap in propertynames(df)) && edit_with(df, Add(cap,""))
+            df[ii,cap] .= getindex.(m[ii], cap)
+        end
     end
+    
+    !(x.input in x.output) && select!(df, Not(x.input))
+    :value in x.output     && convert_type!(df, :value, Float64)
     return df
 end
 
 
 function edit_with(df::DataFrame, x::Melt; file=nothing)
+    # !!!! @warn("Melt <: Edit is depreciated. Use Stack instead.")
     on = intersect(x.on, propertynames(df))
     df = melt(df, on, variable_name=x.var, value_name=x.val)
     df[!, x.var] .= convert_type.(String, df[:, x.var])
+    return df
+end
+
+
+function edit_with(df::DataFrame, x::Stack; file=nothing)
+    on = intersect(x.on, propertynames(df))
+    df = stack(df, Not(on); variable_name=x.var, value_name=x.val, variable_eltype=String)
     return df
 end
 
@@ -217,6 +239,8 @@ function edit_with(df::DataFrame, x::Rename; file=nothing)
     x.from in cols && (df = rename(df, x.from => x.to))
     x.to == :upper && (df = edit_with(df, Rename.(cols, uppercase.(cols))))
     x.to == :lower && (df = edit_with(df, Rename.(cols, lowercase.(cols))))
+
+    # x.to == :value && (df[!,x.to] .= convert_type.(Float64, df[:,x.to]))
     return df
 end
 
@@ -255,7 +279,7 @@ function edit_with(df::DataFrame, x::Replace; file=nothing)
 end
 
 
-function edit_with(df::DataFrame, x::Stack; file=nothing)
+function edit_with(df::DataFrame, x::Concatenate; file=nothing)
     df = [[edit_with(df[:, occursin.(indicator, propertynames(df))],
         [Rename.(propertynames(df)[occursin.(indicator, propertynames(df))], x.col);
             Add(x.var, replace(string(indicator), "_" => " "))]
@@ -302,36 +326,24 @@ end
 
 # ----- EDIT FROM FILE ---------------------------------------------------------------------
 
-function edit_with(
-    df::DataFrame,
-    y::Dict{Any,Any},
-    file::T;
-    print_status::Bool=false) where T <: File
-
-    # Specify the order in which edits must occur and which of these edits are included
-    # in the yaml file of defined edits.
-    EDITS = ["Deselect", "Rename", "OrderedGroup", "Group", "Stack", "Match", "Melt",
-        "Add", "Map", "Replace", "Drop", "Operate", "Combine", "Describe", "Order"]
-    KEYS = intersect(EDITS, collect(keys(y)))
+function edit_with(df::DataFrame, y::Dict, file::T; print_status::Bool=false) where T <: File
+    # EDITS = ["Deselect","Rename","OrderedGroup","Group","Concatenate","Match","Melt","Stack",
+    #     "Add","Map","Replace","Drop","Operate","Combine","Describe","Order",
+    # ]
+    # KEYS = intersect(EDITS, collect(keys(y)))
+    KEYS = _collect_edits(y)
     [df = edit_with(df, y[k], file; print_status=print_status) for k in KEYS]
     return df
 end
 
 
-function edit_with(
-    file::T,
-    y::Dict{Any,Any};
-    print_status::Bool=false) where T <: File
-    
+function edit_with(file::T, y::Dict; print_status::Bool=false) where T <: File
     df = read_file(y["PathIn"], file; remove_notes=true)
     return edit_with(df, y, file)
 end
 
 
-function edit_with(
-    files::Array{T},
-    y::Dict{Any,Any};
-    print_status::Bool=false) where T <: File
+function edit_with(files::Array{T}, y::Dict; print_status::Bool=false) where T <: File
     
     df = vcat([edit_with(file, y; print_status=print_status) for file in files]...; cols=:union)
     
@@ -347,11 +359,23 @@ function edit_with(
 end
 
 
-function edit_with(y::Dict{Any,Any}; print_status::Bool=false)
+function edit_with(y::Dict; print_status::Bool=false)
     # Find all dictionary keys corresponding to file names and save these in a list to
     # read, edit, and concattenate.
     files = ensurearray(values(find_oftype(y, File)))
     return edit_with(files, y; print_status=print_status)
+end
+
+
+"""
+Specify the order in which edits must occur and which of these edits are included
+in the yaml file of defined edits.
+"""
+function _collect_edits(y::Dict)
+    EDITS = ["Deselect","Rename","OrderedGroup","Group","Concatenate","Match","Melt","Stack",
+        "Add","Map","Replace","Drop","Operate","Combine","Describe","Order",
+    ]
+    return intersect(EDITS, collect(keys(y)))
 end
 
 
@@ -361,7 +385,7 @@ Allows for *basic* filtering over years. Will need to expand to include regions.
 function _filter_datastream(df::DataFrame, y::Dict)
     path = joinpath("data", "coresets")
     set = Dict()
-    if "Filter" in keys(y)
+    if haskey(y, "Filter")
         y["Filter"] in [true,"year"]  && push!(set, :yr => read_file(joinpath(path, "yr.csv"))[:,1])
         y["Filter"] in [true,"state"] && push!(set, :r => read_file(joinpath(path, "r", "state.csv"))[:,1])
     end
@@ -377,8 +401,8 @@ Returns the edited DataFrame, stored in a nicely-sorted order. This is most help
 mapping and developing. Sorting isn't *necessary* and we could remove this function to save
 some time for users.
 """
-function _sort_datastream(df::DataFrame, y::Dict{Any,Any})
-    sorting = "Sort" in keys(y) ? y["Sort"] : true
+function _sort_datastream(df::DataFrame, y::Dict)
+    sorting = haskey(y, "Sort") ? y["Sort"] : true
 
     sorting == false && (return df)
 
@@ -495,8 +519,8 @@ function _map_with(df::DataFrame, df_map::DataFrame, x::Map)
 
     # Rename columns in the mapping DataFrame to temporary values in case any of these
     # columns were already present in the input DataFrame.
-    from = _generate_id(x.from, :from)
-    to = _generate_id(x.to, :to)
+    from = SLiDE._generate_id(x.from, :from)
+    to = SLiDE._generate_id(x.to, :to)
 
     df_map = unique(hcat(
         edit_with(df_map[:,x.from], Rename.(x.from, from)),
@@ -505,30 +529,41 @@ function _map_with(df::DataFrame, df_map::DataFrame, x::Map)
 
     # Ensure the input and mapping DataFrames are consistent in type. Types from the mapping
     # DataFrame are used since all values in each column should be of the same type.
-    if findtype(df[:,x.input]) !== findtype(df_map[:,from])
-        for (ii, ff) in zip(x.input, from)
-            try
-                df[!,ii] .= convert_type.(findtype(df_map[:,ff]), df[:,ii])
-            catch
-                df[!,ii] .= convert_type.(String, df[:,ii])
-                df_map[!,ff] .= convert_type.(String, df_map[:,ff])
-            end
+    # [convert_type!(df, ii, SLiDE.findtype(df_map[:,ff])) for (ii,ff) in zip(x.input,from)]
+    for (ii,ff) in zip(x.input,from)
+        try
+            convert_type!(df, ii, SLiDE.findtype(df_map[:,ff]))
+        catch
+            convert_type!(df, ii, String)
+            convert_type!(df_map, ff, String)
         end
     end
     
-    join_cols = Pair.(x.input, from)
+    on = x.input .=> from
     
-    x.kind == :inner && (df = innerjoin(df, df_map, on=join_cols; makeunique=true))
-    x.kind == :outer && (df = outerjoin(df, df_map, on=join_cols; makeunique=true))
-    x.kind == :left  && (df = leftjoin(df, df_map,  on=join_cols; makeunique=true))
-    x.kind == :right && (df = rightjoin(df, df_map, on=join_cols; makeunique=true))
-    x.kind == :semi  && (df = semijoin(df, df_map,  on=join_cols; makeunique=true))
-    
-    # Remove all output column propertynames that might already be in the DataFrame.
-    # These will be overwritten by the columns from the mapping DataFrame. Finally,
-    # remane mapping "to" columns from their temporary to output values.
-    df = df[:, setdiff(propertynames(df), x.output)]
-    df = edit_with(df, Rename.(to, x.output))
+    if x.kind==:anti
+        df = antijoin(df, df_map,  on=on; makeunique=true)
+    else
+        x.kind in [:inner,:sum] && (df = innerjoin(df, df_map, on=on; makeunique=true))
+        x.kind == :outer && (df = outerjoin(df, df_map, on=on; makeunique=true))
+        x.kind == :left  && (df = leftjoin(df, df_map,  on=on; makeunique=true))
+        x.kind == :right && (df = rightjoin(df, df_map, on=on; makeunique=true))
+        x.kind == :semi  && (df = semijoin(df, df_map,  on=on; makeunique=true))
+        
+        # Remove all output column propertynames that might already be in the DataFrame.
+        # These will be overwritten by the columns from the mapping DataFrame. Finally,
+        # remane mapping "to" columns from their temporary to output values.
+        df = df[:, setdiff(propertynames(df), x.output)]
+        df = edit_with(df, Rename.(to, x.output))
+
+        if x.kind==:sum
+            @info("summing!")
+            convert_type!(df, :value, Float64)
+            df = combine_over(df, x.input; digits=false)
+            setdiff!(cols, x.input)
+        end
+    end
+
     return df[:,cols]
 end
 
@@ -538,7 +573,7 @@ _map_with(df::DataFrame, file::String, x::Map) = _map_with(df, read_file(x), x)
 """
 """
 function sort_unique(df::DataFrame, idx::Array{Symbol,1})
-    idx = idx[sortperm(length.(unique.(skipmissing.(eachcol(df[:,idx])))))]
+    idx = idx[sortperm(nunique(df[:,idx]))]
     return sort(df, idx)
 end
 
@@ -567,4 +602,99 @@ sort_unique(df::DataFrame) = sort_unique(df, findindex(df))
 """
 function DataFrames.select!(df::DataFrame, x::Parameter)
     return select!(df, intersect([x.index; :value], propertynames(df)))
+end
+
+
+"""
+    _unstack(df::DataFrame, colkey, value)
+This function enables unstacking DataFrames (long -> wide) given one or multiple variable
+and/or value columns.
+
+This is helpful when preparing input for calculations during which units are preserved.
+
+# Arguments
+- `df::DataFrame` to stack
+- `colkey::Symbol` or `colkey::Array{Symbol,1}`: variable column(s)
+- `value::Symbol` or `value::Array{Symbol,1}`: value column(s)
+
+# Returns
+
+"""
+function _unstack(df, colkey::Symbol, value::Vector{Symbol}; kwargs...)
+    idx = setdiff(propertynames(df), [colkey;value])
+    lst = [_unstack(df[:,[idx;[colkey,val]]], colkey, val; kwargs...) for val in value]
+    return indexjoin(lst...)
+end
+
+
+function _unstack(df::DataFrame, colkey::Symbol, value::Symbol; fillmissing=false)
+    val = convert_type.(Symbol, unique(df[:,colkey]))
+    df = unstack(df, colkey, value; renamecols=x -> SLiDE._add_id(value, x))
+
+    fillmissing!==false && (df = edit_with(df, Replace.(val, missing, 0.0)))
+    
+    return df
+end
+
+
+function _unstack(df, colkey::Vector{Symbol}, value::Union{Symbol,Vector{Symbol}}; kwargs...)
+    df[!,:variable] .= append.(convert_type(Array{Tuple}, df[:,colkey]))
+    df = select(df, Not(colkey))
+
+    return _unstack(df, :variable, value; kwargs...)
+end
+
+
+"""
+    _stack(df::DataFrame, colkey, value)
+This function enables stacking DataFrames (wide -> long) given one or multiple variable
+and/or value columns.
+
+This is helpful when normalizing a DataFrame after a calculation during which units were
+preserved.
+
+# Arguments
+- `df::DataFrame` to stack
+- `colkey::Symbol` or `colkey::Array{Symbol,1}`: variable column(s)
+- `value::Symbol` or `value::Array{Symbol,1}`: value column(s)
+
+# Returns
+- `df::DataFrame` where colkeys
+
+# Example
+!!!!docs
+"""
+function _stack(df::DataFrame, colkey::Symbol, value::Symbol)
+    return stack(df; variable_name=colkey, value_name=value, variable_eltype=String)
+end
+
+
+function _stack(df::DataFrame, colkey::Array{Symbol,1}, value::Array{Symbol,1})
+    df = _stack(df, :variable, value)
+    N = length(colkey)
+
+    x = [
+        Rename.(Symbol.(1:N), colkey);
+        Order([:variable;colkey], fill(String, N + 1));
+    ]
+
+    df_var = unique(df[:,[:variable]])
+    df_var = hcat(df_var, DataFrame(Tuple.(split.(df_var[:,1], "_"))))
+    df_var = edit_with(df_var, x)
+
+    return innerjoin(df, df_var, on=:variable)
+end
+
+
+function _stack(df::DataFrame, colkey::Symbol, value::Array{Symbol,1})
+    from = Dict(k => _with_id(df, k) for k in value)
+    to = Dict(k => _remove_id.(v, k) for (k, v) in from)
+    idx = setdiff(propertynames(df), values(from)...)
+
+    lst = [edit_with(df[:,[idx;from[k]]], [
+                Rename.(from[k], to[k]);
+                Melt(idx, colkey, k);       # !!!! Melt relies on DataFrames.melt, which is depreciated
+            ]) for k in keys(from)]
+
+    return indexjoin(lst...)
 end

@@ -29,20 +29,21 @@ the `data/coremaps` directory. It returns a .csv file.
     dictionary. All keys that correspond with SLiDE DataStream DataTypes will be converted
     to (lists of) those types.
 """
-function read_file(path::Array{String,1}, file::GAMSInput; remove_notes::Bool=false)
-    filepath = joinpath(path..., file.name)
-    xf = readlines(filepath)
-    df = split_gams(xf; colnames=file.col)
-    return df
+function read_file(path, file::T; kwargs...) where T<:File
+    return read_file(joinpath!(path, file); kwargs...)
 end
 
 
-function read_file(path::Array{String,1}, file::CSVInput; remove_notes::Bool=false)
-    filepath = joinpath(path..., file.name)
-    df = SLiDE._read_csv(filepath)
-    
+function read_file(file::GAMSInput; kwargs...)
+    return _read_gams(file.name; colnames=file.col, id=file.descriptor)
+end
+
+
+function read_file(file::CSVInput; remove_notes::Bool=false, kwargs...)
+    df = SLiDE._read_csv(file.name)
+
     if remove_notes && size(df, 1) > 1
-        df = SLiDE._remove_header(df, filepath)
+        df = SLiDE._remove_header(df, file.name)
         df = SLiDE._remove_footer(df)
         df = SLiDE._remove_empty(df)
     end
@@ -50,9 +51,13 @@ function read_file(path::Array{String,1}, file::CSVInput; remove_notes::Bool=fal
 end
 
 
-function read_file(path::Array{String,1}, file::XLSXInput; remove_notes::Bool=false)
-    filepath = joinpath(path..., file.name)
-    xf = XLSX.readdata(filepath, file.sheet, file.range)
+function read_file(file::TXTInput; kwargs...)
+    return _read_txt(file.name; colnames=file.col)
+end
+
+
+function read_file(file::XLSXInput; kwargs...)
+    xf = XLSX.readdata(file.name, file.sheet, file.range)
     
     # Delete rows containing only missing values.
     xf = xf[[!all(row) for row in eachrow(ismissing.(xf))],:]
@@ -60,43 +65,33 @@ function read_file(path::Array{String,1}, file::XLSXInput; remove_notes::Bool=fa
 end
 
 
-function read_file(path::Array{String,1}, file::DataInput; remove_notes::Bool=false)
-    df = read_file(path, convert_type(CSVInput, file))
+function read_file(file::DataInput; kwargs...)
+    df = read_file(convert_type(CSVInput, file); kwargs...)
     df = edit_with(df, Rename.(propertynames(df), file.col))
-
-    (:value in propertynames(df)) && (df[!,:value] .= convert_type.(Float64, df[:,:value]))
-    return df
+    return convert_type!(df,:value,Float64)
 end
 
 
-function read_file(path::Array{String,1}, file::SetInput; remove_notes::Bool=false)
-    filepath = joinpath(path..., file.name)
+function read_file(path::Any, file::SetInput; kwargs...)
+    filepath = _joinpath(path, file)
     df = _read_csv(filepath)
     return sort(df[:,1])
 end
 
 
-function read_file(path::String, file::T; remove_notes::Bool=false) where T <: File
-    return read_file([path], file; remove_notes=remove_notes)
+function read_file(editor::T) where T<:Edit
+    return read_file(_joinpath("data", "coremaps", editor.file))
 end
 
 
-function read_file(editor::T) where T <: Edit
-    DIR = joinpath("data", "coremaps")
-    df = read_file(joinpath(DIR, editor.file))
-    return df
-end
+function read_file(file::String; kwargs...)
+    ext = splitext(file)[end]
 
-
-function read_file(file::String; colnames=[])
-    file = joinpath(file)
-
-    if occursin(".map", file) | occursin(".set", file)
-        # return gams_to_dataframe(readlines(file); colnames=colnames)
-        return split_gams(readlines(file); colnames=colnames)
+    if ext in [".gms",".map",".set"]
+        return _read_gams(file; kwargs...)
     end
 
-    if occursin(".yml", file) | occursin(".yaml", file)
+    if ext in [".yml",".yaml"]
         y = YAML.load(open(file))
         # Here, we first list all sub-subtypes of DataStream (DataTypes that are used in
         # editing datasource files). Then, we find where they overlap with keys in the
@@ -106,22 +101,43 @@ function read_file(file::String; colnames=[])
         [y[k] = load_from(datatype(k), y[k]) for k in KEYS]
         return y
         
-    elseif occursin(".csv", file)
+    elseif ext in [".csv"]
         df = _read_csv(file)
         return df
     end
 end
 
 
+function read_file(path::Union{Array{String,1}, String}...; kwargs...)
+    return read_file(_joinpath(path); kwargs...)
+end
+
+
 """
 """
-function _read_csv(filepath::String; header::Int=1)
+_joinpath(path::String) = path
+_joinpath(path::Array{String,1}) = joinpath(path...)
+_joinpath(path::Union{Array{String,1}, String}...) = _joinpath(vcat(path...))
+_joinpath(path::Union{Array{String,1}, String}, file::T) where T<:File = _joinpath(path, file.name)
+
+function joinpath!(path, file::T) where T<:File
+    file.name = _joinpath(path, file)
+    return file
+end
+
+
+# ----- CSV FILE SUPPORT -------------------------------------------------------------------
+
+"""
+"""
+function _read_csv(filepath::String; header::Int=1, kwargs...)
     df = CSV.read(filepath, DataFrame,
         silencewarnings=true,
         ignoreemptylines=true,
         comment="#",
         missingstrings=["","\xc9","..."];
-        header=header)
+        header=header,
+    )
     
     (header > 0 && isempty(df)) && (df = _read_csv(filepath; header=0))
 
@@ -193,58 +209,633 @@ function _remove_empty(df::DataFrame)
     end
     return df[:,1:LAST]
 end
-# _remove_empty(df::DataFrame) = df[:,eltype.(eachcol(df)) .!== Missing]
 
+
+# ----- GAMS FILE SUPPORT ------------------------------------------------------------------
 
 """
-    split_gams(xf::Array{String,1}; colnames = false)
-This function converts a GAMS map or set to a DataFrame, expanding sets into multiple rows.
+    _read_gams(filepath::String; id, kwargs...)
+This function reads a GAMS .map, .set, or .gms file to a fully mapped DataFrame.
+Any nested definitions will be expanded.
 
 # Arguments
-- `xf::Array{String,1}`: A list of rows of text from a .map or a .set input file.
+- `filepath::String` to a .map, .set, or .gms file.
+- `id::String`, identifying the name of the GAMS set to read from an input file containing
+    multiple sets.
 
 # Keywords
-- `colnames = []`: A user has the option to specify the column propertynames of the output
-    DataFrame. If none are specified, a default of `[missing, missing_1, ...]` will be used,
-    consistent with the default column headers for `CSV.read()` if column propertynames are missing.
+- `colnames = []`, for the output DataFrame.
 
 # Returns
 - `df::DataFrame`: A dataframe representation of the GAMS map or set.
 """
-function split_gams(x::String)
-    matches = collect(eachmatch(r"((?<=\").*(?=\")|\((?>[^()]|(?R))*\)|[\w\d]+)", x))
-    return [_expand_set(matches[jj][1]) for jj in 1:length(matches)]
+function _read_gams(filepath::String; id="", colnames=[], kwargs...)
+    lines = readlines(filepath)
+    lines = SLiDE._clean_gams(lines)
+    lines = SLiDE._get_gams_set(lines, id)
+
+    iihead = isempty(id) ? fill(false, size(lines)) : occursin.(Regex("^\\s*$id"), lines)
+    header = lines[iihead]
+
+    df = SLiDE._split_gams(lines[.!iihead])
+    length(colnames)==size(df,2) && reduce(rename!, propertynames(df).=>colnames, init=df)
+    return df
 end
 
 
-function split_gams(xf::Array{String,1}; colnames=[])
-    xf = xf[xf .!== ""]                             # blank lines
-    xf = xf[match.(r"^\s*SET", xf) .=== nothing]    # set definitions
-    xf = xf[match.(r"^\s*\*", xf) .=== nothing]     # commented lines
-    length(xf) == 0 && (return nothing)
+"""
+    _split_gams(str::String)
+This function splits a string containing a row of a GAMS set into its elements.
 
-    data = split_gams.(xf)
+```jldoctest
+julia> SLiDE._split_gams.("wes.(mnt,pac)  West")
+3-element Array{Any,1}:
+ "wes"
+ ["mnt", "pac"]
+ "West"
 
-    if length(unique(length.(data))) == 1
-        COLS = length(data[1])
-        cols = isempty(colnames) ? _generate_id(COLS) : colnames
-        data = if all(typeof.(data) .== Array{String,1})
-            DataFrame(permutedims(hcat(data...)), cols)
-        else
-            vcat([DataFrame(Pair.(cols, row)) for row in data]...)
-        end
+julia> SLiDE._split_gams("wes.( West")
+3-element Array{String,1}:
+ "wes"
+ "("
+ "West"
+```
+
+
+    _split_gams(rows::Vector{String})
+This function returns splits lines from a GAMS set into a DataFrame. This includes:
+    1. Splitting the elements of each individual line using `SLiDE._split_gams`
+    2. Unnesting set dis/aggregations that span multiple lines.
+    3. Unnesting set dis/aggregations defined on a single line.
+
+# Examples
+## Set dis/aggregations defined on a single line.
+
+```jldoctest
+julia> rows = [
+    "wes.(mnt,pac) West",
+];
+
+julia> SLiDE._split_gams(rows)
+2×3 DataFrame
+| Row | x1     | x2     | x3     |
+|     | String | String | String |
+|-----|--------|--------|--------|
+| 1   | wes    | mnt    | West   |
+| 2   | wes    | pac    | West   |
+```
+
+
+```jldoctest
+julia> rows = [
+    "mid.(enc,wnc) Midwest",
+    "nor.(mat,nen) Northeast",
+    "wes.(mnt,pac) West",
+    "sou.(esc,sat,wsc) South",
+];
+
+julia> SLiDE._split_gams(rows)
+9×3 DataFrame
+| Row | x1     | x2     | x3        |
+|     | String | String | String    |
+|-----|--------|--------|-----------|
+| 1   | mid    | enc    | Midwest   |
+| 2   | mid    | wnc    | Midwest   |
+| 3   | nor    | mat    | Northeast |
+| 4   | nor    | nen    | Northeast |
+| 5   | sou    | esc    | South     |
+| 6   | sou    | sat    | South     |
+| 7   | sou    | wsc    | South     |
+| 8   | wes    | mnt    | West      |
+| 9   | wes    | pac    | West      |
+```
+
+## Set dis/aggregations that span multiple lines.
+
+```jldoctest
+julia> rows = [
+    "wes.( West",
+    "mnt Mountain",
+    "pac Pacific",
+    ")",
+];
+
+julia> SLiDE._split_gams(rows)
+2×4 DataFrame
+| Row | x1     | x2     | x3     | x4       |
+|     | String | String | String | String   |
+|-----|--------|--------|--------|----------|
+| 1   | wes    | West   | mnt    | Mountain |
+| 2   | wes    | West   | pac    | Pacific  |
+```
+
+
+```jldoctest
+julia> rows = [
+    "mid.( Midwest",
+    "enc East North Central",
+    "wnc West North Central",
+    ")",
+    "nor.( northeast",
+    "mat Middle Atlantic",
+    "nen New England",
+    ")",
+    "sou.( South",
+    "esc East South Central",
+    "sat South Atlantic",
+    "wsc West South Central",
+    ")",
+    "wes.( West",
+    "mnt Mountain",
+    "pac Pacific",
+    ")",
+];
+
+julia> SLiDE._split_gams(rows)
+9×4 DataFrame
+| Row | x1     | x2        | x3     | x4                 |
+|     | String | String    | String | String             |
+|-----|--------|-----------|--------|--------------------|
+| 1   | mid    | Midwest   | enc    | East North Central |
+| 2   | mid    | Midwest   | wnc    | West North Central |
+| 3   | nor    | northeast | mat    | Middle Atlantic    |
+| 4   | nor    | northeast | nen    | New England        |
+| 5   | sou    | South     | esc    | East South Central |
+| 6   | sou    | South     | sat    | South Atlantic     |
+| 7   | sou    | South     | wsc    | West South Central |
+| 8   | wes    | West      | mnt    | Mountain           |
+| 9   | wes    | West      | pac    | Pacific            |
+```
+"""
+function _split_gams(row::T) where T<:AbstractString
+    # 1. Split at first space.
+    row = _split_gams(row, "\\s"; limit=2)
+    
+    # 2. Within captures, split at "." and expand any comma-separated sub-groups.
+    row = vcat([occursin(r".\S",x) ? split.(x,".") : x for x in row]...)
+    return SLiDE._expand_gams_set.(row)
+end
+
+
+function _split_gams(rows::AbstractArray)
+    rows = SLiDE._split_gams.(rows)
+    rows = SLiDE.unnest(rows, "()")
+    rows = SLiDE.unnest(rows)
+    
+    M = maximum(unique.(length.(rows)))[1]
+    return DataFrame([getindex.(rows,ii) for ii in 1:M])
+end
+
+
+function _split_gams(str::T, id; kwargs...) where T<:AbstractString
+    xreg = Regex("($id(?![^(]*\\)))+")
+    return split(str, xreg; kwargs...)
+end
+
+
+"""
+    _groupby(lines::Vector{T}, rstart::Regex, rstop::Regex) where T<:AbstractString
+    _groupby(lines::Vector{T}, char::Char) where T<:AbstractString
+This function groups the input lines into those containing `rstart` and `rstop` OR those
+in between pairs of `char`.
+
+# Example
+
+```jldoctest
+julia> rows = [
+    "sets",
+    "  reg Census Regions / mid,nor,sou,wes /,",
+    "  div Census Divisions / enc,esc,mat,mnt,nen,pac,sat,wnc,wsc /;",
+    "set rmap(reg,div) Census Region and Division mapping /",
+    "  mid.(enc,wnc) Midwest,",
+    "  nor.(mat,nen) Northeast,",
+    "  wes.(mnt,pac) West,",
+    "  sou.(esc,sat,wsc) South /;",
+];
+
+julia> SLiDE._groupby(strip.(rows), Regex("^\\s*sets*"), Regex(";\\s*\$"))
+2-element Array{Array{String,1},1}:
+ ["sets", "reg Census Regions / mid,nor,sou,wes /,", "div Census Divisions / enc,esc,mat,mnt,nen,pac,sat,wnc,wsc /;"]
+ ["set rmap(reg,div) Census Region and Division mapping /", "mid.(enc,wnc) Midwest,", "nor.(mat,nen) Northeast,", "wes.(mnt,pac) West,", "sou.(esc,sat,wsc) South /;"]
+
+julia> SLiDE._groupby(strip.(rows), '/')
+3-element Array{Array{String,1},1}:
+ ["reg Census Regions / mid,nor,sou,wes /,"]
+ ["div Census Divisions / enc,esc,mat,mnt,nen,pac,sat,wnc,wsc /;"]
+ ["set rmap(reg,div) Census Region and Division mapping /", "mid.(enc,wnc) Midwest,", "nor.(mat,nen) Northeast,", "wes.(mnt,pac) West,", "sou.(esc,sat,wsc) South /;"]
+```
+"""
+function _groupby(lines::Vector{T}, id::Char) where T<:AbstractString
+    iiset = findall.(string(id), lines)
+    all(isempty.(iiset)) && (return ensurearray.(lines))
+    
+    N = length(lines)
+    len = length.(iiset)
+    
+    ii = (1:N)[len.==2]
+    iirng = (1:N)[len.==1]
+
+    iibeg = [ii; iirng[isodd.(1:length(iirng))]]
+    iiend = [ii; iirng[iseven.(1:length(iirng))]]
+
+    # Prepend any dropped lines.
+    iidrop = setdiff(1:N, vcat(UnitRange.(iibeg,iiend)...))
+    for ii in iidrop
+        iimin = findmin(iibeg .- ii)[2]
+        occursin(Regex("^\\s*$id"), lines[iibeg[iimin]]) && (iibeg[iimin] = ii)
     end
 
-    return data
+    return [lines[ii] for ii in UnitRange.(iibeg,iiend)]
+end
+
+
+function _groupby(lines::Vector{String}, rstart::Regex, rstop::Regex)
+    N = length(lines)
+    iiset = (1:N)[occursin.(rstart, lowercase.(lines))]
+    iirng = UnitRange.(iiset,[iiset[2:end];N])
+    iiend = [ii[1]-1 + findmax(occursin.(rstop,lines[ii]))[2] for ii in iirng]
+    iirng = UnitRange.(iiset,iiend)
+    return [lines[ii] for ii in iirng]
+end
+
+
+"""
+    _expand_gams_set(str::String)
+    _expand_gams_set(lst::Vector{String})
+This function returns a comma-separated set, split into a vector.
+
+# Arguments
+- `str::String`. Given a string input, if the input is a comma-separated list grouped in
+    parentheses, extract the elements into a list.
+- `lst::Vector{String}`. Given a list of lines, if a single-line set definition is
+    identified, expand it into multiple lines.
+
+# Examples
+
+```jldoctest
+julia> SLiDE._expand_gams_set("(mnt,pac)")
+2-element Array{String,1}:
+ "mnt"
+ "pac"
+```
+
+```jldoctest
+julia> SLiDE._expand_gams_set(["reg Census Regions / mid,nor,sou,wes /,"])
+5-element Array{String,1}:
+ "reg Census Regions"
+ "mid"
+ "nor"
+ "sou"
+ "wes"
+```
+"""
+function _expand_gams_set(x::T) where T<:AbstractString
+    m = match(r"^\s*\((.*)\)\s*$", x)
+    # return string.(strip.((m !== nothing) ? split(m[1], r",\s*") : x))
+    return string.(isnothing(m) ? x : split(m[1], r",\s*"))
+end
+
+function _expand_gams_set(lines::Vector{T}) where T<:AbstractString
+    # https://stackoverflow.com/a/66912887
+    if .|(all(occursin.(r"/\s*[,;]*\s*$",lines)), occursin(r"^\s*/.*/\s*[,;]*\s*$", lines[end]))
+        lines = strip.(match(r"(.*)/(.*)/", string(lines...)).captures)
+        lines = [lines[1]; SLiDE._split_gams(lines[2], ",\\s*")]
+    end
+
+    lines = SLiDE._clean_gams.(lines)
+    return lines[.!isempty.(lines)]
+end
+
+
+"""
+    _get_gams_set(lines, id)
+Given `lines` from a GAMS file, extract the set with the name `id`.
+
+```jldoctest
+rows = [
+    "sets",
+    "  reg Census Regions / mid,nor,sou,wes /,",
+    "  div Census Divisions / enc,esc,mat,mnt,nen,pac,sat,wnc,wsc /;",
+    "set rmap(reg,div) Census Region and Division mapping /",
+    "  mid.(enc,wnc) Midwest,",
+    "  nor.(mat,nen) Northeast,",
+    "  wes.(mnt,pac) West,",
+    "  sou.(esc,sat,wsc) South /;",
+];
+
+julia> SLiDE._get_gams_set(rows, "rmap")
+5-element Array{String,1}:
+ "rmap(reg,div) Census Region and Division mapping"
+ "mid.(enc,wnc) Midwest"
+ "nor.(mat,nen) Northeast"
+ "wes.(mnt,pac) West"
+ "sou.(esc,sat,wsc) South"
+
+julia> SLiDE._get_gams_set(rows, "reg")
+5-element Array{String,1}:
+ "reg Census Regions"
+ "mid"
+ "nor"
+ "sou"
+ "wes"
+```
+"""
+function _get_gams_set(lines::Vector{T}, id) where T<:AbstractString
+    isempty(id) && (return lines)
+    sets = SLiDE._get_gams_sets(lines)
+    ii = occursin.(Regex("^$id"), getindex.(sets,1))
+    !any(ii) && @error("Set $id not found.")
+    return first(sets[ii])
+end
+
+
+"""
+    _get_gams_sets(lines::Vector{String})
+Given lines from a GAMS file, this function extracts all sets, first by looking for lines
+beginning with `set(s)` until those ending with `;`, and then by checking for multiple sets
+within those lines (beginning and ending with '()').
+
+# Returns
+- `sets::Vector{Vector{String}}` extracted from the input `lines`. Each set is ``cleaned''
+    (using `SLiDE._clean_gams`), to remove the label `set(s)` and extraneous characters
+    (`/`,`,`,`;`,spaces). Comma-separated sets defined on one line, such as `/ gas, cru /`,
+    are expanded such that each set element has its own line.
+
+# Example
+
+```jldoctest
+julia> rows = [
+    "sets",
+    "  reg Census Regions / mid,nor,sou,wes /,",
+    "  div Census Divisions / enc,esc,mat,mnt,nen,pac,sat,wnc,wsc /;",
+    "set rmap(reg,div) Census Region and Division mapping /",
+    "  mid.(enc,wnc) Midwest,",
+    "  nor.(mat,nen) Northeast,",
+    "  wes.(mnt,pac) West,",
+    "  sou.(esc,sat,wsc) South /;",
+];
+
+julia> SLiDE._get_gams_sets(rows)
+3-element Array{Array{String,1},1}:
+ ["reg Census Regions", "mid", "nor", "sou", "wes"]
+ ["div Census Divisions", "enc", "esc", "mat", "mnt", "nen", "pac", "sat", "wnc", "wsc"]
+ ["rmap(reg,div) Census Region and Division mapping", "mid.(enc,wnc) Midwest", "nor.(mat,nen) Northeast", "wes.(mnt,pac) West", "sou.(esc,sat,wsc) South"]
+```
+"""
+function _get_gams_sets(lines)
+    sets = SLiDE._groupby(lines, r"^\s*sets*", r";\s*$")
+    sets = vcat(SLiDE._groupby.(sets,'/')...)
+    return SLiDE._expand_gams_set.(sets)
 end
 
 
 """
 """
-function _expand_set(x)
-    m = match(r"^\((.*)\)$", x)
-    x = (m !== nothing) ? string.(strip.(split(m[1], ","))) : string(x)
-    return x
+function _clean_gams(lines::Vector{T}) where T<:AbstractString
+    return lines[.&(.!occursin.(r"^\s*\*", lines), .!occursin.(r"^\s*$", lines))]
+end
+
+function _clean_gams(x::T) where T<:AbstractString
+    return reduce(replace, [
+        "!",
+        r"\"",
+        r"\s*/*\s*[,;]*$",
+        r"^sets*\s*",r"^SETS*\s*",
+    ] .=> "", init = strip(x))
+end
+
+
+"""
+"""
+function _gams_header(str, N; id="", colnames=[])
+    !isempty(colnames) && (return colnames)
+
+    # If no set is defined here...
+    tmp = SLiDE._generate_id(N)
+    !SLiDE._has_set(str, id) && (return tmp)
+
+    xset = match(r"(\(\S*\))", lowercase(str))
+    cols = Symbol.(ensurearray(isnothing(xset) ? id : SLiDE._expand_gams_set(getindex(xset,1))))
+
+    # Replace any implicitly named sets (labeled *) with x.
+    iiundef = (1:length(cols))[cols.==Symbol(*)]
+    cols[iiundef] .= tmp[iiundef]
+
+    return length(cols)==N-1 ? [cols;:desc] : cols
+end
+
+# ----- TXT FILE SUPPORT -------------------------------------------------------------------
+
+"""
+"""
+function _read_txt(path; kwargs...)
+    mat = DelimitedFiles.readdlm(path, String)
+    head = _txt_header(size(mat,2); kwargs...)
+    return DataFrame(mat, head)
+end
+
+
+function _txt_header(N::Integer; colnames=[], kwargs...)
+    tmp = SLiDE._generate_id(N)
+    return |(isempty(colnames), N>length(colnames)) ? tmp : colnames[1:N]
+end
+
+
+# ----- UNNESTING --------------------------------------------------------------------------
+
+"""
+    unnest(rows::Vector, brackets::String)
+This function returns the rows, ``unnesting'' rows enclosed by the `brackets`. The process
+assumes that the row containing the open bracket contains aggregate-level information that
+applies to all rows below it until the closed bracket.
+
+```jldoctest
+julia> rows = [
+    ["wes", "(", "West"],
+    ["mnt", "Mountain"],
+    ["pac", "Pacific"],
+    [")"],
+]
+
+julia> SLiDE.unnest(rows, "()")
+2-element Array{Array{String,1},1}:
+ ["wes", "West", "mnt", "Mountain"]
+ ["wes", "West", "pac", "Pacific"]
+```
+
+
+    unnest(rows::Vector)
+This function returns the rows, expanding any vectors within each row so that each element
+maps to the remaining row contents.
+
+```jldoctest
+julia> rows = [
+           ["nor", "mat", "Northeast"],
+           ["nor", "nen", "Northeast"],
+           ["wes", ["mnt", "pac"], "West"],
+       ];
+
+julia> SLiDE.unnest(rows)
+4-element Array{Array{Any,1},1}:
+ ["nor", "mat", "Northeast"]
+ ["nor", "nen", "Northeast"]
+ ["wes", "mnt", "West"]
+ ["wes", "pac", "West"]
+```
+"""
+function unnest(lines, id::String; fun=identity, kwargs...)
+    N = size(lines,1)
+    
+    # Find mis-matched braces. Groups begin where 
+    iibeg = (1:N)[.&(any.(broadcast.(in, id[1], lines)), .!any.(broadcast.(in, id[2], lines)))]
+    iiend = (1:N)[.&(any.(broadcast.(in, id[2], lines)), .!any.(broadcast.(in, id[1], lines)))]
+    
+    if .&(.!isempty.([iibeg,iiend])...)
+        iiunit = setdiff(1:N, UnitRange.(iibeg,iiend)...)  # all mapping contained to current row
+        iiagg = iibeg                           # outer nesting level
+        iidis = UnitRange.(iibeg.+1,iiend.-1)   # inner nesting level
+
+        ids = string.(split(id,""))
+        filter!.(x -> !(x in ids), lines)
+
+        lines[iiagg] .= _rpad!(lines[iiagg], "")
+        lines[vcat(iidis...)] .= _rpad!(lines[vcat(iidis...)], "")
+
+        lines = vcat(
+            lines[iiunit],
+            SLiDE._unnest(lines, iiagg, iidis),
+        )
+    end
+
+    return lines
+end
+
+
+function unnest(rows)
+    isarr = [typeof.(row).<:AbstractArray for row in rows]
+    iinested = any.(isarr)
+    
+    if any(iinested)
+        rows = vcat(
+            vcat(SLiDE._unnest.(rows[iinested])...),
+            rows[.!iinested],
+        )
+        # Find the index of the first unnested column. Sort by this column.
+        jjunnested = findmin(vcat(sum.(eachcol(isarr[iinested]))...))[2]
+        rows = rows[sortperm(getindex.(rows, jjunnested))]
+    end
+    return rows
+end
+
+
+"""
+    _unnest(row)
+
+```jldoctest
+julia> row = ["wes", ["mnt", "pac"], "West"];
+
+julia> SLiDE._unnest(row)
+2-element Array{Array{String,1},1}:
+ ["wes", "mnt", "West"]
+ ["wes", "pac", "West"]
+```
+
+
+    _unnest(rows, iiagg, iidis)
+
+```jldoctest
+julia> rows = [
+    ["mid", "Midwest"],
+    ["enc", "East North Central"],
+    ["wnc", "West North Central"],
+    ["wes", "West"],
+    ["mnt", "Mountain"],
+    ["pac", "Pacific"],
+]
+
+julia> SLiDE._unnest(rows, 4, 5:6)
+2-element Array{Array{String,1},1}:
+ ["wes", "West", "mnt", "Mountain"]
+ ["wes", "West", "pac", "Pacific"]
+
+julia> SLiDE._unnest(rows, [1,4], [2:3,5:6])
+4-element Array{Array{Any,1},1}:
+ ["mid", "Midwest", "enc", "East North Central"]
+ ["mid", "Midwest", "wnc", "West North Central"]
+ ["wes", "West", "mnt", "Mountain"]
+ ["wes", "West", "pac", "Pacific"]
+```
+"""
+function _unnest(row::Vector{T}) where T<:Any
+    iidis = typeof.(row).<:AbstractArray
+    
+    if any(iidis)
+        row_dis = row[iidis][1]
+        row_agg = convert_type.(typeof.(row[.!iidis]), row[.!iidis])
+
+        # Keep track of which row elements are inner/outer to preserve ordering.
+        # This is necessary for concatenation later.
+        idx = fill(0,size(row))
+        idx[iidis] .= collect((1:sum(iidis)).+length(row_agg))
+        idx[.!iidis] .= 1:length(row_agg)
+        
+        row = _unnest(row_agg, row_dis)
+        row = [permute!(x,idx) for x in row]
+    end
+    
+    return row
+end
+
+function _unnest(rows::AbstractVector, iiagg::Vector{Int}, iidis::Vector{UnitRange{Int}})
+    return vcat([_unnest(rows,aa,dd) for (aa,dd) in zip(iiagg,iidis)]...)
+end
+
+function _unnest(rows::AbstractVector, iiagg::Int, iidis::UnitRange{Int})
+    row_agg = rows[iiagg]
+    row_dis = rows[iidis]
+    return _unnest(row_agg, row_dis)
+end
+
+_unnest(row_outer, row_inner) = [vcat(row_outer,x) for x in row_inner]
+
+
+"""
+    _rpad!(lsts::Vector{Vector{T}}, x) where T<:Any
+This function adds `x` to the end of each list within `lsts` such that all lists are the
+length of the longest list in `lst`.
+
+```jldoctest
+julia> SLiDE._rpad!([["a","b"],["c"]], "")
+2-element Array{Array{String,1},1}:
+ ["a", "b"]
+ ["c", ""]
+```
+
+
+    _rpad(lst::Vector{T}, N::Int, x) where T<:Any
+This function adds `x` to the end of `lst` to make it length `N`.
+
+```jldoctest
+julia> SLiDE._rpad(["a","b"], 3, "")
+3-element Array{String,1}:
+ "a"
+ "b"
+ ""
+```
+"""
+function _rpad!(lst, x)
+    len = length.(lst)
+    return if SLiDE.nunique(len)>1
+        maxlen = maximum(len)
+        [lst[ii] = _rpad(lst[ii], maxlen, x) for ii in 1:length(lst)]
+    else
+        lst
+    end
+end
+
+
+function _rpad(lst, len::Int, x)
+    return length(lst)<len ? vcat(lst, fill(x, len-length(lst))) : lst
 end
 
 
@@ -261,13 +852,13 @@ This function reads information as specified by the path argument.
 """
 function read_from(path::String; ext=".csv", run_bash::Bool=false)
     d = if any(occursin.([".yml",".yaml"], path))
-        _read_from_yaml(path; run_bash=run_bash)
+        SLiDE._read_from_yaml(path; run_bash=run_bash)
     elseif isdir(path)
-        _read_from_dir(path; ext=ext, run_bash=run_bash)
+        SLiDE._read_from_dir(path; ext=ext, run_bash=run_bash)
     else
         @error("Cannot read from $path. Function input must point to an existing directory or yaml file.")
     end
-    return d
+    return Dict{Any,Any}(d)
 end
 
 
@@ -328,14 +919,14 @@ function _read_from_yaml(path::String; run_bash::Bool=false)
     y = read_file(path)
 
     # If the yaml file includes the key "Path", this indicates that the yaml file 
-    if "Path" in keys(y)
+    if haskey(y, "Path")
         # Look for shell scripts in this path, and run them if they are there.
         # If none are found, nothing will happen.
         run_bash && _run_bash(joinpath(SLIDE_DIR, ensurearray(y["Path"])...))
         
         files = ensurearray(values(find_oftype(y, File)))
-        inp = "Input" in keys(y) ? y["Input"] : files
-        d = _read_from_yaml(y["Path"], inp)
+        inp = haskey(y, "Input") ? y["Input"] : files
+        d = _read_from_yaml(_joinpath(y["Path"]), inp)
         d = _edit_from_yaml(d, y, inp)
     else
         inp = ensurearray(values(find_oftype(y, CGE)))
@@ -345,18 +936,19 @@ function _read_from_yaml(path::String; run_bash::Bool=false)
 end
 
 function _read_from_yaml(path::String, files::Dict)
-    path = joinpath(SLIDE_DIR, path)
-    d = Dict(_inp_key(k) => read_file(joinpath(path, f)) for (k, f) in files)
+    # needs to be a dictionary of paths.
+    path = _joinpath(SLIDE_DIR, path)
+    d = Dict(_inp_key(k) => read_file(_joinpath(path, f)) for (k, f) in files)
     return _delete_empty!(d)
 end
 
 function _read_from_yaml(path::String, files::Array{T,1}) where {T <: File}
-    path = joinpath(SLIDE_DIR, path)
-    d = Dict(_inp_key(f) => read_file(path, f) for f in files)
+    path = _joinpath(SLIDE_DIR, path)
+    d = Dict(_inp_key(f) => read_file(path,f) for f in files)
     return _delete_empty!(d)
 end
 
-_read_from_yaml(path::Array{String,1}, file::Any) = _read_from_yaml(joinpath(path...), file)
+# _read_from_yaml(path::Array{String,1}, file::Any) = _read_from_yaml(joinpath(path...), file)
 _read_from_yaml(lst::Array{Parameter,1}) = _delete_empty!(Dict(_inp_key(x) => x for x in lst))
 
 
