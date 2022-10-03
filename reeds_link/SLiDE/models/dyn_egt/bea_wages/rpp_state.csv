@@ -1,0 +1,267 @@
+"SARPP Regional Price Parities by state"
+"(index)" 
+"Bureau of Economic Analysis" 
+"State or DC"
+"GeoFips","GeoName","LineCode","Description","2017"
+"00000","United States","1","RPPs: All items",100.000
+"00000","United States","2","  RPPs: Goods",99.630
+"00000","United States","3","  RPPs: Services: Housing",100.301
+"00000","United States","4","  RPPs: Services: Utilities",98.240
+"00000","United States","5","  RPPs: Services: Other",100.226
+"01000","Alabama","1","RPPs: All items",90.296
+"01000","Alabama","2","  RPPs: Goods",95.558
+"01000","Alabama","3","  RPPs: Services: Housing",60.664
+"01000","Alabama","4","  RPPs: Services: Utilities",113.532
+"01000","Alabama","5","  RPPs: Services: Other",99.158
+"02000","Alaska","1","RPPs: All items",106.041
+"02000","Alaska","2","  RPPs: Goods",107.907
+"02000","Alaska","3","  RPPs: Services: Housing",119.538
+"02000","Alaska","4","  RPPs: Services: Utilities",116.067
+"02000","Alaska","5","  RPPs: Services: Other",101.834
+"04000","Arizona","1","RPPs: All items",98.072
+"04000","Arizona","2","  RPPs: Goods",97.373
+"04000","Arizona","3","  RPPs: Services: Housing",94.235
+"04000","Arizona","4","  RPPs: Services: Utilities",106.504
+"04000","Arizona","5","  RPPs: Services: Other",99.415
+"05000","Arkansas","1","RPPs: All items",89.108
+"05000","Arkansas","2","  RPPs: Goods",94.602
+"05000","Arkansas","3","  RPPs: Services: Housing",58.422
+"05000","Arkansas","4","  RPPs: Services: Utilities",104.954
+"05000","Arkansas","5","  RPPs: Services: Other",98.366
+"06000","California","1","RPPs: All items",109.765
+"06000","California","2","  RPPs: Goods",104.287
+"06000","California","3","  RPPs: Services: Housing",158.475
+"06000","California","4","  RPPs: Services: Utilities",94.240
+"06000","California","5","  RPPs: Services: Other",103.265
+"08000","Colorado","1","RPPs: All items",102.695
+"08000","Colorado","2","  RPPs: Goods",99.667
+"08000","Colorado","3","  RPPs: Services: Housing",126.846
+"08000","Colorado","4","  RPPs: Services: Utilities",85.539
+"08000","Colorado","5","  RPPs: Services: Other",98.720
+"09000","Connecticut","1","RPPs: All items",106.330
+"09000","Connecticut","2","  RPPs: Goods",104.428
+"09000","Connecticut","3","  RPPs: Services: Housing",120.879
+"09000","Connecticut","4","  RPPs: Services: Utilities",99.941
+"09000","Connecticut","5","  RPPs: Services: Other",104.191
+"10000","Delaware","1","RPPs: All items",98.399
+"10000","Delaware","2","  RPPs: Goods",96.294
+"10000","Delaware","3","  RPPs: Services: Housing",93.568
+"10000","Delaware","4","  RPPs: Services: Utilities",103.195
+"10000","Delaware","5","  RPPs: Services: Other",101.100
+"11000","District of Columbia","1","RPPs: All items",109.386
+"11000","District of Columbia","2","  RPPs: Goods",104.825
+"11000","District of Columbia","3","  RPPs: Services: Housing",170.946
+"11000","District of Columbia","4","  RPPs: Services: Utilities",89.668
+"11000","District of Columbia","5","  RPPs: Services: Other",102.727
+"12000","Florida","1","RPPs: All items",101.291
+"12000","Florida","2","  RPPs: Goods",98.506
+"12000","Florida","3","  RPPs: Services: Housing",111.803
+"12000","Florida","4","  RPPs: Services: Utilities",93.684
+"12000","Florida","5","  RPPs: Services: Other",100.096
+"13000","Georgia","1","RPPs: All items",95.606
+"13000","Georgia","2","  RPPs: Goods",97.139
+"13000","Georgia","3","  RPPs: Services: Housing",82.534
+"13000","Georgia","4","  RPPs: Services: Utilities",106.851
+"13000","Georgia","5","  RPPs: Services: Other",98.614
+"15000","Hawaii","1","RPPs: All items",110.030
+"15000","Hawaii","2","  RPPs: Goods",112.374
+"15000","Hawaii","3","  RPPs: Services: Housing",155.062
+"15000","Hawaii","4","  RPPs: Services: Utilities",103.313
+"15000","Hawaii","5","  RPPs: Services: Other",98.077
+"16000","Idaho","1","RPPs: All items",94.908
+"16000","Idaho","2","  RPPs: Goods",101.161
+"16000","Idaho","3","  RPPs: Services: Housing",75.163
+"16000","Idaho","4","  RPPs: Services: Utilities",84.696
+"16000","Idaho","5","  RPPs: Services: Other",99.611
+"17000","Illinois","1","RPPs: All items",100.488
+"17000","Illinois","2","  RPPs: Goods",100.165
+"17000","Illinois","3","  RPPs: Services: Housing",99.675
+"17000","Illinois","4","  RPPs: Services: Utilities",94.309
+"17000","Illinois","5","  RPPs: Services: Other",101.195
+"18000","Indiana","1","RPPs: All items",91.559
+"18000","Indiana","2","  RPPs: Goods",96.164
+"18000","Indiana","3","  RPPs: Services: Housing",74.003
+"18000","Indiana","4","  RPPs: Services: Utilities",102.917
+"18000","Indiana","5","  RPPs: Services: Other",94.151
+"19000","Iowa","1","RPPs: All items",89.516
+"19000","Iowa","2","  RPPs: Goods",95.089
+"19000","Iowa","3","  RPPs: Services: Housing",72.765
+"19000","Iowa","4","  RPPs: Services: Utilities",95.100
+"19000","Iowa","5","  RPPs: Services: Other",91.429
+"20000","Kansas","1","RPPs: All items",92.094
+"20000","Kansas","2","  RPPs: Goods",96.027
+"20000","Kansas","3","  RPPs: Services: Housing",73.719
+"20000","Kansas","4","  RPPs: Services: Utilities",113.661
+"20000","Kansas","5","  RPPs: Services: Other",94.874
+"21000","Kentucky","1","RPPs: All items",90.211
+"21000","Kentucky","2","  RPPs: Goods",94.732
+"21000","Kentucky","3","  RPPs: Services: Housing",63.301
+"21000","Kentucky","4","  RPPs: Services: Utilities",101.376
+"21000","Kentucky","5","  RPPs: Services: Other",97.476
+"22000","Louisiana","1","RPPs: All items",93.476
+"22000","Louisiana","2","  RPPs: Goods",95.991
+"22000","Louisiana","3","  RPPs: Services: Housing",73.101
+"22000","Louisiana","4","  RPPs: Services: Utilities",99.323
+"22000","Louisiana","5","  RPPs: Services: Other",99.269
+"23000","Maine","1","RPPs: All items",96.547
+"23000","Maine","2","  RPPs: Goods",100.379
+"23000","Maine","3","  RPPs: Services: Housing",81.073
+"23000","Maine","4","  RPPs: Services: Utilities",64.049
+"23000","Maine","5","  RPPs: Services: Other",102.120
+"24000","Maryland","1","RPPs: All items",106.662
+"24000","Maryland","2","  RPPs: Goods",102.246
+"24000","Maryland","3","  RPPs: Services: Housing",127.882
+"24000","Maryland","4","  RPPs: Services: Utilities",102.390
+"24000","Maryland","5","  RPPs: Services: Other",103.689
+"25000","Massachusetts","1","RPPs: All items",106.209
+"25000","Massachusetts","2","  RPPs: Goods",104.039
+"25000","Massachusetts","3","  RPPs: Services: Housing",129.033
+"25000","Massachusetts","4","  RPPs: Services: Utilities",93.008
+"25000","Massachusetts","5","  RPPs: Services: Other",102.946
+"26000","Michigan","1","RPPs: All items",92.546
+"26000","Michigan","2","  RPPs: Goods",97.350
+"26000","Michigan","3","  RPPs: Services: Housing",81.457
+"26000","Michigan","4","  RPPs: Services: Utilities",96.534
+"26000","Michigan","5","  RPPs: Services: Other",93.180
+"27000","Minnesota","1","RPPs: All items",96.643
+"27000","Minnesota","2","  RPPs: Goods",100.158
+"27000","Minnesota","3","  RPPs: Services: Housing",95.454
+"27000","Minnesota","4","  RPPs: Services: Utilities",86.783
+"27000","Minnesota","5","  RPPs: Services: Other",95.531
+"28000","Mississippi","1","RPPs: All items",88.134
+"28000","Mississippi","2","  RPPs: Goods",93.909
+"28000","Mississippi","3","  RPPs: Services: Housing",59.012
+"28000","Mississippi","4","  RPPs: Services: Utilities",104.901
+"28000","Mississippi","5","  RPPs: Services: Other",97.045
+"29000","Missouri","1","RPPs: All items",92.466
+"29000","Missouri","2","  RPPs: Goods",96.352
+"29000","Missouri","3","  RPPs: Services: Housing",71.843
+"29000","Missouri","4","  RPPs: Services: Utilities",106.206
+"29000","Missouri","5","  RPPs: Services: Other",96.463
+"30000","Montana","1","RPPs: All items",95.501
+"30000","Montana","2","  RPPs: Goods",101.901
+"30000","Montana","3","  RPPs: Services: Housing",76.208
+"30000","Montana","4","  RPPs: Services: Utilities",83.755
+"30000","Montana","5","  RPPs: Services: Other",99.330
+"31000","Nebraska","1","RPPs: All items",90.838
+"31000","Nebraska","2","  RPPs: Goods",95.384
+"31000","Nebraska","3","  RPPs: Services: Housing",75.138
+"31000","Nebraska","4","  RPPs: Services: Utilities",105.023
+"31000","Nebraska","5","  RPPs: Services: Other",92.471
+"32000","Nevada","1","RPPs: All items",100.221
+"32000","Nevada","2","  RPPs: Goods",99.691
+"32000","Nevada","3","  RPPs: Services: Housing",100.049
+"32000","Nevada","4","  RPPs: Services: Utilities",98.779
+"32000","Nevada","5","  RPPs: Services: Other",100.738
+"33000","New Hampshire","1","RPPs: All items",104.205
+"33000","New Hampshire","2","  RPPs: Goods",101.998
+"33000","New Hampshire","3","  RPPs: Services: Housing",116.166
+"33000","New Hampshire","4","  RPPs: Services: Utilities",84.680
+"33000","New Hampshire","5","  RPPs: Services: Other",103.160
+"34000","New Jersey","1","RPPs: All items",109.230
+"34000","New Jersey","2","  RPPs: Goods",101.618
+"34000","New Jersey","3","  RPPs: Services: Housing",141.406
+"34000","New Jersey","4","  RPPs: Services: Utilities",104.358
+"34000","New Jersey","5","  RPPs: Services: Other",106.535
+"35000","New Mexico","1","RPPs: All items",95.598
+"35000","New Mexico","2","  RPPs: Goods",100.869
+"35000","New Mexico","3","  RPPs: Services: Housing",77.572
+"35000","New Mexico","4","  RPPs: Services: Utilities",91.295
+"35000","New Mexico","5","  RPPs: Services: Other",99.607
+"36000","New York","1","RPPs: All items",109.755
+"36000","New York","2","  RPPs: Goods",108.070
+"36000","New York","3","  RPPs: Services: Housing",136.084
+"36000","New York","4","  RPPs: Services: Utilities",95.759
+"36000","New York","5","  RPPs: Services: Other",105.287
+"37000","North Carolina","1","RPPs: All items",93.681
+"37000","North Carolina","2","  RPPs: Goods",95.798
+"37000","North Carolina","3","  RPPs: Services: Housing",76.333
+"37000","North Carolina","4","  RPPs: Services: Utilities",97.749
+"37000","North Carolina","5","  RPPs: Services: Other",99.000
+"38000","North Dakota","1","RPPs: All items",90.005
+"38000","North Dakota","2","  RPPs: Goods",94.963
+"38000","North Dakota","3","  RPPs: Services: Housing",77.861
+"38000","North Dakota","4","  RPPs: Services: Utilities",84.065
+"38000","North Dakota","5","  RPPs: Services: Other",91.154
+"39000","Ohio","1","RPPs: All items",91.983
+"39000","Ohio","2","  RPPs: Goods",95.462
+"39000","Ohio","3","  RPPs: Services: Housing",74.433
+"39000","Ohio","4","  RPPs: Services: Utilities",95.308
+"39000","Ohio","5","  RPPs: Services: Other",95.444
+"40000","Oklahoma","1","RPPs: All items",91.662
+"40000","Oklahoma","2","  RPPs: Goods",95.702
+"40000","Oklahoma","3","  RPPs: Services: Housing",66.286
+"40000","Oklahoma","4","  RPPs: Services: Utilities",108.999
+"40000","Oklahoma","5","  RPPs: Services: Other",98.734
+"41000","Oregon","1","RPPs: All items",101.032
+"41000","Oregon","2","  RPPs: Goods",100.280
+"41000","Oregon","3","  RPPs: Services: Housing",107.288
+"41000","Oregon","4","  RPPs: Services: Utilities",94.435
+"41000","Oregon","5","  RPPs: Services: Other",99.925
+"42000","Pennsylvania","1","RPPs: All items",98.982
+"42000","Pennsylvania","2","  RPPs: Goods",99.969
+"42000","Pennsylvania","3","  RPPs: Services: Housing",89.000
+"42000","Pennsylvania","4","  RPPs: Services: Utilities",97.174
+"42000","Pennsylvania","5","  RPPs: Services: Other",101.506
+"44000","Rhode Island","1","RPPs: All items",100.932
+"44000","Rhode Island","2","  RPPs: Goods",99.620
+"44000","Rhode Island","3","  RPPs: Services: Housing",101.589
+"44000","Rhode Island","4","  RPPs: Services: Utilities",92.079
+"44000","Rhode Island","5","  RPPs: Services: Other",101.895
+"45000","South Carolina","1","RPPs: All items",93.512
+"45000","South Carolina","2","  RPPs: Goods",95.745
+"45000","South Carolina","3","  RPPs: Services: Housing",75.346
+"45000","South Carolina","4","  RPPs: Services: Utilities",106.581
+"45000","South Carolina","5","  RPPs: Services: Other",99.148
+"46000","South Dakota","1","RPPs: All items",88.701
+"46000","South Dakota","2","  RPPs: Goods",94.867
+"46000","South Dakota","3","  RPPs: Services: Housing",68.473
+"46000","South Dakota","4","  RPPs: Services: Utilities",95.244
+"46000","South Dakota","5","  RPPs: Services: Other",91.386
+"47000","Tennessee","1","RPPs: All items",93.544
+"47000","Tennessee","2","  RPPs: Goods",95.700
+"47000","Tennessee","3","  RPPs: Services: Housing",74.805
+"47000","Tennessee","4","  RPPs: Services: Utilities",100.065
+"47000","Tennessee","5","  RPPs: Services: Other",99.072
+"48000","Texas","1","RPPs: All items",97.880
+"48000","Texas","2","  RPPs: Goods",97.184
+"48000","Texas","3","  RPPs: Services: Housing",94.888
+"48000","Texas","4","  RPPs: Services: Utilities",108.021
+"48000","Texas","5","  RPPs: Services: Other",98.805
+"49000","Utah","1","RPPs: All items",98.853
+"49000","Utah","2","  RPPs: Goods",99.193
+"49000","Utah","3","  RPPs: Services: Housing",95.709
+"49000","Utah","4","  RPPs: Services: Utilities",88.298
+"49000","Utah","5","  RPPs: Services: Other",100.327
+"50000","Vermont","1","RPPs: All items",100.638
+"50000","Vermont","2","  RPPs: Goods",99.760
+"50000","Vermont","3","  RPPs: Services: Housing",100.921
+"50000","Vermont","4","  RPPs: Services: Utilities",78.949
+"50000","Vermont","5","  RPPs: Services: Other",102.068
+"51000","Virginia","1","RPPs: All items",101.362
+"51000","Virginia","2","  RPPs: Goods",98.888
+"51000","Virginia","3","  RPPs: Services: Housing",109.049
+"51000","Virginia","4","  RPPs: Services: Utilities",99.042
+"51000","Virginia","5","  RPPs: Services: Other",100.735
+"53000","Washington","1","RPPs: All items",107.048
+"53000","Washington","2","  RPPs: Goods",105.691
+"53000","Washington","3","  RPPs: Services: Housing",121.774
+"53000","Washington","4","  RPPs: Services: Utilities",96.215
+"53000","Washington","5","  RPPs: Services: Other",104.360
+"54000","West Virginia","1","RPPs: All items",89.066
+"54000","West Virginia","2","  RPPs: Goods",94.516
+"54000","West Virginia","3","  RPPs: Services: Housing",58.178
+"54000","West Virginia","4","  RPPs: Services: Utilities",100.899
+"54000","West Virginia","5","  RPPs: Services: Other",97.866
+"55000","Wisconsin","1","RPPs: All items",93.222
+"55000","Wisconsin","2","  RPPs: Goods",97.608
+"55000","Wisconsin","3","  RPPs: Services: Housing",81.460
+"55000","Wisconsin","4","  RPPs: Services: Utilities",89.847
+"55000","Wisconsin","5","  RPPs: Services: Other",94.640
+"56000","Wyoming","1","RPPs: All items",97.468
+"56000","Wyoming","2","  RPPs: Goods",102.132
+"56000","Wyoming","3","  RPPs: Services: Housing",82.994
+"56000","Wyoming","4","  RPPs: Services: Utilities",98.335
+"56000","Wyoming","5","  RPPs: Services: Other",99.939
+"Legend / Footnotes:"
+"Last updated: December 14, 2021-- new statistics for 2020; revised statistics for 2008-2019."

@@ -1,0 +1,112 @@
+"Table 6.6D. Wages and Salaries Per Full-Time Equivalent Employee by Industry"
+"[Dollars]" 
+"Bureau of Economic Analysis" 
+"Last Revised on: July 30, 2021"
+"Line","","2013","2014","2015","2016","2017","2018","2019","2020"
+"","","","","","","","","",""
+"1","            Wages and salaries per full-time equivalent employee",56667,58350,59993,60826,62721,64685,66781,71456
+"2","Domestic industries",56258,57883,59500,60273,62126,64091,66168,70982
+"3","    Private industries",55439,57174,58733,59520,61429,63396,65459,70369
+"4","        Agriculture, forestry, fishing, and hunting",34013,34551,32936,35479,37114,36661,37562,38338
+"5","            Farms1",35144,35127,32402,33990,35941,34061,34310,33303
+"6","            Forestry, fishing, and related activities",32454,33756,33630,37507,38703,40137,41880,45278
+"7","        Mining",99877,104672,105540,105300,104145,106346,110654,113400
+"8","            Oil and gas extraction",157305,167552,168594,165479,168544,173134,184732,190440
+"9","            Mining, except oil and gas",74111,75748,76373,75935,78150,80860,83278,83538
+"10","            Support activities for mining",85294,89477,87072,84722,88834,92558,95157,94434
+"11","        Utilities",98795,101281,104941,106005,110850,113857,117200,120925
+"12","        Construction",55992,57770,59692,61374,63439,65488,67530,70420
+"13","        Manufacturing",63544,65495,66839,67608,69446,71322,72709,76391
+"14","            Durable goods",66808,68805,70038,71155,73637,75661,77022,80486
+"15","                Wood products",41330,42765,44710,45003,46687,48171,49892,52546
+"16","                Nonmetallic mineral products",53724,55516,57165,58378,60091,61200,62558,65893
+"17","                Primary metals",64342,66722,66640,67330,70862,73581,73638,74068
+"18","                Fabricated metal products",53755,55528,56030,56921,58795,60275,61066,63016
+"19","                Machinery",66593,68746,69897,69671,72436,74158,74962,76685
+"20","                Computer and electronic products",103481,108863,111372,116916,123177,127693,129276,138914
+"21","                Electrical equipment, appliances, and components",65337,66133,66667,67241,69190,70175,72491,75139
+"22","                Motor vehicles, bodies and trailers, and parts",58672,60135,61695,62186,62803,64613,65747,67249
+"23","                Other transportation equipment",86253,89342,90220,90774,93955,96943,97914,99431
+"24","                Furniture and related products",42317,43482,44969,45901,47199,48352,49711,52112
+"25","                Miscellaneous manufacturing",61484,62758,64891,65257,67403,69131,70674,72575
+"26","            Nondurable goods",57975,59799,61358,61639,62492,63958,65364,69526
+"27","                Food and beverage and tobacco products",46616,47928,49457,50279,51198,52376,52919,57549
+"28","                Textile mills and textile product mills",41681,43471,44219,45407,46212,47134,48765,51019
+"29","                Apparel and leather and allied products",39112,41074,41853,43238,44401,45683,47615,50588
+"30","                Paper products",65441,67196,68401,68503,69506,71414,72521,74749
+"31","                Printing and related support activities",47807,48711,49598,50403,51019,52875,53624,55003
+"32","                Petroleum and coal products",108801,110726,115920,115824,115123,119365,123861,124047
+"33","                Chemical products",90970,95402,98475,96586,97112,98816,101794,106654
+"34","                Plastics and rubber products",50529,51450,52524,53749,55054,56191,56969,60349
+"35","        Wholesale trade",72407,74682,77116,77686,79631,81548,84121,88244
+"36","            Durable goods",74402,76546,78929,79765,81844,84060,86662,90245
+"37","            Nondurable goods",69687,72141,74636,74840,76573,78015,80499,85352
+"38","        Retail trade",33506,34406,35429,35854,36856,38194,39490,42908
+"39","            Motor vehicle and parts dealers",53514,55048,56643,57039,57832,59097,60864,65554
+"40","            Food and beverage stores",27024,27420,28015,28272,28908,29709,30649,33415
+"41","            General merchandise stores",26170,26567,26803,27324,28533,29506,30216,32256
+"42","            Other retail2",34272,35341,36629,37007,37956,39607,41038,45473
+"43","        Transportation and warehousing",53364,54817,55941,56593,57905,59652,60647,61666
+"44","            Air transportation",77843,80317,84815,92313,94909,96781,98449,99954
+"45","            Rail transportation",88364,94268,95455,93446,96818,103016,103306,114672
+"46","            Water transportation",84329,87942,90253,89909,92209,95416,96468,101096
+"47","            Truck transportation",48831,50679,52057,52676,54525,57211,58338,60585
+"48","            Transit and ground passenger transportation",33125,34236,35413,37442,40547,44520,51674,49588
+"49","            Pipeline transportation",124309,124963,129658,130880,136721,137285,146037,145784
+"50","            Other transportation and support activities3",51636,52364,52882,53007,53984,55216,55694,57562
+"51","            Warehousing and storage",45603,46375,46642,45893,45659,46457,46818,48340
+"52","        Information",94359,98450,103693,106662,114802,123572,130797,147732
+"53","            Publishing industries (includes software)",112196,117239,126715,130440,143996,158112,168232,185107
+"54","            Motion picture and sound recording industries",73864,81265,80900,77788,80464,84021,84813,106306
+"55","            Broadcasting and telecommunications",82207,83897,86049,88509,90897,93352,98127,105281
+"56","            Information and data processing services",114188,118549,126586,135013,148053,160980,170517,183801
+"57","        Finance and insurance",95450,100814,103640,104883,109541,112314,115470,124106
+"58","            Federal Reserve banks, credit intermediation, and related activities",73261,75652,80159,83113,86194,89422,94859,105338
+"59","            Securities, commodity contracts, and investments",205093,224651,221977,219620,236525,235400,238809,254437
+"60","            Insurance carriers and related activities",80053,82750,85327,86023,88634,91611,93060,98053
+"61","            Funds, trusts, and other financial vehicles",133821,129107,138259,139083,143681,148714,152171,166116
+"62","        Real estate and rental and leasing",54669,57302,59947,60542,62883,65367,67621,71591
+"63","            Real estate",55336,57859,61443,62542,65051,67161,69295,73105
+"64","            Rental and leasing services and lessors of intangible assets4",52859,55784,55889,55105,56973,60343,62806,66537
+"65","        Professional, scientific, and technical services",88827,92154,95472,96414,99320,102689,105958,113114
+"66","            Legal services",90874,93689,96933,99308,102080,105241,108508,114648
+"67","            Computer systems design and related services",106503,110436,113288,115342,119200,124151,129221,138127
+"68","            Miscellaneous professional, scientific, and technical services5",82730,85860,89143,89364,91832,94691,97315,103886
+"69","        Management of companies and enterprises6",117035,123079,125661,122993,127650,130913,137057,138006
+"70","        Administrative and waste management services",39216,40034,41300,42171,43767,45287,47503,51185
+"71","            Administrative and support services",38344,39162,40414,41274,42819,44299,46526,50253
+"72","            Waste management and remediation services",56685,57464,59113,60437,62785,64444,65986,67530
+"73","        Educational services",43909,45182,45730,47196,48043,49457,51116,54420
+"74","        Health care and social assistance",50455,51381,52997,53814,54774,56050,57806,61026
+"75","            Ambulatory health care services",63834,64681,66606,67531,68390,69755,71787,75104
+"76","            Hospitals",60982,62665,64795,65597,67073,68791,70832,73810
+"77","            Nursing and residential care facilities",32062,32676,33842,34574,35365,36538,38055,41726
+"78","            Social assistance",25522,26093,26643,27428,27956,28765,29982,32240
+"79","        Arts, entertainment, and recreation",45145,46244,48287,49321,50484,51385,53076,59328
+"80","            Performing arts, spectator sports, museums, and related activities",83276,85075,89364,92216,94839,96962,100039,119574
+"81","            Amusements, gambling, and recreation industries",30255,30968,32113,32564,33013,33350,34508,36957
+"82","        Accommodation and food services",25896,26868,27727,28711,29748,30982,31939,31121
+"83","            Accommodation",35586,37036,38027,38777,40083,41319,42675,44941
+"84","            Food services and drinking places",23888,24802,25677,26753,27755,28981,29847,28860
+"85","        Other services, except government",39023,39871,41159,42324,44087,45256,46107,50241
+"86","    Government",60642,61751,63809,64512,66103,68087,70304,74434
+"87","        Federal",76263,78367,79875,80724,82932,85765,89077,97817
+"88","            General government",77177,79541,80998,82984,84741,87554,91365,101088
+"89","                Civilian",81697,84937,87182,89293,91991,94979,100984,117676
+"90","                Military7",71015,72017,72182,73849,74259,76827,78200,80655
+"91","            Government enterprises",70157,70623,72727,67089,71380,74178,74372,77647
+"92","        State and local",56467,57429,59617,60319,61804,63602,65642,68791
+"93","            General government",56078,57058,59168,59863,61325,63107,65201,68460
+"94","                Education",54060,54782,56671,57306,58555,60267,63085,67375
+"95","                Other8",58615,59921,62317,63099,64842,66681,67778,69712
+"96","            Government enterprises8",61835,62502,65846,66631,68469,70457,71645,73279
+"97","Rest of the world","---","---","---","---","---","---","---","---"
+"Legend / Footnotes:"
+"1. NAICS crop and animal production."
+"2. Consists of furniture and home furnishings stores; electronics and appliance stores; building material and garden equipment and supplies dealers; health and personal care stores; gasoline stations; clothing and clothing accessories stores; sporting goods, hobby, book, and music stores; miscellaneous store retailers; and nonstore retailers."
+"3. Consists of scenic and sightseeing transportation; transportation support activities; and couriers and messengers."
+"4. Intangible assets include patents, trademarks, and franchise agreements, but not copyrights."
+"5. Consists of accounting, tax preparation, bookkeeping, and payroll services; architectural, engineering, and related services; specialized design services; management, scientific, and technical consulting services; scientific research and development services; advertising and related services; and other professional, scientific, and technical services."
+"6. Consists of offices of bank and other holding companies and of corporate, subsidiary, and regional managing offices."
+"7. Includes Coast Guard."
+"8. Employees of Indian tribal governments are classified in state and local government."

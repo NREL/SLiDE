@@ -1,0 +1,111 @@
+* Oil and natural gas are separated in bluenote.gms.
+
+SET ss "Sectors in the target dataset" /
+		oil	"Petroleum refineries",
+*		cru	"Crude oil extraction",
+*		gas	"Natural gas extraction",
+		cng	"Crude oil and natural gas extraction",
+		col	"Coal mining",
+		ele	"Electric power generation, transmission, and distribution",
+		trn	"Transportation",
+		con	"Construction",
+		eint	"Energy/Emission intensive sectors (embodied carbon > .5 kg per $)",
+		omnf	"Other manufacturing sectors",
+		osrv	"Other services",
+		roe	"Rest of the economy" /;
+
+SET mm "Margins in the target dataset" /
+		trn	"Transport margin",
+		trd	"Retail margin" /;
+
+
+SET smap(ss,s) "Mapping of target sectors ss and source sectors s" /
+		oil.ref_pet 	"Petroleum refineries",
+		cng.oil 	"Oil and natural gas extraction",
+		ele.ele_uti 	"Electricity generation, transmission, and distribution",
+		col.col_min 	"Coal mining",
+		con.con 	"Construction",
+
+		trn.air     	"Air transportation",
+		trn.trn     	"Rail transportation",
+		trn.wtt     	"Water transportation",
+		trn.trk     	"Truck transportation",
+		trn.grd     	"Transit and ground passenger transportation",
+		trn.pip     	"Pipeline transportation",
+		trn.otr     	"Other transportation and support activities",
+
+		eint.uti	"Other utilities",
+		eint.che	"Chemical products",
+		eint.ppd	"Paper products",
+		eint.nmp	"Nonmetallic mineral products",
+		eint.agr	"Farms",
+		eint.pla	"Plastics and rubber products",
+		eint.min	"Other mining",
+		eint.mot	"Motor vehicles, bodies and trailers, and parts manufacturing",
+		eint.pmt 	"Primary metals",
+		eint.fmt	"Fabricated metal products",
+		eint.fbp	"Food and beverage and tobacco products",
+		eint.sec	"Securities, commodity contracts, and investments",
+		eint.eec	"Electrical equipment, appliances, and components",
+		eint.pri	"Printing and related support activities",
+		eint.tex	"Textile mills and textile product mills",
+		eint.mch	"Machinery",
+		eint.wpd	"Wood products",
+
+		omnf.fpd	"Furniture and related products"
+		omnf.ote   	"Other transportation equipment",
+		omnf.mmf   	"Miscellaneous manufacturing",
+		omnf.pet   	"Other petroleum based manufacturing",
+		omnf.smn   	"Support activities for mining",
+		omnf.alt   	"Apparel and leather and allied products",
+		omnf.fof   	"Forestry, fishing, and related activities",
+		omnf.cep   	"Computer and electronic products",
+
+		osrv.ore	"Other real estate",
+		osrv.dat	"Data processing, internet publishing, and other information",
+		osrv.wst	"Waste management and remediation services",
+		osrv.brd	"Broadcasting and telecommunications",
+		osrv.res	"Food services and drinking places",
+		osrv.wrh	"Warehousing and storage",
+		osrv.fin	"Funds, trusts, and other financial vehicles",
+		osrv.rec	"Amusements, gambling, and recreation industries",
+		osrv.edu	"Educational services",
+		osrv.tsv	"Miscellaneous professional, scientific, and technical services",
+		osrv.amd	"Accommodation",
+		osrv.osv	"Other services, except government",
+		osrv.pub	"Publishing industries, except internet (includes software)",
+		osrv.hos	"Hospitals",
+		osrv.adm	"Administrative and support services",
+		osrv.nrs	"Nursing and residential care facilities",
+		osrv.rnt	"Rental and leasing services and lessors of intangible assets",
+		osrv.soc	"Social assistance",
+		osrv.art	"Performing arts, spectator sports, museums, and related activit",
+		osrv.man	"Management of companies and enterprises",
+		osrv.amb	"Ambulatory health care services",
+		osrv.com	"Computer systems design and related services",
+		osrv.bnk	"Federal Reserve banks, credit intermediation, and related activ",
+		osrv.mov	"Motion picture and sound recording industries",
+		osrv.leg	"Legal services",
+		osrv.ins	"Insurance carriers and related activities",
+		osrv.hou	"Housing",
+
+		roe.wht		"Wholesale trade",
+		roe.mvt		"Motor vehicle and parts dealers",
+		roe.fbt		"Food and beverage stores",
+		roe.gmt		"General merchandise stores",
+		roe.ott		"Other retail",
+		roe.fdd		"Federal general government (defense)",
+		roe.fnd		"Federal general government (nondefense)",
+		roe.fen		"Federal government enterprises",
+		roe.slg		"State and local general government",
+		roe.sle		"State and local government enterprises" /;
+
+*	These sectors are dropped in the core build:
+
+*.		roe.use		"Scrap, used and secondhand goods",
+*.		roe.oth		"Noncomparable imports and rest-of-the-world adjustment"
+
+
+SET	mmap(mm,m) "Mapping of target margins mm and source margins m" /
+		trn.trn		"Transport margin",
+		trd.trd		"Retail margin" /;

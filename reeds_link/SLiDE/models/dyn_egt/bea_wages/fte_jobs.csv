@@ -1,0 +1,115 @@
+"Table 6.5D. Full-Time Equivalent Employees by Industry"
+"[Thousands]" 
+"Bureau of Economic Analysis" 
+"Last Revised on: July 30, 2021"
+"Line","","2013","2014","2015","2016","2017","2018","2019","2020"
+"","","","","","","","","",""
+"1","            Full-time equivalent employees1",125540,128130,131007,133022,135118,137598,139614,132167
+"2","Domestic industries",126606,129326,132262,134426,136581,139034,141085,133161
+"3","    Private industries",106686,109296,112269,114150,116189,118451,120457,113082
+"4","        Agriculture, forestry, fishing, and hunting",1167,1187,1239,1219,1220,1219,1222,1197
+"5","            Farms2",676,688,700,703,702,697,697,693
+"6","            Forestry, fishing, and related activities",490,499,539,516,518,522,525,503
+"7","        Mining",797,830,740,600,615,664,663,530
+"8","            Oil and gas extraction",193,197,193,172,143,141,140,124
+"9","            Mining, except oil and gas",207,203,194,177,183,189,188,173
+"10","            Support activities for mining",396,430,353,251,289,334,335,232
+"11","        Utilities",540,544,547,549,547,546,544,541
+"12","        Construction",5754,6043,6378,6640,6892,7176,7430,7151
+"13","        Manufacturing",11742,11917,12075,12039,12180,12389,12524,11840
+"14","            Durable goods",7403,7537,7626,7552,7600,7795,7891,7416
+"15","                Wood products",343,364,370,381,387,398,398,389
+"16","                Nonmetallic mineral products",365,375,389,396,402,411,413,389
+"17","                Primary metals",391,391,386,365,360,371,379,344
+"18","                Fabricated metal products",1399,1427,1429,1386,1386,1432,1453,1348
+"19","                Machinery",1086,1107,1100,1056,1059,1095,1105,1030
+"20","                Computer and electronic products",1048,1033,1042,1033,1029,1039,1059,1047
+"21","                Electrical equipment, appliances, and components",368,373,376,376,383,391,393,375
+"22","                Motor vehicles, bodies and trailers, and parts",810,863,906,934,959,990,987,881
+"23","                Other transportation equipment",681,677,685,674,670,692,726,694
+"24","                Furniture and related products",350,359,370,380,384,384,375,351
+"25","                Miscellaneous manufacturing",561,567,573,571,579,592,603,569
+"26","            Nondurable goods",4339,4380,4450,4487,4580,4594,4633,4423
+"27","                Food and beverage and tobacco products",1599,1626,1674,1719,1789,1812,1843,1789
+"28","                Textile mills and textile product mills",224,224,226,221,222,220,212,190
+"29","                Apparel and leather and allied products",167,162,160,153,145,137,131,109
+"30","                Paper products",367,362,364,361,360,354,359,346
+"31","                Printing and related support activities",443,440,441,438,431,419,412,367
+"32","                Petroleum and coal products",110,110,109,109,112,112,112,108
+"33","                Chemical products",786,791,797,798,815,820,838,832
+"34","                Plastics and rubber products",644,665,680,689,705,720,725,682
+"35","        Wholesale trade",5550,5633,5688,5681,5743,5707,5725,5477
+"36","            Durable goods",3201,3249,3286,3283,3332,3335,3364,3237
+"37","            Nondurable goods",2349,2383,2402,2398,2411,2372,2361,2240
+"38","        Retail trade",13034,13253,13598,13794,13852,13809,13721,13049
+"39","            Motor vehicle and parts dealers",1551,1607,1680,1725,1749,1762,1783,1671
+"40","            Food and beverage stores",2540,2592,2665,2688,2702,2689,2695,2733
+"41","            General merchandise stores",2643,2682,2748,2785,2712,2697,2643,2578
+"42","            Other retail3",6299,6372,6505,6596,6688,6661,6601,6066
+"43","        Transportation and warehousing",4249,4420,4635,4725,4902,5134,5414,5426
+"44","            Air transportation",426,427,439,450,468,477,480,437
+"45","            Rail transportation",188,193,196,179,173,172,166,147
+"46","            Water transportation",63,65,65,62,61,61,63,56
+"47","            Truck transportation",1320,1367,1402,1387,1397,1435,1470,1409
+"48","            Transit and ground passenger transportation",432,451,462,458,462,465,476,350
+"49","            Pipeline transportation",41,44,46,46,47,47,48,48
+"50","            Other transportation and support activities4",1106,1165,1234,1265,1322,1397,1531,1594
+"51","            Warehousing and storage",672,708,791,878,972,1080,1180,1385
+"52","        Information",2533,2569,2576,2632,2613,2628,2642,2534
+"53","            Publishing industries (includes software)",759,778,779,798,803,816,836,866
+"54","            Motion picture and sound recording industries",330,326,349,384,370,368,389,268
+"55","            Broadcasting and telecommunications",1107,1110,1064,1054,1026,1000,963,914
+"56","            Information and data processing services",337,355,384,396,414,444,454,486
+"57","        Finance and insurance",5714,5774,5897,5964,6103,6171,6296,6351
+"58","            Federal Reserve banks, credit intermediation, and related activities",2553,2510,2518,2547,2601,2598,2615,2631
+"59","            Securities, commodity contracts, and investments",841,859,883,893,901,922,929,928
+"60","            Insurance carriers and related activities",2316,2400,2490,2513,2588,2636,2736,2775
+"61","            Funds, trusts, and other financial vehicles",3,6,7,10,12,14,16,18
+"62","        Real estate and rental and leasing",1873,1906,1955,2000,2051,2106,2185,2067
+"63","            Real estate",1369,1394,1429,1462,1501,1552,1621,1590
+"64","            Rental and leasing services and lessors of intangible assets5",504,512,527,538,550,554,564,476
+"65","        Professional, scientific, and technical services",7794,7994,8273,8496,8655,8948,9233,9117
+"66","            Legal services",1088,1074,1077,1084,1095,1104,1120,1096
+"67","            Computer systems design and related services",1626,1705,1821,1891,1958,2034,2108,2113
+"68","            Miscellaneous professional, scientific, and technical services6",5080,5215,5375,5521,5602,5810,6005,5909
+"69","        Management of companies and enterprises7",1978,2004,2071,2130,2182,2243,2258,2263
+"70","        Administrative and waste management services",7607,7901,8183,8322,8459,8615,8671,8005
+"71","            Administrative and support services",7246,7525,7795,7933,8058,8193,8235,7573
+"72","            Waste management and remediation services",362,376,387,389,402,422,435,432
+"73","        Educational services",3043,3083,3153,3205,3278,3336,3368,3182
+"74","        Health care and social assistance",16129,16441,16901,17362,17822,18255,18614,18183
+"75","            Ambulatory health care services",5831,6004,6189,6388,6615,6826,7001,6839
+"76","            Hospitals",4502,4499,4630,4722,4806,4856,4907,4868
+"77","            Nursing and residential care facilities",2925,2968,2978,3038,3037,3079,3067,2937
+"78","            Social assistance",2871,2970,3104,3214,3364,3494,3638,3538
+"79","        Arts, entertainment, and recreation",1689,1784,1800,1866,1910,1993,2040,1466
+"80","            Performing arts, spectator sports, museums, and related activities",474,504,509,524,540,565,578,397
+"81","            Amusements, gambling, and recreation industries",1215,1280,1292,1342,1370,1428,1462,1069
+"82","        Accommodation and food services",9822,10115,10566,10920,11163,11342,11591,9001
+"83","            Accommodation",1686,1709,1753,1778,1804,1839,1890,1266
+"84","            Food services and drinking places",8135,8407,8813,9142,9358,9502,9701,7735
+"85","        Other services, except government",5670,5897,5993,6003,6004,6173,6315,5704
+"86","    Government",19920,20031,19993,20276,20392,20582,20628,20079
+"87","        Federal",4201,4135,4137,4167,4149,4165,4104,3904
+"88","            General government",3654,3590,3576,3574,3588,3608,3552,3359
+"89","                Civilian",2108,2091,2102,2114,2121,2132,2052,1854
+"90","                Military8",1546,1499,1474,1460,1467,1476,1499,1505
+"91","            Government enterprises",547,545,562,592,562,557,552,545
+"92","        State and local",15719,15896,15856,16109,16243,16417,16524,16175
+"93","            General government",14657,14812,14790,15025,15155,15311,15394,15066
+"94","                Education",8166,8252,8250,8392,8477,8531,8454,8066
+"95","                Other9",6491,6560,6540,6633,6678,6780,6940,7000
+"96","            Government enterprises9",1062,1084,1066,1084,1088,1106,1130,1109
+"97","Rest of the world10",-1066,-1196,-1255,-1404,-1463,-1436,-1471,-994
+"Legend / Footnotes:"
+"1. Full-time equivalent employees equals the number of employees on full-time schedules plus the number of employees on part-time schedules converted to a full-time basis. The number of full-time equivalent employees in each industry is the product of the total number of employees and the ratio of average weekly hours per employee for all employees to the average weekly hours per employee on full-time schedules."
+"2. NAICS crop and animal production."
+"3. Consists of furniture and home furnishings stores; electronics and appliance stores; building material and garden equipment and supplies dealers; health and personal care stores; gasoline stations; clothing and clothing accessories stores; sporting goods, hobby, book, and music stores; miscellaneous store retailers; and nonstore retailers."
+"4. Consists of scenic and sightseeing transportation; transportation support activities; and couriers and messengers."
+"5. Intangible assets include patents, trademarks, and franchise agreements, but not copyrights."
+"6. Consists of accounting, tax preparation, bookkeeping, and payroll services; architectural, engineering, and related services; specialized design services; management, scientific, and technical consulting services; scientific research and development services; advertising and related services; and other professional, scientific, and technical services."
+"7. Consists of offices of bank and other holding companies and of corporate, subsidiary, and regional managing offices."
+"8. Includes Coast Guard."
+"9. Employees of Indian tribal governments are classified in state and local government."
+"10. Includes estimates of foreign professional workers and undocumented Mexican migratory workers employed temporarily in the United States."
+"Note. Estimates in this table are based on the 2012 North American Industry Classification System (NAICS)."
